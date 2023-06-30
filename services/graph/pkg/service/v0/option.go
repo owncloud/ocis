@@ -5,6 +5,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -24,7 +25,7 @@ type Options struct {
 	Config                   *config.Config
 	Middleware               []func(http.Handler) http.Handler
 	RequireAdminMiddleware   func(http.Handler) http.Handler
-	GatewayClient            gateway.GatewayAPIClient
+	GatewaySelector          pool.Selectable[gateway.GatewayAPIClient]
 	IdentityBackend          identity.Backend
 	IdentityEducationBackend identity.EducationBackend
 	RoleService              RoleService
@@ -75,10 +76,10 @@ func WithRequireAdminMiddleware(val func(http.Handler) http.Handler) Option {
 	}
 }
 
-// WithGatewayClient provides a function to set the gateway client option.
-func WithGatewayClient(val gateway.GatewayAPIClient) Option {
+// WithGatewaySelector provides a function to set the gateway client option.
+func WithGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.GatewayClient = val
+		o.GatewaySelector = val
 	}
 }
 

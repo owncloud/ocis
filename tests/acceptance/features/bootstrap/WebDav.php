@@ -1184,7 +1184,13 @@ trait WebDav {
 	public function contentOfFileForUserShouldBe(string $fileName, string $user, string $content):void {
 		$user = $this->getActualUsername($user);
 		$this->downloadFileAsUserUsingPassword($user, $fileName);
-		$this->downloadedContentShouldBe($content);
+		$actualStatus = $this->response->getStatusCode();
+		if ($actualStatus !== 200) {
+			throw new Exception(
+				"Expected status code to be '200', but got '$actualStatus'"
+			);
+		}
+		$this->checkDownloadedContentMatches($content);
 	}
 
 	/**
@@ -3334,78 +3340,71 @@ trait WebDav {
 	 * @return void
 	 */
 	public function fileHasBeenDeleted(string $file, string $user):void {
-		$this->userHasDeletedFile($user, "deleted", "file", $file);
+		$this->userHasDeletedResource($user, "deleted", "file", $file);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When user :user deletes file/folder :resource using the WebDAV API
 	 *
 	 * @param string $user
-	 * @param string $file
+	 * @param string $resource
 	 *
 	 * @return void
 	 */
-	public function userDeletesFile(string $user, string $file):void {
+	public function userDeletesFile(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest($user, 'DELETE', $file, []);
+		$this->response = $this->makeDavRequest($user, 'DELETE', $resource, []);
 		$this->lastUploadDeleteTime = \time();
 		$this->pushToLastHttpStatusCodesArray((string) $this->getResponse()->getStatusCode());
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) (?:file|folder|entity) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has deleted (?:file|folder|entity) "([^"]*)"$/
 	 *
 	 * @param string $user
-	 * @param string $deletedOrUnshared
-	 * @param string $entry
+	 * @param string $resource
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFile(string $user, string $deletedOrUnshared, string $entry):void {
+	public function userHasDeletedResource(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
-		$this->userDeletesFile($user, $entry);
+		$this->userDeletesFile($user, $resource);
 		// If the file or folder was there and got deleted then we get a 204
 		// That is good and the expected status
 		// If the file or folder was already not there then we get a 404
 		// That is not expected. Scenarios that use "Given user has deleted..."
 		// should only be using such steps when it is a file that exists and needs
 		// to be deleted.
-		if ($deletedOrUnshared === "deleted") {
-			$deleteText = "delete";
-		} else {
-			$deleteText = "unshare";
-		}
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204"],
-			"HTTP status code was not 204 while trying to $deleteText resource '$entry' for user '$user'"
+			"HTTP status code was not 204 while trying to delete resource '$resource' for user '$user'"
 		);
 		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) the following (?:files|folders|resources)$/
+	 * @Given /^user "([^"]*)" has deleted the following (?:files|folders|resources)$/
 	 *
 	 * @param string $user
-	 * @param string $deletedOrUnshared
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFollowingFiles(string $user, string $deletedOrUnshared, TableNode $table):void {
+	public function userHasDeletedFollowingFiles(string $user, TableNode $table):void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
 		foreach ($paths as $file) {
-			$this->userHasDeletedFile($user, $deletedOrUnshared, $file["path"]);
+			$this->userHasDeletedResource($user, $file["path"]);
 		}
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) the following (?:files|folders)$/
+	 * @When /^user "([^"]*)" deletes the following (?:files|folders)$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -3425,7 +3424,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^the user (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When /^the user deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $file
 	 *
@@ -3436,20 +3435,19 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^the user has (deleted|unshared) (file|folder) "([^"]*)"$/
+	 * @Given /^the user has deleted (file|folder) "([^"]*)"$/
 	 *
-	 * @param string $deletedOrUnshared
 	 * @param string $fileOrFolder
 	 * @param string $file
 	 *
 	 * @return void
 	 */
-	public function theUserHasDeletedFile(string $deletedOrUnshared, string $fileOrFolder, string $file):void {
-		$this->userHasDeletedFile($this->getCurrentUser(), $deletedOrUnshared, $fileOrFolder, $file);
+	public function theUserHasDeletedFile(string $fileOrFolder, string $file):void {
+		$this->userHasDeletedResource($this->getCurrentUser(), $fileOrFolder, $file);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) these (?:files|folders|entries) without delays using the WebDAV API$/
+	 * @When /^user "([^"]*)" deletes these (?:files|folders|entries) without delays using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table of files or folders to delete
@@ -3469,7 +3467,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^the user (?:deletes|unshares) these (?:files|folders|entries) without delays using the WebDAV API$/
+	 * @When /^the user deletes these (?:files|folders|entries) without delays using the WebDAV API$/
 	 *
 	 * @param TableNode $table of files or folders to delete
 	 *
@@ -3481,7 +3479,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" on "(LOCAL|REMOTE)" (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" on "(LOCAL|REMOTE)" deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $server
@@ -3496,30 +3494,24 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" on "(LOCAL|REMOTE)" has (deleted|unshared) (file|folder) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" on "(LOCAL|REMOTE)" has deleted (file|folder) "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $server
-	 * @param string $deletedOrUnshared
 	 * @param string $fileOrFolder
 	 * @param string $entry
 	 *
 	 * @return void
 	 */
-	public function userOnHasDeletedFile(string $user, string $server, string $deletedOrUnshared, string $fileOrFolder, string $entry):void {
+	public function userOnHasDeletedFile(string $user, string $server, string $fileOrFolder, string $entry):void {
 		$this->userOnDeletesFile($user, $server, $entry);
 		// If the file was there and got deleted then we get a 204
 		// If the file was already not there then we get a 404
 		// Either way, the outcome of the "given" step is OK
-		if ($deletedOrUnshared === "deleted") {
-			$deleteText = "delete";
-		} else {
-			$deleteText = "unshare";
-		}
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204", "404"],
-			"HTTP status code was not 204 or 404 while trying to $deleteText $fileOrFolder '$entry' for user '$user' on server '$server'"
+			"HTTP status code was not 204 or 404 while trying to delete $fileOrFolder '$entry' for user '$user' on server '$server'"
 		);
 	}
 
@@ -3709,38 +3701,6 @@ trait WebDav {
 	/**
 	 * Old style chunking upload
 	 *
-	 * @Given user :user has uploaded the following :total chunks to :file with old chunking
-	 *
-	 * @param string $user
-	 * @param string $total
-	 * @param string $file
-	 * @param TableNode $chunkDetails table of 2 columns, chunk number and chunk
-	 *                                content with following headings, e.g.
-	 *                                | number | content                 |
-	 *                                | 1      | first data              |
-	 *                                | 2      | followed by second data |
-	 *                                Chunks may be numbered out-of-order if desired.
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUploadedTheFollowingTotalChunksUsingOldChunking(
-		string $user,
-		string $total,
-		string $file,
-		TableNode $chunkDetails
-	):void {
-		$this->verifyTableNodeColumns($chunkDetails, ['number', 'content']);
-		foreach ($chunkDetails->getHash() as $chunkDetail) {
-			$chunkNumber = (int) $chunkDetail['number'];
-			$chunkContent = $chunkDetail['content'];
-			$this->userHasUploadedChunkedFile($user, $chunkNumber, (int) $total, $chunkContent, $file);
-		}
-	}
-
-	/**
-	 * Old style chunking upload
-	 *
 	 * @When user :user uploads the following chunks to :file with old chunking and using the WebDAV API
 	 *
 	 * @param string $user
@@ -3762,37 +3722,6 @@ trait WebDav {
 	):void {
 		$total = \count($chunkDetails->getHash());
 		$this->userUploadsTheFollowingTotalChunksUsingOldChunking(
-			$user,
-			(string) $total,
-			$file,
-			$chunkDetails
-		);
-	}
-
-	/**
-	 * Old style chunking upload
-	 *
-	 * @Given user :user has uploaded the following chunks to :file with old chunking
-	 *
-	 * @param string $user
-	 * @param string $file
-	 * @param TableNode $chunkDetails table of 2 columns, chunk number and chunk
-	 *                                content with headings, e.g.
-	 *                                | number | content                 |
-	 *                                | 1      | first data              |
-	 *                                | 2      | followed by second data |
-	 *                                Chunks may be numbered out-of-order if desired.
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUploadedTheFollowingChunksUsingOldChunking(
-		string $user,
-		string $file,
-		TableNode $chunkDetails
-	):void {
-		$total = \count($chunkDetails->getRows());
-		$this->userHasUploadedTheFollowingTotalChunksUsingOldChunking(
 			$user,
 			(string) $total,
 			$file,
@@ -4513,7 +4442,7 @@ trait WebDav {
 			foreach ($elementList as $element) {
 				$element = \substr((string)$element, \strlen($davPrefix));
 				if ($checkEachDelete) {
-					$this->userHasDeletedFile($user, "deleted", "file", $element);
+					$this->userHasDeletedResource($user, "deleted", "file", $element);
 				} else {
 					$this->userDeletesFile($user, $element);
 				}

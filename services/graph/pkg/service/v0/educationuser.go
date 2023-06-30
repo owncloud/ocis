@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -35,12 +34,7 @@ func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := g.identityEducationBackend.GetEducationUsers(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -144,12 +138,7 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("user", u).Msg("calling create education user on backend")
 	if u, err = g.identityEducationBackend.CreateEducationUser(r.Context(), *u); err != nil {
 		logger.Debug().Err(err).Msg("could not create education user: backend error")
-		var ecErr errorcode.Error
-		if errors.As(err, &ecErr) {
-			ecErr.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -166,8 +155,8 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 // GetEducationUser implements the Service interface.
 func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get education user")
 	userID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", userID).Msg("calling get education user")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", userID).Msg("could not get education user: unescaping education user id failed")
@@ -186,12 +175,7 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -202,8 +186,8 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 // DeleteEducationUser implements the Service interface.
 func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete education user")
 	userID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", userID).Msg("calling delete education user")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", userID).Msg("could not delete education user: unescaping education user id failed")
@@ -220,12 +204,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get education user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -239,13 +218,19 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 
-	if g.gatewayClient != nil {
+	if g.gatewaySelector != nil {
 		logger.Debug().
 			Str("user", user.GetId()).
 			Msg("calling list spaces with user filter to fetch the personal space for deletion")
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		f := listStorageSpacesUserFilter(user.GetId())
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		client, err := g.gatewaySelector.Next()
+		if err != nil {
+			logger.Error().Err(err).Msg("could not select next gateway client")
+			errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+			return
+		}
+		lspr, err := client.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
@@ -266,7 +251,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map["trashed"]; !ok {
-				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
 					},
@@ -278,7 +263,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,
@@ -299,13 +284,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete education user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	g.publishEvent(e)
@@ -318,8 +298,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 // ExistingUser
 func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch education user")
 	nameOrID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", nameOrID).Msg("calling patch education user")
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: unescaping education user id failed")
@@ -339,6 +319,14 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
+	}
+
+	if accountName, ok := changes.GetOnPremisesSamAccountNameOk(); ok {
+		if !g.isValidUsername(*accountName) {
+			logger.Debug().Str("username", *accountName).Msg("could not update education user: username must be at least the local part of an email")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *changes.OnPremisesSamAccountName))
+			return
+		}
 	}
 
 	var features []events.UserFeature
@@ -368,18 +356,14 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	u, err := g.identityEducationBackend.UpdateEducationUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
 	e := events.UserFeatureChanged{
-		UserID:   nameOrID,
-		Features: features,
+		UserID:    nameOrID,
+		Features:  features,
+		Timestamp: utils.TSNow(),
 	}
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()

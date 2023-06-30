@@ -16,7 +16,7 @@ Feature: assign role
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-5032
   Scenario Outline: assign role to the user with graph api and list role with setting api
@@ -30,7 +30,7 @@ Feature: assign role
       | Admin       | 201        |
       | Space Admin | 401        |
       | User        | 401        |
-      | Guest       | 401        |
+      | User Light  | 401        |
 
 
   Scenario Outline: assign role to the user with setting api and list role with graph api
@@ -44,4 +44,4 @@ Feature: assign role
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |

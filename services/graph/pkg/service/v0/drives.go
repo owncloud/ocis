@@ -261,7 +261,13 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
+
 	drive := libregraph.Drive{}
 	if err := StrictJSONUnmarshal(r.Body, &drive); err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create drive: invalid body schema definition")
@@ -306,7 +312,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		csr.Owner = us
 	}
 
-	resp, err := client.CreateStorageSpace(r.Context(), &csr)
+	resp, err := gatewayClient.CreateStorageSpace(r.Context(), &csr)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not create drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -317,6 +323,11 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED {
 			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: permission denied")
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "permission denied")
+			return
+		}
+		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_INVALID_ARGUMENT {
+			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: bad request")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
 			return
 		}
 		logger.Debug().Interface("grpcmessage", csr).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not create drive: grpc error")
@@ -374,7 +385,12 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 	root := &rid
 
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
 
 	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
@@ -459,7 +475,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Interface("payload", updateSpaceRequest).Msg("calling update space on backend")
-	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
+	resp, err := gatewayClient.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not update drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "transport error")
@@ -581,7 +597,10 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 
 // ListStorageSpacesWithFilters List Storage Spaces using filters
 func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter, unrestricted bool) (*storageprovider.ListStorageSpacesResponse, error) {
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 
 	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(g.config.GRPCClientTLS), grpc.WithTraceProvider(gtracing.TraceProvider))...)
 	if err != nil {
@@ -615,7 +634,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 		}},
 		Filters: filters,
 	}
-	res, err := client.ListStorageSpaces(ctx, lReq)
+	res, err := gatewayClient.ListStorageSpaces(ctx, lReq)
 	return res, err
 }
 
@@ -858,7 +877,10 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	if noQuotaInOpaque {
 		// we have to make a trip to the storage
 		// TODO only if quota property was requested
-		client := g.GetGatewayClient()
+		gatewayClient, err := g.gatewaySelector.Next()
+		if err != nil {
+			return libregraph.Quota{}, err
+		}
 
 		req := &gateway.GetQuotaRequest{
 			Ref: &storageprovider.Reference{
@@ -866,7 +888,8 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 				Path:       ".",
 			},
 		}
-		res, err := client.GetQuota(ctx, req)
+
+		res, err := gatewayClient.GetQuota(ctx, req)
 		switch {
 		case err != nil:
 			logger.Error().Err(err).Interface("ref", req.Ref).Msg("could not call GetQuota: transport error")
@@ -1041,8 +1064,8 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 	}
-
-	dRes, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+	gatewayClient, _ := g.gatewaySelector.Next()
+	dRes, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 		Opaque: opaque,
 		Id: &storageprovider.StorageSpaceId{
 			OpaqueId: storagespace.FormatResourceID(rid),

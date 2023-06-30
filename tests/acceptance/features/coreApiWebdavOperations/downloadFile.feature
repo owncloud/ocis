@@ -60,7 +60,7 @@ Feature: download file
       | spaces      |
 
 
-  Scenario Outline: Get the size of a file
+  Scenario Outline: get the size of a file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     When user "Alice" gets the size of file "test-file.txt" using the WebDAV API
@@ -78,7 +78,7 @@ Feature: download file
       | spaces      |
 
   @issue-1316
-  Scenario Outline: Get the content-length response header of a pdf file
+  Scenario Outline: get the content-length response header of a pdf file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/simple.pdf" to "/simple.pdf"
     When user "Alice" downloads file "/simple.pdf" using the WebDAV API
@@ -97,7 +97,7 @@ Feature: download file
       | spaces      |
 
   @issue-1316
-  Scenario Outline: Get the content-length response header of an image file
+  Scenario Outline: get the content-length response header of an image file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testavatar.png"
     When user "Alice" downloads file "/testavatar.png" using the WebDAV API
@@ -116,7 +116,7 @@ Feature: download file
       | spaces      |
 
 
-  Scenario Outline: Download a file with comma in the filename
+  Scenario Outline: download a file with comma in the filename
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "file with comma in filename" to <filename>
     When user "Alice" downloads file <filename> using the WebDAV API
@@ -264,7 +264,7 @@ Feature: download file
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Downloading a file should serve security headers
+  Scenario Outline: downloading a file should serve security headers
     Given using <dav_version> DAV path
     When user "Alice" downloads file "/welcome.txt" using the WebDAV API
     Then the HTTP status code should be "200"

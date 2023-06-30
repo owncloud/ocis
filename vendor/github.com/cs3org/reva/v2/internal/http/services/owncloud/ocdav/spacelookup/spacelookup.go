@@ -29,6 +29,7 @@ import (
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -37,8 +38,8 @@ import (
 // LookupReferenceForPath returns:
 // a reference with root and relative path
 // the status and error for the lookup
-func LookupReferenceForPath(ctx context.Context, client gateway.GatewayAPIClient, path string) (*storageProvider.Reference, *rpc.Status, error) {
-	space, cs3Status, err := LookUpStorageSpaceForPath(ctx, client, path)
+func LookupReferenceForPath(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], path string) (*storageProvider.Reference, *rpc.Status, error) {
+	space, cs3Status, err := LookUpStorageSpaceForPath(ctx, selector, path)
 	if err != nil || cs3Status.Code != rpc.Code_CODE_OK {
 		return nil, cs3Status, err
 	}
@@ -52,7 +53,7 @@ func LookupReferenceForPath(ctx context.Context, client gateway.GatewayAPIClient
 // LookUpStorageSpaceForPath returns:
 // the storage spaces responsible for a path
 // the status and error for the lookup
-func LookUpStorageSpaceForPath(ctx context.Context, client gateway.GatewayAPIClient, path string) (*storageProvider.StorageSpace, *rpc.Status, error) {
+func LookUpStorageSpaceForPath(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], path string) (*storageProvider.StorageSpace, *rpc.Status, error) {
 	// TODO add filter to only fetch spaces changed in the last 30 sec?
 	// TODO cache space information, invalidate after ... 5min? so we do not need to fetch all spaces?
 	// TODO use ListContainerStream to listen for changes
@@ -70,6 +71,11 @@ func LookUpStorageSpaceForPath(ctx context.Context, client gateway.GatewayAPICli
 				},
 			},
 		},
+	}
+
+	client, err := selector.Next()
+	if err != nil {
+		return nil, status.NewInternal(ctx, "could not select next client"), err
 	}
 
 	lSSRes, err := client.ListStorageSpaces(ctx, lSSReq)

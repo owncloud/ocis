@@ -33,6 +33,7 @@ func Server(opts ...Option) (grpc.Service, func(), error) {
 	handle, teardown, err := svc.NewHandler(
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
+		svc.JWTSecret(options.JWTSecret),
 	)
 	if err != nil {
 		options.Logger.Error().

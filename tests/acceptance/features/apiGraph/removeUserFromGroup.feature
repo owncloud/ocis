@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: remove a user from a group
   As an admin
   I want to be able to remove a user from a group
@@ -159,7 +159,7 @@ Feature: remove a user from a group
   @issue-5938
   Scenario Outline: user other than the admin can't remove a user from their group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -191,7 +191,7 @@ Feature: remove a user from a group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin removes a disabled user from a group

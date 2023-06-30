@@ -51,7 +51,7 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:          "inetOrgPerson",
 				GroupObjectClass:         "groupOfNames",
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
-				DisableUserMechanism:     "none",
+				DisableUserMechanism:     "attribute",
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{

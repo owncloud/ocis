@@ -6,11 +6,14 @@ package email
 import (
 	"bytes"
 	"embed"
+	"errors"
+	"html"
 	"html/template"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 )
@@ -23,7 +26,7 @@ var (
 )
 
 // RenderEmailTemplate renders the email template for a new share
-func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath string, translationPath string, vars map[string]interface{}) (*channels.Message, error) {
+func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath string, translationPath string, vars map[string]string) (*channels.Message, error) {
 	textMt, err := NewTextTemplate(mt, locale, translationPath, vars)
 	if err != nil {
 		return nil, err
@@ -36,8 +39,7 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 	if err != nil {
 		return nil, err
 	}
-
-	htmlMt, err := NewHTMLTemplate(mt, locale, translationPath, vars)
+	htmlMt, err := NewHTMLTemplate(mt, locale, translationPath, escapeStringMap(vars))
 	if err != nil {
 		return nil, err
 	}
@@ -104,16 +106,21 @@ func readImages(emailTemplatePath string) (map[string][]byte, error) {
 func read(entries []fs.DirEntry, fsys fs.FS) (map[string][]byte, error) {
 	list := make(map[string][]byte)
 	for _, e := range entries {
-		if !e.IsDir() {
-			file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
-			if err != nil {
-				return nil, err
-			}
-			if !validateMime(file) {
+		if e.IsDir() {
+			continue
+		}
+		file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
+		if err != nil {
+			// skip if the symbolic is a directory
+			if errors.Is(err, syscall.EISDIR) {
 				continue
 			}
-			list[e.Name()] = file
+			return nil, err
 		}
+		if !validateMime(file) {
+			continue
+		}
+		list[e.Name()] = file
 	}
 	return list, nil
 }
@@ -134,4 +141,11 @@ func validateMime(incipit []byte) bool {
 		}
 	}
 	return false
+}
+
+func escapeStringMap(vars map[string]string) map[string]string {
+	for k := range vars {
+		vars[k] = html.EscapeString(vars[k])
+	}
+	return vars
 }

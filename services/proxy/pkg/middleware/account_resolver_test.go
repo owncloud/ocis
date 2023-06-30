@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
 	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestTokenIsAddedWithMailClaim(t *testing.T) {

@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: move (rename) file
   As a user
   I want to be able to move and rename files
@@ -9,7 +9,7 @@ Feature: move (rename) file
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
+  Scenario Outline: moving a file into a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -33,7 +33,7 @@ Feature: move (rename) file
       | new         | Brian | /testshare         |
 
 
-  Scenario Outline: Moving a file out of a shared folder as the sharer
+  Scenario Outline: moving a file out of a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -55,7 +55,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Can not move a file out of a shared folder as the sharee
+  Scenario Outline: moving a file out of a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -76,7 +76,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Moving a folder into a shared folder as the sharee and as the sharer
+  Scenario Outline: moving a folder into a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -101,7 +101,7 @@ Feature: move (rename) file
       | new         | Brian | /testshare         |
 
 
-  Scenario Outline: Moving a folder out of a shared folder as the sharer
+  Scenario Outline: moving a folder out of a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created the following folders
@@ -126,7 +126,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Moving a folder out of a shared folder as the sharee
+  Scenario Outline: moving a folder out of a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created the following folders
@@ -150,7 +150,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Moving a file to a shared folder with no permissions
+  Scenario Outline: moving a file to a shared folder with no permissions
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -170,7 +170,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Moving a file to overwrite a file in a shared folder with no permissions
+  Scenario Outline: moving a file to overwrite a file in a shared folder with no permissions
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -192,7 +192,7 @@ Feature: move (rename) file
       | new         |
 
 
-  Scenario Outline: Checking file id after a move between received shares
+  Scenario Outline: checking file id after a move between received shares
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created the following folders

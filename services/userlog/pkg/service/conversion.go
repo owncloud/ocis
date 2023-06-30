@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"embed"
-	"errors"
 	"fmt"
 	"io/fs"
 	"strings"
@@ -16,10 +15,10 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/leonelquinteros/gotext"
-	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 )
 
 //go:embed l10n/locale
@@ -52,10 +51,9 @@ type OC10Notification struct {
 // Converter is responsible for converting eventhistory events to OC10Notifications
 type Converter struct {
 	locale            string
-	gwClient          gateway.GatewayAPIClient
+	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
 	machineAuthAPIKey string
 	serviceName       string
-	registeredEvents  map[string]events.Unmarshaller
 	translationPath   string
 
 	// cached within one request not to query other service too much
@@ -66,13 +64,12 @@ type Converter struct {
 }
 
 // NewConverter returns a new Converter
-func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey string, name string, translationPath string, registeredEvents map[string]events.Unmarshaller) *Converter {
+func NewConverter(loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string, name string, translationPath string) *Converter {
 	return &Converter{
 		locale:            loc,
-		gwClient:          gwc,
+		gatewaySelector:   gatewaySelector,
 		machineAuthAPIKey: machineAuthAPIKey,
 		serviceName:       name,
-		registeredEvents:  registeredEvents,
 		translationPath:   translationPath,
 		spaces:            make(map[string]*storageprovider.StorageSpace),
 		users:             make(map[string]*user.User),
@@ -82,20 +79,8 @@ func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey st
 }
 
 // ConvertEvent converts an eventhistory event to an OC10Notification
-func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
-	etype, ok := c.registeredEvents[event.Type]
-	if !ok {
-		// this should not happen
-		return OC10Notification{}, errors.New("eventtype not registered")
-	}
-
-	einterface, err := etype.Unmarshal(event.Event)
-	if err != nil {
-		// this shouldn't happen either
-		return OC10Notification{}, errors.New("cant unmarshal event")
-	}
-
-	switch ev := einterface.(type) {
+func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notification, error) {
+	switch ev := event.(type) {
 	default:
 		return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
 		// file related
@@ -103,31 +88,31 @@ func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
 		switch ev.FinishedStep {
 		case events.PPStepAntivirus:
 			res := ev.Result.(events.VirusscanResult)
-			return c.virusMessage(event.Id, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)
+			return c.virusMessage(eventid, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)
 		case events.PPStepPolicies:
-			return c.policiesMessage(event.Id, PoliciesEnforced, ev.ExecutingUser, ev.Filename, time.Now())
+			return c.policiesMessage(eventid, PoliciesEnforced, ev.ExecutingUser, ev.Filename, time.Now())
 		default:
 			return OC10Notification{}, fmt.Errorf("unknown postprocessing step: %s", ev.FinishedStep)
 		}
 	// space related
 	case events.SpaceDisabled:
-		return c.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return c.spaceMessage(eventid, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceDeleted:
-		return c.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp)
+		return c.spaceDeletedMessage(eventid, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp)
 	case events.SpaceShared:
-		return c.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return c.spaceMessage(eventid, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceUnshared:
-		return c.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return c.spaceMessage(eventid, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceMembershipExpired:
-		return c.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt)
+		return c.spaceMessage(eventid, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt)
 
 	// share related
 	case events.ShareCreated:
-		return c.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime))
+		return c.shareMessage(eventid, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime))
 	case events.ShareExpired:
-		return c.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
+		return c.shareMessage(eventid, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
 	case events.ShareRemoved:
-		return c.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
+		return c.shareMessage(eventid, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
 	}
 }
 
@@ -306,7 +291,7 @@ func (c *Converter) authenticate(usr *user.User) (context.Context, error) {
 	if ctx, ok := c.contexts[usr.GetId().GetOpaqueId()]; ok {
 		return ctx, nil
 	}
-	ctx, err := authenticate(usr, c.gwClient, c.machineAuthAPIKey)
+	ctx, err := authenticate(usr, c.gatewaySelector, c.machineAuthAPIKey)
 	if err == nil {
 		c.contexts[usr.GetId().GetOpaqueId()] = ctx
 	}
@@ -317,7 +302,7 @@ func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovi
 	if space, ok := c.spaces[spaceID]; ok {
 		return space, nil
 	}
-	space, err := getSpace(ctx, spaceID, c.gwClient)
+	space, err := getSpace(ctx, spaceID, c.gatewaySelector)
 	if err == nil {
 		c.spaces[spaceID] = space
 	}
@@ -328,7 +313,7 @@ func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider
 	if r, ok := c.resources[resourceID.GetOpaqueId()]; ok {
 		return r, nil
 	}
-	resource, err := getResource(ctx, resourceID, c.gwClient)
+	resource, err := getResource(ctx, resourceID, c.gatewaySelector)
 	if err == nil {
 		c.resources[resourceID.GetOpaqueId()] = resource
 	}
@@ -339,7 +324,7 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	if u, ok := c.users[userID.GetOpaqueId()]; ok {
 		return u, nil
 	}
-	usr, err := getUser(ctx, userID, c.gwClient)
+	usr, err := getUser(ctx, userID, c.gatewaySelector)
 	if err == nil {
 		c.users[userID.GetOpaqueId()] = usr
 	}

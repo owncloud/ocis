@@ -1178,7 +1178,7 @@ func (i *LDAP) updateAccountEnabledState(logger log.Logger, accountEnabled bool,
 		} else {
 			err = i.disableUser(logger, e.DN)
 		}
-		updateNeeded = true
+		updateNeeded = false
 	}
 
 	return updateNeeded, err

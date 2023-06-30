@@ -294,37 +294,6 @@ func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canLis
 		}
 		return nil, errtypes.InternalError("Missing parent ID on node")
 	}
-	// TODO why do we stat the parent? to determine if the current node is in the trash we would need to traverse all parents...
-	// we need to traverse all parents for permissions anyway ...
-	// - we can compare to space root owner with the current user
-	// - we can compare the share permissions on the root for spaces, which would work for managers
-	// - for non managers / owners we need to traverse all path segments because an intermediate node might have been shared
-	// - if we want to support negative acls we need to traverse the path for all users (but the owner)
-	// for trashed items we need to check all parents
-	// - one of them might have the trash suffix ...
-	// - options:
-	//   - move deleted nodes in a trash folder that is still part of the tree (aka freedesktop org trash spec)
-	//     - shares should still be removed, which requires traversing all trashed children ... and it should be undoable ...
-	//     - what if a trashed file is restored? will child items be accessible by a share?
-	//   - compare paths of trash root items and the trashed file?
-	//     - to determine the relative path of a file we would need to traverse all intermediate nodes anyway
-	//   - recursively mark all children as trashed ... async ... it is ok when that is not synchronous
-	//     - how do we pick up if an error occurs? write a journal somewhere? activity log / delta?
-	//     - stat requests will not pick up trashed items at all
-	//   - recursively move all children into the trash folder?
-	//     - no need to write an additional trash entry
-	//     - can be made more robust with a journal
-	//     - same recursion mechanism can be used to purge items? sth we still need to do
-	//   - flag the two above options with dtime
-	if !skipParentCheck {
-		_, err = os.Stat(n.ParentPath())
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				return nil, errtypes.NotFound(err.Error())
-			}
-			return nil, err
-		}
-	}
 
 	if revisionSuffix == "" {
 		n.BlobID = attrs.String(prefixes.BlobIDAttr)
@@ -406,11 +375,11 @@ func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
 }
 
 // ParentWithReader returns the parent node
-func (n *Node) ParentWithReader(r io.Reader) (p *Node, err error) {
+func (n *Node) ParentWithReader(r io.Reader) (*Node, error) {
 	if n.ParentID == "" {
 		return nil, fmt.Errorf("decomposedfs: root has no parent")
 	}
-	p = &Node{
+	p := &Node{
 		SpaceID:   n.SpaceID,
 		lu:        n.lu,
 		ID:        n.ParentID,
@@ -418,17 +387,19 @@ func (n *Node) ParentWithReader(r io.Reader) (p *Node, err error) {
 	}
 
 	// fill metadata cache using the reader
-	_, _ = p.XattrsWithReader(r)
-
-	// lookup name and parent id in extended attributes
-	p.ParentID, _ = p.XattrString(prefixes.ParentidAttr)
-	p.Name, _ = p.XattrString(prefixes.NameAttr)
-
-	// check node exists
-	if _, err := os.Stat(p.InternalPath()); err == nil {
-		p.Exists = true
+	attrs, err := p.XattrsWithReader(r)
+	switch {
+	case metadata.IsNotExist(err):
+		return p, nil // swallow not found, the node defaults to exists = false
+	case err != nil:
+		return nil, err
 	}
-	return
+	p.Exists = true
+
+	p.Name = attrs.String(prefixes.NameAttr)
+	p.ParentID = attrs.String(prefixes.ParentidAttr)
+
+	return p, err
 }
 
 // Parent returns the parent node
@@ -948,11 +919,11 @@ func (n *Node) IsDisabled() bool {
 
 // GetTreeSize reads the treesize from the extended attributes
 func (n *Node) GetTreeSize() (treesize uint64, err error) {
-	s, err := n.XattrInt64(prefixes.TreesizeAttr)
+	s, err := n.XattrUint64(prefixes.TreesizeAttr)
 	if err != nil {
 		return 0, err
 	}
-	return uint64(s), nil
+	return s, nil
 }
 
 // SetTreeSize writes the treesize to the extended attributes
@@ -1039,7 +1010,6 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 			}
 			AddPermissions(&ap, g.GetPermissions())
 		case metadata.IsAttrUnset(err):
-			err = nil
 			appctx.GetLogger(ctx).Error().Interface("node", n).Str("grant", grantees[i]).Interface("grantees", grantees).Msg("grant vanished from node after listing")
 			// continue with next segment
 		default:

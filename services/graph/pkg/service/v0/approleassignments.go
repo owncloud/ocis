@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -54,6 +57,11 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 
 	userID := chi.URLParam(r, "userID")
 
+	// We can ignore the error, in the worst case the old role will be empty
+	oldRoles, _ := g.roleService.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+		AccountUuid: userID,
+	})
+
 	if appRoleAssignment.GetPrincipalId() != userID {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("user id %s does not match principal id %v", userID, appRoleAssignment.GetPrincipalId()))
 		return
@@ -76,6 +84,27 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var role string
+	roles := oldRoles.GetAssignments()
+	if len(roles) > 0 {
+		role = roles[0].GetRoleId()
+	}
+
+	e := events.UserFeatureChanged{
+		UserID: userID,
+		Features: []events.UserFeature{
+			{
+				Name:     "roleChanged",
+				Value:    appRoleAssignment.AppRoleId,
+				OldValue: &role,
+			},
+		},
+		Timestamp: utils.TSNow(),
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, g.assignmentToAppRoleAssignment(artur.GetAssignment()))
 }

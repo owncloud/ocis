@@ -1,5 +1,8 @@
 @api @preview-extension-required
 Feature: previews of files downloaded through the webdav API
+  As a user
+  I want to be able to download the preview of the files
+  So that I can view the contents of the files
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -131,7 +134,7 @@ Feature: previews of files downloaded through the webdav API
     And as user "Brian" the preview of "/Shares/parent.txt" with width "32" and height "32" should have been changed
 
 
-  Scenario: it should update the preview content if the file content is updated (content with UTF chars)
+  Scenario: preview content should be updated if the file content is updated (content with UTF chars)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/lorem.txt"
     And user "Alice" has uploaded file with content "सिमसिमे पानी" to "/lorem.txt"
     When user "Alice" downloads the preview of "/lorem.txt" with width "32" and height "32" using the WebDAV API

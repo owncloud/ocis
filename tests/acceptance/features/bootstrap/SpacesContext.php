@@ -27,7 +27,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
-use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -206,6 +205,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method finds available spaces to the user and returns the spaceId by spaceName
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getSpaceIdByName(string $user, string $spaceName): string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		return $space["id"];
+	}
+
+	/**
 	 * This method sets space id by Space Name
 	 * This is currently used to set space id from ocis in core so that we can reuse available resource (code) and avoid duplication
 	 *
@@ -379,14 +392,20 @@ class SpacesContext implements Context {
 	public function setUpScenario(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
+		// register new context
+		$this->trashbinContext = new TrashbinContext();
+		$this->webDavPropertiesContext = new WebDavPropertiesContext();
+		$this->favoritesContext = new FavoritesContext();
+		$this->checksumContext = new ChecksumContext();
+		$this->filesVersionsContext = new FilesVersionsContext();
+		$environment->registerContext($this->trashbinContext);
+		$environment->registerContext($this->webDavPropertiesContext);
+		$environment->registerContext($this->favoritesContext);
+		$environment->registerContext($this->checksumContext);
+		$environment->registerContext($this->filesVersionsContext);
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->ocsContext = $environment->getContext('OCSContext');
-		$this->trashbinContext = $environment->getContext('TrashbinContext');
-		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
-		$this->favoritesContext = $environment->getContext('FavoritesContext');
-		$this->checksumContext = $environment->getContext('ChecksumContext');
-		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -572,43 +591,13 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" (?:creates|tries to create) a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)" using the Graph API$/
 	 * @When /^user "([^"]*)" (?:creates|tries to create) a space "([^"]*)" of type "([^"]*)" with the default quota using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $spaceType
-	 *
-	 * @return void
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function theUserCreatesASpaceUsingTheGraphApi(
-		string $user,
-		string $spaceName,
-		string $spaceType
-	): void {
-		$space = ["Name" => $spaceName, "driveType" => $spaceType];
-		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(
-			GraphHelper::createSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
-
-		$this->setSpaceCreator($spaceName, $user);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)" using the Graph API$/
-	 *
-	 * @param string $user
-	 * @param string $spaceName
-	 * @param string $spaceType
-	 * @param int    $quota
+	 * @param int|null $quota
 	 *
 	 * @return void
 	 *
@@ -619,7 +608,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $spaceType,
-		int $quota
+		?int $quota = null
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
@@ -735,36 +724,6 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	): void {
-		$this->featureContext->propfindResultShouldContainEntries(
-			$shouldOrNot,
-			$expectedFiles,
-		);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
-	}
-
-	/**
-	 * @Then /^the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
-	 *
-	 * @param string    $spaceName
-	 * @param string    $shouldOrNot   (not|)
-	 * @param TableNode $expectedFiles
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function theSpaceShouldContainEntries(
-		string $spaceName,
-		string $shouldOrNot,
-		TableNode $expectedFiles
-	): void {
-		$spaceCreator = $this->getSpaceCreator($spaceName);
-		$space = $this->getSpaceByName($spaceCreator, $spaceName);
-		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
-			$spaceCreator,
-			$spaceName
-		);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
@@ -921,7 +880,7 @@ class SpacesContext implements Context {
 			$userName,
 		);
 
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -1230,6 +1189,28 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" uploads a file "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserUploadsALocalFileToSpace(
+		string $user,
+		string $source,
+		string $destination,
+		string $spaceName
+	): void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->userUploadsAFileTo($user, $source, $destination);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -1254,6 +1235,41 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param array $bodyData
+	 * @param string $owner
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function updateSpace(
+		string $user,
+		string $spaceName,
+		array $bodyData,
+		string $owner = ''
+	): ResponseInterface {
+		if ($spaceName === "non-existing") {
+			// check sending invalid data
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+		} else {
+			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
+			$spaceId = $space["id"];
+		}
+
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+
+		return GraphHelper::updateSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$spaceId
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" (?:changes|tries to change) the name of the "([^"]*)" space to "([^"]*)"$/
 	 * @When /^user "([^"]*)" (?:changes|tries to change) the name of the "([^"]*)" space to "([^"]*)" owned by user "([^"]*)"$/
 	 *
@@ -1272,26 +1288,8 @@ class SpacesContext implements Context {
 		string $newName,
 		string $owner = ''
 	): void {
-		if ($spaceName === "non-existing") {
-			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
-		} else {
-			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
-			$spaceId = $space["id"];
-		}
-
 		$bodyData = ["Name" => $newName];
-		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
-
-		$this->featureContext->setResponse(
-			GraphHelper::updateSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse($this->updateSpace($user, $spaceName, $bodyData, $owner));
 	}
 
 	/**
@@ -1313,26 +1311,8 @@ class SpacesContext implements Context {
 		string $newDescription,
 		string $owner = ''
 	): void {
-		if ($spaceName === "non-existing") {
-			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
-		} else {
-			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
-			$spaceId = $space["id"];
-		}
-
 		$bodyData = ["description" => $newDescription];
-		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
-
-		$this->featureContext->setResponse(
-			GraphHelper::updateSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse($this->updateSpace($user, $spaceName, $bodyData, $owner));
 	}
 
 	/**
@@ -1377,26 +1357,8 @@ class SpacesContext implements Context {
 		int $newQuota,
 		string $owner = ''
 	): void {
-		if ($spaceName === "non-existing") {
-			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
-		} else {
-			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
-			$spaceId = $space["id"];
-		}
-
 		$bodyData = ["quota" => ["total" => $newQuota]];
-		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
-
-		$this->featureContext->setResponse(
-			GraphHelper::updateSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse($this->updateSpace($user, $spaceName, $bodyData, $owner));
 	}
 
 	/**
@@ -1495,8 +1457,8 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $spaceType
-	 * @param int $quota
+	 * @param string|null $spaceType
+	 * @param int|null $quota
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1508,15 +1470,8 @@ class SpacesContext implements Context {
 		int $quota
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
-		$body = json_encode($space);
-		$this->featureContext->setResponse(
-			GraphHelper::createSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse($this->createSpace($user, $space));
+		$this->setSpaceCreator($spaceName, $user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
@@ -1539,19 +1494,32 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$space = ["Name" => $spaceName];
-		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(
-			GraphHelper::createSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse($this->createSpace($user, $space));
 		$this->setSpaceCreator($spaceName, $user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $space
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function createSpace(
+		string $user,
+		array $space
+	): ResponseInterface {
+		$body = json_encode($space, JSON_THROW_ON_ERROR);
+		return GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
 		);
 	}
 
@@ -2134,6 +2102,28 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has unshared a space :spaceName shared with :recipient
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $recipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasUnsharedASpaceSharedWith(
+		string $user,
+		string $spaceName,
+		string $recipient
+	): void {
+		$this->sendUnshareSpaceRequest($user, $spaceName, $recipient);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to (?:user|group) "([^"]*)"$/
 	 *
 	 * @param  string $user
@@ -2185,6 +2175,26 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has deleted a space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasDeletedASpaceOwnedByUser(
+		string $user,
+		string $spaceName
+	):void {
+		$this->sendDeleteSpaceRequest($user, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			204,
+			"Expected response status code should be 200"
 		);
 	}
 
@@ -2685,42 +2695,15 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^these etags should have changed$/
+	 * @Then /^these etags (should|should not) have changed$/
 	 *
+	 * @param string $action
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theseEtagsShouldHaveChanged(TableNode $table): void {
-		$this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
-		$this->featureContext->verifyTableNodeColumnsCount($table, 3);
-		$unchangedEtagCount = 0;
-		$unchangedEtagMessage = __METHOD__;
-		foreach ($table->getColumnsHash() as $row) {
-			$user = $row['user'];
-			$path = $row['path'];
-			$space = $row['space'];
-			$etag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
-			$storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
-			if ($etag === $storedEtag) {
-				$unchangedEtagCount++;
-				$unchangedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' to change, but it did not.";
-			}
-		}
-
-		Assert::assertEquals(0, $unchangedEtagCount, $unchangedEtagMessage);
-	}
-
-	/**
-	 * @Then /^these etags should not have changed$/
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theseEtagsShouldNotHaveChanged(TableNode $table): void {
+	public function theseEtagsShouldShouldNotHaveChanged(string $action, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
 		$this->featureContext->verifyTableNodeColumnsCount($table, 3);
 		$changedEtagCount = 0;
@@ -2729,11 +2712,15 @@ class SpacesContext implements Context {
 			$user = $row['user'];
 			$path = $row['path'];
 			$space = $row['space'];
-			$actualEtag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
+			$etag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
 			$storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
-			if ($actualEtag !== $storedEtag) {
+			if ($action === 'should' && $etag === $storedEtag) {
 				$changedEtagCount++;
-				$changedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' not to change, but it did.";
+				$changedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' to change, but it did not.";
+			}
+			if ($action === 'should not' && $etag !== $storedEtag) {
+				$changedEtagCount++;
+				$changedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' to change, but it did not.";
 			}
 		}
 
@@ -3153,6 +3140,15 @@ class SpacesContext implements Context {
 					break;
 				case "oc:privatelink":
 					Assert::assertEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValue, 'cannot find private link for space or resource in the response');
+					break;
+				case "oc:tags":
+					// The value should be a comma-separated string of tag names.
+					// We do not care what order they happen to be in, so compare as sorted lists.
+					$expectedTags = \explode(",", $value);
+					$expectedTags = \sort($expectedTags);
+					$actualTags = \explode(",", $responseValue);
+					$actualTags = \sort($actualTags);
+					Assert::assertEquals($expectedTags, $actualTags, "wrong $findItem in the response");
 					break;
 				default:
 					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");

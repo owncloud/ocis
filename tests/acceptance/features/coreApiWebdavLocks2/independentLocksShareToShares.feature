@@ -1,6 +1,8 @@
 @api @issue-1284
-Feature: independent locks
-  Make sure all locks are independent and don't interact with other items that have the same name
+Feature: independent locks - make sure all locks are independent and don't interact with other items that have the same name
+  As a user
+  I want to independently lock resources shared with me
+  So that resources with same name in other received shares will not be locked
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

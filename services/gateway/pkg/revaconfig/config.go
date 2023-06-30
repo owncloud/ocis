@@ -6,9 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
 )
 

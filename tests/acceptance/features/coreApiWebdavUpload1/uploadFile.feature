@@ -167,7 +167,7 @@ Feature: upload file
       | spaces      |
 
   @issue-1345
-  Scenario Outline: Uploading file to path with extension .part should not be possible
+  Scenario Outline: uploading file to path with extension .part should not be possible
     Given using <dav_version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile.part" using the WebDAV API
     Then the HTTP status code should be "400"

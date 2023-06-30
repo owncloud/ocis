@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
-	proxytracing "github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
@@ -50,7 +49,8 @@ type Authenticator interface {
 func Authentication(auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	configureSupportedChallenges(options)
-	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	tracer := getTraceProvider(options).Tracer("proxy")
+
 	spanOpts := []trace.SpanStartOption{
 		trace.WithSpanKind(trace.SpanKindServer),
 	}
@@ -205,4 +205,11 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 		}
 	}
 	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(l.fallback), l.r.Host))
+}
+
+func getTraceProvider(o Options) trace.TracerProvider {
+	if o.TraceProvider != nil {
+		return o.TraceProvider
+	}
+	return trace.NewNoopTracerProvider()
 }

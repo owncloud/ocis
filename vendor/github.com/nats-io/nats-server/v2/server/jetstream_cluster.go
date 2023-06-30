@@ -2808,12 +2808,12 @@ func (js *jetStream) applyStreamEntries(mset *stream, ce *CommittedEntry, isReco
 					panic(err.Error())
 				}
 				// Ignore if we are recovering and we have already processed.
-				if isRecovering {
-					if mset.state().FirstSeq <= sp.LastSeq {
-						// Make sure all messages from the purge are gone.
-						mset.store.Compact(sp.LastSeq + 1)
+				if isRecovering && (sp.Request == nil || sp.Request.Sequence == 0) {
+					if sp.Request == nil {
+						sp.Request = &JSApiStreamPurgeRequest{Sequence: sp.LastSeq}
+					} else {
+						sp.Request.Sequence = sp.LastSeq
 					}
-					continue
 				}
 
 				s := js.server()
@@ -3107,7 +3107,9 @@ func (js *jetStream) processStreamAssignment(sa *streamAssignment) bool {
 		accStreams = make(map[string]*streamAssignment)
 	} else if osa := accStreams[stream]; osa != nil && osa != sa {
 		// Copy over private existing state from former SA.
-		sa.Group.node = osa.Group.node
+		if sa.Group != nil {
+			sa.Group.node = osa.Group.node
+		}
 		sa.consumers = osa.consumers
 		sa.responded = osa.responded
 		sa.err = osa.err
@@ -3198,7 +3200,9 @@ func (js *jetStream) processUpdateStreamAssignment(sa *streamAssignment) {
 	}
 
 	// Copy over private existing state from former SA.
-	sa.Group.node = osa.Group.node
+	if sa.Group != nil {
+		sa.Group.node = osa.Group.node
+	}
 	sa.consumers = osa.consumers
 	sa.err = osa.err
 
@@ -3216,7 +3220,9 @@ func (js *jetStream) processUpdateStreamAssignment(sa *streamAssignment) {
 		sa.responded = false
 	} else {
 		// Make sure to clean up any old node in case this stream moves back here.
-		sa.Group.node = nil
+		if sa.Group != nil {
+			sa.Group.node = nil
+		}
 	}
 	js.mu.Unlock()
 
@@ -3400,6 +3406,7 @@ func (js *jetStream) processClusterCreateStream(acc *Account, sa *streamAssignme
 	s, rg := js.srv, sa.Group
 	alreadyRunning := rg.node != nil
 	storage := sa.Config.Storage
+	restore := sa.Restore
 	js.mu.RUnlock()
 
 	// Process the raft group and make sure it's running if needed.
@@ -3408,11 +3415,13 @@ func (js *jetStream) processClusterCreateStream(acc *Account, sa *streamAssignme
 	// If we are restoring, create the stream if we are R>1 and not the preferred who handles the
 	// receipt of the snapshot itself.
 	shouldCreate := true
-	if sa.Restore != nil {
+	if restore != nil {
 		if len(rg.Peers) == 1 || rg.node != nil && rg.node.ID() == rg.Preferred {
 			shouldCreate = false
 		} else {
+			js.mu.Lock()
 			sa.Restore = nil
+			js.mu.Unlock()
 		}
 	}
 
@@ -3784,7 +3793,9 @@ func (js *jetStream) processConsumerAssignment(ca *consumerAssignment) {
 	} else if oca := sa.consumers[ca.Name]; oca != nil {
 		wasExisting = true
 		// Copy over private existing state from former SA.
-		ca.Group.node = oca.Group.node
+		if ca.Group != nil {
+			ca.Group.node = oca.Group.node
+		}
 		ca.responded = oca.responded
 		ca.err = oca.err
 	}
@@ -3899,8 +3910,12 @@ func (js *jetStream) processConsumerRemoval(ca *consumerAssignment) {
 	var needDelete bool
 	if accStreams := cc.streams[ca.Client.serviceAccount()]; accStreams != nil {
 		if sa := accStreams[ca.Stream]; sa != nil && sa.consumers != nil && sa.consumers[ca.Name] != nil {
-			needDelete = true
-			delete(sa.consumers, ca.Name)
+			oca := sa.consumers[ca.Name]
+			// Make sure this removal is for what we have, otherwise ignore.
+			if ca.Group != nil && oca.Group != nil && ca.Group.Name == oca.Group.Name {
+				needDelete = true
+				delete(sa.consumers, ca.Name)
+			}
 		}
 	}
 	js.mu.Unlock()

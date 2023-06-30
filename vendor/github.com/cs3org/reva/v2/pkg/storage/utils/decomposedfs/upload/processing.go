@@ -70,10 +70,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 		return nil, errors.New("Decomposedfs: missing dir in metadata")
 	}
 
-	n, err := lu.NodeFromSpaceID(ctx, &provider.ResourceId{
-		SpaceId:  info.Storage["SpaceRoot"],
-		OpaqueId: info.Storage["SpaceRoot"],
-	})
+	n, err := lu.NodeFromSpaceID(ctx, info.Storage["SpaceRoot"])
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: error getting space root node")
 	}
@@ -114,7 +111,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 	rp, err := p.AssemblePermissions(ctx, checkNode)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.InitiateFileUpload:
 		return nil, errtypes.PermissionDenied(path)
 	}

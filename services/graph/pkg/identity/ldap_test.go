@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/stretchr/testify/assert"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 )
 
 func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP, error) {

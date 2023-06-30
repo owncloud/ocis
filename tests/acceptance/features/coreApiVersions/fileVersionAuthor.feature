@@ -1,5 +1,8 @@
 @api @issue-2914
 Feature: file versions remember the author of each version
+  As a user
+  I want to know the author of each version of a file
+  So that I can better understand the version history and choose a version to restore
 
   Background:
     Given using OCS API version "2"

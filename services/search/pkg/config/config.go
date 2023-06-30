@@ -18,6 +18,8 @@ type Config struct {
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
+	TokenManager *TokenManager `yaml:"token_manager"`
+
 	Reva                       *shared.Reva          `yaml:"reva"`
 	GRPCClientTLS              *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	Events                     Events                `yaml:"events"`

@@ -11,6 +11,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
@@ -21,12 +22,15 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/mocks"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/service"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("UserlogService", func() {
@@ -37,23 +41,40 @@ var _ = Describe("UserlogService", func() {
 		bus testBus
 		sto microstore.Store
 
-		gwc cs3mocks.GatewayAPIClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+
 		ehc mocks.EventHistoryService
+		vc  settingssvc.MockValueService
 	)
 
 	BeforeEach(func() {
 		var err error
 		sto = store.Create()
 		bus = testBus(make(chan events.Event))
+
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
+
 		o := utils.AppendJSONToOpaque(nil, "grants", map[string]*provider.ResourcePermissions{"userid": {Stat: true}})
-		gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{StorageSpaces: []*provider.StorageSpace{
+		gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{StorageSpaces: []*provider.StorageSpace{
 			{
 				Opaque:    o,
 				SpaceType: "project",
 			},
 		}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
-		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
-		gwc.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		vc.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
+			return nil, nil
+		}
 
 		ul, err = service.NewUserlogService(
 			service.Config(cfg),
@@ -61,8 +82,9 @@ var _ = Describe("UserlogService", func() {
 			service.Store(sto),
 			service.Logger(log.NewLogger()),
 			service.Mux(chi.NewMux()),
-			service.GatewayClient(&gwc),
+			service.GatewaySelector(gatewaySelector),
 			service.HistoryClient(&ehc),
+			service.ValueClient(&vc),
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.SpaceDisabled{},
 			}),

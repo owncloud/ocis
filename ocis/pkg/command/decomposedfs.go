@@ -4,15 +4,23 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -21,15 +29,157 @@ import (
 // DecomposedfsCommand is the entrypoint for the groups command.
 func DecomposedfsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:        "decomposedfs",
-		Usage:       `cli tools to inspect and manipulate a decomposedfs storage.`,
-		Category:    "maintenance",
-		Subcommands: []*cli.Command{metadataCmd(cfg)},
+		Name:     "decomposedfs",
+		Usage:    `cli tools to inspect and manipulate a decomposedfs storage.`,
+		Category: "maintenance",
+		Subcommands: []*cli.Command{
+			metadataCmd(cfg),
+			checkCmd(cfg),
+		},
 	}
 }
 
 func init() {
 	register.AddCommand(DecomposedfsCommand)
+}
+
+func checkCmd(cfg *config.Config) *cli.Command {
+	return &cli.Command{
+		Name:  "check-treesize",
+		Usage: `cli tool to check the treesize metadata of a Space`,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "root",
+				Aliases:  []string{"r"},
+				Required: true,
+				Usage:    "Path to the root directory of the decomposedfs",
+			},
+			&cli.StringFlag{
+				Name:     "node",
+				Required: true,
+				Aliases:  []string{"n"},
+				Usage:    "Space ID of the Space to inspect",
+			},
+			&cli.BoolFlag{
+				Name:  "repair",
+				Usage: "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while ownCloud Infinite Scale is not running.",
+			},
+			&cli.BoolFlag{
+				Name:  "force",
+				Usage: "Do not prompt for confirmation when running in repair mode.",
+			},
+		},
+		Action: check,
+	}
+}
+
+func check(c *cli.Context) error {
+	rootFlag := c.String("root")
+	repairFlag := c.Bool("repair")
+
+	if repairFlag && !c.Bool("force") {
+		answer := strings.ToLower(stringPrompt("IMPORTANT: Only use '--repair' when ownCloud Infinite Scale is not running. Do you want to continue? [yes | no = default]"))
+		if answer != "yes" && answer != "y" {
+			return nil
+		}
+	}
+
+	lu, backend := getBackend(c)
+	o := &options.Options{
+		MetadataBackend: backend.Name(),
+		MaxConcurrency:  100,
+	}
+	bs, err := blobstore.New(rootFlag)
+	if err != nil {
+		fmt.Println("Failed to init blobstore")
+		return err
+	}
+
+	tree := tree.New(lu, bs, o, store.Create())
+
+	nId := c.String("node")
+	n, err := lu.NodeFromSpaceID(context.Background(), nId)
+	if err != nil || !n.Exists {
+		fmt.Println("Can not find node '" + nId + "'")
+		return err
+	}
+	fmt.Printf("Checking treesizes in space: %s (id: %s)\n", n.Name, n.ID)
+	ctx := revactx.ContextSetUser(context.Background(),
+		&userpb.User{
+			Id: &userpb.UserId{
+				OpaqueId: "00000000-0000-0000-0000-000000000000",
+			},
+			Username: "offline",
+		})
+
+	treeSize, err := walkTree(ctx, tree, lu, n, repairFlag)
+	treesizeFromMetadata, err := n.GetTreeSize()
+	if err != nil {
+		fmt.Printf("failed to read treesize of node: %s: %s\n", n.ID, err)
+	}
+	if treesizeFromMetadata != treeSize {
+		fmt.Printf("Tree sizes mismatch for space: %s\n\tNodeId: %s\n\tInternalPath: %s\n\tcalculated treesize: %d\n\ttreesize in metadata: %d\n",
+			n.Name, n.ID, n.InternalPath(), treeSize, treesizeFromMetadata)
+		if repairFlag {
+			fmt.Printf("Fixing tree size for node: %s. Calculated treesize: %d\n",
+				n.ID, treeSize)
+			n.SetTreeSize(treeSize)
+		}
+	}
+	return nil
+}
+
+func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *node.Node, repair bool) (uint64, error) {
+	if root.Type() != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		return 0, errors.New("can't travers non-container nodes")
+	}
+	children, err := tree.ListFolder(ctx, root)
+	if err != nil {
+		fmt.Println("Can not list children for space'" + root.ID + "'")
+		return 0, err
+	}
+
+	var treesize uint64
+	for _, child := range children {
+		switch child.Type() {
+		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
+			subtreesize, err := walkTree(ctx, tree, lu, child, repair)
+			if err != nil {
+				fmt.Printf("error calculating tree size of node: %s: %s\n", child.ID, err)
+				return 0, err
+			}
+			treesizeFromMetadata, err := child.GetTreeSize()
+			if err != nil {
+				fmt.Printf("failed to read tree size of node: %s: %s\n", child.ID, err)
+				return 0, err
+			}
+			if treesizeFromMetadata != subtreesize {
+				origin, err := lu.Path(ctx, child, node.NoCheck)
+				if err != nil {
+					fmt.Printf("error get path: %s\n", err)
+				}
+				fmt.Printf("Tree sizes mismatch for node: %s\n\tNodeId: %s\n\tInternalPath: %s\n\tcalculated treesize: %d\n\ttreesize in metadata: %d\n",
+					origin, child.ID, child.InternalPath(), subtreesize, treesizeFromMetadata)
+				if repair {
+					fmt.Printf("Fixing tree size for node: %s. Calculated treesize: %d\n",
+						child.ID, subtreesize)
+					child.SetTreeSize(subtreesize)
+				}
+			}
+			treesize += subtreesize
+		case provider.ResourceType_RESOURCE_TYPE_FILE:
+			blobsize, err := child.GetBlobSize()
+			if err != nil {
+				fmt.Printf("error reading blobsize of node: %s: %s\n", child.ID, err)
+				return 0, err
+			}
+			treesize += blobsize
+		default:
+			fmt.Printf("Ignoring type: %v, node: %s %s\n", child.Type(), child.Name, child.ID)
+		}
+	}
+
+	return treesize, nil
 }
 
 func metadataCmd(cfg *config.Config) *cli.Command {
@@ -135,15 +285,19 @@ func setCmd(cfg *config.Config) *cli.Command {
 				b64, err := base64.StdEncoding.DecodeString(v[2:])
 				if err == nil {
 					v = string(b64)
+				} else {
+					fmt.Printf("Error decoding base64 string: '%s'. Using as raw string.\n", err)
 				}
 			} else if strings.HasPrefix(v, "0x") {
-				h, err := hex.DecodeString(v)
+				h, err := hex.DecodeString(v[2:])
 				if err == nil {
 					v = string(h)
+				} else {
+					fmt.Printf("Error decoding base64 string: '%s'. Using as raw string.\n", err)
 				}
 			}
 
-			err = backend.Set(path, c.String("attribute"), []byte(v[2:]))
+			err = backend.Set(path, c.String("attribute"), []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
@@ -188,7 +342,7 @@ func getPath(c *cli.Context, lu *lookup.Lookup) (string, error) {
 			fmt.Println("Invalid node id.")
 			return "", err
 		}
-		n, _ := lu.NodeFromID(context.Background(), &id)
+		n, err := lu.NodeFromID(context.Background(), &id)
 		if err != nil || !n.Exists {
 			fmt.Println("Can not find node '" + nId + "'")
 			return "", err

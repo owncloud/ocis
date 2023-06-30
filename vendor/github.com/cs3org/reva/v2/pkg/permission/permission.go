@@ -24,9 +24,9 @@ import (
 
 const (
 	// ListAllSpaces is the hardcoded name for the list all spaces permission
-	ListAllSpaces string = "list-all-spaces"
+	ListAllSpaces string = "Drives.List"
 	// CreateSpace is the hardcoded name for the create space permission
-	CreateSpace string = "create-space"
+	CreateSpace string = "Drives.Create"
 	// WritePublicLink is the hardcoded name for the PublicLink.Write permission
 	WritePublicLink string = "PublicLink.Write"
 )

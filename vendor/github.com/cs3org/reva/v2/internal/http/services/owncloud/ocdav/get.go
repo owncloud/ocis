@@ -45,7 +45,7 @@ func (s *svc) handlePathGet(w http.ResponseWriter, r *http.Request, ns string) {
 
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Str("svc", "ocdav").Str("handler", "get").Logger()
 
-	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, fn)
+	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", fn).Msg("failed to look up storage space")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -60,10 +60,16 @@ func (s *svc) handlePathGet(w http.ResponseWriter, r *http.Request, ns string) {
 }
 
 func (s *svc) handleGet(ctx context.Context, w http.ResponseWriter, r *http.Request, ref *provider.Reference, dlProtocol string, log zerolog.Logger) {
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	sReq := &provider.StatRequest{
 		Ref: ref,
 	}
-	sRes, err := s.gwClient.Stat(ctx, sReq)
+	sRes, err := client.Stat(ctx, sReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error stat resource")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -85,7 +91,7 @@ func (s *svc) handleGet(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	}
 
 	dReq := &provider.InitiateFileDownloadRequest{Ref: ref}
-	dRes, err := s.gwClient.InitiateFileDownload(ctx, dReq)
+	dRes, err := client.InitiateFileDownload(ctx, dReq)
 	switch {
 	case err != nil:
 		log.Error().Err(err).Msg("error initiating file download")

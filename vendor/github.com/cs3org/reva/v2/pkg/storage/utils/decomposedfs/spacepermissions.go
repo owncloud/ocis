@@ -8,6 +8,7 @@ import (
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc"
@@ -16,6 +17,7 @@ import (
 // PermissionsChecker defines an interface for checking permissions on a Node
 type PermissionsChecker interface {
 	AssemblePermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
+	AssembleTrashPermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
 }
 
 // CS3PermissionsClient defines an interface for checking permissions against the CS3 permissions service
@@ -25,13 +27,13 @@ type CS3PermissionsClient interface {
 
 // Permissions manages permissions
 type Permissions struct {
-	item  PermissionsChecker   // handles item permissions
-	space CS3PermissionsClient // handlers space permissions
+	item                PermissionsChecker                                   // handles item permissions
+	permissionsSelector pool.Selectable[cs3permissions.PermissionsAPIClient] // handlers space permissions
 }
 
 // NewPermissions returns a new Permissions instance
-func NewPermissions(item PermissionsChecker, space CS3PermissionsClient) Permissions {
-	return Permissions{item: item, space: space}
+func NewPermissions(item PermissionsChecker, permissionsSelector pool.Selectable[cs3permissions.PermissionsAPIClient]) Permissions {
+	return Permissions{item: item, permissionsSelector: permissionsSelector}
 }
 
 // AssemblePermissions is used to assemble file permissions
@@ -39,9 +41,14 @@ func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (pro
 	return p.item.AssemblePermissions(ctx, n)
 }
 
+// AssembleTrashPermissions is used to assemble file permissions
+func (p Permissions) AssembleTrashPermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
+	return p.item.AssembleTrashPermissions(ctx, n)
+}
+
 // CreateSpace returns true when the user is allowed to create the space
 func (p Permissions) CreateSpace(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "create-space", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.Create", spaceRef(spaceid))
 }
 
 // SetSpaceQuota returns true when the user is allowed to change the spaces quota
@@ -50,25 +57,25 @@ func (p Permissions) SetSpaceQuota(ctx context.Context, spaceid string, spaceTyp
 	default:
 		return false // only quotas of personal and project space may be changed
 	case _spaceTypePersonal:
-		return p.checkPermission(ctx, "set-space-quota", spaceRef(spaceid))
+		return p.checkPermission(ctx, "Drives.ReadWritePersonalQuota", spaceRef(spaceid))
 	case _spaceTypeProject:
-		return p.checkPermission(ctx, "Drive.ReadWriteQuota.Project", spaceRef(spaceid))
+		return p.checkPermission(ctx, "Drives.ReadWriteProjectQuota", spaceRef(spaceid))
 	}
 }
 
 // ManageSpaceProperties returns true when the user is allowed to change space properties (name/subtitle)
 func (p Permissions) ManageSpaceProperties(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "Drive.ReadWrite", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.ReadWrite", spaceRef(spaceid))
 }
 
 // SpaceAbility returns true when the user is allowed to enable/disable the space
 func (p Permissions) SpaceAbility(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "Drive.ReadWriteEnabled", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.ReadWriteEnabled", spaceRef(spaceid))
 }
 
 // ListAllSpaces returns true when the user is allowed to list all spaces
 func (p Permissions) ListAllSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "list-all-spaces", nil)
+	return p.checkPermission(ctx, "Drives.List", nil)
 }
 
 // ListSpacesOfUser returns true when the user is allowed to list the spaces of the given user
@@ -86,18 +93,23 @@ func (p Permissions) ListSpacesOfUser(ctx context.Context, userid *userv1beta1.U
 
 // DeleteAllSpaces returns true when the user is allowed to delete all spaces
 func (p Permissions) DeleteAllSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "delete-all-spaces", nil)
+	return p.checkPermission(ctx, "Drives.DeleteProject", nil)
 }
 
 // DeleteAllHomeSpaces returns true when the user is allowed to delete all home spaces
 func (p Permissions) DeleteAllHomeSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "delete-all-home-spaces", nil)
+	return p.checkPermission(ctx, "Drives.DeletePersonal", nil)
 }
 
 // checkPermission is used to check a users space permissions
 func (p Permissions) checkPermission(ctx context.Context, perm string, ref *provider.Reference) bool {
+	permissionsClient, err := p.permissionsSelector.Next()
+	if err != nil {
+		return false
+	}
+
 	user := ctxpkg.ContextMustGetUser(ctx)
-	checkRes, err := p.space.CheckPermission(ctx, &cs3permissions.CheckPermissionRequest{
+	checkRes, err := permissionsClient.CheckPermission(ctx, &cs3permissions.CheckPermissionRequest{
 		Permission: perm,
 		SubjectRef: &cs3permissions.SubjectReference{
 			Spec: &cs3permissions.SubjectReference_UserId{

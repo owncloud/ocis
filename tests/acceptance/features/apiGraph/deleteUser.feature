@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: delete user
   As an admin
   I want to be able to delete users
@@ -12,7 +12,7 @@ Feature: delete user
 
 
   Scenario Outline: admin user deletes a user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | <userName>    |
       | displayName | <displayName> |
@@ -30,7 +30,7 @@ Feature: delete user
 
   Scenario: delete a user and specify the user name in different case
     Given user "brand-new-user" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brand-New-User" using the Graph API
     Then the HTTP status code should be "204"
     And user "brand-new-user" should not exist
@@ -38,8 +38,8 @@ Feature: delete user
 
   Scenario Outline: admin user deletes another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not exist
@@ -48,18 +48,18 @@ Feature: delete user
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user tries to delete his/her own account
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "403"
     And user "Alice" should exist
 
 
   Scenario Outline: non-admin user tries to delete his/her own account
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "401"
     And user "Alice" should exist
@@ -67,30 +67,30 @@ Feature: delete user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user tries to delete a nonexistent user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "404"
 
-  
+
   Scenario Outline: non-admin user tries to delete a nonexistent user
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "401"
     Examples:
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: non-admin user tries to delete another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
     And user "Brian" should exist
@@ -98,20 +98,20 @@ Feature: delete user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
 
   Scenario: admin user deletes a disabled user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
@@ -120,11 +120,11 @@ Feature: delete user
 
 
   Scenario Outline: normal user tries to delete a disabled user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
-    And the administrator has given "Carol" the role "<userRole>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Carol" using the Graph API
     And the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Carol" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
@@ -133,13 +133,36 @@ Feature: delete user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
+
+
+  Scenario: personal space is deleted automatically when the user is deleted
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    When the user "Alice" deletes a user "Brian" using the Graph API
+    Then the HTTP status code should be "204"
+    When user "Alice" lists all spaces via the GraphApi with query "$filter=driveType eq 'personal'"
+    Then the json responded should not contain a space with name "Brian Murphy"
+
+
+  Scenario: accepted share is deleted automatically when the user is deleted
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created a folder "new" in space "Brian Murphy"
+    And user "Brian" has created a share inside of space "Brian Murphy" with settings:
+      | path      | new    |
+      | shareWith | Alice  |
+      | role      | viewer |
+    And user "Alice" has accepted share "/new" offered by user "Brian"
+    When the user "Alice" deletes a user "Brian" using the Graph API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "Shares/new" should not exist

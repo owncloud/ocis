@@ -40,15 +40,15 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;APP_PROVIDER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
-type Service struct {
-	Name string `yaml:"-"`
-}
-
 type Debug struct {
 	Addr   string `yaml:"addr" env:"APP_PROVIDER_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"APP_PROVIDER_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint"`
 	Pprof  bool   `yaml:"pprof" env:"APP_PROVIDER_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling"`
 	Zpages bool   `yaml:"zpages" env:"APP_PROVIDER_DEBUG_ZPAGES" desc:"Enables zpages, which can  be used for collecting and viewing traces in-memory."`
+}
+
+type Service struct {
+	Name string `yaml:"name" env:"APP_PROVIDER_SERVICE_NAME" desc:"The name of the service. This needs to be changed when using more than one app provider. Each app provider configured needs to be identified by a unique service name. Possible examples are: 'app-provider-collabora', 'app-provider-onlyoffice', 'app-provider-office365'."`
 }
 
 type GRPCConfig struct {
@@ -69,6 +69,7 @@ type WOPIDriver struct {
 	AppInternalURL            string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, like in your DMZ."`
 	AppName                   string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name."`
 	AppURL                    string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app."`
+	AppDisableChat            bool   `yaml:"app_disable_chat" env:"APP_PROVIDER_WOPI_DISABLE_CHAT" desc:"Disable the chat functionality of the office app."`
 	Insecure                  bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments."`
 	IopSecret                 string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"Shared secret of the CS3org WOPI server."`
 	WopiURL                   string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"External url of the CS3org WOPI server."`

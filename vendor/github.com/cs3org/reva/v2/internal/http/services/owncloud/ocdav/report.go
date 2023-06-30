@@ -81,9 +81,15 @@ func (s *svc) doFilterFiles(w http.ResponseWriter, r *http.Request, ff *reportFi
 			return
 		}
 
+		client, err := s.gatewaySelector.Next()
+		if err != nil {
+			log.Error().Err(err).Msg("error selecting next gateway client")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		infos := make([]*provider.ResourceInfo, 0, len(favorites))
 		for i := range favorites {
-			statRes, err := s.gwClient.Stat(ctx, &providerv1beta1.StatRequest{Ref: &providerv1beta1.Reference{ResourceId: favorites[i]}})
+			statRes, err := client.Stat(ctx, &providerv1beta1.StatRequest{Ref: &providerv1beta1.Reference{ResourceId: favorites[i]}})
 			if err != nil {
 				log.Error().Err(err).Msg("error getting resource info")
 				continue

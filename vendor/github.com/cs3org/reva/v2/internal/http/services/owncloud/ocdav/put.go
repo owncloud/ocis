@@ -114,7 +114,7 @@ func (s *svc) handlePathPut(w http.ResponseWriter, r *http.Request, ns string) {
 	fn := path.Join(ns, r.URL.Path)
 
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
-	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, fn)
+	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", fn).Msg("failed to look up storage space")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -148,8 +148,14 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	if length == 0 {
-		tfRes, err := s.gwClient.TouchFile(ctx, &provider.TouchFileRequest{
+		tfRes, err := client.TouchFile(ctx, &provider.TouchFileRequest{
 			Ref: ref,
 		})
 		if err != nil {
@@ -162,7 +168,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		sRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{
+		sRes, err := client.Stat(ctx, &provider.StatRequest{
 			Ref: ref,
 		})
 		if err != nil {
@@ -241,7 +247,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	}
 
 	// where to upload the file?
-	uRes, err := s.gwClient.InitiateFileUpload(ctx, uReq)
+	uRes, err := client.InitiateFileUpload(ctx, uReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error initiating file upload")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -258,7 +264,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 			status := http.StatusForbidden
 			m := uRes.Status.Message
 			// check if user has access to parent
-			sRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
+			sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
 				ResourceId: ref.ResourceId,
 				Path:       utils.MakeRelativePath(path.Dir(ref.Path)),
 			}})

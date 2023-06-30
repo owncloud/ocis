@@ -21,8 +21,10 @@ package sharecache
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -30,12 +32,19 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/jsoncs3/shareid"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
+
+// name is the Tracer name used to identify this instrumentation library.
+const tracerName = "sharecache"
 
 // Cache caches the list of share ids for users/groups
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user/group
 type Cache struct {
+	lockMap sync.Map
+
 	UserShares map[string]*UserShareCache
 
 	storage   metadata.Storage
@@ -58,6 +67,14 @@ type SpaceShareIDs struct {
 	IDs   map[string]struct{}
 }
 
+func (c *Cache) lockUser(userID string) func() {
+	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
+	lock := v.(*sync.Mutex)
+
+	lock.Lock()
+	return func() { lock.Unlock() }
+}
+
 // New returns a new Cache instance
 func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cache {
 	return Cache{
@@ -66,11 +83,19 @@ func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cach
 		namespace:  namespace,
 		filename:   filename,
 		ttl:        ttl,
+		lockMap:    sync.Map{},
 	}
 }
 
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
+	unlock := c.lockUser(userid)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
+
 	storageid, spaceid, _ := shareid.Decode(shareID)
 	ssid := storageid + shareid.IDDelimiter + spaceid
 
@@ -94,6 +119,13 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 
 // Remove removes a share for the given user
 func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
+	unlock := c.lockUser(userid)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
+
 	storageid, spaceid, _ := shareid.Decode(shareID)
 	ssid := storageid + shareid.IDDelimiter + spaceid
 
@@ -133,14 +165,21 @@ func (c *Cache) List(userid string) map[string]SpaceShareIDs {
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, userID string) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+
 	log := appctx.GetLogger(ctx).With().Str("userID", userID).Logger()
-	log.Debug().Msg("Syncing share cache...")
 
 	var mtime time.Time
 	//  - do we have a cached list of created shares for the user in memory?
 	if usc := c.UserShares[userID]; usc != nil {
 		if time.Now().Before(c.UserShares[userID].nextSync) {
-			log.Debug().Msg("Skipping share cache sync, it was just recently synced...")
+			span.AddEvent("skip sync")
+			span.SetStatus(codes.Ok, "")
 			return nil
 		}
 		c.UserShares[userID].nextSync = time.Now().Add(c.ttl)
@@ -155,46 +194,59 @@ func (c *Cache) Sync(ctx context.Context, userID string) error {
 	info, err := c.storage.Stat(ctx, userCreatedPath)
 	if err != nil {
 		if _, ok := err.(errtypes.NotFound); ok {
+			span.AddEvent("no file")
+			span.SetStatus(codes.Ok, "")
 			return nil // Nothing to sync against
 		}
+		span.SetStatus(codes.Error, fmt.Sprintf("Failed to stat the share cache: %s", err.Error()))
 		log.Error().Err(err).Msg("Failed to stat the share cache")
 		return err
 	}
 	// check mtime of /users/{userid}/created.json
 	if utils.TSToTime(info.Mtime).After(mtime) {
-		log.Debug().Msg("Updating share cache...")
+		span.AddEvent("updating cache")
 		//  - update cached list of created shares for the user in memory if changed
 		createdBlob, err := c.storage.SimpleDownload(ctx, userCreatedPath)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the share cache: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to download the share cache")
 			return err
 		}
 		newShareCache := &UserShareCache{}
 		err = json.Unmarshal(createdBlob, newShareCache)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to unmarshal the share cache: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to unmarshal the share cache")
 			return err
 		}
 		newShareCache.Mtime = utils.TSToTime(info.Mtime)
 		c.UserShares[userID] = newShareCache
 	}
-	log.Debug().Msg("Share cache is up to date")
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
 // Persist persists the data for one user/group to the storage
 func (c *Cache) Persist(ctx context.Context, userid string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Persist")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userid))
+
 	oldMtime := c.UserShares[userid].Mtime
 	c.UserShares[userid].Mtime = time.Now()
 
 	createdBytes, err := json.Marshal(c.UserShares[userid])
 	if err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := c.userCreatedPath(userid)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -204,8 +256,11 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 		IfUnmodifiedSince: c.UserShares[userid].Mtime,
 	}); err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 

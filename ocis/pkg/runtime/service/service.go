@@ -109,45 +109,195 @@ func NewService(options ...Option) (*Service, error) {
 		cfg:          opts.Config,
 	}
 
-	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
-	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
-	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
-	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
-	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
-	s.ServicesRegistry[opts.Config.Invitations.Service.Name] = invitations.NewSutureService
-	s.ServicesRegistry[opts.Config.OCS.Service.Name] = ocs.NewSutureService
-	s.ServicesRegistry[opts.Config.Store.Service.Name] = store.NewSutureService
-	s.ServicesRegistry[opts.Config.Thumbnails.Service.Name] = thumbnails.NewSutureService
-	s.ServicesRegistry[opts.Config.Web.Service.Name] = web.NewSutureService
-	s.ServicesRegistry[opts.Config.WebDAV.Service.Name] = webdav.NewSutureService
-	s.ServicesRegistry[opts.Config.Webfinger.Service.Name] = webfinger.NewSutureService
-	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewSutureService
-	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
-	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService
-	s.ServicesRegistry[opts.Config.AppRegistry.Service.Name] = appRegistry.NewSutureService
-	s.ServicesRegistry[opts.Config.Users.Service.Name] = users.NewSutureService
-	s.ServicesRegistry[opts.Config.Groups.Service.Name] = groups.NewSutureService
-	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService
-	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewSutureService
-	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewSutureService
-	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewSutureService
-	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewSutureService
-	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appProvider.NewSutureService
-	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
-	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
-	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
-	s.ServicesRegistry[opts.Config.EventHistory.Service.Name] = eventhistory.NewSutureService
-	s.ServicesRegistry[opts.Config.Userlog.Service.Name] = userlog.NewSutureService
+	// populate services
+	reg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
+		s.ServicesRegistry[name] = NewSutureServiceBuilder(exec)
+	}
+	reg(opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AppProvider.Context = ctx
+		cfg.AppProvider.Commons = cfg.Commons
+		return appProvider.Execute(cfg.AppProvider)
+	})
+	reg(opts.Config.AppRegistry.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AppRegistry.Context = ctx
+		cfg.AppRegistry.Commons = cfg.Commons
+		return appRegistry.Execute(cfg.AppRegistry)
+	})
+	reg(opts.Config.AuthBasic.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AuthBasic.Context = ctx
+		cfg.AuthBasic.Commons = cfg.Commons
+		return authbasic.Execute(cfg.AuthBasic)
+	})
+	reg(opts.Config.AuthMachine.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AuthMachine.Context = ctx
+		cfg.AuthMachine.Commons = cfg.Commons
+		return authmachine.Execute(cfg.AuthMachine)
+	})
+	reg(opts.Config.EventHistory.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.EventHistory.Context = ctx
+		cfg.EventHistory.Commons = cfg.Commons
+		return eventhistory.Execute(cfg.EventHistory)
+	})
+	reg(opts.Config.Frontend.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Frontend.Context = ctx
+		cfg.Frontend.Commons = cfg.Commons
+		return frontend.Execute(cfg.Frontend)
+	})
+	reg(opts.Config.Gateway.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Gateway.Context = ctx
+		cfg.Gateway.Commons = cfg.Commons
+		return gateway.Execute(cfg.Gateway)
+	})
+	reg(opts.Config.Graph.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Graph.Context = ctx
+		cfg.Graph.Commons = cfg.Commons
+		return graph.Execute(cfg.Graph)
+	})
+	reg(opts.Config.Groups.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Groups.Context = ctx
+		cfg.Groups.Commons = cfg.Commons
+		return groups.Execute(cfg.Groups)
+	})
+	reg(opts.Config.IDM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.IDM.Context = ctx
+		cfg.IDM.Commons = cfg.Commons
+		return idm.Execute(cfg.IDM)
+	})
+	reg(opts.Config.Invitations.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Invitations.Context = ctx
+		cfg.Invitations.Commons = cfg.Commons
+		return invitations.Execute(cfg.Invitations)
+	})
+	reg(opts.Config.Nats.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Nats.Context = ctx
+		cfg.Nats.Commons = cfg.Commons
+		return nats.Execute(cfg.Nats)
+	})
+	reg(opts.Config.Notifications.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Notifications.Context = ctx
+		cfg.Notifications.Commons = cfg.Commons
+		return notifications.Execute(cfg.Notifications)
+	})
+	reg(opts.Config.OCDav.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.OCDav.Context = ctx
+		cfg.OCDav.Commons = cfg.Commons
+		return ocdav.Execute(cfg.OCDav)
+	})
+	reg(opts.Config.OCS.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.OCS.Context = ctx
+		cfg.OCS.Commons = cfg.Commons
+		return ocs.Execute(cfg.OCS)
+	})
+	reg(opts.Config.Postprocessing.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Postprocessing.Context = ctx
+		cfg.Postprocessing.Commons = cfg.Commons
+		return postprocessing.Execute(cfg.Postprocessing)
+	})
+	reg(opts.Config.Search.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Search.Context = ctx
+		cfg.Search.Commons = cfg.Commons
+		return search.Execute(cfg.Search)
+	})
+	reg(opts.Config.Settings.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Settings.Context = ctx
+		cfg.Settings.Commons = cfg.Commons
+		return settings.Execute(cfg.Settings)
+	})
+	reg(opts.Config.StoragePublicLink.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.StoragePublicLink.Context = ctx
+		cfg.StoragePublicLink.Commons = cfg.Commons
+		return storagepublic.Execute(cfg.StoragePublicLink)
+	})
+	reg(opts.Config.StorageShares.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.StorageShares.Context = ctx
+		cfg.StorageShares.Commons = cfg.Commons
+		return storageshares.Execute(cfg.StorageShares)
+	})
+	reg(opts.Config.StorageSystem.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.StorageSystem.Context = ctx
+		cfg.StorageSystem.Commons = cfg.Commons
+		return storageSystem.Execute(cfg.StorageSystem)
+	})
+	reg(opts.Config.StorageUsers.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.StorageUsers.Context = ctx
+		cfg.StorageUsers.Commons = cfg.Commons
+		return storageusers.Execute(cfg.StorageUsers)
+	})
+	reg(opts.Config.Store.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Store.Context = ctx
+		cfg.Store.Commons = cfg.Commons
+		return store.Execute(cfg.Store)
+	})
+	reg(opts.Config.Thumbnails.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Thumbnails.Context = ctx
+		cfg.Thumbnails.Commons = cfg.Commons
+		return thumbnails.Execute(cfg.Thumbnails)
+	})
+	reg(opts.Config.Userlog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Userlog.Context = ctx
+		cfg.Userlog.Commons = cfg.Commons
+		return userlog.Execute(cfg.Userlog)
+	})
+	reg(opts.Config.Users.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Users.Context = ctx
+		cfg.Users.Commons = cfg.Commons
+		return users.Execute(cfg.Users)
+	})
+	reg(opts.Config.Web.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Web.Context = ctx
+		cfg.Web.Commons = cfg.Commons
+		return web.Execute(cfg.Web)
+	})
+	reg(opts.Config.WebDAV.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.WebDAV.Context = ctx
+		cfg.WebDAV.Commons = cfg.Commons
+		return webdav.Execute(cfg.WebDAV)
+	})
+	reg(opts.Config.Webfinger.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Webfinger.Context = ctx
+		cfg.Webfinger.Commons = cfg.Commons
+		return webfinger.Execute(cfg.Webfinger)
+	})
 
 	// populate optional services
-	s.Additional[opts.Config.Antivirus.Service.Name] = antivirus.NewSutureService
-	s.Additional[opts.Config.Audit.Service.Name] = audit.NewSutureService
-	s.Additional[opts.Config.Policies.Service.Name] = policies.NewSutureService
+	areg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
+		s.Additional[name] = NewSutureServiceBuilder(exec)
+	}
+	areg(opts.Config.Antivirus.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Antivirus.Context = ctx
+		// cfg.Antivirus.Commons = cfg.Commons // antivirus holds no Commons atm
+		return antivirus.Execute(cfg.Antivirus)
+	})
+	areg(opts.Config.Audit.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Audit.Context = ctx
+		cfg.Audit.Commons = cfg.Commons
+		return audit.Execute(cfg.Audit)
+	})
+	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Policies.Context = ctx
+		cfg.Policies.Commons = cfg.Commons
+		return policies.Execute(cfg.Policies)
+	})
 
 	// populate delayed services
-	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
-	s.Delayed[opts.Config.Proxy.Service.Name] = proxy.NewSutureService
-	s.Delayed[opts.Config.IDP.Service.Name] = idp.NewSutureService
+	dreg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
+		s.Delayed[name] = NewSutureServiceBuilder(exec)
+	}
+	dreg(opts.Config.IDP.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.IDP.Context = ctx
+		cfg.IDP.Commons = cfg.Commons
+		return idp.Execute(cfg.IDP)
+	})
+	dreg(opts.Config.Proxy.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Proxy.Context = ctx
+		cfg.Proxy.Commons = cfg.Commons
+		return proxy.Execute(cfg.Proxy)
+	})
+	dreg(opts.Config.Sharing.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Sharing.Context = ctx
+		cfg.Sharing.Commons = cfg.Commons
+		return sharing.Execute(cfg.Sharing)
+	})
 
 	return s, nil
 }
@@ -282,7 +432,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	for _, name := range cfg.Runtime.Disabled {
 		delete(runset, name)
 	}
-
 }
 
 // List running processes for the Service Controller.

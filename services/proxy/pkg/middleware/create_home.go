@@ -10,6 +10,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -23,19 +24,19 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return &createHome{
-			next:              next,
-			logger:            logger,
-			revaGatewayClient: options.RevaGatewayClient,
-			roleQuotas:        options.RoleQuotas,
+			next:                next,
+			logger:              logger,
+			revaGatewaySelector: options.RevaGatewaySelector,
+			roleQuotas:          options.RoleQuotas,
 		}
 	}
 }
 
 type createHome struct {
-	next              http.Handler
-	logger            log.Logger
-	revaGatewayClient gateway.GatewayAPIClient
-	roleQuotas        map[string]uint64
+	next                http.Handler
+	logger              log.Logger
+	revaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	roleQuotas          map[string]uint64
 }
 
 func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -64,14 +65,18 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	createHomeRes, err := m.revaGatewayClient.CreateHome(ctx, createHomeReq)
-
+	client, err := m.revaGatewaySelector.Next()
 	if err != nil {
-		m.logger.Err(err).Msg("error calling CreateHome")
-	} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
-		err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-		if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
-			m.logger.Err(err).Msg("error when calling Createhome")
+		m.logger.Err(err).Msg("error selecting next gateway client")
+	} else {
+		createHomeRes, err := client.CreateHome(ctx, createHomeReq)
+		if err != nil {
+			m.logger.Err(err).Msg("error calling CreateHome")
+		} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
+			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
+			if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+				m.logger.Err(err).Msg("error when calling Createhome")
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: get groups and their members
   As an admin
   I want to be able to get groups
@@ -6,9 +6,9 @@ Feature: get groups and their members
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
-
+  
   Scenario: admin user lists all the groups
     Given group "tea-lover" has been created
     And group "coffee-lover" has been created
@@ -23,7 +23,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get the groups list
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And group "h2o-lover" has been created
@@ -54,7 +54,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets users of a group
@@ -74,7 +74,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
     Then the HTTP status code should be "403"
@@ -103,7 +103,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets all groups along with its member's information
@@ -235,7 +235,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get all groups along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And user "Alice" has been added to group "tea-lover"
@@ -267,7 +267,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets a group along with its member's information
@@ -350,7 +350,7 @@ Feature: get groups and their members
   @issue-5604
   Scenario Outline: user other than the admin gets a group along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
@@ -381,7 +381,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: get details of a group

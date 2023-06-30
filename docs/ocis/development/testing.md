@@ -74,7 +74,21 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 
 ```bash
 START_EMAIL=true \
-BEHAT_FEATURE='tests/acceptance/features/apiEmailNotification/emailNotification.feature' \
+BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+```
+
+{{< /hint >}}
+
+{{< hint info >}}
+To run the tests that require an antivirus service (tests tagged with `@antivirus`), you need to provide the following environment variables while running the tests.
+
+```bash
+START_ANTIVIRUS=true \
+OCIS_ASYNC_UPLOADS=true \
+OCIS_ADD_RUN_SERVICES=antivirus \
+POSTPROCESSING_STEPS=virusscan \
+BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -313,7 +327,7 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
 3. Recommended: add the new step implementations in `OcisConfigContext.php`
 
-## Running Test Suite With Email Service (@Email)
+## Running Test Suite With Email Service (@email)
 
 Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
 
@@ -405,4 +419,77 @@ In order to run a single test, use the `BEHAT_FEATURE` environment variable.
 make test-paralleldeployment-api \
 ... \
 BEHAT_FEATURE="tests/parallelDeployAcceptance/features/apiShareManagement/acceptShares.feature"
+```
+
+## Running Test Suite With Antivirus Service (@antivirus)
+Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
+
+### Setup clamAV
+#### 1. Setup Locally
+
+##### Linux OS user
+Run the following command to set up calmAV and clamAV daemon
+```bash
+sudo apt install clamav clamav-daemon -y
+```
+
+Make sure that the  clamAV daemon is up and running
+
+```bash
+sudo service clamav-daemon status
+```
+{{< hint info >}}
+The commands are ubuntu specific and may differ according to your system. You can find information related to installation of clamAV in their official documentation [here](https://docs.clamav.net/manual/Installing/Packages.html).
+{{< /hint>}}
+
+##### Mac OS user
+Install ClamAV using [here](https://gist.github.com/mendozao/3ea393b91f23a813650baab9964425b9)
+Start ClamAV daemon 
+```bash
+/your/location/to/brew/Cellar/clamav/1.1.0/sbin/clamd
+```
+#### 2. Setup clamAV With Docker
+##### Linux OS user
+Run `clamAV` through docker
+```bash
+docker run -d -p 3310:3310 owncloudci/clamavd
+```
+
+##### Mac OS user
+```bash
+docker run -d -p 3310:3310 -v /your/local/filesystem/path/to/clamav/:/var/lib/clamav mkodockx/docker-clamav:alpine
+```
+
+### Run oCIS
+
+As `antivirus` service is not enabled by default we need to enable the service while running oCIS server. We also need to enable `async upload` and as virus scan is performed in post-processing step, we need to set it as well. Documentation for environment variables related to antivirus is available [here](https://owncloud.dev/services/antivirus/#environment-variables)
+
+```bash
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+ANTIVIRUS_SCANNER_TYPE="clamav" \
+ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
+POSTPROCESSING_STEPS="virusscan" \
+OCIS_ASYNC_UPLOADS=true \
+OCIS_ADD_RUN_SERVICES="antivirus"
+ocis/bin/ocis server
+```
+{{< hint info >}}
+The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
+
+For antivirus running localy on Linux OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/var/run/clamav/clamd.ctl"`.
+For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.socket"`.
+For antivirus running with docker, use `ANTIVIRUS_CLAMAV_SOCKET= "tcp://host.docker.internal:3310"`
+{{< /hint>}}
+
+#### Run the Acceptance Test
+
+Run the acceptance test with the following command:
+
+```bash
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+BEHAT_FEATURE="tests/acceptance/features/apiAntivirus/antivirus.feature" \
+make test-acceptance-api
 ```

@@ -1020,9 +1020,9 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 		return fmt.Errorf("jetstream can not be enabled on the system account")
 	}
 
-	s.mu.Lock()
+	s.mu.RLock()
 	sendq := s.sys.sendq
-	s.mu.Unlock()
+	s.mu.RUnlock()
 
 	// No limits means we dynamically set up limits.
 	// We also place limits here so we know that the account is configured for JetStream.
@@ -1054,12 +1054,15 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 	jsa := &jsAccount{js: js, account: a, limits: limits, streams: make(map[string]*stream), sendq: sendq, usage: make(map[string]*jsaStorage)}
 	jsa.storeDir = filepath.Join(js.config.StoreDir, a.Name)
 
-	jsa.usageMu.Lock()
-	jsa.utimer = time.AfterFunc(usageTick, jsa.sendClusterUsageUpdateTimer)
-	// Cluster mode updates to resource usage, but we always will turn on. System internal prevents echos.
-	jsa.updatesPub = fmt.Sprintf(jsaUpdatesPubT, a.Name, sysNode)
-	jsa.updatesSub, _ = s.sysSubscribe(fmt.Sprintf(jsaUpdatesSubT, a.Name), jsa.remoteUpdateUsage)
-	jsa.usageMu.Unlock()
+	// A single server does not need to do the account updates at this point.
+	if js.cluster != nil || !s.standAloneMode() {
+		jsa.usageMu.Lock()
+		jsa.utimer = time.AfterFunc(usageTick, jsa.sendClusterUsageUpdateTimer)
+		// Cluster mode updates to resource usage. System internal prevents echos.
+		jsa.updatesPub = fmt.Sprintf(jsaUpdatesPubT, a.Name, sysNode)
+		jsa.updatesSub, _ = s.sysSubscribe(fmt.Sprintf(jsaUpdatesSubT, a.Name), jsa.remoteUpdateUsage)
+		jsa.usageMu.Unlock()
+	}
 
 	js.accounts[a.Name] = jsa
 	js.mu.Unlock()
@@ -1209,22 +1212,23 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 
 		// Check if we are encrypted.
 		keyFile := filepath.Join(mdir, JetStreamMetaFileKey)
-		if key, err := os.ReadFile(keyFile); err == nil {
+		keyBuf, err := os.ReadFile(keyFile)
+		if err == nil {
 			s.Debugf("  Stream metafile is encrypted, reading encrypted keyfile")
-			if len(key) < minMetaKeySize {
-				s.Warnf("  Bad stream encryption key length of %d", len(key))
+			if len(keyBuf) < minMetaKeySize {
+				s.Warnf("  Bad stream encryption key length of %d", len(keyBuf))
 				continue
 			}
 			// Decode the buffer before proceeding.
-			nbuf, err := s.decryptMeta(sc, key, buf, a.Name, fi.Name())
+			nbuf, err := s.decryptMeta(sc, keyBuf, buf, a.Name, fi.Name())
 			if err != nil {
 				// See if we are changing ciphers.
 				switch sc {
 				case ChaCha:
-					nbuf, err = s.decryptMeta(AES, key, buf, a.Name, fi.Name())
+					nbuf, err = s.decryptMeta(AES, keyBuf, buf, a.Name, fi.Name())
 					osc, convertingCiphers = AES, true
 				case AES:
-					nbuf, err = s.decryptMeta(ChaCha, key, buf, a.Name, fi.Name())
+					nbuf, err = s.decryptMeta(ChaCha, keyBuf, buf, a.Name, fi.Name())
 					osc, convertingCiphers = ChaCha, true
 				}
 				if err != nil {
@@ -1234,9 +1238,6 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 			}
 			buf = nbuf
 			plaintext = false
-
-			// Remove the key file to have system regenerate with the new cipher.
-			os.Remove(keyFile)
 		}
 
 		var cfg FileStreamInfo
@@ -1288,6 +1289,8 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 				s.Noticef("  Encrypting stream '%s > %s'", a.Name, cfg.StreamConfig.Name)
 			} else if convertingCiphers {
 				s.Noticef("  Converting from %s to %s for stream '%s > %s'", osc, sc, a.Name, cfg.StreamConfig.Name)
+				// Remove the key file to have system regenerate with the new cipher.
+				os.Remove(keyFile)
 			}
 		}
 
@@ -1295,6 +1298,13 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 		mset, err := a.addStream(&cfg.StreamConfig)
 		if err != nil {
 			s.Warnf("  Error recreating stream %q: %v", cfg.Name, err)
+			// If we removed a keyfile from above make sure to put it back.
+			if convertingCiphers {
+				err := os.WriteFile(keyFile, keyBuf, defaultFilePerms)
+				if err != nil {
+					s.Warnf("  Error replacing meta keyfile for stream %q: %v", cfg.Name, err)
+				}
+			}
 			continue
 		}
 		if !cfg.Created.IsZero() {

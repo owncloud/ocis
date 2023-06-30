@@ -24,7 +24,7 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
 
 
-  Scenario Outline: Get the list of resources in the root folder with depth 0
+  Scenario Outline: get the list of resources in the root folder with depth 0
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -48,7 +48,7 @@ Feature: list files
       | spaces      |
 
 
-  Scenario Outline: Get the list of resources in the root folder with depth 1
+  Scenario Outline: get the list of resources in the root folder with depth 1
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/" with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -74,7 +74,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindEnabled
-  Scenario Outline: Get the list of resources in the root folder with depth infinity
+  Scenario Outline: get the list of resources in the root folder with depth infinity
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -103,7 +103,7 @@ Feature: list files
       | spaces      |
 
 
-  Scenario Outline: Get the list of resources in a folder with depth 0
+  Scenario Outline: get the list of resources in a folder with depth 0
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -127,7 +127,7 @@ Feature: list files
       | spaces      |
 
 
-  Scenario Outline: Get the list of resources in a folder with depth 1
+  Scenario Outline: get the list of resources in a folder with depth 1
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -155,7 +155,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindEnabled
-  Scenario Outline: Get the list of resources in a folder with depth infinity
+  Scenario Outline: get the list of resources in a folder with depth infinity
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -180,7 +180,7 @@ Feature: list files
       | spaces      |
 
 
-  Scenario: Get the list of resources in a folder shared through public link with depth 0
+  Scenario: get the list of resources in a folder shared through public link with depth 0
     Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
@@ -203,7 +203,7 @@ Feature: list files
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
 
 
-  Scenario: Get the list of resources in a folder shared through public link with depth 1
+  Scenario: get the list of resources in a folder shared through public link with depth 1
     Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
@@ -228,7 +228,7 @@ Feature: list files
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
 
   @depthInfinityPropfindEnabled
-  Scenario: Get the list of resources in a folder shared through public link with depth infinity
+  Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
@@ -251,7 +251,7 @@ Feature: list files
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
 
 
-  Scenario Outline: Get the list of files in the trashbin with depth 0
+  Scenario Outline: get the list of files in the trashbin with depth 0
     Given using <dav_version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
@@ -282,7 +282,7 @@ Feature: list files
       | spaces      |
 
 
-  Scenario Outline: Get the list of files in the trashbin with depth 1
+  Scenario Outline: get the list of files in the trashbin with depth 1
     Given using <dav_version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
@@ -315,7 +315,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindEnabled
-  Scenario Outline: Get the list of files in the trashbin with depth infinity
+  Scenario Outline: get the list of files in the trashbin with depth infinity
     Given using <dav_version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
@@ -346,7 +346,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindDisabled
-  Scenario Outline: Get the list of resources in the root folder with depth infinity when depth infinity is not allowed
+  Scenario Outline: get the list of resources in the root folder with depth infinity when depth infinity is not allowed
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "412"
@@ -361,7 +361,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindDisabled
-  Scenario Outline: Get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
+  Scenario Outline: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
     Given using <dav_version> DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
@@ -380,7 +380,7 @@ Feature: list files
       | spaces      |
 
   @depthInfinityPropfindDisabled
-  Scenario Outline: Get the list of files in the trashbin with depth infinity when depth infinity is not allowed
+  Scenario Outline: get the list of files in the trashbin with depth infinity when depth infinity is not allowed
     Given using <dav_version> DAV path
     And user "Alice" has deleted the following resources
       | path           |

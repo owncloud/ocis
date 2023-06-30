@@ -20,19 +20,19 @@ Feature: change role
       | Admin       | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
-      | Admin       | Guest       |
+      | Admin       | User Light  |
       | Space Admin | Admin       |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | User        | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
-      | Guest       | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
+      | User        | User Light  |
+      | User Light  | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
 
 
   Scenario Outline: admin user tries to change his/her own role
@@ -44,5 +44,18 @@ Feature: change role
       | newRole     |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
       | Admin       |
+
+
+  Scenario Outline: non-admin cannot change the user role
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" tries to change the role of user "Alice" to role "Admin" using the Graph API
+    Then the HTTP status code should be "401"
+    And user "Brian" should have the role "User"
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | User Light  |

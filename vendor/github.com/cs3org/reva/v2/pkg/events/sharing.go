@@ -206,6 +206,7 @@ type LinkAccessFailed struct {
 	Token     string
 	Status    rpc.Code
 	Message   string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -221,6 +222,7 @@ type LinkRemoved struct {
 	// split protobuf Ref
 	ShareID    *link.PublicShareId
 	ShareToken string
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface

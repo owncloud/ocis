@@ -11,10 +11,12 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/logging"
@@ -90,16 +92,18 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			gwclient, err := pool.GetGatewayServiceClient(
+			gatewaySelector, err := pool.GatewaySelector(
 				cfg.RevaGateway,
 				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
+				pool.WithRegistry(registry.GetRegistry()),
 			)
 			if err != nil {
-				return fmt.Errorf("could not get reva client: %s", err)
+				return fmt.Errorf("could not get reva client selector: %s", err)
 			}
 
 			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
+			vClient := settingssvc.NewValueService("com.owncloud.api.settings", ogrpc.DefaultClient())
 
 			{
 				server, err := http.Server(
@@ -109,8 +113,9 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Metrics(mtrcs),
 					http.Store(st),
 					http.Consumer(consumer),
-					http.Gateway(gwclient),
+					http.GatewaySelector(gatewaySelector),
 					http.History(hClient),
+					http.Value(vClient),
 					http.RegisteredEvents(_registeredEvents),
 				)
 

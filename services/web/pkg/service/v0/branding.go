@@ -26,9 +26,15 @@ var (
 
 // UploadLogo implements the endpoint to upload a custom logo for the oCIS instance.
 func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, err := p.gatewaySelector.Next()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	user := revactx.ContextMustGetUser(r.Context())
-	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
-		Permission: "change-logo",
+	rsp, err := gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
+		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
 				UserId: user.Id,
@@ -79,9 +85,15 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 // ResetLogo implements the endpoint to reset the instance logo.
 // The config will be changed back to use the embedded logo asset.
 func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, err := p.gatewaySelector.Next()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	user := revactx.ContextMustGetUser(r.Context())
-	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
-		Permission: "change-logo",
+	rsp, err := gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
+		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
 				UserId: user.Id,

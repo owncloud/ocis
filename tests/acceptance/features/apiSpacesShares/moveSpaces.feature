@@ -13,7 +13,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: moving a file within same space project with role manager and editor
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
@@ -33,7 +33,7 @@ Feature: move (rename) file
 
 
   Scenario: moving a file within same space project with role viewer
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
@@ -49,7 +49,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: user moves a file from a space project with different a role to a space project with different role
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
@@ -79,7 +79,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: user moves a file from a space project with different role to a space personal
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
     And user "Brian" has shared a space "Project" with settings:
@@ -99,7 +99,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: user moves a file from space project with different role to space Shares with different role (permission)
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
@@ -125,7 +125,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: user moves a file from space personal to space project with different role
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
@@ -181,7 +181,7 @@ Feature: move (rename) file
 
 
   Scenario Outline: user moves a file from space Shares with different role (permissions) to space project with different role
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
@@ -318,22 +318,18 @@ Feature: move (rename) file
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare/testsubfolder |
 
-  @issue-4797
+
   Scenario: overwriting a file while moving
     Given user "Brian" has created folder "/folder"
-    And user "Brian" has uploaded file with content "old content version 1" to "/folder/testfile.txt"
-    And user "Brian" has uploaded file with content "old content version 2" to "/folder/testfile.txt"
-    And user "Brian" has uploaded file with content "new data" to "/testfile.txt"
+    And user "Brian" has uploaded file with content "some content" to "/folder/testfile.txt"
+    And user "Brian" has uploaded file with content "old data version 1" to "/testfile.txt"
+    And user "Brian" has uploaded file with content "new data version 2" to "/testfile.txt"
     When user "Brian" overwrites file "/testfile.txt" from space "Personal" to "folder/testfile.txt" inside space "Personal" while moving using the WebDAV API
     Then the HTTP status code should be "204"
-    And the content of file "/folder/testfile.txt" for user "Brian" should be "new data"
+    And the content of file "/folder/testfile.txt" for user "Brian" should be "new data version 2"
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testfile.txt |
     When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "1" of the space "Personal" using the WebDAV API
     Then the HTTP status code should be "200"
-    And the downloaded content should be "old content version 2"
-    When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "2" of the space "Personal" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded content should be "old content version 1"
+    And the downloaded content should be "old data version 1"
     And as "Brian" file "testfile.txt" should exist in the trashbin of the space "Personal"
-

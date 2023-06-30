@@ -46,7 +46,7 @@ Feature: create files and folder
       | spaces      | /new&folder     |
 
   @smokeTest
-  Scenario Outline: Creating a folder
+  Scenario Outline: get resourcetype property of a folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test_folder"
     When user "Alice" gets the following properties of folder "/test_folder" using the WebDAV API
@@ -65,7 +65,7 @@ Feature: create files and folder
       | spaces      |
 
 
-  Scenario Outline: Creating a folder with special chars
+  Scenario Outline: get resourcetype property of a folder with special chars
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test_folder:5"
     When user "Alice" gets the following properties of folder "/test_folder:5" using the WebDAV API
@@ -84,7 +84,7 @@ Feature: create files and folder
       | spaces      |
 
   @issue-1345
-  Scenario Outline: Creating a directory which contains .part should not be possible
+  Scenario Outline: creating a directory which contains .part should not be possible
     Given using <dav_version> DAV path
     When user "Alice" creates folder "/folder.with.ext.part" using the WebDAV API
     Then the HTTP status code should be "400"
@@ -142,7 +142,7 @@ Feature: create files and folder
       | spaces      |
 
 
-  Scenario Outline: Create a file
+  Scenario Outline: create a file
     Given using <dav_version> DAV path
     When user "Alice" uploads file with content "some text" to "<file_name>" using the WebDAV API
     Then the HTTP status code should be "201"

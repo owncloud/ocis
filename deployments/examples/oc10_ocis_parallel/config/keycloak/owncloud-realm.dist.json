@@ -579,7 +579,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx",
-    "redirectUris" : [ "oc://ios.owncloud.com", "oc.ios://ios.owncloud.com" ],
+    "redirectUris" : [ "oc://ios.owncloud.com" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,

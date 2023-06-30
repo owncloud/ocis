@@ -10,6 +10,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/store"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -66,7 +67,7 @@ var _ = Describe("EventHistoryService", func() {
 				},
 			},
 			Failed:    false,
-			Timestamp: time.Time{},
+			Timestamp: utils.TimeToTS(time.Time{}),
 		})
 		ids[1] = bus.Publish(events.UserCreated{
 			UserID: "another-id",

@@ -61,7 +61,12 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		ClientId:     u.Username,
 		ClientSecret: currentPw,
 	}
-	authRes, err := g.gatewayClient.Authenticate(r.Context(), authReq)
+	client, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
+	authRes, err := client.Authenticate(r.Context(), authReq)
 	if err != nil {
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return

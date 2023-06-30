@@ -98,6 +98,7 @@ func (r *Role) OCSPermissions() Permissions {
 // R = Shareable
 // M = Mounted
 // Z = Deniable (NEW)
+// P = Purge from trashbin
 func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) string {
 	var b strings.Builder
 	if !isPublic && isShared {
@@ -127,6 +128,10 @@ func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) s
 
 	if r.CS3ResourcePermissions().DenyGrant {
 		fmt.Fprintf(&b, "Z")
+	}
+
+	if r.CS3ResourcePermissions().PurgeRecycle {
+		fmt.Fprintf(&b, "P")
 	}
 
 	return b.String()
@@ -231,7 +236,6 @@ func NewEditorRole(sharing bool) *Role {
 			ListContainer:        true,
 			ListRecycle:          true,
 			Move:                 true,
-			PurgeRecycle:         true,
 			RestoreRecycleItem:   true,
 			Stat:                 true,
 		},
@@ -255,7 +259,6 @@ func NewSpaceEditorRole() *Role {
 			ListGrants:           true,
 			ListRecycle:          true,
 			Move:                 true,
-			PurgeRecycle:         true,
 			RestoreFileVersion:   true,
 			RestoreRecycleItem:   true,
 			Stat:                 true,
@@ -400,7 +403,6 @@ func NewLegacyRoleFromOCSPermissions(p Permissions) *Role {
 	}
 	if p.Contain(PermissionDelete) {
 		r.cS3ResourcePermissions.Delete = true
-		r.cS3ResourcePermissions.PurgeRecycle = true
 	}
 	if p.Contain(PermissionShare) {
 		r.cS3ResourcePermissions.AddGrant = true
@@ -446,8 +448,7 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		rp.InitiateFileUpload {
 		r.ocsPermissions |= PermissionCreate
 	}
-	if rp.Delete &&
-		rp.PurgeRecycle {
+	if rp.Delete {
 		r.ocsPermissions |= PermissionDelete
 	}
 	if rp.AddGrant {

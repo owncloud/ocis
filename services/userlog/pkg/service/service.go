@@ -14,12 +14,18 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
+	"github.com/r3labs/sse/v2"
+	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"
 )
@@ -31,7 +37,9 @@ type UserlogService struct {
 	store            store.Store
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
-	gwClient         gateway.GatewayAPIClient
+	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	valueClient      settingssvc.ValueService
+	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
 	translationPath  string
 }
@@ -58,8 +66,13 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		store:            o.Store,
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
-		gwClient:         o.GatewayClient,
+		gatewaySelector:  o.GatewaySelector,
+		valueClient:      o.ValueClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
+	}
+
+	if !ul.cfg.DisableSSE {
+		ul.sse = sse.New()
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -67,9 +80,13 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		ul.registeredEvents[typ.String()] = e
 	}
 
-	ul.m.Route("/", func(r chi.Router) {
-		r.Get("/*", ul.HandleGetEvents)
-		r.Delete("/*", ul.HandleDeleteEvents)
+	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
+		r.Get("/", ul.HandleGetEvents)
+		r.Delete("/", ul.HandleDeleteEvents)
+
+		if !ul.cfg.DisableSSE {
+			r.Get("/sse", ul.HandleSSE)
+		}
 	})
 
 	go ul.MemorizeEvents(ch)
@@ -154,7 +171,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 
 		// III) store the eventID for each user
 		for _, id := range users {
-			if err := ul.addEventsToUser(id, event.ID); err != nil {
+			if err := ul.addEventToUser(id, event); err != nil {
 				ul.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 				continue
 			}
@@ -218,10 +235,30 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 	})
 }
 
-func (ul *UserlogService) addEventsToUser(userid string, eventids ...string) error {
+func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
+	if !ul.cfg.DisableSSE {
+		if err := ul.sendSSE(userid, event); err != nil {
+			ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
+		}
+	}
 	return ul.alterUserEventList(userid, func(ids []string) []string {
-		return append(ids, eventids...)
+		return append(ids, event.ID)
 	})
+}
+
+func (ul *UserlogService) sendSSE(userid string, event events.Event) error {
+	ev, err := ul.getConverter(ul.getUserLocale(userid)).ConvertEvent(event.ID, event.Event)
+	if err != nil {
+		return err
+	}
+
+	b, err := json.Marshal(ev)
+	if err != nil {
+		return err
+	}
+
+	ul.sse.Publish(userid, &sse.Event{Data: b})
+	return nil
 }
 
 func (ul *UserlogService) removeExpiredEvents(userid string, all []string, received []*ehmsg.Event) error {
@@ -283,7 +320,7 @@ func (ul *UserlogService) findSpaceMembers(ctx context.Context, spaceID string, 
 		return nil, errors.New("need authenticated context to find space members")
 	}
 
-	space, err := getSpace(ctx, spaceID, ul.gwClient)
+	space, err := getSpace(ctx, spaceID, ul.gatewaySelector)
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +398,7 @@ func (ul *UserlogService) resolveID(ctx context.Context, userid *user.UserId, gr
 
 // resolves the users of a group
 func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]string, error) {
-	grp, err := getGroup(ctx, groupID, ul.gwClient)
+	grp, err := getGroup(ctx, groupID, ul.gatewaySelector)
 	if err != nil {
 		return nil, err
 	}
@@ -380,13 +417,13 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 		return nil
 	}
 
-	u, err := getUser(context.Background(), uid, ul.gwClient)
+	u, err := getUser(context.Background(), uid, ul.gatewaySelector)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get user")
 		return nil
 	}
 
-	ctx, err := authenticate(u, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	ctx, err := authenticate(u, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		ul.log.Error().Err(err).Str("userid", u.GetId().GetOpaqueId()).Msg("failed to impersonate user")
 		return nil
@@ -394,9 +431,37 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 	return ctx
 }
 
-func authenticate(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (context.Context, error) {
+func (ul *UserlogService) getUserLocale(userid string) string {
+	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
+		micrometadata.Set(context.Background(), middleware.AccountID, userid),
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userid,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+	)
+	if err != nil {
+		ul.log.Error().Err(err).Str("userid", userid).Msg("cannot get users locale")
+		return ""
+	}
+	val := resp.GetValue().GetValue().GetListValue().GetValues()
+	if len(val) == 0 {
+		return ""
+	}
+	return val[0].GetStringValue()
+}
+
+func (ul *UserlogService) getConverter(locale string) *Converter {
+	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath)
+}
+
+func authenticate(usr *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := revactx.ContextSetUser(context.Background(), usr)
-	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
+	authRes, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + usr.GetId().GetOpaqueId(),
 		ClientSecret: machineAuthAPIKey,
@@ -411,8 +476,13 @@ func authenticate(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKe
 	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
 }
 
-func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient) (*storageprovider.StorageSpace, error) {
-	res, err := gwc.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
+func getSpace(ctx context.Context, spaceID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.StorageSpace, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := gatewayClient.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
 	if err != nil {
 		return nil, err
 	}
@@ -428,8 +498,13 @@ func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient)
 	return res.StorageSpaces[0], nil
 }
 
-func getUser(ctx context.Context, userid *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
-	getUserResponse, err := gwc.GetUser(context.Background(), &user.GetUserRequest{
+func getUser(ctx context.Context, userid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*user.User, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	getUserResponse, err := gatewayClient.GetUser(context.Background(), &user.GetUserRequest{
 		UserId: userid,
 	})
 	if err != nil {
@@ -443,8 +518,13 @@ func getUser(ctx context.Context, userid *user.UserId, gwc gateway.GatewayAPICli
 	return getUserResponse.GetUser(), nil
 }
 
-func getGroup(ctx context.Context, groupid string, gwc gateway.GatewayAPIClient) (*group.Group, error) {
-	r, err := gwc.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
+func getGroup(ctx context.Context, groupid string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*group.Group, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := gatewayClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
 	if err != nil {
 		return nil, err
 	}
@@ -456,8 +536,13 @@ func getGroup(ctx context.Context, groupid string, gwc gateway.GatewayAPIClient)
 	return r.GetGroup(), nil
 }
 
-func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gwc gateway.GatewayAPIClient) (*storageprovider.ResourceInfo, error) {
-	res, err := gwc.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
+func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.ResourceInfo, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
 	if err != nil {
 		return nil, err
 	}

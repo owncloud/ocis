@@ -12,6 +12,9 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/tags"
@@ -21,8 +24,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/propfind"
-	merrors "go-micro.dev/v4/errors"
-	"go-micro.dev/v4/metadata"
 )
 
 const (
@@ -189,6 +190,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:highlights", match.Entity.Highlights))
 
 	t := tags.New(match.Entity.Tags...)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", t.AsList()))

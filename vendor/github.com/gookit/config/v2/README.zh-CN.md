@@ -83,7 +83,7 @@ package main
 
 import (
     "github.com/gookit/config/v2"
-    "github.com/gookit/config/v2/yamlv3"
+    "github.com/gookit/config/v2/yaml"
 )
 
 // go run ./examples/yaml.go
@@ -92,7 +92,7 @@ func main() {
 	config.WithOptions(config.ParseEnv)
 
 	// 添加驱动程序以支持yaml内容解析（除了JSON是默认支持，其他的则是按需使用）
-	config.AddDriver(yamlv3.Driver)
+	config.AddDriver(yaml.Driver)
 
 	// 加载配置，可以同时传入多个文件
 	err := config.LoadFiles("testdata/yml_base.yml")
@@ -371,7 +371,7 @@ NEW: 支持通过结构标签 `default` 解析并设置默认值
 	c := config.New("test").WithOptions(config.ParseDefault)
 
 	// only set name
-	c.SetData(map[string]interface{}{
+	c.SetData(map[string]any{
 		"name": "inhere",
 	})
 
@@ -402,7 +402,7 @@ NEW: 支持通过结构标签 `default` 解析并设置默认值
 
 ### 载入配置
 
-- `LoadData(dataSource ...interface{}) (err error)` 从struct或map加载数据
+- `LoadData(dataSource ...any) (err error)` 从struct或map加载数据
 - `LoadFlags(keys []string) (err error)` 从命令行参数载入数据
 - `LoadOSEnvs(nameToKeyMap map[string]string)` 从ENV载入数据
 - `LoadExists(sourceFiles ...string) (err error)` 从存在的配置文件里加载数据，会忽略不存在的文件
@@ -427,25 +427,25 @@ NEW: 支持通过结构标签 `default` 解析并设置默认值
 - `Strings(key string) (arr []string)`
 - `StringMap(key string) (mp map[string]string)`
 - `SubDataMap(key string) maputi.Data`
-- `Get(key string, findByPath ...bool) (value interface{})`
+- `Get(key string, findByPath ...bool) (value any)`
 
 **将数据映射到结构体:**
 
-- `BindStruct(key string, dst interface{}) error`
-- `MapOnExists(key string, dst interface{}) error`
+- `BindStruct(key string, dst any) error`
+- `MapOnExists(key string, dst any) error`
 
 ### 设置值
 
-- `Set(key string, val interface{}, setByPath ...bool) (err error)`
+- `Set(key string, val any, setByPath ...bool) (err error)`
 
 ### 有用的方法
 
 - `Getenv(name string, defVal ...string) (val string)`
 - `AddDriver(driver Driver)`
-- `Data() map[string]interface{}`
+- `Data() map[string]any`
 - `Exists(key string, findByPath ...bool) bool`
 - `DumpTo(out io.Writer, format string) (n int64, err error)`
-- `SetData(data map[string]interface{})` 设置数据以覆盖 `Config.Data`
+- `SetData(data map[string]any)` 设置数据以覆盖 `Config.Data`
 
 ## 单元测试
 
@@ -484,6 +484,9 @@ go test -cover ./...
 - Toml 解析 [go toml](https://github.com/BurntSushi/toml)
 - 数据合并 [mergo](https://github.com/imdario/mergo)
 - 映射数据到结构体 [mapstructure](https://github.com/mitchellh/mapstructure)
+- JSON5 解析
+  - [yosuke-furukawa/json5](https://github.com/yosuke-furukawa/json5)
+  - [titanous/json5](https://github.com/titanous/json5)
 
 ## License
 

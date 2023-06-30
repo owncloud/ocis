@@ -90,13 +90,15 @@ type Config struct {
 	loadedUrls  []string
 	loadedFiles []string
 	driverNames []string
-	reloading   bool
+	// driver alias to name map.
+	aliasMap  map[string]string
+	reloading bool
 
 	// TODO Deprecated decoder and encoder, use driver instead
 	// drivers map[string]Driver
 
-	// decoders["toml"] = func(blob []byte, v interface{}) (err error){}
-	// decoders["yaml"] = func(blob []byte, v interface{}) (err error){}
+	// decoders["toml"] = func(blob []byte, v any) (err error){}
+	// decoders["yaml"] = func(blob []byte, v any) (err error){}
 	decoders map[string]Decoder
 	encoders map[string]Encoder
 
@@ -109,17 +111,9 @@ type Config struct {
 	sMapCache map[string]strMap
 }
 
-// New config instance
-func New(name string) *Config {
-	return &Config{
-		name: name,
-		opts: newDefaultOption(),
-		data: make(map[string]any),
-
-		// default add JSON driver
-		encoders: map[string]Encoder{JSON: JSONEncoder},
-		decoders: map[string]Decoder{JSON: JSONDecoder},
-	}
+// New config instance, default add JSON driver
+func New(name string, opts ...OptionFn) *Config {
+	return NewEmpty(name).WithDriver(JSONDriver).WithOptions(opts...)
 }
 
 // NewEmpty config instance
@@ -132,6 +126,7 @@ func NewEmpty(name string) *Config {
 		// don't add any drivers
 		encoders: map[string]Encoder{},
 		decoders: map[string]Decoder{},
+		aliasMap: make(map[string]string),
 	}
 }
 
@@ -140,15 +135,13 @@ func NewWith(name string, fn func(c *Config)) *Config {
 	return New(name).With(fn)
 }
 
-// NewWithOptions config instance
-func NewWithOptions(name string, opts ...func(opts *Options)) *Config {
+// NewWithOptions config instance. alias of New()
+func NewWithOptions(name string, opts ...OptionFn) *Config {
 	return New(name).WithOptions(opts...)
 }
 
 // Default get the default instance
-func Default() *Config {
-	return dc
-}
+func Default() *Config { return dc }
 
 /*************************************************************
  * config drivers
@@ -171,6 +164,11 @@ func AddDriver(driver Driver) { dc.AddDriver(driver) }
 // AddDriver set a decoder and encoder driver for a format.
 func (c *Config) AddDriver(driver Driver) {
 	format := driver.Name()
+	if len(driver.Aliases()) > 0 {
+		for _, alias := range driver.Aliases() {
+			c.aliasMap[alias] = format
+		}
+	}
 
 	c.driverNames = append(c.driverNames, format)
 	c.decoders[format] = driver.GetDecoder()
@@ -179,21 +177,21 @@ func (c *Config) AddDriver(driver Driver) {
 
 // HasDecoder has decoder
 func (c *Config) HasDecoder(format string) bool {
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	_, ok := c.decoders[format]
 	return ok
 }
 
 // HasEncoder has encoder
 func (c *Config) HasEncoder(format string) bool {
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	_, ok := c.encoders[format]
 	return ok
 }
 
 // DelDriver delete driver of the format
 func (c *Config) DelDriver(format string) {
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	delete(c.decoders, format)
 	delete(c.encoders, format)
 }
@@ -204,6 +202,21 @@ func (c *Config) DelDriver(format string) {
 
 // Name get config name
 func (c *Config) Name() string { return c.name }
+
+// AddAlias add alias for a format(driver name)
+func AddAlias(format, alias string) { dc.AddAlias(format, alias) }
+
+// AddAlias add alias for a format(driver name)
+//
+// Example:
+//
+//	config.AddAlias("ini", "conf")
+func (c *Config) AddAlias(format, alias string) {
+	c.aliasMap[alias] = format
+}
+
+// AliasMap get alias map
+func (c *Config) AliasMap() map[string]string { return c.aliasMap }
 
 // Error get last error, will clear after read.
 func (c *Config) Error() error {
@@ -237,8 +250,8 @@ func (c *Config) ClearAll() {
 	c.ClearData()
 	c.ClearCaches()
 
-	c.loadedUrls = []string{}
-	c.loadedFiles = []string{}
+	c.aliasMap = make(map[string]string)
+	// options
 	c.opts.Readonly = false
 }
 
@@ -246,7 +259,7 @@ func (c *Config) ClearAll() {
 func (c *Config) ClearData() {
 	c.fireHook(OnCleanData)
 
-	c.data = make(map[string]interface{})
+	c.data = make(map[string]any)
 	c.loadedUrls = []string{}
 	c.loadedFiles = []string{}
 }

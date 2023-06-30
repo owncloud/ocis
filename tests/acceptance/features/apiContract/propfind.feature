@@ -10,7 +10,7 @@ Feature: Propfind test
       | Alice    |
       | Brian    |
     And using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
 
 
@@ -22,7 +22,7 @@ Feature: Propfind test
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
       | oc:name        | new-space        |
-      | oc:permissions | RDNVCKZ          |
+      | oc:permissions | RDNVCKZP         |
       | oc:privatelink |                  |
       | oc:size        | 12               |
 
@@ -43,6 +43,6 @@ Feature: Propfind test
       | oc:size        | 12               |
     Examples:
       | role    | oc_permission |
-      | manager | RDNVCKZ       |
+      | manager | RDNVCKZP      |
       | editor  | DNVCK         |
       | viewer  |               |

@@ -15,10 +15,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/jellydator/ttlcache/v2"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -55,9 +58,9 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	}
 
 	// initialize gateway
-	gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+	selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()))
 	if err != nil {
-		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
+		logger.Fatal().Err(err).Msg("could not get reva gateway selector")
 		return nil, teardown, err
 	}
 	// initialize search content extractor
@@ -68,7 +71,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			return nil, teardown, err
 		}
 	case "tika":
-		if extractor, err = content.NewTikaExtractor(gw, logger, cfg); err != nil {
+		if extractor, err = content.NewTikaExtractor(selector, logger, cfg); err != nil {
 			return nil, teardown, err
 		}
 	default:
@@ -106,7 +109,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
-	ss := search.NewService(gw, eng, extractor, logger, cfg)
+	ss := search.NewService(selector, eng, extractor, logger, cfg)
 
 	// setup event handling
 	if err := search.HandleEvents(ss, bus, logger, cfg); err != nil {
@@ -118,20 +121,30 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
+	tokenManager, err := jwt.New(map[string]interface{}{
+		"secret":  options.JWTSecret,
+		"expires": int64(24 * 60 * 60),
+	})
+	if err != nil {
+		return nil, teardown, err
+	}
+
 	return &Service{
-		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
-		log:      logger,
-		searcher: ss,
-		cache:    cache,
+		id:           cfg.GRPC.Namespace + "." + cfg.Service.Name,
+		log:          logger,
+		searcher:     ss,
+		cache:        cache,
+		tokenManager: tokenManager,
 	}, teardown, nil
 }
 
 // Service implements the searchServiceHandler interface
 type Service struct {
-	id       string
-	log      log.Logger
-	searcher search.Searcher
-	cache    *ttlcache.Cache
+	id           string
+	log          log.Logger
+	searcher     search.Searcher
+	cache        *ttlcache.Cache
+	tokenManager token.Manager
 }
 
 // Search handles the search
@@ -144,7 +157,13 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	u, _ := revactx.ContextGetUser(ctx)
+	// unpack user
+	u, _, err := s.tokenManager.DismantleToken(ctx, t)
+	if err != nil {
+		return err
+	}
+	ctx = revactx.ContextSetUser(ctx, u)
+
 	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
 	res, ok := s.FromCache(key)
 	if !ok {

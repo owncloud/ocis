@@ -58,7 +58,6 @@ func randSeq(n int) string {
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	registry.Register("nextcloud", New)
 }
 

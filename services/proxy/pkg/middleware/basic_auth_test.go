@@ -6,7 +6,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"

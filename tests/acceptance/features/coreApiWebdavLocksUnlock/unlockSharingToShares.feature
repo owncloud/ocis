@@ -1,5 +1,8 @@
 @api @issue-1284
 Feature: UNLOCK locked items (sharing)
+  As a user
+  I want to unlock a shared resource that has been locked by me to be restricted
+  So that other users cannot unlock the shared resource
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -10,7 +13,7 @@ Feature: UNLOCK locked items (sharing)
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
 
 
-  Scenario Outline: as share receiver unlocking a shared file locked by the file owner is not possible. To unlock use the owners locktoken
+  Scenario Outline: unlocking a shared file that has been locked by the file owner is not feasible unless the owner lock tocken is used
     Given using <dav-path> DAV path
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
@@ -34,7 +37,7 @@ Feature: UNLOCK locked items (sharing)
       | spaces   | exclusive  | /parent.txt        |
 
 
-  Scenario Outline: as share receiver unlocking a file in a share locked by the file owner is not possible. To unlock use the owners locktoken
+  Scenario Outline: sharee cannot unlock a file within a shared folder when it is locked by the file owner unless the owner lock token is used
     Given using <dav-path> DAV path
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
@@ -58,7 +61,7 @@ Feature: UNLOCK locked items (sharing)
       | spaces   | exclusive  |
 
 
-  Scenario Outline: as share receiver unlock a shared file
+  Scenario Outline: sharee unlock a shared file
     Given using <dav-path> DAV path
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
     And user "Brian" has accepted share "<pending_share_path>" offered by user "Alice"
@@ -106,7 +109,7 @@ Feature: UNLOCK locked items (sharing)
       | spaces   | exclusive  | /parent.txt        |
 
 
-  Scenario Outline: as owner unlocking a file in a share that was locked by the share receiver is not possible. To unlock use the receivers locktoken
+  Scenario Outline: unlocking a file in a shared folder, which was locked by the sharee is not possible for the owner unless the receiver's locktoken is used
     Given using <dav-path> DAV path
     And user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"

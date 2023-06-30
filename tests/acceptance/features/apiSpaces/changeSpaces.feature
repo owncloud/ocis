@@ -13,7 +13,7 @@ Feature: Change data of space
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     And user "Alice" has shared a space "Project Jupiter" with settings:
       | shareWith | Brian  |
@@ -509,7 +509,7 @@ Feature: Change data of space
 
 
   Scenario Outline: user can't upload resource greater than set quota
-    Given the administrator has given "Alice" the role "<userRole>" using the settings api
+    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "15"
     When user "Alice" uploads a file inside space "Alice Hansen" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -520,7 +520,7 @@ Feature: Change data of space
     | Admin       |
     | Space Admin |
     | User        |
-    | Guest       |
+    | User Light  |
 
 
   Scenario Outline: admin user set own quota of a personal space via the Graph API and upload resource

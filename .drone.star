@@ -9,6 +9,7 @@ INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
+OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
 OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS = "owncloudci/drone-cancel-previous-builds"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
@@ -132,6 +133,21 @@ config = {
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
+            },
+        },
+        "apiAntivirus": {
+            "suites": [
+                "apiAntivirus",
+            ],
+            "skip": False,
+            "earlyFail": True,
+            "antivirusNeeded": True,
+            "extraServerEnvironment": {
+                "ANTIVIRUS_SCANNER_TYPE": "clamav",
+                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+                "POSTPROCESSING_STEPS": "virusscan",
+                "OCIS_ASYNC_UPLOADS": True,
+                "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
     },
@@ -761,6 +777,7 @@ def localApiTestPipeline(ctx):
         "storages": ["ocis"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
+        "antivirusNeeded": False,
     }
 
     if "localApiTests" in config:
@@ -783,10 +800,11 @@ def localApiTestPipeline(ctx):
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
+                                     (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
-                            "services": emailService() if params["emailNeeded"] else [],
+                            "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
                                 "ref": [
@@ -2108,7 +2126,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
             "FRONTEND_SEARCH_MIN_LENGTH": "2",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # make gateway available to wopi server
-            "APP_PROVIDER_EXTERNAL_ADDR": "127.0.0.1:9164",
+            "APP_PROVIDER_EXTERNAL_ADDR": "com.owncloud.api.app-provider",
             "APP_PROVIDER_DRIVER": "wopi",
             "APP_PROVIDER_WOPI_APP_NAME": "FakeOffice",
             "APP_PROVIDER_WOPI_APP_URL": "http://fakeoffice:8080",
@@ -2917,5 +2935,20 @@ def waitForEmailService():
         "image": OC_CI_WAIT_FOR,
         "commands": [
             "wait-for -it email:9000 -t 600",
+        ],
+    }]
+
+def clamavService():
+    return [{
+        "name": "clamav",
+        "image": OC_CI_CLAMAVD,
+    }]
+
+def waitForClamavService():
+    return [{
+        "name": "wait-for-clamav",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it clamav:3310 -t 600",
         ],
     }]

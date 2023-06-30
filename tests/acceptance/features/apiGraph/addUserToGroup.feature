@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: add users to group
   As a admin
   I want to be able to add users to a group
@@ -121,7 +121,7 @@ Feature: add users to group
 
   @issue-5938
   Scenario Outline: user other than the admin tries to add herself to a group
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     And group "groupA" has been created
     When user "Alice" tries to add herself to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
@@ -150,12 +150,12 @@ Feature: add users to group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-5938
   Scenario Outline: user other than the admin tries to add other user to a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
@@ -184,7 +184,7 @@ Feature: add users to group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin tries to add user to a nonexistent group
@@ -194,14 +194,14 @@ Feature: add users to group
   @issue-5939
   Scenario Outline: user other than the admin tries to add user to a nonexistent group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
     Examples:
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin tries to add a nonexistent user to a group
@@ -216,7 +216,7 @@ Feature: add users to group
 
 
   Scenario: add multiple users to a group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -234,7 +234,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add users to a nonexistent group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -247,7 +247,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add multiple nonexistent users to a group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add the following nonexistent users to a group "grp1" at once using the Graph API
       | username |
@@ -257,7 +257,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add nonexistent and existing users to a group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -284,7 +284,7 @@ Feature: add users to group
 
   @issue-5702
   Scenario: try to add users to a group twice
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -306,7 +306,7 @@ Feature: add users to group
 
   @issue-5793
   Scenario: try to add a group to another group with PATCH request
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -320,7 +320,7 @@ Feature: add users to group
 
   @issue-5793
   Scenario: try to add a group to another group with POST request
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -334,7 +334,7 @@ Feature: add users to group
 
 
   Scenario Outline: admin tries to add a user to a group with invalid JSON
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -349,7 +349,7 @@ Feature: add users to group
 
 
   Scenario Outline: admin tries to add multiple users to a group at once with invalid JSON
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -368,7 +368,7 @@ Feature: add users to group
 
   @issue-5871
   Scenario: admin tries to add multiple users with wrong host
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -382,7 +382,7 @@ Feature: add users to group
 
   @issue-5871
   Scenario: admin tries to add single user with wrong host
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -392,7 +392,7 @@ Feature: add users to group
 
 
   Scenario Outline: try to add invalid user id to a group
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add an invalid user id "<invalid-uuidv4>" to a group "grp1" using the Graph API
     Then the HTTP status code should be "404"
@@ -404,7 +404,7 @@ Feature: add users to group
 
 
   Scenario Outline: try to add invalid user ids to a group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add the following invalid user ids to a group "grp1" at once using the Graph API
       | user-id          |
@@ -419,7 +419,7 @@ Feature: add users to group
 
   @issue-5855
   Scenario: add same user twice to a group at once
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |

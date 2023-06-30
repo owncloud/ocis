@@ -5,8 +5,10 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/metrics"
 	"github.com/urfave/cli/v2"
@@ -26,8 +28,9 @@ type Options struct {
 	Namespace        string
 	Store            store.Store
 	Consumer         events.Consumer
-	GatewayClient    gateway.GatewayAPIClient
+	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	HistoryClient    ehsvc.EventHistoryService
+	ValueClient      settingssvc.ValueService
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -98,10 +101,10 @@ func Consumer(consumer events.Consumer) Option {
 	}
 }
 
-// Gateway provides a function to configure the gateway client
-func Gateway(gw gateway.GatewayAPIClient) Option {
+// GatewaySelector provides a function to configure the gateway client selector
+func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.GatewayClient = gw
+		o.GatewaySelector = gatewaySelector
 	}
 }
 
@@ -116,5 +119,12 @@ func History(h ehsvc.EventHistoryService) Option {
 func RegisteredEvents(evs []events.Unmarshaller) Option {
 	return func(o *Options) {
 		o.RegisteredEvents = evs
+	}
+}
+
+// Value provides a function to configure the value service client
+func Value(vs settingssvc.ValueService) Option {
+	return func(o *Options) {
+		o.ValueClient = vs
 	}
 }

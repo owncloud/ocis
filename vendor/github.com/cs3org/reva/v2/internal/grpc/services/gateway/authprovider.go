@@ -44,6 +44,7 @@ func (s *svc) Authenticate(ctx context.Context, req *gateway.AuthenticateRequest
 	// find auth provider
 	c, err := s.findAuthProvider(ctx, req.Type)
 	if err != nil {
+		log.Err(err).Str("type", req.Type).Msg("error getting auth provider client")
 		return &gateway.AuthenticateResponse{
 			Status: status.NewInternal(ctx, "error getting auth provider client"),
 		}, nil

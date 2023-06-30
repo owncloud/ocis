@@ -10,8 +10,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger log.Logger
-	Config *config.Config
+	Logger    log.Logger
+	Config    *config.Config
+	JWTSecret string
 }
 
 func newOptions(opts ...Option) Options {
@@ -35,5 +36,12 @@ func Logger(val log.Logger) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
+	}
+}
+
+// JWTSecret provides a function to set the Config option.
+func JWTSecret(val string) Option {
+	return func(o *Options) {
+		o.JWTSecret = val
 	}
 }

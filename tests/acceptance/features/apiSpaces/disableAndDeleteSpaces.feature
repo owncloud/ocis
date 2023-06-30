@@ -14,7 +14,7 @@ Feature: Disabling and deleting space
       | Brian    |
       | Bob      |
       | Carol    |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project Moon" with the default quota using the GraphApi
     And user "Alice" has shared a space "Project Moon" with settings:
       | shareWith | Brian  |
@@ -25,7 +25,7 @@ Feature: Disabling and deleting space
 
 
   Scenario Outline: user can disable their own space via the Graph API
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "Project Moon"
@@ -35,19 +35,19 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
-  Scenario Outline: user with role user and guest cannot disable other space via the Graph API
-    Given the administrator has given "Carol" the role "<role>" using the settings api
+  Scenario Outline: user with role user and user light cannot disable other space via the Graph API
+    Given the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "404"
     And the user "Brian" should have a space called "Project Moon"
     And the user "Bob" should have a space called "Project Moon"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |
 
 
   Scenario: a space manager can disable and delete space in which files and folders exist via the webDav API
@@ -61,7 +61,7 @@ Feature: Disabling and deleting space
 
 
   Scenario Outline: user cannot delete their own space without first disabling it
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "400"
     And the user "Alice" should have a space called "Project Moon"
@@ -70,11 +70,11 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: user can delete their own disabled space via the Graph API
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     And user "Alice" has disabled a space "Project Moon"
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "204"
@@ -84,11 +84,11 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: an admin and space manager can disable other space via the Graph API
-    Given the administrator has given "Carol" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     When user "Carol" disables a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "204"
     And the user "Carol" should not have a space called "Project Moon"
@@ -99,7 +99,7 @@ Feature: Disabling and deleting space
 
 
   Scenario Outline: an admin and space manager can delete other disabled Space
-    Given the administrator has given "Carol" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" deletes a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "204"
@@ -111,12 +111,12 @@ Feature: Disabling and deleting space
       | Space Admin |
 
 
-  Scenario Outline: user with role user and guest cannot delete others disabled space via the Graph API
-    Given the administrator has given "Carol" the role "<role>" using the settings api
+  Scenario Outline: user with role user and user light cannot delete others disabled space via the Graph API
+    Given the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |

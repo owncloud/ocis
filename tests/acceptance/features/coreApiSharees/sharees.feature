@@ -161,45 +161,6 @@ Feature: search sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: federated sharee for files
-    Given using OCS API version "<ocs-api-version>"
-    When user "Alice" gets the sharees using the sharing API with parameters
-      | search   | test@localhost |
-      | itemType | file           |
-    Then the OCS status code should be "<ocs-status>"
-    And the HTTP status code should be "<http-status>"
-    And the "exact users" sharees returned should be empty
-    And the "users" sharees returned should be empty
-    And the "exact groups" sharees returned should be empty
-    And the "groups" sharees returned should be empty
-    And the "exact remotes" sharees returned should be
-      | test@localhost | 6 | test@localhost |
-    And the "remotes" sharees returned should be empty
-    Examples:
-      | ocs-api-version | ocs-status | http-status |
-      | 1               | 100        | 200         |
-      | 2               | 200        | 200         |
-
-
-  Scenario Outline: federated sharee for calendars not allowed
-    Given using OCS API version "<ocs-api-version>"
-    When user "Alice" gets the sharees using the sharing API with parameters
-      | search   | test@localhost |
-      | itemType | calendar       |
-    Then the OCS status code should be "<ocs-status>"
-    And the HTTP status code should be "<http-status>"
-    And the "exact users" sharees returned should be empty
-    And the "users" sharees returned should be empty
-    And the "exact groups" sharees returned should be empty
-    And the "groups" sharees returned should be empty
-    And the "exact remotes" sharees returned should be empty
-    And the "remotes" sharees returned should be empty
-    Examples:
-      | ocs-api-version | ocs-status | http-status |
-      | 1               | 100        | 200         |
-      | 2               | 200        | 200         |
-
-
   Scenario Outline: enumerate only group members - only show partial results from member of groups
     Given using OCS API version "<ocs-api-version>"
     And these users have been created with default attributes and without skeleton files:

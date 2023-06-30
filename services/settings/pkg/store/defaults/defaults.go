@@ -15,23 +15,23 @@ const (
 	// BundleUUIDRoleUser represents the user role.
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
 
-	// BundleUUIDRoleGuest represents the guest role.
-	BundleUUIDRoleGuest = "38071a68-456a-4553-846a-fa67bf5596cc"
+	// BundleUUIDRoleUserLight represents the user light role.
+	BundleUUIDRoleUserLight = "38071a68-456a-4553-846a-fa67bf5596cc"
 
 	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
 	// RoleManagementPermissionName is the hardcoded setting name for the role management permission
-	RoleManagementPermissionName string = "role-management"
+	RoleManagementPermissionName string = "Roles.ReadWrite"
 
 	// SettingsManagementPermissionID is the hardcoded setting UUID for the settings management permission
 	SettingsManagementPermissionID string = "3d58f441-4a05-42f8-9411-ef5874528ae1"
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
-	SettingsManagementPermissionName string = "settings-management"
+	SettingsManagementPermissionName string = "Settings.ReadWrite"
 
-	// LanguageReadWriteID is the hardcoded setting UUID for the language read write permission
+	// LanguageReadWriteID is the hardcoded setting UUID for the language read write all permission
 	LanguageReadWriteID string = "7d81f103-0488-4853-bce5-98dcce36d649"
-	// LanguageReadWriteName is the hardcoded setting name for the language read write permission
-	LanguageReadWriteName string = "language-readwrite"
+	// LanguageReadWriteName is the hardcoded setting name for the language read write all permission
+	LanguageReadWriteName string = "Language.ReadWrite"
 
 	// DisableEmailNotificationsPermissionID is the hardcoded setting UUID for the disable email notifications permission
 	DisableEmailNotificationsPermissionID string = "ad5bb5e5-dc13-4cd3-9304-09a424564ea8"
@@ -43,42 +43,42 @@ const (
 	// SetPersonalSpaceQuotaPermissionID is the hardcoded setting UUID for the set personal space quota permission
 	SetPersonalSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
 	// SetPersonalSpaceQuotaPermissionName is the hardcoded setting name for the set personal space quota permission
-	SetPersonalSpaceQuotaPermissionName string = "set-space-quota"
+	SetPersonalSpaceQuotaPermissionName string = "Drives.ReadWritePersonalQuota"
 
 	// SetProjectSpaceQuotaPermissionID is the hardcoded setting UUID for the set project space quota permission
 	SetProjectSpaceQuotaPermissionID string = "977f0ae6-0da2-4856-93f3-22e0a8482489"
 	// SetProjectSpaceQuotaPermissionName is the hardcoded setting name for the set project space quota permission
-	SetProjectSpaceQuotaPermissionName string = "Drive.ReadWriteQuota.Project"
+	SetProjectSpaceQuotaPermissionName string = "Drives.ReadWriteProjectQuota"
 
 	// ListAllSpacesPermissionID is the hardcoded setting UUID for the list all spaces permission
 	ListAllSpacesPermissionID string = "016f6ddd-9501-4a0a-8ebe-64a20ee8ec82"
 	// ListAllSpacesPermissionName is the hardcoded setting name for the list all spaces permission
-	ListAllSpacesPermissionName string = "list-all-spaces"
+	ListAllSpacesPermissionName string = "Drives.List"
 
 	// CreateSpacePermissionID is the hardcoded setting UUID for the create space permission
 	CreateSpacePermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
 	// CreateSpacePermissionName is the hardcoded setting name for the create space permission
-	CreateSpacePermissionName string = "create-space"
+	CreateSpacePermissionName string = "Drives.Create"
 
 	// DeleteHomeSpacesPermissionID is the hardcoded setting UUID for the delete home space permission
 	DeleteHomeSpacesPermissionID string = "5de9fe0a-4bc5-4a47-b758-28f370caf169"
 	// DeleteHomeSpacesPermissionName is the hardcoded setting name for the delete home space permission
-	DeleteHomeSpacesPermissionName string = "delete-all-home-spaces"
+	DeleteHomeSpacesPermissionName string = "Drives.DeletePersonal"
 
 	// DeleteAllSpacesPermissionID is the hardcoded setting UUID for the delete all spaces permission
 	DeleteAllSpacesPermissionID string = "fb60b004-c1fa-4f09-bf87-55ce7d46ac61"
 	// DeleteAllSpacesPermissionName is the hardcoded setting name for the delete all space permission
-	DeleteAllSpacesPermissionName string = "delete-all-spaces"
+	DeleteAllSpacesPermissionName string = "Drives.DeleteProject"
 
 	// ManageSpacePropertiesPermissionID is the hardcoded setting UUID for the manage space properties permission
 	ManageSpacePropertiesPermissionID string = "b44b4054-31a2-42b8-bb71-968b15cfbd4f"
 	// ManageSpacePropertiesPermissionName is the hardcoded setting name for the manage space properties permission
-	ManageSpacePropertiesPermissionName string = "Drive.ReadWrite"
+	ManageSpacePropertiesPermissionName string = "Drives.ReadWrite"
 
 	// SpaceAbilityPermissionID is the hardcoded setting UUID for the space ability permission
 	SpaceAbilityPermissionID string = "cf3faa8c-50d9-4f84-9650-ff9faf21aa9d"
 	// SpaceAbilityPermissionName is the hardcoded setting name for the space ability permission
-	SpaceAbilityPermissionName string = "Drive.ReadWriteEnabled"
+	SpaceAbilityPermissionName string = "Drives.ReadWriteEnabled"
 
 	// SettingUUIDProfileLanguage is the hardcoded setting UUID for the user profile language
 	SettingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
@@ -88,20 +88,20 @@ const (
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
 	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
 	// AccountManagementPermissionName is the hardcoded setting name for the account management permission
-	AccountManagementPermissionName string = "account-management"
+	AccountManagementPermissionName string = "Accounts.ReadWrite"
 	// GroupManagementPermissionID is the hardcoded setting UUID for the group management permission
 	GroupManagementPermissionID string = "522adfbe-5908-45b4-b135-41979de73245"
 	// GroupManagementPermissionName is the hardcoded setting name for the group management permission
-	GroupManagementPermissionName string = "group-management"
+	GroupManagementPermissionName string = "Groups.ReadWrite"
 	// SelfManagementPermissionID is the hardcoded setting UUID for the self management permission
 	SelfManagementPermissionID string = "e03070e9-4362-4cc6-a872-1c7cb2eb2b8e"
 	// SelfManagementPermissionName is the hardcoded setting name for the self management permission
-	SelfManagementPermissionName string = "self-management"
+	SelfManagementPermissionName string = "Self.ReadWrite"
 
 	// ChangeLogoPermissionID is the hardcoded setting UUID for the change-logo permission
 	ChangeLogoPermissionID string = "ed83fc10-1f54-4a9e-b5a7-fb517f5f3e01"
 	// ChangeLogoPermissionName is the hardcoded setting name for the change-logo permission
-	ChangeLogoPermissionName string = "change-logo"
+	ChangeLogoPermissionName string = "Logo.Write"
 
 	// WritePublicLinkPermissionID is the hardcoded setting UUID for the PublicLink.Write permission
 	WritePublicLinkPermissionID string = "11516bbd-7157-49e1-b6ac-d00c820f980b"
@@ -114,7 +114,7 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 	return []*settingsmsg.Bundle{
 		generateBundleAdminRole(),
 		generateBundleUserRole(),
-		generateBundleGuestRole(),
+		generateBundleUserLightRole(),
 		generateBundleProfileRequest(),
 		generateBundleSpaceAdminRole(),
 	}
@@ -481,8 +481,8 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
-				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
-				Name:        "language-readwrite",
+				Id:          LanguageReadWriteID,
+				Name:        LanguageReadWriteName,
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
@@ -572,8 +572,8 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 		},
 		Settings: []*settingsmsg.Setting{
 			{
-				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
-				Name:        "language-readwrite",
+				Id:          LanguageReadWriteID,
+				Name:        LanguageReadWriteName,
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
@@ -651,20 +651,20 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 	}
 }
 
-func generateBundleGuestRole() *settingsmsg.Bundle {
+func generateBundleUserLightRole() *settingsmsg.Bundle {
 	return &settingsmsg.Bundle{
-		Id:          BundleUUIDRoleGuest,
-		Name:        "guest",
+		Id:          BundleUUIDRoleUserLight,
+		Name:        "user-light",
 		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
-		DisplayName: "Guest",
+		DisplayName: "User Light",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
 		Settings: []*settingsmsg.Setting{
 			{
-				Id:          "ca878636-8b1a-4fae-8282-8617a4c13597",
-				Name:        "language-readwrite",
+				Id:          LanguageReadWriteID,
+				Name:        LanguageReadWriteName,
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,

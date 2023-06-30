@@ -1,7 +1,7 @@
 @api @skipOnStable2.0
 Feature: Tag
-  As a user 
-  I want to tag resources 
+  As a user
+  I want to tag resources
   So that I can sort and search them quickly
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
@@ -13,7 +13,7 @@ Feature: Tag
       | Alice    |
       | Brian    |
     And using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "use-tag" with the default quota using the GraphApi
     And user "Alice" has created a folder "folderMain" in space "use-tag"
     And user "Alice" has uploaded a file inside space "use-tag" with content "some content" to "folderMain/insideTheFolder.txt"
@@ -255,3 +255,52 @@ Feature: Tag
     And the response should contain following tags:
       | folderTag |
       | marketing |
+
+
+  Scenario: user creates a comma-separated list of tags for resources in the project space
+    Given user "Alice" has shared a space "use-tag" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
+      | finance,नेपाल |
+    Then the HTTP status code should be "200"
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value         |
+      | oc:tags | finance,नेपाल |
+    When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
+      | file,नेपाल,Tag |
+    Then the HTTP status code should be "200"
+    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value          |
+      | oc:tags | file,नेपाल,Tag |
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the response should contain following tags:
+      | finance |
+      | नेपाल   |
+      | file    |
+      | Tag     |
+
+
+  Scenario: setting a comma-separated list of tags adds to any existing tags on the resource
+    Given user "Alice" has created the following tags for folder "folderMain" of the space "use-tag":
+      | finance,hr |
+    When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
+      | engineering,finance,qa |
+    Then the HTTP status code should be "200"
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value                     |
+      | oc:tags | engineering,finance,hr,qa |
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the response should contain following tags:
+      | engineering |
+      | finance     |
+      | hr          |
+      | qa          |

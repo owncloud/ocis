@@ -1,6 +1,5 @@
 package config
 
-// default json driver(encoder/decoder)
 import (
 	"encoding/json"
 
@@ -11,8 +10,17 @@ import (
 // TODO refactor: rename GetDecoder() to Decode(), rename GetEncoder() to Encode()
 type Driver interface {
 	Name() string
+	Aliases() []string // alias format names, use for resolve format name
 	GetDecoder() Decoder
 	GetEncoder() Encoder
+}
+
+// DriverV2 interface.
+type DriverV2 interface {
+	Name() string      // driver name, also is format name.
+	Aliases() []string // alias format names, use for resolve format name
+	Decode(blob []byte, v any) (err error)
+	Encode(v any) (out []byte, err error)
 }
 
 // Decoder for decode yml,json,toml format content
@@ -24,6 +32,7 @@ type Encoder func(v any) (out []byte, err error)
 // StdDriver struct
 type StdDriver struct {
 	name    string
+	aliases []string
 	decoder Decoder
 	encoder Encoder
 }
@@ -33,9 +42,24 @@ func NewDriver(name string, dec Decoder, enc Encoder) *StdDriver {
 	return &StdDriver{name: name, decoder: dec, encoder: enc}
 }
 
+// WithAliases set aliases for driver
+func (d *StdDriver) WithAliases(aliases ...string) *StdDriver {
+	d.aliases = aliases
+	return d
+}
+
+// WithAlias add alias for driver
+func (d *StdDriver) WithAlias(alias string) *StdDriver {
+	d.aliases = append(d.aliases, alias)
+	return d
+}
+
 // Name of driver
-func (d *StdDriver) Name() string {
-	return d.name
+func (d *StdDriver) Name() string { return d.name }
+
+// Aliases format name of driver
+func (d *StdDriver) Aliases() []string {
+	return d.aliases
 }
 
 // Decode of driver
@@ -59,13 +83,11 @@ func (d *StdDriver) GetEncoder() Encoder {
 }
 
 /*************************************************************
- * json driver
+ * JSON driver
  *************************************************************/
 
 var (
 	// JSONAllowComments support write comments on json file.
-	//
-	// Deprecated: please use JSONDriver.ClearComments = true
 	JSONAllowComments = true
 
 	// JSONMarshalIndent if not empty, will use json.MarshalIndent for encode data.
@@ -105,6 +127,11 @@ type jsonDriver struct {
 // Name of the driver
 func (d *jsonDriver) Name() string {
 	return d.driverName
+}
+
+// Aliases of the driver
+func (d *jsonDriver) Aliases() []string {
+	return nil
 }
 
 // Decode for the driver

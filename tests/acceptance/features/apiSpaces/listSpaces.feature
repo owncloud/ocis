@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: List and create spaces
   As a user
   I want to be able to list project spaces
@@ -150,7 +150,7 @@ Feature: List and create spaces
 
 
   Scenario: ordinary user will not see any space when using a filter for project
-    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "my project" of type "project" with quota "20"
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the HTTP status code should be "200"
@@ -289,7 +289,7 @@ Feature: List and create spaces
 
 
   Scenario Outline: user can list his created spaces via multiple endpoints
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match
@@ -419,7 +419,7 @@ Feature: List and create spaces
 
 
   Scenario Outline: user cannot list space by id if he is not member of the space
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     And user "Admin" has created a space "Project Venus" with the default quota using the GraphApi
     When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id
     Then the HTTP status code should be "404"
@@ -429,4 +429,4 @@ Feature: List and create spaces
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |

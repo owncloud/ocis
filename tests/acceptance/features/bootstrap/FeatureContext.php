@@ -52,6 +52,7 @@ class FeatureContext extends BehatVariablesContext {
 	use Provisioning;
 	use Sharing;
 	use WebDav;
+	use JsonAssertions;
 
 	/**
 	 * Unix timestamp seconds
@@ -161,6 +162,7 @@ class FeatureContext extends BehatVariablesContext {
 	public OCSContext $ocsContext;
 	public AuthContext $authContext;
 	public GraphContext $graphContext;
+	public SpacesContext $spacesContext;
 	public AppConfigurationContext $appConfigurationContext;
 	private array $initialTrustedServer;
 
@@ -1360,7 +1362,7 @@ class FeatureContext extends BehatVariablesContext {
 		PyStringNode $schemaString
 	): void {
 		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->assertJsonDocumentMatchesSchema(
 			$jsonResponse->ocs->data,
 			$this->getJSONSchema($schemaString)
 		);
@@ -1377,7 +1379,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString): void {
 		$responseBody = $this->getJsonDecodedResponseBodyContent();
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)
 		);
@@ -3230,6 +3232,12 @@ class FeatureContext extends BehatVariablesContext {
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();
 		$featureFileName = \basename($featureFile);
+
+		if (!OcisHelper::isTestingOnReva()) {
+			$this->spacesContext = new SpacesContext();
+			$this->spacesContext->setUpScenario($scope);
+			$environment->registerContext($this->spacesContext);
+		}
 
 		if ($this->sendScenarioLineReferencesInXRequestId()) {
 			$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;

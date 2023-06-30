@@ -18,7 +18,8 @@ type Config struct {
 
 	WebUIURL string `yaml:"ocis_url" env:"OCIS_URL;NOTIFICATIONS_WEB_UI_URL" desc:"The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails"`
 
-	Notifications Notifications `yaml:"notifications"`
+	Notifications Notifications        `yaml:"notifications"`
+	GRPCClientTLS shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
 	Context context.Context `yaml:"-"`
 }

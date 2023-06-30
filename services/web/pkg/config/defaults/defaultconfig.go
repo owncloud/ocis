@@ -82,7 +82,7 @@ func DefaultConfig() *config.Config {
 		Asset: config.Asset{
 			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
 		},
-		GatewayAddress: "127.0.0.1:9142",
+		GatewayAddress: "com.owncloud.api.gateway",
 		Web: config.Web{
 			Path:        "",
 			ThemeServer: "https://localhost:9200",
@@ -194,7 +194,7 @@ func Sanitize(cfg *config.Config) {
 		cfg.Web.Config.Options.FeedbackLink = nil
 	}
 	// remove Upload parent if no value is set
-	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 {
+	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 && cfg.Web.Config.Options.Upload.CompanionURL == "" {
 		cfg.Web.Config.Options.Upload = nil
 	}
 }

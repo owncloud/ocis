@@ -32,6 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
@@ -188,7 +189,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			var pass string
 			var err error
 			if _, pass, hasValidBasicAuthHeader = r.BasicAuth(); hasValidBasicAuthHeader {
-				res, err = handleBasicAuth(r.Context(), s.gwClient, token, pass)
+				res, err = handleBasicAuth(r.Context(), s.gatewaySelector, token, pass)
 			} else {
 				q := r.URL.Query()
 				sig := q.Get("signature")
@@ -198,7 +199,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
-				res, err = handleSignatureAuth(r.Context(), s.gwClient, token, sig, expiration)
+				res, err = handleSignatureAuth(r.Context(), s.gatewaySelector, token, sig, expiration)
 			}
 
 			switch {
@@ -232,7 +233,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			r = r.WithContext(ctx)
 
 			// the public share manager knew the token, but does the referenced target still exist?
-			sRes, err := getTokenStatInfo(ctx, s.gwClient, token)
+			sRes, err := getTokenStatInfo(ctx, s.gatewaySelector, token)
 			switch {
 			case err != nil:
 				log.Error().Err(err).Msg("error sending grpc stat request")
@@ -271,7 +272,12 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 	})
 }
 
-func getTokenStatInfo(ctx context.Context, client gatewayv1beta1.GatewayAPIClient, token string) (*provider.StatResponse, error) {
+func getTokenStatInfo(ctx context.Context, selector pool.Selectable[gatewayv1beta1.GatewayAPIClient], token string) (*provider.StatResponse, error) {
+	client, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	return client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
 		ResourceId: &provider.ResourceId{
 			StorageId: utils.PublicStorageProviderID,
@@ -281,7 +287,11 @@ func getTokenStatInfo(ctx context.Context, client gatewayv1beta1.GatewayAPIClien
 	}})
 }
 
-func handleBasicAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, token, pw string) (*gatewayv1beta1.AuthenticateResponse, error) {
+func handleBasicAuth(ctx context.Context, selector pool.Selectable[gatewayv1beta1.GatewayAPIClient], token, pw string) (*gatewayv1beta1.AuthenticateResponse, error) {
+	c, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	authenticateRequest := gatewayv1beta1.AuthenticateRequest{
 		Type:         "publicshares",
 		ClientId:     token,
@@ -291,7 +301,11 @@ func handleBasicAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, tok
 	return c.Authenticate(ctx, &authenticateRequest)
 }
 
-func handleSignatureAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, token, sig, expiration string) (*gatewayv1beta1.AuthenticateResponse, error) {
+func handleSignatureAuth(ctx context.Context, selector pool.Selectable[gatewayv1beta1.GatewayAPIClient], token, sig, expiration string) (*gatewayv1beta1.AuthenticateResponse, error) {
+	c, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	authenticateRequest := gatewayv1beta1.AuthenticateRequest{
 		Type:         "publicshares",
 		ClientId:     token,

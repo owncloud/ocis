@@ -29,17 +29,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
-	"google.golang.org/genproto/protobuf/field_mask"
-
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/google/uuid"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel/codes"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/genproto/protobuf/field_mask"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -55,7 +58,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata" // nolint:staticcheck // we need the legacy package to convert V1 to V2 messages
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 )
 
 /*
@@ -109,12 +111,16 @@ import (
   - if the mtime changed we download the file to update the local cache
 */
 
+// name is the Tracer name used to identify this instrumentation library.
+const tracerName = "jsoncs3"
+
 func init() {
 	registry.Register("jsoncs3", NewDefault)
 }
 
 type config struct {
 	GatewayAddr       string       `mapstructure:"gateway_addr"`
+	MaxConcurrency    int          `mapstructure:"max_concurrency"`
 	ProviderAddr      string       `mapstructure:"provider_addr"`
 	ServiceUserID     string       `mapstructure:"service_user_id"`
 	ServiceUserIdp    string       `mapstructure:"service_user_idp"`
@@ -144,6 +150,8 @@ type Manager struct {
 	SpaceRoot *provider.ResourceId
 
 	initialized bool
+
+	MaxConcurrency int
 
 	gateway     gatewayv1beta1.GatewayAPIClient
 	eventStream events.Stream
@@ -205,11 +213,11 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 		}
 	}
 
-	return New(s, gc, c.CacheTTL, es)
+	return New(s, gc, c.CacheTTL, es, c.MaxConcurrency)
 }
 
 // New returns a new manager instance.
-func New(s metadata.Storage, gc gatewayv1beta1.GatewayAPIClient, ttlSeconds int, es events.Stream) (*Manager, error) {
+func New(s metadata.Storage, gc gatewayv1beta1.GatewayAPIClient, ttlSeconds int, es events.Stream, maxconcurrency int) (*Manager, error) {
 	ttl := time.Duration(ttlSeconds) * time.Second
 	return &Manager{
 		Cache:              providercache.New(s, ttl),
@@ -219,11 +227,15 @@ func New(s metadata.Storage, gc gatewayv1beta1.GatewayAPIClient, ttlSeconds int,
 		storage:            s,
 		gateway:            gc,
 		eventStream:        es,
+		MaxConcurrency:     maxconcurrency,
 	}, nil
 }
 
-func (m *Manager) initialize() error {
+func (m *Manager) initialize(ctx context.Context) error {
+	_, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "initialize")
+	defer span.End()
 	if m.initialized {
+		span.SetStatus(codes.Ok, "already initialized")
 		return nil
 	}
 
@@ -231,35 +243,49 @@ func (m *Manager) initialize() error {
 	defer m.Unlock()
 
 	if m.initialized { // check if initialization happened while grabbing the lock
+		span.SetStatus(codes.Ok, "initialized while grabbing lock")
 		return nil
 	}
 
-	ctx := context.Background()
+	ctx = context.Background()
 	err := m.storage.Init(ctx, "jsoncs3-share-manager-metadata")
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
 	err = m.storage.MakeDirIfNotExist(ctx, "storages")
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	err = m.storage.MakeDirIfNotExist(ctx, "users")
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	err = m.storage.MakeDirIfNotExist(ctx, "groups")
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
 	m.initialized = true
+	span.SetStatus(codes.Ok, "initialized")
 	return nil
 }
 
 // Share creates a new share
 func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *collaboration.ShareGrant) (*collaboration.Share, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Share")
+	defer span.End()
+	if err := m.initialize(ctx); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
@@ -270,7 +296,10 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 	// TODO: should this not already be caught at the gw level?
 	if g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER &&
 		(utils.UserEqual(g.Grantee.GetUserId(), user.Id) || utils.UserEqual(g.Grantee.GetUserId(), md.Owner)) {
-		return nil, errtypes.BadRequest("jsoncs3: owner/creator and grantee are the same")
+		err := errtypes.BadRequest("jsoncs3: owner/creator and grantee are the same")
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 
 	// check if share already exists.
@@ -280,12 +309,13 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 		Grantee:    g.Grantee,
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	_, err := m.getByKey(ctx, key)
 	if err == nil {
 		// share already exists
-		return nil, errtypes.AlreadyExists(key.String())
+		err := errtypes.AlreadyExists(key.String())
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 
 	shareID := shareid.Encode(md.GetId().GetStorageId(), md.GetId().GetSpaceId(), uuid.NewString())
@@ -303,65 +333,111 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 		Mtime:       ts,
 	}
 
-	err = m.Cache.Add(ctx, md.Id.StorageId, md.Id.SpaceId, shareID, s)
-	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-		if err := m.Cache.Sync(ctx, md.Id.StorageId, md.Id.SpaceId); err != nil {
-			return nil, err
-		}
-		err = m.Cache.Add(ctx, md.Id.StorageId, md.Id.SpaceId, shareID, s)
-		// TODO try more often?
-	}
-	if err != nil {
-		return nil, err
-	}
+	eg, ctx := errgroup.WithContext(ctx)
 
-	err = m.CreatedCache.Add(ctx, s.GetCreator().GetOpaqueId(), shareID)
-	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-		if err := m.CreatedCache.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
-			return nil, err
+	eg.Go(func() error {
+		err := m.Cache.Add(ctx, md.Id.StorageId, md.Id.SpaceId, shareID, s)
+		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+			if err := m.Cache.Sync(ctx, md.Id.StorageId, md.Id.SpaceId); err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+
+				return err
+			}
+
+			err = m.Cache.Add(ctx, md.Id.StorageId, md.Id.SpaceId, shareID, s)
+			// TODO try more often?
 		}
-		err = m.CreatedCache.Add(ctx, s.GetCreator().GetOpaqueId(), shareID)
-		// TODO try more often?
-	}
-	if err != nil {
-		return nil, err
-	}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+
+		return err
+	})
+
+	eg.Go(func() error {
+		err := m.CreatedCache.Add(ctx, s.GetCreator().GetOpaqueId(), shareID)
+		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+			if err := m.CreatedCache.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+
+				return err
+			}
+
+			err = m.CreatedCache.Add(ctx, s.GetCreator().GetOpaqueId(), shareID)
+			// TODO try more often?
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+
+		return err
+	})
 
 	spaceID := md.Id.StorageId + shareid.IDDelimiter + md.Id.SpaceId
 	// set flag for grantee to have access to share
 	switch g.Grantee.Type {
 	case provider.GranteeType_GRANTEE_TYPE_USER:
-		userid := g.Grantee.GetUserId().GetOpaqueId()
+		eg.Go(func() error {
+			userid := g.Grantee.GetUserId().GetOpaqueId()
 
-		rs := &collaboration.ReceivedShare{
-			Share: s,
-			State: collaboration.ShareState_SHARE_STATE_PENDING,
-		}
-		err = m.UserReceivedStates.Add(ctx, userid, spaceID, rs)
-		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-			if err := m.UserReceivedStates.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
-				return nil, err
+			rs := &collaboration.ReceivedShare{
+				Share: s,
+				State: collaboration.ShareState_SHARE_STATE_PENDING,
 			}
-			err = m.UserReceivedStates.Add(ctx, userid, spaceID, rs)
-			// TODO try more often?
-		}
-		if err != nil {
-			return nil, err
-		}
+			err := m.UserReceivedStates.Add(ctx, userid, spaceID, rs)
+			if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+				if err := m.UserReceivedStates.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
+					span.RecordError(err)
+					span.SetStatus(codes.Error, err.Error())
+					return err
+				}
+
+				err = m.UserReceivedStates.Add(ctx, userid, spaceID, rs)
+				// TODO try more often?
+			}
+
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+
+			return err
+		})
 	case provider.GranteeType_GRANTEE_TYPE_GROUP:
-		groupid := g.Grantee.GetGroupId().GetOpaqueId()
-		err := m.GroupReceivedCache.Add(ctx, groupid, shareID)
-		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-			if err := m.GroupReceivedCache.Sync(ctx, groupid); err != nil {
-				return nil, err
+		eg.Go(func() error {
+			groupid := g.Grantee.GetGroupId().GetOpaqueId()
+			err := m.GroupReceivedCache.Add(ctx, groupid, shareID)
+			if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+				if err := m.GroupReceivedCache.Sync(ctx, groupid); err != nil {
+					span.RecordError(err)
+					span.SetStatus(codes.Error, err.Error())
+					return err
+				}
+
+				err = m.GroupReceivedCache.Add(ctx, groupid, shareID)
+				// TODO try more often?
 			}
-			err = m.GroupReceivedCache.Add(ctx, groupid, shareID)
-			// TODO try more often?
-		}
-		if err != nil {
-			return nil, err
-		}
+
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+
+			return err
+		})
 	}
+
+	if err = eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	span.SetStatus(codes.Ok, "")
 
 	return s, nil
 }
@@ -413,12 +489,12 @@ func (m *Manager) get(ctx context.Context, ref *collaboration.ShareReference) (s
 
 // GetShare gets the information for a share by the given ref.
 func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.Share, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "GetShare")
+	defer span.End()
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	s, err := m.get(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -463,12 +539,13 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 
 // Unshare deletes a share
 func (m *Manager) Unshare(ctx context.Context, ref *collaboration.ShareReference) error {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Unshare")
+	defer span.End()
+
+	if err := m.initialize(ctx); err != nil {
 		return err
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	user := ctxpkg.ContextMustGetUser(ctx)
 
 	s, err := m.get(ctx, ref)
@@ -486,12 +563,12 @@ func (m *Manager) Unshare(ctx context.Context, ref *collaboration.ShareReference
 
 // UpdateShare updates the mode of the given share.
 func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareReference, p *collaboration.SharePermissions, updated *collaboration.Share, fieldMask *field_mask.FieldMask) (*collaboration.Share, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "UpdateShare")
+	defer span.End()
+
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	var toUpdate *collaboration.Share
 
@@ -541,6 +618,8 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 	toUpdate.Mtime = utils.TSNow()
 
 	// Update provider cache
+	unlock := m.Cache.LockSpace(toUpdate.ResourceId.SpaceId)
+	defer unlock()
 	err := m.Cache.Persist(ctx, toUpdate.ResourceId.StorageId, toUpdate.ResourceId.SpaceId)
 	// when persisting fails
 	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
@@ -565,12 +644,12 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 
 // ListShares returns the shares created by the user
 func (m *Manager) ListShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.Share, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListShares")
+	defer span.End()
+
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 
@@ -582,6 +661,9 @@ func (m *Manager) ListShares(ctx context.Context, filters []*collaboration.Filte
 }
 
 func (m *Manager) listSharesByIDs(ctx context.Context, user *userv1beta1.User, filters []*collaboration.Filter) ([]*collaboration.Share, error) {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "listSharesByIDs")
+	defer span.End()
+
 	providerSpaces := make(map[string]map[string]struct{})
 	for _, f := range share.FilterFiltersByType(filters, collaboration.Filter_TYPE_RESOURCE_ID) {
 		storageID := f.GetResourceId().GetStorageId()
@@ -598,6 +680,8 @@ func (m *Manager) listSharesByIDs(ctx context.Context, user *userv1beta1.User, f
 		for spaceID := range spaces {
 			err := m.Cache.Sync(ctx, providerID, spaceID)
 			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
 				return nil, err
 			}
 
@@ -645,13 +729,19 @@ func (m *Manager) listSharesByIDs(ctx context.Context, user *userv1beta1.User, f
 			}
 		}
 	}
+	span.SetStatus(codes.Ok, "")
 	return ss, nil
 }
 
 func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User, filters []*collaboration.Filter) ([]*collaboration.Share, error) {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "listCreatedShares")
+	defer span.End()
+
 	var ss []*collaboration.Share
 
 	if err := m.CreatedCache.Sync(ctx, user.Id.OpaqueId); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return ss, err
 	}
 	for ssid, spaceShareIDs := range m.CreatedCache.List(user.Id.OpaqueId) {
@@ -691,19 +781,19 @@ func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User,
 		}
 	}
 
+	span.SetStatus(codes.Ok, "")
 	return ss, nil
 }
 
 // ListReceivedShares returns the list of shares the user has access to.
 func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListReceivedShares")
+	defer span.End()
+
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
 
-	m.Lock()
-	defer m.Unlock()
-
-	var rss []*collaboration.ReceivedShare
 	user := ctxpkg.ContextMustGetUser(ctx)
 
 	ssids := map[string]*receivedsharecache.Space{}
@@ -750,53 +840,111 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 		}
 	}
 
-	for ssid, rspace := range ssids {
-		storageID, spaceID, _ := shareid.Decode(ssid)
-		err := m.Cache.Sync(ctx, storageID, spaceID)
-		if err != nil {
-			continue
-		}
-		for shareID, state := range rspace.States {
-			s := m.Cache.Get(storageID, spaceID, shareID)
-			if s == nil {
-				continue
-			}
-			if share.IsExpired(s) {
-				if err := m.removeShare(ctx, s); err != nil {
-					log.Error().Err(err).
-						Msg("failed to unshare expired share")
-				}
-				if err := events.Publish(m.eventStream, events.ShareExpired{
-					ShareOwner:     s.GetOwner(),
-					ItemID:         s.GetResourceId(),
-					ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
-					GranteeUserID:  s.GetGrantee().GetUserId(),
-					GranteeGroupID: s.GetGrantee().GetGroupId(),
-				}); err != nil {
-					log.Error().Err(err).
-						Msg("failed to publish share expired event")
-				}
-				continue
-			}
-
-			if share.IsGrantedToUser(s, user) {
-				if share.MatchesFiltersWithState(s, state.State, filters) {
-					rs := &collaboration.ReceivedShare{
-						Share:      s,
-						State:      state.State,
-						MountPoint: state.MountPoint,
-					}
-					rss = append(rss, rs)
-				}
-			}
-		}
+	numWorkers := m.MaxConcurrency
+	if numWorkers == 0 || len(ssids) < numWorkers {
+		numWorkers = len(ssids)
 	}
 
+	type w struct {
+		ssid   string
+		rspace *receivedsharecache.Space
+	}
+	work := make(chan w)
+	results := make(chan *collaboration.ReceivedShare)
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	// Distribute work
+	g.Go(func() error {
+		defer close(work)
+		for ssid, rspace := range ssids {
+			select {
+			case work <- w{ssid, rspace}:
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		}
+		return nil
+	})
+
+	// Spawn workers that'll concurrently work the queue
+	for i := 0; i < numWorkers; i++ {
+		g.Go(func() error {
+			for w := range work {
+				storageID, spaceID, _ := shareid.Decode(w.ssid)
+				err := m.Cache.Sync(ctx, storageID, spaceID)
+				if err != nil {
+					continue
+				}
+				for shareID, state := range w.rspace.States {
+					s := m.Cache.Get(storageID, spaceID, shareID)
+					if s == nil {
+						continue
+					}
+					if share.IsExpired(s) {
+						if err := m.removeShare(ctx, s); err != nil {
+							log.Error().Err(err).
+								Msg("failed to unshare expired share")
+						}
+						if err := events.Publish(m.eventStream, events.ShareExpired{
+							ShareOwner:     s.GetOwner(),
+							ItemID:         s.GetResourceId(),
+							ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
+							GranteeUserID:  s.GetGrantee().GetUserId(),
+							GranteeGroupID: s.GetGrantee().GetGroupId(),
+						}); err != nil {
+							log.Error().Err(err).
+								Msg("failed to publish share expired event")
+						}
+						continue
+					}
+
+					if share.IsGrantedToUser(s, user) {
+						if share.MatchesFiltersWithState(s, state.State, filters) {
+							rs := &collaboration.ReceivedShare{
+								Share:      s,
+								State:      state.State,
+								MountPoint: state.MountPoint,
+							}
+							select {
+							case results <- rs:
+							case <-ctx.Done():
+								return ctx.Err()
+							}
+						}
+					}
+				}
+			}
+			return nil
+		})
+	}
+
+	// Wait for things to settle down, then close results chan
+	go func() {
+		_ = g.Wait() // error is checked later
+		close(results)
+	}()
+
+	rss := []*collaboration.ReceivedShare{}
+	for n := range results {
+		rss = append(rss, n)
+	}
+
+	if err := g.Wait(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+
+	span.SetStatus(codes.Ok, "")
 	return rss, nil
 }
 
 // convert must be called in a lock-controlled block.
 func (m *Manager) convert(ctx context.Context, userID string, s *collaboration.Share) *collaboration.ReceivedShare {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "convert")
+	defer span.End()
+
 	rs := &collaboration.ReceivedShare{
 		Share: s,
 		State: collaboration.ShareState_SHARE_STATE_PENDING,
@@ -815,7 +963,7 @@ func (m *Manager) convert(ctx context.Context, userID string, s *collaboration.S
 
 // GetReceivedShare returns the information for a received share.
 func (m *Manager) GetReceivedShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.ReceivedShare, error) {
-	if err := m.initialize(); err != nil {
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
 
@@ -823,8 +971,9 @@ func (m *Manager) GetReceivedShare(ctx context.Context, ref *collaboration.Share
 }
 
 func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.ReceivedShare, error) {
-	m.Lock()
-	defer m.Unlock()
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "getReceived")
+	defer span.End()
+
 	s, err := m.get(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -854,7 +1003,10 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 
 // UpdateReceivedShare updates the received share with share state.
 func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
-	if err := m.initialize(); err != nil {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "UpdateReceivedShare")
+	defer span.End()
+
+	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
 
@@ -862,9 +1014,6 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 	if err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	for i := range fieldMask.Paths {
 		switch fieldMask.Paths[i] {
@@ -907,7 +1056,7 @@ func updateShareID(share *collaboration.Share) {
 // Load imports shares and received shares from channels (e.g. during migration)
 func (m *Manager) Load(ctx context.Context, shareChan <-chan *collaboration.Share, receivedShareChan <-chan share.ReceivedShareWithUser) error {
 	log := appctx.GetLogger(ctx)
-	if err := m.initialize(); err != nil {
+	if err := m.initialize(ctx); err != nil {
 		return err
 	}
 
@@ -964,33 +1113,39 @@ func (m *Manager) Load(ctx context.Context, shareChan <-chan *collaboration.Shar
 }
 
 func (m *Manager) removeShare(ctx context.Context, s *collaboration.Share) error {
-	storageID, spaceID, _ := shareid.Decode(s.Id.OpaqueId)
-	err := m.Cache.Remove(ctx, storageID, spaceID, s.Id.OpaqueId)
-	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-		if err := m.Cache.Sync(ctx, storageID, spaceID); err != nil {
-			return err
-		}
-		err = m.Cache.Remove(ctx, storageID, spaceID, s.Id.OpaqueId)
-		// TODO try more often?
-	}
-	if err != nil {
-		return err
-	}
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "removeShare")
+	defer span.End()
 
-	// remove from created cache
-	err = m.CreatedCache.Remove(ctx, s.GetCreator().GetOpaqueId(), s.Id.OpaqueId)
-	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
-		if err := m.CreatedCache.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
-			return err
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		storageID, spaceID, _ := shareid.Decode(s.Id.OpaqueId)
+		err := m.Cache.Remove(ctx, storageID, spaceID, s.Id.OpaqueId)
+		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+			if err := m.Cache.Sync(ctx, storageID, spaceID); err != nil {
+				return err
+			}
+			err = m.Cache.Remove(ctx, storageID, spaceID, s.Id.OpaqueId)
+			// TODO try more often?
 		}
-		err = m.CreatedCache.Remove(ctx, s.GetCreator().GetOpaqueId(), s.Id.OpaqueId)
-		// TODO try more often?
-	}
-	if err != nil {
+
 		return err
-	}
+	})
+
+	eg.Go(func() error {
+		// remove from created cache
+		err := m.CreatedCache.Remove(ctx, s.GetCreator().GetOpaqueId(), s.Id.OpaqueId)
+		if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+			if err := m.CreatedCache.Sync(ctx, s.GetCreator().GetOpaqueId()); err != nil {
+				return err
+			}
+			err = m.CreatedCache.Remove(ctx, s.GetCreator().GetOpaqueId(), s.Id.OpaqueId)
+			// TODO try more often?
+		}
+
+		return err
+	})
 
 	// TODO remove from grantee cache
 
-	return nil
+	return eg.Wait()
 }

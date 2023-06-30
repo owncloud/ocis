@@ -4,7 +4,7 @@ package config
 type Options struct {
 	HomeFolder               string           `json:"homeFolder,omitempty" yaml:"homeFolder" env:"WEB_OPTION_HOME_FOLDER" desc:"Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows picking a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'."`
 	OpenAppsInTab            bool             `json:"openAppsInTab,omitempty" yaml:"openAppsInTab" env:"WEB_OPTION_OPEN_APPS_IN_TAB" desc:"Configures whether apps and extensions should generally open in a new tab. Defaults to false."`
-	DisablePreviews          bool             `json:"disablePreviews,omitempty" yaml:"disablePreviews" env:"WEB_OPTION_DISABLE_PREVIEWS" desc:"Set this option to 'true' to disable previews in all the different file listing views. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all."`
+	DisablePreviews          bool             `json:"disablePreviews,omitempty" yaml:"disablePreviews" env:"OCIS_DISABLE_PREVIEWS;WEB_OPTION_DISABLE_PREVIEWS" desc:"Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all."`
 	PreviewFileMimeTypes     []string         `json:"previewFileMimeTypes,omitempty" yaml:"previewFileMimeTypes" env:"WEB_OPTION_PREVIEW_FILE_MIMETYPES" desc:"Specifies which mimeTypes will be previewed in the UI. For example to only preview jpg and text files, set this option to ['image/jpeg', 'text/plain']."`
 	AccountEditLink          *AccountEditLink `json:"accountEditLink,omitempty" yaml:"accountEditLink"`
 	DisableFeedbackLink      bool             `json:"disableFeedbackLink,omitempty" yaml:"disableFeedbackLink" env:"WEB_OPTION_DISABLE_FEEDBACK_LINK" desc:"Set this option to 'true' to disable the feedback link in the topbar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website."`
@@ -20,6 +20,9 @@ type Options struct {
 	ContextHelpersReadMore   bool             `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not."`
 	LogoutURL                string           `json:"logoutUrl,omitempty" yaml:"logoutUrl" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default."`
 	OpenLinksWithDefaultApp  bool             `json:"openLinksWithDefaultApp,omitempty" yaml:"openLinksWithDefaultApp" env:"WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP" desc:"Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'."`
+	ImprintURL               string           `json:"imprintUrl,omitempty" yaml:"imprintUrl" env:"WEB_OPTION_IMPRINT_URL" desc:"Specifies the target URL for the imprint link valid for the ocis instance in the account menu."`
+	PrivacyURL               string           `json:"privacyUrl,omitempty" yaml:"privacyUrl" env:"WEB_OPTION_PRIVACY_URL" desc:"Specifies the target URL for the privacy link valid for the ocis instance in the account menu."`
+	AccessDeniedHelpURL      string           `json:"accessDeniedHelpURL,omitempty" yaml:"accessDeniedHelpURL" env:"WEB_OPTION_ACCESS_DENIED_HELP_URL" desc:"Specifies the target URL valid for the ocis instance for the generic logged out / access denied page."`
 }
 
 // AccountEditLink are the AccountEditLink options
@@ -51,7 +54,8 @@ type Routing struct {
 
 // Upload are the upload options
 type Upload struct {
-	XHR XHR `json:"xhr,omitempty" yaml:"xhr"`
+	XHR          XHR    `json:"xhr,omitempty" yaml:"xhr"`
+	CompanionURL string `json:"companionUrl,omitempty" yaml:"companionUrl" env:"WEB_OPTION_UPLOAD_COMPANION_URL" desc:"Sets the URL of Companion which is a service provided by Uppy to import files from external cloud providers. See https://uppy.io/docs/companion/ for instructions on how to set up Companion. This feature is disabled as long as no URL is given."`
 }
 
 // XHR are the XHR options

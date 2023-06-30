@@ -1,0 +1,9 @@
+services:
+  start_antivirus:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - clamav
+    command: clamav:3310
+  clamav:
+    image: mkodockx/docker-clamav:alpine
+

@@ -49,6 +49,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
@@ -99,7 +100,8 @@ type Decomposedfs struct {
 	stream       events.Stream
 	cache        cache.StatCache
 
-	UserCache *ttlcache.Cache
+	UserCache    *ttlcache.Cache
+	spaceIDCache mtimesyncedcache.Cache[string, map[string]string]
 }
 
 // NewDefault returns an instance with default components
@@ -127,12 +129,13 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		microstore.Database(o.IDCache.Database),
 		microstore.Table(o.IDCache.Table),
 	))
-	permissionsClient, err := pool.GetPermissionsClient(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
+
+	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
 	if err != nil {
 		return nil, err
 	}
 
-	permissions := NewPermissions(node.NewPermissions(lu), permissionsClient)
+	permissions := NewPermissions(node.NewPermissions(lu), permissionsSelector)
 
 	return New(o, lu, permissions, tp, es)
 }
@@ -270,7 +273,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						},
 						Path: utils.MakeRelativePath(filepath.Join(up.Info.MetaData["dir"], up.Info.MetaData["filename"])),
 					},
-					Timestamp:  now,
+					Timestamp:  utils.TimeToTS(now),
 					SpaceOwner: n.SpaceOwnerOrManager(ctx),
 				},
 			); err != nil {
@@ -426,7 +429,7 @@ func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return 0, 0, 0, errtypes.InternalError(err.Error())
+		return 0, 0, 0, err
 	case !rp.GetQuota && !fs.p.ListAllSpaces(ctx):
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -533,7 +536,7 @@ func (fs *Decomposedfs) GetPathByID(ctx context.Context, id *provider.ResourceId
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return "", errtypes.InternalError(err.Error())
+		return "", err
 	case !rp.GetPath:
 		f := storagespace.FormatResourceID(*id)
 		if rp.Stat {
@@ -580,7 +583,7 @@ func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) 
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.CreateContainer:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -636,7 +639,7 @@ func (fs *Decomposedfs) TouchFile(ctx context.Context, ref *provider.Reference, 
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -679,7 +682,7 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 	rp, err := fs.p.AssemblePermissions(ctx, oldNode)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.Move:
 		f, _ := storagespace.FormatReference(oldRef)
 		if rp.Stat {
@@ -699,7 +702,7 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 	rp, err = fs.p.AssemblePermissions(ctx, newNode)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case oldNode.IsDir() && !rp.CreateContainer:
 		f, _ := storagespace.FormatReference(newRef)
 		if rp.Stat {
@@ -745,7 +748,7 @@ func (fs *Decomposedfs) GetMD(ctx context.Context, ref *provider.Reference, mdKe
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.Stat:
 		f, _ := storagespace.FormatReference(ref)
 		return nil, errtypes.NotFound(f)
@@ -789,7 +792,7 @@ func (fs *Decomposedfs) ListFolder(ctx context.Context, ref *provider.Reference,
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.ListContainer:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -880,7 +883,7 @@ func (fs *Decomposedfs) Delete(ctx context.Context, ref *provider.Reference) (er
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.Delete:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -920,7 +923,7 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.InitiateFileDownload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -951,7 +954,7 @@ func (fs *Decomposedfs) GetLock(ctx context.Context, ref *provider.Reference) (*
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.InitiateFileDownload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -977,7 +980,7 @@ func (fs *Decomposedfs) SetLock(ctx context.Context, ref *provider.Reference, lo
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -1007,7 +1010,7 @@ func (fs *Decomposedfs) RefreshLock(ctx context.Context, ref *provider.Reference
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -1037,7 +1040,7 @@ func (fs *Decomposedfs) Unlock(ctx context.Context, ref *provider.Reference, loc
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload: // TODO do we need a dedicated permission?
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {

@@ -24,6 +24,7 @@ type k8sWatcher struct {
 
 	sync.RWMutex
 	pods map[string]*client.Pod
+	sync.Once
 }
 
 // build a cache of pods when the watcher starts.
@@ -164,7 +165,9 @@ func (k *k8sWatcher) Stop() {
 	case <-k.next:
 		return
 	default:
-		close(k.next)
+		k.Do(func() {
+			close(k.next)
+		})
 	}
 }
 

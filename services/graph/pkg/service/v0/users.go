@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/CiscoM31/godata"
@@ -65,12 +66,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
 		if err != nil {
 			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 		if me.MemberOf == nil {
@@ -84,12 +80,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		me.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), me.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", me.GetId()).Msg("could not get appRoleAssignments for self")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 	}
@@ -318,12 +309,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		logger.Error().Err(err).Msg("could not create user: backend error")
-		var ecErr errorcode.Error
-		if errors.As(err, &ecErr) {
-			ecErr.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -392,12 +378,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -427,10 +408,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with filter")
+
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
+
+		client, err := g.gatewaySelector.Next()
+		if err != nil {
+			logger.Error().Err(err).Msg("error selecting next gateway client")
+			render.Status(r, http.StatusInternalServerError)
+			return
+		}
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		lspr, err := client.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: filters,
 		})
@@ -482,12 +471,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		user.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), user.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 	}
@@ -526,12 +510,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	user, err := g.identityBackend.GetUser(r.Context(), userID, odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -545,13 +524,19 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 
-	if g.gatewayClient != nil {
+	if g.gatewaySelector != nil {
 		logger.Debug().
 			Str("user", user.GetId()).
 			Msg("calling list spaces with user filter to fetch the personal space for deletion")
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		f := listStorageSpacesUserFilter(user.GetId())
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		client, err := g.gatewaySelector.Next()
+		if err != nil {
+			logger.Error().Err(err).Msg("error selecting next gateway client")
+			errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "error selecting next gateway client, aborting")
+			return
+		}
+		lspr, err := client.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
@@ -572,7 +557,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map["trashed"]; !ok {
-				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
 					},
@@ -584,7 +569,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,
@@ -605,13 +590,8 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	g.publishEvent(e)
@@ -633,6 +613,22 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	oldUserValues, err := g.identityBackend.GetUser(r.Context(), nameOrID, odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not get user: backend error")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
 	if nameOrID == "" {
 		logger.Debug().Msg("could not update user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
@@ -648,10 +644,18 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reflect.ValueOf(*changes).IsZero() {
-		logger.Debug().Interface("body", r.Body).Msg("ignoring empyt request body")
+		logger.Debug().Interface("body", r.Body).Msg("ignoring empty request body")
 		render.Status(r, http.StatusNoContent)
 		render.NoContent(w, r)
 		return
+	}
+
+	if accountName, ok := changes.GetOnPremisesSamAccountNameOk(); ok {
+		if !g.isValidUsername(*accountName) {
+			logger.Info().Str("username", *accountName).Msg("could not update user: invalid username")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid username")
+			return
+		}
 	}
 
 	var features []events.UserFeature
@@ -662,37 +666,61 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
 		}
-		features = append(features, events.UserFeature{Name: "email", Value: *mail})
+		features = append(features, events.UserFeature{
+			Name:     "email",
+			Value:    *mail,
+			OldValue: oldUserValues.Mail,
+		})
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
-		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
+		features = append(features, events.UserFeature{
+			Name:     "displayname",
+			Value:    *name,
+			OldValue: oldUserValues.DisplayName,
+		})
 	}
 
-	if changes.HasUserType() {
+	if userType, ok := changes.GetUserTypeOk(); ok {
 		if !isValidUserType(*changes.UserType) {
 			logger.Debug().Interface("user", changes).Msg("invalid userType attribute")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
 			return
 		}
+		features = append(features, events.UserFeature{
+			Name:     "changeUserType",
+			Value:    *userType,
+			OldValue: oldUserValues.UserType,
+		})
+	}
+
+	if accEnabled, ok := changes.GetAccountEnabledOk(); ok {
+		oldAccVal := strconv.FormatBool(oldUserValues.GetAccountEnabled())
+		features = append(features, events.UserFeature{
+			Name:     "accountEnabled",
+			Value:    strconv.FormatBool(*accEnabled),
+			OldValue: &oldAccVal,
+		})
+	}
+
+	if changes.HasPasswordProfile() {
+		features = append(features, events.UserFeature{
+			Name: "passwordChanged",
+		})
 	}
 
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
 	e := events.UserFeatureChanged{
-		UserID:   nameOrID,
-		Features: features,
+		UserID:    nameOrID,
+		Features:  features,
+		Timestamp: utils.TSNow(),
 	}
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()

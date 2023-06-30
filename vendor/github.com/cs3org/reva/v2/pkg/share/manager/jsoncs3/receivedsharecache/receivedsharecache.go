@@ -21,8 +21,10 @@ package receivedsharecache
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -31,12 +33,19 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
+
+// name is the Tracer name used to identify this instrumentation library.
+const tracerName = "receivedsharecache"
 
 // Cache stores the list of received shares and their states
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user
 type Cache struct {
+	lockMap sync.Map
+
 	ReceivedSpaces map[string]*Spaces
 
 	storage metadata.Storage
@@ -69,11 +78,27 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		ReceivedSpaces: map[string]*Spaces{},
 		storage:        s,
 		ttl:            ttl,
+		lockMap:        sync.Map{},
 	}
+}
+
+func (c *Cache) lockUser(userID string) func() {
+	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
+	lock := v.(*sync.Mutex)
+
+	lock.Lock()
+	return func() { lock.Unlock() }
 }
 
 // Add adds a new entry to the cache
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
+
 	if c.ReceivedSpaces[userID] == nil {
 		c.ReceivedSpaces[userID] = &Spaces{
 			Spaces: map[string]*Space{},
@@ -93,7 +118,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 		MountPoint: rs.MountPoint,
 	}
 
-	return c.Persist(ctx, userID)
+	return c.persist(ctx, userID)
 }
 
 // Get returns one entry from the cache
@@ -106,13 +131,20 @@ func (c *Cache) Get(userID, spaceID, shareID string) *State {
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, userID string) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+
 	log := appctx.GetLogger(ctx).With().Str("userID", userID).Logger()
-	log.Debug().Msg("Syncing received share cache...")
 
 	var mtime time.Time
 	if c.ReceivedSpaces[userID] != nil {
 		if time.Now().Before(c.ReceivedSpaces[userID].nextSync) {
-			log.Debug().Msg("Skipping received share cache sync, it was just recently synced...")
+			span.AddEvent("skip sync")
+			span.SetStatus(codes.Ok, "")
 			return nil
 		}
 		c.ReceivedSpaces[userID].nextSync = time.Now().Add(c.ttl)
@@ -123,39 +155,49 @@ func (c *Cache) Sync(ctx context.Context, userID string) error {
 	}
 
 	jsonPath := userJSONPath(userID)
-	info, err := c.storage.Stat(ctx, jsonPath)
+	info, err := c.storage.Stat(ctx, jsonPath) // TODO we only need the mtime ... use fieldmask to make the request cheaper
 	if err != nil {
 		if _, ok := err.(errtypes.NotFound); ok {
+			span.AddEvent("no file")
+			span.SetStatus(codes.Ok, "")
 			return nil // Nothing to sync against
 		}
+		span.SetStatus(codes.Error, fmt.Sprintf("Failed to stat the received share: %s", err.Error()))
 		log.Error().Err(err).Msg("Failed to stat the received share")
 		return err
 	}
 	// check mtime of /users/{userid}/created.json
 	if utils.TSToTime(info.Mtime).After(mtime) {
-		log.Debug().Msg("Updating received share cache...")
+		span.AddEvent("updating cache")
 		//  - update cached list of created shares for the user in memory if changed
 		createdBlob, err := c.storage.SimpleDownload(ctx, jsonPath)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the received share: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to download the received share")
 			return err
 		}
 		newSpaces := &Spaces{}
 		err = json.Unmarshal(createdBlob, newSpaces)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to unmarshal the received share: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to unmarshal the received share")
 			return err
 		}
 		newSpaces.Mtime = utils.TSToTime(info.Mtime)
 		c.ReceivedSpaces[userID] = newSpaces
 	}
-	log.Debug().Msg("Received share cache is up to date")
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
-// Persist persists the data for one user to the storage
-func (c *Cache) Persist(ctx context.Context, userID string) error {
+// persist persists the data for one user to the storage
+func (c *Cache) persist(ctx context.Context, userID string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Persist")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+
 	if c.ReceivedSpaces[userID] == nil {
+		span.SetStatus(codes.Ok, "no received shares")
 		return nil
 	}
 
@@ -165,11 +207,15 @@ func (c *Cache) Persist(ctx context.Context, userID string) error {
 	createdBytes, err := json.Marshal(c.ReceivedSpaces[userID])
 	if err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := userJSONPath(userID)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -179,8 +225,11 @@ func (c *Cache) Persist(ctx context.Context, userID string) error {
 		IfUnmodifiedSince: c.ReceivedSpaces[userID].Mtime,
 	}); err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 

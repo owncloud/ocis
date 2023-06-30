@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -18,23 +20,29 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 	BeforeEach(func() {
 		authenticator = PublicShareAuthenticator{
 			Logger: log.NewLogger(),
-			RevaGatewayClient: mockGatewayClient{
-				AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
-					if authType != "publicshares" {
-						return "", rpcv1beta1.Code_CODE_NOT_FOUND
-					}
+			RevaGatewaySelector: pool.GetSelector[gateway.GatewayAPIClient](
+				"GatewaySelector",
+				"com.owncloud.api.gateway",
+				func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+					return mockGatewayClient{
+						AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
+							if authType != "publicshares" {
+								return "", rpcv1beta1.Code_CODE_NOT_FOUND
+							}
 
-					if clientID == "sharetoken" && (clientSecret == "password|examples3cr3t" || clientSecret == "signature|examplesignature|exampleexpiration") {
-						return "exampletoken", rpcv1beta1.Code_CODE_OK
-					}
+							if clientID == "sharetoken" && (clientSecret == "password|examples3cr3t" || clientSecret == "signature|examplesignature|exampleexpiration") {
+								return "exampletoken", rpcv1beta1.Code_CODE_OK
+							}
 
-					if clientID == "sharetoken" && clientSecret == "password|" {
-						return "otherexampletoken", rpcv1beta1.Code_CODE_OK
-					}
+							if clientID == "sharetoken" && clientSecret == "password|" {
+								return "otherexampletoken", rpcv1beta1.Code_CODE_OK
+							}
 
-					return "", rpcv1beta1.Code_CODE_NOT_FOUND
+							return "", rpcv1beta1.Code_CODE_NOT_FOUND
+						},
+					}
 				},
-			},
+			),
 		}
 	})
 	When("the request contains correct data", func() {

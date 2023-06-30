@@ -13,6 +13,7 @@ use Behat\Behat\Context\Context;
 use GuzzleHttp\Exception\GuzzleException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -89,13 +90,10 @@ class SettingsContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestAssignmentsList(string $user, string $userId): void {
+	public function sendRequestAssignmentsList(string $user, string $userId): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-list";
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
-
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
-		);
+		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body);
 	}
 
 	/**
@@ -222,7 +220,7 @@ class SettingsContext implements Context {
 	 */
 	public function userGetAssignmentsList(string $user): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$this->sendRequestAssignmentsList($user, $userId);
+		$this->featureContext->setResponse($this->sendRequestAssignmentsList($user, $userId));
 	}
 
 	/**
@@ -238,10 +236,14 @@ class SettingsContext implements Context {
 	 */
 	public function userShouldHaveRole(string $user, string $role): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$this->sendRequestAssignmentsList($this->featureContext->getAdminUserName(), $userId);
-		$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-		$assignmentRoleId = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["assignments"][0]["roleId"];
-		Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user $user has no role $role");
+		$response = $this->sendRequestAssignmentsList($this->featureContext->getAdminUserName(), $userId);
+		$assignmentResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		if (isset($assignmentResponse->assignments[0]->roleId)) {
+			$actualRoleId = $assignmentResponse->assignments[0]->roleId;
+			Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $actualRoleId, "user $user has no role $role");
+		} else {
+			Assert::fail("Response should contain user role but not found.\n" . json_encode($assignmentResponse));
+		}
 	}
 
 	/**
@@ -330,7 +332,7 @@ class SettingsContext implements Context {
 	public function getSettingLanguageValue(string $user): string {
 		$this->sendRequestGetSettingsValuesList($user);
 		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
-	
+
 		// if no language is set, the request body is empty return English as the default language
 		if (empty($body)) {
 			return "en";

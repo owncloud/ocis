@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -34,12 +33,7 @@ func (g Graph) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
 	classes, err := g.identityEducationBackend.GetEducationClasses(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get classes: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -82,12 +76,7 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if class, err = g.identityEducationBackend.CreateEducationClass(r.Context(), *class); err != nil {
 		logger.Debug().Interface("class", class).Msg("could not create class: backend error")
-		var eerr errorcode.Error
-		if errors.As(err, &eerr) {
-			eerr.Render(w, r)
-			return
-		}
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -104,8 +93,8 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 // PatchEducationClass implements the Service interface.
 func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch education class")
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("calling patch education class")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Str("id", classID).Msg("could not change class: unescaping class id failed")
@@ -183,12 +172,7 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not change class: backend could not add members")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -212,8 +196,8 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 // GetEducationClass implements the Service interface.
 func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get education class")
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("calling get education class")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Str("id", classID).Msg("could not get class: unescaping class id failed")
@@ -233,12 +217,8 @@ func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 	class, err := g.identityEducationBackend.GetEducationClass(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	render.Status(r, http.StatusOK)
@@ -248,8 +228,8 @@ func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 // DeleteEducationClass implements the Service interface.
 func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete class")
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("calling delete class")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class: unescaping class id failed")
@@ -268,12 +248,7 @@ func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -289,8 +264,8 @@ func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 // GetEducationClassMembers implements the Service interface.
 func (g Graph) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get class members")
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("calling get class members")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Str("id", classID).Msg("could not get class members: unescaping class id failed")
@@ -308,12 +283,7 @@ func (g Graph) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) 
 	members, err := g.identityEducationBackend.GetEducationClassMembers(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class members: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -324,9 +294,9 @@ func (g Graph) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) 
 // PostEducationClassMember implements the Service interface.
 func (g Graph) PostEducationClassMember(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("Calling post class member")
 
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("Calling post class member")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().
@@ -377,12 +347,7 @@ func (g Graph) PostEducationClassMember(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add class member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -397,9 +362,10 @@ func (g Graph) PostEducationClassMember(w http.ResponseWriter, r *http.Request) 
 // DeleteEducationClassMember implements the Service interface.
 func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete class member")
 
 	classID := chi.URLParam(r, "classID")
+	memberID := chi.URLParam(r, "memberID")
+	logger.Info().Str("classID", classID).Str("memberID", memberID).Msg("calling delete class member")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class member: unescaping class id failed")
@@ -413,7 +379,6 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	memberID := chi.URLParam(r, "memberID")
 	memberID, err = url.PathUnescape(memberID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete class member: unescaping member id failed")
@@ -431,12 +396,7 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 	/* TODO requires reva changes
@@ -450,8 +410,8 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 // GetEducationClassTeachers implements the Service interface.
 func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get class teachers")
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("calling get class teachers")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Str("id", classID).Msg("could not get class teachers: unescaping class id failed")
@@ -469,12 +429,7 @@ func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
 	teachers, err := g.identityEducationBackend.GetEducationClassTeachers(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class teachers: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -485,9 +440,9 @@ func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
 // PostEducationClassTeacher implements the Service interface.
 func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("Calling post class teacher")
 
 	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("classID", classID).Msg("Calling post class teacher")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().
@@ -538,12 +493,7 @@ func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add class teacher: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -558,9 +508,10 @@ func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 // DeleteEducationClassTeacher implements the Service interface.
 func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete class teacher")
 
 	classID := chi.URLParam(r, "classID")
+	teacherID := chi.URLParam(r, "teacherID")
+	logger.Info().Str("classID", classID).Str("teacherID", teacherID).Msg("calling delete class teacher")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class teacher: unescaping class id failed")
@@ -574,7 +525,6 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	teacherID := chi.URLParam(r, "teacherID")
 	teacherID, err = url.PathUnescape(teacherID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", teacherID).Msg("could not delete class teacher: unescaping teacher id failed")
@@ -592,12 +542,7 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class teacher: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 	/* TODO requires reva changes

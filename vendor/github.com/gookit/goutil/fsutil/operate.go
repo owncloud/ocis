@@ -4,16 +4,39 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/gookit/goutil/basefn"
 )
 
 // Mkdir alias of os.MkdirAll()
 func Mkdir(dirPath string, perm os.FileMode) error {
 	return os.MkdirAll(dirPath, perm)
+}
+
+// MkDirs batch make multi dirs at once
+func MkDirs(perm os.FileMode, dirPaths ...string) error {
+	for _, dirPath := range dirPaths {
+		if err := os.MkdirAll(dirPath, perm); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// MkSubDirs batch make multi sub-dirs at once
+func MkSubDirs(perm os.FileMode, parentDir string, subDirs ...string) error {
+	for _, dirName := range subDirs {
+		dirPath := parentDir + "/" + dirName
+		if err := os.MkdirAll(dirPath, perm); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // MkParentDir quick create parent dir
@@ -25,61 +48,11 @@ func MkParentDir(fpath string) error {
 	return nil
 }
 
-// DiscardReader anything from the reader
-func DiscardReader(src io.Reader) {
-	_, _ = io.Copy(ioutil.Discard, src)
-}
-
-// MustReadFile read file contents, will panic on error
-func MustReadFile(filePath string) []byte {
-	bs, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	return bs
-}
-
-// MustReadReader read contents from io.Reader, will panic on error
-func MustReadReader(r io.Reader) []byte {
-	// TODO go 1.16+ bs, err := io.ReadAll(r)
-	bs, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
-	return bs
-}
-
-// GetContents read contents from path or io.Reader, will panic on error
-func GetContents(in any) []byte {
-	if fPath, ok := in.(string); ok {
-		return MustReadFile(fPath)
-	}
-
-	if r, ok := in.(io.Reader); ok {
-		return MustReadReader(r)
-	}
-
-	panic("invalid type of input")
-}
-
-// ReadExistFile read file contents if existed, will panic on error
-func ReadExistFile(filePath string) []byte {
-	if IsFile(filePath) {
-		bs, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			panic(err)
-		}
-		return bs
-	}
-	return nil
-}
-
 // ************************************************************
 //	open/create files
 // ************************************************************
 
-// some flag consts for open file
+// some commonly flag consts for open file
 const (
 	FsCWAFlags = os.O_CREATE | os.O_WRONLY | os.O_APPEND // create, append write-only
 	FsCWTFlags = os.O_CREATE | os.O_WRONLY | os.O_TRUNC  // create, override write-only
@@ -88,6 +61,10 @@ const (
 )
 
 // OpenFile like os.OpenFile, but will auto create dir.
+//
+// Usage:
+//
+//	file, err := OpenFile("path/to/file.txt", FsCWFlags, 0666)
 func OpenFile(filepath string, flag int, perm os.FileMode) (*os.File, error) {
 	fileDir := path.Dir(filepath)
 	if err := os.MkdirAll(fileDir, DefaultDirPerm); err != nil {
@@ -101,18 +78,37 @@ func OpenFile(filepath string, flag int, perm os.FileMode) (*os.File, error) {
 	return file, nil
 }
 
-/* TODO MustOpenFile() */
-
-// QuickOpenFile like os.OpenFile, open for write, if not exists, will create it.
+// MustOpenFile like os.OpenFile, but will auto create dir.
 //
-// Tip: file flag default is FsCWAFlags
-func QuickOpenFile(filepath string, fileFlag ...int) (*os.File, error) {
-	flag := FsCWAFlags
-	if len(fileFlag) > 0 {
-		flag = fileFlag[0]
+// Usage:
+//
+//	file := MustOpenFile("path/to/file.txt", FsCWFlags, 0666)
+func MustOpenFile(filepath string, flag int, perm os.FileMode) *os.File {
+	file, err := OpenFile(filepath, flag, perm)
+	if err != nil {
+		panic(err)
 	}
+	return file
+}
 
+// QuickOpenFile like os.OpenFile, open for append write. if not exists, will create it.
+//
+// Alias of OpenAppendFile()
+func QuickOpenFile(filepath string, fileFlag ...int) (*os.File, error) {
+	flag := basefn.FirstOr(fileFlag, FsCWAFlags)
 	return OpenFile(filepath, flag, DefaultFilePerm)
+}
+
+// OpenAppendFile like os.OpenFile, open for append write. if not exists, will create it.
+func OpenAppendFile(filepath string, filePerm ...os.FileMode) (*os.File, error) {
+	perm := basefn.FirstOr(filePerm, DefaultFilePerm)
+	return OpenFile(filepath, FsCWAFlags, perm)
+}
+
+// OpenTruncFile like os.OpenFile, open for override write. if not exists, will create it.
+func OpenTruncFile(filepath string, filePerm ...os.FileMode) (*os.File, error) {
+	perm := basefn.FirstOr(filePerm, DefaultFilePerm)
+	return OpenFile(filepath, FsCWTFlags, perm)
 }
 
 // OpenReadFile like os.OpenFile, open file for read contents
@@ -134,11 +130,7 @@ func CreateFile(fpath string, filePerm, dirPerm os.FileMode, fileFlag ...int) (*
 		}
 	}
 
-	flag := FsCWTFlags
-	if len(fileFlag) > 0 {
-		flag = fileFlag[0]
-	}
-
+	flag := basefn.FirstOr(fileFlag, FsCWAFlags)
 	return os.OpenFile(fpath, flag, filePerm)
 }
 
@@ -149,105 +141,6 @@ func MustCreateFile(filePath string, filePerm, dirPerm os.FileMode) *os.File {
 		panic(err)
 	}
 	return file
-}
-
-// ************************************************************
-//	write, copy files
-// ************************************************************
-
-// PutContents create file and write contents to file at once.
-//
-// data type allow: string, []byte, io.Reader
-//
-// Tip: file flag default is FsCWAFlags
-//
-// Usage:
-//
-//	fsutil.PutContents(filePath, contents, fsutil.FsCWTFlags)
-func PutContents(filePath string, data any, fileFlag ...int) (int, error) {
-	// create and open file
-	dstFile, err := QuickOpenFile(filePath, fileFlag...)
-	if err != nil {
-		return 0, err
-	}
-
-	defer dstFile.Close()
-	switch typData := data.(type) {
-	case []byte:
-		return dstFile.Write(typData)
-	case string:
-		return dstFile.WriteString(typData)
-	case io.Reader: // eg: buffer
-		n, err := io.Copy(dstFile, typData)
-		return int(n), err
-	default:
-		panic("PutContents: data type only allow: []byte, string, io.Reader")
-	}
-}
-
-// WriteFile create file and write contents to file, can set perm for file.
-//
-// data type allow: string, []byte, io.Reader
-//
-// Tip: file flag default is FsCWTFlags
-//
-// Usage:
-//
-//	fsutil.WriteFile(filePath, contents, 0666, fsutil.FsCWAFlags)
-func WriteFile(filePath string, data any, perm os.FileMode, fileFlag ...int) error {
-	flag := FsCWTFlags
-	if len(fileFlag) > 0 {
-		flag = fileFlag[0]
-	}
-
-	f, err := os.OpenFile(filePath, flag, perm)
-	if err != nil {
-		return err
-	}
-
-	switch typData := data.(type) {
-	case []byte:
-		_, err = f.Write(typData)
-	case string:
-		_, err = f.WriteString(typData)
-	case io.Reader: // eg: buffer
-		_, err = io.Copy(f, typData)
-	default:
-		_ = f.Close()
-		panic("WriteFile: data type only allow: []byte, string, io.Reader")
-	}
-
-	if err1 := f.Close(); err1 != nil && err == nil {
-		err = err1
-	}
-	return err
-}
-
-// CopyFile copy a file to another file path.
-func CopyFile(srcPath, dstPath string) error {
-	srcFile, err := os.OpenFile(srcPath, FsRFlags, 0)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	// create and open file
-	dstFile, err := QuickOpenFile(dstPath, FsCWTFlags)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	_, err = io.Copy(dstFile, srcFile)
-	return err
-}
-
-// MustCopyFile copy file to another path.
-func MustCopyFile(srcPath, dstPath string) {
-	err := CopyFile(srcPath, dstPath)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // ************************************************************
@@ -302,6 +195,18 @@ func DeleteIfFileExist(fPath string) error {
 	return nil
 }
 
+// RemoveSub removes all sub files and dirs of dirPath, but not remove dirPath.
+func RemoveSub(dirPath string, fns ...FilterFunc) error {
+	return FindInDir(dirPath, func(fPath string, ent fs.DirEntry) error {
+		if ent.IsDir() {
+			if err := RemoveSub(fPath, fns...); err != nil {
+				return err
+			}
+		}
+		return os.Remove(fPath)
+	}, fns...)
+}
+
 // ************************************************************
 //	other operates
 // ************************************************************
@@ -319,7 +224,6 @@ func Unzip(archive, targetDir string) (err error) {
 	}
 
 	for _, file := range reader.File {
-
 		if strings.Contains(file.Name, "..") {
 			return fmt.Errorf("illegal file path in zip: %v", file.Name)
 		}

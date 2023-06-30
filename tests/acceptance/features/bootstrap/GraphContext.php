@@ -13,7 +13,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
-use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
@@ -261,33 +260,6 @@ class GraphContext implements Context {
 			$userId
 		);
 		$this->featureContext->setResponse($result);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
-	}
-
-	/**
-	 * @param $requestingUser
-	 * @param $targetUser
-	 *
-	 * @return void
-	 * @throws JsonException
-	 * @throws GuzzleException
-	 */
-	public function userHasRetrievedUserUsingTheGraphApi(
-		$requestingUser,
-		$targetUser
-	): void {
-		$requester = $this->featureContext->getActualUsername($requestingUser);
-		$requesterPassword = $this->featureContext->getPasswordForUser($requestingUser);
-		$user = $this->featureContext->getActualUsername($targetUser);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$response = GraphHelper::getUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$requester,
-			$requesterPassword,
-			$userId
-		);
-		$this->featureContext->setResponse($response);
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
@@ -1981,6 +1953,20 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @Then /^the Graph API response should have no role$/
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theGraphApiResponseShouldHaveNoRole(): void {
+		Assert::assertEmpty(
+			$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'],
+			"the user has a role, but should not"
+		);
+	}
+
+	/**
 	 * @When user :user gets details of the group :groupName using the Graph API
 	 *
 	 * @param string $user
@@ -2035,7 +2021,7 @@ class GraphContext implements Context {
 			!$shouldContain && $userOrGroupFound,
 			'Response contains user or group "' . $userOrGroup . '" but should not have.'
 		);
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -2371,7 +2357,7 @@ class GraphContext implements Context {
 				"Response does not contain event type '" . $eventType . "'."
 			);
 		}
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -2393,7 +2379,7 @@ class GraphContext implements Context {
 				"Response does not contain key 'user'"
 			);
 		}
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert->user,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -2424,8 +2410,26 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user unassigns the role of user :ofUser using the Graph API
-	 * @When user :user tries to unassign the role of user :ofUser using the Graph API
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function getAssignedRole(string $user) {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $this->featureContext->getUserIdByUserName($user);
+		return (
+			GraphHelper::getAssignedRole(
+				$this->featureContext->getBAseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				$userId
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:unassigns|tries to unassign) the role of user "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $ofUser
@@ -2438,15 +2442,7 @@ class GraphContext implements Context {
 	public function theUserUnassignsTheRoleOfUserUsingTheGraphApi(string $user, string $ofUser): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?? $ofUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
-
-		$response = GraphHelper::getAssignedRole(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$userId
-		);
-		$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($response)["value"][0]["id"];
+		$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($ofUser))["value"][0]["id"];
 
 		$this->featureContext->setResponse(
 			GraphHelper::unassignRole(
@@ -2471,16 +2467,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function userShouldHaveTheRoleAssigned(string $user, string $role): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
-		$response = GraphHelper::getAssignedRole(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUserName(),
-			$this->featureContext->getAdminPassword(),
-			$userId
-		);
-
-		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($response)['value'][0];
+		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($user))['value'][0];
 		if (empty($this->appEntity)) {
 			$this->setApplicationEntity();
 		}
@@ -2503,16 +2490,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function userShouldNotHaveAnyRoleAssigned(string $user): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
-		$response = GraphHelper::getAssignedRole(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUserName(),
-			$this->featureContext->getAdminPassword(),
-			$userId
-		);
-
-		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($response)['value'];
+		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($user))['value'];
 		Assert::assertEmpty(
 			$jsonDecodedResponse,
 			__METHOD__

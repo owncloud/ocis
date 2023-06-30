@@ -7,7 +7,9 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,17 +22,19 @@ import (
 	engineMocks "github.com/owncloud/ocis/v2/services/search/pkg/engine/mocks"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("Searchprovider", func() {
 	var (
-		s           search.Searcher
-		extractor   *contentMocks.Extractor
-		gw          *cs3mocks.GatewayAPIClient
-		indexClient *engineMocks.Engine
-		ctx         context.Context
-		logger      = log.NewLogger()
-		user        = &userv1beta1.User{
+		s               search.Searcher
+		extractor       *contentMocks.Extractor
+		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+		indexClient     *engineMocks.Engine
+		ctx             context.Context
+		logger          = log.NewLogger()
+		user            = &userv1beta1.User{
 			Id: &userv1beta1.UserId{
 				OpaqueId: "user",
 			},
@@ -70,22 +74,31 @@ var _ = Describe("Searchprovider", func() {
 	)
 
 	BeforeEach(func() {
-		ctx = context.Background()
-		gw = &cs3mocks.GatewayAPIClient{}
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
+
+		ctx = revactx.ContextSetUser(context.Background(), user)
 		indexClient = &engineMocks.Engine{}
 		extractor = &contentMocks.Extractor{}
 
-		s = search.NewService(gw, indexClient, extractor, logger, &config.Config{})
+		s = search.NewService(gatewaySelector, indexClient, extractor, logger, &config.Config{})
 
-		gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
 			Token:  "authtoken",
 		}, nil)
-		gw.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
 			Status: status.NewOK(context.Background()),
 			Info:   ri,
 		}, nil)
-		gw.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+		gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
 			return req.ResourceId.OpaqueId == ri.Id.OpaqueId
 		})).Return(&sprovider.GetPathResponse{
 			Status: status.NewOK(context.Background()),
@@ -96,14 +109,14 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			s := search.NewService(gw, indexClient, extractor, logger, &config.Config{})
+			s := search.NewService(gatewaySelector, indexClient, extractor, logger, &config.Config{})
 			Expect(s).ToNot(BeNil())
 		})
 	})
 
 	Describe("IndexSpace", func() {
 		It("walks the space and indexes all files", func() {
-			gw.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
 				User:   user,
 			}, nil)
@@ -127,7 +140,7 @@ var _ = Describe("Searchprovider", func() {
 
 		Context("with a personal space", func() {
 			BeforeEach(func() {
-				gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
 				}, nil)
@@ -210,14 +223,14 @@ var _ = Describe("Searchprovider", func() {
 						},
 					},
 				}
-				gw.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
+				gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
 					Status: status.NewOK(ctx),
 					Path:   "/grant/path",
 				}, nil)
 			})
 
 			It("searches the received spaces", func() {
-				gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{grantSpace, mountpointSpace},
 				}, nil)
@@ -259,7 +272,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Context("when searching both spaces", func() {
 				BeforeEach(func() {
-					gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 						Status:        status.NewOK(ctx),
 						StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
 					}, nil)

@@ -19,8 +19,8 @@
 package runtime
 
 import (
-	"github.com/cs3org/reva/v2/pkg/registry"
 	"github.com/rs/zerolog"
+	"go-micro.dev/v4/registry"
 )
 
 // Option defines a single option function.

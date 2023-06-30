@@ -10,10 +10,10 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\OcsApiHelper;
 use Behat\Gherkin\Node\PyStringNode;
-use Helmich\JsonAssert\JsonAssertions;
 use TestHelpers\EmailHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
+use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -81,7 +81,7 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" lists all notifications$/
+	 * @When /^user "([^"]*)" lists all notifications$/
 	 *
 	 * @param string $user
 	 *
@@ -116,6 +116,28 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @Then /^user "([^"]*)" should have "([^"]*)" notifications$/
+	 *
+	 * @param string $user
+	 * @param int $numberOfNotification
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveNotifications(string $user, int $numberOfNotification): void {
+		if (!isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			throw new Exception("Notification is empty");
+		}
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+		$actualNumber = \count($responseBody);
+		Assert::assertEquals(
+			$numberOfNotification,
+			$actualNumber,
+			"Expected number of notification was '$numberOfNotification', but got '$actualNumber'"
+		);
+	}
+
+	/**
 	 * @Then /^the JSON response should contain a notification message with the subject "([^"]*)" and the message-details should match$/
 	 *
 	 * @param string $subject
@@ -128,6 +150,30 @@ class NotificationContext implements Context {
 		string $subject,
 		PyStringNode $schemaString
 	): void {
+		$responseBody = $this->filterResponseAccordingToNotificationSubject($subject);
+		// substitute the value here
+		$schemaString = $schemaString->getRaw();
+		$schemaString = $this->featureContext->substituteInLineCodes(
+			$schemaString,
+			$this->featureContext->getCurrentUser(),
+			[],
+			[],
+			null,
+			$this->getUserRecipient(),
+		);
+		$this->featureContext->assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
+		);
+	}
+
+	/**
+	 * @param string $subject
+	 *
+	 * @return object
+	 */
+	public function filterResponseAccordingToNotificationSubject(string $subject): object {
+		$responseBody =  null;
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
 			foreach ($responseBody as $value) {
@@ -141,20 +187,27 @@ class NotificationContext implements Context {
 		} else {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
 		}
+		return $responseBody;
+	}
 
-		// substitute the value here
-		$schemaString = $schemaString->getRaw();
-		$schemaString = $this->featureContext->substituteInLineCodes(
-			$schemaString,
-			$this->featureContext->getCurrentUser(),
-			[],
-			[],
-			null,
-			$this->getUserRecipient(),
-		);
-		JsonAssertions::assertJsonDocumentMatchesSchema(
-			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+	/**
+	 * @Then user :user should get a notification with subject :subject and message:
+	 *
+	 * @param string $user
+	 * @param string $subject
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
+		$this->userListAllNotifications($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject)->message);
+		$expectedMessage = $table->getColumnsHash()[0]['message'];
+		Assert::assertSame(
+			$expectedMessage,
+			$actualMessage,
+			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
 		);
 	}
 

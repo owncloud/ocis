@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -33,10 +34,17 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
+
+// name is the Tracer name used to identify this instrumentation library.
+const tracerName = "providercache"
 
 // Cache holds share information structured by provider and space
 type Cache struct {
+	lockMap sync.Map
+
 	Providers map[string]*Spaces
 
 	storage metadata.Storage
@@ -95,17 +103,34 @@ func (s *Shares) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// LockSpace locks the cache for a given space and returns an unlock function
+func (c *Cache) LockSpace(spaceID string) func() {
+	v, _ := c.lockMap.LoadOrStore(spaceID, &sync.Mutex{})
+	lock := v.(*sync.Mutex)
+
+	lock.Lock()
+	return func() { lock.Unlock() }
+}
+
 // New returns a new Cache instance
 func New(s metadata.Storage, ttl time.Duration) Cache {
 	return Cache{
 		Providers: map[string]*Spaces{},
 		storage:   s,
 		ttl:       ttl,
+		lockMap:   sync.Map{},
 	}
 }
 
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, share *collaboration.Share) error {
+	unlock := c.LockSpace(spaceID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+
 	switch {
 	case storageID == "":
 		return fmt.Errorf("missing storage id")
@@ -122,6 +147,13 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 
 // Remove removes a share from the cache
 func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) error {
+	unlock := c.LockSpace(spaceID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+
 	if c.Providers[storageID] == nil ||
 		c.Providers[storageID].Spaces[spaceID] == nil {
 		return nil
@@ -150,7 +182,12 @@ func (c *Cache) ListSpace(storageID, spaceID string) *Shares {
 
 // PersistWithTime persists the data of one space if it has not been modified since the given mtime
 func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, mtime time.Time) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "PersistWithTime")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
+
 	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
+		span.SetStatus(codes.Ok, "no shares in provider or space")
 		return nil
 	}
 
@@ -161,11 +198,15 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	createdBytes, err := json.Marshal(c.Providers[storageID].Spaces[spaceID])
 	if err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := spaceJSONPath(storageID, spaceID)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -175,8 +216,11 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 		IfUnmodifiedSince: c.Providers[storageID].Spaces[spaceID].Mtime,
 	}); err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
@@ -187,15 +231,23 @@ func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, storageID, spaceID string) error {
+	unlock := c.LockSpace(spaceID)
+	defer unlock()
+
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
+
 	log := appctx.GetLogger(ctx).With().Str("storageID", storageID).Str("spaceID", spaceID).Logger()
-	log.Debug().Msg("Syncing provider cache...")
 
 	var mtime time.Time
 	if c.Providers[storageID] != nil && c.Providers[storageID].Spaces[spaceID] != nil {
 		mtime = c.Providers[storageID].Spaces[spaceID].Mtime
 
 		if time.Now().Before(c.Providers[storageID].Spaces[spaceID].nextSync) {
-			log.Debug().Msg("Skipping provider cache sync, it was just recently synced...")
+			span.AddEvent("skip sync")
+			span.SetStatus(codes.Ok, "")
 			return nil
 		}
 		c.Providers[storageID].Spaces[spaceID].nextSync = time.Now().Add(c.ttl)
@@ -207,28 +259,33 @@ func (c *Cache) Sync(ctx context.Context, storageID, spaceID string) error {
 	info, err := c.storage.Stat(ctx, jsonPath)
 	if err != nil {
 		if _, ok := err.(errtypes.NotFound); ok {
-			log.Debug().Msg("no json file, nothing to sync")
+			span.AddEvent("no file")
+			span.SetStatus(codes.Ok, "")
 			return nil // Nothing to sync against
 		}
 		if _, ok := err.(*os.PathError); ok {
-			log.Debug().Msg("no storage dir, nothing to sync")
+			span.AddEvent("no dir")
+			span.SetStatus(codes.Ok, "")
 			return nil // Nothing to sync against
 		}
+		span.SetStatus(codes.Error, fmt.Sprintf("Failed to stat the provider cache: %s", err.Error()))
 		log.Error().Err(err).Msg("Failed to stat the provider cache")
 		return err
 	}
 	// check mtime of /users/{userid}/created.json
 	if utils.TSToTime(info.Mtime).After(mtime) {
-		log.Debug().Msg("Updating provider cache...")
+		span.AddEvent("updating cache")
 		//  - update cached list of created shares for the user in memory if changed
 		createdBlob, err := c.storage.SimpleDownload(ctx, jsonPath)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the provider cache: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to download the provider cache")
 			return err
 		}
 		newShares := &Shares{}
 		err = json.Unmarshal(createdBlob, newShares)
 		if err != nil {
+			span.SetStatus(codes.Error, fmt.Sprintf("Failed to unmarshal the provider cache: %s", err.Error()))
 			log.Error().Err(err).Msg("Failed to unmarshal the provider cache")
 			return err
 		}
@@ -236,7 +293,7 @@ func (c *Cache) Sync(ctx context.Context, storageID, spaceID string) error {
 		c.initializeIfNeeded(storageID, spaceID)
 		c.Providers[storageID].Spaces[spaceID] = newShares
 	}
-	log.Debug().Msg("Provider cache is up to date")
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 

@@ -27,6 +27,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 // WalkFunc is the type of function called by Walk to visit each file or directory
@@ -46,12 +47,12 @@ type Walker interface {
 }
 
 type revaWalker struct {
-	gtw gateway.GatewayAPIClient
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // NewWalker creates a Walker object that uses the reva gateway
-func NewWalker(gtw gateway.GatewayAPIClient) Walker {
-	return &revaWalker{gtw: gtw}
+func NewWalker(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Walker {
+	return &revaWalker{gatewaySelector: gatewaySelector}
 }
 
 // Walk walks the file tree rooted at root, calling fn for each file or folder in the tree, including the root.
@@ -95,7 +96,11 @@ func (r *revaWalker) walkRecursively(ctx context.Context, wd string, info *provi
 }
 
 func (r *revaWalker) readDir(ctx context.Context, id *provider.ResourceId) ([]*provider.ResourceInfo, error) {
-	resp, err := r.gtw.ListContainer(ctx, &provider.ListContainerRequest{Ref: &provider.Reference{ResourceId: id, Path: "."}})
+	gatewayClient, err := r.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := gatewayClient.ListContainer(ctx, &provider.ListContainerRequest{Ref: &provider.Reference{ResourceId: id, Path: "."}})
 
 	switch {
 	case err != nil:
@@ -108,7 +113,11 @@ func (r *revaWalker) readDir(ctx context.Context, id *provider.ResourceId) ([]*p
 }
 
 func (r *revaWalker) stat(ctx context.Context, id *provider.ResourceId) (*provider.ResourceInfo, error) {
-	resp, err := r.gtw.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: id, Path: "."}})
+	gatewayClient, err := r.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: id, Path: "."}})
 
 	switch {
 	case err != nil:

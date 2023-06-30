@@ -9,7 +9,7 @@ Feature: move (rename) file
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: Moving a file
+  Scenario Outline: moving a file
     Given using <dav_version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
@@ -29,7 +29,7 @@ Feature: move (rename) file
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Moving and overwriting a file
+  Scenario Outline: moving and overwriting a file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
@@ -49,7 +49,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Moving (renaming) a file to be only different case
+  Scenario Outline: moving (renaming) a file to be only different case
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     When user "Alice" moves file "/textfile0.txt" to "/TextFile0.txt" using the WebDAV API
@@ -67,7 +67,7 @@ Feature: move (rename) file
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Moving (renaming) a file to a file with only different case to an existing file
+  Scenario Outline: moving (renaming) a file to a file with only different case to an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
@@ -86,7 +86,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Moving (renaming) a file to a file in a folder with only different case to an existing file
+  Scenario Outline: moving (renaming) a file to a file in a folder with only different case to an existing file
     Given using <dav_version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
@@ -138,7 +138,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Checking file id after a move
+  Scenario Outline: checking file id after a move
     Given using <dav_version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -159,7 +159,7 @@ Feature: move (rename) file
       | spaces      |
 
   @issue-1295
-  Scenario Outline: Renaming a file to a path with extension .part should not be possible
+  Scenario Outline: renaming a file to a path with extension .part should not be possible
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToRename.txt"
     When user "Alice" moves file "/fileToRename.txt" to "/welcome.part" using the WebDAV API
@@ -278,7 +278,7 @@ Feature: move (rename) file
       | spaces      |
 
   @smokeTest
-  Scenario Outline: user tries to rename a file that doesnt exist
+  Scenario Outline: user tries to rename a file that doesn't exist
     Given using <dav_version> DAV path
     When user "Alice" moves file "/doesNotExist.txt" to "/exist.txt" using the WebDAV API
     Then the HTTP status code should be "404"
@@ -294,7 +294,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Moving a hidden file
+  Scenario Outline: moving a hidden file
     Given using <dav_version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded the following files with content "hidden file"
@@ -325,7 +325,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Renaming to/from a hidden file
+  Scenario Outline: renaming to/from a hidden file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded the following files with content "hidden file"
       | path               |
@@ -355,7 +355,7 @@ Feature: move (rename) file
       | spaces      |
 
 
-  Scenario Outline: Moving a file (deep moves with various folder and file names)
+  Scenario Outline: moving a file (deep moves with various folder and file names)
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<source_folder>"
     And user "Alice" has created folder "<target_folder>"
@@ -397,7 +397,7 @@ Feature: move (rename) file
       | spaces      | texta         | file.txt    | textb         | 1           |
 
 
-  Scenario Outline: Moving a file from a folder to the root
+  Scenario Outline: moving a file from a folder to the root
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<source_folder>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source_folder>/<source_file>"

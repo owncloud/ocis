@@ -1,5 +1,8 @@
 @api @issue-1284
 Feature: actions on a locked item are possible if the token is sent with the request
+  As a user
+  I want to share the lock token of a resource
+  So that the users or apps can access the resource that I have locked
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

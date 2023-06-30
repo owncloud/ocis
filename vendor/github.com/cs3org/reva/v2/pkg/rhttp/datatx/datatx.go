@@ -28,6 +28,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 // DataTX provides an abstraction around various data transfer protocols.
@@ -46,6 +47,7 @@ func EmitFileUploadedEvent(spaceOwnerOrManager, executant *userv1beta1.UserId, r
 		Owner:      spaceOwnerOrManager,
 		Executant:  executant,
 		Ref:        ref,
+		Timestamp:  utils.TSNow(),
 	}
 
 	return events.Publish(publisher, uploadedEv)

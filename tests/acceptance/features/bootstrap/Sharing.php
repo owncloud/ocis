@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SharingHelper;
 use TestHelpers\HttpRequestHelper;
@@ -2354,20 +2355,24 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all shares shared by him/her using the sharing API
-	 *
 	 * @param string $user
+	 * @param string|null $endpointPath
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
 	 */
-	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user):void {
+	public function getAllShares(
+		string $user,
+		?string $endpointPath = null
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
 			$this->getPasswordForUser($user),
 			"GET",
-			$this->getSharesEndpointPath(),
+			$this->getSharesEndpointPath($endpointPath),
 			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
@@ -2375,12 +2380,23 @@ trait Sharing {
 	}
 
 	/**
-	 * @When the administrator gets all shares shared by him/her using the sharing API
+	 * @When /^user "([^"]*)" gets all shares shared by (?:him|her) using the sharing API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user):void {
+		$this->setResponse($this->getAllshares($user));
+	}
+
+	/**
+	 * @When /^the administrator gets all shares shared by (?:him|her) using the sharing API$/
 	 *
 	 * @return void
 	 */
 	public function theAdministratorGetsAllSharesSharedByHimUsingTheSharingApi():void {
-		$this->userGetsAllSharesSharedByHimUsingTheSharingApi($this->getAdminUsername());
+		$this->setResponse($this->getAllShares($this->getAdminUsername()));
 	}
 
 	/**
@@ -2392,7 +2408,6 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsFilteredSharesSharedByHimUsingTheSharingApi(string $user, string $shareType):void {
-		$user = $this->getActualUsername($user);
 		if ($shareType === 'public link') {
 			$shareType = 'public_link';
 		}
@@ -2401,16 +2416,7 @@ trait Sharing {
 		} else {
 			$rawShareTypes = SharingHelper::SHARE_TYPES[$shareType];
 		}
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?share_types=" . $rawShareTypes),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?share_types=" . $rawShareTypes));
 	}
 
 	/**
@@ -2422,17 +2428,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsAllTheSharesFromTheFileUsingTheSharingApi(string $user, string $path):void {
-		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?path=$path"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?path=$path"));
 	}
 
 	/**
@@ -2447,17 +2443,7 @@ trait Sharing {
 		string $user,
 		string $path
 	):void {
-		$userActual = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$userActual,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?reshares=true&path=$path"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?reshares=true&path=$path"));
 	}
 
 	/**
@@ -2469,17 +2455,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path):void {
-		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?path=$path&subfiles=true"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?path=$path&subfiles=true"));
 	}
 
 	/**
@@ -2771,6 +2747,69 @@ trait Sharing {
 			$value = $this->replaceValuesFromTable($field, $value);
 			Assert::assertTrue(
 				$this->isFieldInResponse($field, $value),
+				"$field doesn't have value '$value'"
+			);
+		}
+	}
+
+	/**
+	 * @Then the fields of the last response to user :user and space :space should include
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkFieldsOfSpaceSharingResponse(string $user, string $space, ?TableNode $body):void {
+		$this->verifyTableNodeColumnsCount($body, 2);
+	
+		$bodyRows = $body->getRowsHash();
+		$userRelatedFieldNames = [
+			"owner",
+			"user",
+			"uid_owner",
+			"uid_file_owner",
+			"share_with",
+			"displayname_file_owner",
+			"displayname_owner",
+			"additional_info_owner",
+			"additional_info_file_owner",
+			"space_id"
+		];
+
+		$this->setLastPublicShareData($this->getResponseXml(null, __METHOD__));
+		foreach ($bodyRows as $field => $value) {
+			if (\in_array($field, $userRelatedFieldNames)) {
+				$value = $this->substituteInLineCodes(
+					$value,
+					$user,
+					[],
+					[
+						[
+							"code" => "%space_id%",
+							"function" =>
+								[$this->spacesContext, "getSpaceIdByName"],
+							"parameter" => [$user, $space]
+						],
+					],
+					null,
+					null
+				);
+				if ($field === "uid_file_owner") {
+					$value = (explode("$", $value))[1];
+				}
+				if ($field === "space_id") {
+					$exploadedSpaceId = explode("$", $value);
+					$value = $exploadedSpaceId[0] . "$" . $exploadedSpaceId[1] . "!" . $exploadedSpaceId[1];
+				}
+			}
+			$value = $this->getActualUsername($value);
+			$value = $this->replaceValuesFromTable($field, $value);
+   
+			Assert::assertTrue(
+				$this->isFieldInResponse($field, $value, true, $this->getLastPublicShareData()->data[0]),
 				"$field doesn't have value '$value'"
 			);
 		}
@@ -3449,7 +3488,7 @@ trait Sharing {
 					Assert::assertEquals($row['path'], $share['path']);
 					$found = true;
 					break;
-				} catch (PHPUnit\Framework\ExpectationFailedException $e) {
+				} catch (ExpectationFailedException $e) {
 				}
 			}
 			if (!$found) {
@@ -3490,6 +3529,25 @@ trait Sharing {
 	 * @throws JsonException
 	 */
 	public function userHasUnsharedResourceSharedTo(string $sharer, string $path, string $sharee): void {
+		$this->userUnsharesResourceSharedTo($sharer, $path, $sharee);
+		$this->ocsContext->assertOCSResponseIndicatesSuccess(
+			'The ocs share response does not indicate success.',
+		);
+		$this->emptyLastHTTPStatusCodesArray();
+		$this->emptyLastOCSStatusCodesArray();
+	}
+
+	/**
+	 * @When /^user "([^"]*)" unshares (?:folder|file|entity) "([^"]*)" shared to "([^"]*)"$/
+	 *
+	 * @param string $sharer
+	 * @param string $path
+	 * @param string $sharee
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function userUnsharesResourceSharedTo(string $sharer, string $path, string $sharee): void {
 		$sharer = $this->getActualUsername($sharer);
 		$sharee = $this->getActualUsername($sharee);
 
@@ -3511,12 +3569,6 @@ trait Sharing {
 			'DELETE',
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
 		);
-
-		$this->ocsContext->assertOCSResponseIndicatesSuccess(
-			'The ocs share response does not indicate success.',
-		);
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
 	}
 
 	/**

@@ -35,6 +35,11 @@ func (v *Value) Val() any {
 	return v.V
 }
 
+// Val get
+// func (v *Value) ValOr[T any](defVal T) T {
+// 	return v.V
+// }
+
 // Int value get
 func (v *Value) Int() int {
 	if v.V == nil {
@@ -102,7 +107,7 @@ func (v *Value) Strings() (ss []string) {
 	return
 }
 
-// SplitToStrings split string value to strings
+// SplitToStrings split string value to strings. sep default is comma(,)
 func (v *Value) SplitToStrings(sep ...string) (ss []string) {
 	if v.V == nil {
 		return
@@ -114,7 +119,7 @@ func (v *Value) SplitToStrings(sep ...string) (ss []string) {
 	return
 }
 
-// SplitToInts split string value to []int
+// SplitToInts split string value to []int. sep default is comma(,)
 func (v *Value) SplitToInts(sep ...string) (ss []int) {
 	if v.V == nil {
 		return

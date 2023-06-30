@@ -13,7 +13,13 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.Sharer, s.gwClient, s.machineAuthAPIKey)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
+	ownerCtx, owner, err := utils.Impersonate(e.Sharer, gatewayClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
@@ -44,7 +50,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	sharerDisplayName := owner.GetDisplayName()
 	recipientList, err := s.render(ownerCtx, email.ShareCreated,
 		"ShareGrantee",
-		map[string]interface{}{
+		map[string]string{
 			"ShareSharer": sharerDisplayName,
 			"ShareFolder": resourceInfo.Name,
 			"ShareLink":   shareLink,
@@ -62,7 +68,13 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		Str("itemid", e.ItemID.GetOpaqueId()).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, s.gwClient, s.machineAuthAPIKey)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
+	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, gatewayClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
@@ -84,7 +96,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 
 	recipientList, err := s.render(ownerCtx, email.ShareExpired,
 		"ShareGrantee",
-		map[string]interface{}{
+		map[string]string{
 			"ShareFolder": resourceInfo.GetName(),
 			"ExpiredAt":   e.ExpiredAt.Format("2006-01-02 15:04:05"),
 		}, granteeList, owner.GetDisplayName())

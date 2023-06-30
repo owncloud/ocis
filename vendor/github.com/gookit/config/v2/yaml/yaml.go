@@ -5,10 +5,9 @@ Usage please see example:
 */
 package yaml
 
-// see https://pkg.go.dev/gopkg.in/yaml.v2
 import (
+	"github.com/goccy/go-yaml"
 	"github.com/gookit/config/v2"
-	"gopkg.in/yaml.v2"
 )
 
 // Decoder the yaml content decoder
@@ -18,5 +17,4 @@ var Decoder config.Decoder = yaml.Unmarshal
 var Encoder config.Encoder = yaml.Marshal
 
 // Driver for yaml
-// TIP: recommended use the yamlv3.Driver
-var Driver = config.NewDriver(config.Yaml, Decoder, Encoder)
+var Driver = config.NewDriver(config.Yaml, Decoder, Encoder).WithAliases(config.Yml)

@@ -7,6 +7,7 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	webmid "github.com/owncloud/ocis/v2/services/web/pkg/middleware"
@@ -35,7 +36,7 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	client, err := pool.GetGatewayServiceClient(options.Config.GatewayAddress)
+	gatewaySelector, err := pool.GatewaySelector(options.Config.GatewayAddress, pool.WithRegistry(registry.GetRegistry()))
 	if err != nil {
 		return http.Service{}, err
 	}
@@ -43,7 +44,7 @@ func Server(opts ...Option) (http.Service, error) {
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
-		svc.GatewayClient(client),
+		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
