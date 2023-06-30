@@ -922,6 +922,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
                  [
                      {
                          "name": "fakeoffice",
@@ -949,9 +950,6 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "curl -k --fail --retry-connrefused --retry 9 --retry-all-errors 'http://wopiserver:8880/wopi'",
                          ],
                      },
-                 ] +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
-                 [
                      {
                          "name": "prepare-test-file-%s" % (storage),
                          "image": OC_CI_ALPINE,
