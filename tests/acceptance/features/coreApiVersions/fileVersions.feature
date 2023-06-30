@@ -421,7 +421,7 @@ Feature: dav-versions
       | new         | Brian | /testshare |
 
 
-  Scenario: receiver tries to get file versions of unshared file from the sharer
+  Scenario: sharee tries to get file versions of file not shared by the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "textfile1" to "textfile1.txt"
