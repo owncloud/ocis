@@ -922,7 +922,6 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
                  [
                      {
                          "name": "fakeoffice",
@@ -933,6 +932,9 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
                          ],
                      },
+                 ] +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
+                 [
                      {
                          "name": "wopiserver",
                          "image": "cs3org/wopiserver:v10.0.0",
