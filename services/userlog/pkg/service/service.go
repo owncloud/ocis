@@ -19,6 +19,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -80,9 +81,15 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		ul.registeredEvents[typ.String()] = e
 	}
 
+	m := roles.NewManager(
+		// TODO: caching?
+		roles.Logger(o.Logger),
+		roles.RoleService(o.RoleClient),
+	)
+
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
-		r.Post("/", ul.HandlePostEvent)
+		r.Post("/", RequireAdmin(&m, ul.log)(ul.HandlePostEvent))
 		r.Delete("/", ul.HandleDeleteEvents)
 
 		if !ul.cfg.DisableSSE {
