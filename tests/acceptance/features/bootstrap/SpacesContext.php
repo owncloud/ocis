@@ -3316,4 +3316,27 @@ class SpacesContext implements Context {
 		}
 		Assert::assertTrue($foundRoleInResponse, "the response does not contain the $recipientType $recipient");
 	}
+
+	/**
+	 * @When user :user downloads the space :spaceName using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userDownloadsTheSpaceUsingTheWebdavApi(string $user, string $spaceName):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$url = $this->featureContext->getBaseUrl() . '/archiver?id=' . $space["id"];
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$url,
+				'',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+	}
 }

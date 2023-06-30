@@ -47,6 +47,7 @@ default:
         - SpacesTUSContext:
         - GraphContext:
         - OcisConfigContext:
+        - ArchiverContext:
 
     apiSpacesShares:
       paths:
