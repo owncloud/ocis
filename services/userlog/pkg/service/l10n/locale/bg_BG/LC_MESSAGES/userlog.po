@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-06-19 00:15+0000\n"
+"POT-Creation-Date: 2023-07-02 00:16+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Martin Zhekov <martin03staff@gmail.com>, 2023\n"
 "Language-Team: Bulgarian (Bulgaria) (https://app.transifex.com/owncloud-org/teams/6149/bg_BG/)\n"
@@ -31,7 +31,7 @@ msgstr "Достъпът до {resource} е изтекъл"
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
-msgstr ""
+msgstr "Файлът {resource} беше изтрит, защото нарушава политиките"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
@@ -39,7 +39,7 @@ msgstr "Срокът на членство е изтекъл"
 
 #: pkg/service/templates.go:14
 msgid "Policies enforced"
-msgstr ""
+msgstr "Прилагани политики"
 
 #: pkg/service/templates.go:24
 msgid "Removed from Space"
@@ -71,11 +71,12 @@ msgstr "Пространството е споделено"
 
 #: pkg/service/templates.go:9
 msgid "Virus found"
-msgstr ""
+msgstr "Открит е вирус"
 
 #: pkg/service/templates.go:10
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr ""
+"Вирусът е открит в {resource}. Качването не е възможно. Вирус: {virus}"
 
 #: pkg/service/templates.go:20
 msgid "{user} added you to Space {space}"
