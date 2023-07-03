@@ -12,7 +12,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config/parser"
@@ -33,10 +32,10 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-			if err != nil {
-				return err
-			}
+			// tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			// if err != nil {
+			// 	return err
+			// }
 			gr := run.Group{}
 			ctx, cancel := defineContext(cfg)
 
@@ -54,7 +53,7 @@ func Server(cfg *config.Config) *cli.Command {
 				runtime.RunWithOptions(rCfg, pidFile,
 					runtime.WithLogger(&logger.Logger),
 					runtime.WithRegistry(reg),
-					runtime.WithTraceProvider(tracingProvider),
+					//					runtime.WithTraceProvider(tracingProvider),
 				)
 
 				return nil
