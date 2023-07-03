@@ -199,7 +199,7 @@ class SpacesContext implements Context {
 			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		}
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
+		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
 		return $spaces[$spaceName];
 	}
@@ -2366,6 +2366,26 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" with admin permission lists all deleted files in the trash bin of the space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function adminListAllDeletedFilesInTrash(
+		string $user,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByNameManager($user, $spaceName);
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest($fullUrl, '', 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
+		);
+	}
+
+	/**
 	 * User get all objects in the trash of project space
 	 *
 	 * Method "getTrashbinContentFromResponseXml" borrowed from core repository
@@ -2460,7 +2480,7 @@ class SpacesContext implements Context {
 		}
 
 		if ($pathToDeletedObject === "") {
-			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of user '$user' space '$spaceName'");
+			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'");
 		}
 
 		$destination = $this->baseUrl . $this->davSpacesUrl . $space["id"] . $destination;
@@ -2475,6 +2495,50 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$header,
+				""
+			)
+		);
+	}
+
+	/**
+	 * @When user :user deletes the file/folder :resource from the trash of the space :spaceName
+	 * @When user :user tries to delete the file/folder :resource from the trash of the space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $object
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userDeletesObjectsFromTrashRequest(
+		string $user,
+		string $object,
+		string $spaceName
+	): void {
+		// find object in trash
+		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+		$pathToDeletedObject = "";
+		foreach ($objectsInTrash as $objectInTrash) {
+			if ($objectInTrash["name"] === $object) {
+				$pathToDeletedObject = $objectInTrash["href"];
+			}
+		}
+
+		if ($pathToDeletedObject === "") {
+			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'");
+		}
+
+		$fullUrl = $this->baseUrl . $pathToDeletedObject;
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'DELETE',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
 				""
 			)
 		);
