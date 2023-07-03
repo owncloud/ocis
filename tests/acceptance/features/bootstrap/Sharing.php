@@ -3465,6 +3465,25 @@ trait Sharing {
 	 * @throws JsonException
 	 */
 	public function userHasUnsharedResourceSharedTo(string $sharer, string $path, string $sharee): void {
+		$this->userUnsharesResourceSharedTo($sharer, $path, $sharee);
+		$this->ocsContext->assertOCSResponseIndicatesSuccess(
+			'The ocs share response does not indicate success.',
+		);
+		$this->emptyLastHTTPStatusCodesArray();
+		$this->emptyLastOCSStatusCodesArray();
+	}
+
+	/**
+	 * @When /^user "([^"]*)" unshares (?:folder|file|entity) "([^"]*)" shared to "([^"]*)"$/
+	 *
+	 * @param string $sharer
+	 * @param string $path
+	 * @param string $sharee
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function userUnsharesResourceSharedTo(string $sharer, string $path, string $sharee): void {
 		$sharer = $this->getActualUsername($sharer);
 		$sharee = $this->getActualUsername($sharee);
 
@@ -3486,12 +3505,6 @@ trait Sharing {
 			'DELETE',
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
 		);
-
-		$this->ocsContext->assertOCSResponseIndicatesSuccess(
-			'The ocs share response does not indicate success.',
-		);
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
 	}
 
 	/**
