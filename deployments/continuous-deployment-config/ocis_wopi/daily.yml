@@ -34,6 +34,9 @@
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
           OCIS_DOCKER_TAG: latest
           OCIS_DOMAIN: ocis.ocis-wopi.daily.owncloud.works
+          COMPANION_DOMAIN: companion.ocis-wopi.daily.owncloud.works
+          COMPANION_WEB_CONFIG_FILE_NAME: web-daily.yaml
+          COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
           WOPISERVER_DOMAIN: wopiserver.ocis-wopi.daily.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis-wopi.daily.owncloud.works
           ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.daily.owncloud.works

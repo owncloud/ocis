@@ -90,6 +90,7 @@ services:
       NATS_NATS_PORT: 9233
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./config/ocis/${COMPANION_WEB_CONFIG_FILE_NAME:-web.yaml}:/etc/ocis/web.yaml
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
@@ -256,7 +257,7 @@ services:
       COMPANION_DATADIR: /tmp/companion/
       COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
       COMPANION_PROTOCOL: https
-      COMPANION_UPLOAD_URLS: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      COMPANION_UPLOAD_URLS: "^https://${OCIS_DOMAIN:-ocis.owncloud.test}/"
       COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
       COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
     volumes:
