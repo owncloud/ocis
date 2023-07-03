@@ -330,7 +330,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @issue-1269
   Scenario Outline: updating share permissions from change to read restricts public from deleting files using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "PARENT"
@@ -345,8 +345,6 @@ Feature: update a public link share
     And the public deletes file "CHILD/child.txt" from the last public link share using the new public WebDAV API
     And the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
-
-    @issue-1269
     Examples:
       | ocs_api_version |
       | 1               |

@@ -166,15 +166,15 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "Brian" has been created with default attributes and without skeleton files
     And user "testtrashbin100" has deleted file "/textfile1.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin100"
-    Then the HTTP status code should be "<status-code>"
+    Then the HTTP status code should be "404"
     And the last webdav response should not contain the following elements
       | path          | user            |
       | textfile1.txt | testtrashbin100 |
     @skipOnRevaMaster
     Examples:
-      | dav-path | status-code |
-      | new      | 404         |
-      | spaces   | 404         |
+      | dav-path |
+      | new      |
+      | spaces   |
 
   @issue-3561 @smokeTest
   Scenario Outline: listing other user's trashbin is prohibited with multiple files on trashbin
@@ -186,16 +186,16 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "testtrashbin101" has deleted file "/textfile0.txt"
     And user "testtrashbin101" has deleted file "/textfile2.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin101"
-    Then the HTTP status code should be "<status-code>"
+    Then the HTTP status code should be "404"
     And the last webdav response should not contain the following elements
       | path          | user            |
       | textfile0.txt | testtrashbin101 |
       | textfile2.txt | testtrashbin101 |
     @skipOnRevaMaster
     Examples:
-      | dav-path | status-code |
-      | new      | 404         |
-      | spaces   | 404         |
+      | dav-path |
+      | new      |
+      | spaces   |
 
   @issue-3561  @provisioning_api-app-required
   Scenario Outline: listing other user's trashbin is prohibited for newly recreated user with same name
@@ -211,7 +211,7 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "testtrashbin102" has uploaded file "filesForUpload/textfile.txt" to "/textfile3.txt"
     And user "testtrashbin102" has deleted file "/textfile3.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin102"
-    Then the HTTP status code should be "<status-code>"
+    Then the HTTP status code should be "404"
     And the last webdav response should not contain the following elements
       | path          | user            |
       | textfile0.txt | testtrashbin102 |
@@ -219,9 +219,9 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile3.txt | testtrashbin102 |
     @skipOnRevaMaster
     Examples:
-      | dav-path | status-code |
-      | new      | 404         |
-      | spaces   | 404         |
+      | dav-path |
+      | new      |
+      | spaces   |
 
   @issue-3561
   Scenario Outline: listing other user's empty unused trashbin is prohibited

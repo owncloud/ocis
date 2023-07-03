@@ -69,20 +69,17 @@ Feature: dav-versions
     And the content of file "/davtest.txt" for user "Alice" should be "Back To The Future."
 
   @smokeTest @skipOnStorage:ceph
-  Scenario Outline: uploading a chunked file does create the correct version that can be restored
-    Given using <dav-path> DAV path
+  Scenario: uploading a chunked file does create the correct version that can be restored
+    Given using old DAV path
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/textfile0.txt" in 2 chunks using the WebDAV API
     And user "Alice" uploads file "filesForUpload/lorem.txt" to "/textfile0.txt" in 3 chunks using the WebDAV API
 #    HTTP status code is different for old (201) and new (204) WebDav API when uploading in chunks
-    Then the HTTP status code of responses on all endpoints should be "<status-code>"
+    Then the HTTP status code of responses on all endpoints should be "201"
     And the version folder of file "/textfile0.txt" for user "Alice" should contain "2" elements
     When user "Alice" restores version index "1" of file "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/textfile0.txt" for user "Alice" should be "Dav-Test"
-    Examples:
-      | dav-path | status-code |
-      | old      | 201         |
 
   @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: restore a file and check the content and checksum
@@ -381,19 +378,19 @@ Feature: dav-versions
       | permissions | change    |
       | shareWith   | Alice     |
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    And user "<mover>" has uploaded file with content "test data 1" to "/testfile.txt"
-    And user "<mover>" has uploaded file with content "test data 2" to "/testfile.txt"
-    And user "<mover>" has uploaded file with content "test data 3" to "/testfile.txt"
-    When user "<mover>" moves file "/testfile.txt" to "<dst-folder>/testfile.txt" using the WebDAV API
+    And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
+    And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
+    And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
+    When user "Brian" moves file "/testfile.txt" to "/testshare/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/testfile.txt" for user "Alice" should be "test data 3"
     And the content of file "/testshare/testfile.txt" for user "Brian" should be "test data 3"
-    And as "<mover>" file "/testfile.txt" should not exist
+    And as "Brian" file "/testfile.txt" should not exist
     And the version folder of file "/Shares/testshare/testfile.txt" for user "Alice" should contain "2" elements
     Examples:
-      | dav_version | mover | dst-folder        |
-      | old         | Brian | /testshare        |
-      | new         | Brian | /testshare        |
+      | dav_version |
+      | old         |
+      | new         |
 
 
   Scenario Outline: moving a file (with versions) out of a shared folder as the sharee and as the sharer
@@ -409,16 +406,16 @@ Feature: dav-versions
       | permissions | change    |
       | shareWith   | Alice     |
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "<mover>" moves file "<src-folder>/testfile.txt" to "/testfile.txt" using the WebDAV API
+    When user "Brian" moves file "/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/testfile.txt" for user "<mover>" should be "test data 3"
+    And the content of file "/testfile.txt" for user "Brian" should be "test data 3"
     And as "Alice" file "/Shares/testshare/testfile.txt" should not exist
     And as "Brian" file "/testshare/testfile.txt" should not exist
-    And the version folder of file "/testfile.txt" for user "<mover>" should contain "2" elements
+    And the version folder of file "/testfile.txt" for user "Brian" should contain "2" elements
     Examples:
-      | dav_version | mover | src-folder |
-      | old         | Brian | /testshare |
-      | new         | Brian | /testshare |
+      | dav_version |
+      | old         |
+      | new         |
 
 
   Scenario: sharee tries to get file versions of file not shared by the sharer

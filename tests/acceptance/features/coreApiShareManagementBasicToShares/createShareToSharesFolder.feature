@@ -467,7 +467,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
- @skipOnGraph
+  @skipOnGraph
   Scenario Outline: share with a group and then add a user to that group
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
@@ -492,8 +492,8 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-
   # deleting an LDAP group is not relevant or possible using the provisioning API
+  @issue-2441
   Scenario Outline: shares shared to deleted group should not be available
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
@@ -510,7 +510,7 @@ Feature: sharing
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with group "grp1" should include
       | share_with  | grp1           |
-      | file_target | <path>         |
+      | file_target | /textfile0.txt |
       | path        | /textfile0.txt |
       | uid_owner   | %username%     |
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -524,11 +524,10 @@ Feature: sharing
     And file "/textfile0.txt" should not be included as path in the response
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     And as "Carol" file "/Shares/textfile0.txt" should not exist
-    @issue-2441
     Examples:
-      | ocs_api_version | ocs_status_code | path           |
-      | 1               | 100             | /textfile0.txt |
-      | 2               | 200             | /textfile0.txt |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
   @issue-2146
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
@@ -560,7 +559,7 @@ Feature: sharing
     And the content of file "/common/sub/textfile0.txt" for user "Alice" should be "BLABLABLA" plus end-of-line
 
   @issue-enterprise-3896 @issue-2201
-  Scenario Outline: sharing back to resharer is allowed
+  Scenario: sharing back to resharer is allowed
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -570,18 +569,15 @@ Feature: sharing
     And user "Brian" has accepted share "/userZeroFolder" offered by user "Alice"
     And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
     And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "Carol" with permissions "read, share"
-    And user "Carol" has accepted share "<pending_share_path>" offered by user "Brian"
+    And user "Carol" has accepted share "/userOneFolder" offered by user "Brian"
     When user "Carol" shares folder "/Shares/userOneFolder" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
 #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Brian" that no shares are in the pending state
     And as "Brian" folder "/Shares/userOneFolder" should not exist
-    Examples:
-      | pending_share_path |
-      | /userOneFolder     |
 
   @issue-enterprise-3896 @issue-2201
-  Scenario Outline: sharing back to original sharer is allowed
+  Scenario: sharing back to original sharer is allowed
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -591,18 +587,15 @@ Feature: sharing
     And user "Brian" has accepted share "/userZeroFolder" offered by user "Alice"
     And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
     And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "Carol" with permissions "read, share"
-    And user "Carol" has accepted share "<pending_share_path>" offered by user "Brian"
+    And user "Carol" has accepted share "/userOneFolder" offered by user "Brian"
     When user "Carol" shares folder "/Shares/userOneFolder" with user "Alice" using the sharing API
     Then the HTTP status code should be "200"
 #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Alice" that no shares are in the pending state
     And as "Alice" folder "/Shares/userOneFolder" should not exist
-    Examples:
-      | pending_share_path |
-      | /userOneFolder     |
 
   @issue-enterprise-3896 @issue-2201
-  Scenario Outline: sharing a subfolder to a user that already received parent folder share
+  Scenario: sharing a subfolder to a user that already received parent folder share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -615,15 +608,12 @@ Feature: sharing
     And user "Carol" has accepted share "/userZeroFolder" offered by user "Alice"
     And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
     And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "David" with permissions "read, share"
-    And user "David" has accepted share "<pending_share_path>" offered by user "Brian"
+    And user "David" has accepted share "/userOneFolder" offered by user "Brian"
     When user "David" shares folder "/Shares/userOneFolder" with user "Carol" using the sharing API
     Then the HTTP status code should be "200"
 #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Carol" that no shares are in the pending state
     And as "Carol" folder "/Shares/userOneFolder" should not exist
-    Examples:
-      | pending_share_path |
-      | /userOneFolder     |
 
   @smokeTest
   Scenario Outline: creating a share of a renamed file

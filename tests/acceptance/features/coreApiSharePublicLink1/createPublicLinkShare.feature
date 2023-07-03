@@ -273,12 +273,12 @@ Feature: create a public link share
     Given using OCS API version "<ocs_api_version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path | / |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "400"
     And the HTTP status code should be "<http_status_code>"
     Examples:
-      | ocs_api_version | ocs_status_code | http_status_code |
-      | 1               | 400             | 200              |
-      | 2               | 400             | 400              |
+      | ocs_api_version | http_status_code |
+      | 1               | 200              |
+      | 2               | 400              |
 
 
   Scenario Outline: user creates a public link share of a file with file name longer than 64 chars using the public WebDAV API

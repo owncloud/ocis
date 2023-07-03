@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Remove files, folder
   As a user
   I want to be able to remove files, folders
@@ -65,11 +65,11 @@ Feature: Remove files, folder
       | text.txt |
     And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
     Examples:
-      | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash | quotaValue |
-      | Alice | manager | 204  | should not           | should               | 0          |
-      | Brian | manager | 204  | should not           | should               | 0          |
-      | Brian | editor  | 204  | should not           | should               | 0          |
-      | Brian | viewer  | 403  | should               | should not           | 12         |
+      | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash |
+      | Alice | manager | 204  | should not           | should               |
+      | Brian | manager | 204  | should not           | should               |
+      | Brian | editor  | 204  | should not           | should               |
+      | Brian | viewer  | 403  | should               | should not           |
 
 
   Scenario: try to delete an empty string folder from a space
