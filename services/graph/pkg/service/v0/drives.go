@@ -31,7 +31,6 @@ import (
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	gtracing "github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
@@ -161,7 +160,6 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
 	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
-
 	if err != nil {
 		logger.Debug().Err(err).Str("driveID", chi.URLParam(r, "driveID")).Msg("could not get drive: unescaping drive id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
@@ -602,7 +600,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 		return nil, err
 	}
 
-	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(g.config.GRPCClientTLS), grpc.WithTraceProvider(gtracing.TraceProvider))...)
+	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(g.config.GRPCClientTLS), grpc.WithTraceProvider(g.traceProvider))...)
 	if err != nil {
 		return nil, err
 	}
@@ -1099,7 +1097,6 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "grpc error")
 		return
 	}
-
 }
 
 func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libregraph.Drive, error) {
