@@ -126,7 +126,7 @@ Feature: sharing
       | 2               | 400              | create,delete |
 
   @issue-2201
-  Scenario Outline: share ownership change after moving a shared file outside of an outer share
+  Scenario: share ownership change after moving a shared file outside of an outer share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -137,7 +137,7 @@ Feature: sharing
     And user "Alice" has shared folder "/folder1" with user "Brian" with permissions "all"
     And user "Brian" has accepted share "/folder1" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/folder1/folder2" with user "Carol" with permissions "all"
-    And user "Carol" has accepted share "<folder2_share_path>" offered by user "Brian"
+    And user "Carol" has accepted share "/folder2" offered by user "Brian"
     When user "Brian" moves folder "/Shares/folder1/folder2" to "/moved-out/folder2" using the WebDAV API
     Then the HTTP status code should be "201"
     And the response when user "Brian" gets the info of the last share should include
@@ -156,12 +156,9 @@ Feature: sharing
       | mimetype          | httpd/unix-directory |
     And as "Alice" folder "/Shares/folder1/folder2" should not exist
     And as "Carol" folder "/Shares/folder2" should exist
-    Examples:
-      | folder2_share_path |
-      | /folder2           |
 
-
-  Scenario Outline: share ownership change after moving a shared file to another share
+  @issue-2442
+  Scenario: share ownership change after moving a shared file to another share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -181,7 +178,7 @@ Feature: sharing
       | item_source       | A_STRING             |
       | share_type        | user                 |
       | file_source       | A_STRING             |
-      | file_target       | <path>               |
+      | file_target       | /Carol-folder        |
       | permissions       | all                  |
       | stime             | A_NUMBER             |
       | storage           | A_STRING             |
@@ -191,10 +188,6 @@ Feature: sharing
       | mimetype          | httpd/unix-directory |
     And as "Alice" folder "/Alice-folder/folder2" should not exist
     And as "Carol" folder "/Carol-folder/folder2" should exist
-    @issue-2442
-    Examples:
-      | path          |
-      | /Carol-folder |
 
   @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below

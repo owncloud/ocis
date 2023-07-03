@@ -186,7 +186,7 @@ Feature: edit user
       | User        | Admin       |
       | User Light  | Space Admin |
       | User Light  | User        |
-      | User Light  | User Light       |
+      | User Light  | User Light  |
       | User Light  | Admin       |
 
 
@@ -209,11 +209,11 @@ Feature: edit user
     }
     """
     Examples:
-      | action description                | newDisplayName | code | displayNameAsResult |
-      | change to a display name          | Olaf Scholz    | 200  | Olaf Scholz         |
-      | override to existing display name | Carol King     | 200  | Carol King          |
-      | change to an empty display name   |                | 400  | Brian Murphy        |
-      | displayName with characters       | *:!;_+-&#(?)   | 200  | *:!;_+-&#(?)        |
+      | action description                | newDisplayName | displayNameAsResult |
+      | change to a display name          | Olaf Scholz    | Olaf Scholz         |
+      | override to existing display name | Carol King     | Carol King          |
+      | change to an empty display name   |                | Brian Murphy        |
+      | displayName with characters       | *:!;_+-&#(?)   | *:!;_+-&#(?)        |
 
 
   Scenario Outline: normal user should not be able to change his/her own display name
@@ -239,7 +239,7 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | User Light       |
+      | User Light  |
 
 
   Scenario Outline: normal user should not be able to edit another user's display name
@@ -500,4 +500,4 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | User Light       |
+      | User Light  |
