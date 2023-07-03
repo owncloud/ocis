@@ -42,6 +42,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/pkg/handler"
+	"go.opentelemetry.io/otel/propagation"
+)
+
+// Propagator ensures the importer module uses the same trace propagation strategy.
+var Propagator = propagation.NewCompositeTextMapPropagator(
+	propagation.Baggage{},
+	propagation.TraceContext{},
 )
 
 func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns string) {
@@ -253,6 +260,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
 		httpReq.Header.Set(net.HeaderContentType, r.Header.Get(net.HeaderContentType))
 		httpReq.Header.Set(net.HeaderContentLength, r.Header.Get(net.HeaderContentLength))

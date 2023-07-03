@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d
-	github.com/cs3org/reva/v2 v2.14.1-0.20230629081848-5e7f1bf5c21d
+	github.com/cs3org/reva/v2 v2.14.1-0.20230630110658-4d867d522806
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -335,5 +335,3 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
-
-replace github.com/cs3org/reva/v2 => github.com/micbar/reva/v2 v2.0.0-20230626125956-c381fe19a108

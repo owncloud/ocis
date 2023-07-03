@@ -37,7 +37,6 @@ import (
 
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -62,11 +61,16 @@ import (
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
 	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
-// name is the Tracer name used to identify this instrumentation library.
-const tracerName = "decomposedfs"
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs")
+}
 
 // Tree is used to manage a tree hierarchy
 type Tree interface {
@@ -202,7 +206,9 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 
 // Postprocessing starts the postprocessing result collector
 func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
-	ctx := context.TODO()
+	ctx := context.TODO() // we should pass the trace id in the event and initialize the trace provider here
+	ctx, span := tracer.Start(ctx, "Postprocessing")
+	defer span.End()
 	log := logger.New()
 	for event := range ch {
 		switch ev := event.Event.(type) {
@@ -247,7 +253,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read parent")
 			} else {
 				// update parent tmtime to propagate etag change
-				_ = p.SetTMTime(&now)
+				_ = p.SetTMTime(ctx, &now)
 				if err := fs.tp.Propagate(ctx, p, 0); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate etag change")
 				}
@@ -256,7 +262,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			upload.Cleanup(up, failed, keepUpload)
 
 			// remove cache entry in gateway
-			fs.cache.RemoveStat(ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 
 			if err := events.Publish(
 				fs.stream,
@@ -331,7 +337,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						}
 
 						// remove cache entry in gateway
-						fs.cache.RemoveStat(ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+						fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 						continue
 					}
 
@@ -369,7 +375,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 					}
 
 					// remove cache entry in gateway
-					fs.cache.RemoveStat(ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+					fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 					continue
 				}
 				*/
@@ -390,13 +396,13 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				n = no
 			}
 
-			if err := n.SetScanData(res.Description, res.Scandate); err != nil {
+			if err := n.SetScanData(ctx, res.Description, res.Scandate); err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("resourceID", res.ResourceID).Msg("Failed to set scan results")
 				continue
 			}
 
 			// remove cache entry in gateway
-			fs.cache.RemoveStat(ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 		default:
 			log.Error().Interface("event", ev).Msg("Unknown event")
 		}
@@ -412,6 +418,8 @@ func (fs *Decomposedfs) Shutdown(ctx context.Context) error {
 // GetQuota returns the quota available
 // TODO Document in the cs3 should we return quota or free space?
 func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (total uint64, inUse uint64, remaining uint64, err error) {
+	ctx, span := tracer.Start(ctx, "GetQuota")
+	defer span.End()
 	var n *node.Node
 	if ref == nil {
 		err = errtypes.BadRequest("no space given")
@@ -487,6 +495,8 @@ func (fs *Decomposedfs) calculateTotalUsedRemaining(quotaStr string, inUse, rema
 
 // CreateHome creates a new home node for the given user
 func (fs *Decomposedfs) CreateHome(ctx context.Context) (err error) {
+	ctx, span := tracer.Start(ctx, "CreateHome")
+	defer span.End()
 	if fs.o.UserLayout == "" {
 		return errtypes.NotSupported("Decomposedfs: CreateHome() home supported disabled")
 	}
@@ -519,6 +529,8 @@ func isAlreadyExists(err error) bool {
 // GetHome is called to look up the home path for a user
 // It is NOT supposed to return the internal path but the external path
 func (fs *Decomposedfs) GetHome(ctx context.Context) (string, error) {
+	ctx, span := tracer.Start(ctx, "GetHome")
+	defer span.End()
 	if fs.o.UserLayout == "" {
 		return "", errtypes.NotSupported("Decomposedfs: GetHome() home supported disabled")
 	}
@@ -529,6 +541,8 @@ func (fs *Decomposedfs) GetHome(ctx context.Context) (string, error) {
 
 // GetPathByID returns the fn pointed by the file id, without the internal namespace
 func (fs *Decomposedfs) GetPathByID(ctx context.Context, id *provider.ResourceId) (string, error) {
+	ctx, span := tracer.Start(ctx, "GetPathByID")
+	defer span.End()
 	n, err := fs.lu.NodeFromID(ctx, id)
 	if err != nil {
 		return "", err
@@ -557,6 +571,9 @@ func (fs *Decomposedfs) GetPathByID(ctx context.Context, id *provider.ResourceId
 
 // CreateDir creates the specified directory
 func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) (err error) {
+	ctx, span := tracer.Start(ctx, "CreateDir")
+	defer span.End()
+
 	name := path.Base(ref.Path)
 	if name == "" || name == "." || name == "/" {
 		return errtypes.BadRequest("Invalid path: " + ref.Path)
@@ -617,6 +634,8 @@ func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) 
 
 // TouchFile as defined in the storage.FS interface
 func (fs *Decomposedfs) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
+	ctx, span := tracer.Start(ctx, "TouchFile")
+	defer span.End()
 	parentRef := &provider.Reference{
 		ResourceId: ref.ResourceId,
 		Path:       path.Dir(ref.Path),
@@ -669,6 +688,8 @@ func (fs *Decomposedfs) CreateReference(ctx context.Context, p string, targetURI
 
 // Move moves a resource from one reference to another
 func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Reference) (err error) {
+	ctx, span := tracer.Start(ctx, "Move")
+	defer span.End()
 	var oldNode, newNode *node.Node
 	if oldNode, err = fs.lu.NodeFromResource(ctx, oldRef); err != nil {
 		return
@@ -703,13 +724,13 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 	switch {
 	case err != nil:
 		return err
-	case oldNode.IsDir() && !rp.CreateContainer:
+	case oldNode.IsDir(ctx) && !rp.CreateContainer:
 		f, _ := storagespace.FormatReference(newRef)
 		if rp.Stat {
 			return errtypes.PermissionDenied(f)
 		}
 		return errtypes.NotFound(f)
-	case !oldNode.IsDir() && !rp.InitiateFileUpload:
+	case !oldNode.IsDir(ctx) && !rp.InitiateFileUpload:
 		f, _ := storagespace.FormatReference(newRef)
 		if rp.Stat {
 			return errtypes.PermissionDenied(f)
@@ -735,6 +756,8 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 
 // GetMD returns the metadata for the specified resource
 func (fs *Decomposedfs) GetMD(ctx context.Context, ref *provider.Reference, mdKeys []string, fieldMask []string) (ri *provider.ResourceInfo, err error) {
+	ctx, span := tracer.Start(ctx, "GetMD")
+	defer span.End()
 	var node *node.Node
 	if node, err = fs.lu.NodeFromResource(ctx, ref); err != nil {
 		return
@@ -777,13 +800,12 @@ func (fs *Decomposedfs) GetMD(ctx context.Context, ref *provider.Reference, mdKe
 
 // ListFolder returns a list of resources in the specified folder
 func (fs *Decomposedfs) ListFolder(ctx context.Context, ref *provider.Reference, mdKeys []string, fieldMask []string) ([]*provider.ResourceInfo, error) {
+	ctx, span := tracer.Start(ctx, "ListFolder")
+	defer span.End()
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListFolder")
-	defer span.End()
 
 	if !n.Exists {
 		return nil, errtypes.NotFound(filepath.Join(n.ParentID, n.Name))
@@ -872,6 +894,8 @@ func (fs *Decomposedfs) ListFolder(ctx context.Context, ref *provider.Reference,
 
 // Delete deletes the specified resource
 func (fs *Decomposedfs) Delete(ctx context.Context, ref *provider.Reference) (err error) {
+	ctx, span := tracer.Start(ctx, "Delete")
+	defer span.End()
 	var node *node.Node
 	if node, err = fs.lu.NodeFromResource(ctx, ref); err != nil {
 		return
@@ -904,6 +928,8 @@ func (fs *Decomposedfs) Delete(ctx context.Context, ref *provider.Reference) (er
 
 // Download returns a reader to the specified resource
 func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+	ctx, span := tracer.Start(ctx, "Download")
+	defer span.End()
 	// check if we are trying to download a revision
 	// TODO the CS3 api should allow initiating a revision download
 	if ref.ResourceId != nil && strings.Contains(ref.ResourceId.OpaqueId, node.RevisionIDDelimiter) {
@@ -941,6 +967,8 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (
 
 // GetLock returns an existing lock on the given reference
 func (fs *Decomposedfs) GetLock(ctx context.Context, ref *provider.Reference) (*provider.Lock, error) {
+	ctx, span := tracer.Start(ctx, "GetLock")
+	defer span.End()
 	node, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: error resolving ref")
@@ -968,6 +996,8 @@ func (fs *Decomposedfs) GetLock(ctx context.Context, ref *provider.Reference) (*
 
 // SetLock puts a lock on the given reference
 func (fs *Decomposedfs) SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
+	ctx, span := tracer.Start(ctx, "SetLock")
+	defer span.End()
 	node, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: error resolving ref")
@@ -994,6 +1024,8 @@ func (fs *Decomposedfs) SetLock(ctx context.Context, ref *provider.Reference, lo
 
 // RefreshLock refreshes an existing lock on the given reference
 func (fs *Decomposedfs) RefreshLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock, existingLockID string) error {
+	ctx, span := tracer.Start(ctx, "RefreshLock")
+	defer span.End()
 	if lock.LockId == "" {
 		return errtypes.BadRequest("missing lockid")
 	}
@@ -1024,6 +1056,8 @@ func (fs *Decomposedfs) RefreshLock(ctx context.Context, ref *provider.Reference
 
 // Unlock removes an existing lock from the given reference
 func (fs *Decomposedfs) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
+	ctx, span := tracer.Start(ctx, "Unlock")
+	defer span.End()
 	if lock.LockId == "" {
 		return errtypes.BadRequest("missing lockid")
 	}

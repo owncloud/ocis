@@ -19,6 +19,7 @@
 package metadata
 
 import (
+	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -39,13 +40,13 @@ func (XattrsBackend) Name() string { return "xattrs" }
 // Get an extended attribute value for the given key
 // No file locking is involved here as reading a single xattr is
 // considered to be atomic.
-func (b XattrsBackend) Get(filePath, key string) ([]byte, error) {
+func (b XattrsBackend) Get(ctx context.Context, filePath, key string) ([]byte, error) {
 	return xattr.Get(filePath, key)
 }
 
 // GetInt64 reads a string as int64 from the xattrs
-func (b XattrsBackend) GetInt64(filePath, key string) (int64, error) {
-	attr, err := b.Get(filePath, key)
+func (b XattrsBackend) GetInt64(ctx context.Context, filePath, key string) (int64, error) {
+	attr, err := b.Get(ctx, filePath, key)
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +59,7 @@ func (b XattrsBackend) GetInt64(filePath, key string) (int64, error) {
 
 // List retrieves a list of names of extended attributes associated with the
 // given path in the file system.
-func (XattrsBackend) List(filePath string) (attribs []string, err error) {
+func (XattrsBackend) List(ctx context.Context, filePath string) (attribs []string, err error) {
 	attrs, err := xattr.List(filePath)
 	if err == nil {
 		return attrs, nil
@@ -75,8 +76,8 @@ func (XattrsBackend) List(filePath string) (attribs []string, err error) {
 
 // All reads all extended attributes for a node, protected by a
 // shared file lock
-func (b XattrsBackend) All(filePath string) (attribs map[string][]byte, err error) {
-	attrNames, err := b.List(filePath)
+func (b XattrsBackend) All(ctx context.Context, filePath string) (attribs map[string][]byte, err error) {
+	attrNames, err := b.List(ctx, filePath)
 
 	if err != nil {
 		return nil, err
@@ -106,12 +107,12 @@ func (b XattrsBackend) All(filePath string) (attribs map[string][]byte, err erro
 }
 
 // Set sets one attribute for the given path
-func (b XattrsBackend) Set(path string, key string, val []byte) (err error) {
-	return b.SetMultiple(path, map[string][]byte{key: val}, true)
+func (b XattrsBackend) Set(ctx context.Context, path string, key string, val []byte) (err error) {
+	return b.SetMultiple(ctx, path, map[string][]byte{key: val}, true)
 }
 
 // SetMultiple sets a set of attribute for the given path
-func (XattrsBackend) SetMultiple(path string, attribs map[string][]byte, acquireLock bool) (err error) {
+func (XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) (err error) {
 	if acquireLock {
 		err := os.MkdirAll(filepath.Dir(path), 0600)
 		if err != nil {
@@ -144,7 +145,7 @@ func (XattrsBackend) SetMultiple(path string, attribs map[string][]byte, acquire
 }
 
 // Remove an extended attribute key
-func (XattrsBackend) Remove(filePath string, key string) (err error) {
+func (XattrsBackend) Remove(ctx context.Context, filePath string, key string) (err error) {
 	lockedFile, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -173,6 +174,6 @@ func cleanupLockfile(f *lockedfile.File) {
 
 // AllWithLockedSource reads all extended attributes from the given reader.
 // The path argument is used for storing the data in the cache
-func (b XattrsBackend) AllWithLockedSource(path string, _ io.Reader) (map[string][]byte, error) {
-	return b.All(path)
+func (b XattrsBackend) AllWithLockedSource(ctx context.Context, path string, _ io.Reader) (map[string][]byte, error) {
+	return b.All(ctx, path)
 }

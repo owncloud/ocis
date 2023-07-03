@@ -352,7 +352,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.14.1-0.20230629081848-5e7f1bf5c21d
+# github.com/cs3org/reva/v2 v2.14.1-0.20230630110658-4d867d522806
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -1841,6 +1841,7 @@ go.opentelemetry.io/otel/semconv/internal
 go.opentelemetry.io/otel/semconv/v1.10.0
 go.opentelemetry.io/otel/semconv/v1.12.0
 go.opentelemetry.io/otel/semconv/v1.17.0
+go.opentelemetry.io/otel/semconv/v1.20.0
 go.opentelemetry.io/otel/semconv/v1.4.0
 # go.opentelemetry.io/otel/exporters/jaeger v1.15.1
 ## explicit; go 1.19
@@ -2195,4 +2196,3 @@ stash.kopano.io/kgol/oidc-go
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
 # github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
-# github.com/cs3org/reva/v2 => github.com/micbar/reva/v2 v2.0.0-20230626125956-c381fe19a108

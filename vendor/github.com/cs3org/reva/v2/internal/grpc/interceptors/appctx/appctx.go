@@ -24,7 +24,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/rs/zerolog"
-	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )

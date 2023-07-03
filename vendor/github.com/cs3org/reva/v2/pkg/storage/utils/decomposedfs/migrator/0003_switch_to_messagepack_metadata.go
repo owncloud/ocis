@@ -19,6 +19,7 @@
 package migrator
 
 import (
+	"context"
 	"errors"
 	"io/fs"
 	"os"
@@ -74,7 +75,7 @@ func (m *Migrator) Migration0003() (Result, error) {
 				return nil
 			}
 
-			attribs, err := xattrs.All(path)
+			attribs, err := xattrs.All(context.Background(), path)
 			if err != nil {
 				m.log.Error().Err(err).Str("path", path).Msg("error converting file")
 				return err
@@ -83,14 +84,14 @@ func (m *Migrator) Migration0003() (Result, error) {
 				return nil
 			}
 
-			err = mpk.SetMultiple(path, attribs, false)
+			err = mpk.SetMultiple(context.Background(), path, attribs, false)
 			if err != nil {
 				m.log.Error().Err(err).Str("path", path).Msg("error setting attributes")
 				return err
 			}
 
 			for k := range attribs {
-				err = xattrs.Remove(path, k)
+				err = xattrs.Remove(context.Background(), path, k)
 				if err != nil {
 					m.log.Debug().Err(err).Str("path", path).Msg("error removing xattr")
 				}

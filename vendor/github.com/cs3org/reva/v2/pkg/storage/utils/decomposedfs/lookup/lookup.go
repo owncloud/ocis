@@ -34,7 +34,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
+}
 
 // Lookup implements transformations from filepath to node and back
 type Lookup struct {
@@ -57,8 +65,8 @@ func (lu *Lookup) MetadataBackend() metadata.Backend {
 }
 
 // ReadBlobSizeAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobSizeAttr(path string) (int64, error) {
-	blobSize, err := lu.metadataBackend.GetInt64(path, prefixes.BlobsizeAttr)
+func (lu *Lookup) ReadBlobSizeAttr(ctx context.Context, path string) (int64, error) {
+	blobSize, err := lu.metadataBackend.GetInt64(ctx, path, prefixes.BlobsizeAttr)
 	if err != nil {
 		return 0, errors.Wrapf(err, "error reading blobsize xattr")
 	}
@@ -66,8 +74,8 @@ func (lu *Lookup) ReadBlobSizeAttr(path string) (int64, error) {
 }
 
 // ReadBlobIDAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobIDAttr(path string) (string, error) {
-	attr, err := lu.metadataBackend.Get(path, prefixes.BlobIDAttr)
+func (lu *Lookup) ReadBlobIDAttr(ctx context.Context, path string) (string, error) {
+	attr, err := lu.metadataBackend.Get(ctx, path, prefixes.BlobIDAttr)
 	if err != nil {
 		return "", errors.Wrapf(err, "error reading blobid xattr")
 	}
@@ -75,9 +83,9 @@ func (lu *Lookup) ReadBlobIDAttr(path string) (string, error) {
 }
 
 // TypeFromPath returns the type of the node at the given path
-func (lu *Lookup) TypeFromPath(path string) provider.ResourceType {
+func (lu *Lookup) TypeFromPath(ctx context.Context, path string) provider.ResourceType {
 	// Try to read from xattrs
-	typeAttr, err := lu.metadataBackend.GetInt64(path, prefixes.TypeAttr)
+	typeAttr, err := lu.metadataBackend.GetInt64(ctx, path, prefixes.TypeAttr)
 	if err == nil {
 		return provider.ResourceType(int32(typeAttr))
 	}
@@ -91,7 +99,7 @@ func (lu *Lookup) TypeFromPath(path string) provider.ResourceType {
 
 	switch {
 	case fi.IsDir():
-		if _, err = lu.metadataBackend.Get(path, prefixes.ReferenceAttr); err == nil {
+		if _, err = lu.metadataBackend.Get(ctx, path, prefixes.ReferenceAttr); err == nil {
 			t = provider.ResourceType_RESOURCE_TYPE_REFERENCE
 		} else {
 			t = provider.ResourceType_RESOURCE_TYPE_CONTAINER
@@ -108,6 +116,9 @@ func (lu *Lookup) TypeFromPath(path string) provider.ResourceType {
 
 // NodeFromResource takes in a request path or request id and converts it to a Node
 func (lu *Lookup) NodeFromResource(ctx context.Context, ref *provider.Reference) (*node.Node, error) {
+	ctx, span := tracer.Start(ctx, "NodeFromResource")
+	defer span.End()
+
 	if ref.ResourceId != nil {
 		// check if a storage space reference is used
 		// currently, the decomposed fs uses the root node id as the space id
@@ -136,6 +147,8 @@ func (lu *Lookup) NodeFromResource(ctx context.Context, ref *provider.Reference)
 
 // NodeFromID returns the internal path for the id
 func (lu *Lookup) NodeFromID(ctx context.Context, id *provider.ResourceId) (n *node.Node, err error) {
+	ctx, span := tracer.Start(ctx, "NodeFromID")
+	defer span.End()
 	if id == nil {
 		return nil, fmt.Errorf("invalid resource id %+v", id)
 	}
@@ -178,7 +191,7 @@ func (lu *Lookup) Path(ctx context.Context, n *node.Node, hasPermission node.Per
 	root := n.SpaceRoot
 	for n.ID != root.ID {
 		p = filepath.Join(n.Name, p)
-		if n, err = n.Parent(); err != nil {
+		if n, err = n.Parent(ctx); err != nil {
 			appctx.GetLogger(ctx).
 				Error().Err(err).
 				Str("path", p).
@@ -207,7 +220,7 @@ func (lu *Lookup) WalkPath(ctx context.Context, r *node.Node, p string, followRe
 		}
 
 		if followReferences {
-			if attrBytes, err := r.Xattr(prefixes.ReferenceAttr); err == nil {
+			if attrBytes, err := r.Xattr(ctx, prefixes.ReferenceAttr); err == nil {
 				realNodeID := attrBytes
 				ref, err := refFromCS3(realNodeID)
 				if err != nil {
@@ -220,7 +233,7 @@ func (lu *Lookup) WalkPath(ctx context.Context, r *node.Node, p string, followRe
 				}
 			}
 		}
-		if r.IsSpaceRoot() {
+		if r.IsSpaceRoot(ctx) {
 			r.SpaceRoot = r
 		}
 
@@ -268,7 +281,7 @@ func refFromCS3(b []byte) (*provider.Reference, error) {
 // The optional filter function can be used to filter by attribute name, e.g. by checking a prefix
 // For the source file, a shared lock is acquired.
 // NOTE: target resource will be write locked!
-func (lu *Lookup) CopyMetadata(src, target string, filter func(attributeName string) bool) (err error) {
+func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string) bool) (err error) {
 	// Acquire a read log on the source node
 	// write lock existing node before reading treesize or tree time
 	f, err := lockedfile.Open(lu.MetadataBackend().MetadataPath(src))
@@ -288,14 +301,14 @@ func (lu *Lookup) CopyMetadata(src, target string, filter func(attributeName str
 		}
 	}()
 
-	return lu.CopyMetadataWithSourceLock(src, target, filter, f)
+	return lu.CopyMetadataWithSourceLock(ctx, src, target, filter, f)
 }
 
 // CopyMetadataWithSourceLock copies all extended attributes from source to target.
 // The optional filter function can be used to filter by attribute name, e.g. by checking a prefix
 // For the source file, a matching lockedfile is required.
 // NOTE: target resource will be write locked!
-func (lu *Lookup) CopyMetadataWithSourceLock(sourcePath, targetPath string, filter func(attributeName string) bool, lockedSource *lockedfile.File) (err error) {
+func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string) bool, lockedSource *lockedfile.File) (err error) {
 	switch {
 	case lockedSource == nil:
 		return errors.New("no lock provided")
@@ -303,7 +316,7 @@ func (lu *Lookup) CopyMetadataWithSourceLock(sourcePath, targetPath string, filt
 		return errors.New("lockpath does not match filepath")
 	}
 
-	attrs, err := lu.metadataBackend.AllWithLockedSource(sourcePath, lockedSource)
+	attrs, err := lu.metadataBackend.AllWithLockedSource(ctx, sourcePath, lockedSource)
 	if err != nil {
 		return err
 	}
@@ -315,7 +328,7 @@ func (lu *Lookup) CopyMetadataWithSourceLock(sourcePath, targetPath string, filt
 		}
 	}
 
-	return lu.MetadataBackend().SetMultiple(targetPath, newAttrs, true)
+	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, true)
 }
 
 // DetectBackendOnDisk returns the name of the metadata backend being used on disk

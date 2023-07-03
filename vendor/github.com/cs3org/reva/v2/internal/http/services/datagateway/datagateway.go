@@ -36,7 +36,16 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/tree")
+}
 
 const (
 	// TokenTransportHeader holds the header key for the reva transfer token
@@ -116,6 +125,14 @@ func (s *svc) Unprotected() []string {
 
 func (s *svc) setHandler() {
 	s.handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		ctx, span := tracer.Start(ctx, "HandlerFunc")
+		defer span.End()
+		span.SetAttributes(
+			semconv.HTTPMethodKey.String(r.Method),
+			semconv.HTTPURLKey.String(r.URL.String()),
+		)
+		r = r.WithContext(ctx)
 		switch r.Method {
 		case "HEAD":
 			addCorsHeader(w)

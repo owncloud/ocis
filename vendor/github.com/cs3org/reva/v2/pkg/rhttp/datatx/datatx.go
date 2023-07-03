@@ -21,6 +21,7 @@
 package datatx
 
 import (
+	"context"
 	"net/http"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -55,5 +56,5 @@ func EmitFileUploadedEvent(spaceOwnerOrManager, executant *userv1beta1.UserId, r
 
 // InvalidateCache is a helper function which invalidates the stat cache
 func InvalidateCache(owner *userv1beta1.UserId, ref *provider.Reference, statCache cache.StatCache) {
-	statCache.RemoveStat(owner, ref.GetResourceId())
+	statCache.RemoveStatContext(context.TODO(), owner, ref.GetResourceId())
 }

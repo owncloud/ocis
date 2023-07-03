@@ -83,7 +83,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 	log.Debug().Interface("info", info).Interface("node", n).Msg("Decomposedfs: resolved filename")
 
 	// the parent owner will become the new owner
-	parent, perr := n.Parent()
+	parent, perr := n.Parent(ctx)
 	if perr != nil {
 		return nil, errors.Wrap(perr, "Decomposedfs: error getting parent "+n.ParentID)
 	}
@@ -117,7 +117,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 	}
 
 	// are we trying to overwriting a folder with a file?
-	if n.Exists && n.IsDir() {
+	if n.Exists && n.IsDir(ctx) {
 		return nil, errtypes.PreconditionFailed("resource is not a file")
 	}
 
@@ -294,7 +294,7 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 	initAttrs.SetString(prefixes.StatusPrefix, node.ProcessingStatus+upload.Info.ID)
 
 	// update node metadata with new blobid etc
-	err = n.SetXattrs(initAttrs, false)
+	err = n.SetXattrsWithContext(context.TODO(), initAttrs, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: could not write metadata")
 	}
@@ -347,7 +347,7 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 		// nothing to do
 	}
 
-	if _, err := node.CheckQuota(n.SpaceRoot, false, 0, fsize); err != nil {
+	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, false, 0, fsize); err != nil {
 		return f, err
 	}
 
@@ -374,11 +374,11 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 
 func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint64) (*lockedfile.File, error) {
 	old, _ := node.ReadNode(upload.Ctx, upload.lu, spaceID, n.ID, false, nil, false)
-	if _, err := node.CheckQuota(n.SpaceRoot, true, uint64(old.Blobsize), fsize); err != nil {
+	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, true, uint64(old.Blobsize), fsize); err != nil {
 		return nil, err
 	}
 
-	tmtime, err := old.GetTMTime()
+	tmtime, err := old.GetTMTime(upload.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -414,7 +414,7 @@ func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint
 	}
 
 	// copy blob metadata to version node
-	if err := upload.lu.CopyMetadataWithSourceLock(targetPath, upload.versionsPath, func(attributeName string) bool {
+	if err := upload.lu.CopyMetadataWithSourceLock(upload.Ctx, targetPath, upload.versionsPath, func(attributeName string) bool {
 		return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 			attributeName == prefixes.TypeAttr ||
 			attributeName == prefixes.BlobIDAttr ||

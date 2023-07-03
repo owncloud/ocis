@@ -40,6 +40,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 func sufferMacOSFinder(r *http.Request) bool {
@@ -302,6 +303,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 	httpReq.Header.Set(datagateway.TokenTransportHeader, token)
 
 	httpRes, err := s.client.Do(httpReq)

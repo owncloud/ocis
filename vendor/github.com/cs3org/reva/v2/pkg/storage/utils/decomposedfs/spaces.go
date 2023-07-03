@@ -146,8 +146,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		metadata.SetString(prefixes.SpaceAliasAttr, alias)
 	}
 
-	// Write node
-	if err := root.SetXattrs(metadata, true); err != nil {
+	if err := root.SetXattrsWithContext(ctx, metadata, true); err != nil {
 		return nil, err
 	}
 
@@ -693,7 +692,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 	}
 
 	if mapHasKey(metadata, prefixes.QuotaAttr) {
-		typ, err := spaceNode.SpaceRoot.Xattr(prefixes.SpaceTypeAttr)
+		typ, err := spaceNode.SpaceRoot.Xattr(ctx, prefixes.SpaceTypeAttr)
 		if err != nil {
 			return &provider.UpdateStorageSpaceResponse{
 				Status: &v1beta11.Status{
@@ -711,13 +710,13 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 	}
 	metadata[prefixes.TreeMTimeAttr] = []byte(time.Now().UTC().Format(time.RFC3339Nano))
 
-	err = spaceNode.SetXattrs(metadata, true)
+	err = spaceNode.SetXattrsWithContext(ctx, metadata, true)
 	if err != nil {
 		return nil, err
 	}
 
 	if restore {
-		if err := spaceNode.SetDTime(nil); err != nil {
+		if err := spaceNode.SetDTime(ctx, nil); err != nil {
 			return nil, err
 		}
 	}
@@ -752,7 +751,7 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 		return err
 	}
 
-	st, err := n.SpaceRoot.XattrString(prefixes.SpaceTypeAttr)
+	st, err := n.SpaceRoot.XattrString(ctx, prefixes.SpaceTypeAttr)
 	if err != nil {
 		return errtypes.InternalError(fmt.Sprintf("space %s does not have a spacetype, possible corrupt decompsedfs", n.ID))
 	}
@@ -761,11 +760,11 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 		return err
 	}
 	if purge {
-		if !n.IsDisabled() {
+		if !n.IsDisabled(ctx) {
 			return errtypes.NewErrtypeFromStatus(status.NewInvalid(ctx, "can't purge enabled space"))
 		}
 
-		spaceType, err := n.XattrString(prefixes.SpaceTypeAttr)
+		spaceType, err := n.XattrString(ctx, prefixes.SpaceTypeAttr)
 		if err != nil {
 			return err
 		}
@@ -792,7 +791,7 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 
 	// mark as disabled by writing a dtime attribute
 	dtime := time.Now()
-	return n.SetDTime(&dtime)
+	return n.SetDTime(ctx, &dtime)
 }
 
 func (fs *Decomposedfs) updateIndexes(ctx context.Context, grantee *provider.Grantee, spaceType, spaceID string) error {
@@ -905,7 +904,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 			return nil, errtypes.NotFound(fmt.Sprintf("space %s not found", n.ID))
 		}
 
-		if n.SpaceRoot.IsDisabled() {
+		if n.SpaceRoot.IsDisabled(ctx) {
 			rp, err := fs.p.AssemblePermissions(ctx, n)
 			if err != nil || !IsManager(rp) {
 				return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s is not allowed to list deleted spaces %s", user.Username, n.ID))
@@ -916,7 +915,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 	var err error
 	// TODO apply more filters
 	var sname string
-	if sname, err = n.SpaceRoot.XattrString(prefixes.SpaceNameAttr); err != nil {
+	if sname, err = n.SpaceRoot.XattrString(ctx, prefixes.SpaceNameAttr); err != nil {
 		// FIXME: Is that a severe problem?
 		appctx.GetLogger(ctx).Debug().Err(err).Msg("space does not have a name attribute")
 	}
@@ -1021,12 +1020,12 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		// Mtime is set either as node.tmtime or as fi.mtime below
 	}
 
-	space.SpaceType, err = n.SpaceRoot.XattrString(prefixes.SpaceTypeAttr)
+	space.SpaceType, err = n.SpaceRoot.XattrString(ctx, prefixes.SpaceTypeAttr)
 	if err != nil {
 		appctx.GetLogger(ctx).Debug().Err(err).Msg("space does not have a type attribute")
 	}
 
-	if n.SpaceRoot.IsDisabled() {
+	if n.SpaceRoot.IsDisabled(ctx) {
 		space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "trashed", "trashed")
 	}
 
@@ -1039,7 +1038,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 	// we set the space mtime to the root item mtime
 	// override the stat mtime with a tmtime if it is present
 	var tmtime time.Time
-	if tmt, err := n.GetTMTime(); err == nil {
+	if tmt, err := n.GetTMTime(ctx); err == nil {
 		tmtime = tmt
 		un := tmt.UnixNano()
 		space.Mtime = &types.Timestamp{
@@ -1065,7 +1064,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		Value:   []byte(etag),
 	}
 
-	spaceAttributes, err := n.SpaceRoot.Xattrs()
+	spaceAttributes, err := n.SpaceRoot.Xattrs(ctx)
 	if err != nil {
 		return nil, err
 	}

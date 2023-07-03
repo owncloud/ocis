@@ -93,7 +93,7 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 			delete(md.Metadata, node.FavoriteKey)
 			if u, ok := ctxpkg.ContextGetUser(ctx); ok {
 				if uid := u.GetId(); uid != nil {
-					if err := n.SetFavorite(uid, val); err != nil {
+					if err := n.SetFavorite(ctx, uid, val); err != nil {
 						sublog.Error().Err(err).
 							Interface("user", u).
 							Msg("could not set favorite flag")
@@ -111,7 +111,7 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 	}
 	for k, v := range md.Metadata {
 		attrName := prefixes.MetadataPrefix + k
-		if err = n.SetXattrString(attrName, v); err != nil {
+		if err = n.SetXattrString(ctx, attrName, v); err != nil {
 			errs = append(errs, errors.Wrap(err, "Decomposedfs: could not set metadata attribute "+attrName+" to "+k))
 		}
 	}
@@ -184,7 +184,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 				continue
 			}
 			fa := fmt.Sprintf("%s:%s:%s@%s", prefixes.FavPrefix, utils.UserTypeToString(uid.GetType()), uid.GetOpaqueId(), uid.GetIdp())
-			if err := n.RemoveXattr(fa); err != nil {
+			if err := n.RemoveXattr(ctx, fa); err != nil {
 				if metadata.IsAttrUnset(err) {
 					continue // already gone, ignore
 				}
@@ -195,7 +195,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 				errs = append(errs, errors.Wrap(err, "could not unset favorite flag"))
 			}
 		default:
-			if err = n.RemoveXattr(prefixes.MetadataPrefix + k); err != nil {
+			if err = n.RemoveXattr(ctx, prefixes.MetadataPrefix+k); err != nil {
 				if metadata.IsAttrUnset(err) {
 					continue // already gone, ignore
 				}

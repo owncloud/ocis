@@ -38,6 +38,8 @@ func NewPermissions(item PermissionsChecker, permissionsSelector pool.Selectable
 
 // AssemblePermissions is used to assemble file permissions
 func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
+	ctx, span := tracer.Start(ctx, "AssemblePermissions")
+	defer span.End()
 	return p.item.AssemblePermissions(ctx, n)
 }
 

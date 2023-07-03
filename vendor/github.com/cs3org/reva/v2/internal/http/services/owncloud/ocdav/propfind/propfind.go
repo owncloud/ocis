@@ -54,7 +54,7 @@ import (
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
