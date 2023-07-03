@@ -1877,7 +1877,7 @@ def changelog():
                         "push",
                     ],
                     "message": "Automated changelog update [skip ci]",
-                    "branch": "master",
+                    "branch": "education-3.1",
                     "author_email": "devops@owncloud.com",
                     "author_name": "ownClouders",
                     "netrc_machine": "github.com",
@@ -1981,7 +1981,7 @@ def docs():
                     },
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
-                    "target_branch": "docs-stable-3.0",
+                    "target_branch": "docs-education-3.1",
                     "delete": "true",
                 },
                 "when": {
