@@ -9,7 +9,7 @@ Feature: propagation of etags when copying files or folders
 
   @issue-4251
   Scenario Outline: copying a file does not change its etag
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/file.txt"
@@ -24,18 +24,18 @@ Feature: propagation of etags when copying files or folders
       | Alice | /                |
       | Alice | /renamedFile.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: copying a file inside a folder changes its etag
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     And user "Alice" has stored etag of element "/file.txt"
@@ -51,18 +51,18 @@ Feature: propagation of etags when copying files or folders
       | Alice | /folder/renamedFile.txt |
       | Alice | /folder                 |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: copying a file from one folder to an other changes the etags of destination
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/src"
     And user "Alice" has uploaded file with content "uploaded content" to "/src/file.txt"
     And user "Alice" has created folder "/dst"
@@ -79,18 +79,18 @@ Feature: propagation of etags when copying files or folders
       | user  | path |
       | Alice | /src |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: copying a file into a subfolder changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
@@ -112,18 +112,18 @@ Feature: propagation of etags when copying files or folders
       | Alice | /upload/file.txt |
     @issue-4091
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: copying a file inside a publicly shared folder by public changes etag for the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has created a public link share with settings
@@ -145,19 +145,19 @@ Feature: propagation of etags when copying files or folders
       | Alice | /upload/file.txt |
     @issue-4091
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: sharee copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -187,14 +187,14 @@ Feature: propagation of etags when copying files or folders
       | Alice | /upload/file.txt        |
       | Brian | /Shares/upload/file.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: sharer copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -224,6 +224,6 @@ Feature: propagation of etags when copying files or folders
       | Alice | /upload/file.txt        |
       | Brian | /Shares/upload/file.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

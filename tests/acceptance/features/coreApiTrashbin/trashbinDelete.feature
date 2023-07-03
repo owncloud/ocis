@@ -15,7 +15,7 @@ Feature: files and folders can be deleted from the trashbin
 
   @smokeTest
   Scenario Outline: trashbin can be emptied
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "file with comma" to "sample,0.txt"
     And user "Alice" has uploaded file with content "file with comma" to "sample,1.txt"
     And user "Alice" has deleted file "<filename1>"
@@ -25,19 +25,19 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "<filename1>" should not exist in the trashbin
     And as "Alice" the file with original path "<filename2>" should not exist in the trashbin
     Examples:
-      | dav-path | filename1     | filename2     |
-      | new      | textfile0.txt | textfile1.txt |
-      | new      | sample,0.txt  | sample,1.txt  |
+      | dav-path-version | filename1     | filename2     |
+      | new              | textfile0.txt | textfile1.txt |
+      | new              | sample,0.txt  | sample,1.txt  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | filename1     | filename2     |
-      | spaces   | textfile0.txt | textfile1.txt |
-      | spaces   | sample,0.txt  | sample,1.txt  |
+      | dav-path-version | filename1     | filename2     |
+      | spaces           | textfile0.txt | textfile1.txt |
+      | spaces           | sample,0.txt  | sample,1.txt  |
 
   @smokeTest
   Scenario Outline: delete a single file from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
     And user "Alice" has deleted file "/PARENT/parent.txt"
@@ -49,17 +49,17 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: delete multiple files from the trashbin and make sure the correct ones are gone
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/textfile0.txt"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/child.txt"
     And user "Alice" has deleted file "/textfile0.txt"
@@ -76,17 +76,17 @@ Feature: files and folders can be deleted from the trashbin
     But as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: user tries to delete another user's trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
@@ -100,13 +100,13 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | new      |
-      | spaces   |
+      | dav-path-version |
+      | new              |
+      | spaces           |
 
 
   Scenario Outline: user tries to delete trashbin file using invalid password
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
@@ -119,17 +119,17 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: user tries to delete trashbin file using no password
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
@@ -142,17 +142,17 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: delete a folder that contains a file from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created folder "FOLDER/CHILD"
     And user "Alice" has uploaded file with content "to delete" to "/FOLDER/parent.txt"
@@ -167,17 +167,17 @@ Feature: files and folders can be deleted from the trashbin
     But as "Alice" the file with original path "/FOLDER/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/FOLDER/CHILD/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: delete a subfolder from a deleted folder from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created folder "FOLDER/CHILD"
     And user "Alice" has uploaded file with content "to delete" to "/FOLDER/parent.txt"
@@ -192,17 +192,17 @@ Feature: files and folders can be deleted from the trashbin
     But as "Alice" the file with original path "/FOLDER/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/FOLDER/CHILD/child.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: delete files with special characters from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded the following files with content "special character file"
       | path             |
       | qa&dev.txt       |
@@ -229,17 +229,17 @@ Feature: files and folders can be deleted from the trashbin
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: delete folders with special characters from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created the following folders
       | path         |
       | qa&dev       |
@@ -266,17 +266,17 @@ Feature: files and folders can be deleted from the trashbin
       | %file *?2    |
       | # %ab ab?=ed |
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: delete folders with dot in the name from the trashbin
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created the following folders
       | path      |
       | /fo.      |
@@ -315,10 +315,10 @@ Feature: files and folders can be deleted from the trashbin
       | /fo.xyz   |
       | /fo.exe   |
     Examples:
-      | dav-path |
-      | new      |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |

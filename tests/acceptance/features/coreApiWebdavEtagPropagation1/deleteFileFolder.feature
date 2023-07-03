@@ -10,7 +10,7 @@ Feature: propagation of etags when deleting a file or folder
 
 
   Scenario Outline: deleting a file changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has stored etag of element "/"
@@ -24,18 +24,18 @@ Feature: propagation of etags when deleting a file or folder
       | Alice | /upload     |
       | Alice | /upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: deleting a folder changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has stored etag of element "/"
@@ -49,18 +49,18 @@ Feature: propagation of etags when deleting a file or folder
       | Alice | /upload     |
       | Alice | /upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: deleting a folder with content changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/toDelete/file.txt"
@@ -75,19 +75,19 @@ Feature: propagation of etags when deleting a file or folder
       | Alice | /upload     |
       | Alice | /upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: sharee deleting a file changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -111,14 +111,14 @@ Feature: propagation of etags when deleting a file or folder
       | Brian | /Shares/upload     |
       | Brian | /Shares/upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: sharer deleting a file changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -142,14 +142,14 @@ Feature: propagation of etags when deleting a file or folder
       | Brian | /Shares/upload     |
       | Brian | /Shares/upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: sharee deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -173,14 +173,14 @@ Feature: propagation of etags when deleting a file or folder
       | Brian | /Shares/upload     |
       | Brian | /Shares/upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: sharer deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -204,13 +204,13 @@ Feature: propagation of etags when deleting a file or folder
       | Brian | /Shares/upload     |
       | Brian | /Shares/upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: deleting a file in a publicly shared folder changes its etag for the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has created a public link share with settings
       | path        | upload |
@@ -224,18 +224,18 @@ Feature: propagation of etags when deleting a file or folder
       | Alice | /       |
       | Alice | /upload |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
-  @skipOnRevaMaster
+    @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: deleting a folder in a publicly shared folder changes its etag for the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created a public link share with settings
       | path        | upload |
@@ -249,11 +249,11 @@ Feature: propagation of etags when deleting a file or folder
       | Alice | /       |
       | Alice | /upload |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

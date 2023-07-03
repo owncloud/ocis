@@ -23,7 +23,7 @@ Feature: sharing
 
 
   Scenario Outline: uploading file to a group read-only share folder does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -38,13 +38,13 @@ Feature: sharing
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: uploading file to a user upload-only share folder works
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -64,13 +64,13 @@ Feature: sharing
     Cheers.
     """
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: uploading file to a group upload-only share folder works
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -92,13 +92,13 @@ Feature: sharing
     Cheers.
     """
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest
   Scenario Outline: uploading file to a user read/write share folder works
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -116,13 +116,13 @@ Feature: sharing
     Cheers.
     """
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: uploading file to a group read/write share folder works
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -142,13 +142,13 @@ Feature: sharing
     Cheers.
     """
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest @skipOnGraph
   Scenario Outline: check quota of owners parent directory of a shared file
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And the quota of user "Brian" has been set to "0"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
@@ -165,13 +165,13 @@ Feature: sharing
     Cheers.
     """
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @skipOnGraph
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -185,13 +185,13 @@ Feature: sharing
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: uploading to a group shared folder with read/write permission when the sharer has insufficient quota does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -207,13 +207,13 @@ Feature: sharing
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @skipOnGraph
   Scenario Outline: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -227,13 +227,13 @@ Feature: sharing
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @skipOnGraph
   Scenario Outline: uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -249,13 +249,13 @@ Feature: sharing
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: sharer can download file uploaded with different permission by sharee to a shared folder
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -269,13 +269,13 @@ Feature: sharing
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path | permissions |
-      | old      | change      |
-      | new      | create      |
+      | dav-path-version | permissions |
+      | old              | change      |
+      | new              | create      |
 
 
   Scenario Outline: upload an empty file (size zero byte) to a shared folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/folder-to-share"
     And user "Brian" has shared folder "/folder-to-share" with user "Alice"
@@ -285,6 +285,6 @@ Feature: sharing
     And as "Alice" file "/Shares/folder-to-share/zerobyte.txt" should exist
     And the content of file "/Shares/folder-to-share/zerobyte.txt" for user "Alice" should be ""
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

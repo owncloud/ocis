@@ -10,7 +10,7 @@ Feature: upload file using old chunking
 
 
   Scenario Outline: upload chunked file in ascending order
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
       | 1      | AAAAA   |
@@ -22,17 +22,17 @@ Feature: upload file using old chunking
     And as "Alice" file "/myChunkedFile.txt" should exist
     And the content of file "/myChunkedFile.txt" for user "Alice" should be "AAAAABBBBBCCCCC"
     Examples:
-      | dav_version |
-      | old         |
+      | dav-path-version |
+      | old              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: upload chunked file in descending order
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
       | 3      | CCCCC   |
@@ -42,17 +42,17 @@ Feature: upload file using old chunking
     And as "Alice" file "/myChunkedFile.txt" should exist
     And the content of file "/myChunkedFile.txt" for user "Alice" should be "AAAAABBBBBCCCCC"
     Examples:
-      | dav_version |
-      | old         |
+      | dav-path-version |
+      | old              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: upload chunked file in random order
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
       | 2      | BBBBB   |
@@ -62,17 +62,17 @@ Feature: upload file using old chunking
     And as "Alice" file "/myChunkedFile.txt" should exist
     And the content of file "/myChunkedFile.txt" for user "Alice" should be "AAAAABBBBBCCCCC"
     Examples:
-      | dav_version |
-      | old         |
+      | dav-path-version |
+      | old              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: checking file id after a move overwrite using old chunking endpoint
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has copied file "/textfile0.txt" to "/existingFile.txt"
     And user "Alice" has stored id of file "/existingFile.txt"
@@ -86,20 +86,20 @@ Feature: upload file using old chunking
       Cheers.
       """
     Examples:
-      | dav_version |
-      | old         |
+      | dav-path-version |
+      | old              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @smokeTest
   # This smokeTest scenario does ordinary checks for chunked upload,
   # without adjusting the log level. This allows it to run in test environments
   # where the log level has been fixed and cannot be changed.
   Scenario Outline: chunked upload files with difficult name
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/<file-name>" in 3 chunks using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/<file-name>" should exist
@@ -110,19 +110,19 @@ Feature: upload file using old chunking
       Cheers.
       """
     Examples:
-      | dav_version | file-name                       |
-      | old         | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
-      | old         | 0                               |
+      | dav-path-version | file-name                       |
+      | old              | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
+      | old              | 0                               |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version | file-name                       |
-      | spaces      | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
-      | spaces      | 0                               |
+      | dav-path-version | file-name                       |
+      | spaces           | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
+      | spaces           | 0                               |
 
 
   Scenario Outline: upload chunked file with old chunking with lengthy filenames
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads the following chunks to "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" with old chunking and using the WebDAV API
       | number | content                   |
       | 1      | AAAAAAAAAAAAAAAAAAAAAAAAA |
@@ -134,10 +134,10 @@ Feature: upload file using old chunking
     And as "Alice" file "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" should exist
     And the content of file "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" for user "Alice" should be "AAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBCCCCCCCCCCCCCCCCCCCCCCCCC"
     Examples:
-      | dav_version |
-      | old         |
+      | dav-path-version |
+      | old              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

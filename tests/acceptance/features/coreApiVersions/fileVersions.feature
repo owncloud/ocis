@@ -369,7 +369,7 @@ Feature: dav-versions
 
 
   Scenario Outline: moving a file (with versions) into a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a share with settings
@@ -388,13 +388,13 @@ Feature: dav-versions
     And as "Brian" file "/testfile.txt" should not exist
     And the version folder of file "/Shares/testshare/testfile.txt" for user "Alice" should contain "2" elements
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: moving a file (with versions) out of a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data 1" to "/testshare/testfile.txt"
@@ -413,9 +413,9 @@ Feature: dav-versions
     And as "Brian" file "/testshare/testfile.txt" should not exist
     And the version folder of file "/testfile.txt" for user "Brian" should contain "2" elements
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario: sharee tries to get file versions of file not shared by the sharer

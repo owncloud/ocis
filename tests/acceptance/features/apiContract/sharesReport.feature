@@ -16,7 +16,7 @@ Feature: REPORT request to Shares space
 
 
   Scenario Outline: check the REPORT response of the found folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -29,13 +29,13 @@ Feature: REPORT request to Shares space
       | d:getcontenttype | httpd/unix-directory |
       | oc:permissions   | S                    |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: check the REPORT response of the found file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     And user "Alice" has uploaded file with content "Not all those who wander are lost." to "/folderMain/SubFolder1/subFOLDER2/frodo.txt"
     When user "Brian" searches for "frodo.txt" using the WebDAV API
@@ -50,17 +50,17 @@ Feature: REPORT request to Shares space
       | oc:permissions     | S                                      |
       | d:getcontentlength | 34                                     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: search for the shared folder when share is not accepted
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Brian" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

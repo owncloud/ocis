@@ -9,7 +9,7 @@ Feature: low level tests for upload of chunks
 
 
   Scenario Outline: upload a chunk twice
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                    |
       #    ZmlsZS50eHQ= is the base64 encode of file.txt
@@ -19,18 +19,18 @@ Feature: low level tests for upload of chunks
     Then the HTTP status code should be "409"
     And as "Alice" file "file.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: finalize file upload after uploading a chunk twice
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                    |
       #    ZmlsZS50eHQ= is the base64 encode of file.txt
@@ -41,18 +41,18 @@ Feature: low level tests for upload of chunks
     Then the HTTP status code should be "204"
     And the content of file "/file.txt" for user "Alice" should be "1234567890"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: send last chunk twice
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                    |
       #    ZmlsZS50eHQ= is the base64 encode of file.txt
@@ -63,18 +63,18 @@ Feature: low level tests for upload of chunks
     Then the HTTP status code should be "404"
     And the content of file "/file.txt" for user "Alice" should be "1234567890"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: start with uploading not at the beginning of the file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                    |
       #    ZmlsZS50eHQ= is the base64 encode of file.txt
@@ -83,11 +83,11 @@ Feature: low level tests for upload of chunks
     Then the HTTP status code should be "409"
     And as "Alice" file "file.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

@@ -9,7 +9,7 @@ Feature: Unlock locked items
 
 
   Scenario Outline: unlock one of multiple locks set by the user itself
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | shared |
@@ -19,14 +19,14 @@ Feature: Unlock locked items
     Then the HTTP status code should be "204"
     And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: public unlocking a file in a share that was locked by the file owner is not possible. To unlock use the owners locktoken
@@ -45,7 +45,7 @@ Feature: Unlock locked items
 
 
   Scenario Outline: unlocking a file or folder does not unlock another file with the same name in another part of the file system
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/locked/textfile0.txt"
     And user "Alice" has created folder "notlocked"
@@ -62,14 +62,14 @@ Feature: Unlock locked items
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "/textfile0.txt"
     But user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "/locked/textfile0.txt"
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |

@@ -15,56 +15,56 @@ Feature: create file or folder named similar to Shares folder
 
 
   Scenario Outline: create a folder with a name similar to Shares
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Brian" creates folder "<folder_name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "<folder_name>" should exist
     And as "Brian" folder "/Shares" should exist
     Examples:
-      | dav_version | folder_name |
-      | old         | /Share      |
-      | old         | /shares     |
-      | old         | /Shares1    |
-      | new         | /Share      |
-      | new         | /shares     |
-      | new         | /Shares1    |
+      | dav-path-version | folder_name |
+      | old              | /Share      |
+      | old              | /shares     |
+      | old              | /Shares1    |
+      | new              | /Share      |
+      | new              | /shares     |
+      | new              | /Shares1    |
 
 
   Scenario Outline: create a file with a name similar to Shares
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Brian" uploads file with content "some text" to "<file_name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "<file_name>" for user "Brian" should be "some text"
     And as "Brian" folder "/Shares" should exist
     Examples:
-      | dav_version | file_name |
-      | old         | /Share    |
-      | old         | /shares   |
-      | old         | /Shares1  |
-      | new         | /Share    |
-      | new         | /shares   |
-      | new         | /Shares1  |
+      | dav-path-version | file_name |
+      | old              | /Share    |
+      | old              | /shares   |
+      | old              | /Shares1  |
+      | new              | /Share    |
+      | new              | /shares   |
+      | new              | /Shares1  |
 
 
   Scenario Outline: try to create a folder named Shares
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Brian" creates folder "/Shares" using the WebDAV API
     Then the HTTP status code should be "405"
     And as "Brian" folder "/Shares" should exist
     And as "Brian" folder "/Shares/FOLDER" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: try to create a file named Shares
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Brian" uploads file with content "some text" to "/Shares" using the WebDAV API
     Then the HTTP status code should be "409"
     And as "Brian" folder "/Shares" should exist
     And as "Brian" folder "/Shares/FOLDER" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

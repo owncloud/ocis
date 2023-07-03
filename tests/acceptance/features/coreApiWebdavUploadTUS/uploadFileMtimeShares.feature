@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: upload file
   As a user
   I want the mtime of an uploaded file to be the creation date on upload source not the upload date
@@ -12,7 +12,7 @@ Feature: upload file
 
 
   Scenario Outline: upload file with mtime to a received share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
@@ -20,13 +20,13 @@ Feature: upload file
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: upload file with mtime to a send share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
@@ -34,13 +34,13 @@ Feature: upload file
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: overwriting a file with mtime in a received share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
@@ -49,13 +49,13 @@ Feature: upload file
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: overwriting a file with mtime in a send share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
@@ -64,6 +64,6 @@ Feature: upload file
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
