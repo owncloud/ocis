@@ -89,13 +89,11 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 	if len(assignedRoles) > 1 {
-		err := errors.New("too many roles assigned")
-		logger.Error().Err(err).Msg("The user has too many roles assigned")
-		return nil, err
+		logger.Error().Str("userID", user.GetId().GetOpaqueId()).Int("numRoles", len(assignedRoles)).Msg("The user has too many roles assigned")
 	}
 	logger.Debug().Interface("assignedRoleIds", assignedRoles).Msg("Currently assigned roles")
 
-	if len(assignedRoles) == 0 || (assignedRoles[0] != roleIDFromClaim) {
+	if len(assignedRoles) != 1 || (assignedRoles[0] != roleIDFromClaim) {
 		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleId", roleIDFromClaim).Msg("Updating role assignment for user")
 		newctx, err := ra.prepareAdminContext()
 		if err != nil {
