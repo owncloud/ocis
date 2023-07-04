@@ -30,7 +30,7 @@ Feature: propagation of etags when moving files or folders
       | dav_version |
       | spaces      |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: moving a file from one folder to an other changes the etags of both folders
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/src"
@@ -56,7 +56,7 @@ Feature: propagation of etags when moving files or folders
       | dav_version |
       | spaces      |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: moving a file into a subfolder changes the etags of all parents
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
@@ -105,7 +105,7 @@ Feature: propagation of etags when moving files or folders
       | dav_version |
       | spaces      |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: moving a folder from one folder to an other changes the etags of both folders
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/src"
@@ -131,7 +131,7 @@ Feature: propagation of etags when moving files or folders
       | dav_version |
       | spaces      |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: moving a folder into a subfolder changes the etags of all parents
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
@@ -211,7 +211,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
@@ -279,7 +279,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path

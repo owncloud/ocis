@@ -7,7 +7,7 @@ Feature: propagation of etags when creating folders
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: creating a folder inside a folder changes its etag
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/folder"
@@ -54,7 +54,7 @@ Feature: propagation of etags when creating folders
       | dav_version |
       | spaces      |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: sharee creating a folder inside a folder received as a share changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
@@ -80,7 +80,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
@@ -106,7 +106,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-  @issue-product-280
+  @issue-4251
   Scenario Outline: creating a folder in a publicly shared folder changes its etag for the sharer
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/folder"
