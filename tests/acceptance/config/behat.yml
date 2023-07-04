@@ -139,6 +139,7 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - OcisConfigContext:
+        - TagContext:
 
     apiCors:
       paths:
