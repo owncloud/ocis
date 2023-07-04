@@ -139,3 +139,13 @@ Feature: State of the quota
     When user "Brian" tries to create a space "new space" of type "project" with quota "51" using the Graph API
     Then the HTTP status code should be "400"
     And the user "Brian" should not have a space called "new space"
+
+
+  Scenario: user can restore a file version even if there is not enough quota to do so
+    Given user "Admin" has changed the quota of the "Alice Hansen" space to "30"
+    And user "Alice" has uploaded file with content "file is less than 30 bytes" to "/file.txt"
+    And user "Alice" has uploaded file with content "reduceContent" to "/file.txt"
+    And user "Alice" has uploaded file with content "some content" to "newFile.txt"
+    When user "Alice" restores version index "1" of file "/file.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "/file.txt" for user "Alice" should be "file is less than 30 bytes"

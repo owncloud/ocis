@@ -12,8 +12,6 @@ Feature: Restore files, folder
       | username |
       | Alice    |
       | Brian    |
-      | Bob      |
-      | Carol    |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "restore objects" with the default quota using the GraphApi
@@ -74,11 +72,44 @@ Feature: Restore files, folder
       | Brian | viewer  | 403  | should not           | should               |
 
 
-  Scenario: user can restore a file even if there is not enough quota to do so
-    Given user "Admin" has changed the quota of the "Brian Murphy" space to "30"
-    And user "Brian" has uploaded file with content "file is less than 30 bytes" to "/file.txt"
-    And user "Brian" has uploaded file with content "reduceContent" to "/file.txt"
-    And user "Brian" has uploaded file with content "some content" to "newFile.txt"
-    When user "Brian" restores version index "1" of file "/file.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And the content of file "/file.txt" for user "Brian" should be "file is less than 30 bytes"
+  Scenario Outline: only space manager can purge the trash via the webDav API
+    Given user "Alice" has shared a space "restore objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
+    When user "Brian" deletes the file "file.txt" from the trash of the space "restore objects"
+    Then the HTTP status code should be "<code>"
+    And as "Brian" file "file.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "restore objects"
+    Examples:
+      | role    | code | shouldOrNotBeInTrash |
+      | manager | 204  | should not           |
+      | editor  | 403  | should               |
+      | viewer  | 403  | should               |
+
+
+  Scenario Outline: admin user who is not a member of space cannot see its trash bin
+    Given user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    When user "Brian" with admin permission lists all deleted files in the trash bin of the space "restore objects"
+    Then the HTTP status code should be "404"
+    Examples:
+      | role        |
+      | Space Admin |
+      | Admin       |
+
+
+  Scenario Outline: admin user without space-manager role cannot purge the trash
+    Given user "Alice" has shared a space "restore objects" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
+    When user "Brian" tries to delete the file "file.txt" from the trash of the space "restore objects"
+    Then the HTTP status code should be "403"
+    And as "Alice" file "file.txt" should exist in the trashbin of the space "restore objects"
+    Examples:
+      | role        |
+      | Space Admin |
+      | Admin       |
+
