@@ -205,6 +205,24 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method finds the space of a user by name and returns the space id
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getSpaceIdByName(string $user, string $spaceName): string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		Assert::assertIsArray($space, "Space with name $spaceName not found");
+		if (!isset($space["id"])) {
+			throw new Exception(__METHOD__ . " space with name $spaceName not found in $space");
+		}
+		return $space["id"];
+	}
+
+	/**
 	 * This method sets space id by Space Name
 	 * This is currently used to set space id from ocis in core so that we can reuse available resource (code) and avoid duplication
 	 *
