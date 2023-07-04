@@ -24,6 +24,7 @@ ocis/cmd/ocis/config/
 
 # docs
 /hugo
+/docs/services/*/_index.md
 
 # IDEs
 .idea
