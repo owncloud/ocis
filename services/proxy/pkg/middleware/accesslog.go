@@ -13,12 +13,15 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
+			requestID := middleware.GetReqID(r.Context())
+			// add Request Id to all responses
+			w.Header().Set(middleware.RequestIDHeader, requestID)
 			wrap := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 			next.ServeHTTP(wrap, r)
 
 			logger.Info().
 				Str("proto", r.Proto).
-				Str(log.RequestIDString, middleware.GetReqID(r.Context())).
+				Str(log.RequestIDString, requestID).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).
