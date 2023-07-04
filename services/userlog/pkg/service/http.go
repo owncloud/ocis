@@ -110,22 +110,8 @@ func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	ul.sse.ServeHTTP(w, r)
 }
 
-// HandlePostEvent is the POST handler for events
-func (ul *UserlogService) HandlePostEvent(w http.ResponseWriter, r *http.Request) {
-	u, ok := ctx.ContextGetUser(r.Context())
-	if !ok {
-		ul.log.Error().Msg("post: no user in context")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	uid := u.GetId().GetOpaqueId()
-	if uid == "" {
-		ul.log.Error().Msg("post: user in context is broken")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+// HandlePostGlobaelEvent is the POST handler for global events
+func (ul *UserlogService) HandlePostGlobalEvent(w http.ResponseWriter, r *http.Request) {
 	var req PostEventsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
@@ -135,6 +121,24 @@ func (ul *UserlogService) HandlePostEvent(w http.ResponseWriter, r *http.Request
 
 	if err := ul.StoreGlobalEvent(req.Type, req.Data); err != nil {
 		ul.log.Error().Err(err).Msg("post: error storing global event")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// HandleDeleteGlobalEvent is the DELETE handler for global events
+func (ul *UserlogService) HandleDeleteGlobalEvent(w http.ResponseWriter, r *http.Request) {
+	var req DeleteEventsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := ul.DeleteGlobalEvents(req.IDs); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("delete events failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -197,12 +201,9 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.HandlerFu
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			u, ok := revactx.ContextGetUser(r.Context())
-			if !ok {
-				errorcode.AccessDenied.Render(w, r, http.StatusUnauthorized, "Unauthorized")
-				return
-			}
-			if u.Id == nil || u.Id.OpaqueId == "" {
-				errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is missing an id")
+			if !ok || u.GetId().GetOpaqueId() == "" {
+				logger.Error().Str("userid", u.Id.OpaqueId).Msg("user not in context")
+				errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
 				return
 			}
 			// get roles from context
@@ -213,11 +214,12 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.HandlerFu
 				roleIDs, err = rm.FindRoleIDsForUser(r.Context(), u.Id.OpaqueId)
 				if err != nil {
 					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to get roles for user")
-					errorcode.AccessDenied.Render(w, r, http.StatusUnauthorized, "Unauthorized")
+					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
 					return
 				}
 				if len(roleIDs) == 0 {
-					errorcode.AccessDenied.Render(w, r, http.StatusUnauthorized, "Unauthorized")
+					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("user has no roles")
+					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
 					return
 				}
 			}
@@ -228,7 +230,7 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.HandlerFu
 				return
 			}
 
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "Forbidden")
+			errorcode.AccessDenied.Render(w, r, http.StatusNotFound, "Forbidden")
 		}
 	}
 }

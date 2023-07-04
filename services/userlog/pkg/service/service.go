@@ -90,8 +90,9 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
-		r.Post("/", RequireAdmin(&m, ul.log)(ul.HandlePostEvent))
 		r.Delete("/", ul.HandleDeleteEvents)
+		r.Post("/global", RequireAdmin(&m, ul.log)(ul.HandlePostGlobalEvent))
+		r.Delete("/global", RequireAdmin(&m, ul.log)(ul.HandleDeleteGlobalEvent))
 
 		if !ul.cfg.DisableSSE {
 			r.Get("/sse", ul.HandleSSE)
@@ -266,11 +267,22 @@ func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) e
 			return fmt.Errorf("cannot parse time to format. time: '%s' format: '%s'", dps, format)
 		}
 
-		return ul.storeGlobalEvent(typ, DeprovisionData{
-			DeprovisionDate: date,
-		})
+		ev := DeprovisionData{
+			DeprovisionDate:   date,
+			DeprovisionFormat: format,
+		}
 
+		b, err := json.Marshal(ev)
+		if err != nil {
+			return err
+		}
+
+		return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+			evs[typ] = b
+			return nil
+		})
 	}
+
 }
 
 // GetGlobalEvents will return all global events
@@ -289,6 +301,16 @@ func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) 
 	}
 
 	return out, nil
+}
+
+// DeleteGlobalEvents will delete the specified event
+func (ul *UserlogService) DeleteGlobalEvents(evnames []string) error {
+	return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+		for _, name := range evnames {
+			delete(evs, name)
+		}
+		return nil
+	})
 }
 
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
@@ -368,18 +390,15 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 	})
 }
 
-func (ul *UserlogService) storeGlobalEvent(typ string, ev interface{}) error {
-	b, err := json.Marshal(ev)
-	if err != nil {
-		return err
-	}
-
+func (ul *UserlogService) alterGlobalEvents(alter func(map[string]json.RawMessage) error) error {
 	evs, err := ul.GetGlobalEvents()
 	if err != nil && err != store.ErrNotFound {
 		return err
 	}
 
-	evs[typ] = b
+	if err := alter(evs); err != nil {
+		return err
+	}
 
 	val, err := json.Marshal(evs)
 	if err != nil {
