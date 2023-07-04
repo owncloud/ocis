@@ -1,4 +1,4 @@
-@api @issue-product-280
+@api @issue-4251
 Feature: propagation of etags when restoring a version of a file
 
   Background:
