@@ -794,7 +794,7 @@ func (fs *owncloudsqlfs) CreateDir(ctx context.Context, ref *provider.Reference)
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *owncloudsqlfs) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool) error {
+func (fs *owncloudsqlfs) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
 	ip, err := fs.resolve(ctx, ref)
 	if err != nil {
 		return err
@@ -830,15 +830,25 @@ func (fs *owncloudsqlfs) TouchFile(ctx context.Context, ref *provider.Reference,
 	if err != nil {
 		return err
 	}
-	mtime := time.Now().Unix()
+	storageMtime := time.Now().Unix()
+	mt := storageMtime
+	if mtime != "" {
+		t, err := strconv.Atoi(mtime)
+		if err != nil {
+			log.Info().
+				Str("owncloudsql", ip).
+				Msg("error mtime conversion. mtine set to system time")
+		}
+		mt = time.Unix(int64(t), 0).Unix()
+	}
 
 	data := map[string]interface{}{
 		"path":          fs.toDatabasePath(ip),
 		"etag":          calcEtag(ctx, fi),
 		"mimetype":      mime.Detect(false, ip),
 		"permissions":   int(conversions.RoleFromResourcePermissions(parentPerms, false).OCSPermissions()), // inherit permissions of parent
-		"mtime":         mtime,
-		"storage_mtime": mtime,
+		"mtime":         mt,
+		"storage_mtime": storageMtime,
 	}
 	storageID, err := fs.getStorage(ctx, ip)
 	if err != nil {

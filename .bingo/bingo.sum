@@ -14,6 +14,7 @@ github.com/creack/pty v1.1.15/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/efficientgo/core v1.0.0-rc.0 h1:jJoA0N+C4/knWYVZ6GrdHOtDyrg8Y/TR4vFpTaqTsqs=
+github.com/efficientgo/core v1.0.0-rc.0/go.mod h1:kQa0V74HNYMfuJH6jiPiwNdpWXl4xd/K4tzlrcvYDQI=
 github.com/efficientgo/tools/core v0.0.0-20210201220623-8118984754c2 h1:GD19G/vhEa8amDJDBYcTaFXZjxKed67Ev0ZFPHdd/LQ=
 github.com/efficientgo/tools/core v0.0.0-20210201220623-8118984754c2/go.mod h1:cFZoHUhKg31xkPnPjhPKFtevnx0Xcg67ptBRxbpaxtk=
 github.com/efficientgo/tools/core v0.0.0-20220225185207-fe763185946b h1:ZHiD4/yE4idlbqvAO6iYCOYRzOMRpxkW+FKasRA3tsQ=

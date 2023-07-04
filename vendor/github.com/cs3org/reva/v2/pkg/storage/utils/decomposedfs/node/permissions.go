@@ -149,7 +149,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 			// continue with next segment
 		}
 
-		if cn, err = cn.Parent(); err != nil {
+		if cn, err = cn.Parent(ctx); err != nil {
 			// We get an error but get a parent, but can not read it from disk (eg. it has been deleted already)
 			if cn != nil {
 				return ap, errors.Wrap(err, "Decomposedfs: error getting parent for node "+cn.ID)

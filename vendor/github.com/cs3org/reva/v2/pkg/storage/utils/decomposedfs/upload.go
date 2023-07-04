@@ -196,7 +196,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 
 	log.Debug().Interface("info", info).Interface("node", n).Interface("metadata", metadata).Msg("Decomposedfs: resolved filename")
 
-	_, err = node.CheckQuota(n.SpaceRoot, n.Exists, uint64(n.Blobsize), uint64(info.Size))
+	_, err = node.CheckQuota(ctx, n.SpaceRoot, n.Exists, uint64(n.Blobsize), uint64(info.Size))
 	if err != nil {
 		return nil, err
 	}

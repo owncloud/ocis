@@ -19,6 +19,7 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -67,6 +68,7 @@ type Cache interface {
 type StatCache interface {
 	Cache
 	RemoveStat(userID *userpb.UserId, res *provider.ResourceId)
+	RemoveStatContext(ctx context.Context, userID *userpb.UserId, res *provider.ResourceId)
 	GetKey(userID *userpb.UserId, ref *provider.Reference, metaDataKeys, fieldMaskPaths []string) string
 }
 

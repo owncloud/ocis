@@ -88,7 +88,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	}
 
 	origin := ""
-	attrs, err := fs.lu.MetadataBackend().All(originalPath)
+	attrs, err := fs.lu.MetadataBackend().All(ctx, originalPath)
 	if err != nil {
 		return items, err
 	}
@@ -111,7 +111,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 		sublog.Error().Err(err).Msg("could not parse time format, ignoring")
 	}
 
-	nodeType := fs.lu.TypeFromPath(originalPath)
+	nodeType := fs.lu.TypeFromPath(ctx, originalPath)
 	if nodeType != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		// this is the case when we want to directly list a file in the trashbin
 		blobsize, err := strconv.ParseInt(string(attrs[prefixes.BlobsizeAttr]), 10, 64)
@@ -154,16 +154,16 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 
 		size := int64(0)
 
-		nodeType = fs.lu.TypeFromPath(resolvedChildPath)
+		nodeType = fs.lu.TypeFromPath(ctx, resolvedChildPath)
 		switch nodeType {
 		case provider.ResourceType_RESOURCE_TYPE_FILE:
-			size, err = fs.lu.ReadBlobSizeAttr(resolvedChildPath)
+			size, err = fs.lu.ReadBlobSizeAttr(ctx, resolvedChildPath)
 			if err != nil {
 				sublog.Error().Err(err).Str("name", name).Msg("invalid blob size, skipping")
 				continue
 			}
 		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
-			attr, err := fs.lu.MetadataBackend().Get(resolvedChildPath, prefixes.TreesizeAttr)
+			attr, err := fs.lu.MetadataBackend().Get(ctx, resolvedChildPath, prefixes.TreesizeAttr)
 			if err != nil {
 				sublog.Error().Err(err).Str("name", name).Msg("invalid tree size, skipping")
 				continue
@@ -235,13 +235,13 @@ func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*p
 			continue
 		}
 
-		attrs, err := fs.lu.MetadataBackend().All(nodePath)
+		attrs, err := fs.lu.MetadataBackend().All(ctx, nodePath)
 		if err != nil {
 			log.Error().Err(err).Str("trashRoot", trashRoot).Str("item", itemPath).Str("node_path", nodePath).Msg("could not get extended attributes, skipping")
 			continue
 		}
 
-		nodeType := fs.lu.TypeFromPath(nodePath)
+		nodeType := fs.lu.TypeFromPath(ctx, nodePath)
 		if nodeType == provider.ResourceType_RESOURCE_TYPE_INVALID {
 			log.Error().Err(err).Str("trashRoot", trashRoot).Str("item", itemPath).Str("node_path", nodePath).Msg("invalid node type, skipping")
 			continue

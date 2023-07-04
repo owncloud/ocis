@@ -129,7 +129,7 @@ func Cleanup(upload *Upload, failure bool, keepUpload bool) {
 
 	// unset processing status
 	if upload.Node != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
-		if err := upload.Node.UnmarkProcessing(upload.Info.ID); err != nil {
+		if err := upload.Node.UnmarkProcessing(upload.Ctx, upload.Info.ID); err != nil {
 			upload.log.Info().Str("path", upload.Node.InternalPath()).Err(err).Msg("unmarking processing failed")
 		}
 	}
@@ -370,7 +370,7 @@ func (upload *Upload) cleanup(cleanNode, cleanBin, cleanInfo bool) {
 			upload.Node = nil
 		default:
 
-			if err := upload.lu.CopyMetadata(p, upload.Node.InternalPath(), func(attributeName string) bool {
+			if err := upload.lu.CopyMetadata(upload.Ctx, p, upload.Node.InternalPath(), func(attributeName string) bool {
 				return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 					attributeName == prefixes.TypeAttr ||
 					attributeName == prefixes.BlobIDAttr ||

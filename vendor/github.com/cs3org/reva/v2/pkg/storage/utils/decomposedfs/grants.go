@@ -135,7 +135,7 @@ func (fs *Decomposedfs) ListGrants(ctx context.Context, ref *provider.Reference)
 	}
 	log := appctx.GetLogger(ctx)
 	var attrs node.Attributes
-	if attrs, err = grantNode.Xattrs(); err != nil {
+	if attrs, err = grantNode.Xattrs(ctx); err != nil {
 		log.Error().Err(err).Msg("error listing attributes")
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		attr = prefixes.GrantUserAcePrefix + g.Grantee.GetUserId().OpaqueId
 	}
 
-	if err = grantNode.RemoveXattr(attr); err != nil {
+	if err = grantNode.RemoveXattr(ctx, attr); err != nil {
 		return err
 	}
 
@@ -326,7 +326,7 @@ func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provide
 	// set the grant
 	e := ace.FromGrant(g)
 	principal, value := e.Marshal()
-	if err := n.SetXattr(prefixes.GrantPrefix+principal, value); err != nil {
+	if err := n.SetXattr(ctx, prefixes.GrantPrefix+principal, value); err != nil {
 		appctx.GetLogger(ctx).Error().Err(err).
 			Str("principal", principal).Msg("Could not set grant for principal")
 		return err

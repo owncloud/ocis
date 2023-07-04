@@ -21,6 +21,7 @@ package eosfs
 import (
 	"context"
 	"database/sql"
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -32,8 +33,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	b64 "encoding/base64"
 
 	"github.com/bluele/gcache"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -1673,7 +1672,7 @@ func (fs *eosfs) CreateDir(ctx context.Context, ref *provider.Reference) error {
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *eosfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool) error {
+func (fs *eosfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool, _ string) error {
 	log := appctx.GetLogger(ctx)
 
 	fn, auth, err := fs.resolveRefAndGetAuth(ctx, ref)

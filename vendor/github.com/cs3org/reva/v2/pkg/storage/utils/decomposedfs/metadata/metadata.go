@@ -19,9 +19,19 @@
 package metadata
 
 import (
+	"context"
 	"errors"
 	"io"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/metadata")
+}
 
 var errUnconfiguredError = errors.New("no metadata backend configured. Bailing out")
 
@@ -29,21 +39,21 @@ var errUnconfiguredError = errors.New("no metadata backend configured. Bailing o
 type Backend interface {
 	Name() string
 
-	All(path string) (map[string][]byte, error)
-	Get(path, key string) ([]byte, error)
+	All(ctx context.Context, path string) (map[string][]byte, error)
+	Get(ctx context.Context, path, key string) ([]byte, error)
 
-	GetInt64(path, key string) (int64, error)
-	List(path string) (attribs []string, err error)
-	Set(path, key string, val []byte) error
-	SetMultiple(path string, attribs map[string][]byte, acquireLock bool) error
-	Remove(path, key string) error
+	GetInt64(ctx context.Context, path, key string) (int64, error)
+	List(ctx context.Context, path string) (attribs []string, err error)
+	Set(ctx context.Context, path, key string, val []byte) error
+	SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) error
+	Remove(ctx context.Context, path, key string) error
 
 	Purge(path string) error
 	Rename(oldPath, newPath string) error
 	IsMetaFile(path string) bool
 	MetadataPath(path string) string
 
-	AllWithLockedSource(path string, source io.Reader) (map[string][]byte, error)
+	AllWithLockedSource(ctx context.Context, path string, source io.Reader) (map[string][]byte, error)
 }
 
 // NullBackend is the default stub backend, used to enforce the configuration of a proper backend
@@ -53,28 +63,40 @@ type NullBackend struct{}
 func (NullBackend) Name() string { return "null" }
 
 // All reads all extended attributes for a node
-func (NullBackend) All(path string) (map[string][]byte, error) { return nil, errUnconfiguredError }
+func (NullBackend) All(ctx context.Context, path string) (map[string][]byte, error) {
+	return nil, errUnconfiguredError
+}
 
 // Get an extended attribute value for the given key
-func (NullBackend) Get(path, key string) ([]byte, error) { return []byte{}, errUnconfiguredError }
+func (NullBackend) Get(ctx context.Context, path, key string) ([]byte, error) {
+	return []byte{}, errUnconfiguredError
+}
 
 // GetInt64 reads a string as int64 from the xattrs
-func (NullBackend) GetInt64(path, key string) (int64, error) { return 0, errUnconfiguredError }
+func (NullBackend) GetInt64(ctx context.Context, path, key string) (int64, error) {
+	return 0, errUnconfiguredError
+}
 
 // List retrieves a list of names of extended attributes associated with the
 // given path in the file system.
-func (NullBackend) List(path string) ([]string, error) { return nil, errUnconfiguredError }
+func (NullBackend) List(ctx context.Context, path string) ([]string, error) {
+	return nil, errUnconfiguredError
+}
 
 // Set sets one attribute for the given path
-func (NullBackend) Set(path string, key string, val []byte) error { return errUnconfiguredError }
+func (NullBackend) Set(ctx context.Context, path string, key string, val []byte) error {
+	return errUnconfiguredError
+}
 
 // SetMultiple sets a set of attribute for the given path
-func (NullBackend) SetMultiple(path string, attribs map[string][]byte, acquireLock bool) error {
+func (NullBackend) SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) error {
 	return errUnconfiguredError
 }
 
 // Remove removes an extended attribute key
-func (NullBackend) Remove(path string, key string) error { return errUnconfiguredError }
+func (NullBackend) Remove(ctx context.Context, path string, key string) error {
+	return errUnconfiguredError
+}
 
 // IsMetaFile returns whether the given path represents a meta file
 func (NullBackend) IsMetaFile(path string) bool { return false }
@@ -90,6 +112,6 @@ func (NullBackend) MetadataPath(path string) string { return "" }
 
 // AllWithLockedSource reads all extended attributes from the given reader
 // The path argument is used for storing the data in the cache
-func (NullBackend) AllWithLockedSource(path string, source io.Reader) (map[string][]byte, error) {
+func (NullBackend) AllWithLockedSource(ctx context.Context, path string, source io.Reader) (map[string][]byte, error) {
 	return nil, errUnconfiguredError
 }

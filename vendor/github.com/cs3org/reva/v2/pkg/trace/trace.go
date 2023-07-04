@@ -33,26 +33,24 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var (
 	// Propagator is the default Reva propagator.
 	Propagator      = propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
-	defaultProvider = revaDefaultTracerProvider{
-		provider: trace.NewNoopTracerProvider(),
-	}
+	defaultProvider = revaDefaultTracerProvider{}
 )
 
 type revaDefaultTracerProvider struct {
 	mutex       sync.RWMutex
 	initialized bool
-	provider    trace.TracerProvider
 }
 
 // NewTracerProvider returns a new TracerProvider, configure for the specified service
@@ -86,9 +84,7 @@ func NewTracerProvider(opts ...Option) trace.TracerProvider {
 
 // SetDefaultTracerProvider sets the default trace provider
 func SetDefaultTracerProvider(tp trace.TracerProvider) {
-	defaultProvider.mutex.Lock()
-	defer defaultProvider.mutex.Unlock()
-	defaultProvider.provider = tp
+	otel.SetTracerProvider(tp)
 	defaultProvider.initialized = true
 }
 
@@ -99,14 +95,13 @@ func InitDefaultTracerProvider(collector, endpoint string) {
 	defaultProvider.mutex.Lock()
 	defer defaultProvider.mutex.Unlock()
 	if !defaultProvider.initialized {
-		defaultProvider.provider = getJaegerTracerProvider(Options{
+		SetDefaultTracerProvider(getJaegerTracerProvider(Options{
 			Enabled:     true,
 			Collector:   collector,
 			Endpoint:    endpoint,
 			ServiceName: "reva default jaeger provider",
-		})
+		}))
 	}
-	defaultProvider.initialized = true
 }
 
 // DefaultProvider returns the "global" default TracerProvider
@@ -114,7 +109,7 @@ func InitDefaultTracerProvider(collector, endpoint string) {
 func DefaultProvider() trace.TracerProvider {
 	defaultProvider.mutex.RLock()
 	defer defaultProvider.mutex.RUnlock()
-	return defaultProvider.provider
+	return otel.GetTracerProvider()
 }
 
 // getJaegerTracerProvider returns a new TracerProvider, configure for the specified service

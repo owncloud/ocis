@@ -21,6 +21,7 @@ package runtime
 import (
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/registry"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -28,8 +29,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger   *zerolog.Logger
-	Registry registry.Registry
+	Logger        *zerolog.Logger
+	Registry      registry.Registry
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -54,5 +56,12 @@ func WithLogger(logger *zerolog.Logger) Option {
 func WithRegistry(r registry.Registry) Option {
 	return func(o *Options) {
 		o.Registry = r
+	}
+}
+
+// WithTraceProvider provides a function to set the trace provider.
+func WithTraceProvider(tp trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = tp
 	}
 }

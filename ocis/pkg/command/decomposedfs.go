@@ -113,7 +113,7 @@ func check(c *cli.Context) error {
 		})
 
 	treeSize, err := walkTree(ctx, tree, lu, n, repairFlag)
-	treesizeFromMetadata, err := n.GetTreeSize()
+	treesizeFromMetadata, err := n.GetTreeSize(c.Context)
 	if err != nil {
 		fmt.Printf("failed to read treesize of node: %s: %s\n", n.ID, err)
 	}
@@ -123,14 +123,14 @@ func check(c *cli.Context) error {
 		if repairFlag {
 			fmt.Printf("Fixing tree size for node: %s. Calculated treesize: %d\n",
 				n.ID, treeSize)
-			n.SetTreeSize(treeSize)
+			n.SetTreeSize(c.Context, treeSize)
 		}
 	}
 	return nil
 }
 
 func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *node.Node, repair bool) (uint64, error) {
-	if root.Type() != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+	if root.Type(ctx) != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		return 0, errors.New("can't travers non-container nodes")
 	}
 	children, err := tree.ListFolder(ctx, root)
@@ -141,14 +141,14 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 
 	var treesize uint64
 	for _, child := range children {
-		switch child.Type() {
+		switch child.Type(ctx) {
 		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
 			subtreesize, err := walkTree(ctx, tree, lu, child, repair)
 			if err != nil {
 				fmt.Printf("error calculating tree size of node: %s: %s\n", child.ID, err)
 				return 0, err
 			}
-			treesizeFromMetadata, err := child.GetTreeSize()
+			treesizeFromMetadata, err := child.GetTreeSize(ctx)
 			if err != nil {
 				fmt.Printf("failed to read tree size of node: %s: %s\n", child.ID, err)
 				return 0, err
@@ -163,19 +163,19 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 				if repair {
 					fmt.Printf("Fixing tree size for node: %s. Calculated treesize: %d\n",
 						child.ID, subtreesize)
-					child.SetTreeSize(subtreesize)
+					child.SetTreeSize(ctx, subtreesize)
 				}
 			}
 			treesize += subtreesize
 		case provider.ResourceType_RESOURCE_TYPE_FILE:
-			blobsize, err := child.GetBlobSize()
+			blobsize, err := child.GetBlobSize(ctx)
 			if err != nil {
 				fmt.Printf("error reading blobsize of node: %s: %s\n", child.ID, err)
 				return 0, err
 			}
 			treesize += blobsize
 		default:
-			fmt.Printf("Ignoring type: %v, node: %s %s\n", child.Type(), child.Name, child.ID)
+			fmt.Printf("Ignoring type: %v, node: %s %s\n", child.Type(ctx), child.Name, child.ID)
 		}
 	}
 
@@ -215,7 +215,7 @@ func dumpCmd(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			attribs, err := backend.All(path)
+			attribs, err := backend.All(c.Context, path)
 			if err != nil {
 				fmt.Println("Error reading attributes")
 				return err
@@ -244,7 +244,7 @@ func getCmd(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			attribs, err := backend.All(path)
+			attribs, err := backend.All(c.Context, path)
 			if err != nil {
 				fmt.Println("Error reading attributes")
 				return err
@@ -297,7 +297,7 @@ func setCmd(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			err = backend.Set(path, c.String("attribute"), []byte(v))
+			err = backend.Set(c.Context, path, c.String("attribute"), []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
@@ -359,7 +359,7 @@ func printAttribs(attribs map[string][]byte, onlyAttribute string) {
 	}
 
 	names := []string{}
-	for k, _ := range attribs {
+	for k := range attribs {
 		names = append(names, k)
 	}
 

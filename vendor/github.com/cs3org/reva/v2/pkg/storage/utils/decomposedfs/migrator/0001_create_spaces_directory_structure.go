@@ -19,6 +19,7 @@
 package migrator
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -48,7 +49,7 @@ func (m *Migrator) Migration0001() (Result, error) {
 		for _, n := range nodes {
 			nodePath := filepath.Join(nodesPath, n.Name())
 
-			attr, err := m.lu.MetadataBackend().Get(nodePath, prefixes.ParentidAttr)
+			attr, err := m.lu.MetadataBackend().Get(context.Background(), nodePath, prefixes.ParentidAttr)
 			if err == nil && string(attr) == node.RootID {
 				if err := m.moveNode(n.Name(), n.Name()); err != nil {
 					m.log.Error().Err(err).

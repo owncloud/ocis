@@ -130,7 +130,7 @@ func (s *svc) UpdateShare(ctx context.Context, req *collaboration.UpdateShareReq
 		}
 	}
 
-	s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), res.Share.ResourceId)
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), res.Share.ResourceId)
 	return res, nil
 }
 
@@ -213,7 +213,7 @@ func (s *svc) UpdateReceivedShare(ctx context.Context, req *collaboration.Update
 		}, nil
 	}
 
-	s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), req.Share.Share.ResourceId)
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Share.Share.ResourceId)
 	return c.UpdateReceivedShare(ctx, req)
 	/*
 		    TODO: Leftover from master merge. Do we need this?
@@ -504,7 +504,7 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 
 		switch status.Code {
 		case rpc.Code_CODE_OK:
-			s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
+			s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
 		case rpc.Code_CODE_UNIMPLEMENTED:
 			appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants not supported, ignoring")
 			rollBackFn(status)
@@ -548,7 +548,7 @@ func (s *svc) addSpaceShare(ctx context.Context, req *collaboration.CreateShareR
 
 	switch st.Code {
 	case rpc.Code_CODE_OK:
-		s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
+		s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
 		s.providerCache.RemoveListStorageProviders(req.ResourceInfo.Id)
 	case rpc.Code_CODE_UNIMPLEMENTED:
 		appctx.GetLogger(ctx).Debug().Interface("status", st).Interface("req", req).Msg("storing grants not supported, ignoring")
@@ -618,7 +618,7 @@ func (s *svc) removeShare(ctx context.Context, req *collaboration.RemoveShareReq
 		}
 	}
 
-	s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), share.ResourceId)
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), share.ResourceId)
 	return res, nil
 }
 
@@ -651,7 +651,7 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 			Status: removeGrantStatus,
 		}, err
 	}
-	s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), ref)
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), ref)
 	s.providerCache.RemoveListStorageProviders(ref)
 	return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
 }

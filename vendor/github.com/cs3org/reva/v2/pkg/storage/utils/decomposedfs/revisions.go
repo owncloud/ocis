@@ -85,7 +85,7 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 					Key:   n.ID + node.RevisionIDDelimiter + parts[1],
 					Mtime: uint64(mtime.Unix()),
 				}
-				blobSize, err := fs.lu.ReadBlobSizeAttr(items[i])
+				blobSize, err := fs.lu.ReadBlobSizeAttr(ctx, items[i])
 				if err != nil {
 					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("error reading blobsize xattr, using 0")
 				}
@@ -147,11 +147,11 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 
 	contentPath := fs.lu.InternalPath(spaceID, revisionKey)
 
-	blobid, err := fs.lu.ReadBlobIDAttr(contentPath)
+	blobid, err := fs.lu.ReadBlobIDAttr(ctx, contentPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob id of revision '%s' for node '%s'", n.ID, revisionKey)
 	}
-	blobsize, err := fs.lu.ReadBlobSizeAttr(contentPath)
+	blobsize, err := fs.lu.ReadBlobSizeAttr(ctx, contentPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob size of revision '%s' for node '%s'", n.ID, revisionKey)
 	}
@@ -230,7 +230,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 		}()
 
 		// copy blob metadata from node to new revision node
-		err = fs.lu.CopyMetadata(nodePath, newRevisionPath, func(attributeName string) bool {
+		err = fs.lu.CopyMetadata(ctx, nodePath, newRevisionPath, func(attributeName string) bool {
 			return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) || // for checksums
 				attributeName == prefixes.TypeAttr ||
 				attributeName == prefixes.BlobIDAttr ||
@@ -249,7 +249,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 
 		// copy blob metadata from restored revision to node
 		restoredRevisionPath := fs.lu.InternalPath(spaceID, revisionKey)
-		err = fs.lu.CopyMetadata(restoredRevisionPath, nodePath, func(attributeName string) bool {
+		err = fs.lu.CopyMetadata(ctx, restoredRevisionPath, nodePath, func(attributeName string) bool {
 			return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 				attributeName == prefixes.TypeAttr ||
 				attributeName == prefixes.BlobIDAttr ||
@@ -259,7 +259,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 			return errtypes.InternalError("failed to copy blob xattrs to old revision to node")
 		}
 
-		revisionSize, err := fs.lu.MetadataBackend().GetInt64(restoredRevisionPath, prefixes.BlobsizeAttr)
+		revisionSize, err := fs.lu.MetadataBackend().GetInt64(ctx, restoredRevisionPath, prefixes.BlobsizeAttr)
 		if err != nil {
 			return errtypes.InternalError("failed to read blob size xattr from old revision")
 		}

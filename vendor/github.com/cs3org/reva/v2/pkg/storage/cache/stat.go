@@ -19,6 +19,7 @@
 package cache
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"time"
@@ -26,7 +27,17 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
+}
 
 // NewStatCache creates a new StatCache
 func NewStatCache(store string, nodes []string, database, table string, ttl time.Duration, size int) StatCache {
@@ -42,12 +53,21 @@ type statCache struct {
 	cacheStore
 }
 
-// RemoveStat removes a reference from the stat cache
-func (c statCache) RemoveStat(userID *userpb.UserId, res *provider.ResourceId) {
+func (c statCache) RemoveStatContext(ctx context.Context, userID *userpb.UserId, res *provider.ResourceId) {
+	_, span := tracer.Start(ctx, "RemoveStatContext")
+	defer span.End()
+
+	span.SetAttributes(semconv.EnduserIDKey.String(userID.GetOpaqueId()))
+
 	uid := "uid:" + userID.GetOpaqueId()
 	sid := ""
 	oid := ""
+
 	if res != nil {
+		span.SetAttributes(
+			attribute.String("space.id", res.SpaceId),
+			attribute.String("node.id", res.OpaqueId),
+		)
 		sid = "sid:" + res.SpaceId
 		oid = "oid:" + res.OpaqueId
 	}
@@ -73,6 +93,11 @@ func (c statCache) RemoveStat(userID *userpb.UserId, res *provider.ResourceId) {
 	}
 
 	wg.Wait()
+}
+
+// RemoveStatContext(ctx,  removes a reference from the stat cache
+func (c statCache) RemoveStat(userID *userpb.UserId, res *provider.ResourceId) {
+	c.RemoveStatContext(context.Background(), userID, res)
 }
 
 // generates a user specific key pointing to ref - used for statcache
