@@ -21,16 +21,16 @@ Feature: PROPFIND
     When user "Alice" requests "<dav_path>" with "PROPFIND" using basic auth and with headers
       | header | value   |
       | depth  | <depth> |
-    Then the HTTP status code should be "<http_status>"
+    Then the HTTP status code should be "207"
     Examples:
-      | dav_path                    | depth    | http_status |
-      | /remote.php/dav/files/alice | 0        | 207         |
-      | /remote.php/dav/files/alice | infinity | 207         |
+      | dav_path                    | depth    |
+      | /remote.php/dav/files/alice | 0        |
+      | /remote.php/dav/files/alice | infinity |
     @skipOnRevaMaster
     Examples:
-      | dav_path                         | depth    | http_status |
-      | /remote.php/dav/spaces/%spaceid% | 0        | 207         |
-      | /remote.php/dav/spaces/%spaceid% | infinity | 207         |
+      | dav_path                         | depth    |
+      | /remote.php/dav/spaces/%spaceid% | 0        |
+      | /remote.php/dav/spaces/%spaceid% | infinity |
 
 
   Scenario: send PROPFIND request to a public link

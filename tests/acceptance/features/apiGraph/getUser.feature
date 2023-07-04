@@ -90,7 +90,7 @@ Feature: get users
       | User        | Admin       |
       | User Light  | Space Admin |
       | User Light  | User        |
-      | User Light  | User Light       |
+      | User Light  | User Light  |
       | User Light  | Admin       |
 
   @skipOnStable2.0

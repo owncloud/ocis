@@ -46,19 +46,16 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: orphaned shares
+  Scenario: orphaned shares
     Given using OCS API version "1"
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
     And user "Alice" has shared folder "/common/sub" with user "Brian"
-    And user "Brian" has accepted share "<pending_share_path>" offered by user "Alice"
+    And user "Brian" has accepted share "/sub" offered by user "Alice"
     When user "Alice" deletes folder "/common" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" folder "/Shares/sub" should not exist
     And as "Brian" folder "/sub" should not exist
-    Examples:
-      | pending_share_path |
-      | /sub               |
 
   @smokeTest
   Scenario: deleting a file out of a share as recipient creates a backup for the owner
@@ -92,7 +89,7 @@ Feature: sharing
     And as "Brian" file "/sub/shared_file.txt" should exist in the trashbin
 
   @smokeTest
-  Scenario Outline: unshare from self
+  Scenario: unshare from self
     And group "grp1" has been created
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -102,7 +99,7 @@ Feature: sharing
     And user "Carol" has created folder "PARENT"
     And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "Carol" has shared file "/PARENT/parent.txt" with group "grp1"
-    And user "Brian" has accepted share "<pending_share_path>" offered by user "Carol"
+    And user "Brian" has accepted share "/parent.txt" offered by user "Carol"
     And user "Carol" has stored etag of element "/PARENT"
     And user "Brian" has stored etag of element "/"
     And user "Brian" has stored etag of element "/Shares"
@@ -111,9 +108,6 @@ Feature: sharing
     And the etag of element "/" of user "Brian" should have changed
     And the etag of element "/Shares" of user "Brian" should have changed
     And the etag of element "/PARENT" of user "Carol" should not have changed
-    Examples:
-      | pending_share_path |
-      | /parent.txt        |
 
 
   Scenario: sharee of a read-only share folder tries to delete the shared folder
@@ -220,12 +214,12 @@ Feature: sharing
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" tries to delete the last share of user "Alice" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "404"
     And the HTTP status code should be "<http_status_code>"
     Examples:
-      | ocs_api_version | ocs_status_code | http_status_code |
-      | 1               | 404             | 200              |
-      | 2               | 404             | 404              |
+      | ocs_api_version | http_status_code |
+      | 1               | 200              |
+      | 2               | 404              |
 
 
   Scenario Outline: unshare a shared resources
@@ -234,9 +228,9 @@ Feature: sharing
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Alice" unshares file "textfile0.txt" shared to "Brian"
     Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "200"
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     Examples:
-      | ocs_api_version | ocs_status_code | http_status_code |
-      | 1               | 100             | 200              |
-      | 2               | 200             | 200              |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
