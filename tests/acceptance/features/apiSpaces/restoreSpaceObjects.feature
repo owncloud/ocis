@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Restore files, folder
   As a user with manager and editor role
   I want to be able to restore files, folders
@@ -27,15 +27,15 @@ Feature: Restore files, folder
       | role      | <role> |
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     And user "Alice" has removed the folder "newFolder" from space "restore objects"
-    When user "<user>" lists all deleted files in the trash bin of the space "restore objects"
+    When user "Brian" lists all deleted files in the trash bin of the space "restore objects"
     Then the HTTP status code should be "207"
-    And as "<user>" folder "newFolder" should exist in the trashbin of the space "restore objects"
-    And as "<user>" file "file.txt" should exist in the trashbin of the space "restore objects"
+    And as "Brian" folder "newFolder" should exist in the trashbin of the space "restore objects"
+    And as "Brian" file "file.txt" should exist in the trashbin of the space "restore objects"
     Examples:
-      | user  | role    |
-      | Brian | manager |
-      | Brian | editor  |
-      | Brian | viewer  |
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
 
 
   Scenario Outline: user can restore a folder with some objects from the trash via the webDav API

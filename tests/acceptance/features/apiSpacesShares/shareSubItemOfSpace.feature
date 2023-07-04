@@ -74,15 +74,15 @@ Feature: Share a file or folder that is inside a space
       | path      | <entity> |
       | shareWith | Bob      |
       | role      | editor   |
-    Then the HTTP status code should be "<statusCode>"
-    And the OCS status code should be "<statusCode>"
-    And the OCS status message should be "<statusMessage>"
+    Then the HTTP status code should be "404"
+    And the OCS status code should be "404"
+    And the OCS status message should be "No share permission"
     Examples:
-      | entity   | spaceRole | statusCode | statusMessage       |
-      | folder   | editor    | 404        | No share permission |
-      | file.txt | editor    | 404        | No share permission |
-      | file.txt | viewer    | 404        | No share permission |
-      | folder   | viewer    | 404        | No share permission |
+      | entity   | spaceRole |
+      | folder   | editor    |
+      | file.txt | editor    |
+      | file.txt | viewer    |
+      | folder   | viewer    |
 
 
   Scenario Outline: user participant of the project space can see the created resources share

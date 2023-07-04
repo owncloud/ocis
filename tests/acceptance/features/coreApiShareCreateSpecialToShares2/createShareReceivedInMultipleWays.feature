@@ -25,7 +25,7 @@ Feature: share resources where the sharee receives the share in multiple ways
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
       | share_with             | %username%                |
       | share_with_displayname | %displayname%             |
-      | file_target            | <file_target>             |
+      | file_target            | /textfile0 (2).txt        |
       | path                   | /Shares/textfile0 (2).txt |
       | permissions            | share,read,update         |
       | uid_owner              | %username%                |
@@ -35,9 +35,9 @@ Feature: share resources where the sharee receives the share in multiple ways
       | storage_id             | ANY_VALUE                 |
       | share_type             | user                      |
     Examples:
-      | ocs_api_version | ocs_status_code | file_target        |
-      | 1               | 100             | /textfile0 (2).txt |
-      | 2               | 200             | /textfile0 (2).txt |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
   @issue-1289
   Scenario Outline: share of folder and sub-folder to same user
@@ -53,16 +53,16 @@ Feature: share resources where the sharee receives the share in multiple ways
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Brian" should be able to accept pending share "/PARENT" offered by user "Alice"
-    And user "Brian" should be able to accept pending share "<pending_sub_share_path>" offered by user "Alice"
+    And user "Brian" should be able to accept pending share "/CHILD" offered by user "Alice"
     And user "Brian" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
       | /Shares/CHILD/            |
       | /Shares/CHILD/child.txt   |
     Examples:
-      | ocs_api_version | ocs_status_code | pending_sub_share_path |
-      | 1               | 100             | /CHILD                 |
-      | 2               | 200             | /CHILD                 |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
   @issue-2021
   Scenario Outline: sharing subfolder when parent already shared
@@ -74,12 +74,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     When user "Alice" shares folder "/test/sub" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Brian" should be able to accept pending share "<pending_share_path>" offered by user "Alice"
+    And user "Brian" should be able to accept pending share "/sub" offered by user "Alice"
     And as "Brian" folder "/Shares/sub" should exist
     Examples:
-      | ocs_api_version | ocs_status_code | pending_share_path |
-      | 1               | 100             | /sub               |
-      | 2               | 200             | /sub               |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
   @issue-2021
   Scenario Outline: sharing subfolder when parent already shared with group of sharer
@@ -92,14 +92,14 @@ Feature: share resources where the sharee receives the share in multiple ways
     When user "Alice" shares folder "/test/sub" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Brian" should be able to accept pending share "<pending_share_path>" offered by user "Alice"
+    And user "Brian" should be able to accept pending share "/sub" offered by user "Alice"
     And as "Brian" folder "/Shares/sub" should exist
     Examples:
-      | ocs_api_version | ocs_status_code | pending_share_path |
-      | 1               | 100             | /sub               |
-      | 2               | 200             | /sub               |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
-
+  @issue-2131
   Scenario Outline: multiple users share a file with the same name but different permissions to a user
     Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -110,27 +110,25 @@ Feature: share resources where the sharee receives the share in multiple ways
     Then as "Alice" the info about the last share by user "Brian" with user "Alice" should include
       | uid_owner   | %username%      |
       | share_with  | %username%      |
-      | file_target | <file_target_1> |
+      | file_target | /randomfile.txt |
       | item_type   | file            |
       | permissions | read            |
     When user "Carol" shares file "randomfile.txt" with user "Alice" with permissions "read,update" using the sharing API
     And user "Alice" accepts share "/randomfile.txt" offered by user "Carol" using the sharing API
     Then as "Alice" the info about the last share by user "Carol" with user "Alice" should include
-      | uid_owner   | %username%      |
-      | share_with  | %username%      |
-      | file_target | <file_target_2> |
-      | item_type   | file            |
-      | permissions | read,update     |
+      | uid_owner   | %username%          |
+      | share_with  | %username%          |
+      | file_target | /randomfile (2).txt |
+      | item_type   | file                |
+      | permissions | read,update         |
     And the content of file "/Shares/randomfile.txt" for user "Alice" should be "First data"
     And the content of file "/Shares/randomfile (2).txt" for user "Alice" should be "Second data"
-
-    @issue-2131
     Examples:
-      | ocs_api_version | file_target_1   | file_target_2       |
-      | 1               | /randomfile.txt | /randomfile (2).txt |
-      | 2               | /randomfile.txt | /randomfile (2).txt |
+      | ocs_api_version |
+      | 1               |
+      | 2               |
 
-
+  @issue-2131
   Scenario Outline: multiple users share a folder with the same name to a user
     Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -141,31 +139,29 @@ Feature: share resources where the sharee receives the share in multiple ways
     When user "Brian" shares folder "zzzfolder" with user "Alice" with permissions "read,delete" using the sharing API
     And user "Alice" accepts share "/zzzfolder" offered by user "Brian" using the sharing API
     Then as "Alice" the info about the last share by user "Brian" with user "Alice" should include
-      | uid_owner   | %username%      |
-      | share_with  | %username%      |
-      | file_target | <file_target_1> |
-      | item_type   | folder          |
-      | permissions | read,delete     |
+      | uid_owner   | %username%  |
+      | share_with  | %username%  |
+      | file_target | /zzzfolder  |
+      | item_type   | folder      |
+      | permissions | read,delete |
     When user "Carol" shares folder "zzzfolder" with user "Alice" with permissions "read,share" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs_status_code>"
     And user "Alice" should be able to accept pending share "/zzzfolder" offered by user "Carol"
     Then as "Alice" the info about the last share by user "Carol" with user "Alice" should include
-      | uid_owner   | %username%      |
-      | share_with  | %username%      |
-      | file_target | <file_target_2> |
-      | item_type   | folder          |
-      | permissions | read,share      |
+      | uid_owner   | %username%     |
+      | share_with  | %username%     |
+      | file_target | /zzzfolder (2) |
+      | item_type   | folder         |
+      | permissions | read,share     |
     And as "Alice" folder "/Shares/zzzfolder/Brian" should exist
     And as "Alice" folder "/Shares/zzzfolder (2)/Carol" should exist
-
-    @issue-2131
     Examples:
-      | ocs_api_version | file_target_1 | file_target_2  | ocs_status_code |
-      | 1               | /zzzfolder    | /zzzfolder (2) | 100             |
-      | 2               | /zzzfolder    | /zzzfolder (2) | 200             |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
- @skipOnGraph
+  @skipOnGraph
   Scenario Outline: share with a group and then add a user to that group that already has a file with the shared name
     Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -192,8 +188,8 @@ Feature: share resources where the sharee receives the share in multiple ways
       | 1               | 100             |
       | 2               | 200             |
 
-
-  Scenario Outline: sharing parent folder to user with all permissions and its child folder to group with read permission then check create operation
+  @issue-2440
+  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check create operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -214,20 +210,16 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith   | grp1           |
       | permissions | read           |
     When user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
-    And user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
-    And user "Alice" accepts share "<path>" offered by user "Carol" using the sharing API
+    And user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
+    And user "Alice" accepts share "/child1" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
     And user "Brian" should be able to create folder "/Shares/parent/fo1"
     And user "Brian" should be able to create folder "/Shares/parent/child1/fo2"
     And user "Alice" should not be able to create folder "/Shares/child1/fo3"
-    @issue-2440
-    Examples:
-      | path    |
-      | /child1 |
 
-
-  Scenario Outline: sharing parent folder to user with all permissions and its child folder to group with read permission then check rename operation
+  @issue-2440
+  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check rename operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -249,20 +241,16 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith   | grp1           |
       | permissions | read           |
     When user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
-    And user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
-    And user "Alice" accepts share "<path>" offered by user "Carol" using the sharing API
+    And user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
+    And user "Alice" accepts share "/child1" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
     And user "Brian" should be able to rename file "/Shares/parent/child1/child2/textfile-2.txt" to "/Shares/parent/child1/child2/rename.txt"
     And user "Brian" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
     And user "Alice" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
-    @issue-2440
-    Examples:
-      | path    |
-      | /child1 |
 
-
-  Scenario Outline: sharing parent folder to user with all permissions and its child folder to group with read permission then check delete operation
+  @issue-2440
+  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check delete operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -284,20 +272,16 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith   | grp1           |
       | permissions | read           |
     When user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
-    And user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
-    And user "Alice" accepts share "<path>" offered by user "Carol" using the sharing API
+    And user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
+    And user "Alice" accepts share "/child1" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
     And user "Brian" should be able to delete file "/Shares/parent/child1/child2/textfile-2.txt"
     And user "Brian" should not be able to delete folder "/Shares/child1/child2"
     And user "Alice" should not be able to delete folder "/Shares/child1/child2"
-    @issue-2440
-    Examples:
-      | path    |
-      | /child1 |
 
 
-  Scenario Outline: sharing parent folder to user with all permissions and its child folder to group with read permission then check reshare operation
+  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check reshare operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -318,8 +302,8 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith   | grp1           |
       | permissions | read           |
     And user "Brian" has accepted share "/parent" offered by user "Carol"
-    And user "Brian" has accepted share "<path>" offered by user "Carol"
-    And user "Alice" has accepted share "<path>" offered by user "Carol"
+    And user "Brian" has accepted share "/child1" offered by user "Carol"
+    And user "Alice" has accepted share "/child1" offered by user "Carol"
     When user "Brian" creates a share using the sharing API with settings
       | path        | /Shares/parent |
       | shareType   | user           |
@@ -331,12 +315,9 @@ Feature: share resources where the sharee receives the share in multiple ways
     And as "Brian" folder "/Shares/child1" should exist
     And as "Alice" folder "/Shares/child1" should exist
     And as "Alice" folder "/Shares/parent" should exist
-    Examples:
-      | path    |
-      | /child1 |
 
 
-  Scenario Outline: sharing parent folder to group with read permission and its child folder to user with all permissions then check create operation
+  Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check create operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -356,7 +337,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType   | user           |
       | shareWith   | Brian          |
       | permissions | all            |
-    When user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
+    When user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
     And user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
     And user "Alice" accepts share "/parent" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
@@ -366,12 +347,9 @@ Feature: share resources where the sharee receives the share in multiple ways
     But user "Brian" should not be able to create folder "/Shares/parent/fo3"
     And user "Brian" should not be able to create folder "/Shares/parent/fo3"
     And user "Alice" should not be able to create folder "/Shares/parent/fo3"
-    Examples:
-      | path    |
-      | /child1 |
 
-
-  Scenario Outline: sharing parent folder to group with read permission and its child folder to user with all permissions then check rename operation
+  @issue-2440
+  Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check rename operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -392,7 +370,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType   | user           |
       | shareWith   | Brian          |
       | permissions | all            |
-    When user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
+    When user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
     And user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
     And user "Alice" accepts share "/parent" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
@@ -400,13 +378,9 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Brian" should be able to rename file "/Shares/child1/child2/textfile-2.txt" to "/Shares/child1/child2/rename.txt"
     And user "Brian" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
     And user "Alice" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
-    @issue-2440
-    Examples:
-      | path    |
-      | /child1 |
 
-
-  Scenario Outline: sharing parent folder to group with read permission and its child folder to user with all permissions then check delete operation
+  @issue-2440
+  Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check delete operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -427,7 +401,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType   | user           |
       | shareWith   | Brian          |
       | permissions | all            |
-    When user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
+    When user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
     And user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
     And user "Alice" accepts share "/parent" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
@@ -435,13 +409,9 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Brian" should be able to delete file "/Shares/child1/child2/textfile-2.txt"
     And user "Brian" should not be able to delete folder "/Shares/parent/child1"
     And user "Alice" should not be able to delete folder "/Shares/parent/child1"
-    @issue-2440
-    Examples:
-      | path    |
-      | /child1 |
 
 
-  Scenario Outline: sharing parent folder to group with read permission and its child folder to user with all permissions then check reshare operation
+  Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check reshare operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
@@ -461,22 +431,19 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType   | user           |
       | shareWith   | Brian          |
       | permissions | all            |
-    When user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
+    When user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
     And user "Brian" accepts share "/parent" offered by user "Carol" using the sharing API
     And user "Alice" accepts share "/parent" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
     And user "Brian" should be able to share folder "/Shares/child1" with user "Alice" with permissions "read" using the sharing API
-    And user "Alice" should be able to accept pending share "<path>" offered by user "Brian"
+    And user "Alice" should be able to accept pending share "/child1" offered by user "Brian"
     And as "Brian" folder "/Shares/parent" should exist
     And as "Alice" folder "/Shares/parent" should exist
     And as "Alice" folder "/Shares/child1" should exist
-    Examples:
-      | path    |
-      | /child1 |
 
 
-  Scenario Outline: sharing parent folder to one group with all permissions and its child folder to another group with read permission
+  Scenario: sharing parent folder to one group with all permissions and its child folder to another group with read permission
     Given these groups have been created:
       | groupname |
       | grp1      |
@@ -502,7 +469,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith   | grp2           |
       | permissions | read           |
     When user "Alice" accepts share "/parent" offered by user "Carol" using the sharing API
-    And user "Brian" accepts share "<path>" offered by user "Carol" using the sharing API
+    And user "Brian" accepts share "/child1" offered by user "Carol" using the sharing API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
     And user "Alice" should be able to create folder "/Shares/parent/child1/fo1"
@@ -516,9 +483,6 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Brian" should not be able to create folder "/Shares/child1/child2/fo2"
     And user "Brian" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
     And user "Brian" should not be able to share folder "/Shares/child1" with group "grp3" with permissions "read" using the sharing API
-    Examples:
-      | path    |
-      | /child1 |
 
 
   Scenario Outline: share receiver renames the received group share and shares same folder through user share again

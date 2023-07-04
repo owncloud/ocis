@@ -113,7 +113,7 @@ Feature: sharing
   Scenario Outline: user is not allowed to reshare file and set more permissions bits
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions <received_permissions>
+    And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions 17
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "404"
@@ -122,21 +122,21 @@ Feature: sharing
     And the sharing API should report to user "Carol" that no shares are in the pending state
     But as "Brian" file "/Shares/textfile0.txt" should exist
     Examples:
-      | ocs_api_version | http_status_code | received_permissions | reshare_permissions |
+      | ocs_api_version | http_status_code | reshare_permissions |
       # passing on more bits including reshare
-      | 1               | 200              | 17                   | 19                  |
-      | 2               | 404              | 17                   | 19                  |
-      | 1               | 200              | 17                   | 23                  |
-      | 2               | 404              | 17                   | 23                  |
-      | 1               | 200              | 17                   | 31                  |
-      | 2               | 404              | 17                   | 31                  |
+      | 1               | 200              | 19                  |
+      | 2               | 404              | 19                  |
+      | 1               | 200              | 23                  |
+      | 2               | 404              | 23                  |
+      | 1               | 200              | 31                  |
+      | 2               | 404              | 31                  |
       # passing on more bits but not reshare
-      | 1               | 200              | 17                   | 3                   |
-      | 2               | 404              | 17                   | 3                   |
-      | 1               | 200              | 17                   | 7                   |
-      | 2               | 404              | 17                   | 7                   |
-      | 1               | 200              | 17                   | 15                  |
-      | 2               | 404              | 17                   | 15                  |
+      | 1               | 200              | 3                   |
+      | 2               | 404              | 3                   |
+      | 1               | 200              | 7                   |
+      | 2               | 404              | 7                   |
+      | 1               | 200              | 15                  |
+      | 2               | 404              | 15                  |
 
 
   Scenario Outline: user is allowed to reshare file and set create (4) or delete (8) permissions bits, which get ignored

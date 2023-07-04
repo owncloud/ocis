@@ -51,14 +51,14 @@ Feature: COPY file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "403"
 
- @skipOnRevaMaster
- Scenario: send COPY requests to another user's webDav endpoints as normal user using the spaces WebDAV API
-   When user "Brian" requests these endpoints with "COPY" about user "Alice"
-     | endpoint                                           |
-     | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
-     | /remote.php/dav/spaces/%spaceid%/PARENT            |
-     | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
-   Then the HTTP status code of responses on all endpoints should be "403"
+  @skipOnRevaMaster
+  Scenario: send COPY requests to another user's webDav endpoints as normal user using the spaces WebDAV API
+    When user "Brian" requests these endpoints with "COPY" about user "Alice"
+      | endpoint                                           |
+      | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
+      | /remote.php/dav/spaces/%spaceid%/PARENT            |
+      | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
+    Then the HTTP status code of responses on all endpoints should be "403"
 
 
   Scenario: send COPY requests to webDav endpoints using invalid username but correct password
@@ -114,7 +114,7 @@ Feature: COPY file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "415"
 
- @skipOnRevaMaster
+  @skipOnRevaMaster
   Scenario: send COPY requests to webDav endpoints with body as normal user using the spaces WebDAV API
     When user "Alice" requests these endpoints with "COPY" including body "doesnotmatter" about user "Alice"
       | endpoint                                           |
