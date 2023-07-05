@@ -333,7 +333,7 @@ def cachePipeline(name, steps):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/tags/**",
                 "refs/pull/**",
             ],
@@ -418,7 +418,7 @@ def getGoBinForTesting(ctx):
                  cacheGoBin(),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -561,7 +561,7 @@ def testOcisModule(ctx, module):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/tags/%s/v*" % (module),
                 "refs/pull/**",
             ],
@@ -586,7 +586,7 @@ def buildOcisBinaryForTesting(ctx):
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -680,7 +680,7 @@ def uploadScanResults(ctx):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -769,7 +769,7 @@ def codestyle(ctx):
                 "depends_on": [],
                 "trigger": {
                     "ref": [
-                        "refs/heads/stable-*",
+                        "refs/heads/education-*",
                         "refs/pull/**",
                         "refs/tags/**",
                     ],
@@ -824,7 +824,7 @@ def localApiTestPipeline(ctx):
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
                                 "ref": [
-                                    "refs/heads/stable-*",
+                                    "refs/heads/education-*",
                                     "refs/pull/**",
                                 ],
                             },
@@ -890,7 +890,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -993,7 +993,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -1043,7 +1043,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -1161,7 +1161,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -1170,7 +1170,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
 def e2eTests(ctx):
     e2e_trigger = {
         "ref": [
-            "refs/heads/stable-*",
+            "refs/heads/education-*",
             "refs/tags/**",
             "refs/pull/**",
         ],
@@ -1735,7 +1735,7 @@ def licenseCheck(ctx):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -1881,7 +1881,7 @@ def changelog():
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -2003,7 +2003,7 @@ def docs():
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
@@ -2076,7 +2076,7 @@ def notify():
         "depends_on": [],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/heads/release*",
                 "refs/tags/**",
             ],
@@ -2510,7 +2510,7 @@ def genericCachePurge(flush_path):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
             "status": [
@@ -2762,7 +2762,7 @@ def litmus(ctx, storage):
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
+                "refs/heads/education-*",
                 "refs/pull/**",
             ],
         },
