@@ -231,6 +231,7 @@ class TrashbinContext implements Context {
 			'trash-bin',
 			$davPathVersion
 		);
+		$this->featureContext->setResponse($response);
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__ . " $collectionPath"
@@ -714,10 +715,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	private function isInTrash(?string $user, ?string $originalPath):bool {
-		$res = $this->featureContext->getResponse();
 		$listing = $this->listTrashbinFolder($user);
-
-		$this->featureContext->setResponse($res);
 
 		// we don't care if the test step writes a leading "/" or not
 		$originalPath = \ltrim($originalPath, '/');
@@ -981,8 +979,11 @@ class TrashbinContext implements Context {
 		?string $originalPath
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
+		$result = $this->isInTrash($user, $originalPath);
+		$actualStatus = $this->featureContext->getResponse()->getStatusCode();
+		Assert::assertEquals(207, $actualStatus, "Expected status code to be '207', but got '$actualStatus'");
 		Assert::assertTrue(
-			$this->isInTrash($user, $originalPath),
+			$result,
 			"File previously located at $originalPath wasn't found in the trashbin of user $user"
 		);
 	}
