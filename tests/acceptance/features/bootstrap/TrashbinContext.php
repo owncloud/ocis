@@ -231,21 +231,39 @@ class TrashbinContext implements Context {
 			'trash-bin',
 			$davPathVersion
 		);
+		$response->getBody()->rewind();
+		$statusCode = $response->getStatusCode();
+		$respBody = $response->getBody()->getContents();
+		Assert::assertEquals("207", $statusCode, "Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
+
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__ . " $collectionPath"
 		);
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
+
+		// set endpoint according to webdav request (2 = new, 3 = spaces)
+		$endpoint = "/remote.php/dav/trash-bin/$user";
+		if ($davPathVersion === 3) {
+			$space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef()
+			);
+			$endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
+		}
+
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
 			$files,
-			static function ($element) use ($user, $collectionPath) {
+			static function ($element) use ($endpoint, $collectionPath) {
 				$path = $collectionPath;
 				if ($path !== "") {
 					$path = $path . "/";
 				}
-				return ($element['href'] !== "/remote.php/dav/trash-bin/$user/$path");
+				return ($element['href'] !== "$endpoint/$path");
 			}
 		);
 
@@ -714,10 +732,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	private function isInTrash(?string $user, ?string $originalPath):bool {
-		$res = $this->featureContext->getResponse();
 		$listing = $this->listTrashbinFolder($user);
-
-		$this->featureContext->setResponse($res);
 
 		// we don't care if the test step writes a leading "/" or not
 		$originalPath = \ltrim($originalPath, '/');
