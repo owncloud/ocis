@@ -74,6 +74,7 @@ var _ = Describe("Schools", func() {
 
 		cfg = defaults.FullDefaultConfig()
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
+		cfg.Identity.LDAP.EducationConfig.SchoolTerminationGraceDays = 30
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
@@ -294,8 +295,17 @@ var _ = Describe("Schools", func() {
 		schoolUpdate.SetDisplayName("New School Name")
 		schoolUpdateJson, _ := json.Marshal(schoolUpdate)
 
+		schoolUpdatePast := libregraph.NewEducationSchool()
+		schoolUpdatePast.SetTerminationDate(time.Now().Add(-time.Hour * 1))
+		schoolUpdatePastJson, _ := json.Marshal(schoolUpdatePast)
 
+		schoolUpdateBeforeGrace := libregraph.NewEducationSchool()
+		schoolUpdateBeforeGrace.SetTerminationDate(time.Now().Add(24 * 10 * time.Hour))
+		schoolUpdateBeforeGraceJson, _ := json.Marshal(schoolUpdateBeforeGrace)
 
+		schoolUpdatePastGrace := libregraph.NewEducationSchool()
+		schoolUpdatePastGrace.SetTerminationDate(time.Now().Add(24 * 31 * time.Hour))
+		schoolUpdatePastGraceJson, _ := json.Marshal(schoolUpdatePastGrace)
 
 		BeforeEach(func() {
 			identityEducationBackend.On("UpdateEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(schoolUpdate, nil)
@@ -315,6 +325,9 @@ var _ = Describe("Schools", func() {
 			Entry("handles missing or empty school id", "", bytes.NewBufferString(""), http.StatusBadRequest),
 			Entry("handles malformed school id", "school%id", bytes.NewBuffer(schoolUpdateJson), http.StatusBadRequest),
 			Entry("updates the school", "school-id", bytes.NewBuffer(schoolUpdateJson), http.StatusOK),
+			Entry("fails to set a termination date in the past", "school-id", bytes.NewBuffer(schoolUpdatePastJson), http.StatusBadRequest),
+			Entry("fails to set a termination date before grace period", "school-id", bytes.NewBuffer(schoolUpdateBeforeGraceJson), http.StatusBadRequest),
+			Entry("succeeds to set a termination date past the grace period", "school-id", bytes.NewBuffer(schoolUpdatePastGraceJson), http.StatusOK),
 		)
 	})
 
