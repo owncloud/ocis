@@ -169,7 +169,7 @@ config = {
     },
     "rocketchat": {
         "channel": "ocis-internal",
-        "from_secret": "private_rocketchat",
+        "from_secret": "rocketchat_chat_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
@@ -203,7 +203,7 @@ MINIO_MC_ENV = {
         "from_secret": "cache_public_s3_bucket",
     },
     "MC_HOST": {
-        "from_secret": "cache_s3_endpoint",
+        "from_secret": "cache_s3_server",
     },
     "AWS_ACCESS_KEY_ID": {
         "from_secret": "cache_s3_access_key",
