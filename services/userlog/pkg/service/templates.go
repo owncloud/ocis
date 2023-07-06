@@ -56,8 +56,8 @@ var (
 	}
 
 	PlatformDeprovision = NotificationTemplate{
-		Subject: Template("Platform will be deprovisioned"),
-		Message: Template("Attention! The platform will be deprovisioned at {date}"),
+		Subject: Template("Instance will be shut down and deprovisioned"),
+		Message: Template("Attention! The instance will be shut down and deprovisioned on {date}. Download all your data before that date as no access past that date is possible."),
 	}
 )
 
