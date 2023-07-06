@@ -80,6 +80,16 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// validate terminationDate attribute, needs to be "far enough" in the future, terminationDate can be nil (means
+	// termination date is to be deleted
+	if terminationDate, ok := school.GetTerminationDateOk(); ok && terminationDate != nil {
+		err = g.validateTerminationDate(*terminationDate)
+		if err != nil {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		}
+		return
+	}
+
 	if school, err = g.identityEducationBackend.CreateEducationSchool(r.Context(), *school); err != nil {
 		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: backend error")
 		errorcode.RenderError(w, r, err)
@@ -123,6 +133,16 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	// validate terminationDate attribute, needs to be "far enough" in the future, terminationDate can be nil (means
+	// termination date is to be deleted
+	if terminationDate, ok := school.GetTerminationDateOk(); ok && terminationDate != nil {
+		err = g.validateTerminationDate(*terminationDate)
+		if err != nil {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		}
 		return
 	}
 
@@ -564,6 +584,19 @@ func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
+}
+
+func (g Graph) validateTerminationDate(terminationDate time.Time) error {
+	if terminationDate.Before(time.Now()) {
+		return fmt.Errorf("can not set a termination date in the past")
+	}
+	graceTime := g.config.Identity.LDAP.EducationConfig.SchoolTerminationGracePeriod
+	if graceTime != 0 {
+		if terminationDate.Before(time.Now().Add(graceTime)) {
+			return fmt.Errorf("termination needs to be at least %vin the future", graceTime)
+		}
+	}
+	return nil
 }
 
 func sortEducationSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchool) ([]*libregraph.EducationSchool, error) {

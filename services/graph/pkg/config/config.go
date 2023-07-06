@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -94,6 +95,8 @@ type LDAPEducationConfig struct {
 	SchoolNameAttribute   string `yaml:"school_name_attribute" env:"GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of a school."`
 	SchoolNumberAttribute string `yaml:"school_number_attribute" env:"GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE" desc:"LDAP Attribute to use for the number of a school."`
 	SchoolIDAttribute     string `yaml:"school_id_attribute" env:"GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID."`
+
+	SchoolTerminationGracePeriod time.Duration `yaml:"school_termination_min_grace_period" env:"GRAPH_LDAP_SCHOOL_TERMINATION_MIN_GRACE_PERIOD" desc:"The minimal time period, which the terminationDate of a School needs to be in the future, when updating it."`
 }
 
 type Identity struct {
