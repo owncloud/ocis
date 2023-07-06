@@ -288,58 +288,34 @@ var _ = Describe("Schools", func() {
 			Expect(rr.Code).To(Equal(http.StatusCreated))
 		})
 	})
-	Describe("PatchEducationSchool", func() {
-		It("handles invalid body", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools/", bytes.NewBufferString("{invalid"))
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", *newSchool.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchEducationSchool(rr, r)
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+	Describe("updating a School", func() {
+		schoolUpdate := libregraph.NewEducationSchool()
+		schoolUpdate.SetDisplayName("New School Name")
+		schoolUpdateJson, _ := json.Marshal(schoolUpdate)
+
+
+
+
+		BeforeEach(func() {
+			identityEducationBackend.On("UpdateEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(schoolUpdate, nil)
 		})
-
-		It("handles missing or empty school id", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			svc.PatchEducationSchool(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-
-			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", "")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchEducationSchool(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("handles malformed school id", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", "school%id")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchEducationSchool(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("updates the school", func() {
-			newSchool = libregraph.NewEducationSchool()
-			newSchool.SetDisplayName("New School Name")
-			newSchoolJson, err := json.Marshal(newSchool)
-			Expect(err).ToNot(HaveOccurred())
-
-			identityEducationBackend.On("UpdateEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
-
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools/schoolid", bytes.NewBuffer(newSchoolJson))
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", "school-id")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-
-			svc.PatchEducationSchool(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusOK))
-		})
+		DescribeTable("PatchEducationSchool",
+			func(schoolId string, body io.Reader, statusCode int) {
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools/", body)
+				rctx := chi.NewRouteContext()
+				if schoolId != "" {
+					rctx.URLParams.Add("schoolID", schoolId)
+				}
+				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.PatchEducationSchool(rr, r)
+				Expect(rr.Code).To(Equal(statusCode))
+			},
+			Entry("handles invalid body", "school-id", bytes.NewBufferString("{invalid"), http.StatusBadRequest),
+			Entry("handles missing or empty school id", "", bytes.NewBufferString(""), http.StatusBadRequest),
+			Entry("handles malformed school id", "school%id", bytes.NewBuffer(schoolUpdateJson), http.StatusBadRequest),
+			Entry("updates the school", "school-id", bytes.NewBuffer(schoolUpdateJson), http.StatusOK),
+		)
 	})
 
 	Describe("DeleteEducationSchool", func() {
