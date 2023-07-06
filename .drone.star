@@ -198,7 +198,7 @@ pipelineVolumeGo = \
 # minio mc environment variables
 MINIO_MC_ENV = {
     "CACHE_BUCKET": {
-        "from_secret": "cache_public_s3_bucket",
+        "from_secret": "cache_s3_bucket",
     },
     "MC_HOST": {
         "from_secret": "cache_s3_server",
@@ -389,10 +389,10 @@ def checkGoBinCache():
         "image": OC_UBUNTU,
         "environment": {
             "CACHE_ENDPOINT": {
-                "from_secret": "cache_public_s3_server",
+                "from_secret": "cache_s3_server",
             },
             "CACHE_BUCKET": {
-                "from_secret": "cache_public_s3_bucket",
+                "from_secret": "cache_s3_bucket",
             },
         },
         "commands": [
@@ -492,7 +492,7 @@ def testOcisModule(ctx, module):
             "image": PLUGINS_S3,
             "settings": {
                 "endpoint": {
-                    "from_secret": "cache_s3_endpoint",
+                    "from_secret": "cache_s3_server",
                 },
                 "bucket": "cache",
                 "source": "cache/**/*",
@@ -1238,10 +1238,10 @@ def buildTracingComment():
         ],
         "environment": {
             "CACHE_ENDPOINT": {
-                "from_secret": "cache_public_s3_server",
+                "from_secret": "cache_s3_server",
             },
             "CACHE_BUCKET": {
-                "from_secret": "cache_public_s3_bucket",
+                "from_secret": "cache_s3_bucket",
             },
         },
         "when": {
@@ -2401,7 +2401,7 @@ def genericCache(name, action, mounts, cache_path):
         "image": PLUGINS_S3_CACHE,
         "settings": {
             "endpoint": {
-                "from_secret": "cache_s3_endpoint",
+                "from_secret": "cache_s3_server",
             },
             "rebuild": rebuild,
             "restore": restore,
@@ -2440,7 +2440,7 @@ def genericCachePurge(flush_path):
                         "from_secret": "cache_s3_secret_key",
                     },
                     "endpoint": {
-                        "from_secret": "cache_s3_endpoint",
+                        "from_secret": "cache_s3_server",
                     },
                     "flush": True,
                     "flush_age": 1,
@@ -2743,10 +2743,10 @@ def checkForWebCache(name):
         "image": OC_UBUNTU,
         "environment": {
             "CACHE_ENDPOINT": {
-                "from_secret": "cache_public_s3_server",
+                "from_secret": "cache_s3_server",
             },
             "CACHE_BUCKET": {
-                "from_secret": "cache_public_s3_bucket",
+                "from_secret": "cache_s3_bucket",
             },
         },
         "commands": [
