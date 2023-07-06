@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/pkg/errors"
@@ -156,7 +157,7 @@ func (XattrsBackend) Remove(ctx context.Context, filePath string, key string) (e
 }
 
 // IsMetaFile returns whether the given path represents a meta file
-func (XattrsBackend) IsMetaFile(path string) bool { return false }
+func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".meta.lock") }
 
 // Purge purges the data of a given path
 func (XattrsBackend) Purge(path string) error { return nil }
@@ -166,6 +167,9 @@ func (XattrsBackend) Rename(oldPath, newPath string) error { return nil }
 
 // MetadataPath returns the path of the file holding the metadata for the given path
 func (XattrsBackend) MetadataPath(path string) string { return path }
+
+// LockfilePath returns the path of the lock file
+func (XattrsBackend) LockfilePath(path string) string { return path + ".mlock" }
 
 func cleanupLockfile(f *lockedfile.File) {
 	_ = f.Close()

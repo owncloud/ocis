@@ -40,7 +40,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -750,17 +749,8 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 		// lock parent before reading treesize or tree time
 
 		_, subspan := tracer.Start(ctx, "lockedfile.OpenFile")
-		var parentFilename string
-		switch t.lookup.MetadataBackend().(type) {
-		case metadata.MessagePackBackend:
-			parentFilename = t.lookup.MetadataBackend().MetadataPath(n.ParentPath())
-			f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
-		case metadata.XattrsBackend:
-			// we have to use dedicated lockfiles to lock directories
-			// this only works because the xattr backend also locks folders with separate lock files
-			parentFilename = n.ParentPath() + filelocks.LockFileSuffix
-			f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
-		}
+		parentFilename := t.lookup.MetadataBackend().LockfilePath(n.ParentPath())
+		f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
 		subspan.End()
 		if err != nil {
 			sublog.Error().Err(err).

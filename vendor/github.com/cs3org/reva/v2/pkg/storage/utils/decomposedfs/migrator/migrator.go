@@ -29,7 +29,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var allMigrations = []string{"0001", "0002", "0003"}
+var allMigrations = []string{"0001", "0002", "0003", "0004"}
 
 const (
 	resultFailed            = "failed"

@@ -52,6 +52,7 @@ type Backend interface {
 	Rename(oldPath, newPath string) error
 	IsMetaFile(path string) bool
 	MetadataPath(path string) string
+	LockfilePath(path string) string
 
 	AllWithLockedSource(ctx context.Context, path string, source io.Reader) (map[string][]byte, error)
 }
@@ -109,6 +110,9 @@ func (NullBackend) Rename(oldPath, newPath string) error { return errUnconfigure
 
 // MetadataPath returns the path of the file holding the metadata for the given path
 func (NullBackend) MetadataPath(path string) string { return "" }
+
+// LockfilePath returns the path of the lock file
+func (NullBackend) LockfilePath(path string) string { return "" }
 
 // AllWithLockedSource reads all extended attributes from the given reader
 // The path argument is used for storing the data in the cache

@@ -28,6 +28,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/favorite"
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/broker"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -53,6 +54,8 @@ type Options struct {
 	TracingExporter  string
 	TracingCollector string
 	TracingEndpoint  string
+
+	TraceProvider trace.TracerProvider
 
 	MetricsEnabled   bool
 	MetricsNamespace string
@@ -231,6 +234,13 @@ func WithTracingInsecure() Option {
 func WithTracingExporter(exporter string) Option {
 	return func(o *Options) {
 		o.TracingExporter = exporter
+	}
+}
+
+// WithTraceProvider option
+func WithTraceProvider(provider trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = provider
 	}
 }
 
