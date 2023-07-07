@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
+* Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
@@ -40,6 +41,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/6414
    https://github.com/owncloud/ocis/pull/6469
    https://github.com/cs3org/reva/pull/3948
+
+* Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
+
+   The update role method did not allow to set a role when the user already has two roles. This makes
+   no sense as the user is supposed to have only one and the update will fix that. We still log an error
+   level log to make the admin aware of that.
+
+   https://github.com/owncloud/ocis/pull/6605
+   https://github.com/owncloud/ocis/pull/6618
 
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 
