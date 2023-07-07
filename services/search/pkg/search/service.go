@@ -246,9 +246,18 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			return nil, err
 		}
 
-		ownerCtx, err := getAuthContext(&user.User{Id: space.Owner.Id}, s.gatewaySelector, s.secret, s.logger)
-		if err != nil {
-			return nil, err
+		var ownerCtx context.Context
+		if space.Owner.Id.Type == user.UserType_USER_TYPE_SPACE_OWNER {
+			// We can't impersonate SPACE_OWNER users and have to fall back to using the user auth instead,
+			// which will not resolve the absolute path of the share in the space but only the part the user
+			// is allowed to see.
+			// In the future this problem can be solved using service accounts.
+			ownerCtx = ctx
+		} else {
+			ownerCtx, err = getAuthContext(&user.User{Id: space.Owner.Id}, s.gatewaySelector, s.secret, s.logger)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		gpRes, err := gatewayClient.GetPath(ownerCtx, &provider.GetPathRequest{
