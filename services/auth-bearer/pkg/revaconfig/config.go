@@ -8,13 +8,6 @@ import (
 // AuthBearerConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func AuthBearerConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
-		"core": map[string]interface{}{
-			"tracing_enabled":      cfg.Tracing.Enabled,
-			"tracing_exporter":     cfg.Tracing.Type,
-			"tracing_endpoint":     cfg.Tracing.Endpoint,
-			"tracing_collector":    cfg.Tracing.Collector,
-			"tracing_service_name": cfg.Service.Name,
-		},
 		"shared": map[string]interface{}{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
