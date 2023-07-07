@@ -21,7 +21,6 @@ OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.5"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER = "plugins/docker:latest"
-PLUGINS_DOWNSTREAM = "plugins/downstream:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
 PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
@@ -1912,26 +1911,6 @@ def docs():
                     "tree docs/hugo/public",
                     "rm -rf docs/hugo",
                 ],
-            },
-            {
-                "name": "downstream",
-                "image": PLUGINS_DOWNSTREAM,
-                "settings": {
-                    "server": "https://drone.owncloud.com/",
-                    "token": {
-                        "from_secret": "drone_token",
-                    },
-                    "repositories": [
-                        "owncloud/owncloud.github.io@main",
-                    ],
-                },
-                "when": {
-                    "ref": {
-                        "exclude": [
-                            "refs/pull/**",
-                        ],
-                    },
-                },
             },
         ],
         "trigger": {
