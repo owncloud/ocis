@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-07-08-29-22]
+[#deprecation-note-2023-07-07-08-33-02]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -49,7 +49,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
 `POSTPROCESSING_TRACING_ENDPOINT` +
@@ -265,7 +265,7 @@ a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-07-07-08-29-22[Deprecation Note]
+xref:deprecation-note-2023-07-07-08-33-02[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
