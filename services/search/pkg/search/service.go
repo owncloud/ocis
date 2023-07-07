@@ -26,6 +26,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 //go:generate mockery --name=Searcher
@@ -73,39 +74,53 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 // Search processes a search request and passes it down to the engine.
 func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	s.logger.Debug().Str("query", req.Query).Msg("performing a search")
-	query, scope := ParseScope(req.Query)
-	if query == "" {
-		return nil, errtypes.BadRequest("empty query provided")
-	}
-	req.Query = query
-	var filters []*provider.ListStorageSpacesRequest_Filter
-	if len(scope) > 0 {
-		scopeRef, err := extractScope(scope)
-		if err != nil {
-			return nil, err
-		}
-		if req.Ref == nil {
-			req.Ref = scopeRef
-		}
-		req.Ref.Path = scopeRef.GetPath()
-		if scopeRef.GetResourceId().OpaqueId != "" {
-			filters = []*provider.ListStorageSpacesRequest_Filter{
-				{
-					Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID,
-					Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: &provider.StorageSpaceId{OpaqueId: scopeRef.GetResourceId().OpaqueId}},
-				},
-			}
-		}
-	}
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
-
 	currentUser := revactx.ContextMustGetUser(ctx)
 
-	filters = append(filters, []*provider.ListStorageSpacesRequest_Filter{
+	// Extract scope from query if set
+	query, scope := ParseScope(req.Query)
+	if query == "" {
+		return nil, errtypes.BadRequest("empty query provided")
+	}
+	req.Query = query
+	if len(scope) > 0 {
+		if req.Ref != nil {
+			return nil, errtypes.BadRequest("cannot scope a search that is limited to a resource")
+		}
+		scopeRef, err := extractScope(scope)
+		if err != nil {
+			return nil, err
+		}
+		// Stat the scope to get the resource id
+		statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+			Ref:       scopeRef,
+			FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}},
+		})
+		if err != nil {
+			return nil, err
+		}
+		// GetPath the scope to get the full path in the space
+		gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
+			ResourceId: statRes.Info.Id,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Ref = &searchmsg.Reference{
+			ResourceId: &searchmsg.ResourceID{
+				StorageId: statRes.Info.Space.Root.StorageId,
+				SpaceId:   statRes.Info.Space.Root.SpaceId,
+				OpaqueId:  statRes.Info.Space.Root.OpaqueId,
+			},
+			Path: gpRes.Path,
+		}
+	}
+	filters := []*provider.ListStorageSpacesRequest_Filter{
 		{
 			Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
 			Term: &provider.ListStorageSpacesRequest_Filter_User{User: currentUser.GetId()},
@@ -114,17 +129,23 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 			Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
 			Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
 		},
-	}...)
+	}
+
+	// Get the spaces to search
+	spaces := []*provider.StorageSpace{}
 	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{Filters: filters})
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
 	}
-
-	spaces := []*provider.StorageSpace{}
 	for _, space := range listSpacesRes.StorageSpaces {
 		if utils.ReadPlainFromOpaque(space.Opaque, "trashed") == _spaceStateTrashed {
 			// Do not consider disabled spaces
+			continue
+		}
+		if space.SpaceType != "mountpoint" && req.Ref != nil && (req.Ref.GetResourceId().GetSpaceId() != space.Root.GetSpaceId()) {
+			// Do not search (non-mountpoint) spaces that do not match the given scope (if a scope is set)
+			// We still need the mountpoint in order to map the result paths to the according share
 			continue
 		}
 		spaces = append(spaces, space)
@@ -233,8 +254,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string) (*searchsvc.SearchIndexResponse, error) {
 	if req.Ref != nil &&
 		(req.Ref.ResourceId.StorageId != space.Root.StorageId ||
-			req.Ref.ResourceId.SpaceId != space.Root.SpaceId ||
-			req.Ref.ResourceId.OpaqueId != space.Root.OpaqueId) {
+			req.Ref.ResourceId.SpaceId != space.Root.SpaceId) {
 		return nil, errSkipSpace
 	}
 
@@ -249,7 +269,8 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		rootName         string
 		permissions      *provider.ResourcePermissions
 	)
-	mountpointPrefix := req.GetRef().GetPath()
+	mountpointPrefix := ""
+	searchPathPrefix := req.Ref.GetPath()
 	switch space.SpaceType {
 	case "mountpoint":
 		return nil, errSkipSpace // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
@@ -292,6 +313,9 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			return nil, errSkipSpace
 		}
 		mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
+		if searchPathPrefix == "" {
+			searchPathPrefix = mountpointPrefix
+		}
 		sid, spid, oid, err := storagespace.SplitID(mountpointID)
 		if err != nil {
 			s.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointID).Msg("invalid mountpoint space id")
@@ -313,7 +337,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		Query: req.Query,
 		Ref: &searchmsg.Reference{
 			ResourceId: searchRootID,
-			Path:       mountpointPrefix,
+			Path:       searchPathPrefix,
 		},
 		PageSize: req.PageSize,
 	}

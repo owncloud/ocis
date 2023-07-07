@@ -160,13 +160,13 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 	return b.String()
 }
 
-func extractScope(path string) (*searchmsg.Reference, error) {
+func extractScope(path string) (*provider.Reference, error) {
 	ref, err := storagespace.ParseReference(path)
 	if err != nil {
 		return nil, err
 	}
-	return &searchmsg.Reference{
-		ResourceId: &searchmsg.ResourceID{
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
 			StorageId: ref.ResourceId.StorageId,
 			SpaceId:   ref.ResourceId.SpaceId,
 			OpaqueId:  ref.ResourceId.OpaqueId,
