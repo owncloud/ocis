@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/parser"
@@ -32,7 +33,13 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+			err = ogrpc.Configure(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
+			)
 			if err != nil {
 				return err
 			}
@@ -76,6 +83,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Metrics(metrics),
 				grpc.Consumer(consumer),
 				grpc.Persistence(st),
+				grpc.TraceProvider(traceProvider),
 			)
 
 			gr.Add(service.Run, func(err error) {
@@ -107,7 +115,6 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			return gr.Run()
-
 		},
 	}
 }
