@@ -246,7 +246,12 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			return nil, err
 		}
 
-		gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
+		ownerCtx, err := getAuthContext(&user.User{Id: space.Owner.Id}, s.gatewaySelector, s.secret, s.logger)
+		if err != nil {
+			return nil, err
+		}
+
+		gpRes, err := gatewayClient.GetPath(ownerCtx, &provider.GetPathRequest{
 			ResourceId: space.Root,
 		})
 		if err != nil {
