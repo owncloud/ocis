@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-07-14-31-18]
+[#deprecation-note-2023-07-07-15-07-12]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -84,7 +84,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `GATEWAY_LOG_PRETTY` +
@@ -182,7 +182,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-07-07-14-31-18[Deprecation Note]
+xref:deprecation-note-2023-07-07-15-07-12[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -246,7 +246,7 @@ Disable creation of the home space on login.
 
 a|`OCIS_TRANSFER_SECRET` +
 `STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-07-07-14-31-18[Deprecation Note]
+xref:deprecation-note-2023-07-07-15-07-12[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

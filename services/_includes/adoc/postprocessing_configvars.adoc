@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-07-14-31-18]
+[#deprecation-note-2023-07-07-15-07-12]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -79,7 +79,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `POSTPROCESSING_LOG_PRETTY` +
@@ -265,7 +265,7 @@ a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-07-07-14-31-18[Deprecation Note]
+xref:deprecation-note-2023-07-07-15-07-12[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

@@ -2,7 +2,7 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_LOG_LEVEL<br/>ANTIVIRUS_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_LEVEL<br/>ANTIVIRUS_LOG_LEVEL | string |  | The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.|
 | OCIS_LOG_PRETTY<br/>ANTIVIRUS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>ANTIVIRUS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>ANTIVIRUS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|

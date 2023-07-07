@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-07-14-31-18]
+[#deprecation-note-2023-07-07-15-07-12]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -84,7 +84,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `SEARCH_LOG_PRETTY` +
@@ -173,7 +173,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-07-07-14-31-18[Deprecation Note]
+xref:deprecation-note-2023-07-07-15-07-12[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -222,7 +222,7 @@ The clusterID of the event system. The event system is the message queuing servi
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
 `SEARCH_EVENTS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-07-07-14-31-18[Deprecation Note]
+xref:deprecation-note-2023-07-07-15-07-12[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

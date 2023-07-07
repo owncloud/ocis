@@ -33,7 +33,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `IDM_TRACING_COLLECTOR`
 
@@ -230,7 +230,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -280,7 +280,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -345,7 +345,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `LDAP_INSECURE`
 
@@ -907,7 +907,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a| `OCIS_EVENTS_ENDPOINT`
 
@@ -955,7 +955,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -1123,7 +1123,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1190,7 +1190,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -1369,7 +1369,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -1419,7 +1419,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1485,7 +1485,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_LDAP_INSECURE`
 
@@ -1874,7 +1874,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a| `OCIS_LOG_PRETTY`
 
@@ -1946,7 +1946,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1967,7 +1967,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider href for the openid-discovery relation.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -2384,7 +2384,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `REVA_GATEWAY`
 
