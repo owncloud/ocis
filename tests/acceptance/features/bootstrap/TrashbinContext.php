@@ -231,10 +231,10 @@ class TrashbinContext implements Context {
 			'trash-bin',
 			$davPathVersion
 		);
-        $response->getBody()->rewind();
-        $statusCode = $response->getStatusCode();
-        $respBody = $response->getBody()->getContents();
-        Assert::assertEquals("207",$statusCode,"Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
+		$response->getBody()->rewind();
+		$statusCode = $response->getStatusCode();
+		$respBody = $response->getBody()->getContents();
+		Assert::assertEquals("207", $statusCode, "Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
 
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$response,
@@ -243,17 +243,17 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-        //set endpoint for according to dav path
-        $endpoint = "/remote.php/dav/trash-bin/$user";
-        if($this->featureContext->getDavPathVersion() === 3){
-            $space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
-                $this->featureContext->getBaseUrl(),
-                $user,
-                $this->featureContext->getPasswordForUser($user),
-                $this->featureContext->getStepLineRef()
-            );
-            $endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
-        }
+		//set endpoint for according to dav path
+		$endpoint = "/remote.php/dav/trash-bin/$user";
+		if ($this->featureContext->getDavPathVersion() === 3) {
+			$space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef()
+			);
+			$endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
+		}
 
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
@@ -997,7 +997,7 @@ class TrashbinContext implements Context {
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
 		Assert::assertTrue(
-            $this->isInTrash($user, $originalPath),
+			$this->isInTrash($user, $originalPath),
 			"File previously located at $originalPath wasn't found in the trashbin of user $user"
 		);
 	}
