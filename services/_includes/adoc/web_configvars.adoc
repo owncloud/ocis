@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-10-14-29-10]
+[#deprecation-note-2023-07-10-15-11-28]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -257,7 +257,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-07-10-14-29-10[Deprecation Note]
+xref:deprecation-note-2023-07-10-15-11-28[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -267,7 +267,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-07-10-14-29-10[Deprecation Note]
+xref:deprecation-note-2023-07-10-15-11-28[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -505,6 +505,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.
+
+a|`WEB_OPTION_TOKEN_STORAGE_LOCAL` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'false'.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

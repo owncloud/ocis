@@ -130,6 +130,7 @@ web:
       imprintUrl: ""
       privacyUrl: ""
       accessDeniedHelpURL: ""
+      tokenStorageLocal: false
     styles: []
     scripts: []
     custom_translations: []
