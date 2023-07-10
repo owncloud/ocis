@@ -56,7 +56,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Name(cfg.Service.Name),
 				grpc.Context(ctx),
 				grpc.Metrics(mtrcs),
-				grpc.JWTSecret(cfg.Commons.TokenManager.JWTSecret),
+				grpc.JWTSecret(cfg.TokenManager.JWTSecret),
 			)
 			defer teardown()
 			if err != nil {
