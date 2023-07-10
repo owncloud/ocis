@@ -123,7 +123,7 @@ Please always refer to our [Contribution Guidelines](https://github.com/owncloud
 
 ## End User License Agreement
 
-Stable versions of ownCloud Infinite Scale are subject to the [End User License Agreement](https://github.com/owncloud/ocis/blob/master/assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf).
+Some builds of stable ownCloud Infinite Scale releases provided by ownCloud GmbH are subject to an [End User License Agreement](https://owncloud.com/license-owncloud-infinite-scale/).
 
 ## Copyright
 
