@@ -4,14 +4,12 @@
 # images
 ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
-DRONE_CLI = "drone/cli:alpine"
 INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
-OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS = "owncloudci/drone-cancel-previous-builds"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
 OC_CI_GOLANG = "owncloudci/golang:1.20"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
@@ -169,7 +167,7 @@ config = {
     },
     "rocketchat": {
         "channel": "ocis-internal",
-        "from_secret": "private_rocketchat",
+        "from_secret": "rocketchat_chat_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
@@ -203,7 +201,7 @@ MINIO_MC_ENV = {
         "from_secret": "cache_s3_bucket",
     },
     "MC_HOST": {
-        "from_secret": "cache_s3_endpoint",
+        "from_secret": "cache_s3_server",
     },
     "AWS_ACCESS_KEY_ID": {
         "from_secret": "cache_s3_access_key",
@@ -254,7 +252,6 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
-        cancelPreviousBuilds() + \
         codestyle(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
@@ -339,30 +336,6 @@ def testOcisModules(ctx):
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
     return pipelines + [scan_result_upload]
-
-def cancelPreviousBuilds():
-    return [{
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "cancel-previous-builds",
-        "clone": {
-            "disable": True,
-        },
-        "steps": [{
-            "name": "cancel-previous-builds",
-            "image": OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS,
-            "settings": {
-                "DRONE_TOKEN": {
-                    "from_secret": "drone_token",
-                },
-            },
-        }],
-        "trigger": {
-            "ref": [
-                "refs/pull/**",
-            ],
-        },
-    }]
 
 def testPipelines(ctx):
     pipelines = []
@@ -625,14 +598,11 @@ def uploadScanResults(ctx):
             {
                 "name": "sync-from-cache",
                 "image": MINIO_MC,
-                "environment": {
-                    "MC_HOST_cachebucket": {
-                        "from_secret": "cache_s3_connection_url",
-                    },
-                },
+                "environment": MINIO_MC_ENV,
                 "commands": [
                     "mkdir -p cache",
-                    "mc mirror cachebucket/cache/%s/%s/cache cache/" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                    "mc mirror cachebucket/$CACHE_BUCKET/%s/%s/cache cache/" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
             {
@@ -652,13 +622,10 @@ def uploadScanResults(ctx):
             {
                 "name": "purge-cache",
                 "image": MINIO_MC,
-                "environment": {
-                    "MC_HOST_cachebucket": {
-                        "from_secret": "cache_s3_connection_url",
-                    },
-                },
+                "environment": MINIO_MC_ENV,
                 "commands": [
-                    "mc rm --recursive --force cachebucket/cache/%s/%s/cache" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
         ],
@@ -1222,10 +1189,10 @@ def uploadTracingResult(ctx):
         "pull": "if-not-exists",
         "settings": {
             "bucket": {
-                "from_secret": "cache_public_s3_bucket",
+                "from_secret": "cache_s3_bucket",
             },
             "endpoint": {
-                "from_secret": "cache_public_s3_server",
+                "from_secret": "cache_s3_server",
             },
             "path_style": True,
             "source": "webTestRunner/reports/e2e/playwright/tracing/**/*",
@@ -1335,30 +1302,6 @@ def failEarly(ctx, early_fail):
                         "from_secret": "github_token",
                     },
                 },
-                "when": {
-                    "status": [
-                        "failure",
-                    ],
-                    "event": [
-                        "pull_request",
-                    ],
-                },
-            },
-            {
-                "name": "stop-build",
-                "image": DRONE_CLI,
-                # # https://github.com/drone/runner-go/blob/0bd0f8fc31c489817572060d17c6e24aaa487470/pipeline/runtime/const.go#L95-L102
-                # "failure": "fail-fast",
-                # would be an alternative, but is currently broken
-                "environment": {
-                    "DRONE_SERVER": "https://drone.owncloud.com",
-                    "DRONE_TOKEN": {
-                        "from_secret": "drone_token",
-                    },
-                },
-                "commands": [
-                    "drone build stop owncloud/ocis ${DRONE_BUILD_NUMBER}",
-                ],
                 "when": {
                     "status": [
                         "failure",
