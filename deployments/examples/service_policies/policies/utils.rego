@@ -1,8 +1,6 @@
 package utils
 
-import future.keywords.if
-
-ALLOWED_FILE_EXTENSIONS := [
+ALLOWED_RESOURCE_EXTENSIONS := [
     ".apk", ".avi", ".bat", ".bmp", ".css", ".csv", ".doc", ".docm", ".docx",
     ".docxf", ".dotx", ".eml", ".epub", ".htm", ".html", ".ipa", ".jar", ".java",
     ".jpg", ".js", ".json", ".mp3", ".mp4", ".msg", ".odp", ".ods", ".odt", ".oform",
@@ -11,43 +9,14 @@ ALLOWED_FILE_EXTENSIONS := [
     ".txt", ".xls", ".xlsm", ".xlsx", ".xltm", ".xltx", ".xml", ".zip", ".md"
 ]
 
-##
-
-is_stage_http {
-    input.stage == "http"
+is_extension_allowed(identifier) {
+     extension := ALLOWED_RESOURCE_EXTENSIONS[_]
+     endswith(identifier, extension)
 }
 
-is_stage_pp {
-    input.stage == "pp"
-}
-
-##
-
-is_user_admin {
-    input.user.username == "admin"
-}
-
-##
-
-is_request_type_put {
-    is_stage_http
-    input.request.method == "PUT"
-}
-
-is_request_type_post {
-    is_stage_http
-    input.request.method == "POST"
-}
-
-is_request_type_mkcol {
-    is_stage_http
-    input.request.method == "MKCOL"
-}
-
-##
-
-collection_contains(collection, source) {
-     current := collection[_]
-     endswith(source, current)
+is_mimetype_allowed(mimetype) {
+     extensions := ocis.mimetype.extensions(mimetype)
+     extension := extensions[_]
+     is_extension_allowed(extension)
 }
 

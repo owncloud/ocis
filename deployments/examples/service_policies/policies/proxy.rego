@@ -6,13 +6,14 @@ import data.utils
 default granted := true
 
 granted = false if {
-    utils.is_request_type_put
-    not input.request.path == "/data"
-    not utils.collection_contains(utils.ALLOWED_FILE_EXTENSIONS, input.request.path)
+    print("PRINT MESSAGE EXAMPLE")
+    input.request.method == "PUT"
+    not startswith(input.request.path, "/ocs")
+    not utils.is_extension_allowed(input.request.path)
 }
 
 granted = false if {
-    utils.is_request_type_post
+    input.request.method == "POST"
     startswith(input.request.path, "/remote.php")
-    not utils.collection_contains(utils.ALLOWED_FILE_EXTENSIONS, input.resource.name)
+    not utils.is_extension_allowed(input.resource.name)
 }
