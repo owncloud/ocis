@@ -51,7 +51,6 @@ const (
 
 // Service initializes the ocdav service and underlying http server.
 func Service(opts ...Option) (micro.Service, error) {
-
 	sopts := newOptions(opts...)
 
 	// set defaults
@@ -86,19 +85,23 @@ func Service(opts ...Option) (micro.Service, error) {
 	// chi.RegisterMethod(ocdav.MethodMkcol)
 	// chi.RegisterMethod(ocdav.MethodReport)
 	r := chi.NewRouter()
-	topts := []rtrace.Option{
-		rtrace.WithExporter(sopts.TracingExporter),
-		rtrace.WithEndpoint(sopts.TracingEndpoint),
-		rtrace.WithCollector(sopts.TracingCollector),
-		rtrace.WithServiceName(sopts.Name),
+	tp := sopts.TraceProvider
+
+	if tp == nil {
+		topts := []rtrace.Option{
+			rtrace.WithExporter(sopts.TracingExporter),
+			rtrace.WithEndpoint(sopts.TracingEndpoint),
+			rtrace.WithCollector(sopts.TracingCollector),
+			rtrace.WithServiceName(sopts.Name),
+		}
+		if sopts.TracingEnabled {
+			topts = append(topts, rtrace.WithEnabled())
+		}
+		if sopts.TracingInsecure {
+			topts = append(topts, rtrace.WithInsecure())
+		}
+		tp = rtrace.NewTracerProvider(topts...)
 	}
-	if sopts.TracingEnabled {
-		topts = append(topts, rtrace.WithEnabled())
-	}
-	if sopts.TracingInsecure {
-		topts = append(topts, rtrace.WithInsecure())
-	}
-	tp := rtrace.NewTracerProvider(topts...)
 	if err := useMiddlewares(r, &sopts, revaService, tp); err != nil {
 		return nil, err
 	}
@@ -132,7 +135,6 @@ func Service(opts ...Option) (micro.Service, error) {
 }
 
 func setDefaults(sopts *Options) error {
-
 	// set defaults
 	if sopts.Name == "" {
 		sopts.Name = ServerName

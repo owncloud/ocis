@@ -20,7 +20,6 @@ package decomposedfs
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -220,14 +219,12 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		switch {
 		case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
 			// remove from user index
-			userIDPath := filepath.Join(fs.o.Root, "indexes", "by-user-id", g.Grantee.GetUserId().GetOpaqueId(), grantNode.SpaceID)
-			if err := os.Remove(userIDPath); err != nil {
+			if err := fs.userSpaceIndex.Remove(g.Grantee.GetUserId().GetOpaqueId(), grantNode.SpaceID); err != nil {
 				return err
 			}
 		case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
 			// remove from group index
-			userIDPath := filepath.Join(fs.o.Root, "indexes", "by-group-id", g.Grantee.GetGroupId().GetOpaqueId(), grantNode.SpaceID)
-			if err := os.Remove(userIDPath); err != nil {
+			if err := fs.groupSpaceIndex.Remove(g.Grantee.GetGroupId().GetOpaqueId(), grantNode.SpaceID); err != nil {
 				return err
 			}
 		}

@@ -298,31 +298,13 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 	}
 
 	matches := map[string]struct{}{}
+	var allMatches map[string]string
+	var err error
 
 	if requestedUserID != nil {
-		allMatches := map[string]string{}
-		indexPath := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId())
-		fi, err := os.Stat(indexPath)
-		if err == nil {
-			allMatches, err = fs.spaceIDCache.LoadOrStore("by-user-id:"+requestedUserID.GetOpaqueId(), fi.ModTime(), func() (map[string]string, error) {
-				path := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId(), "*")
-				m, err := filepath.Glob(path)
-				if err != nil {
-					return nil, err
-				}
-				matches := map[string]string{}
-				for _, match := range m {
-					link, err := os.Readlink(match)
-					if err != nil {
-						continue
-					}
-					matches[match] = link
-				}
-				return matches, nil
-			})
-		}
+		allMatches, err = fs.userSpaceIndex.Load(requestedUserID.GetOpaqueId())
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error reading user index")
 		}
 
 		if nodeID == spaceIDAny {
@@ -344,29 +326,12 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 		}
 
 		for _, group := range user.Groups {
-			indexPath := filepath.Join(fs.o.Root, "indexes", "by-group-id", group)
-			fi, err := os.Stat(indexPath)
+			allMatches, err = fs.groupSpaceIndex.Load(group)
 			if err != nil {
-				continue
-			}
-			allMatches, err := fs.spaceIDCache.LoadOrStore("by-group-id:"+group, fi.ModTime(), func() (map[string]string, error) {
-				path := filepath.Join(fs.o.Root, "indexes", "by-group-id", group, "*")
-				m, err := filepath.Glob(path)
-				if err != nil {
-					return nil, err
+				if os.IsNotExist(err) {
+					continue // no spaces for this group
 				}
-				matches := map[string]string{}
-				for _, match := range m {
-					link, err := os.Readlink(match)
-					if err != nil {
-						continue
-					}
-					matches[match] = link
-				}
-				return matches, nil
-			})
-			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "error reading group index")
 			}
 
 			if nodeID == spaceIDAny {
@@ -381,33 +346,22 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 	}
 
 	if requestedUserID == nil {
+		if _, ok := spaceTypes[spaceTypeAny]; ok {
+			// TODO do not hardcode dirs
+			spaceTypes = map[string]struct{}{
+				"personal": {},
+				"project":  {},
+				"share":    {},
+			}
+		}
+
 		for spaceType := range spaceTypes {
-			indexPath := filepath.Join(fs.o.Root, "indexes", "by-type")
-			if spaceType != spaceTypeAny {
-				indexPath = filepath.Join(indexPath, spaceType)
-			}
-			fi, err := os.Stat(indexPath)
+			allMatches, err = fs.spaceTypeIndex.Load(spaceType)
 			if err != nil {
-				continue
-			}
-			allMatches, err := fs.spaceIDCache.LoadOrStore("by-type:"+spaceType, fi.ModTime(), func() (map[string]string, error) {
-				path := filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, "*")
-				m, err := filepath.Glob(path)
-				if err != nil {
-					return nil, err
+				if os.IsNotExist(err) {
+					continue // no spaces for this space type
 				}
-				matches := map[string]string{}
-				for _, match := range m {
-					link, err := os.Readlink(match)
-					if err != nil {
-						continue
-					}
-					matches[match] = link
-				}
-				return matches, nil
-			})
-			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "error reading type index")
 			}
 
 			if nodeID == spaceIDAny {
@@ -764,13 +718,12 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 			return errtypes.NewErrtypeFromStatus(status.NewInvalid(ctx, "can't purge enabled space"))
 		}
 
+		// TODO invalidate ALL indexes in msgpack, not only by type
 		spaceType, err := n.XattrString(ctx, prefixes.SpaceTypeAttr)
 		if err != nil {
 			return err
 		}
-		// remove type index
-		spaceTypePath := filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, spaceID)
-		if err := os.Remove(spaceTypePath); err != nil {
+		if err := fs.spaceTypeIndex.Remove(spaceType, spaceID); err != nil {
 			return err
 		}
 
@@ -817,80 +770,18 @@ func (fs *Decomposedfs) updateIndexes(ctx context.Context, grantee *provider.Gra
 }
 
 func (fs *Decomposedfs) linkSpaceByUser(ctx context.Context, userID, spaceID string) error {
-	if userID == "" {
-		return nil
-	}
-	// create user index dir
-	// TODO: pathify userID
-	if err := os.MkdirAll(filepath.Join(fs.o.Root, "indexes", "by-user-id", userID), 0700); err != nil {
-		return err
-	}
-
-	err := os.Symlink("../../../spaces/"+lookup.Pathify(spaceID, 1, 2)+"/nodes/"+lookup.Pathify(spaceID, 4, 2), filepath.Join(fs.o.Root, "indexes/by-user-id", userID, spaceID))
-	if err != nil {
-		if isAlreadyExists(err) {
-			appctx.GetLogger(ctx).Debug().Err(err).Str("space", spaceID).Str("user-id", userID).Msg("symlink already exists")
-			// FIXME: is it ok to wipe this err if the symlink already exists?
-			err = nil //nolint
-		} else {
-			// TODO how should we handle error cases here?
-			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("user-id", userID).Msg("could not create symlink")
-		}
-	}
-	return nil
+	target := "../../../spaces/" + lookup.Pathify(spaceID, 1, 2) + "/nodes/" + lookup.Pathify(spaceID, 4, 2)
+	return fs.userSpaceIndex.Add(userID, spaceID, target)
 }
 
 func (fs *Decomposedfs) linkSpaceByGroup(ctx context.Context, groupID, spaceID string) error {
-	if groupID == "" {
-		return nil
-	}
-	// create group index dir
-	// TODO: pathify groupid
-	if err := os.MkdirAll(filepath.Join(fs.o.Root, "indexes", "by-group-id", groupID), 0700); err != nil {
-		return err
-	}
-
-	err := os.Symlink("../../../spaces/"+lookup.Pathify(spaceID, 1, 2)+"/nodes/"+lookup.Pathify(spaceID, 4, 2), filepath.Join(fs.o.Root, "indexes/by-group-id", groupID, spaceID))
-	if err != nil {
-		if isAlreadyExists(err) {
-			appctx.GetLogger(ctx).Debug().Err(err).Str("space", spaceID).Str("group-id", groupID).Msg("symlink already exists")
-			// FIXME: is it ok to wipe this err if the symlink already exists?
-			err = nil //nolint
-		} else {
-			// TODO how should we handle error cases here?
-			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("group-id", groupID).Msg("could not create symlink")
-		}
-	}
-	return nil
+	target := "../../../spaces/" + lookup.Pathify(spaceID, 1, 2) + "/nodes/" + lookup.Pathify(spaceID, 4, 2)
+	return fs.groupSpaceIndex.Add(groupID, spaceID, target)
 }
 
-// TODO: implement linkSpaceByGroup
-
 func (fs *Decomposedfs) linkStorageSpaceType(ctx context.Context, spaceType string, spaceID string) error {
-	if spaceType == "" {
-		return nil
-	}
-	// create space type dir
-	if err := os.MkdirAll(filepath.Join(fs.o.Root, "indexes", "by-type", spaceType), 0700); err != nil {
-		return err
-	}
-
-	// link space in spacetypes
-	err := os.Symlink("../../../spaces/"+lookup.Pathify(spaceID, 1, 2)+"/nodes/"+lookup.Pathify(spaceID, 4, 2), filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, spaceID))
-	if err != nil {
-		if isAlreadyExists(err) {
-			appctx.GetLogger(ctx).Debug().Err(err).Str("space", spaceID).Str("spacetype", spaceType).Msg("symlink already exists")
-			// FIXME: is it ok to wipe this err if the symlink already exists?
-		} else {
-			// TODO how should we handle error cases here?
-			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("spacetype", spaceType).Msg("could not create symlink")
-			return err
-		}
-	}
-
-	// touch index root to invalidate caches
-	now := time.Now()
-	return os.Chtimes(filepath.Join(fs.o.Root, "indexes", "by-type"), now, now)
+	target := "../../../spaces/" + lookup.Pathify(spaceID, 1, 2) + "/nodes/" + lookup.Pathify(spaceID, 4, 2)
+	return fs.spaceTypeIndex.Add(spaceType, spaceID, target)
 }
 
 func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, checkPermissions bool) (*provider.StorageSpace, error) {
