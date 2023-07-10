@@ -3,12 +3,14 @@ package opa_test
 import (
 	"context"
 	"encoding/base64"
+	"net/http"
+	"net/http/httptest"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/rego"
+
 	"github.com/owncloud/ocis/v2/services/policies/pkg/engine/opa"
-	"net/http"
-	"net/http/httptest"
 )
 
 var _ = Describe("opa ocis resource functions", func() {

@@ -3,11 +3,12 @@ package opa
 import (
 	"bytes"
 	"fmt"
+	"net/http"
+
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/types"
-	"net/http"
 )
 
 var RFResourceDownload = rego.Function1(

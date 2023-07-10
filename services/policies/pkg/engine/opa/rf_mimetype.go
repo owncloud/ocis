@@ -1,12 +1,13 @@
 package opa
 
 import (
+	"mime"
+	"strings"
+
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/types"
-	"mime"
-	"strings"
 )
 
 var RFMimetypeExtensions = rego.Function1(
