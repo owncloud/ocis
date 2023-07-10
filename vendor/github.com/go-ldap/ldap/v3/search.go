@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	ber "github.com/go-asn1-ber/asn1-ber"
 )
@@ -185,9 +186,9 @@ func readTag(f reflect.StructField) (string, bool) {
 // Unmarshal parses the Entry in the value pointed to by i
 //
 // Currently, this methods only supports struct fields of type
-// string, []string, int, int64 or []byte. Other field types will not be
-// regarded. If the field type is a string or int but multiple attribute
-// values are returned, the first value will be used to fill the field.
+// string, []string, int, int64, []byte, *DN, []*DN or time.Time. Other field types
+// will not be regarded. If the field type is a string or int but multiple
+// attribute values are returned, the first value will be used to fill the field.
 //
 // Example:
 //
@@ -216,12 +217,22 @@ func readTag(f reflect.StructField) (string, bool) {
 //		// values.
 //		Data []byte `ldap:"data"`
 //
+//		// Time is parsed with the generalizedTime spec into a time.Time
+//		Created time.Time `ldap:"createdTimestamp"`
+//
+//		// *DN is parsed with the ParseDN
+//		Owner *ldap.DN `ldap:"owner"`
+//
+//		// []*DN is parsed with the ParseDN
+//		Children []*ldap.DN `ldap:"children"`
+//
 //		// This won't work, as the field is not of type string. For this
 //		// to work, you'll have to temporarily store the result in string
 //		// (or string array) and convert it to the desired type afterwards.
 //		UserAccountControl uint32 `ldap:"userPrincipalName"`
 //	}
 //	user := UserEntry{}
+//
 //	if err := result.Unmarshal(&user); err != nil {
 //		// ...
 //	}
@@ -275,8 +286,28 @@ func (e *Entry) Unmarshal(i interface{}) (err error) {
 				return fmt.Errorf("ldap: could not parse value '%s' into int field", values[0])
 			}
 			fv.SetInt(intVal)
+		case time.Time:
+			t, err := ber.ParseGeneralizedTime([]byte(values[0]))
+			if err != nil {
+				return fmt.Errorf("ldap: could not parse value '%s' into time.Time field", values[0])
+			}
+			fv.Set(reflect.ValueOf(t))
+		case *DN:
+			dn, err := ParseDN(values[0])
+			if err != nil {
+				return fmt.Errorf("ldap: could not parse value '%s' into *ldap.DN field", values[0])
+			}
+			fv.Set(reflect.ValueOf(dn))
+		case []*DN:
+			for _, item := range values {
+				dn, err := ParseDN(item)
+				if err != nil {
+					return fmt.Errorf("ldap: could not parse value '%s' into *ldap.DN field", item)
+				}
+				fv.Set(reflect.Append(fv, reflect.ValueOf(dn)))
+			}
 		default:
-			return fmt.Errorf("ldap: expected field to be of type string, []string, int, int64 or []byte, got %v", ft.Type)
+			return fmt.Errorf("ldap: expected field to be of type string, []string, int, int64, []byte, *DN, []*DN or time.Time, got %v", ft.Type)
 		}
 	}
 	return
@@ -552,4 +583,58 @@ func unpackAttributes(children []*ber.Packet) []*EntryAttribute {
 	}
 
 	return entries
+}
+
+// DirSync does a Search with dirSync Control.
+func (l *Conn) DirSync(searchRequest *SearchRequest, flags int64, maxAttrCount int64, cookie []byte) (*SearchResult, error) {
+	var dirSyncControl *ControlDirSync
+
+	control := FindControl(searchRequest.Controls, ControlTypeDirSync)
+	if control == nil {
+		dirSyncControl = NewControlDirSync(flags, maxAttrCount, cookie)
+		searchRequest.Controls = append(searchRequest.Controls, dirSyncControl)
+	} else {
+		castControl, ok := control.(*ControlDirSync)
+		if !ok {
+			return nil, fmt.Errorf("Expected DirSync control to be of type *ControlDirSync, got %v", control)
+		}
+		if castControl.Flags != flags {
+			return nil, fmt.Errorf("flags given in search request (%d) conflicts with flags given in search call (%d)", castControl.Flags, flags)
+		}
+		if castControl.MaxAttrCnt != maxAttrCount {
+			return nil, fmt.Errorf("MaxAttrCnt given in search request (%d) conflicts with maxAttrCount given in search call (%d)", castControl.MaxAttrCnt, maxAttrCount)
+		}
+		dirSyncControl = castControl
+	}
+	searchResult := new(SearchResult)
+	result, err := l.Search(searchRequest)
+	l.Debug.Printf("Looking for result...")
+	if err != nil {
+		return searchResult, err
+	}
+	if result == nil {
+		return searchResult, NewError(ErrorNetwork, errors.New("ldap: packet not received"))
+	}
+
+	searchResult.Entries = append(searchResult.Entries, result.Entries...)
+	searchResult.Referrals = append(searchResult.Referrals, result.Referrals...)
+	searchResult.Controls = append(searchResult.Controls, result.Controls...)
+
+	l.Debug.Printf("Looking for DirSync Control...")
+	dirSyncResult := FindControl(result.Controls, ControlTypeDirSync)
+	if dirSyncResult == nil {
+		dirSyncControl = nil
+		l.Debug.Printf("Could not find dirSyncControl control.  Breaking...")
+		return searchResult, nil
+	}
+
+	cookie = dirSyncResult.(*ControlDirSync).Cookie
+	if len(cookie) == 0 {
+		dirSyncControl = nil
+		l.Debug.Printf("Could not find cookie.  Breaking...")
+		return searchResult, nil
+	}
+	dirSyncControl.SetCookie(cookie)
+
+	return searchResult, nil
 }
