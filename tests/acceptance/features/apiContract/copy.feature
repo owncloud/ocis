@@ -1,9 +1,9 @@
-@api 
+@api
 Feature: Copy test
   As a user
   I want to check the PROPFIND response
   So that I can make sure that the response contains all the relevant values
-  
+
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -22,3 +22,5 @@ Feature: Copy test
     And the following headers should match these regular expressions
       | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/ |
       | Access-Control-Allow-Origin | /^[*]{1}$/             |
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      

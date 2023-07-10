@@ -58,6 +58,7 @@ class SearchContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
+    $headers['X-Request-Id'] = WebDavHelper::generateUUIDv4();
 		$body
 			= "<?xml version='1.0' encoding='utf-8' ?>\n" .
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .
@@ -83,7 +84,7 @@ class SearchContext implements Context {
 			$password,
 			"REPORT",
 			"/",
-			null,
+			$headers,
 			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion()

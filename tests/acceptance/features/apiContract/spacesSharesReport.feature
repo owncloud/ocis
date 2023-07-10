@@ -28,6 +28,8 @@ Feature: Report test
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
       | key              | value                |
       | oc:fileid        | UUIDof:SubFolder1    |
@@ -47,6 +49,8 @@ Feature: Report test
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
       | key                | value                                            |
       | oc:fileid          | UUIDof:SubFolder1/subFOLDER2/insideTheFolder.txt |
@@ -65,4 +69,6 @@ Feature: Report test
       | role      | viewer     |
     When user "Brian" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the search result should contain "0" entries

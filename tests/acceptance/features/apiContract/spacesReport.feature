@@ -19,6 +19,8 @@ Feature: REPORT request to project space
     And using new DAV path
     When user "Alice" searches for "testFile.txt" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key                | value               |
       | oc:fileid          | UUIDof:testFile.txt |
@@ -35,6 +37,8 @@ Feature: REPORT request to project space
     And using new DAV path
     When user "Alice" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key                | value                                                       |
       | oc:fileid          | UUIDof:folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
@@ -50,6 +54,8 @@ Feature: REPORT request to project space
     And using new DAV path
     When user "Alice" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key              | value                |
       | oc:fileid        | UUIDof:folderMain    |
@@ -64,6 +70,8 @@ Feature: REPORT request to project space
     Given user "Alice" has created a folder "folderMain/sub-folder" in space "findData"
     And using new DAV path
     When user "Alice" searches for "sub" using the WebDAV API
+    And the following headers should match these regular expressions
+      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
     Then the HTTP status code should be "207"
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key              | value                        |
