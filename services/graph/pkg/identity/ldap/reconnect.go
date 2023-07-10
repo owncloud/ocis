@@ -277,7 +277,25 @@ func (c ConnWithReconnect) StartTLS(*tls.Config) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
-func (c ConnWithReconnect) Close() {}
+// Close implements the ldap.Client interface
+func (c ConnWithReconnect) Close() (err error) {
+	conn, err := c.GetConnection()
+
+	if err != nil {
+		return err
+	}
+	return conn.Close()
+}
+
+// GetLastError implements the ldap.Client interface
+func (c ConnWithReconnect) GetLastError() error {
+	conn, err := c.GetConnection()
+
+	if err != nil {
+		return err
+	}
+	return conn.GetLastError()
+}
 
 func (c ConnWithReconnect) IsClosing() bool {
 	return false
@@ -331,4 +349,9 @@ func (c ConnWithReconnect) TLSConnectionState() (tls.ConnectionState, bool) {
 // Unbind implements the ldap.Client interface
 func (c ConnWithReconnect) Unbind() error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+// DirSync implements the ldap.Client interface
+func (c ConnWithReconnect) DirSync(searchRequest *ldap.SearchRequest, flags, maxAttrCount int64, cookie []byte) (*ldap.SearchResult, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
