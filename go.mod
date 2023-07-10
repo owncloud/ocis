@@ -22,7 +22,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.2
-	github.com/go-ldap/ldap/v3 v3.4.5-0.20230327113050-32d292ef5ded
+	github.com/go-ldap/ldap/v3 v3.4.5
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-micro/plugins/v4/client/grpc v1.2.0
 	github.com/go-micro/plugins/v4/events/natsjs v1.2.0
