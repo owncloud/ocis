@@ -239,8 +239,8 @@ class NotificationContext implements Context {
 				[
 					"code" => "%space_id%",
 					"function" =>
-						[$this->spacesContext, "getSpaceIdByNameFromResponse"],
-					"parameter" => [$spaceName]
+						[$this->spacesContext, "getSpaceIdByName"],
+					"parameter" => [$sender, $spaceName]
 				],
 			],
 			null,
