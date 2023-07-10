@@ -104,6 +104,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
 			vClient := settingssvc.NewValueService("com.owncloud.api.settings", ogrpc.DefaultClient())
+			rClient := settingssvc.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient())
 
 			{
 				server, err := http.Server(
@@ -116,6 +117,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.GatewaySelector(gatewaySelector),
 					http.History(hClient),
 					http.Value(vClient),
+					http.Role(rClient),
 					http.RegisteredEvents(_registeredEvents),
 				)
 

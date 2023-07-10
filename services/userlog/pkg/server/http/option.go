@@ -31,6 +31,7 @@ type Options struct {
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	HistoryClient    ehsvc.EventHistoryService
 	ValueClient      settingssvc.ValueService
+	RoleClient       settingssvc.RoleService
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -126,5 +127,12 @@ func RegisteredEvents(evs []events.Unmarshaller) Option {
 func Value(vs settingssvc.ValueService) Option {
 	return func(o *Options) {
 		o.ValueClient = vs
+	}
+}
+
+// Roles provides a function to configure the roles service client
+func Role(rs settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.RoleClient = rs
 	}
 }

@@ -25,6 +25,7 @@ type Options struct {
 	HistoryClient    ehsvc.EventHistoryService
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	ValueClient      settingssvc.ValueService
+	RoleClient       settingssvc.RoleService
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -84,8 +85,16 @@ func RegisteredEvents(e []events.Unmarshaller) Option {
 	}
 }
 
+// ValueClient adds a grpc client for the value service
 func ValueClient(vs settingssvc.ValueService) Option {
 	return func(o *Options) {
 		o.ValueClient = vs
+	}
+}
+
+// RoleClient adds a grpc client for the role service
+func RoleClient(rs settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.RoleClient = rs
 	}
 }

@@ -6,6 +6,10 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 )
 
 // HeaderAcceptLanguage is the header where the client can set the locale
@@ -57,6 +61,23 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		resp.OCS.Data = append(resp.OCS.Data, noti)
 	}
 
+	glevs, err := ul.GetGlobalEvents()
+	if err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("get global events failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for t, data := range glevs {
+		noti, err := conv.ConvertGlobalEvent(t, data)
+		if err != nil {
+			ul.log.Error().Err(err).Str("eventtype", t).Msg("failed to convert event")
+			continue
+		}
+
+		resp.OCS.Data = append(resp.OCS.Data, noti)
+	}
+
 	resp.OCS.Meta.StatusCode = http.StatusOK
 	b, _ := json.Marshal(resp)
 	w.Write(b)
@@ -87,6 +108,42 @@ func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	r.URL.RawQuery = q.Encode()
 
 	ul.sse.ServeHTTP(w, r)
+}
+
+// HandlePostGlobaelEvent is the POST handler for global events
+func (ul *UserlogService) HandlePostGlobalEvent(w http.ResponseWriter, r *http.Request) {
+	var req PostEventsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := ul.StoreGlobalEvent(req.Type, req.Data); err != nil {
+		ul.log.Error().Err(err).Msg("post: error storing global event")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// HandleDeleteGlobalEvent is the DELETE handler for global events
+func (ul *UserlogService) HandleDeleteGlobalEvent(w http.ResponseWriter, r *http.Request) {
+	var req DeleteEventsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := ul.DeleteGlobalEvents(req.IDs); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("delete events failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // HandleDeleteEvents is the DELETE handler for events
@@ -129,4 +186,51 @@ type GetEventResponseOC10 struct {
 // DeleteEventsRequest is the expected body for the delete request
 type DeleteEventsRequest struct {
 	IDs []string `json:"ids"`
+}
+
+// PostEventsRequest is the expected body for the post request
+type PostEventsRequest struct {
+	// the event type, e.g. "deprovision"
+	Type string `json:"type"`
+	// arbitray data for the event
+	Data map[string]string `json:"data"`
+}
+
+// RequireAdmin middleware is used to require the user in context to be an admin / have account management permissions
+func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			u, ok := revactx.ContextGetUser(r.Context())
+			if !ok || u.GetId().GetOpaqueId() == "" {
+				logger.Error().Str("userid", u.Id.OpaqueId).Msg("user not in context")
+				errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
+				return
+			}
+			// get roles from context
+			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
+			if !ok {
+				logger.Debug().Str("userid", u.Id.OpaqueId).Msg("No roles in context, contacting settings service")
+				var err error
+				roleIDs, err = rm.FindRoleIDsForUser(r.Context(), u.Id.OpaqueId)
+				if err != nil {
+					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to get roles for user")
+					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
+					return
+				}
+				if len(roleIDs) == 0 {
+					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("user has no roles")
+					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
+					return
+				}
+			}
+
+			// check if permission is present in roles of the authenticated account
+			if rm.FindPermissionByID(r.Context(), roleIDs, settings.AccountManagementPermissionID) != nil {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			errorcode.AccessDenied.Render(w, r, http.StatusNotFound, "Forbidden")
+		}
+	}
 }

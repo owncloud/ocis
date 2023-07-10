@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -19,6 +20,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -80,9 +82,17 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		ul.registeredEvents[typ.String()] = e
 	}
 
+	m := roles.NewManager(
+		// TODO: caching?
+		roles.Logger(o.Logger),
+		roles.RoleService(o.RoleClient),
+	)
+
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
 		r.Delete("/", ul.HandleDeleteEvents)
+		r.Post("/global", RequireAdmin(&m, ul.log)(ul.HandlePostGlobalEvent))
+		r.Delete("/global", RequireAdmin(&m, ul.log)(ul.HandleDeleteGlobalEvent))
 
 		if !ul.cfg.DisableSSE {
 			r.Get("/sse", ul.HandleSSE)
@@ -235,6 +245,74 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 	})
 }
 
+// StoreGlobalEvent will store a global event that will be returned with each `GetEvents` request
+func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) error {
+	switch typ {
+	default:
+		return fmt.Errorf("unknown event type: %s", typ)
+	case "deprovision":
+		dps, ok := data["deprovision_date"]
+		if !ok {
+			return errors.New("need 'deprovision_date' in request body")
+		}
+
+		format := data["deprovision_date_format"]
+		if format == "" {
+			format = time.RFC3339
+		}
+
+		date, err := time.Parse(format, dps)
+		if err != nil {
+			fmt.Println("", format, "\n", dps)
+			return fmt.Errorf("cannot parse time to format. time: '%s' format: '%s'", dps, format)
+		}
+
+		ev := DeprovisionData{
+			DeprovisionDate:   date,
+			DeprovisionFormat: format,
+		}
+
+		b, err := json.Marshal(ev)
+		if err != nil {
+			return err
+		}
+
+		return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+			evs[typ] = b
+			return nil
+		})
+	}
+
+}
+
+// GetGlobalEvents will return all global events
+func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) {
+	out := make(map[string]json.RawMessage)
+
+	recs, err := ul.store.Read(_globalEventsKey)
+	if err != nil && err != store.ErrNotFound {
+		return out, err
+	}
+
+	if len(recs) > 0 {
+		if err := json.Unmarshal(recs[0].Value, &out); err != nil {
+			return out, err
+		}
+	}
+
+	return out, nil
+}
+
+// DeleteGlobalEvents will delete the specified event
+func (ul *UserlogService) DeleteGlobalEvents(evnames []string) error {
+	return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+		for _, name := range evnames {
+			delete(evs, name)
+		}
+		return nil
+	})
+}
+
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
 	if !ul.cfg.DisableSSE {
 		if err := ul.sendSSE(userid, event); err != nil {
@@ -309,6 +387,27 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 	return ul.store.Write(&store.Record{
 		Key:   userid,
 		Value: b,
+	})
+}
+
+func (ul *UserlogService) alterGlobalEvents(alter func(map[string]json.RawMessage) error) error {
+	evs, err := ul.GetGlobalEvents()
+	if err != nil && err != store.ErrNotFound {
+		return err
+	}
+
+	if err := alter(evs); err != nil {
+		return err
+	}
+
+	val, err := json.Marshal(evs)
+	if err != nil {
+		return err
+	}
+
+	return ul.store.Write(&store.Record{
+		Key:   "global-events",
+		Value: val,
 	})
 }
 
