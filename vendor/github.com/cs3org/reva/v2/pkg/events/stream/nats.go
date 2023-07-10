@@ -52,6 +52,7 @@ func NatsFromConfig(cfg NatsConfig) (events.Stream, error) {
 		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(cfg.Endpoint),
 		natsjs.ClusterID(cfg.Cluster),
+		natsjs.SynchronousPublish(true),
 	)
 
 }

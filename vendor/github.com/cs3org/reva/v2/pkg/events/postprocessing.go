@@ -184,3 +184,16 @@ func (ResumePostprocessing) Unmarshal(v []byte) (interface{}, error) {
 	err := json.Unmarshal(v, &e)
 	return e, err
 }
+
+// RestartPostprocessing will be emitted by postprocessing service if it doesn't know about an upload
+type RestartPostprocessing struct {
+	UploadID  string
+	Timestamp *types.Timestamp
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (RestartPostprocessing) Unmarshal(v []byte) (interface{}, error) {
+	e := RestartPostprocessing{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}

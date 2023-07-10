@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d
-	github.com/cs3org/reva/v2 v2.14.1-0.20230630110658-4d867d522806
+	github.com/cs3org/reva/v2 v2.14.1-0.20230711102918-b095db01ac36
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -25,7 +25,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.5
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-micro/plugins/v4/client/grpc v1.2.0
-	github.com/go-micro/plugins/v4/events/natsjs v1.2.0
+	github.com/go-micro/plugins/v4/events/natsjs v1.2.1
 	github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 	github.com/go-micro/plugins/v4/registry/consul v1.2.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
@@ -212,6 +212,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
+	github.com/google/renameio/v2 v2.0.0 // indirect
 	github.com/gookit/color v1.5.3 // indirect
 	github.com/gookit/goutil v0.6.9 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect

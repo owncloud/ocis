@@ -284,7 +284,7 @@ func refFromCS3(b []byte) (*provider.Reference, error) {
 func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string) bool) (err error) {
 	// Acquire a read log on the source node
 	// write lock existing node before reading treesize or tree time
-	f, err := lockedfile.Open(lu.MetadataBackend().MetadataPath(src))
+	lock, err := lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(src), os.O_RDONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -293,7 +293,7 @@ func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter f
 		return errors.Wrap(err, "xattrs: Unable to lock source to read")
 	}
 	defer func() {
-		rerr := f.Close()
+		rerr := lock.Close()
 
 		// if err is non nil we do not overwrite that
 		if err == nil {
@@ -301,7 +301,7 @@ func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter f
 		}
 	}()
 
-	return lu.CopyMetadataWithSourceLock(ctx, src, target, filter, f)
+	return lu.CopyMetadataWithSourceLock(ctx, src, target, filter, lock)
 }
 
 // CopyMetadataWithSourceLock copies all extended attributes from source to target.
@@ -312,11 +312,11 @@ func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, ta
 	switch {
 	case lockedSource == nil:
 		return errors.New("no lock provided")
-	case lockedSource.File.Name() != lu.MetadataBackend().MetadataPath(sourcePath):
+	case lockedSource.File.Name() != lu.MetadataBackend().LockfilePath(sourcePath):
 		return errors.New("lockpath does not match filepath")
 	}
 
-	attrs, err := lu.metadataBackend.AllWithLockedSource(ctx, sourcePath, lockedSource)
+	attrs, err := lu.metadataBackend.All(ctx, sourcePath)
 	if err != nil {
 		return err
 	}

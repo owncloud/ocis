@@ -36,7 +36,7 @@ import (
 var tracer trace.Tracer
 
 func init() {
-	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/cache")
 }
 
 // NewStatCache creates a new StatCache

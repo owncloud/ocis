@@ -51,10 +51,13 @@ func NewUnary() grpc.UnaryServerInterceptor {
 
 		log := appctx.GetLogger(ctx)
 		var event *zerolog.Event
+		var msg string
 		if code != codes.OK {
 			event = log.Error()
+			msg = err.Error()
 		} else {
 			event = log.Debug()
+			msg = "unary"
 		}
 
 		event.Str("user-agent", userAgent).
@@ -63,7 +66,7 @@ func NewUnary() grpc.UnaryServerInterceptor {
 			Str("start", start.Format("02/Jan/2006:15:04:05 -0700")).
 			Str("end", end.Format("02/Jan/2006:15:04:05 -0700")).Int("time_ns", int(diff)).
 			Str("code", code.String()).
-			Msg("unary")
+			Msg(msg)
 
 		return res, err
 	}
@@ -91,10 +94,13 @@ func NewStream() grpc.StreamServerInterceptor {
 
 		log := appctx.GetLogger(ss.Context())
 		var event *zerolog.Event
+		var msg string
 		if code != codes.OK {
 			event = log.Error()
+			msg = err.Error()
 		} else {
-			event = log.Info()
+			event = log.Debug()
+			msg = "stream"
 		}
 
 		event.Str("user-agent", userAgent).
@@ -103,7 +109,7 @@ func NewStream() grpc.StreamServerInterceptor {
 			Str("start", start.Format("02/Jan/2006:15:04:05 -0700")).
 			Str("end", end.Format("02/Jan/2006:15:04:05 -0700")).Int("time_ns", int(diff)).
 			Str("code", code.String()).
-			Msg("stream")
+			Msg(msg)
 
 		return err
 	}

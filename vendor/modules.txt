@@ -352,7 +352,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.14.1-0.20230630110658-4d867d522806
+# github.com/cs3org/reva/v2 v2.14.1-0.20230711102918-b095db01ac36
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -658,6 +658,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload
 github.com/cs3org/reva/v2/pkg/storage/utils/downloader
@@ -881,7 +882,7 @@ github.com/go-logr/stdr
 # github.com/go-micro/plugins/v4/client/grpc v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/client/grpc
-# github.com/go-micro/plugins/v4/events/natsjs v1.2.0
+# github.com/go-micro/plugins/v4/events/natsjs v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
@@ -1052,6 +1053,9 @@ github.com/google/go-tika/tika
 # github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1
 ## explicit; go 1.14
 github.com/google/pprof/profile
+# github.com/google/renameio/v2 v2.0.0
+## explicit; go 1.13
+github.com/google/renameio/v2
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid

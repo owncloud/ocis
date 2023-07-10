@@ -8,11 +8,12 @@ import (
 
 // Options which are used to configure the nats stream.
 type Options struct {
-	ClusterID string
-	ClientID  string
-	Address   string
-	TLSConfig *tls.Config
-	Logger    logger.Logger
+	ClusterID   string
+	ClientID    string
+	Address     string
+	TLSConfig   *tls.Config
+	Logger      logger.Logger
+	SyncPublish bool
 }
 
 // Option is a function which configures options.
@@ -50,5 +51,12 @@ func TLSConfig(t *tls.Config) Option {
 func Logger(log logger.Logger) Option {
 	return func(o *Options) {
 		o.Logger = log
+	}
+}
+
+// SynchronousPublish allows using a synchronous publishing instead of the default asynchronous
+func SynchronousPublish(sync bool) Option {
+	return func(o *Options) {
+		o.SyncPublish = sync
 	}
 }

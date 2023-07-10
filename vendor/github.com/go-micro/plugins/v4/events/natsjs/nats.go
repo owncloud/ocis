@@ -112,6 +112,16 @@ func (s *stream) Publish(topic string, msg interface{}, opts ...events.PublishOp
 	}
 
 	// publish the event to the topic's channel
+	// publish synchronously if configured
+	if s.opts.SyncPublish {
+		_, err := s.natsJetStreamCtx.Publish(event.Topic, bytes)
+		if err != nil {
+			err = errors.Wrap(err, "Error publishing message to topic")
+		}
+		return err
+	}
+
+	// publish asynchronously by default
 	if _, err := s.natsJetStreamCtx.PublishAsync(event.Topic, bytes); err != nil {
 		return errors.Wrap(err, "Error publishing message to topic")
 	}
