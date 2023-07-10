@@ -26,7 +26,7 @@ wopiurl = https://wopiserver.owncloud.test
 
 # URL for direct download of files. The complete URL that is sent
 # to clients will include the access_token argument
-downloadurl = https://wopiserver.owncloud.test/wopi/cbox/download
+downloadurl = https://wopiserver.owncloud.test/wopi/iop/download
 
 # The internal server engine to use (defaults to flask).
 # Set to waitress for production installations.
