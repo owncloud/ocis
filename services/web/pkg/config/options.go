@@ -23,7 +23,7 @@ type Options struct {
 	ImprintURL               string           `json:"imprintUrl,omitempty" yaml:"imprintUrl" env:"WEB_OPTION_IMPRINT_URL" desc:"Specifies the target URL for the imprint link valid for the ocis instance in the account menu."`
 	PrivacyURL               string           `json:"privacyUrl,omitempty" yaml:"privacyUrl" env:"WEB_OPTION_PRIVACY_URL" desc:"Specifies the target URL for the privacy link valid for the ocis instance in the account menu."`
 	AccessDeniedHelpURL      string           `json:"accessDeniedHelpURL,omitempty" yaml:"accessDeniedHelpURL" env:"WEB_OPTION_ACCESS_DENIED_HELP_URL" desc:"Specifies the target URL valid for the ocis instance for the generic logged out / access denied page."`
-	TokenStorageLocalSession bool             `json:"tokenStorageLocalSession,omitempty" yaml:"tokenStorageLocalSession" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL_SESSION" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'false'."`
+	TokenStorageLocal        bool             `json:"tokenStorageLocal,omitempty" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'false'."`
 }
 
 // AccountEditLink are the AccountEditLink options
