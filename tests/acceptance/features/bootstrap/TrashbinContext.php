@@ -231,22 +231,39 @@ class TrashbinContext implements Context {
 			'trash-bin',
 			$davPathVersion
 		);
-		$this->featureContext->setResponse($response);
+        $response->getBody()->rewind();
+        $statusCode = $response->getStatusCode();
+        $respBody = $response->getBody()->getContents();
+        Assert::assertEquals("207",$statusCode,"Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
+
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__ . " $collectionPath"
 		);
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
+
+        //set endpoint for according to dav path
+        $endpoint = "/remote.php/dav/trash-bin/$user";
+        if($this->featureContext->getDavPathVersion() === 3){
+            $space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+                $this->featureContext->getBaseUrl(),
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $this->featureContext->getStepLineRef()
+            );
+            $endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
+        }
+
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
 			$files,
-			static function ($element) use ($user, $collectionPath) {
+			static function ($element) use ($endpoint, $collectionPath) {
 				$path = $collectionPath;
 				if ($path !== "") {
 					$path = $path . "/";
 				}
-				return ($element['href'] !== "/remote.php/dav/trash-bin/$user/$path");
+				return ($element['href'] !== "$endpoint/$path");
 			}
 		);
 
@@ -979,11 +996,8 @@ class TrashbinContext implements Context {
 		?string $originalPath
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$result = $this->isInTrash($user, $originalPath);
-		$actualStatus = $this->featureContext->getResponse()->getStatusCode();
-		Assert::assertEquals(207, $actualStatus, "Expected status code to be '207', but got '$actualStatus'");
 		Assert::assertTrue(
-			$result,
+            $this->isInTrash($user, $originalPath),
 			"File previously located at $originalPath wasn't found in the trashbin of user $user"
 		);
 	}
