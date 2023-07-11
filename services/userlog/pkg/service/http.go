@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // HeaderAcceptLanguage is the header where the client can set the locale
@@ -22,19 +22,25 @@ func (ul *UserlogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetEvents is the GET handler for events
 func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request) {
-	u, ok := revactx.ContextGetUser(r.Context())
+	ctx, span := tracer.Start(r.Context(), "HandleGetEvents")
+	defer span.End()
+	u, ok := revactx.ContextGetUser(ctx)
 	if !ok {
 		ul.log.Error().Int("returned statuscode", http.StatusUnauthorized).Msg("user unauthorized")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	evs, err := ul.GetEvents(r.Context(), u.GetId().GetOpaqueId())
+	evs, err := ul.GetEvents(ctx, u.GetId().GetOpaqueId())
 	if err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("get events failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	span.SetAttributes(attribute.KeyValue{
+		Key:   "events",
+		Value: attribute.IntValue(len(evs)),
+	})
 
 	conv := ul.getConverter(r.Header.Get(HeaderAcceptLanguage))
 
@@ -61,7 +67,7 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		resp.OCS.Data = append(resp.OCS.Data, noti)
 	}
 
-	glevs, err := ul.GetGlobalEvents()
+	glevs, err := ul.GetGlobalEvents(ctx)
 	if err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("get global events failed")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -85,7 +91,7 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 
 // HandleSSE is the GET handler for events
 func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
-	u, ok := ctx.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		ul.log.Error().Msg("sse: no user in context")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -119,7 +125,7 @@ func (ul *UserlogService) HandlePostGlobalEvent(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := ul.StoreGlobalEvent(req.Type, req.Data); err != nil {
+	if err := ul.StoreGlobalEvent(r.Context(), req.Type, req.Data); err != nil {
 		ul.log.Error().Err(err).Msg("post: error storing global event")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -137,7 +143,7 @@ func (ul *UserlogService) HandleDeleteGlobalEvent(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := ul.DeleteGlobalEvents(req.IDs); err != nil {
+	if err := ul.DeleteGlobalEvents(r.Context(), req.IDs); err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("delete events failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return

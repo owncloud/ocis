@@ -29,8 +29,16 @@ import (
 	"github.com/r3labs/sse/v2"
 	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/metadata"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/owncloud/ocis/services/userlog/pkg/service")
+}
 
 // UserlogService is the service responsible for user activities
 type UserlogService struct {
@@ -43,7 +51,6 @@ type UserlogService struct {
 	valueClient      settingssvc.ValueService
 	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
-	translationPath  string
 }
 
 // NewUserlogService returns an EventHistory service
@@ -54,7 +61,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 	}
 
 	if o.Consumer == nil || o.Store == nil {
-		return nil, fmt.Errorf("Need non nil consumer (%v) and store (%v) to work properly", o.Consumer, o.Store)
+		return nil, fmt.Errorf("need non nil consumer (%v) and store (%v) to work properly", o.Consumer, o.Store)
 	}
 
 	ch, err := events.Consume(o.Consumer, "userlog", o.RegisteredEvents...)
@@ -191,6 +198,8 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 
 // GetEvents allows retrieving events from the eventhistory by userid
 func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehmsg.Event, error) {
+	ctx, span := tracer.Start(ctx, "GetEvents")
+	defer span.End()
 	rec, err := ul.store.Read(userid)
 	if err != nil && err != store.ErrNotFound {
 		ul.log.Error().Err(err).Str("userid", userid).Msg("failed to read record from store")
@@ -246,7 +255,9 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 // StoreGlobalEvent will store a global event that will be returned with each `GetEvents` request
-func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) error {
+func (ul *UserlogService) StoreGlobalEvent(ctx context.Context, typ string, data map[string]string) error {
+	ctx, span := tracer.Start(ctx, "StoreGlobalEvent")
+	defer span.End()
 	switch typ {
 	default:
 		return fmt.Errorf("unknown event type: %s", typ)
@@ -277,7 +288,7 @@ func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) e
 			return err
 		}
 
-		return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+		return ul.alterGlobalEvents(ctx, func(evs map[string]json.RawMessage) error {
 			evs[typ] = b
 			return nil
 		})
@@ -286,7 +297,9 @@ func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) e
 }
 
 // GetGlobalEvents will return all global events
-func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) {
+func (ul *UserlogService) GetGlobalEvents(ctx context.Context) (map[string]json.RawMessage, error) {
+	_, span := tracer.Start(ctx, "GetGlobalEvents")
+	defer span.End()
 	out := make(map[string]json.RawMessage)
 
 	recs, err := ul.store.Read(_globalEventsKey)
@@ -304,8 +317,10 @@ func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) 
 }
 
 // DeleteGlobalEvents will delete the specified event
-func (ul *UserlogService) DeleteGlobalEvents(evnames []string) error {
-	return ul.alterGlobalEvents(func(evs map[string]json.RawMessage) error {
+func (ul *UserlogService) DeleteGlobalEvents(ctx context.Context, evnames []string) error {
+	_, span := tracer.Start(ctx, "DeleteGlobalEvents")
+	defer span.End()
+	return ul.alterGlobalEvents(ctx, func(evs map[string]json.RawMessage) error {
 		for _, name := range evnames {
 			delete(evs, name)
 		}
@@ -390,8 +405,10 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 	})
 }
 
-func (ul *UserlogService) alterGlobalEvents(alter func(map[string]json.RawMessage) error) error {
-	evs, err := ul.GetGlobalEvents()
+func (ul *UserlogService) alterGlobalEvents(ctx context.Context, alter func(map[string]json.RawMessage) error) error {
+	_, span := tracer.Start(ctx, "alterGlobalEvents")
+	defer span.End()
+	evs, err := ul.GetGlobalEvents(ctx)
 	if err != nil && err != store.ErrNotFound {
 		return err
 	}
@@ -587,7 +604,7 @@ func getSpace(ctx context.Context, spaceID string, gatewaySelector pool.Selectab
 	}
 
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("Error while getting space: (%v) %s", res.GetStatus().GetCode(), res.GetStatus().GetMessage())
+		return nil, fmt.Errorf("error while getting space: (%v) %s", res.GetStatus().GetCode(), res.GetStatus().GetMessage())
 	}
 
 	if len(res.StorageSpaces) == 0 {
@@ -647,7 +664,7 @@ func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, ga
 	}
 
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("Unexpected status code while getting space: %v", res.GetStatus().GetCode())
+		return nil, fmt.Errorf("unexpected status code while getting space: %v", res.GetStatus().GetCode())
 	}
 
 	return res.GetInfo(), nil
