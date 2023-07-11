@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"ociswrapper/common"
@@ -16,7 +17,6 @@ import (
 
 var cmd *exec.Cmd
 var retryCount = 0
-var maxRetry = 5
 
 func Start(envMap map[string]any) {
 	if retryCount == 0 {
@@ -57,6 +57,8 @@ func Start(envMap map[string]any) {
 		m := stdoutScanner.Text()
 		fmt.Println(m)
 		retryCount++
+
+		maxRetry, _ := strconv.Atoi(config.Get("retry"))
 		if retryCount <= maxRetry {
 			fmt.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
 			// Stop and start again
@@ -71,6 +73,7 @@ func Stop() {
 	if err != nil {
 		log.Panic("Cannot kill oCIS server")
 	}
+	cmd.Wait()
 }
 
 func WaitForConnection() bool {
