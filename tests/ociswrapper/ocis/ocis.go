@@ -59,6 +59,8 @@ func Start(envMap map[string]any) {
 		retryCount++
 		if retryCount <= maxRetry {
 			fmt.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+			// Stop and start again
+			Stop()
 			Start(envMap)
 		}
 	}
@@ -88,7 +90,7 @@ func WaitForConnection() bool {
 	for {
 		select {
 		case <-timeout:
-			fmt.Println(fmt.Sprintf("Timeout waiting for oCIS server [%f] seconds", timeoutValue.Seconds()))
+			fmt.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
 			return false
 		default:
 			_, err := client.Get(config.Get("url"))
