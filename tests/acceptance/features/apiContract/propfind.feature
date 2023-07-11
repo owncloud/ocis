@@ -48,8 +48,8 @@ Feature: Propfind test
       | viewer  |               |
 
 
-  Scenario Outline: space member with a different role checks the PROPFIND request of folders in the space
-    Given user "Alice" has created a folder "folderMain/subFolder1/subFolder2" in space "new-space"
+  Scenario Outline: space member with a different role checks the PROPFIND request of the folder in the space
+    Given user "Alice" has created a folder "folderMain" in space "new-space"
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -62,6 +62,18 @@ Feature: Propfind test
       | oc:name        | folderMain        |
       | oc:permissions | <oc_permission>   |
       | oc:size        | 0                 |
+    Examples:
+      | role    | oc_permission |
+      | manager | RDNVCKZP      |
+      | editor  | DNVCK         |
+      | viewer  |               |
+
+
+  Scenario Outline: space member with a different role checks the PROPFIND request of the sub-folder in the space
+    Given user "Alice" has created a folder "folderMain/subFolder1/subFolder2" in space "new-space"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
