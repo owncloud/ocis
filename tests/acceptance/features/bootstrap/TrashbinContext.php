@@ -243,7 +243,7 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-		//set endpoint for according to dav path
+		//set endpoint according to webdav request (1 = old, 2 = new, 3 = spaces)
 		$endpoint = "/remote.php/dav/trash-bin/$user";
 		if ($this->featureContext->getDavPathVersion() === 3) {
 			$space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
