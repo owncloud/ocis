@@ -18,18 +18,22 @@ The following sections list the changes for unreleased.
 * Enhancement - Add IDs to graph resource logging: [#6593](https://github.com/owncloud/ocis/pull/6593)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
+* Enhancement - Add X-Request-Id to all responses: [#6715](https://github.com/owncloud/ocis/pull/6715)
 * Enhancement - Add SSE Endpoint: [#5998](https://github.com/owncloud/ocis/pull/5998)
 * Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
 * Enhancement - Make the post logout redirect uri configurable: [#6583](https://github.com/owncloud/ocis/pull/6583)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
+* Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 * Enhancement - Thumbnails can be disabled for webdav & web now: [#6577](https://github.com/owncloud/ocis/pull/6577)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
+* Enhancement - Add postprocessing mimetype to extension helper: [#6133](https://github.com/owncloud/ocis/pull/6133)
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
+* Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
@@ -133,6 +137,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6300
 
+* Enhancement - Add X-Request-Id to all responses: [#6715](https://github.com/owncloud/ocis/pull/6715)
+
+   We added the X-Request-Id to all responses to increase the debuggability of the platform.
+
+   https://github.com/owncloud/ocis/pull/6715
+
 * Enhancement - Add SSE Endpoint: [#5998](https://github.com/owncloud/ocis/pull/5998)
 
    Add a server-sent events (sse) endpoint for the userlog service
@@ -200,6 +210,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6572
    https://github.com/owncloud/ocis/pull/6590
 
+* Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
+
+   Explain the usage of the EULA for binary builds.
+
+   https://github.com/owncloud/ocis/pull/6755
+
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 
    Use reva client selectors instead of the static clients, this introduces the ocis service
@@ -239,6 +255,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6549
 
+* Enhancement - Add postprocessing mimetype to extension helper: [#6133](https://github.com/owncloud/ocis/pull/6133)
+
+   Add rego helper to resolve extensions from mimetype
+   `ocis.mimetype.extensions(mimetype)`. Besides that, a rego print helper is included also
+   `print("PRINT MESSAGE EXAMPLE")`
+
+   https://github.com/owncloud/ocis/pull/6133
+
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 
    The search result REPORT response now contains a content preview which highlights the search
@@ -246,6 +270,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6426
    https://github.com/owncloud/ocis/pull/6634
+
+* Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
+
+   We introduced the feature to store the access token in the local storage, this feature is
+   disabled by default, but can be enabled by setting the env `WEB_OPTION_TOKEN_STORAGE_LOCAL`
+   to `true`.
+
+   https://github.com/owncloud/ocis/pull/6760
 
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
