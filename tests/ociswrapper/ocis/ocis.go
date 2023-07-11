@@ -15,9 +15,13 @@ import (
 )
 
 var cmd *exec.Cmd
+var retryCount = 0
+var maxRetry = 5
 
 func Start(envMap map[string]any) {
-	defer common.Wg.Done()
+	if retryCount == 0 {
+		defer common.Wg.Done()
+	}
 
 	cmd = exec.Command(config.Get("bin"), "server")
 	cmd.Env = os.Environ()
@@ -52,6 +56,11 @@ func Start(envMap map[string]any) {
 	for stdoutScanner.Scan() {
 		m := stdoutScanner.Text()
 		fmt.Println(m)
+		retryCount++
+		if retryCount <= maxRetry {
+			fmt.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+			Start(envMap)
+		}
 	}
 }
 
@@ -66,7 +75,9 @@ func WaitForConnection() bool {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+	// 5 seconds timeout
 	timeoutValue := 5 * time.Second
+
 	client := http.Client{
 		Timeout:   timeoutValue,
 		Transport: transport,
@@ -87,6 +98,7 @@ func WaitForConnection() bool {
 				fmt.Println(fmt.Sprintf("oCIS server is ready to accept requests"))
 				return true
 			}
+			// 500 milliseconds poll interval
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
