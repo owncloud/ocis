@@ -126,6 +126,7 @@ func DefaultConfig() *config.Config {
 					},
 					Upload:                  &config.Upload{},
 					OpenLinksWithDefaultApp: true,
+					TokenStorageLocal:       true,
 				},
 			},
 		},

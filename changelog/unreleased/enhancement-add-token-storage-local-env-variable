@@ -4,4 +4,4 @@ We introduced the feature to store the access token in the local storage, this f
 but can be enabled by setting the env `WEB_OPTION_TOKEN_STORAGE_LOCAL` to `true`.
 
 https://github.com/owncloud/ocis/pull/6760
-
+https://github.com/owncloud/ocis/pull/6771
