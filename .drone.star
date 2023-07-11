@@ -898,6 +898,13 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
                          ],
                      },
+                     {
+                         "name": "wait-for-fakeoffice",
+                         "image": OC_CI_ALPINE,
+                         "commands": [
+                             "curl -k --fail --retry-connrefused --retry 9 --retry-all-errors 'http://fakeoffice:8080'",
+                         ],
+                     },
                  ] +
                  ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
                  [
