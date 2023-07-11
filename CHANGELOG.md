@@ -31,6 +31,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
+* Enhancement - Add WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP env variable: [#6328](https://github.com/owncloud/ocis/pull/6328)
 * Enhancement - Add postprocessing mimetype to extension helper: [#6133](https://github.com/owncloud/ocis/pull/6133)
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 * Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
@@ -255,6 +256,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6549
 
+* Enhancement - Add WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP env variable: [#6328](https://github.com/owncloud/ocis/pull/6328)
+
+   We introduced the open file links with default app feature in web which is enabled by default,
+   this is now configurable and can be disabled by setting the env
+   `WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` to `false`.
+
+   https://github.com/owncloud/ocis/pull/6328
+
 * Enhancement - Add postprocessing mimetype to extension helper: [#6133](https://github.com/owncloud/ocis/pull/6133)
 
    Add rego helper to resolve extensions from mimetype
@@ -278,6 +287,7 @@ The following sections list the changes for unreleased.
    to `true`.
 
    https://github.com/owncloud/ocis/pull/6760
+   https://github.com/owncloud/ocis/pull/6771
 
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
