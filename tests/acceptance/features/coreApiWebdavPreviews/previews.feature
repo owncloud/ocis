@@ -1,4 +1,4 @@
-@api @preview-extension-required
+@api
 Feature: previews of files downloaded through the webdav API
   As a user
   I want to be able to download the preview of the files
@@ -81,14 +81,18 @@ Feature: previews of files downloaded through the webdav API
     And the downloaded image should be "32" pixels wide and "32" pixels high
 
 
-  Scenario: download previews of shared files (to shares folder)
+  Scenario Outline: download previews of shared files (to shares folder)
     Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And user "Alice" has shared file "/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
-    When user "Brian" downloads the preview of "/Shares/parent.txt" with width "32" and height "32" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/<resource>" to "/<resource>"
+    And user "Alice" has shared file "/<resource>" with user "Brian"
+    And user "Brian" has accepted share "/<resource>" offered by user "Alice"
+    When user "Brian" downloads the preview of "/Shares/<resource>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
+    Examples:
+      | resource    |
+      | lorem.txt   |
+      | example.gif |
 
 
   Scenario: download previews of other users files

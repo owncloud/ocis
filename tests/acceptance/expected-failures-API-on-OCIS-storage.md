@@ -210,11 +210,11 @@ cannot share a folder with create permission
 
 #### [download previews of other users file](https://github.com/owncloud/ocis/issues/2071)
 
-- [coreApiWebdavPreviews/previews.feature:94](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L94)
+- [coreApiWebdavPreviews/previews.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L98)
 
 #### [different error message detail for previews of folder](https://github.com/owncloud/ocis/issues/2064)
 
-- [coreApiWebdavPreviews/previews.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L103)
+- [coreApiWebdavPreviews/previews.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L107)
 
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
@@ -564,7 +564,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
 
-- [coreApiWebdavPreviews/previews.feature:137](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L137)
+- [coreApiWebdavPreviews/previews.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L141)
 
 #### [Share path in the response is different between share states](https://github.com/owncloud/ocis/issues/2540)
 
