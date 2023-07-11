@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"ociswrapper/common"
+	"ociswrapper/log"
 	"ociswrapper/ocis/config"
 )
 
@@ -33,45 +33,48 @@ func Start(envMap map[string]any) {
 	}
 	cmd.Env = append(cmd.Env, environments...)
 
-	stderr, err := cmd.StderrPipe()
+	logs, err := cmd.StderrPipe()
 	if err != nil {
-		fmt.Println(err)
+		log.Panic(err)
 	}
-	stdout, err := cmd.StdoutPipe()
+	output, err := cmd.StdoutPipe()
 	if err != nil {
-		fmt.Println(err)
+		log.Panic(err)
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		fmt.Println(err)
+		log.Panic(err)
 	}
 
-	stderrScanner := bufio.NewScanner(stderr)
-	for stderrScanner.Scan() {
-		m := stderrScanner.Text()
+	// Read and print the logs when the 'ocis server' command is running
+	logScanner := bufio.NewScanner(logs)
+	for logScanner.Scan() {
+		m := logScanner.Text()
 		fmt.Println(m)
 	}
-	stdoutScanner := bufio.NewScanner(stdout)
-	for stdoutScanner.Scan() {
-		m := stdoutScanner.Text()
+	// Read output when the 'ocis server' command gets exited
+	outputScanner := bufio.NewScanner(output)
+	for outputScanner.Scan() {
+		m := outputScanner.Text()
 		fmt.Println(m)
 		retryCount++
 
 		maxRetry, _ := strconv.Atoi(config.Get("retry"))
 		if retryCount <= maxRetry {
-			fmt.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+			log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
 			// Stop and start again
 			Stop()
 			Start(envMap)
 		}
 	}
+	cmd.Wait()
 }
 
 func Stop() {
 	err := cmd.Process.Kill()
 	if err != nil {
-		log.Panic("Cannot kill oCIS server")
+		log.Panic(err)
 	}
 	cmd.Wait()
 }
@@ -93,14 +96,12 @@ func WaitForConnection() bool {
 	for {
 		select {
 		case <-timeout:
-			fmt.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
+			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
 			return false
 		default:
 			_, err := client.Get(config.Get("url"))
-			if err != nil {
-				fmt.Println("Waiting for oCIS server...")
-			} else {
-				fmt.Println(fmt.Sprintf("oCIS server is ready to accept requests"))
+			if err == nil {
+				log.Println("oCIS server is ready to accept requests")
 				return true
 			}
 			// 500 milliseconds poll interval
@@ -110,7 +111,7 @@ func WaitForConnection() bool {
 }
 
 func Restart(envMap map[string]any) bool {
-	log.Print("Restarting oCIS server...")
+	log.Println("Restarting oCIS server...")
 	Stop()
 
 	common.Wg.Add(1)

@@ -1,9 +1,10 @@
 package wrapper
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"ociswrapper/common"
+	"ociswrapper/log"
 	"ociswrapper/ocis/config"
 	"ociswrapper/wrapper/handlers"
 )
@@ -26,7 +27,7 @@ func Start(port string) {
 
 	httpServer.Handler = mux
 
-	log.Printf("Starting server on port %s...", port)
+	log.Println(fmt.Sprintf("Starting ociswrapper on port %s...", port))
 
 	err := httpServer.ListenAndServe()
 	if err != nil {
