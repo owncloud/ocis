@@ -22,6 +22,7 @@ import (
 	"context"
 	"regexp"
 
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -218,15 +219,29 @@ func (s *service) GetPublicShare(ctx context.Context, req *link.GetPublicShareRe
 		log.Error().Msg("error getting user from context")
 	}
 
-	found, err := s.sm.GetPublicShare(ctx, u, req.Ref, req.GetSign())
-	if err != nil {
-		return nil, err
+	ps, err := s.sm.GetPublicShare(ctx, u, req.Ref, req.GetSign())
+	switch {
+	case err != nil:
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, err.Error())
+		}
+		return &link.GetPublicShareResponse{
+			Status: st,
+		}, nil
+	case ps == nil:
+		return &link.GetPublicShareResponse{
+			Status: status.NewNotFound(ctx, "not found"),
+		}, nil
+	default:
+		return &link.GetPublicShareResponse{
+			Status: status.NewOK(ctx),
+			Share:  ps,
+		}, nil
 	}
-
-	return &link.GetPublicShareResponse{
-		Status: status.NewOK(ctx),
-		Share:  found,
-	}, nil
 }
 
 func (s *service) ListPublicShares(ctx context.Context, req *link.ListPublicSharesRequest) (*link.ListPublicSharesResponse, error) {

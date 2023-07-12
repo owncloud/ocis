@@ -625,8 +625,6 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.13 h1:TYHggH/hwP7eArqiXSJUvtOPNzQDyQ7vwmwEqlFWhMc=
 github.com/crewjam/saml v0.4.13/go.mod h1:igEejV+fihTIlHXYP8zOec3V5A8y3lws5bQBFsTm4gA=
-github.com/cs3org/reva/v2 v2.14.1-0.20230711102918-b095db01ac36 h1:Jww+ia7QQPE6zctpRb60iflrAaasRxNl9AfmOyM8Fw0=
-github.com/cs3org/reva/v2 v2.14.1-0.20230711102918-b095db01ac36/go.mod h1:4z5EQghS2LhSWZWocH51Dw9VAs16No1zSFvFgQtgS7w=
 github.com/cs3org/reva/v2 v2.14.1-0.20230712131605-76f38842c6d2 h1:i9hn9nmcLLezXh4Dt9aa867CtCXQhNujEWTL+4+M3S4=
 github.com/cs3org/reva/v2 v2.14.1-0.20230712131605-76f38842c6d2/go.mod h1:4z5EQghS2LhSWZWocH51Dw9VAs16No1zSFvFgQtgS7w=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=

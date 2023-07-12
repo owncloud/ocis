@@ -430,7 +430,7 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 	if ref.GetToken() != "" {
 		ps, pw, err := m.getByToken(ctx, ref.GetToken())
 		if err != nil {
-			return nil, errors.New("no shares found by token")
+			return nil, errtypes.NotFound("no shares found by token")
 		}
 		if ps.PasswordProtected && sign {
 			err := publicshare.AddSignature(ps, pw)
@@ -463,7 +463,7 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 				if err := m.revokeExpiredPublicShare(ctx, &ps, u); err != nil {
 					return nil, err
 				}
-				return nil, errors.New("no shares found by id:" + ref.GetId().String())
+				return nil, errtypes.NotFound("no shares found by id:" + ref.GetId().String())
 			}
 			if ps.PasswordProtected && sign {
 				err := publicshare.AddSignature(&ps, passDB)
@@ -475,7 +475,7 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 		}
 
 	}
-	return nil, errors.New("no shares found by id:" + ref.GetId().String())
+	return nil, errtypes.NotFound("no shares found by id:" + ref.GetId().String())
 }
 
 // ListPublicShares retrieves all the shares on the manager that are valid.
