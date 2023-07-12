@@ -32,7 +32,6 @@ PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:4.7.0"
-THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
 DEFAULT_NODEJS_VERSION = "18"
@@ -95,11 +94,9 @@ config = {
     ],
     "cs3ApiTests": {
         "skip": False,
-        "earlyFail": True,
     },
     "wopiValidatorTests": {
         "skip": False,
-        "earlyFail": True,
     },
     "localApiTests": {
         "basic": {
@@ -114,14 +111,12 @@ config = {
                 "apiAsyncUpload",
             ],
             "skip": False,
-            "earlyFail": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
             "skip": False,
-            "earlyFail": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -138,7 +133,6 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
-            "earlyFail": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -153,17 +147,14 @@ config = {
         "numberOfParts": 10,
         "skip": False,
         "skipExceptParts": [],
-        "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
         "skip": False,
         "skipExceptParts": [],
-        "earlyFail": True,
     },
     "e2eTests": {
         "skip": False,
-        "earlyFail": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -737,7 +728,6 @@ def localApiTestPipeline(ctx):
     defaults = {
         "suites": {},
         "skip": False,
-        "earlyFail": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
         "storages": ["ocis"],
@@ -753,7 +743,6 @@ def localApiTestPipeline(ctx):
                 for item in defaults:
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for suite in params["suites"]:
-                    early_fail = params["earlyFail"] if "earlyFail" in params else False
                     for storage in params["storages"]:
                         pipeline = {
                             "kind": "pipeline",
@@ -768,8 +757,7 @@ def localApiTestPipeline(ctx):
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     localApiTests(suite, storage, params["extraEnvironment"]) +
-                                     failEarly(ctx, early_fail),
+                                     localApiTests(suite, storage, params["extraEnvironment"])
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
@@ -812,8 +800,6 @@ def localApiTests(suite, storage, extra_environment = {}):
     }]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
-    early_fail = config["cs3ApiTests"]["earlyFail"] if "earlyFail" in config["cs3ApiTests"] else False
-
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -834,8 +820,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                              "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=ocis-server:9142",
                          ],
                      },
-                 ] +
-                 failEarly(ctx, early_fail),
+                 ]
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -846,8 +831,6 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     }
 
 def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
-    early_fail = config["wopiValidatorTests"]["earlyFail"] if "earlyFail" in config["wopiValidatorTests"] else False
-
     testgroups = [
         "BaseWopiViewing",
         "CheckFileInfoSchema",
@@ -937,8 +920,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                          ],
                      },
                  ] +
-                 validatorTests +
-                 failEarly(ctx, early_fail),
+                 validatorTests
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -949,7 +931,6 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
-    early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
 
@@ -987,7 +968,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
                      },
-                 ] + failEarly(ctx, early_fail),
+                 ]
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -1012,7 +993,6 @@ def uiTests(ctx):
     default = {
         "filterTags": "",
         "skip": False,
-        "earlyFail": False,
         # only used if 'full-ci' is in build title or if run by cron
         "numberOfParts": 20,
         "skipExceptParts": [],
@@ -1024,7 +1004,6 @@ def uiTests(ctx):
         params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
 
     filterTags = params["filterTags"]
-    earlyFail = params["earlyFail"]
 
     if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
@@ -1033,17 +1012,17 @@ def uiTests(ctx):
 
         for runPart in range(1, numberOfParts + 1):
             if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
-                pipelines.append(uiTestPipeline(ctx, "", earlyFail, runPart, numberOfParts))
+                pipelines.append(uiTestPipeline(ctx, "",runPart, numberOfParts))
 
     # For ordinary PRs, always run the "minimal" UI test pipeline
     # That has its own expected-failures file, and we always want to know that it is correct,
     if (ctx.build.event != "tag"):
-        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail, 1, 2, "ocis", "smoke"))
-        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail, 2, 2, "ocis", "smoke"))
+        pipelines.append(uiTestPipeline(ctx, filterTags, 1, 2, "ocis", "smoke"))
+        pipelines.append(uiTestPipeline(ctx, filterTags, 2, 2, "ocis", "smoke"))
 
     return pipelines
 
-def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
@@ -1101,7 +1080,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                              "./run.sh",
                          ],
                      },
-                 ] + failEarly(ctx, early_fail),
+                 ]
         "services": selenium() + middlewareService(),
         "volumes": [{
             "name": "uploads",
@@ -1162,9 +1141,7 @@ def e2eTests(ctx):
         restoreWebPnpmCache() + \
         ocisServer("ocis", 4, []) + \
         e2e_test_ocis + \
-        uploadTracingResult(ctx) + \
-        buildTracingComment() + \
-        e2eGithubComment()
+        uploadTracingResult(ctx)
 
     if ("skip-e2e" in ctx.build.title.lower()):
         return []
@@ -1217,103 +1194,6 @@ def uploadTracingResult(ctx):
             ],
         },
     }]
-
-def buildTracingComment():
-    return [{
-        "name": "build-tracing-comment",
-        "image": OC_UBUNTU,
-        "commands": [
-            "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
-            'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
-            'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
-            'echo "\n</p></details>" >>  comments.file',
-            "more  comments.file",
-        ],
-        "environment": {
-            "CACHE_ENDPOINT": {
-                "from_secret": "cache_s3_server",
-            },
-            "CACHE_BUCKET": {
-                "from_secret": "cache_s3_bucket",
-            },
-        },
-        "when": {
-            "status": [
-                "failure",
-            ],
-            "event": [
-                "pull_request",
-                "cron",
-            ],
-        },
-    }]
-
-def e2eGithubComment():
-    prefix = "E2E tests failed: ${DRONE_BUILD_LINK}/${DRONE_JOB_NUMBER}${DRONE_STAGE_NUMBER}/1"
-    return [{
-        "name": "github-comment",
-        "image": THEGEEKLAB_DRONE_GITHUB_COMMENT,
-        "pull": "if-not-exists",
-        "settings": {
-            "message": "%s/reports/e2e/playwright/tracing/comments.file" % dirs["web"],
-            "key": "pr-${DRONE_PULL_REQUEST}",
-            "update": "true",
-            "api_key": {
-                "from_secret": "github_token",
-            },
-        },
-        "commands": [
-            "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
-            "if [ -s comments.file ]; then echo '%s' | cat - comments.file > temp && mv temp comments.file && /bin/drone-github-comment; fi" % prefix,
-        ],
-        "when": {
-            "status": [
-                "failure",
-            ],
-            "event": [
-                "pull_request",
-            ],
-        },
-    }]
-
-def failEarly(ctx, early_fail):
-    """failEarly sends posts a comment about the failed pipeline to the github pr and then kills all pipelines of the current build
-
-    Args:
-        ctx: drone passes a context with information which the pipeline can be adapted to
-        early_fail: boolean if an early fail should happen or not
-
-    Returns:
-        pipeline steps
-    """
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
-        return []
-
-    if (early_fail):
-        return [
-            {
-                "name": "github-comment",
-                "image": THEGEEKLAB_DRONE_GITHUB_COMMENT,
-                "settings": {
-                    "message": ":boom: Acceptance test [<strong>${DRONE_STAGE_NAME}</strong>](${DRONE_BUILD_LINK}/${DRONE_STAGE_NUMBER}/1) failed. Further test are cancelled...",
-                    "key": "pr-${DRONE_PULL_REQUEST}",  #TODO: we could delete the comment after a successful CI run
-                    "update": "true",
-                    "api_key": {
-                        "from_secret": "github_token",
-                    },
-                },
-                "when": {
-                    "status": [
-                        "failure",
-                    ],
-                    "event": [
-                        "pull_request",
-                    ],
-                },
-            },
-        ]
-
-    return []
 
 def dockerReleases(ctx):
     pipelines = []
