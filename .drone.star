@@ -757,7 +757,7 @@ def localApiTestPipeline(ctx):
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     localApiTests(suite, storage, params["extraEnvironment"])
+                                     localApiTests(suite, storage, params["extraEnvironment"]),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
@@ -820,7 +820,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                              "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=ocis-server:9142",
                          ],
                      },
-                 ]
+                 ],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -927,7 +927,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                          ],
                      },
                  ] +
-                 validatorTests
+                 validatorTests,
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -975,7 +975,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
                      },
-                 ]
+                 ],
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -1019,7 +1019,7 @@ def uiTests(ctx):
 
         for runPart in range(1, numberOfParts + 1):
             if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
-                pipelines.append(uiTestPipeline(ctx, "",runPart, numberOfParts))
+                pipelines.append(uiTestPipeline(ctx, "", runPart, numberOfParts))
 
     # For ordinary PRs, always run the "minimal" UI test pipeline
     # That has its own expected-failures file, and we always want to know that it is correct,
@@ -1087,7 +1087,7 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
                              "./run.sh",
                          ],
                      },
-                 ]
+                 ],
         "services": selenium() + middlewareService(),
         "volumes": [{
             "name": "uploads",
@@ -1148,7 +1148,8 @@ def e2eTests(ctx):
         restoreWebPnpmCache() + \
         ocisServer("ocis", 4, []) + \
         e2e_test_ocis + \
-        uploadTracingResult(ctx)
+        uploadTracingResult(ctx) + \
+        logTracingResults()
 
     if ("skip-e2e" in ctx.build.title.lower()):
         return []
@@ -1191,6 +1192,26 @@ def uploadTracingResult(ctx):
                 "from_secret": "cache_public_s3_secret_key",
             },
         },
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
+                "cron",
+            ],
+        },
+    }]
+
+def logTracingResults():
+    return [{
+        "name": "log-tracing-result",
+        "image": OC_UBUNTU,
+        "commands": [
+            "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
+            'echo "To see the trace, please open the following link in the console"',
+            'for f in *.zip; do echo "npx playwright show-trace https://cache.owncloud.com/public/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n"; done',
+        ],
         "when": {
             "status": [
                 "failure",
