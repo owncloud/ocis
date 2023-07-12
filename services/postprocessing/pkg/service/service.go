@@ -87,6 +87,15 @@ func (pps *PostprocessingService) Run() error {
 		case events.ResumePostprocessing:
 			pp, err = getPP(pps.store, ev.UploadID)
 			if err != nil {
+				if err == store.ErrNotFound {
+					if err := events.Publish(pps.pub, events.RestartPostprocessing{
+						UploadID:  ev.UploadID,
+						Timestamp: ev.Timestamp,
+					}); err != nil {
+						pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot publish RestartPostprocessing event")
+					}
+					continue
+				}
 				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 				continue
 			}
