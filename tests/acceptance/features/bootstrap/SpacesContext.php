@@ -3118,7 +3118,7 @@ class SpacesContext implements Context {
 	 */
 	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$properties = ['oc:permissions','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype', 'oc:tags'];
+		$properties = ['oc:permissions','oc:file-parent','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype', 'oc:tags'];
 		$this->featureContext->setResponse(
 			WebDavHelper::propfind(
 				$this->featureContext->getBaseUrl(),

@@ -50,3 +50,66 @@ Feature: Propfind test
       | manager | RDNVCKZP      |
       | editor  | DNVCK         |
       | viewer  |               |
+
+
+  Scenario Outline: space member with a different role checks the PROPFIND request of the folder in the space
+    Given user "Alice" has created a folder "folderMain" in space "new-space"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+      | key            | value             |
+      | oc:fileid      | UUIDof:folderMain |
+      | oc:file-parent | UUIDof:new-space  |
+      | oc:name        | folderMain        |
+      | oc:permissions | <oc_permission>   |
+      | oc:size        | 0                 |
+    Examples:
+      | role    | oc_permission |
+      | manager | RDNVCKZP      |
+      | editor  | DNVCK         |
+      | viewer  |               |
+
+
+  Scenario Outline: space member with a different role checks the PROPFIND request of the sub-folder in the space
+    Given user "Alice" has created a folder "folderMain/subFolder1/subFolder2" in space "new-space"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+      | key            | value                                   |
+      | oc:fileid      | UUIDof:folderMain/subFolder1/subFolder2 |
+      | oc:file-parent | UUIDof:folderMain/subFolder1            |
+      | oc:name        | subFolder2                              |
+      | oc:permissions | <oc_permission>                         |
+      | oc:size        | 0                                       |
+    Examples:
+      | role    | oc_permission |
+      | manager | RDNVCKZP      |
+      | editor  | DNVCK         |
+      | viewer  |               |
+
+
+  Scenario Outline: space member with a different role checks the PROPFIND request of the file in the space
+    Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "testfile.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+      | key            | value               |
+      | oc:fileid      | UUIDof:testfile.txt |
+      | oc:file-parent | UUIDof:new-space    |
+      | oc:name        | testfile.txt        |
+      | oc:permissions | <oc_permission>     |
+      | oc:size        | 12                  |
+    Examples:
+      | role    | oc_permission |
+      | manager | RDNVWZP       |
+      | editor  | DNVW          |
+      | viewer  |               |
