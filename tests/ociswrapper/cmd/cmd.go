@@ -31,6 +31,7 @@ func serveCmd() *cobra.Command {
 			// set configs
 			ocisConfig.Set("bin", cmd.Flag("bin").Value.String())
 			ocisConfig.Set("url", cmd.Flag("url").Value.String())
+			ocisConfig.Set("retry", cmd.Flag("retry").Value.String())
 		},
 	}
 
@@ -38,6 +39,7 @@ func serveCmd() *cobra.Command {
 	serveCmd.Flags().SortFlags = false
 	serveCmd.Flags().StringP("bin", "", ocisConfig.Get("bin"), "Full oCIS binary path")
 	serveCmd.Flags().StringP("url", "", ocisConfig.Get("url"), "oCIS server url")
+	serveCmd.Flags().StringP("retry", "", ocisConfig.Get("retry"), "Number of retries to start oCIS server")
 	serveCmd.Flags().StringP("port", "p", wrapperConfig.Get("port"), "Wrapper API server port")
 
 	return serveCmd
