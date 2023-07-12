@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -13,12 +14,15 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"google.golang.org/grpc/metadata"
 )
+
+var scopeRegex = regexp.MustCompile(`scope:\s*([^" "\n\r]*)`)
 
 // ResolveReference makes sure the path is relative to the space root
 func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.Reference, error) {
@@ -154,4 +158,29 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		fmt.Fprintf(&b, "CK")
 	}
 	return b.String()
+}
+
+func extractScope(path string) (*provider.Reference, error) {
+	ref, err := storagespace.ParseReference(path)
+	if err != nil {
+		return nil, err
+	}
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: ref.ResourceId.StorageId,
+			SpaceId:   ref.ResourceId.SpaceId,
+			OpaqueId:  ref.ResourceId.OpaqueId,
+		},
+		Path: ref.GetPath(),
+	}, nil
+}
+
+// ParseScope extract a scope value from the query string and returns search, scope strings
+func ParseScope(query string) (string, string) {
+	match := scopeRegex.FindStringSubmatch(query)
+	if len(match) >= 2 {
+		cut := match[0]
+		return strings.TrimSpace(strings.ReplaceAll(query, cut, "")), strings.TrimSpace(match[1])
+	}
+	return query, ""
 }
