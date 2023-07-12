@@ -1,3 +1,4 @@
+// Package revaconfig contains the config for the reva service
 package revaconfig
 
 import (
