@@ -10,7 +10,7 @@ Feature: independent locks - make sure all locks are independent and don't inter
 
 
   Scenario Outline: locking a file in a received share does not lock other items with the same name in other received shares (shares from different users)
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FromAlice"
     And user "Brian" has created folder "FromBrian"
@@ -26,21 +26,21 @@ Feature: independent locks - make sure all locks are independent and don't inter
     And user "Carol" should be able to upload file "filesForUpload/lorem.txt" to "/Shares/FromAlice/textfile0.txt"
     But user "Carol" should not be able to upload file "filesForUpload/lorem.txt" to "/Shares/FromBrian/textfile0.txt"
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
 
   Scenario Outline: locking a file in a received share does not lock other items with the same name in other received shares (shares from same user)
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked/"
     And user "Alice" has created folder "notlocked/"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/locked/textfile0.txt"
@@ -55,14 +55,14 @@ Feature: independent locks - make sure all locks are independent and don't inter
     And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "/Shares/notlocked/textfile0.txt"
     But user "Brian" should not be able to upload file "filesForUpload/lorem.txt" to "/Shares/locked/textfile0.txt"
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |

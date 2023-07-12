@@ -375,7 +375,7 @@ Feature: update a public link share
 
   Scenario Outline: rename a folder with public link and get its info
     Given using OCS API version "<ocs_api_version>"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path | FOLDER |
@@ -406,22 +406,22 @@ Feature: update a public link share
       | mail_send              | 0                    |
       | name                   |                      |
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | old      | 1               | 100             |
-      | old      | 2               | 200             |
-      | new      | 1               | 100             |
-      | new      | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | old              | 1               | 100             |
+      | old              | 2               | 200             |
+      | new              | 1               | 100             |
+      | new              | 2               | 200             |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | spaces   | 1               | 100             |
-      | spaces   | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | spaces           | 1               | 100             |
+      | spaces           | 2               | 200             |
 
 
   Scenario Outline: rename a file with public link and get its info
     Given using OCS API version "<ocs_api_version>"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
     And user "Alice" has created a public link share with settings
       | path | lorem.txt |
@@ -452,22 +452,22 @@ Feature: update a public link share
       | mail_send              | 0              |
       | name                   |                |
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | old      | 1               | 100             |
-      | old      | 2               | 200             |
-      | new      | 1               | 100             |
-      | new      | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | old              | 1               | 100             |
+      | old              | 2               | 200             |
+      | new              | 1               | 100             |
+      | new              | 2               | 200             |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | spaces   | 1               | 100             |
-      | spaces   | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | spaces           | 1               | 100             |
+      | spaces           | 2               | 200             |
 
 
   Scenario Outline: update the role of a public link to internal
     Given using OCS API version "<ocs_api_version>"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has created a public link share with settings
       | path        | /textfile.txt |
@@ -477,14 +477,14 @@ Feature: update a public link share
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | old      | 1               | 100             |
-      | old      | 2               | 200             |
-      | new      | 1               | 100             |
-      | new      | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | old              | 1               | 100             |
+      | old              | 2               | 200             |
+      | new              | 1               | 100             |
+      | new              | 2               | 200             |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | spaces   | 1               | 100             |
-      | spaces   | 2               | 200             |
+      | dav-path-version | ocs_api_version | ocs_status_code |
+      | spaces           | 1               | 100             |
+      | spaces           | 2               | 200             |

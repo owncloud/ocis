@@ -10,13 +10,13 @@ Feature: PROPFIND
     When user "Alice" requests "<dav_path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
     Examples:
-      | dav_path                      |
-      | /remote.php/dav/files         |
+      | dav_path              |
+      | /remote.php/dav/files |
 
     @skipOnRevaMaster
     Examples:
-      | dav_path                      |
-      | /remote.php/dav/spaces        |
+      | dav_path               |
+      | /remote.php/dav/spaces |
 
 
   Scenario Outline: send PROPFIND request to "/remote.php/dav/(files|spaces)" with depth header
@@ -29,6 +29,7 @@ Feature: PROPFIND
       | dav_path                    | depth    |
       | /remote.php/dav/files/alice | 0        |
       | /remote.php/dav/files/alice | infinity |
+
     @skipOnRevaMaster
     Examples:
       | dav_path                         | depth    |

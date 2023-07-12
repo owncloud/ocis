@@ -9,7 +9,7 @@ Feature: propagation of etags when creating folders
 
   @issue-4251
   Scenario Outline: creating a folder inside a folder changes its etag
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
@@ -20,18 +20,18 @@ Feature: propagation of etags when creating folders
       | Alice | /       |
       | Alice | /folder |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: creating an invalid folder inside a folder should not change any etags
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has created folder "/folder/sub"
     And user "Alice" has stored etag of element "/"
@@ -45,19 +45,19 @@ Feature: propagation of etags when creating folders
       | Alice | /folder     |
       | Alice | /folder/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4251
   Scenario Outline: sharee creating a folder inside a folder received as a share changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
     And user "Brian" has accepted share "/folder" offered by user "Alice"
@@ -76,14 +76,14 @@ Feature: propagation of etags when creating folders
       | Brian | /Shares        |
       | Brian | /Shares/folder |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
     And user "Brian" has accepted share "/folder" offered by user "Alice"
@@ -102,13 +102,13 @@ Feature: propagation of etags when creating folders
       | Brian | /Shares        |
       | Brian | /Shares/folder |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-4251
   Scenario Outline: creating a folder in a publicly shared folder changes its etag for the sharer
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has created a public link share with settings
       | path        | folder |
@@ -122,11 +122,11 @@ Feature: propagation of etags when creating folders
       | Alice | /       |
       | Alice | /folder |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
-  @skipOnRevaMaster
+    @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

@@ -12,7 +12,7 @@ Feature: sharing
 
   @smokeTest
   Scenario Outline: moving a file into a share as recipient
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/shared"
     And user "Alice" has shared folder "/shared" with user "Brian"
     And user "Brian" has accepted share "/shared" offered by user "Alice"
@@ -22,13 +22,13 @@ Feature: sharing
     And as "Brian" file "/Shares/shared/shared_file.txt" should exist
     And as "Alice" file "/shared/shared_file.txt" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: move files between shares by same user
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "share1"
     And user "Alice" has created folder "share2"
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
@@ -44,13 +44,13 @@ Feature: sharing
     And as "Alice" file "share1/textfile0.txt" should not exist
     But as "Alice" file "share2/textfile0.txt" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: move files between shares by same user added by sharee
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "share1"
     And user "Alice" has created folder "share2"
     And user "Brian" has uploaded file with content "some data" to "/textfile0.txt"
@@ -66,13 +66,13 @@ Feature: sharing
     But as "Brian" file "/Shares/share2/shared_file.txt" should exist
     And as "Alice" file "share2/shared_file.txt" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: move files between shares by different users
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"
@@ -88,13 +88,13 @@ Feature: sharing
     And as "Brian" file "PARENT/shared_file.txt" should exist
     But as "Alice" file "PARENT/shared_file.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: overwrite a received file share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "this is the old content" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
@@ -104,7 +104,7 @@ Feature: sharing
     And the content of file "Shares/textfile1.txt" for user "Brian" should be "this is a new content"
     And the content of file "textfile1.txt" for user "Alice" should be "this is a new content"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 

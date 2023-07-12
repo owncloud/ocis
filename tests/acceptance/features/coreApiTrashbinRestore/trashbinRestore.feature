@@ -10,7 +10,7 @@ Feature: restore deleted files/folders
 
   @smokeTest
   Scenario Outline: deleted file can be restored
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "parent text" to "/PARENT/parent.txt"
@@ -30,13 +30,13 @@ Feature: restore deleted files/folders
       | /textfile0.txt     |
       | /textfile1.txt     |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: file deleted from a folder can be restored to the original folder
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has moved file "/textfile0.txt" to "/new-folder/new-file.txt"
     And user "Alice" has deleted file "/new-folder/new-file.txt"
@@ -46,13 +46,13 @@ Feature: restore deleted files/folders
     And as "Alice" file "/new-folder/new-file.txt" should exist
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: file deleted from a folder is restored to the original folder if the original folder was deleted and restored
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has moved file "/textfile0.txt" to "/new-folder/new-file.txt"
     And user "Alice" has deleted file "/new-folder/new-file.txt"
@@ -64,13 +64,13 @@ Feature: restore deleted files/folders
     And as "Alice" file "/new-folder/new-file.txt" should exist
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: file is deleted and restored to a new destination
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has created folder "/PARENT/CHILD"
     And user "Alice" has uploaded file with content "to delete" to "<delete-path>"
@@ -84,18 +84,18 @@ Feature: restore deleted files/folders
     And as "Alice" file "<delete-path>" should not exist
     And the content of file "<restore-path>" for user "Alice" should be "to delete"
     Examples:
-      | dav-path | delete-path             | restore-path         |
-      | old      | /PARENT/parent.txt      | parent.txt           |
-      | new      | /PARENT/parent.txt      | parent.txt           |
-      | old      | /PARENT/CHILD/child.txt | child.txt            |
-      | new      | /PARENT/CHILD/child.txt | child.txt            |
-      | old      | /textfile0.txt          | PARENT/textfile0.txt |
-      | new      | /textfile0.txt          | PARENT/textfile0.txt |
+      | dav-path-version | delete-path             | restore-path         |
+      | old              | /PARENT/parent.txt      | parent.txt           |
+      | new              | /PARENT/parent.txt      | parent.txt           |
+      | old              | /PARENT/CHILD/child.txt | child.txt            |
+      | new              | /PARENT/CHILD/child.txt | child.txt            |
+      | old              | /textfile0.txt          | PARENT/textfile0.txt |
+      | new              | /textfile0.txt          | PARENT/textfile0.txt |
 
 
   Scenario Outline: restoring a file to an already existing path overrides the file
     Given user "Alice" has uploaded file with content "file to delete" to "/.hiddenfile0.txt"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "PARENT file content" to <upload-path>
     And user "Alice" has deleted file <delete-path>
@@ -104,15 +104,15 @@ Feature: restore deleted files/folders
     And as "Alice" file <upload-path> should exist
     And the content of file <upload-path> for user "Alice" should be "file to delete"
     Examples:
-      | dav-path | upload-path                | delete-path        |
-      | old      | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
-      | new      | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
-      | old      | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
-      | new      | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
+      | dav-path-version | upload-path                | delete-path        |
+      | old              | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
+      | new              | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
+      | old              | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
+      | new              | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
 
 
   Scenario Outline: file deleted from a folder is restored to the original folder if the original folder was deleted and recreated
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has moved file "/textfile0.txt" to "/new-folder/new-file.txt"
     And user "Alice" has deleted file "/new-folder/new-file.txt"
@@ -126,13 +126,13 @@ Feature: restore deleted files/folders
     And as "Alice" file "/new-folder/new-file.txt" should exist
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored by a different user
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Brian" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the trashbin API
@@ -141,13 +141,13 @@ Feature: restore deleted files/folders
     And user "Alice" should not see the following elements
       | /textfile0.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored with invalid password
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the password "invalid" and the trashbin API
@@ -156,13 +156,13 @@ Feature: restore deleted files/folders
     And user "Alice" should not see the following elements
       | /textfile0.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored without using a password
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the password "" and the trashbin API
@@ -171,13 +171,13 @@ Feature: restore deleted files/folders
     And user "Alice" should not see the following elements
       | /textfile0.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: files with strange names can be restored
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "file original content" to "<file-to-upload>"
     And user "Alice" has deleted file "<file-to-upload>"
     And user "Alice" restores the file with original path "<file-to-upload>" using the trashbin API
@@ -186,17 +186,17 @@ Feature: restore deleted files/folders
     And as "Alice" file "<file-to-upload>" should exist
     And the content of file "<file-to-upload>" for user "Alice" should be "file original content"
     Examples:
-      | dav-path | file-to-upload          |
-      | old      | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
-      | new      | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
-      | old      | strängé नेपाली file     |
-      | new      | strängé नेपाली file     |
-      | old      | sample,1.txt            |
-      | new      | sample,1.txt            |
+      | dav-path-version | file-to-upload          |
+      | old              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
+      | new              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
+      | old              | strängé नेपाली file     |
+      | new              | strängé नेपाली file     |
+      | old              | sample,1.txt            |
+      | new              | sample,1.txt            |
 
 
   Scenario Outline: file deleted from a multi level sub-folder can be restored to the original folder
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has created folder "/new-folder/folder1/"
     And user "Alice" has created folder "/new-folder/folder1/folder2/"
@@ -208,13 +208,13 @@ Feature: restore deleted files/folders
     And as "Alice" file "/new-folder/folder1/folder2/new-file.txt" should exist
     And the content of file "/new-folder/folder1/folder2/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted multi level folder can be restored including the content
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has created folder "/new-folder/folder1/"
     And user "Alice" has created folder "/new-folder/folder1/folder2/"
@@ -226,13 +226,13 @@ Feature: restore deleted files/folders
     And as "Alice" file "/new-folder/folder1/folder2/new-file.txt" should exist
     And the content of file "/new-folder/folder1/folder2/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: subfolder from a deleted multi level folder can be restored including the content
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has created folder "/new-folder/folder1"
     And user "Alice" has created folder "/new-folder/folder1/folder2"
@@ -246,13 +246,13 @@ Feature: restore deleted files/folders
     And the content of file "/folder1/folder2/new-file.txt" for user "Alice" should be "file to delete"
     But as "Alice" the folder with original path "/new-folder" should exist in the trashbin
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: file from a deleted multi level sub-folder can be restored
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/new-folder"
     And user "Alice" has created folder "/new-folder/folder1/"
     And user "Alice" has created folder "/new-folder/folder1/folder2/"
@@ -266,13 +266,13 @@ Feature: restore deleted files/folders
     And the content of file "/new-file.txt" for user "Alice" should be "file to delete"
     But as "Alice" the file with original path "/new-folder/folder1/folder2/not-restored.txt" should exist in the trashbin
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted hidden file can be restored
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has uploaded the following files with content "hidden file"
       | path                 |
@@ -300,13 +300,13 @@ Feature: restore deleted files/folders
       | .hidden_file         |
       | /FOLDER/.hidden_file |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring files with special characters
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded the following files with content "special character file"
       | path             |
       | qa&dev.txt       |
@@ -339,13 +339,13 @@ Feature: restore deleted files/folders
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring folders with special characters
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created the following folders
       | path         |
       | qa&dev       |
@@ -378,13 +378,13 @@ Feature: restore deleted files/folders
       | %file *?2    |
       | # %ab ab?=ed |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted file inside a nested folder can be restored to a different location
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/parent_folder"
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
@@ -396,13 +396,13 @@ Feature: restore deleted files/folders
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should not exist in the trashbin
     And the content of file "parent.txt" for user "Alice" should be "parent text"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted file inside a nested folder cannot be restored to the original location if the location doesn't exist
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/parent_folder"
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
@@ -415,13 +415,13 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/           |
       | /parent_folder/sub/parent.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted file inside a nested folder can be restored to the original location if the location exists
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/parent_folder"
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
@@ -439,13 +439,13 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/           |
       | /parent_folder/sub/parent.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted file inside a nested folder cannot be restored without the destination
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/parent_folder"
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
@@ -458,13 +458,13 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/           |
       | /parent_folder/sub/parent.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: deleted file cannot be restored without the destination
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "parent text" to "/parent.txt"
     And user "Alice" has deleted file "parent.txt"
     When user "Alice" restores the folder with original path "parent.txt" without specifying the destination using the trashbin API
@@ -473,13 +473,13 @@ Feature: restore deleted files/folders
     And user "Alice" should not see the following elements
       | /parent.txt |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring folders with dot in the name
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created the following folders
       | path      |
       | /fo.      |
@@ -527,6 +527,6 @@ Feature: restore deleted files/folders
       | /fo.xyz   |
       | /fo.exe   |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |

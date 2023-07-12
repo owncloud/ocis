@@ -10,7 +10,7 @@ Feature: propagation of etags when restoring a file or folder from trash
 
 
   Scenario Outline: restoring a file to its original location changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has deleted file "/upload/sub/file.txt"
@@ -25,13 +25,13 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /upload     |
       | Alice | /upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring a file to an other location changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/restore"
     And user "Alice" has created folder "/restore/sub"
@@ -48,13 +48,13 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /restore     |
       | Alice | /restore/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring a folder to its original location changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has deleted folder "/upload/sub/toDelete"
@@ -69,13 +69,13 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /upload     |
       | Alice | /upload/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: restoring a folder to an other location changes the etags of all parents
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has deleted folder "/upload/sub/toDelete"
@@ -92,6 +92,6 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /restore     |
       | Alice | /restore/sub |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

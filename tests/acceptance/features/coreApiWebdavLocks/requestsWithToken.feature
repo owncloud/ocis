@@ -9,7 +9,7 @@ Feature: actions on a locked item are possible if the token is sent with the req
 
 
   Scenario Outline: two users having both a shared lock can use the resource
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "textfile0.txt"
     And user "Brian" has uploaded file with content "some data" to "textfile0.txt"
@@ -28,11 +28,11 @@ Feature: actions on a locked item are possible if the token is sent with the req
     And the content of file "textfile0.txt" for user "Alice" should be "from user 1"
     And the content of file "Shares/textfile0.txt" for user "Brian" should be "from user 1"
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |

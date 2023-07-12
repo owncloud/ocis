@@ -23,7 +23,7 @@ Feature: Search
 
   @smokeTest
   Scenario Outline: search for entry by pattern
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
@@ -38,18 +38,18 @@ Feature: Search
     But the search result of user "Alice" should not contain these entries:
       | /a-image.png |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: search for entries by only some letters from the middle of the entry name
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     When user "Alice" searches for "ol" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -60,18 +60,18 @@ Feature: Search
       | /FOLDER                  |
       | /just-a-folder/lolol.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: search for files by extension
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "png" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
@@ -83,33 +83,33 @@ Feature: Search
       | /just-a-folder/upload.txt     |
       | /just-a-folder/uploadÜठिF.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: search with empty field
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "" using the WebDAV API
     Then the HTTP status code should be "400"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: limit returned search entries
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" and limits the results to "3" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain any "3" of these entries:
@@ -122,18 +122,18 @@ Feature: Search
       | /upload😀 😁/upload😀 😁.txt  |
       | /upload😀 😁/upload,1.txt     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: limit returned search entries to only 1 entry
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" and limits the results to "1" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain any "1" of these entries:
@@ -146,18 +146,18 @@ Feature: Search
       | /upload😀 😁/upload😀 😁.txt  |
       | /upload😀 😁/upload,1.txt     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: limit returned search entries to more entries than there are
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" and limits the results to "100" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "8" entries
@@ -171,18 +171,18 @@ Feature: Search
       | /upload😀 😁/upload😀 😁.txt  |
       | /upload😀 😁/upload,1.txt     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4712
   Scenario Outline: report extra properties in search entries for a file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
@@ -204,18 +204,18 @@ Feature: Search
       | {http://owncloud.org/ns}owner-id           | %username%                                                                                        |
       | {http://owncloud.org/ns}owner-display-name | %displayname%                                                                                     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-4712
   Scenario Outline: report extra properties in search entries for a folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "upload" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
@@ -236,18 +236,18 @@ Feature: Search
       | {http://owncloud.org/ns}owner-id           | %username%                                                                                        |
       | {http://owncloud.org/ns}owner-display-name | %displayname%                                                                                     |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: search for entry with emoji by pattern
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" searches for "😀 😁" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
@@ -261,11 +261,11 @@ Feature: Search
       | /just-a-folder/uploadÜठिF.txt |
       | /फनी näme/upload.txt          |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

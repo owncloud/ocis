@@ -9,7 +9,7 @@ Feature: move folders
 
 
   Scenario Outline: uploading file into a moved folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test-moved"
     And user "Alice" has moved folder "/test-moved" to "/test/test-moved"
@@ -17,12 +17,12 @@ Feature: move folders
     Then as "Alice" file "/test/test-moved/textfile.txt" should exist
     And the content of file "/test/test-moved/textfile.txt" for user "Alice" should be "uploaded content"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 

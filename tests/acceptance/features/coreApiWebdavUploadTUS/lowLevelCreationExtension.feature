@@ -9,7 +9,7 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
 
 
   Scenario Outline: creating a new upload resource
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" creates a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 100                                           |
       #    d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg== is the base64 encode of world_domination_plan.pdf
@@ -20,18 +20,18 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | Tus-Resumable | /1\.0\.0/                       |
       | Location      | /http[s]?:\/\/.*:\d+\/data\/.*/ |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: creating a new upload resource without upload length
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" creates a new TUS resource on the WebDAV API with these headers:
       | Tus-Resumable   | 1.0.0                                         |
       #    d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg== is the base64 encode of world_domination_plan.pdf
@@ -41,11 +41,11 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | header   |
       | Location |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

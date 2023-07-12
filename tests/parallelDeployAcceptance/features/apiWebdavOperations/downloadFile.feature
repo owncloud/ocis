@@ -12,24 +12,24 @@ Feature: download file
 
   Scenario Outline: download a file
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" using the WebDAV API
     Then the downloaded content should be "ownCloud test text file"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: download a file with range
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" with range "bytes=0-7" using the WebDAV API
     Then the downloaded content should be "ownCloud"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario: Get the size of a file
@@ -40,74 +40,74 @@ Feature: download file
 
 
   Scenario Outline: Download a file with comma in the filename
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "file with comma in filename" to <filename>
     And using "ocis" as owncloud selector
     When user "Alice" downloads file <filename> using the WebDAV API
     Then the downloaded content should be "file with comma in filename"
     Examples:
-      | dav_version | filename       |
-      | old         | "sample,1.txt" |
-      | old         | ",,,.txt"      |
-      | old         | ",,,.,"        |
-      | new         | "sample,1.txt" |
-      | new         | ",,,.txt"      |
-      | new         | ",,,.,"        |
+      | dav-path-version | filename       |
+      | old              | "sample,1.txt" |
+      | old              | ",,,.txt"      |
+      | old              | ",,,.,"        |
+      | new              | "sample,1.txt" |
+      | new              | ",,,.txt"      |
+      | new              | ",,,.,"        |
 
 
   Scenario Outline: download a file with single part ranges
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" with range "bytes=0-7" using the WebDAV API
     Then the HTTP status code should be "206"
     And the following headers should be set
-      | header         | value         |
-      | Content-Length | 8             |
-      | Content-Range  | bytes 0-7/23  |
+      | header         | value        |
+      | Content-Length | 8            |
+      | Content-Range  | bytes 0-7/23 |
     And the downloaded content should be "ownCloud"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: download a file with last byte range out of bounds
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" with range "bytes=0-24" using the WebDAV API
     Then the HTTP status code should be "206"
     And the downloaded content should be "ownCloud test text file"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: download a range at the end of a file
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" with range "bytes=-4" using the WebDAV API
     Then the HTTP status code should be "206"
     And the downloaded content should be "file"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: download a file with range out of bounds
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" with range "bytes=24-30" using the WebDAV API
     Then the HTTP status code should be "416"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: download a hidden file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded the following files with content "hidden file"
       | path                |
@@ -121,17 +121,17 @@ Feature: download file
     Then the HTTP status code should be "200"
     And the downloaded content should be "hidden file"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: Downloading a file should serve security headers
     Given using "ocis" as owncloud selector
-    And using <dav_version> DAV path
+    And using <dav-path-version> DAV path
     When user "Alice" downloads file "textfile.txt" using the WebDAV API
     Then the following headers should be set
-      | header                            | value                                                              | 
+      | header                            | value                                                              |
       | Content-Disposition               | attachment; filename*=UTF-8''textfile.txt; filename="textfile.txt" |
       | Content-Security-Policy           | default-src 'none';                                                |
       | X-Content-Type-Options            | nosniff                                                            |
@@ -141,6 +141,6 @@ Feature: download file
       | X-Robots-Tag                      | none                                                               |
       | X-XSS-Protection                  | 1; mode=block                                                      |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

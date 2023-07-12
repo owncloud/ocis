@@ -25,7 +25,7 @@ Feature: list files
 
 
   Scenario Outline: get the list of resources in the root folder with depth 0
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should not contain these nodes
@@ -38,18 +38,18 @@ Feature: list files
       | simple-folder/simple-empty-folder |
       | simple-folder/simple-folder1      |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get the list of resources in the root folder with depth 1
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/" with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
@@ -64,18 +64,18 @@ Feature: list files
       | simple-folder/simple-empty-folder |
       | simple-folder/simple-folder1      |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindEnabled
   Scenario Outline: get the list of resources in the root folder with depth infinity
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
@@ -93,18 +93,18 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get the list of resources in a folder with depth 0
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
@@ -117,18 +117,18 @@ Feature: list files
       | simple-folder/simple-empty-folder |
       | simple-folder/simple-folder1      |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get the list of resources in a folder with depth 1
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
@@ -145,18 +145,18 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindEnabled
   Scenario Outline: get the list of resources in a folder with depth infinity
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
@@ -170,14 +170,14 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario: get the list of resources in a folder shared through public link with depth 0
@@ -252,7 +252,7 @@ Feature: list files
 
 
   Scenario Outline: get the list of files in the trashbin with depth 0
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
       | textfile0.txt  |
@@ -272,18 +272,18 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get the list of files in the trashbin with depth 1
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
       | textfile0.txt  |
@@ -305,18 +305,18 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindEnabled
   Scenario Outline: get the list of files in the trashbin with depth infinity
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
       | textfile0.txt  |
@@ -336,33 +336,33 @@ Feature: list files
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindDisabled
   Scenario Outline: get the list of resources in the root folder with depth infinity when depth infinity is not allowed
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "412"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindDisabled
   Scenario Outline: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
@@ -371,17 +371,17 @@ Feature: list files
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "412"
     Examples:
-      | dav_version |
-      | new         |
+      | dav-path-version |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @depthInfinityPropfindDisabled
   Scenario Outline: get the list of files in the trashbin with depth infinity when depth infinity is not allowed
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has deleted the following resources
       | path           |
       | textfile0.txt  |
@@ -390,11 +390,11 @@ Feature: list files
     When user "Alice" lists the resources in the trashbin with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "412"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
