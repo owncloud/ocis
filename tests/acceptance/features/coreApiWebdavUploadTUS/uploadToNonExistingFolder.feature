@@ -10,34 +10,34 @@ Feature: upload file
 
 
   Scenario Outline: attempt to upload a file into a nonexistent folder inside shares
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" folder "/Shares/FOLDER/" should not exist
     And as "Alice" file "/Shares/FOLDER/textfile.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: attempt to upload a file into a nonexistent folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file with content "uploaded content" to "/nonExistentFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" folder "/nonExistentFolder" should not exist
     And as "Alice" file "/nonExistentFolder/textfile.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: attempt to upload a file into a nonexistent folder within correctly received share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -46,13 +46,13 @@ Feature: upload file
     Then as "Brian" folder "/Shares/FOLDER/nonExistentFolder" should not exist
     And as "Brian" file "/Shares/FOLDER/nonExistentFolder/textfile.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
   Scenario Outline: attempt to upload a file into a nonexistent folder within correctly received read only share
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read"
@@ -61,6 +61,6 @@ Feature: upload file
     Then as "Brian" folder "/Shares/FOLDER/nonExistentFolder" should not exist
     And as "Brian" file "/Shares/FOLDER/nonExistentFolder/textfile.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

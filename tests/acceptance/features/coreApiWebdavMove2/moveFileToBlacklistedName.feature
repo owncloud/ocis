@@ -11,15 +11,15 @@ Feature: users cannot move (rename) a file to a blacklisted name
 
   @issue-1295
   Scenario Outline: rename a file to a filename that is banned by default
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" moves file "/textfile0.txt" to "/.htaccess" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

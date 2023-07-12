@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: move (rename) file
   As a user
   I want to be able to move and rename files
@@ -9,8 +9,8 @@ Feature: move (rename) file
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a file into a shared folder as the sharee and as the sharer
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a share with settings
@@ -26,15 +26,15 @@ Feature: move (rename) file
     And the content of file "/testshare/testfile.txt" for user "Brian" should be "test data"
     And as "<mover>" file "/testfile.txt" should not exist
     Examples:
-      | dav_version | mover | destination_folder |
-      | old         | Alice | /Shares/testshare  |
-      | old         | Brian | /testshare         |
-      | new         | Alice | /Shares/testshare  |
-      | new         | Brian | /testshare         |
+      | dav-path-version | mover | destination_folder |
+      | old              | Alice | /Shares/testshare  |
+      | old              | Brian | /testshare         |
+      | new              | Alice | /Shares/testshare  |
+      | new              | Brian | /testshare         |
 
 
-  Scenario Outline: Moving a file out of a shared folder as the sharer
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a file out of a shared folder as the sharer
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
@@ -50,13 +50,13 @@ Feature: move (rename) file
     And as "Alice" file "/Shares/testshare/testfile.txt" should not exist
     And as "Brian" file "/testshare/testfile.txt" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Can not move a file out of a shared folder as the sharee
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a file out of a shared folder as the sharee
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
@@ -71,13 +71,13 @@ Feature: move (rename) file
     And as "Alice" file "/Shares/testshare/testfile.txt" should exist
     And as "Brian" file "/testshare/testfile.txt" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Moving a folder into a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a folder into a shared folder as the sharee and as the sharer
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a share with settings
@@ -94,15 +94,15 @@ Feature: move (rename) file
     And the content of file "/testshare/testsubfolder/testfile.txt" for user "Brian" should be "test data"
     And as "<mover>" file "/testsubfolder" should not exist
     Examples:
-      | dav_version | mover | destination_folder |
-      | old         | Alice | /Shares/testshare  |
-      | old         | Brian | /testshare         |
-      | new         | Alice | /Shares/testshare  |
-      | new         | Brian | /testshare         |
+      | dav-path-version | mover | destination_folder |
+      | old              | Alice | /Shares/testshare  |
+      | old              | Brian | /testshare         |
+      | new              | Alice | /Shares/testshare  |
+      | new              | Brian | /testshare         |
 
 
-  Scenario Outline: Moving a folder out of a shared folder as the sharer
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a folder out of a shared folder as the sharer
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created the following folders
       | path                     |
@@ -121,13 +121,13 @@ Feature: move (rename) file
     And as "Alice" folder "/testshare/testsubfolder" should not exist
     And as "Brian" folder "/testshare/testsubfolder" should not exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Moving a folder out of a shared folder as the sharee
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a folder out of a shared folder as the sharee
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created the following folders
       | path                     |
@@ -145,13 +145,13 @@ Feature: move (rename) file
     And as "Alice" folder "/Shares/testshare/testsubfolder" should exist
     And as "Brian" folder "/testshare/testsubfolder" should exist
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Moving a file to a shared folder with no permissions
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a file to a shared folder with no permissions
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -165,13 +165,13 @@ Feature: move (rename) file
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Moving a file to overwrite a file in a shared folder with no permissions
-    Given using <dav_version> DAV path
+  Scenario Outline: moving a file to overwrite a file in a shared folder with no permissions
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -187,13 +187,13 @@ Feature: move (rename) file
     Then the HTTP status code should be "403"
     And the content of file "/Shares/testshare/overwritethis.txt" for user "Alice" should be "Welcome to ownCloud"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
 
-  Scenario Outline: Checking file id after a move between received shares
-    Given using <dav_version> DAV path
+  Scenario Outline: checking file id after a move between received shares
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created the following folders
       | path     |
@@ -217,6 +217,6 @@ Feature: move (rename) file
     And as "Brian" folder "/Shares/folderB/ONE/TWO" should exist
     And user "Brian" folder "/Shares/folderB/ONE" should have the previously stored id
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |

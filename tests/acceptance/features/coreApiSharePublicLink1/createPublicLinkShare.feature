@@ -346,7 +346,7 @@ Feature: create a public link share
 
 
   Scenario Outline: get the mtime of a file shared by public link
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | file.txt |
@@ -354,13 +354,13 @@ Feature: create a public link share
     Then the HTTP status code should be "200"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
     Examples:
-      | dav_version |
+      | dav-path-version |
       | old         |
       | new         |
 
 
   Scenario Outline: get the mtime of a file inside a folder shared by public link
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" creates a public link share using the sharing API with settings
@@ -369,7 +369,7 @@ Feature: create a public link share
     Then the HTTP status code should be "200"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
     Examples:
-      | dav_version |
+      | dav-path-version |
       | old         |
       | new         |
 

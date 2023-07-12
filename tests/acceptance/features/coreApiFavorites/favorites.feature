@@ -18,7 +18,7 @@ Feature: favorite
 
   @issue-1263
   Scenario Outline: favorite a folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" favorites element "/FOLDER" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Alice" folder "/FOLDER" should be favorited
@@ -28,18 +28,18 @@ Feature: favorite
     Then the HTTP status code should be "207"
     And the single response should contain a property "oc:favorite" with value "1"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @issue-1263
   Scenario Outline: unfavorite a folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has favorited element "/FOLDER"
     When user "Alice" unfavorites element "/FOLDER" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -50,18 +50,18 @@ Feature: favorite
     Then the HTTP status code should be "207"
     And the single response should contain a property "oc:favorite" with value "0"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @smokeTest @issue-1263
   Scenario Outline: favorite a file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" favorites element "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Alice" file "/textfile0.txt" should be favorited
@@ -71,18 +71,18 @@ Feature: favorite
     Then the HTTP status code should be "207"
     And the single response should contain a property "oc:favorite" with value "1"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @smokeTest @issue-1263
   Scenario Outline: unfavorite a file
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
     When user "Alice" unfavorites element "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -93,18 +93,18 @@ Feature: favorite
     Then the HTTP status code should be "207"
     And the single response should contain a property "oc:favorite" with value "0"
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: get favorited elements of a folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" favorites element "/FOLDER" using the WebDAV API
     And user "Alice" favorites element "/textfile0.txt" using the WebDAV API
     And user "Alice" favorites element "/textfile1.txt" using the WebDAV API
@@ -114,18 +114,18 @@ Feature: favorite
       | /textfile0.txt |
       | /textfile1.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get favorited elements of a subfolder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/subfolder"
     And user "Alice" has uploaded file with content "some data" to "/subfolder/textfile0.txt"
     And user "Alice" has uploaded file with content "some data" to "/subfolder/textfile1.txt"
@@ -141,18 +141,18 @@ Feature: favorite
     And user "Alice" should not have favorited the following elements
       | /subfolder/textfile1.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get favorited elements and limit count of entries
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
     And user "Alice" has favorited element "/textfile1.txt"
     And user "Alice" has favorited element "/textfile2.txt"
@@ -166,18 +166,18 @@ Feature: favorite
       | /textfile3.txt |
       | /textfile4.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: get favorited elements paginated in subfolder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/subfolder"
     And user "Alice" has copied file "/textfile0.txt" to "/subfolder/textfile0.txt"
     And user "Alice" has copied file "/textfile0.txt" to "/subfolder/textfile1.txt"
@@ -199,18 +199,18 @@ Feature: favorite
       | /subfolder/textfile3.txt |
       | /subfolder/textfile4.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: favoriting a folder does not change the favorite state of elements inside the folder
-    Given using <dav_version> DAV path
+    Given using <dav-path-version> DAV path
     When user "Alice" favorites element "/PARENT/parent.txt" using the WebDAV API
     And user "Alice" favorites element "/PARENT" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -218,11 +218,11 @@ Feature: favorite
       | /PARENT            |
       | /PARENT/parent.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |
