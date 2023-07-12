@@ -35,6 +35,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
 * Enhancement - Add WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP env variable: [#6328](https://github.com/owncloud/ocis/pull/6328)
 * Enhancement - Add postprocessing mimetype to extension helper: [#6133](https://github.com/owncloud/ocis/pull/6133)
+* Enhancement - Provide Search filter for locations: [#6713](https://github.com/owncloud/ocis/pull/6713)
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 * Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
@@ -287,6 +288,15 @@ The following sections list the changes for unreleased.
    `print("PRINT MESSAGE EXAMPLE")`
 
    https://github.com/owncloud/ocis/pull/6133
+
+* Enhancement - Provide Search filter for locations: [#6713](https://github.com/owncloud/ocis/pull/6713)
+
+   The search result REPORT response now can be restricted the by the current folder via api
+   (recursive) The scope needed for "current folder" (default is to search all available spaces)
+   - part of the oc:pattern:"scope:<uuid> /Test"
+
+   https://github.com/owncloud/ocis/pull/6713
+   OCIS-3705
 
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 
