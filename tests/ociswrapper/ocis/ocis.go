@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"ociswrapper/common"
@@ -15,9 +16,12 @@ import (
 )
 
 var cmd *exec.Cmd
+var retryCount = 0
 
 func Start(envMap map[string]any) {
-	defer common.Wg.Done()
+	if retryCount == 0 {
+		defer common.Wg.Done()
+	}
 
 	cmd = exec.Command(config.Get("bin"), "server")
 	cmd.Env = os.Environ()
@@ -52,6 +56,15 @@ func Start(envMap map[string]any) {
 	for stdoutScanner.Scan() {
 		m := stdoutScanner.Text()
 		fmt.Println(m)
+		retryCount++
+
+		maxRetry, _ := strconv.Atoi(config.Get("retry"))
+		if retryCount <= maxRetry {
+			fmt.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+			// Stop and start again
+			Stop()
+			Start(envMap)
+		}
 	}
 }
 
@@ -60,13 +73,16 @@ func Stop() {
 	if err != nil {
 		log.Panic("Cannot kill oCIS server")
 	}
+	cmd.Wait()
 }
 
 func WaitForConnection() bool {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+	// 5 seconds timeout
 	timeoutValue := 5 * time.Second
+
 	client := http.Client{
 		Timeout:   timeoutValue,
 		Transport: transport,
@@ -77,7 +93,7 @@ func WaitForConnection() bool {
 	for {
 		select {
 		case <-timeout:
-			fmt.Println(fmt.Sprintf("Timeout waiting for oCIS server [%f] seconds", timeoutValue.Seconds()))
+			fmt.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
 			return false
 		default:
 			_, err := client.Get(config.Get("url"))
@@ -87,6 +103,7 @@ func WaitForConnection() bool {
 				fmt.Println(fmt.Sprintf("oCIS server is ready to accept requests"))
 				return true
 			}
+			// 500 milliseconds poll interval
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
