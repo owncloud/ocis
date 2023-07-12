@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
 * Bugfix - Fix search shares: [#6741](https://github.com/owncloud/ocis/pull/6741)
+* Bugfix - Restart Postprocessing: [#6726](https://github.com/owncloud/ocis/pull/6726)
 * Change - YAML configuration files are restricted to yaml-1.2: [#6510](https://github.com/owncloud/ocis/issues/6510)
 * Enhancement - Add 'ocis decomposedfs check-treesize' command: [#6556](https://github.com/owncloud/ocis/pull/6556)
 * Enhancement - Add IDs to graph resource logging: [#6593](https://github.com/owncloud/ocis/pull/6593)
@@ -98,6 +99,14 @@ The following sections list the changes for unreleased.
    from the space root.
 
    https://github.com/owncloud/ocis/pull/6741
+
+* Bugfix - Restart Postprocessing: [#6726](https://github.com/owncloud/ocis/pull/6726)
+
+   In case the postprocessing service cannot find the specified upload when restarting
+   postprocessing, it will now send a `RestartPostprocessing` event to retrigger complete
+   postprocessing
+
+   https://github.com/owncloud/ocis/pull/6726
 
 * Change - YAML configuration files are restricted to yaml-1.2: [#6510](https://github.com/owncloud/ocis/issues/6510)
 
