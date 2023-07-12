@@ -22,6 +22,11 @@ then
 	STEP_THROUGH_OPTION="--step-through"
 fi
 
+if [ -n "${STOP_ON_FAILURE}" ]
+then
+	STOP_OPTION="--stop-on-failure"
+fi
+
 if [ -n "${PLAIN_OUTPUT}" ]
 then
 	# explicitly tell Behat to not do colored output
@@ -180,6 +185,7 @@ fi
 # ---------------
 # $UNEXPECTED_FAILED_SCENARIOS array of scenarios that failed unexpectedly
 # $UNEXPECTED_PASSED_SCENARIOS array of scenarios that passed unexpectedly (while running with expected-failures.txt)
+# $STOP_ON_FAILURE - aborts the test run after the first failure
 
 declare -a UNEXPECTED_FAILED_SCENARIOS
 declare -a UNEXPECTED_PASSED_SCENARIOS
@@ -195,7 +201,7 @@ function run_behat_tests() {
 	fi
 
 	echo "Using behat config '${BEHAT_YML}'"
-	${BEHAT} ${COLORS_OPTION} --strict ${STEP_THROUGH_OPTION} -c ${BEHAT_YML} -f pretty ${BEHAT_SUITE_OPTION} --tags ${BEHAT_FILTER_TAGS} ${BEHAT_FEATURE} -v 2>&1 | tee -a ${TEST_LOG_FILE}
+	${BEHAT} ${COLORS_OPTION} ${STOP_OPTION} --strict ${STEP_THROUGH_OPTION} -c ${BEHAT_YML} -f pretty ${BEHAT_SUITE_OPTION} --tags ${BEHAT_FILTER_TAGS} ${BEHAT_FEATURE} -v 2>&1 | tee -a ${TEST_LOG_FILE}
 
 	BEHAT_EXIT_STATUS=${PIPESTATUS[0]}
 
