@@ -53,9 +53,10 @@ var _ = Describe("Searchprovider", func() {
 					},
 				},
 			},
-			Id:   &sprovider.StorageSpaceId{OpaqueId: "storageid$personalspace!personalspace"},
-			Root: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "personalspace", OpaqueId: "personalspace"},
-			Name: "personalspace",
+			Id:        &sprovider.StorageSpaceId{OpaqueId: "storageid$personalspace!personalspace"},
+			Root:      &sprovider.ResourceId{StorageId: "storageid", SpaceId: "personalspace", OpaqueId: "personalspace"},
+			Name:      "personalspace",
+			SpaceType: "personal",
 		}
 
 		ri = &sprovider.ResourceInfo{
@@ -94,10 +95,6 @@ var _ = Describe("Searchprovider", func() {
 			Status: status.NewOK(ctx),
 			Token:  "authtoken",
 		}, nil)
-		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
-			Status: status.NewOK(context.Background()),
-			Info:   ri,
-		}, nil)
 		gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
 			return req.ResourceId.OpaqueId == ri.Id.OpaqueId
 		})).Return(&sprovider.GetPathResponse{
@@ -123,7 +120,10 @@ var _ = Describe("Searchprovider", func() {
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
-
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info:   ri,
+			}, nil)
 			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, user.Id)
 			Expect(err).ShouldNot(HaveOccurred())
 		})
@@ -167,6 +167,10 @@ var _ = Describe("Searchprovider", func() {
 						},
 					},
 				}, nil)
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info:   ri,
+				}, nil)
 			})
 
 			It("does not mess with field-based searches", func() {
@@ -183,6 +187,75 @@ var _ = Describe("Searchprovider", func() {
 				res, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
+				Expect(len(res.Matches)).To(Equal(1))
+				match := res.Matches[0]
+				Expect(match.Entity.Id.OpaqueId).To(Equal("foo-id"))
+				Expect(match.Entity.Name).To(Equal("Foo.pdf"))
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(personalSpace.Root.OpaqueId))
+				Expect(match.Entity.Ref.Path).To(Equal("./path/to/Foo.pdf"))
+			})
+		})
+
+		Context("with a personal space with a filter", func() {
+			BeforeEach(func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
+				}, nil)
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info: &sprovider.ResourceInfo{
+						Space: &sprovider.StorageSpace{Root: &sprovider.ResourceId{
+							StorageId: "storageid",
+							SpaceId:   "personalspace",
+							OpaqueId:  "personalspace",
+						}},
+					},
+				}, nil)
+				gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
+					Status: status.NewOK(ctx),
+					Path:   "/path",
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: personalSpace.Root.StorageId,
+										SpaceId:   personalSpace.Root.SpaceId,
+										OpaqueId:  personalSpace.Root.OpaqueId,
+									},
+									Path: "./path/to/Foo.pdf",
+								},
+								Id: &searchmsg.ResourceID{
+									StorageId: personalSpace.Root.StorageId,
+									OpaqueId:  "foo-id",
+								},
+								Name: "Foo.pdf",
+							},
+						},
+					},
+				}, nil)
+			})
+
+			It("searches the personal user space", func() {
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{
+					Query: "foo scope:storageid$personalspace!personalspace/path",
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: "storageid",
+							SpaceId:   "personalspace",
+							OpaqueId:  "personalspace",
+						},
+					},
+				})
+
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
@@ -223,6 +296,10 @@ var _ = Describe("Searchprovider", func() {
 						},
 					},
 				}
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info:   ri,
+				}, nil)
 				gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
 					Status: status.NewOK(ctx),
 					Path:   "/grant/path",

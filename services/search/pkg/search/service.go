@@ -32,8 +32,12 @@ import (
 //go:generate mockery --name=Searcher
 
 const (
-	_spaceStateTrashed = "trashed"
-	_slowQueryDuration = 500 * time.Millisecond
+	_spaceStateTrashed   = "trashed"
+	_spaceTypeMountpoint = "mountpoint"
+	_spaceTypePersonal   = "personal"
+	_spaceTypeProject    = "project"
+	_spaceTypeGrant      = "grant"
+	_slowQueryDuration   = 500 * time.Millisecond
 )
 
 // Searcher is the interface to the SearchService
@@ -105,7 +109,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		}
 		// GetPath the scope to get the full path in the space
 		gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
-			ResourceId: statRes.Info.Id,
+			ResourceId: statRes.GetInfo().GetId(),
 		})
 		if err != nil {
 			return nil, err
@@ -113,9 +117,9 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 		req.Ref = &searchmsg.Reference{
 			ResourceId: &searchmsg.ResourceID{
-				StorageId: statRes.Info.Space.Root.StorageId,
-				SpaceId:   statRes.Info.Space.Root.SpaceId,
-				OpaqueId:  statRes.Info.Space.Root.OpaqueId,
+				StorageId: statRes.GetInfo().GetSpace().GetRoot().GetStorageId(),
+				SpaceId:   statRes.GetInfo().GetSpace().GetRoot().GetSpaceId(),
+				OpaqueId:  statRes.GetInfo().GetSpace().GetRoot().GetOpaqueId(),
 			},
 			Path: gpRes.Path,
 		}
@@ -153,7 +157,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	mountpointMap := map[string]string{}
 	for _, space := range spaces {
-		if space.SpaceType != "mountpoint" {
+		if space.SpaceType != _spaceTypeMountpoint {
 			continue
 		}
 		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
@@ -272,9 +276,9 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	mountpointPrefix := ""
 	searchPathPrefix := req.Ref.GetPath()
 	switch space.SpaceType {
-	case "mountpoint":
+	case _spaceTypeMountpoint:
 		return nil, errSkipSpace // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
-	case "grant":
+	case _spaceTypeGrant:
 		// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
 		searchRootID.OpaqueId = space.Root.SpaceId
 		if mountpointID == "" {
@@ -329,7 +333,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
-	case "personal", "project":
+	case _spaceTypePersonal, _spaceTypeProject:
 		permissions = space.GetRootInfo().GetPermissionSet()
 	}
 

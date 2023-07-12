@@ -162,8 +162,10 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	}
 
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
+	totalMatches := res.Total
 	for _, hit := range res.Hits {
 		if sir.Ref != nil && !strings.HasPrefix(getFieldValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
+			totalMatches--
 			continue
 		}
 
@@ -206,7 +208,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 
 	return &searchService.SearchIndexResponse{
 		Matches:      matches,
-		TotalMatches: int32(res.Total),
+		TotalMatches: int32(totalMatches),
 	}, nil
 }
 
