@@ -25,6 +25,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Make the post logout redirect uri configurable: [#6583](https://github.com/owncloud/ocis/pull/6583)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
+* Enhancement - Bump Hugo: [#6787](https://github.com/owncloud/ocis/pull/6787)
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
 * Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
@@ -187,6 +188,12 @@ The following sections list the changes for unreleased.
    We have added old & new values to the audit logs We have added the missing events for role changes
 
    https://github.com/owncloud/ocis/pull/6537
+
+* Enhancement - Bump Hugo: [#6787](https://github.com/owncloud/ocis/pull/6787)
+
+   Bump hugo pkg (needed for docs generation) to `v0.115.2`
+
+   https://github.com/owncloud/ocis/pull/6787
 
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
 
