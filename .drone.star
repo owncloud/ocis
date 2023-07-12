@@ -142,6 +142,13 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
+        "apiFullTextSearch": {
+            "suites": [
+                "apiFullTextSearch",
+            ],
+            "skip": False,
+            "tikaNeeded": True,
+        },
     },
     "apiTests": {
         "numberOfParts": 10,
@@ -734,6 +741,7 @@ def localApiTestPipeline(ctx):
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
+        "tikaNeeded": False,
     }
 
     if "localApiTests" in config:
@@ -754,7 +762,8 @@ def localApiTestPipeline(ctx):
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
+                                     (tikaService() if params["tikaNeeded"] else []) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]),
