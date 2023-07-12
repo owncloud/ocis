@@ -201,7 +201,8 @@ class WebDavHelper {
 		if ($folderDepth !== '0' && $folderDepth !== '1' && $folderDepth !== 'infinity') {
 			throw new InvalidArgumentException('Invalid depth value ' . $folderDepth);
 		}
-		$headers = ['Depth' => $folderDepth];
+		$headers['Depth'] = $folderDepth;
+		$headers['X-Request-Id'] = WebDavHelper::generateUUIDv4();
 		return self::makeDavRequest(
 			$baseUrl,
 			$user,
