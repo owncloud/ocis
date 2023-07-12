@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-06-19 00:15+0000\n"
+"POT-Creation-Date: 2023-07-11 00:40+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Hugo Blackwood, 2023\n"
 "Language-Team: Korean (https://app.transifex.com/owncloud-org/teams/6149/ko/)\n"
@@ -29,9 +29,20 @@ msgstr "{space} 스페이스 접근 권한 잃음"
 msgid "Access to {resource} expired"
 msgstr "{resource} 접근 권한 만료됨"
 
+#: pkg/service/templates.go:60
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr ""
+
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
 msgstr "정책을 위반하여 {resource} 파일이 삭제됨"
+
+#: pkg/service/templates.go:59
+msgid "Instance will be shut down and deprovisioned"
+msgstr ""
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"

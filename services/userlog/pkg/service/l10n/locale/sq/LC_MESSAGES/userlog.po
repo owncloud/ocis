@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-06-19 00:15+0000\n"
+"POT-Creation-Date: 2023-07-12 04:27+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -29,9 +29,22 @@ msgstr "U humb hyrje te Hapësira {space}"
 msgid "Access to {resource} expired"
 msgstr "Hyrja te {resource} skadoi"
 
+#: pkg/service/templates.go:60
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr ""
+"Kujdes! Instanca do të fiket dhe mbyllet më {date}. Shkarkoni krejt të "
+"dhënat tuaja para asaj data, ngaqë pas saj s’do të jetë më e mundur."
+
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
 msgstr "Kartela {resource} u fshi, ngaqë cenonte rregullat"
+
+#: pkg/service/templates.go:59
+msgid "Instance will be shut down and deprovisioned"
+msgstr "Instanca do të fiket dhe mbyllet"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"

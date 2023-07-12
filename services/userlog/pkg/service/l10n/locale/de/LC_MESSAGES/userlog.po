@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-06-19 00:15+0000\n"
+"POT-Creation-Date: 2023-07-11 00:40+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: hurradieweltgehtunter <florian@owncloud.com>, 2023\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -30,10 +30,21 @@ msgstr "Ihr Zugriff auf Space {space} ist abgelaufen."
 msgid "Access to {resource} expired"
 msgstr "Ihr Zugriff auf {resource} ist abgelaufen."
 
+#: pkg/service/templates.go:60
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr ""
+
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
 msgstr ""
 "Datei {resource} wurde gelöscht, weil sie gegen die Richtlinien verstößt."
+
+#: pkg/service/templates.go:59
+msgid "Instance will be shut down and deprovisioned"
+msgstr ""
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"

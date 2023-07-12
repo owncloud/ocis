@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Shouyuan Shi, 2023
+# Shouyuan, 2023
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-06-28 04:01+0000\n"
+"POT-Creation-Date: 2023-07-11 00:40+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
-"Last-Translator: Shouyuan Shi, 2023\n"
+"Last-Translator: Shouyuan, 2023\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/owncloud-org/teams/6149/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,9 +29,20 @@ msgstr "对于空间 {space} 的访问权限丢失"
 msgid "Access to {resource} expired"
 msgstr "对于 {resource} 的访问权限过期"
 
+#: pkg/service/templates.go:60
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr ""
+
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
 msgstr "文件 {resource} 因违反了策略已被删除"
+
+#: pkg/service/templates.go:59
+msgid "Instance will be shut down and deprovisioned"
+msgstr ""
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
