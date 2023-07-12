@@ -14,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -55,8 +56,14 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			tracerProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
 
-			err := ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			err = ogrpc.Configure(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracerProvider))...,
+			)
 			if err != nil {
 				return err
 			}
@@ -97,6 +104,7 @@ func Server(cfg *config.Config) *cli.Command {
 				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
 				pool.WithRegistry(registry.GetRegistry()),
+				pool.WithTracerProvider(tracerProvider),
 			)
 			if err != nil {
 				return fmt.Errorf("could not get reva client selector: %s", err)
@@ -119,6 +127,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Value(vClient),
 					http.Role(rClient),
 					http.RegisteredEvents(_registeredEvents),
+					http.TracerProvider(tracerProvider),
 				)
 
 				if err != nil {

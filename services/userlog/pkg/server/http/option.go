@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/metrics"
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -33,6 +34,7 @@ type Options struct {
 	ValueClient      settingssvc.ValueService
 	RoleClient       settingssvc.RoleService
 	RegisteredEvents []events.Unmarshaller
+	TracerProvider   trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -134,5 +136,12 @@ func Value(vs settingssvc.ValueService) Option {
 func Role(rs settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.RoleClient = rs
+	}
+}
+
+// TracerProvider provides a function to set the TracerProvider option
+func TracerProvider(val trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TracerProvider = val
 	}
 }
