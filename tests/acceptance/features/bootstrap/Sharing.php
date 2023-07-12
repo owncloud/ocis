@@ -1378,7 +1378,7 @@ trait Sharing {
 	 */
 	public function isUserOrGroupInSharedData(string $userOrGroupId, $shareType, $permissions = null):bool {
 		$shareType = SharingHelper::getShareType($shareType);
-
+        var_dump($shareType);
 		if ($permissions !== null) {
 			if (\is_string($permissions) && !\is_numeric($permissions)) {
 				$permissions = $this->splitPermissionsString($permissions);
@@ -1387,12 +1387,14 @@ trait Sharing {
 		}
 
 		$data = $this->getResponseXml(null, __METHOD__)->data[0];
+        var_dump($data);
 		if (\is_iterable($data)) {
 			foreach ($data as $element) {
 				if (($element->share_type->__toString() === (string) $shareType)
 					&& ($element->share_with->__toString() === $userOrGroupId)
 					&& ($permissions === null || $permissionSum === (int) $element->permissions->__toString())
 				) {
+                    var_dump("8888888888888888888888888888888888888888888888888888888888888");
 					return true;
 				}
 			}
@@ -1403,7 +1405,9 @@ trait Sharing {
 			\gettype($data) .
 			" and therefore does not contain share_with information."
 		);
+        var_dump("1111111111111111");
 		return false;
+
 	}
 
 	/**
@@ -1427,13 +1431,15 @@ trait Sharing {
 		$permissions = null,
 		?bool $getShareData = false
 	):void {
-		$user1Actual = $this->getActualUsername($user1);
-		$user2Actual = $this->getActualUsername($user2);
+		$sharer = $this->getActualUsername($user1);
+		$sharee = $this->getActualUsername($user2);
 
 		$path = $this->getSharesEndpointPath("?path=" . \urlencode($filepath));
+
+        //check whether file is shared or not
 		$this->response = OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
-			$user1Actual,
+            $sharer,
 			$this->getPasswordForUser($user1),
 			"GET",
 			$path,
@@ -1441,23 +1447,34 @@ trait Sharing {
 			[],
 			$this->ocsApiVersion
 		);
-		if ($getShareData && $this->isUserOrGroupInSharedData($user2Actual, "user", $permissions)) {
+
+        var_dump($this->response->getBody()->getContents());
+        // incase if above api fail to crate share again try to create share
+//        var_dump($this->isUserOrGroupInSharedData($sharee, "user", $permissions));
+        // in case of rsorce shared with another user  isUserOrGroupInSharedData return true
+		if ($getShareData && $this->isUserOrGroupInSharedData($sharee, "user", $permissions)) {
 			return;
 		} else {
+            var_dump("-----ss");
 			$this->createShare(
 				$user1,
 				$filepath,
 				'0',
-				$user2Actual,
+                $sharee,
 				null,
 				null,
 				$permissions
 			);
+            //http status code check
+            //ocs
+            // throw response
 		}
+        var_dump("jjjjj");
 		if ($getShareData) {
+            var_dump("thrd===========================");
 			$this->response = OcsApiHelper::sendRequest(
 				$this->getBaseUrl(),
-				$user1Actual,
+                $sharer,
 				$this->getPasswordForUser($user1),
 				"GET",
 				$path,
@@ -1529,36 +1546,39 @@ trait Sharing {
 	 * @Given /^user "([^"]*)" has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)"(?: with permissions (\d+))?$/
 	 * @Given /^user "([^"]*)" has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)" with permissions "([^"]*)"$/
 	 *
-	 * @param string $user1
+	 * @param string $sharer
 	 * @param string $filepath
-	 * @param string $user2
+	 * @param string $sharee
 	 * @param string|int|string[]|int[] $permissions
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function userHasSharedFileWithUserUsingTheSharingApi(
-		string $user1,
+		string $sharer,
 		string $filepath,
-		string $user2,
+		string $sharee,
 		$permissions = null
 	):void {
-		$user1 = $this->getActualUsername($user1);
-		$user2 = $this->getActualUsername($user2);
+//		$sharer = $this->getActualUsername($user1);
+//		$sharee = $this->getActualUsername($user2);
+        // share action done in this function
 		$this->shareFileWithUserUsingTheSharingApi(
-			$user1,
+			$sharer,
 			$filepath,
-			$user2,
+			$sharee,
 			$permissions,
 			true
 		);
+
+
 		$this->ocsContext->assertOCSResponseIndicatesSuccess(
 			'The ocs share response does not indicate success.',
 		);
 		// this is expected to fail if a file is shared with create and delete permissions, which is not possible
 		Assert::assertTrue(
-			$this->isUserOrGroupInSharedData($user2, "user", $permissions),
-			__METHOD__ . " User $user1 failed to share $filepath with user $user2"
+			$this->isUserOrGroupInSharedData($sharee, "user", $permissions),
+			__METHOD__ . " User $sharer failed to share $filepath with user $sharee"
 		);
 	}
 
@@ -2764,7 +2784,7 @@ trait Sharing {
 	 */
 	public function checkFieldsOfSpaceSharingResponse(string $user, string $space, ?TableNode $body):void {
 		$this->verifyTableNodeColumnsCount($body, 2);
-	
+
 		$bodyRows = $body->getRowsHash();
 		$userRelatedFieldNames = [
 			"owner",
@@ -2807,7 +2827,7 @@ trait Sharing {
 			}
 			$value = $this->getActualUsername($value);
 			$value = $this->replaceValuesFromTable($field, $value);
-   
+
 			Assert::assertTrue(
 				$this->isFieldInResponse($field, $value, true, $this->getLastPublicShareData()->data[0]),
 				"$field doesn't have value '$value'"

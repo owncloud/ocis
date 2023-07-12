@@ -63,6 +63,7 @@ class OcsApiHelper {
 		}
 		$fullUrl .= "ocs/v$ocsApiVersion.php" . $path;
 		$headers['OCS-APIREQUEST'] = true;
+        var_dump($fullUrl);
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
 	}
 

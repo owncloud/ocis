@@ -196,7 +196,7 @@ class HttpRequestHelper {
 		} else {
 			$debugResponses = false;
 		}
-
+var_dump($url,$method,$user,$body,$headers);
 		$sendRetryLimit = self::numRetriesOnHttpTooEarly();
 		$sendCount = 0;
 		$sendExceptionHappened = false;
