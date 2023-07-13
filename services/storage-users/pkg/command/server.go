@@ -75,7 +75,16 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			gr.Add(debugServer.ListenAndServe, func(_ error) {
+			gr.Add(debugServer.ListenAndServe, func(err error) {
+				logger.Error().Err(err).Str("server", cfg.Service.Name).
+					Msg("Shutting down debug server")
+				if err := debugServer.Shutdown(context.Background()); err != nil {
+					logger.Error().
+						Err(err).
+						Str("server", cfg.Service.Name).
+						Msg("Error during debug server shutdown")
+				}
+
 				cancel()
 			})
 
