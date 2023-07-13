@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -12,6 +13,7 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 	Logger               log.Logger
+	Context              context.Context
 	Name                 string
 	Version              string
 	Address              string
@@ -42,6 +44,13 @@ func newOptions(opts ...Option) Options {
 func Logger(l log.Logger) Option {
 	return func(o *Options) {
 		o.Logger = l
+	}
+}
+
+// Context provides a function to set the context option.
+func Context(ctx context.Context) Option {
+	return func(o *Options) {
+		o.Context = ctx
 	}
 }
 
