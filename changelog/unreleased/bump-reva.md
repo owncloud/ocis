@@ -23,6 +23,7 @@ Update reva to latest edge
 *   Enhancement [cs3org/reva#3965](https://github.com/cs3org/reva/pull/3965): ResumePostprocessing Event
 *   Enhancement [cs3org/reva#3981](https://github.com/cs3org/reva/pull/3981): We have updated the UserFeatureChangedEvent to reflect value changes
 *   Enhancement [cs3org/reva#3986](https://github.com/cs3org/reva/pull/3986): Allow disabling wopi chat
+*   Enhancement [cs3org/reva#4043](https://github.com/cs3org/reva/pull/4043): Prevent 0-byte messagepack metadata files
 
 https://github.com/owncloud/ocis/pull/6529
 https://github.com/owncloud/ocis/pull/6544
