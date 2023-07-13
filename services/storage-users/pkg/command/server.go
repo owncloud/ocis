@@ -108,12 +108,17 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				eventSVC, err := event.NewService(selector, stream, logger, *cfg)
+				eventSVC, err := event.NewService(ctx, selector, stream, logger, *cfg)
 				if err != nil {
-					logger.Fatal().Err(err).Msg("can't create event service")
+					logger.Fatal().Err(err).Msg("can't create event handler")
 				}
 
 				gr.Add(eventSVC.Run, func(_ error) {
+					logger.Error().
+						Err(err).
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down event handler")
+
 					cancel()
 				})
 			}
