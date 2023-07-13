@@ -27,7 +27,7 @@ Feature: refuse access
     Given using <dav-path-version> DAV path
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
-    And user "Alice" has been disabled
+    And the user "Admin" has disabled user "Alice" using the Graph API
     When user "Alice" downloads file "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "401"
     Examples:
