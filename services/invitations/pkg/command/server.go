@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/config"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/config/parser"
@@ -14,7 +15,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,7 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -54,7 +54,7 @@ func Server(cfg *config.Config) *cli.Command {
 				svc, err := service.New(
 					service.Logger(logger),
 					service.Config(cfg),
-					//service.WithRelationProviders(relationProviders),
+					// service.WithRelationProviders(relationProviders),
 				)
 				if err != nil {
 					logger.Error().Err(err).Msg("handler init")
@@ -62,7 +62,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				svc = service.NewInstrument(svc, metrics)
 				svc = service.NewLogging(svc, logger) // this logs service specific data
-				svc = service.NewTracing(svc)
+				svc = service.NewTracing(svc, traceProvider)
 
 				server, err := http.Server(
 					http.Logger(logger),
@@ -70,7 +70,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Config(cfg),
 					http.Service(svc),
 				)
-
 				if err != nil {
 					logger.Info().
 						Err(err).
@@ -98,7 +97,6 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Context(ctx),
 					debug.Config(cfg),
 				)
-
 				if err != nil {
 					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
