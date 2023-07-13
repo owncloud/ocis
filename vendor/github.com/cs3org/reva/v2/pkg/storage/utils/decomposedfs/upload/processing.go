@@ -38,7 +38,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -332,23 +331,17 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 	}
 
 	// create and write lock new node metadata
-	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().MetadataPath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
+	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}
 
-	switch upload.lu.MetadataBackend().(type) {
-	case metadata.MessagePackBackend:
-		// for the ini and metadata backend we also need to touch the actual node file here.
-		// it stores the mtime of the resource, which must not change when we update the ini file
-		h, err := os.OpenFile(n.InternalPath(), os.O_CREATE, 0600)
-		if err != nil {
-			return f, err
-		}
-		h.Close()
-	case metadata.XattrsBackend:
-		// nothing to do
+	// we also need to touch the actual node file here it stores the mtime of the resource
+	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE, 0600)
+	if err != nil {
+		return f, err
 	}
+	h.Close()
 
 	if _, err := node.CheckQuota(n.SpaceRoot, false, 0, fsize); err != nil {
 		return f, err
@@ -406,7 +399,7 @@ func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint
 	targetPath := n.InternalPath()
 
 	// write lock existing node before reading treesize or tree time
-	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().MetadataPath(targetPath), os.O_RDWR, 0600)
+	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(targetPath), os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}

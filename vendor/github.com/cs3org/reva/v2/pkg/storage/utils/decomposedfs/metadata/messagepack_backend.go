@@ -19,7 +19,9 @@
 package metadata
 
 import (
+	"errors"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -27,6 +29,7 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/google/renameio/v2"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/shamaton/msgpack/v2"
@@ -130,57 +133,55 @@ func (b MessagePackBackend) saveAttributes(path string, setAttribs map[string][]
 		f   readWriteCloseSeekTruncater
 		err error
 	)
+
+	lockPath := b.LockfilePath(path)
 	metaPath := b.MetadataPath(path)
 	if acquireLock {
-		f, err = lockedfile.OpenFile(metaPath, os.O_RDWR|os.O_CREATE, 0600)
-	} else {
-		f, err = os.OpenFile(metaPath, os.O_RDWR|os.O_CREATE, 0600)
+		f, err = lockedfile.OpenFile(lockPath, os.O_RDWR|os.O_CREATE, 0600)
+		defer func() { _ = f.Close() }()
 	}
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	// Invalidate cache early
 	_ = b.metaCache.RemoveMetadata(b.cacheKey(path))
 
 	// Read current state
-	msgBytes, err := io.ReadAll(f)
-	if err != nil {
-		return err
-	}
+	var msgBytes []byte
+	msgBytes, err = os.ReadFile(metaPath)
 	attribs := map[string][]byte{}
-	if len(msgBytes) > 0 {
+	switch {
+	case err != nil:
+		if !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+	case len(msgBytes) == 0:
+		// ugh. an empty file? bail out
+		return errors.New("encountered empty metadata file")
+	default:
+		// only unmarshal if we read data
 		err = msgpack.Unmarshal(msgBytes, &attribs)
 		if err != nil {
 			return err
 		}
 	}
 
-	// set new metadata
+	// prepare metadata
 	for key, val := range setAttribs {
 		attribs[key] = val
 	}
 	for _, key := range deleteAttribs {
 		delete(attribs, key)
 	}
-
-	// Truncate file
-	_, err = f.Seek(0, io.SeekStart)
-	if err != nil {
-		return err
-	}
-	err = f.Truncate(0)
+	var d []byte
+	d, err = msgpack.Marshal(attribs)
 	if err != nil {
 		return err
 	}
 
-	// Write new metadata to file
-	d, err := msgpack.Marshal(attribs)
-	if err != nil {
-		return err
-	}
-	_, err = f.Write(d)
+	// overwrite file atomically
+	err = renameio.WriteFile(metaPath, d, 0600)
 	if err != nil {
 		return err
 	}
@@ -196,9 +197,11 @@ func (b MessagePackBackend) loadAttributes(path string, source io.Reader) (map[s
 	}
 
 	metaPath := b.MetadataPath(path)
+	var msgBytes []byte
+
 	if source == nil {
-		source, err = lockedfile.Open(metaPath)
 		// // No cached entry found. Read from storage and store in cache
+		source, err = os.Open(metaPath)
 		if err != nil {
 			if os.IsNotExist(err) {
 				// some of the caller rely on ENOTEXISTS to be returned when the
@@ -211,10 +214,12 @@ func (b MessagePackBackend) loadAttributes(path string, source io.Reader) (map[s
 				return attribs, nil // no attributes set yet
 			}
 		}
-		defer source.(*lockedfile.File).Close()
+		msgBytes, err = io.ReadAll(source)
+		source.(*os.File).Close()
+	} else {
+		msgBytes, err = io.ReadAll(source)
 	}
 
-	msgBytes, err := io.ReadAll(source)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +239,9 @@ func (b MessagePackBackend) loadAttributes(path string, source io.Reader) (map[s
 }
 
 // IsMetaFile returns whether the given path represents a meta file
-func (MessagePackBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".mpk") }
+func (MessagePackBackend) IsMetaFile(path string) bool {
+	return strings.HasSuffix(path, ".mpk") || strings.HasSuffix(path, ".mlock")
+}
 
 // Purge purges the data of a given path
 func (b MessagePackBackend) Purge(path string) error {
@@ -264,6 +271,9 @@ func (b MessagePackBackend) Rename(oldPath, newPath string) error {
 
 // MetadataPath returns the path of the file holding the metadata for the given path
 func (MessagePackBackend) MetadataPath(path string) string { return path + ".mpk" }
+
+// LockfilePath returns the path of the lock file
+func (MessagePackBackend) LockfilePath(path string) string { return path + ".mlock" }
 
 func (b MessagePackBackend) cacheKey(path string) string {
 	// rootPath is guaranteed to have no trailing slash
