@@ -39,6 +39,7 @@ func RegisterService(ctx context.Context, service *mRegistry.Service, logger log
 				if err != nil {
 					logger.Err(err).Msgf("Error unregistering external service %v", service.Name)
 				}
+				return
 			}
 		}
 	}()
