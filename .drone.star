@@ -1928,6 +1928,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
             "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
+            "FRONTEND_OCS_ENABLE_DENIALS": True,
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
