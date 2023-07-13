@@ -120,6 +120,7 @@ default:
         - SpacesTUSContext:
         - OcisConfigContext:
         - TagContext:
+        - TrashbinContext:
 
     apiCors:
       paths:
