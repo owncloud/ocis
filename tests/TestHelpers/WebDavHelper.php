@@ -600,6 +600,7 @@ class WebDavHelper {
 	 * @param Client|null $client
 	 * @param array|null $urlParameter to concatenate with path
 	 * @param string|null $doDavRequestAsUser run the DAV as this user, if null it is the same as $user
+	 * @param bool $isGivenStep is set to true if makeDavRequest is called from a "given" step
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -622,7 +623,8 @@ class WebDavHelper {
 		?int $timeout = 0,
 		?Client $client = null,
 		?array $urlParameter = [],
-		?string $doDavRequestAsUser = null
+		?string $doDavRequestAsUser = null,
+		?bool $isGivenStep = false
 	):ResponseInterface {
 		$baseUrl = self::sanitizeUrl($baseUrl, true);
 
@@ -701,7 +703,8 @@ class WebDavHelper {
 			null,
 			$stream,
 			$timeout,
-			$client
+			$client,
+			$isGivenStep
 		);
 	}
 
