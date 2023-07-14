@@ -43,16 +43,10 @@ type Config struct {
 	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT" desc:"The STORAGE SHARES API endpoint."`
 	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The APP REGISTRY API endpoint."`
 
-	StorageRegistry StorageRegistry `yaml:"storage_registry"` //TODO: should we even support switching this?
+	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
-}
-type Tracing struct {
-	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GATEWAY_TRACING_ENABLED" desc:"Activates tracing."`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;GATEWAY_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;GATEWAY_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;GATEWAY_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
 type Log struct {
@@ -81,9 +75,9 @@ type GRPCConfig struct {
 }
 
 type StorageRegistry struct {
-	Driver              string   `yaml:"driver"` //TODO: configure via env?
-	Rules               []string `yaml:"rules"`  //TODO: configure via env?
-	JSON                string   `yaml:"json"`   //TODO: configure via env?
+	Driver              string   `yaml:"driver"` // TODO: configure via env?
+	Rules               []string `yaml:"rules"`  // TODO: configure via env?
+	JSON                string   `yaml:"json"`   // TODO: configure via env?
 	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 }
 
