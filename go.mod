@@ -101,7 +101,7 @@ require (
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools/v3 v3.4.0
+	gotest.tools/v3 v3.5.0
 	stash.kopano.io/kgol/oidc-go v0.3.4
 	stash.kopano.io/kgol/rndm v1.1.2
 )
