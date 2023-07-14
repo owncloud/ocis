@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
@@ -40,7 +41,17 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
-			err := grpc.Configure(grpc.GetClientOptions(&cfg.GRPCClientTLS)...)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+
+			err = grpc.Configure(
+				append(
+					grpc.GetClientOptions(&cfg.GRPCClientTLS),
+					grpc.WithTraceProvider(traceProvider),
+				)...,
+			)
 			if err != nil {
 				return err
 			}
@@ -133,6 +144,7 @@ func Server(cfg *config.Config) *cli.Command {
 				pool.WithTLSCACert(cfg.Notifications.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
 				pool.WithRegistry(registry.GetRegistry()),
+				pool.WithTracerProvider(traceProvider),
 			)
 			if err != nil {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
