@@ -69,6 +69,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Prefix(cfg.HTTP.Prefix),
 					ocdav.GatewaySvc(cfg.Reva.Address),
 					ocdav.JWTSecret(cfg.TokenManager.JWTSecret),
+					ocdav.TransferSecret(cfg.TransferSecret),
 					ocdav.ProductName(cfg.Status.ProductName),
 					ocdav.ProductVersion(cfg.Status.ProductVersion),
 					ocdav.Product(cfg.Status.Product),
