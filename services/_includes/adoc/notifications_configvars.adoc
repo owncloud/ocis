@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-14-11-23-26]
+[#deprecation-note-2023-07-14-14-12-32]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -32,7 +32,7 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`IDM_TRACING_ENABLED` +
+`NOTIFICATIONS_TRACING_ENABLED` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -42,7 +42,7 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`IDM_TRACING_TYPE` +
+`NOTIFICATIONS_TRACING_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -52,7 +52,7 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`IDM_TRACING_ENDPOINT` +
+`NOTIFICATIONS_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -62,7 +62,7 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`IDM_TRACING_COLLECTOR` +
+`NOTIFICATIONS_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -319,7 +319,7 @@ a| [subs=-attributes]
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-07-14-11-23-26[Deprecation Note]
+xref:deprecation-note-2023-07-14-14-12-32[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
