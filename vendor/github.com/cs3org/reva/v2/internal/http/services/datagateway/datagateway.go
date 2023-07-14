@@ -58,8 +58,8 @@ func init() {
 	global.Register("datagateway", New)
 }
 
-// transferClaims are custom claims for a JWT token to be used between the metadata and data gateways.
-type transferClaims struct {
+// TransferClaims are custom claims for a JWT token to be used between the metadata and data gateways.
+type TransferClaims struct {
 	jwt.StandardClaims
 	Target string `json:"target"`
 }
@@ -161,7 +161,24 @@ func addCorsHeader(res http.ResponseWriter) {
 	headers.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD")
 }
 
-func (s *svc) verify(ctx context.Context, r *http.Request) (*transferClaims, error) {
+// Verify a transfer token against the given secret
+func Verify(ctx context.Context, token string, secret string) (*TransferClaims, error) {
+	j, err := jwt.ParseWithClaims(token, &TransferClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error parsing token")
+	}
+
+	if claims, ok := j.Claims.(*TransferClaims); ok && j.Valid {
+		return claims, nil
+	}
+	err = errtypes.InvalidCredentials("token invalid")
+	return nil, err
+}
+
+func (s *svc) verify(ctx context.Context, r *http.Request) (*TransferClaims, error) {
 	// Extract transfer token from request header. If not existing, assume that it's the last path segment instead.
 	token := r.Header.Get(TokenTransportHeader)
 	if token == "" {
@@ -169,20 +186,7 @@ func (s *svc) verify(ctx context.Context, r *http.Request) (*transferClaims, err
 		r.Header.Set(TokenTransportHeader, token)
 	}
 
-	j, err := jwt.ParseWithClaims(token, &transferClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(s.conf.TransferSharedSecret), nil
-	})
-
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing token")
-	}
-
-	if claims, ok := j.Claims.(*transferClaims); ok && j.Valid {
-		return claims, nil
-	}
-
-	err = errtypes.InvalidCredentials("token invalid")
-	return nil, err
+	return Verify(ctx, token, s.conf.TransferSharedSecret)
 }
 
 func (s *svc) doHead(w http.ResponseWriter, r *http.Request) {

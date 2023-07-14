@@ -16,11 +16,25 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-package loader
+package micro
 
-import (
-	// Load core app registry drivers.
-	_ "github.com/cs3org/reva/v2/pkg/app/registry/micro"
-	_ "github.com/cs3org/reva/v2/pkg/app/registry/static"
-	// Add your own here
-)
+import "github.com/mitchellh/mapstructure"
+
+type config struct {
+	Namespace string            `mapstructure:"namespace"`
+	MimeTypes []*mimeTypeConfig `mapstructure:"mime_types"`
+}
+
+func (c *config) init() {
+	if c.Namespace == "" {
+		c.Namespace = "cs3"
+	}
+}
+
+func parseConfig(m map[string]interface{}) (*config, error) {
+	c := &config{}
+	if err := mapstructure.Decode(m, c); err != nil {
+		return nil, err
+	}
+	return c, nil
+}

@@ -32,6 +32,7 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/datagateway"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
@@ -253,6 +254,18 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			return
 		}
 		var httpRes *http.Response
+
+		// if we know the transfer secret we can directly talk to the dataprovider
+		if s.c.TransferSharedSecret != "" {
+			claims, err := datagateway.Verify(ctx, token, s.c.TransferSharedSecret)
+			if err != nil {
+				log.Error().Err(err).Msg("error verifying transfer token")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			// directly send request to target
+			ep = claims.Target
+		}
 
 		httpReq, err := rhttp.NewRequest(ctx, http.MethodPatch, ep, r.Body)
 		if err != nil {

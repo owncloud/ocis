@@ -48,7 +48,15 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/pkg/handler"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/upload")
+}
 
 // Tree is used to manage a tree hierarchy
 type Tree interface {
@@ -125,11 +133,13 @@ func buildUpload(ctx context.Context, info tusd.FileInfo, binPath string, infoPa
 
 // Cleanup cleans the upload
 func Cleanup(upload *Upload, failure bool, keepUpload bool) {
+	ctx, span := tracer.Start(upload.Ctx, "Cleanup")
+	defer span.End()
 	upload.cleanup(failure, !keepUpload, !keepUpload)
 
 	// unset processing status
 	if upload.Node != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
-		if err := upload.Node.UnmarkProcessing(upload.Ctx, upload.Info.ID); err != nil {
+		if err := upload.Node.UnmarkProcessing(ctx, upload.Info.ID); err != nil {
 			upload.log.Info().Str("path", upload.Node.InternalPath()).Err(err).Msg("unmarking processing failed")
 		}
 	}
@@ -137,7 +147,11 @@ func Cleanup(upload *Upload, failure bool, keepUpload bool) {
 
 // WriteChunk writes the stream from the reader to the given offset of the upload
 func (upload *Upload) WriteChunk(_ context.Context, offset int64, src io.Reader) (int64, error) {
+	ctx, span := tracer.Start(upload.Ctx, "WriteChunk")
+	defer span.End()
+	_, subspan := tracer.Start(ctx, "os.OpenFile")
 	file, err := os.OpenFile(upload.binPath, os.O_WRONLY|os.O_APPEND, defaultFilePerm)
+	subspan.End()
 	if err != nil {
 		return 0, err
 	}
@@ -147,7 +161,9 @@ func (upload *Upload) WriteChunk(_ context.Context, offset int64, src io.Reader)
 	// TODO but how do we get the `Upload-Checksum`? WriteChunk() only has a context, offset and the reader ...
 	// It is sent with the PATCH request, well or in the POST when the creation-with-upload extension is used
 	// but the tus handler uses a context.Background() so we cannot really check the header and put it in the context ...
+	_, subspan = tracer.Start(ctx, "io.Copy")
 	n, err := io.Copy(file, src)
+	subspan.End()
 
 	// If the HTTP PATCH request gets interrupted in the middle (e.g. because
 	// the user wants to pause the upload), Go's net/http returns an io.ErrUnexpectedEOF.
@@ -168,11 +184,15 @@ func (upload *Upload) GetInfo(_ context.Context) (tusd.FileInfo, error) {
 
 // GetReader returns an io.Reader for the upload
 func (upload *Upload) GetReader(_ context.Context) (io.Reader, error) {
+	_, span := tracer.Start(upload.Ctx, "GetReader")
+	defer span.End()
 	return os.Open(upload.binPath)
 }
 
 // FinishUpload finishes an upload and moves the file to the internal destination
 func (upload *Upload) FinishUpload(_ context.Context) error {
+	ctx, span := tracer.Start(upload.Ctx, "FinishUpload")
+	defer span.End()
 	// set lockID to context
 	if upload.Info.MetaData["lockid"] != "" {
 		upload.Ctx = ctxpkg.ContextSetLockID(upload.Ctx, upload.Info.MetaData["lockid"])
@@ -188,7 +208,9 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 	md5h := md5.New()
 	adler32h := adler32.New()
 	{
+		_, subspan := tracer.Start(ctx, "os.Open")
 		f, err := os.Open(upload.binPath)
+		subspan.End()
 		if err != nil {
 			// we can continue if no oc checksum header is set
 			log.Info().Err(err).Str("binPath", upload.binPath).Msg("error opening binPath")
@@ -198,7 +220,9 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 		r1 := io.TeeReader(f, sha1h)
 		r2 := io.TeeReader(r1, md5h)
 
+		_, subspan = tracer.Start(ctx, "io.Copy")
 		_, err = io.Copy(adler32h, r2)
+		subspan.End()
 		if err != nil {
 			log.Info().Err(err).Msg("error copying checksums")
 		}
@@ -315,6 +339,8 @@ func (upload *Upload) ConcatUploads(_ context.Context, uploads []tusd.Upload) (e
 
 // writeInfo updates the entire information. Everything will be overwritten.
 func (upload *Upload) writeInfo() error {
+	_, span := tracer.Start(upload.Ctx, "writeInfo")
+	defer span.End()
 	data, err := json.Marshal(upload.Info)
 	if err != nil {
 		return err
@@ -324,10 +350,12 @@ func (upload *Upload) writeInfo() error {
 
 // Finalize finalizes the upload (eg moves the file to the internal destination)
 func (upload *Upload) Finalize() (err error) {
+	ctx, span := tracer.Start(upload.Ctx, "Finalize")
+	defer span.End()
 	n := upload.Node
 	if n == nil {
 		var err error
-		n, err = node.ReadNode(upload.Ctx, upload.lu, upload.Info.Storage["SpaceRoot"], upload.Info.Storage["NodeId"], false, nil, false)
+		n, err = node.ReadNode(ctx, upload.lu, upload.Info.Storage["SpaceRoot"], upload.Info.Storage["NodeId"], false, nil, false)
 		if err != nil {
 			return err
 		}
@@ -335,8 +363,10 @@ func (upload *Upload) Finalize() (err error) {
 	}
 
 	// upload the data to the blobstore
-
-	if err := upload.tp.WriteBlob(n, upload.binPath); err != nil {
+	_, subspan := tracer.Start(ctx, "WriteBlob")
+	err = upload.tp.WriteBlob(n, upload.binPath)
+	subspan.End()
+	if err != nil {
 		return errors.Wrap(err, "failed to upload file to blostore")
 	}
 
