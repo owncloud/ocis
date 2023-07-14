@@ -136,3 +136,19 @@ Feature: Search
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Brian" should not contain these entries:
       | /folderMain |
+  
+  @issue-enterprise-6000
+  Scenario: user cannot find data that is not shared
+    Given user "Alice" has created a folder "foo/sharedToBrian" in space "Alice Hansen"
+    And user "Alice" has created a folder "sharedToCarol" in space "Alice Hansen"
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
+      | path      | foo    |
+      | shareWith | Brian  |
+      | role      | viewer |
+    And user "Brian" has accepted share "/foo" offered by user "Alice"
+    When user "Brian" searches for "shared" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Brian" should contain these entries:
+      | /sharedToBrian |
+    But the search result of user "Brian" should not contain these entries:
+      | /sharedToCarol |
