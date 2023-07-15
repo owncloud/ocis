@@ -6,15 +6,16 @@
 # Translators:
 # Michael Barz <mbarz@owncloud.com>, 2023
 # hurradieweltgehtunter <florian@owncloud.com>, 2023
+# Edith Parzefall, 2023
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-07-11 00:40+0000\n"
+"POT-Creation-Date: 2023-07-15 00:54+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
-"Last-Translator: hurradieweltgehtunter <florian@owncloud.com>, 2023\n"
+"Last-Translator: Edith Parzefall, 2023\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,6 +37,9 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
+"Achtung! Diese Instanz wird am {date} heruntergefahren und außer Betrieb "
+"genommen werden. Laden Sie Ihre Daten vor diesem Tag herunter, da Sie danach"
+" nicht mehr darauf zugreifen können."
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
@@ -44,7 +48,7 @@ msgstr ""
 
 #: pkg/service/templates.go:59
 msgid "Instance will be shut down and deprovisioned"
-msgstr ""
+msgstr "Instanz wird heruntergefahren und außer Betrieb genommen werden."
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"

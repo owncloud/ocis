@@ -6,15 +6,16 @@
 # Translators:
 # Aidos Kakimzhanov <aidos.kakimzhan@gmail.com>, 2023
 # Viktor Scharf, 2023
+# Roman Perekhod, 2023
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-07-11 00:40+0000\n"
+"POT-Creation-Date: 2023-07-15 00:54+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
-"Last-Translator: Viktor Scharf, 2023\n"
+"Last-Translator: Roman Perekhod, 2023\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,6 +37,8 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
+"Внимание! Сервер будет отключен и деинициализирован {дата}. Скачайте все "
+"свои данные до этой даты, так как доступ после этой даты невозможен."
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
@@ -43,7 +46,7 @@ msgstr "Файл {resource} был удален, в связи с нарушен
 
 #: pkg/service/templates.go:59
 msgid "Instance will be shut down and deprovisioned"
-msgstr ""
+msgstr "Сервер будет отключен и деинициализирован"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
