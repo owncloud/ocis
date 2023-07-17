@@ -16,6 +16,7 @@ yarn.lock
 # build artifacts
 */bin
 services/*/bin
+services/*/dist
 /ocis/dist/
 services/*/assets
 ocis/ocis
