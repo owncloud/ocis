@@ -255,6 +255,12 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 >
 > STORAGE_DRIVER=owncloudsql
 
+`STOP_ON_FAILURE`: to stop running tests after the first failure
+
+> Example:
+>
+> STOP_ON_FAILURE=true
+
 ### Use Existing Tests for BDD
 
 As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in oCIS.
