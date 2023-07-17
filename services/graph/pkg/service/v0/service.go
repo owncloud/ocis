@@ -25,7 +25,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
-	gtracing "github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -151,6 +150,7 @@ func NewService(opts ...Option) (Graph, error) {
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
 		historyClient:            options.EventHistoryClient,
+		traceProvider:            options.TraceProvider,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {
@@ -158,7 +158,7 @@ func NewService(opts ...Option) (Graph, error) {
 	}
 
 	if options.PermissionService == nil {
-		grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(gtracing.TraceProvider))...)
+		grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(options.TraceProvider))...)
 		if err != nil {
 			return svc, err
 		}

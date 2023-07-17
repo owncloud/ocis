@@ -14,6 +14,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -35,6 +36,7 @@ type Options struct {
 	SearchService            searchsvc.SearchProviderService
 	KeycloakClient           keycloak.Client
 	EventHistoryClient       ehsvc.EventHistoryService
+	TraceProvider            trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -143,5 +145,12 @@ func KeycloakClient(val keycloak.Client) Option {
 func EventHistoryClient(val ehsvc.EventHistoryService) Option {
 	return func(o *Options) {
 		o.EventHistoryClient = val
+	}
+}
+
+// TraceProvider provides a function to set the TraceProvider option.
+func TraceProvider(val trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = val
 	}
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -73,6 +74,7 @@ type Graph struct {
 	searchService            searchsvc.SearchProviderService
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService
+	traceProvider            trace.TracerProvider
 }
 
 // ServeHTTP implements the Service interface.

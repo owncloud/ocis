@@ -26,7 +26,6 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/events"
@@ -116,7 +115,7 @@ func Server(opts ...Option) (http.Service, error) {
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
 	var gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
+	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(options.TraceProvider))...)
 	if err != nil {
 		return http.Service{}, err
 	}
@@ -164,16 +163,11 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
 		svc.KeycloakClient(keyCloakClient),
 		svc.EventHistoryClient(hClient),
+		svc.TraceProvider(options.TraceProvider),
 	)
 
 	if err != nil {
 		return http.Service{}, errors.New("could not initialize graph service")
-	}
-
-	{
-		handle = svc.NewInstrument(handle, options.Metrics)
-		handle = svc.NewLogging(handle, options.Logger)
-		handle = svc.NewTracing(handle)
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
