@@ -1104,6 +1104,11 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
     }
 
 def e2eTests(ctx):
+    feature_paths = [
+        "tests/e2e/cucumber/features/*/*[!.oc10].feature",
+        "tests/e2e/cucumber/features/smoke/*/*[!.oc10].feature",
+    ]
+
     e2e_trigger = {
         "ref": [
             "refs/heads/master",
@@ -1123,50 +1128,51 @@ def e2eTests(ctx):
         "temp": {},
     }]
 
-    e2e_test_ocis = [{
-        "name": "e2e-tests",
-        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-        "environment": {
-            "BASE_URL_OCIS": "ocis-server:9200",
-            "HEADLESS": "true",
-            "OCIS": "true",
-            "RETRY": "1",
-            "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-            "LOCAL_UPLOAD_DIR": "/uploads",
-            "API_TOKEN": "true",
-        },
-        "commands": [
-            "cd %s" % dirs["web"],
-            "sleep 10 && pnpm test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
-        ],
-    }]
+    pipelines = []
 
-    e2eTestsSteps = \
-        skipIfUnchanged(ctx, "e2e-tests") + \
-        restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
-        restoreWebCache() + \
-        restoreWebPnpmCache() + \
-        tikaService() + \
-        ocisServer("ocis", 4, [], tika_enabled = True) + \
-        e2e_test_ocis + \
-        uploadTracingResult(ctx) + \
-        logTracingResults()
+    for path in feature_paths:
+        e2eTestsSteps = \
+            skipIfUnchanged(ctx, "e2e-tests") + \
+            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+            restoreWebCache() + \
+            restoreWebPnpmCache() + \
+            tikaService() + \
+            ocisServer("ocis", 4, [], tika_enabled = True) + \
+            [{
+                "name": "e2e-tests",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "environment": {
+                    "BASE_URL_OCIS": "ocis-server:9200",
+                    "HEADLESS": "true",
+                    "OCIS": "true",
+                    "RETRY": "1",
+                    "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+                    "LOCAL_UPLOAD_DIR": "/uploads",
+                    "API_TOKEN": "true",
+                },
+                "commands": [
+                    "cd %s" % dirs["web"],
+                    "pnpm test:e2e:cucumber %s" % path,
+                ],
+            }] + \
+            uploadTracingResult(ctx) + \
+            logTracingResults()
 
-    if ("skip-e2e" in ctx.build.title.lower()):
-        return []
+        if ("skip-e2e" in ctx.build.title.lower()):
+            return []
 
-    if (ctx.build.event != "tag"):
-        return [{
-            "kind": "pipeline",
-            "type": "docker",
-            "name": "e2e-tests",
-            "steps": e2eTestsSteps,
-            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
-            "trigger": e2e_trigger,
-            "volumes": e2e_volumes,
-        }]
+        if (ctx.build.event != "tag"):
+            pipelines.append({
+                "kind": "pipeline",
+                "type": "docker",
+                "name": "e2e-tests",
+                "steps": e2eTestsSteps,
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
+                "trigger": e2e_trigger,
+                "volumes": e2e_volumes,
+            })
 
-    return []
+    return pipelines
 
 def uploadTracingResult(ctx):
     return [{
