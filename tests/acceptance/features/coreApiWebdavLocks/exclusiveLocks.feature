@@ -1,12 +1,15 @@
 @api @issue-1284
 Feature: there can be only one exclusive lock on a resource
+  As a user
+  I want to lock a resource
+  So that other users cannot  access or change that resource
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: a second lock cannot be set on a folder when its exclusively locked
-    Given using <dav-path> DAV path
+  Scenario Outline: second lock cannot be set on a folder when its exclusively locked
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | exclusive |
@@ -15,21 +18,21 @@ Feature: there can be only one exclusive lock on a resource
     Then the HTTP status code should be "423"
     And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
 
-  Scenario Outline: a share receiver cannot lock a resource exclusively locked by itself
-    Given using <dav-path> DAV path
+  Scenario Outline: sharee cannot lock a resource exclusively locked by itself
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -42,21 +45,21 @@ Feature: there can be only one exclusive lock on a resource
     And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
     And 1 locks should be reported for file "textfile0 (2).txt" of user "Brian" by the WebDAV API
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
 
-  Scenario Outline: a share receiver cannot lock a resource exclusively locked by the owner
-    Given using <dav-path> DAV path
+  Scenario Outline: sharee cannot lock a resource exclusively locked by the owner
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -69,21 +72,21 @@ Feature: there can be only one exclusive lock on a resource
     And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
     And 1 locks should be reported for file "textfile0 (2).txt" of user "Brian" by the WebDAV API
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
 
-  Scenario Outline: a share owner cannot lock a resource exclusively locked by a share receiver
-    Given using <dav-path> DAV path
+  Scenario Outline: sharer cannot lock a resource exclusively locked by a sharee
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -96,14 +99,14 @@ Feature: there can be only one exclusive lock on a resource
     And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
     And 1 locks should be reported for file "textfile0 (2).txt" of user "Brian" by the WebDAV API
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |

@@ -261,7 +261,7 @@ Feature: sharing
 
 
   Scenario Outline: sharer deletes file uploaded with upload-only permission by sharee to a shared folder
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created a share with settings
@@ -276,6 +276,6 @@ Feature: sharing
     And as "Brian" file "/Shares/FOLDER/textFile.txt" should not exist
     And as "Alice" file "/textFile.txt" should not exist
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |

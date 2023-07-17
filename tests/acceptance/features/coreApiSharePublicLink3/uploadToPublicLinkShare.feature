@@ -25,7 +25,7 @@ Feature: upload to a public link share
 
 
   Scenario Outline: uploading file to a public upload-only share using public API that was deleted does not work
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created a public link share with settings
       | path        | FOLDER |
       | permissions | create |
@@ -35,14 +35,14 @@ Feature: upload to a public link share
 
     @issue-1268
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
   @issue-1269
   Scenario: uploading file to a public read-only share folder with public API does not work

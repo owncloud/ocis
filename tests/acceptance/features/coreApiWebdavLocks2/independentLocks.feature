@@ -7,7 +7,7 @@ Feature: independent locks
 
 
   Scenario Outline: locking a file does not lock other items with the same name in other parts of the file system
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/locked/textfile0.txt"
     And user "Alice" has created folder "notlocked"
@@ -19,21 +19,21 @@ Feature: independent locks
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "/textfile0.txt"
     But user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "/locked/textfile0.txt"
     Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope |
-      | spaces   | shared     |
-      | spaces   | exclusive  |
+      | dav-path-version | lock-scope |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
 
   Scenario Outline: locking a file/folder with git specific names does not lock other items with the same name in other parts of the file system
-    Given using <dav-path> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked/"
     And user "Alice" has created folder "locked/.git"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/locked/.git/config"
@@ -47,20 +47,20 @@ Feature: independent locks
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "/notlocked/.git/config"
     But user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "/locked/.git/config"
     Examples:
-      | dav-path | lock-scope | to-lock     |
-      | old      | shared     | .git        |
-      | old      | shared     | .git/config |
-      | old      | exclusive  | .git        |
-      | old      | exclusive  | .git/config |
-      | new      | shared     | .git        |
-      | new      | shared     | .git/config |
-      | new      | exclusive  | .git        |
-      | new      | exclusive  | .git/config |
+      | dav-path-version | lock-scope | to-lock     |
+      | old              | shared     | .git        |
+      | old              | shared     | .git/config |
+      | old              | exclusive  | .git        |
+      | old              | exclusive  | .git/config |
+      | new              | shared     | .git        |
+      | new              | shared     | .git/config |
+      | new              | exclusive  | .git        |
+      | new              | exclusive  | .git/config |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path | lock-scope | to-lock     |
-      | spaces   | shared     | .git        |
-      | spaces   | shared     | .git/config |
-      | spaces   | exclusive  | .git        |
-      | spaces   | exclusive  | .git/config |
+      | dav-path-version | lock-scope | to-lock     |
+      | spaces           | shared     | .git        |
+      | spaces           | shared     | .git/config |
+      | spaces           | exclusive  | .git        |
+      | spaces           | exclusive  | .git/config |

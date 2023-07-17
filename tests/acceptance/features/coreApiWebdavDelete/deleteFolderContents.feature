@@ -8,8 +8,8 @@ Feature: delete folder contents
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Removing everything of a folder
-    Given using <dav_version> DAV path
+  Scenario Outline: removing everything from a folder
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/PARENT/"
     And user "Alice" has created folder "/FOLDER/"
     And user "Alice" has created folder "/FOLDER/SUBFOLDER"
@@ -29,11 +29,11 @@ Feature: delete folder contents
       | /FOLDER/fileToDelete.txt        |
       | /FOLDER/SUBFOLDER/testfile0.txt |
     Examples:
-      | dav_version |
-      | old         |
-      | new         |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav_version |
-      | spaces      |
+      | dav-path-version |
+      | spaces           |

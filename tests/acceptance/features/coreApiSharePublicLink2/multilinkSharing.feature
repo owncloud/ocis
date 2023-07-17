@@ -116,7 +116,7 @@ Feature: multi-link sharing
 
   Scenario Outline: deleting a file also deletes its public links
     Given using OCS API version "1"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has created a public link share with settings
       | path        | textfile0.txt |
@@ -136,14 +136,14 @@ Feature: multi-link sharing
     Then the HTTP status code should be "201"
     And as user "Alice" the file "/textfile0.txt" should not have any shares
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario Outline: deleting one public link share of a file doesn't affect the rest
@@ -182,7 +182,7 @@ Feature: multi-link sharing
 
   Scenario Outline: overwriting a file doesn't remove its public shares
     Given using OCS API version "1"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has created a public link share with settings
       | path        | textfile0.txt |
@@ -203,19 +203,19 @@ Feature: multi-link sharing
       | /textfile0.txt | 1           | sharedlink1 |
       | /textfile0.txt | 1           | sharedlink2 |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
 
   @issue-1251
   Scenario Outline: renaming a folder doesn't remove its public shares
     Given using OCS API version "1"
-    And using <dav-path> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path         | FOLDER      |
@@ -238,11 +238,11 @@ Feature: multi-link sharing
       | /FOLDER_RENAMED | 15          | sharedlink1 |
       | /FOLDER_RENAMED | 15          | sharedlink2 |
     Examples:
-      | dav-path |
-      | old      |
-      | new      |
+      | dav-path-version |
+      | old              |
+      | new              |
 
-  @skipOnRevaMaster
+    @skipOnRevaMaster
     Examples:
-      | dav-path |
-      | spaces   |
+      | dav-path-version |
+      | spaces           |
