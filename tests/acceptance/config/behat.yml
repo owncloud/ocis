@@ -175,6 +175,21 @@ default:
         - OcisConfigContext:
         - PublicWebDavContext:
 
+    apiFullTextSearch:
+      paths:
+        - '%paths.base%/../features/apiFullTextSearch'
+      context: *common_ldap_suite_context
+      contexts:
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - PublicWebDavContext:
+        - FeatureContext: *common_feature_context_params
+        - SearchContext:
+        - CapabilitiesContext:
+        - FilesVersionsContext:
+        - OCSContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 
