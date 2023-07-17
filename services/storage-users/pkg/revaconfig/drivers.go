@@ -116,6 +116,7 @@ func OwnCloudSQL(cfg *config.Config) map[string]interface{} {
 func Ocis(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend":            cfg.Drivers.OCIS.MetadataBackend,
+		"propagator":                  cfg.Drivers.OCIS.Propagator,
 		"root":                        cfg.Drivers.OCIS.Root,
 		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
 		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
@@ -171,6 +172,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend":            cfg.Drivers.OCIS.MetadataBackend,
+		"propagator":                  cfg.Drivers.OCIS.Propagator,
 		"root":                        cfg.Drivers.OCIS.Root,
 		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
 		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
@@ -225,6 +227,7 @@ func S3(cfg *config.Config) map[string]interface{} {
 func S3NG(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend":            cfg.Drivers.S3NG.MetadataBackend,
+		"propagator":                  cfg.Drivers.S3NG.Propagator,
 		"root":                        cfg.Drivers.S3NG.Root,
 		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
 		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
@@ -284,6 +287,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend":            cfg.Drivers.S3NG.MetadataBackend,
+		"propagator":                  cfg.Drivers.S3NG.Propagator,
 		"root":                        cfg.Drivers.S3NG.Root,
 		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
 		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
