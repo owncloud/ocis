@@ -1104,10 +1104,16 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
     }
 
 def e2eTests(ctx):
-    feature_paths = [
-        "tests/e2e/cucumber/features/*/*[!.oc10].feature",
-        "tests/e2e/cucumber/features/smoke/*/*[!.oc10].feature",
-    ]
+    test_suites = {
+        "suite1": {
+            "path": "tests/e2e/cucumber/features/*/*[!.oc10].feature",
+            "tikaNeeded": True,
+        },
+        "suite2": {
+            "path": "tests/e2e/cucumber/features/smoke/*/*[!.oc10].feature",
+            "tikaNeeded": False,
+        },
+    }
 
     e2e_trigger = {
         "ref": [
@@ -1133,14 +1139,14 @@ def e2eTests(ctx):
     if ("skip-e2e" in ctx.build.title.lower()):
         return []
 
-    for index, path in enumerate(feature_paths):
-        e2eTestsSteps = \
+    for name, suite in test_suites.items():
+        steps = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
-            tikaService() + \
-            ocisServer("ocis", 4, [], tika_enabled = True) + \
+            (tikaService() if suite["tikaNeeded"] else []) + \
+            ocisServer("ocis", 4, [], tika_enabled = suite["tikaNeeded"]) + \
             [{
                 "name": "e2e-tests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -1155,7 +1161,7 @@ def e2eTests(ctx):
                 },
                 "commands": [
                     "cd %s" % dirs["web"],
-                    "pnpm test:e2e:cucumber %s" % path,
+                    "pnpm test:e2e:cucumber %s" % suite["path"],
                 ],
             }] + \
             uploadTracingResult(ctx) + \
@@ -1165,8 +1171,8 @@ def e2eTests(ctx):
             pipelines.append({
                 "kind": "pipeline",
                 "type": "docker",
-                "name": "e2e-tests-%s" % (index + 1),
-                "steps": e2eTestsSteps,
+                "name": "e2e-tests-%s" % name,
+                "steps": steps,
                 "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
