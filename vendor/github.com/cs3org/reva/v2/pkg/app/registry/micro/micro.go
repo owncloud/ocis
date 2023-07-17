@@ -16,11 +16,35 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-package loader
+package micro
 
 import (
-	// Load core app registry drivers.
-	_ "github.com/cs3org/reva/v2/pkg/app/registry/micro"
-	_ "github.com/cs3org/reva/v2/pkg/app/registry/static"
-	// Add your own here
+	"strings"
+
+	"github.com/cs3org/reva/v2/pkg/app/registry/registry"
 )
+
+const defaultPriority = "0"
+
+func init() {
+	registry.Register("micro", New)
+}
+
+type mimeTypeConfig struct {
+	MimeType      string `mapstructure:"mime_type"`
+	Extension     string `mapstructure:"extension"`
+	Name          string `mapstructure:"name"`
+	Description   string `mapstructure:"description"`
+	Icon          string `mapstructure:"icon"`
+	DefaultApp    string `mapstructure:"default_app"`
+	AllowCreation bool   `mapstructure:"allow_creation"`
+}
+
+// use the UTF-8 record separator
+func splitMimeTypes(s string) []string {
+	return strings.Split(s, "␞")
+}
+
+func joinMimeTypes(mimetypes []string) string {
+	return strings.Join(mimetypes, "␞")
+}

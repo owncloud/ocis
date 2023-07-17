@@ -94,7 +94,10 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		provider: provider,
 	}
 
-	go service.registerProvider()
+	go func() {
+		// TODO: implement me to call service.registerProvider with a ticker
+		service.registerProvider()
+	}()
 	return service, nil
 }
 

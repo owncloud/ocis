@@ -240,7 +240,11 @@ func Get(ctx context.Context, id string, lu *lookup.Lookup, tp Tree, fsRoot stri
 
 // CreateNodeForUpload will create the target node for the Upload
 func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node, error) {
+	ctx, span := tracer.Start(upload.Ctx, "CreateNodeForUpload")
+	defer span.End()
+	_, subspan := tracer.Start(ctx, "os.Stat")
 	fi, err := os.Stat(upload.binPath)
+	subspan.End()
 	if err != nil {
 		return nil, err
 	}
@@ -258,13 +262,13 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 		nil,
 		upload.lu,
 	)
-	n.SpaceRoot, err = node.ReadNode(upload.Ctx, upload.lu, spaceID, spaceID, false, nil, false)
+	n.SpaceRoot, err = node.ReadNode(ctx, upload.lu, spaceID, spaceID, false, nil, false)
 	if err != nil {
 		return nil, err
 	}
 
 	// check lock
-	if err := n.CheckLock(upload.Ctx); err != nil {
+	if err := n.CheckLock(ctx); err != nil {
 		return nil, err
 	}
 
@@ -293,7 +297,7 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 	initAttrs.SetString(prefixes.StatusPrefix, node.ProcessingStatus+upload.Info.ID)
 
 	// update node metadata with new blobid etc
-	err = n.SetXattrsWithContext(context.TODO(), initAttrs, false)
+	err = n.SetXattrsWithContext(ctx, initAttrs, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: could not write metadata")
 	}

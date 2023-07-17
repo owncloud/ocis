@@ -85,6 +85,8 @@ type Config struct {
 	Product                string                            `mapstructure:"product"`
 	ProductName            string                            `mapstructure:"product_name"`
 	ProductVersion         string                            `mapstructure:"product_version"`
+	// optional, if set will unpack the transfer token and directly send uploads to the data provider
+	TransferSharedSecret string `mapstructure:"transfer_shared_secret"`
 
 	NameValidation NameValidation `mapstructure:"validation"`
 

@@ -43,8 +43,9 @@ type Options struct {
 	Context   context.Context
 	// Metrics   *metrics.Metrics
 	// Flags     []cli.Flag
-	Name      string
-	JWTSecret string
+	Name           string
+	JWTSecret      string
+	TransferSecret string
 
 	FavoriteManager favorite.Manager
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
@@ -106,6 +107,13 @@ func Address(val string) Option {
 func JWTSecret(s string) Option {
 	return func(o *Options) {
 		o.JWTSecret = s
+	}
+}
+
+// TransferSecret provides a function to set the transfer secret option.
+func TransferSecret(s string) Option {
+	return func(o *Options) {
+		o.config.TransferSharedSecret = s
 	}
 }
 
