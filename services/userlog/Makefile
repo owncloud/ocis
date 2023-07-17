@@ -10,6 +10,7 @@ include ../../.make/recursion.mk
 ############ tooling ############
 ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
+GOARCH := $(shell go env GOARCH)
 endif
 
 ############ go tooling ############
@@ -23,6 +24,12 @@ include ../../.make/docs.mk
 
 .PHONY: docs-generate
 docs-generate: config-docs-generate
+
+############ dev-docker ############
+.PHONY: dev-docker
+dev-docker:
+	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
+	docker build -f docker/Dockerfile.linux.$(GOARCH) -t owncloud/ocis-services:$(NAME)-dev .
 
 ############ generate ############
 include ../../.make/generate.mk

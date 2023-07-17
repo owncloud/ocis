@@ -1226,12 +1226,17 @@ def logTracingResults():
 
 def dockerReleases(ctx):
     pipelines = []
-    for arch in config["dockerReleases"]["architectures"]:
-        pipelines.append(dockerRelease(ctx, arch))
 
-    manifest = releaseDockerManifest()
-    manifest["depends_on"] = getPipelineNames(pipelines)
-    pipelines.append(manifest)
+    for module in config["modules"]:
+        if module == "ocis-pkg":
+            continue
+
+        for arch in config["dockerReleases"]["architectures"]:
+            pipelines.append(dockerRelease(ctx, module, arch))
+        manifest = releaseDockerManifest(module)
+
+        manifest["depends_on"] = getPipelineNames(pipelines)
+        pipelines.append(manifest)
 
     readme = releaseDockerReadme(ctx)
     readme["depends_on"] = getPipelineNames(pipelines)
@@ -1239,7 +1244,7 @@ def dockerReleases(ctx):
 
     return pipelines
 
-def dockerRelease(ctx, arch):
+def dockerRelease(ctx, module, arch):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
@@ -1264,7 +1269,7 @@ def dockerRelease(ctx, arch):
                 "name": "build",
                 "image": OC_CI_GOLANG,
                 "commands": [
-                    "make -C ocis release-linux-docker-%s" % (arch),
+                    "make -C %s release-linux-docker-%s" % (module, arch),
                 ],
             },
             {
@@ -1272,9 +1277,9 @@ def dockerRelease(ctx, arch):
                 "image": PLUGINS_DOCKER,
                 "settings": {
                     "dry_run": True,
-                    "context": "ocis",
+                    "context": "%s" %(module),
                     "tags": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "dockerfile": "%s/docker/Dockerfile.linux.%s" % (module, arch),
                     "repo": ctx.repo.slug,
                     "build_args": build_args,
                 },
@@ -1297,9 +1302,9 @@ def dockerRelease(ctx, arch):
                         "from_secret": "docker_password",
                     },
                     "auto_tag": True,
-                    "context": "ocis",
+                    "context": "%s" %(module),
                     "auto_tag_suffix": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "dockerfile": "%s/docker/Dockerfile.linux.%s" % (module, arch),
                     "repo": ctx.repo.slug,
                     "build_args": build_args,
                 },
@@ -1625,7 +1630,7 @@ def releaseSubmodule(ctx):
         },
     }
 
-def releaseDockerManifest():
+def releaseDockerManifest(module):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1645,7 +1650,7 @@ def releaseDockerManifest():
                     "password": {
                         "from_secret": "docker_password",
                     },
-                    "spec": "ocis/docker/manifest.tmpl",
+                    "spec": "%s/docker/manifest.tmpl" % (module),
                     "auto_tag": True,
                     "ignore_missing": True,
                 },
