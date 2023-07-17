@@ -227,6 +227,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6507
    https://github.com/owncloud/ocis/pull/6572
    https://github.com/owncloud/ocis/pull/6590
+   https://github.com/owncloud/ocis/pull/6812
 
 * Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 
