@@ -3,6 +3,7 @@
 
 # images
 ALPINE_GIT = "alpine/git:latest"
+APACHE_TIKA = "apache/tika:2.8.0.0"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
@@ -1124,7 +1125,6 @@ def e2eTests(ctx):
             "RETRY": "1",
             "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
             "LOCAL_UPLOAD_DIR": "/uploads",
-            "SLOW_MO": "50",
             "API_TOKEN": "true",
         },
         "commands": [
@@ -1138,7 +1138,8 @@ def e2eTests(ctx):
         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
         restoreWebCache() + \
         restoreWebPnpmCache() + \
-        ocisServer("ocis", 4, []) + \
+        tikaService() + \
+        ocisServer("ocis", 4, [], tika_enabled = True) + \
         e2e_test_ocis + \
         uploadTracingResult(ctx) + \
         logTracingResults()
@@ -1891,7 +1892,7 @@ def notify():
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     if deploy_type == "":
         user = "0:0"
         environment = {
@@ -1913,7 +1914,13 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
             "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
+            "FRONTEND_OCS_ENABLE_DENIALS": True,
         }
+        if tika_enabled:
+            environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
+            environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
+            environment["SEARCH_EXTRACTOR_TIKA_TIKA_URL"] = "http://tika:9998"
+            environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
             "image": OC_CI_ALPINE,
@@ -2764,5 +2771,19 @@ def waitForClamavService():
         "image": OC_CI_WAIT_FOR,
         "commands": [
             "wait-for -it clamav:3310 -t 600",
+        ],
+    }]
+
+def tikaService():
+    return [{
+        "name": "tika",
+        "type": "docker",
+        "image": APACHE_TIKA,
+        "detach": True,
+    }, {
+        "name": "wait-for-tika-service",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it tika:9998 -t 300",
         ],
     }]
