@@ -24,6 +24,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use TestHelpers\GraphHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\UserHelper;
 use TestHelpers\HttpRequestHelper;
@@ -3825,9 +3826,9 @@ trait Provisioning {
 	 */
 	public function adminHasDisabledUserUsingTheProvisioningApi(?string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
-		$this->theHTTPStatusCodeShouldBeSuccess();
-		$this->ocsContext->assertOCSResponseIndicatesSuccess();
+		$response=$this->disableOrEnableUser($this->getAdminUsername(), $user, null, null, null, null, false);
+		$this->setResponse($response);
+		$this->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
 	/**
@@ -5402,20 +5403,22 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function disableOrEnableUser(string $user, string $otherUser, string $action):void {
+	public function disableOrEnableUser(string $user, string $otherUser, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true):ResponseInterface {
 		$actualUser = $this->getActualUsername($user);
 		$actualPassword = $this->getPasswordForUser($actualUser);
-		$actualOtherUser = $this->getActualUsername($otherUser);
-
-		$fullUrl = $this->getBaseUrl()
-			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/$action";
-		$this->response = HttpRequestHelper::put(
-			$fullUrl,
+		$userId = $this->getAttributeOfCreatedUser($otherUser, 'id');
+		return GraphHelper::editUser(
+			$this->getBaseUrl(),
 			$this->getStepLineRef(),
 			$actualUser,
-			$actualPassword
+			$actualPassword,
+			$userId,
+			$userName,
+			$password,
+			$email,
+			$displayName,
+			$accountEnabled
 		);
-		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
