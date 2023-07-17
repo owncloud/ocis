@@ -1130,7 +1130,10 @@ def e2eTests(ctx):
 
     pipelines = []
 
-    for path in feature_paths:
+    if ("skip-e2e" in ctx.build.title.lower()):
+        return []
+
+    for index, path in enumerate(feature_paths):
         e2eTestsSteps = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
@@ -1158,14 +1161,11 @@ def e2eTests(ctx):
             uploadTracingResult(ctx) + \
             logTracingResults()
 
-        if ("skip-e2e" in ctx.build.title.lower()):
-            return []
-
         if (ctx.build.event != "tag"):
             pipelines.append({
                 "kind": "pipeline",
                 "type": "docker",
-                "name": "e2e-tests",
+                "name": "e2e-tests-%s" % (index + 1),
                 "steps": e2eTestsSteps,
                 "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
