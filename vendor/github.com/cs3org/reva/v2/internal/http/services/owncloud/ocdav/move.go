@@ -141,6 +141,12 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 }
 
 func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Request, src, dst *provider.Reference, log zerolog.Logger) {
+	// do not allow overwriting spaces
+	if err := s.validateDestination(dst); err != nil {
+		log.Error().Err(err)
+		w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
+		return
+	}
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {
@@ -304,4 +310,12 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*info.Id))
 	w.Header().Set(net.HeaderOCETag, info.Etag)
 	w.WriteHeader(successCode)
+}
+
+func (s *svc) validateDestination(dstStatRes *provider.Reference) error {
+	// do not allow overwriting spaces
+	if dstStatRes.GetPath() == "." && dstStatRes.GetResourceId().GetOpaqueId() == dstStatRes.GetResourceId().GetSpaceId() {
+		return fmt.Errorf("overwriting is not allowed")
+	}
+	return nil
 }
