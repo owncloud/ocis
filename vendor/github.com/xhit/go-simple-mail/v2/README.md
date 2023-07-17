@@ -69,6 +69,7 @@ Go Simple Mail supports:
 - Add Custom Headers in Message
 - Send NOOP, RESET, QUIT and CLOSE to SMTP client
 - PLAIN, LOGIN and CRAM-MD5 Authentication (since v2.3.0)
+- AUTO Authentication (since v2.14.0)
 - Allow connect to SMTP without authentication (since v2.10.0)
 - Custom TLS Configuration (since v2.5.0)
 - Send a RFC822 formatted message (since v2.8.0)
@@ -76,12 +77,15 @@ Go Simple Mail supports:
 - Support text/calendar content type body (since v2.11.0)
 - Support add a List-Unsubscribe header (since v2.11.0)
 - Support to add a DKIM signarure (since v2.11.0)
+- Support to send using custom connection, ideal for proxy (since v2.15.0)
 
 ## Documentation
 
 https://pkg.go.dev/github.com/xhit/go-simple-mail/v2?tab=doc
 
-Note: by default duplicated recipients throws an error, from `v2.13.0` you can use `email.AllowDuplicateAddress = true` to avoid the check.
+Note 1: by default duplicated recipients throws an error, from `v2.13.0` you can use `email.AllowDuplicateAddress = true` to avoid the check.
+
+Note 2: by default Bcc header is not set in email. From `v2.14.0` you can use `email.AddBccToHeader = true` to add this.
 
 ## Download
 
@@ -99,7 +103,7 @@ package main
 import (
 	"log"
 
-	"github.com/xhit/go-simple-mail/v2"
+	mail "github.com/xhit/go-simple-mail/v2"
 	"github.com/toorop/go-dkim"
 )
 
@@ -153,12 +157,13 @@ func main() {
 	server.Password = "examplepass"
 	server.Encryption = mail.EncryptionSTARTTLS
 
-	// Since v2.3.0 you can specified authentication type:
-	// - PLAIN (default)
+	// You can specified authentication type:
+	// - AUTO (default)
+	// - PLAIN
 	// - LOGIN
 	// - CRAM-MD5
 	// - None
-	// server.Authentication = mail.AuthPlain
+	// server.Authentication = mail.AuthAuto
 
 	// Variable to keep alive connection
 	server.KeepAlive = false
@@ -263,6 +268,77 @@ func main() {
 			log.Println("Email Sent")
 		}
 	}
+```
+
+# Send with custom connection
+
+It's possible to use a custom connection with custom dieler, like a dialer that uses a proxy server, etc...
+
+With this, these servers params are ignored: `Host`, `Port`. You have total control of the connection.
+
+Example using a conn for proxy:
+
+```go
+package main
+
+import (
+	"crypto/tls"
+	"fmt"
+	"log"
+	"net"
+
+	mail "github.com/xhit/go-simple-mail/v2"
+	"golang.org/x/net/proxy"
+)
+
+func main() {
+	server := mail.NewSMTPClient()
+
+	host := "smtp.example.com"
+	port := 587
+	proxyAddr := "proxy.server"
+
+	conn, err := getCustomConnWithProxy(proxyAddr, host, port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.Username = "test@example.com"
+	server.Password = "examplepass"
+	server.Encryption = mail.EncryptionSTARTTLS
+	server.CustomConn = conn
+
+	smtpClient, err := server.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email := mail.NewMSG()
+
+	err = email.SetFrom("From Example <nube@example.com>").AddTo("xhit@example.com").Send(smtpClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func getCustomConnWithProxy(proxyAddr, host string, port int) (net.Conn, error) {
+	dial, err := proxy.SOCKS5("tcp", proxyAddr, nil, proxy.Direct)
+	if err != nil {
+		return nil, err
+	}
+
+	dialer, err := dial.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		return nil, err
+	}
+
+	conf := &tls.Config{ServerName: host}
+	conn := tls.Client(dialer, conf)
+
+	return conn, nil
+}
+
 ```
 
 ## More examples

@@ -9,6 +9,8 @@ import (
 	"net/mail"
 	"net/textproto"
 	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/toorop/go-dkim"
@@ -31,6 +33,7 @@ type Email struct {
 	SMTPServer            *smtpClient
 	DkimMsg               string
 	AllowDuplicateAddress bool
+	AddBccToHeader        bool
 }
 
 /*
@@ -49,10 +52,14 @@ type SMTPServer struct {
 	Port           int
 	KeepAlive      bool
 	TLSConfig      *tls.Config
+
+	// use custom dialer
+	CustomConn net.Conn
 }
 
 // SMTPClient represents a SMTP Client for send email
 type SMTPClient struct {
+	mu          sync.Mutex
 	Client      *smtpClient
 	KeepAlive   bool
 	SendTimeout time.Duration
@@ -134,7 +141,22 @@ const (
 	AuthCRAMMD5
 	// AuthNone for SMTP servers without authentication
 	AuthNone
+	// AuthAuto (default) use the first AuthType of the list of returned types supported by SMTP
+	AuthAuto
 )
+
+func (at AuthType) String() string {
+	switch at {
+	case AuthPlain:
+		return "PLAIN"
+	case AuthLogin:
+		return "LOGIN"
+	case AuthCRAMMD5:
+		return "CRAM-MD5"
+	default:
+		return ""
+	}
+}
 
 // NewMSG creates a new email. It uses UTF-8 by default. All charsets: http://webcheatsheet.com/HTML/character_sets_list.php
 func NewMSG() *Email {
@@ -152,7 +174,7 @@ func NewMSG() *Email {
 // NewSMTPClient returns the client for send email
 func NewSMTPClient() *SMTPServer {
 	server := &SMTPServer{
-		Authentication: AuthPlain,
+		Authentication: AuthAuto,
 		Encryption:     EncryptionNone,
 		ConnectTimeout: 10 * time.Second,
 		SendTimeout:    10 * time.Second,
@@ -331,6 +353,11 @@ func (email *Email) AddAddresses(header string, addresses ...string) *Email {
 			email.headers.Del("Sender")
 			email.Error = errors.New("Mail Error: From and Sender should not be set to the same address")
 			return email
+		}
+
+		// add Bcc only if AddBccToHeader is true
+		if header == "Bcc" && email.AddBccToHeader {
+			email.headers.Add(header, address.String())
 		}
 
 		// add all addresses to the headers except for Bcc and Return-Path
@@ -687,27 +714,30 @@ func (email *Email) SendEnvelopeFrom(from string, client *SMTPClient) error {
 }
 
 // dial connects to the smtp server with the request encryption type
-func dial(host string, port string, encryption Encryption, config *tls.Config) (*smtpClient, error) {
+func dial(customConn net.Conn, host string, port string, encryption Encryption, config *tls.Config) (*smtpClient, error) {
 	var conn net.Conn
 	var err error
+	var c *smtpClient
 
-	address := host + ":" + port
+	if customConn != nil {
+		conn = customConn
+	} else {
+		address := host + ":" + port
+		// do the actual dial
+		switch encryption {
+		// TODO: Remove EncryptionSSL check before launch v3
+		case EncryptionSSL, EncryptionSSLTLS:
+			conn, err = tls.Dial("tcp", address, config)
+		default:
+			conn, err = net.Dial("tcp", address)
+		}
 
-	// do the actual dial
-	switch encryption {
-	// TODO: Remove EncryptionSSL check before launch v3
-	case EncryptionSSL, EncryptionSSLTLS:
-		conn, err = tls.Dial("tcp", address, config)
-	default:
-		conn, err = net.Dial("tcp", address)
+		if err != nil {
+			return nil, errors.New("Mail Error on dialing with encryption type " + encryption.String() + ": " + err.Error())
+		}
 	}
 
-	if err != nil {
-		return nil, errors.New("Mail Error on dialing with encryption type " + encryption.String() + ": " + err.Error())
-	}
-
-	c, err := newClient(conn, host)
-
+	c, err = newClient(conn, host)
 	if err != nil {
 		return nil, fmt.Errorf("Mail Error on smtp dial: %w", err)
 	}
@@ -717,9 +747,9 @@ func dial(host string, port string, encryption Encryption, config *tls.Config) (
 
 // smtpConnect connects to the smtp server and starts TLS and passes auth
 // if necessary
-func smtpConnect(host, port, helo string, a auth, at AuthType, encryption Encryption, config *tls.Config) (*smtpClient, error) {
+func smtpConnect(customConn net.Conn, host, port, helo string, encryption Encryption, config *tls.Config) (*smtpClient, error) {
 	// connect to the mail server
-	c, err := dial(host, port, encryption, config)
+	c, err := dial(customConn, host, port, encryption, config)
 
 	if err != nil {
 		return nil, err
@@ -746,42 +776,60 @@ func smtpConnect(host, port, helo string, a auth, at AuthType, encryption Encryp
 		}
 	}
 
-	// only pass authentication if defined
-	if at != AuthNone {
-		// pass the authentication if necessary
-		if a != nil {
-			if ok, _ := c.extension("AUTH"); ok {
-				if err = c.authenticate(a); err != nil {
-					c.close()
-					return nil, fmt.Errorf("Mail Error on Auth: %w", err)
-				}
-			}
+	return c, nil
+}
+
+func (server *SMTPServer) getAuth(a string) (auth, error) {
+	var afn auth
+	switch {
+	case strings.Contains(a, AuthPlain.String()):
+		if server.Username != "" || server.Password != "" {
+			afn = plainAuthfn("", server.Username, server.Password, server.Host)
+		}
+	case strings.Contains(a, AuthLogin.String()):
+		if server.Username != "" || server.Password != "" {
+			afn = loginAuthfn("", server.Username, server.Password, server.Host)
+		}
+	case strings.Contains(a, AuthCRAMMD5.String()):
+		if server.Username != "" || server.Password != "" {
+			afn = cramMD5Authfn(server.Username, server.Password)
+		}
+	default:
+		return nil, fmt.Errorf("Mail Error on determining auth type, %s is not supported", a)
+	}
+	return afn, nil
+}
+
+func (server *SMTPServer) validateAuth(c *smtpClient) error {
+	var err error
+	var afn auth
+	switch {
+	case server.Authentication == AuthNone || server.Username == "":
+		return nil
+	case server.Authentication != AuthAuto:
+		afn, err = server.getAuth(server.Authentication.String())
+		if err != nil {
+			return err
 		}
 	}
-
-	return c, nil
+	if ok, a := c.extension("AUTH"); ok {
+		// Determine Auth type automatically from extension
+		if afn == nil {
+			afn, err = server.getAuth(a)
+			if err != nil {
+				return err
+			}
+		}
+		if err = c.authenticate(afn); err != nil {
+			c.close()
+			return fmt.Errorf("Mail Error on Auth: %w", err)
+		}
+	}
+	return nil
 }
 
 // Connect returns the smtp client
 func (server *SMTPServer) Connect() (*SMTPClient, error) {
-
-	var a auth
-
-	switch server.Authentication {
-	case AuthPlain:
-		if server.Username != "" || server.Password != "" {
-			a = plainAuthfn("", server.Username, server.Password, server.Host)
-		}
-	case AuthLogin:
-		if server.Username != "" || server.Password != "" {
-			a = loginAuthfn("", server.Username, server.Password, server.Host)
-		}
-	case AuthCRAMMD5:
-		if server.Username != "" || server.Password != "" {
-			a = cramMD5Authfn(server.Username, server.Password)
-		}
-	}
-
 	var smtpConnectChannel chan error
 	var c *smtpClient
 	var err error
@@ -795,7 +843,7 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 	if server.ConnectTimeout != 0 {
 		smtpConnectChannel = make(chan error, 2)
 		go func() {
-			c, err = smtpConnect(server.Host, fmt.Sprintf("%d", server.Port), server.Helo, a, server.Authentication, server.Encryption, tlsConfig)
+			c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig)
 			// send the result
 			smtpConnectChannel <- err
 		}()
@@ -810,7 +858,7 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 		}
 	} else {
 		// no ConnectTimeout, just fire the connect
-		c, err = smtpConnect(server.Host, fmt.Sprintf("%d", server.Port), server.Helo, a, server.Authentication, server.Encryption, tlsConfig)
+		c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -820,26 +868,34 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 		Client:      c,
 		KeepAlive:   server.KeepAlive,
 		SendTimeout: server.SendTimeout,
-	}, nil
+	}, server.validateAuth(c)
 }
 
 // Reset send RSET command to smtp client
 func (smtpClient *SMTPClient) Reset() error {
+	smtpClient.mu.Lock()
+	defer smtpClient.mu.Unlock()
 	return smtpClient.Client.reset()
 }
 
 // Noop send NOOP command to smtp client
 func (smtpClient *SMTPClient) Noop() error {
+	smtpClient.mu.Lock()
+	defer smtpClient.mu.Unlock()
 	return smtpClient.Client.noop()
 }
 
 // Quit send QUIT command to smtp client
 func (smtpClient *SMTPClient) Quit() error {
+	smtpClient.mu.Lock()
+	defer smtpClient.mu.Unlock()
 	return smtpClient.Client.quit()
 }
 
 // Close closes the connection
 func (smtpClient *SMTPClient) Close() error {
+	smtpClient.mu.Lock()
+	defer smtpClient.mu.Unlock()
 	return smtpClient.Client.close()
 }
 
@@ -869,14 +925,14 @@ func send(from string, to []string, msg string, client *SMTPClient) error {
 			if client.SendTimeout != 0 {
 				smtpSendChannel = make(chan error, 1)
 
-				go func(from string, to []string, msg string, c *smtpClient) {
-					smtpSendChannel <- sendMailProcess(from, to, msg, c)
-				}(from, to, msg, client.Client)
+				go func(from string, to []string, msg string, client *SMTPClient) {
+					smtpSendChannel <- sendMailProcess(from, to, msg, client)
+				}(from, to, msg, client)
 			}
 
 			if client.SendTimeout == 0 {
 				// no SendTimeout, just fire the sendMailProcess
-				return sendMailProcess(from, to, msg, client.Client)
+				return sendMailProcess(from, to, msg, client)
 			}
 
 			// get the send result or timeout result, which ever happens first
@@ -888,35 +944,36 @@ func send(from string, to []string, msg string, client *SMTPClient) error {
 				checkKeepAlive(client)
 				return errors.New("Mail Error: SMTP Send timed out")
 			}
-
 		}
 	}
 
 	return errors.New("Mail Error: No SMTP Client Provided")
 }
 
-func sendMailProcess(from string, to []string, msg string, c *smtpClient) error {
+func sendMailProcess(from string, to []string, msg string, c *SMTPClient) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	cmdArgs := make(map[string]string)
 
-	if _, ok := c.ext["SIZE"]; ok {
+	if _, ok := c.Client.ext["SIZE"]; ok {
 		cmdArgs["SIZE"] = strconv.Itoa(len(msg))
 	}
 
 	// Set the sender
-	if err := c.mail(from, cmdArgs); err != nil {
+	if err := c.Client.mail(from, cmdArgs); err != nil {
 		return err
 	}
 
 	// Set the recipients
 	for _, address := range to {
-		if err := c.rcpt(address); err != nil {
+		if err := c.Client.rcpt(address); err != nil {
 			return err
 		}
 	}
 
 	// Send the data command
-	w, err := c.data()
+	w, err := c.Client.data()
 	if err != nil {
 		return err
 	}
@@ -938,9 +995,9 @@ func sendMailProcess(from string, to []string, msg string, c *smtpClient) error 
 // check if keepAlive for close or reset
 func checkKeepAlive(client *SMTPClient) {
 	if client.KeepAlive {
-		client.Client.reset()
+		client.Reset()
 	} else {
-		client.Client.quit()
-		client.Client.close()
+		client.Quit()
+		client.Close()
 	}
 }
