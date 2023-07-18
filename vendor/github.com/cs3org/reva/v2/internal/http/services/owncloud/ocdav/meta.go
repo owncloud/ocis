@@ -27,6 +27,7 @@ import (
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/prop"
@@ -41,7 +42,7 @@ type MetaHandler struct {
 	VersionsHandler *VersionsHandler
 }
 
-func (h *MetaHandler) init(c *Config) error {
+func (h *MetaHandler) init(c *config.Config) error {
 	h.VersionsHandler = new(VersionsHandler)
 	return h.VersionsHandler.init(c)
 }

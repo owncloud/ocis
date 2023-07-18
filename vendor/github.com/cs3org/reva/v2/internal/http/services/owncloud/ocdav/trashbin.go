@@ -29,6 +29,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/prop"
@@ -51,7 +52,7 @@ type TrashbinHandler struct {
 	namespace  string
 }
 
-func (h *TrashbinHandler) init(c *Config) error {
+func (h *TrashbinHandler) init(c *config.Config) error {
 	h.gatewaySvc = c.GatewaySvc
 	h.namespace = path.Join("/", c.FilesNamespace)
 	return nil

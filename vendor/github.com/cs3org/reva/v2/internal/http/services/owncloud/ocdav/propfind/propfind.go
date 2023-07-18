@@ -38,6 +38,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/prop"
@@ -168,13 +169,15 @@ func NewMultiStatusResponseXML() *MultiStatusResponseXML {
 type Handler struct {
 	PublicURL string
 	selector  pool.Selectable[gateway.GatewayAPIClient]
+	c         *config.Config
 }
 
 // NewHandler returns a new PropfindHandler instance
-func NewHandler(publicURL string, selector pool.Selectable[gateway.GatewayAPIClient]) *Handler {
+func NewHandler(publicURL string, selector pool.Selectable[gateway.GatewayAPIClient], c *config.Config) *Handler {
 	return &Handler{
 		PublicURL: publicURL,
 		selector:  selector,
+		c:         c,
 	}
 }
 
@@ -237,6 +240,18 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 		span.SetStatus(codes.Error, "Invalid Depth header value")
 		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
+	if depth == net.DepthInfinity && !p.c.AllowPropfindDepthInfinitiy {
+		span.RecordError(errors.ErrInvalidDepth)
+		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
 		b, err := errors.Marshal(http.StatusBadRequest, m, "")
