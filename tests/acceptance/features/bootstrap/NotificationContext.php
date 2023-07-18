@@ -318,6 +318,15 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
 		$this->userListAllNotifications($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		// sometimes the test might try to get notification before the notification is created by the server
+		// in order to prevent test from failing because of that list the notifications again
+		if (!isset($this->filterResponseAccordingToNotificationSubject($subject)->message)) {
+			\sleep(1);
+			$this->featureContext->setResponse(null);
+			$this->userListAllNotifications($user);
+			$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		}
 		$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject)->message);
 		$expectedMessage = $table->getColumnsHash()[0]['message'];
 		Assert::assertSame(
