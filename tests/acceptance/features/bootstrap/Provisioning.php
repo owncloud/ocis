@@ -3833,7 +3833,8 @@ trait Provisioning {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			" Expected status code is 200 but received " . $response->getStatusCode()
+			__METHOD__
+			. " Expected status code is 200 but received " . $response->getStatusCode()
 			. "\nResponse body: " . $response->getBody(),
 		);
 	}
@@ -5417,14 +5418,12 @@ trait Provisioning {
 
 		$fullUrl = $this->getBaseUrl()
 			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/$action";
-		$response = HttpRequestHelper::put(
+		return HttpRequestHelper::put(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
 		);
-		$this->pushToLastStatusCodesArrays();
-		return $response;
 	}
 
 	/**
