@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-07-11 00:40+0000\n"
+"POT-Creation-Date: 2023-07-18 00:54+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Begüm Topyıldız <bgmtpyldz@gmail.com>, 2023\n"
 "Language-Team: Turkish (https://app.transifex.com/owncloud-org/teams/6149/tr/)\n"
@@ -35,6 +35,9 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
+"Dikkat! Örnek kapatılacak ve {date} tarihinde temel hazırlığı kaldırılacak. "
+"Tüm verilerinizi o tarihten önce indirin, çünkü o tarihten sonra erişim "
+"mümkün değildir."
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
@@ -42,7 +45,7 @@ msgstr "{resource} dosyası, politikaları ihlal ettiği için silindi"
 
 #: pkg/service/templates.go:59
 msgid "Instance will be shut down and deprovisioned"
-msgstr ""
+msgstr "Örnek kapatılacak ve temel hazırlığı kaldırılacak"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
