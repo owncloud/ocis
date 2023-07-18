@@ -1465,16 +1465,16 @@ def licenseCheck(ctx):
 
     settings = {
         "endpoint": {
-            "from_secret": "s3_endpoint",
+            "from_secret": "upload_s3_endpoint",
         },
         "access_key": {
-            "from_secret": "aws_access_key_id",
+            "from_secret": "upload_s3_access_key",
         },
         "secret_key": {
-            "from_secret": "aws_secret_access_key",
+            "from_secret": "upload_s3_secret_key",
         },
         "bucket": {
-            "from_secret": "s3_bucket",
+            "from_secret": "upload_s3_bucket",
         },
         "path_style": True,
         "source": "third-party-licenses.tar.gz",
