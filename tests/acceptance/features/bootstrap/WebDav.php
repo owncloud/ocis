@@ -389,9 +389,12 @@ trait WebDav {
 	 * @param string|null $password
 	 * @param array|null $urlParameter
 	 * @param string|null $doDavRequestAsUser
+	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
-	 * @throws GuzzleException|JsonException
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function makeDavRequest(
 		?string $user,
@@ -404,7 +407,8 @@ trait WebDav {
 		bool $stream = false,
 		?string $password = null,
 		?array $urlParameter = [],
-		?string $doDavRequestAsUser = null
+		?string $doDavRequestAsUser = null,
+		?bool $isGivenStep = false
 	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		if ($this->customDavPath !== null) {
@@ -438,7 +442,8 @@ trait WebDav {
 			$this->httpRequestTimeout,
 			null,
 			$urlParameter,
-			$doDavRequestAsUser
+			$doDavRequestAsUser,
+			$isGivenStep
 		);
 	}
 
@@ -3520,18 +3525,28 @@ trait WebDav {
 	 *
 	 * @param string $user
 	 * @param string $destination
+	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 * @throws JsonException | GuzzleException
+	 * @throws GuzzleException | JsonException
 	 */
-	public function userCreatesFolder(string $user, string $destination):void {
+	public function userCreatesFolder(string $user, string $destination, ?bool $isGivenStep = false):void {
 		$user = $this->getActualUsername($user);
 		$destination = '/' . \ltrim($destination, '/');
 		$this->response = $this->makeDavRequest(
 			$user,
 			"MKCOL",
 			$destination,
-			[]
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			[],
+			null,
+			$isGivenStep
 		);
 		$this->setResponseXml(
 			HttpRequestHelper::parseResponseAsXml($this->response)
@@ -3551,7 +3566,7 @@ trait WebDav {
 	 */
 	public function userHasCreatedFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$this->userCreatesFolder($user, $destination);
+		$this->userCreatesFolder($user, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'"
