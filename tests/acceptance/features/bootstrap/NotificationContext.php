@@ -14,6 +14,8 @@ use TestHelpers\EmailHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -105,14 +107,97 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @When user :user deletes all notifications
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userDeletesAllNotifications(string $user):void {
+		$this->userListAllNotifications($user);
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+			foreach ($responseBody as $value) {
+				// set notificationId
+				$this->notificationIds[] = $value->notification_id;
+			}
+		}
+		$this->featureContext->setResponse($this->userDeletesNotification($user));
+	}
+
+	/**
+	 * @When user :user deletes a notification related to resource :resource with subject :subject
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $subject
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userDeletesNotificationOfResourceAndSubject(string $user, string $resource, string $subject):void {
+		$this->userListAllNotifications($user);
+		$this->filterResponseByNotificationSubjectAndResource($subject, $resource);
+		$this->featureContext->setResponse($this->userDeletesNotification($user));
+	}
+
+	/**
+	 * deletes notification
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userDeletesNotification(string $user):ResponseInterface {
+		$this->setUserRecipient($user);
+		$payload["ids"] = $this->getNotificationIds();
+		return OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			'DELETE',
+			$this->notificationEndpointPath,
+			$this->featureContext->getStepLineRef(),
+			\json_encode($payload),
+			2
+		);
+	}
+
+	/**
 	 * @Then the notifications should be empty
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function theNotificationsShouldBeEmpty(): void {
+		$statusCode = $this->featureContext->getResponse()->getStatusCode();
+		if ($statusCode !== 200) {
+			$response = $this->featureContext->getResponse()->getBody()->getContents();
+			throw new \Exception(
+				__METHOD__
+				. " Failed to get user notification list" . $response
+			);
+		}
 		$notifications = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
 		Assert::assertNull($notifications, "response should not contain any notification");
+	}
+
+	/**
+	 * @Then user :user should not have any notification
+	 *
+	 * @param $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldNotHaveAnyNotification($user): void {
+		$this->userListAllNotifications($user);
+		$this->theNotificationsShouldBeEmpty();
 	}
 
 	/**
@@ -168,6 +253,8 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * filter notification according to subject
+	 *
 	 * @param string $subject
 	 *
 	 * @return object
@@ -191,7 +278,37 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should get a notification with subject :subject and message:
+	 * filter notification according to subject and resource
+	 *
+	 * @param string $subject
+	 * @param string $resource
+	 *
+	 * @return array
+	 */
+	public function filterResponseByNotificationSubjectAndResource(string $subject, string $resource): array {
+		$responseBodyArray = [];
+		$statusCode = $this->featureContext->getResponse()->getStatusCode();
+		if ($statusCode !== 200) {
+			$response = $this->featureContext->getResponse()->getBody()->getContents();
+			Assert::fail($response . " Response should contain status code 200");
+		}
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+			foreach ($responseBody as $value) {
+				if (isset($value->subject) && $value->subject === $subject && isset($value->messageRichParameters->resource->name) && $value->messageRichParameters->resource->name === $resource) {
+					$this->notificationIds[] = $value->notification_id;
+					$responseBodyArray[] = $value;
+				}
+			}
+		} else {
+			$responseBodyArray[] = $this->featureContext->getJsonDecodedResponseBodyContent();
+			Assert::fail("Response should contain notification but found: $responseBodyArray");
+		}
+		return $responseBodyArray;
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" should (?:get|have) a notification with subject "([^"]*)" and message:$/
 	 *
 	 * @param string $user
 	 * @param string $subject
@@ -201,7 +318,6 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
 		$this->userListAllNotifications($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200);
 		$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject)->message);
 		$expectedMessage = $table->getColumnsHash()[0]['message'];
 		Assert::assertSame(
@@ -209,6 +325,21 @@ class NotificationContext implements Context {
 			$actualMessage,
 			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
 		);
+	}
+
+	/**
+	 * @Then user :user should not have a notification related to resource :resource with subject :subject
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $subject
+	 *
+	 * @return void
+	 */
+	public function userShouldNotHaveANotificationRelatedToResourceWithSubject(string $user, string $resource, string $subject):void {
+		$this->userListAllNotifications($user);
+		$response = $this->filterResponseByNotificationSubjectAndResource($subject, $resource);
+		Assert::assertCount(0, $response, "Response should not contain notification related to resource '$resource' with subject '$subject' but found" . print_r($response, true));
 	}
 
 	/**
