@@ -889,7 +889,7 @@ github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/logger/zerolog
-# github.com/go-micro/plugins/v4/registry/consul v1.2.0
+# github.com/go-micro/plugins/v4/registry/consul v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/registry/consul
 # github.com/go-micro/plugins/v4/registry/etcd v1.2.0
