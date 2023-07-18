@@ -49,6 +49,16 @@ func (md Attributes) SetInt64(key string, val int64) {
 	md[key] = []byte(strconv.FormatInt(val, 10))
 }
 
+// UInt64 reads an uint64 value
+func (md Attributes) UInt64(key string) (uint64, error) {
+	return strconv.ParseUint(string(md[key]), 10, 64)
+}
+
+// SetInt64 sets an uint64 value
+func (md Attributes) SetUInt64(key string, val uint64) {
+	md[key] = []byte(strconv.FormatUint(val, 10))
+}
+
 // SetXattrs sets multiple extended attributes on the write-through cache/node
 func (n *Node) SetXattrsWithContext(ctx context.Context, attribs map[string][]byte, acquireLock bool) (err error) {
 	if n.xattrsCache != nil {

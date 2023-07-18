@@ -122,6 +122,9 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 	metadata.SetString(prefixes.NameAttr, req.Name)
 	metadata.SetString(prefixes.SpaceNameAttr, req.Name)
 
+	// This space is empty so set initial treesize to 0
+	metadata.SetUInt64(prefixes.TreesizeAttr, 0)
+
 	if req.Type != "" {
 		metadata.SetString(prefixes.SpaceTypeAttr, req.Type)
 	}
