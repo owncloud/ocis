@@ -47,7 +47,7 @@ func newConsulWatcher(cr *consulRegistry, opts ...registry.WatchOption) (registr
 		return nil, err
 	}
 
-	wp.Handler = cw.handle
+	wp.Handler = cw.serviceHandler
 	go wp.RunWithClientAndHclog(cr.Client(), wp.Logger)
 	cw.wp = wp
 
@@ -181,6 +181,15 @@ func (cw *consulWatcher) serviceHandler(idx uint64, data interface{}) {
 		// kill it with fire!
 		if _, ok := serviceMap[old.Version]; !ok {
 			cw.next <- &registry.Result{Action: "delete", Service: old}
+		}
+	}
+
+	// there are no services in the service, empty all services
+	if len(rservices) != 0 && serviceName == "" {
+		for _, services := range rservices {
+			for _, service := range services {
+				cw.next <- &registry.Result{Action: "delete", Service: service}
+			}
 		}
 	}
 
