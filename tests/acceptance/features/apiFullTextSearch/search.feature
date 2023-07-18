@@ -66,3 +66,20 @@ Feature: full text search
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: search restored files by content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "uploadFolder"
+    And user "Alice" has uploaded file with content "hello world from nepal" to "keywordAtStart.txt"
+    And user "Alice" has deleted file "keywordAtStart.txt"
+    And user "Alice" has restored the file with original path "keywordAtStart.txt"
+    When user "Alice" searches for "Content:hello" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | keywordAtStart.txt  |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
