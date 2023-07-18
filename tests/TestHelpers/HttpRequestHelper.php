@@ -41,7 +41,7 @@ use GuzzleHttp\Pool;
  */
 class HttpRequestHelper {
 	public const HTTP_TOO_EARLY = 425;
-
+	public const HTTP_CONFLICT = 409;
 	private static ?string $oCSelectorCookie = null;
 
 	/**
@@ -159,7 +159,6 @@ class HttpRequestHelper {
 	}
 
 	/**
-	 *
 	 * @param string|null $url
 	 * @param string|null $xRequestId
 	 * @param string|null $method
@@ -173,8 +172,10 @@ class HttpRequestHelper {
 	 *                     than download it all up-front.
 	 * @param int|null $timeout
 	 * @param Client|null $client
+	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
+	 *
 	 * @throws GuzzleException
 	 */
 	public static function sendRequest(
@@ -189,7 +190,8 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		bool $stream = false,
 		?int $timeout = 0,
-		?Client $client =  null
+		?Client $client =  null,
+		?bool $isGivenStep = false
 	):ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
@@ -216,7 +218,7 @@ class HttpRequestHelper {
 				$client
 			);
 
-			if ($response->getStatusCode() >= 400 && $response->getStatusCode() !== self::HTTP_TOO_EARLY) {
+			if ($response->getStatusCode() >= 400 && $response->getStatusCode() !== self::HTTP_TOO_EARLY && $response->getStatusCode() !== self::HTTP_CONFLICT) {
 				$sendExceptionHappened = true;
 			}
 
@@ -224,11 +226,21 @@ class HttpRequestHelper {
 				self::debugResponse($response);
 			}
 			$sendCount = $sendCount + 1;
-			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY) && ($sendCount <= $sendRetryLimit);
+			// Here we check if the response has status code 425 or is a 409 gotten from a Given step
+			// HTTP_TOO_EARLY (425) can happen if async processing of a previous request is still happening.
+			// For example, if a test uploads a file and then immediately tries to download it.
+			// HTTP_CONFLICT (409) can happen if the user has just been created in the previous step.
+			// The OCS API might not "realize" yet that the user exists. A folder creation (MKCOL) or maybe even
+			// a file upload might return 409.
+			// In all these cases we can try the API request again after a short time.
+			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
+						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
+						$sendCount <= $sendRetryLimit;
 			if ($loopAgain) {
-				// we need to repeat the send request, because we got HTTP_TOO_EARLY
+				// we need to repeat the send request, because we got HTTP_TOO_EARLY or HTTP_CONFLICT
 				// wait 1 second before sending again, to give the server some time
 				// to finish whatever post-processing it might be doing.
+				self::debugResponse($response);
 				\sleep(1);
 			}
 		} while ($loopAgain);
