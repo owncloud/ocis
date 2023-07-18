@@ -24,7 +24,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
-use TestHelpers\GraphHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\UserHelper;
 use TestHelpers\HttpRequestHelper;
@@ -3831,8 +3830,12 @@ trait Provisioning {
 		} else {
 			$response = $this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
 		}
-		$this->setResponse($response);
-		$this->thenTheHTTPStatusCodeShouldBe(200);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			" Expected status code is 200 but received " . $response->getStatusCode()
+			. "\nResponse body: " . $response->getBody(),
+		);
 	}
 
 	/**
