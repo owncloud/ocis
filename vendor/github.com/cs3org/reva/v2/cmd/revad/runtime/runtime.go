@@ -72,6 +72,8 @@ type coreConf struct {
 
 	// TracingService specifies the service. i.e OpenCensus, OpenTelemetry, OpenTracing...
 	TracingService string `mapstructure:"tracing_service"`
+
+	GracefulShutdownTimeout int `mapstructure:"graceful_shutdown_timeout"`
 }
 
 func run(
@@ -92,7 +94,7 @@ func run(
 	initCPUCount(coreConf, logger)
 
 	servers := initServers(mainConf, logger, tp)
-	watcher, err := initWatcher(logger, filename)
+	watcher, err := initWatcher(logger, filename, coreConf.GracefulShutdownTimeout)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -110,8 +112,8 @@ func initListeners(watcher *grace.Watcher, servers map[string]grace.Server, log 
 	return listeners
 }
 
-func initWatcher(log *zerolog.Logger, filename string) (*grace.Watcher, error) {
-	watcher, err := handlePIDFlag(log, filename)
+func initWatcher(log *zerolog.Logger, filename string, gracefulShutdownTimeout int) (*grace.Watcher, error) {
+	watcher, err := handlePIDFlag(log, filename, gracefulShutdownTimeout)
 	// TODO(labkode): maybe pidfile can be created later on? like once a server is going to be created?
 	if err != nil {
 		log.Error().Err(err).Msg("error creating grace watcher")
@@ -187,11 +189,11 @@ func initLogger(conf *logConf) *zerolog.Logger {
 	return log
 }
 
-func handlePIDFlag(l *zerolog.Logger, pidFile string) (*grace.Watcher, error) {
-	var opts []grace.Option
-	opts = append(opts, grace.WithPIDFile(pidFile))
-	opts = append(opts, grace.WithLogger(l.With().Str("pkg", "grace").Logger()))
-	w := grace.NewWatcher(opts...)
+func handlePIDFlag(l *zerolog.Logger, pidFile string, gracefulShutdownTimeout int) (*grace.Watcher, error) {
+	w := grace.NewWatcher(grace.WithPIDFile(pidFile),
+		grace.WithLogger(l.With().Str("pkg", "grace").Logger()),
+		grace.WithGracefuleShutdownTimeout(gracefulShutdownTimeout),
+	)
 	err := w.WritePID()
 	if err != nil {
 		return nil, err

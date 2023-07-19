@@ -36,13 +36,14 @@ import (
 // Watcher watches a process for a graceful restart
 // preserving open network sockets to avoid packet loss.
 type Watcher struct {
-	log       zerolog.Logger
-	graceful  bool
-	ppid      int
-	lns       map[string]net.Listener
-	ss        map[string]Server
-	pidFile   string
-	childPIDs []int
+	log                     zerolog.Logger
+	graceful                bool
+	ppid                    int
+	lns                     map[string]net.Listener
+	ss                      map[string]Server
+	pidFile                 string
+	childPIDs               []int
+	gracefulShutdownTimeout int
 }
 
 // Option represent an option.
@@ -59,6 +60,12 @@ func WithLogger(l zerolog.Logger) Option {
 func WithPIDFile(fn string) Option {
 	return func(w *Watcher) {
 		w.pidFile = fn
+	}
+}
+
+func WithGracefuleShutdownTimeout(seconds int) Option {
+	return func(w *Watcher) {
+		w.gracefulShutdownTimeout = seconds
 	}
 }
 
@@ -279,49 +286,67 @@ func (w *Watcher) TrapSignals() {
 			}
 
 		case syscall.SIGQUIT:
-			w.log.Info().Msg("preparing for a graceful shutdown with deadline of 10 seconds")
-			go func() {
-				count := 10
-				ticker := time.NewTicker(time.Second)
-				for ; true; <-ticker.C {
-					w.log.Info().Msgf("shutting down in %d seconds", count-1)
-					count--
-					if count <= 0 {
-						w.log.Info().Msg("deadline reached before draining active conns, hard stopping ...")
-						for _, s := range w.ss {
-							err := s.Stop()
-							if err != nil {
-								w.log.Error().Err(err).Msg("error stopping server")
-							}
-							w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
-						}
-						w.Exit(1)
-					}
-				}
-			}()
-			for _, s := range w.ss {
-				w.log.Info().Msgf("fd to %s:%s gracefully closed ", s.Network(), s.Address())
-				err := s.GracefulStop()
-				if err != nil {
-					w.log.Error().Err(err).Msg("error stopping server")
-					w.log.Info().Msg("exit with error code 1")
-					w.Exit(1)
-				}
-			}
-			w.log.Info().Msg("exit with error code 0")
-			w.Exit(0)
+			gracefulShutdown(w)
 		case syscall.SIGINT, syscall.SIGTERM:
-			w.log.Info().Msg("preparing for hard shutdown, aborting all conns")
-			for _, s := range w.ss {
-				w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
-				err := s.Stop()
-				if err != nil {
-					w.log.Error().Err(err).Msg("error stopping server")
-				}
+			if w.gracefulShutdownTimeout == 0 {
+				hardShutdown(w)
 			}
-			w.Exit(0)
+			gracefulShutdown(w)
 		}
 	}
+}
+
+// TODO: Ideally this would call exit() but properly return an error. The
+// exit() is problematic (i.e. racey) especiaily when orchestrating multiple
+// reva services from some external runtime (like in the "ocis server" case
+func gracefulShutdown(w *Watcher) {
+	w.log.Info().Int("Timeout", w.gracefulShutdownTimeout).Msg("preparing for a graceful shutdown with deadline")
+	go func() {
+		count := w.gracefulShutdownTimeout
+		ticker := time.NewTicker(time.Second)
+		for ; true; <-ticker.C {
+			w.log.Info().Msgf("shutting down in %d seconds", count-1)
+			count--
+			if count <= 0 {
+				w.log.Info().Msg("deadline reached before draining active conns, hard stopping ...")
+				for _, s := range w.ss {
+					err := s.Stop()
+					if err != nil {
+						w.log.Error().Err(err).Msg("error stopping server")
+					}
+					w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
+				}
+				w.Exit(1)
+			}
+		}
+	}()
+	for _, s := range w.ss {
+		w.log.Info().Msgf("fd to %s:%s gracefully closed ", s.Network(), s.Address())
+		err := s.GracefulStop()
+		if err != nil {
+			w.log.Error().Err(err).Msg("error stopping server")
+			w.log.Info().Msg("exit with error code 1")
+
+			w.Exit(1)
+		}
+	}
+	w.log.Info().Msg("exit with error code 0")
+	w.Exit(0)
+}
+
+// TODO: Ideally this would call exit() but properly return an error. The
+// exit() is problematic (i.e. racey) especiaily when orchestrating multiple
+// reva services from some external runtime (like in the "ocis server" case
+func hardShutdown(w *Watcher) {
+	w.log.Info().Msg("preparing for hard shutdown, aborting all conns")
+	for _, s := range w.ss {
+		w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
+		err := s.Stop()
+		if err != nil {
+			w.log.Error().Err(err).Msg("error stopping server")
+		}
+	}
+	w.Exit(0)
 }
 
 func getListenerFile(ln net.Listener) (*os.File, error) {
