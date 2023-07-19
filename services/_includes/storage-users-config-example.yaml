@@ -32,6 +32,7 @@ reva:
     mode: ""
     cacert: ""
 skip_user_groups_in_token: false
+graceful_shutdown_timeout: 30
 driver: ocis
 drivers:
   ocis:
