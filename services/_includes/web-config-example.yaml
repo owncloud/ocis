@@ -129,7 +129,7 @@ web:
       openLinksWithDefaultApp: true
       imprintUrl: ""
       privacyUrl: ""
-      accessDeniedHelpURL: ""
+      accessDeniedHelpUrl: ""
       tokenStorageLocal: true
     styles: []
     scripts: []
