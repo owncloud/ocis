@@ -72,3 +72,20 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+
+
+  Scenario Outline: search files using a deleted tag
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world" to "file1.txt"
+    And user "Alice" has created the following tags for file "file1.txt" of the space "Personal":
+      | tag1 |
+    And user "Alice" has removed the following tags for file "file1.txt" of space "Personal":
+      | tag1 |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

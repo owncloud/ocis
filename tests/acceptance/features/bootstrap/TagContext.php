@@ -179,4 +179,21 @@ class TagContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @Given  /^user "([^"]*)" has removed the following tags for (folder|file) "([^"]*)" of space "([^"]*)":$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHAsRemovedTheFollowingTagsForFileOfSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
+		$this->userRemovesTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
+		$this->featureContext->theHttpStatusCodeShouldBe(200);
+	}
 }
