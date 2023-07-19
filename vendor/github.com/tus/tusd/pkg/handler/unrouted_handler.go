@@ -98,6 +98,12 @@ type HookEvent struct {
 }
 
 func newHookEvent(info FileInfo, r *http.Request) HookEvent {
+	// The Host header field is not present in the header map, see https://pkg.go.dev/net/http#Request:
+	// > For incoming requests, the Host header is promoted to the
+	// > Request.Host field and removed from the Header map.
+	// That's why we add it back manually.
+	r.Header.Set("Host", r.Host)
+
 	return HookEvent{
 		Upload: info,
 		HTTPRequest: HTTPRequest{
@@ -217,7 +223,7 @@ func (handler *UnroutedHandler) Middleware(h http.Handler) http.Handler {
 
 		header := w.Header()
 
-		if origin := r.Header.Get("Origin"); origin != "" {
+		if origin := r.Header.Get("Origin"); !handler.config.DisableCors && origin != "" {
 			header.Set("Access-Control-Allow-Origin", origin)
 
 			if r.Method == "OPTIONS" {
