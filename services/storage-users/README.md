@@ -12,11 +12,11 @@ Starting with Infinite Scale version 3.1, you can define a graceful shutdown per
 
 IMPORTANT: The graceful shtutdown period is only applicapable if the `storage-users` service runs as stand-alone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a stand alone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that the instances configured must be able to communicate on the same network. 
 
-When hard stopping Infinite Scale, it is possible that not all data from the decomposedfs (metadata) has been written down to the storage. Such a hard stop may result in an inconsistent decomposedfs. To mitigate that situation, the following things have been implemented:
+When hard-stopping Infinite Scale, it is possible that not all data from the decomposedfs (metadata) has been written to the storage. Such a hard stop may result in an inconsistent decomposedfs. To mitigate that situation, the following things have been implemented:
 
-* With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing down necessary data. This delay can be necessary if there is a lot of data to be written and/or if storage access/thruput is slow. Though it should not occur but in case you would recieve an error log entry because of not being able to write down data in time, you must increase the default value.
+*   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences you must increase the default value.
 
-* If a shutdown error has been logged, the command line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details. 
+*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details. 
 
 ## CLI Commands
 
