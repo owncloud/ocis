@@ -81,4 +81,8 @@ type Commons struct {
 	SystemUserID      string          `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserAPIKey  string          `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY"`
 	AdminUserID       string          `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand."`
+
+	// NOTE: you will not fing GRPCMaxReceivedMessageSize size being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
+	// It is mentioned here again so it is documented
+	GRPCMaxReceivedMessageSize int `env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000'. Note that large values can potentially hide errors and can cause network timeouts. Can be used temporarily to repair unaccessable large folders (25000+ files)"`
 }
