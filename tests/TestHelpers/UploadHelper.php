@@ -49,6 +49,7 @@ class UploadHelper extends Assert {
 	 * @param int|null $chunkingVersion (1|2|null)
 	 *                                  if set to null chunking will not be used
 	 * @param int|null $noOfChunks how many chunks to upload
+	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -63,7 +64,8 @@ class UploadHelper extends Assert {
 		?array $headers = [],
 		?int $davPathVersionToUse = 1,
 		?int $chunkingVersion = null,
-		?int $noOfChunks = 1
+		?int $noOfChunks = 1,
+		?bool $isGivenStep = false
 	): ResponseInterface {
 		//simple upload with no chunking
 		if ($chunkingVersion === null) {
@@ -77,7 +79,16 @@ class UploadHelper extends Assert {
 				$headers,
 				$xRequestId,
 				$data,
-				$davPathVersionToUse
+				$davPathVersionToUse,
+				"files",
+				null,
+				"basic",
+				false,
+				0,
+				null,
+				[],
+				null,
+				$isGivenStep
 			);
 		} else {
 			//prepare chunking
@@ -102,7 +113,15 @@ class UploadHelper extends Assert {
 				$xRequestId,
 				null,
 				$davPathVersionToUse,
-				"uploads"
+				"uploads",
+				null,
+				"basic",
+				false,
+				0,
+				null,
+				[],
+				null,
+				$isGivenStep
 			);
 			if ($result->getStatusCode() >= 400) {
 				return $result;
@@ -130,7 +149,15 @@ class UploadHelper extends Assert {
 				$xRequestId,
 				$chunk,
 				$davPathVersionToUse,
-				$davRequestType
+				$davRequestType,
+				null,
+				"basic",
+				false,
+				0,
+				null,
+				[],
+				null,
+				$isGivenStep
 			);
 			if ($result->getStatusCode() >= 400) {
 				return $result;
@@ -152,7 +179,15 @@ class UploadHelper extends Assert {
 				$xRequestId,
 				null,
 				$davPathVersionToUse,
-				"uploads"
+				"uploads",
+				null,
+				"basic",
+				false,
+				0,
+				null,
+				[],
+				null,
+				$isGivenStep
 			);
 			if ($result->getStatusCode() >= 400) {
 				return $result;
