@@ -10,7 +10,7 @@ Starting with ocis version 3.0.0, the default backend for metadata switched to m
 
 Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
 
-IMPORTANT: The graceful shtutdown period is only applicapable if the `storage-users` service runs as stand-alone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a stand alone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that the instances configured must be able to communicate on the same network. 
+IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network. 
 
 When hard-stopping Infinite Scale, it is possible that not all data from the decomposedfs (metadata) has been written to the storage. Such a hard stop may result in an inconsistent decomposedfs. To mitigate that situation, the following things have been implemented:
 
