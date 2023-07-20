@@ -259,6 +259,7 @@ trait WebDav {
 		$this->davPath = $this->getOldDavPath();
 		$this->usingOldDavPath = true;
 		$this->customDavPath = null;
+		$this->usingSpacesDavPath = false;
 	}
 
 	/**
