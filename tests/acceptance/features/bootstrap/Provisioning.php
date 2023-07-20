@@ -3825,9 +3825,18 @@ trait Provisioning {
 	 */
 	public function adminHasDisabledUserUsingTheProvisioningApi(?string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
-		$this->theHTTPStatusCodeShouldBeSuccess();
-		$this->ocsContext->assertOCSResponseIndicatesSuccess();
+		if (OcisHelper::isTestingWithGraphApi()) {
+			$response = $this->graphContext->editUserUsingTheGraphApi($this->getAdminUsername(), $user, null, null, null, null, false);
+		} else {
+			$response = $this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
+		}
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			__METHOD__
+			. " Expected status code is 200 but received " . $response->getStatusCode()
+			. "\nResponse body: " . $response->getBody(),
+		);
 	}
 
 	/**
@@ -5402,20 +5411,19 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function disableOrEnableUser(string $user, string $otherUser, string $action):void {
+	public function disableOrEnableUser(string $user, string $otherUser, string $action): ResponseInterface {
 		$actualUser = $this->getActualUsername($user);
 		$actualPassword = $this->getPasswordForUser($actualUser);
 		$actualOtherUser = $this->getActualUsername($otherUser);
 
 		$fullUrl = $this->getBaseUrl()
 			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/$action";
-		$this->response = HttpRequestHelper::put(
+		return HttpRequestHelper::put(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
 		);
-		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
