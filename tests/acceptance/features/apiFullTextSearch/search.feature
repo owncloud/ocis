@@ -47,3 +47,22 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+
+
+  Scenario Outline: search deleted files by content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "uploadFolder"
+    And user "Alice" has uploaded file with content "hello world from nepal" to "uploadFolder/keywordAtStart.txt"
+    And user "Alice" has uploaded file with content "saying hello to the world" to "keywordAtMiddle.txt"
+    And user "Alice" has uploaded file with content "nepal want to say hello" to "keywordAtLast.txt"
+    And user "Alice" has deleted file "keywordAtLast.txt"
+    When user "Alice" searches for "Content:hello" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | keywordAtStart.txt  |
+      | keywordAtMiddle.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
