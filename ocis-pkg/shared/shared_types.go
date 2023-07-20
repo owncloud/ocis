@@ -84,5 +84,5 @@ type Commons struct {
 
 	// NOTE: you will not fing GRPCMaxReceivedMessageSize size being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
 	// It is mentioned here again so it is documented
-	GRPCMaxReceivedMessageSize int `env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000'. Note that large values can potentially hide errors and can cause network timeouts. Can be used temporarily to repair unaccessable large folders (25000+ files)"`
+	GRPCMaxReceivedMessageSize int `env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000' bytes (10MB). Note that large values can potentially hide errors but may lead to network timeouts. Should only be changed temporarily to regain access for large folders with 25.000+ files to copy out data."`
 }

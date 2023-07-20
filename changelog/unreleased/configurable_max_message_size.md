@@ -1,4 +1,4 @@
-Enhancement: configure max message size
+Enhancement: configure max grpc message size
 
 Add a configuration option for the grpc max message size
 
