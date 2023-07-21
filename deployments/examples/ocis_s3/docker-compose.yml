@@ -78,6 +78,16 @@ services:
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+
+      #FRONTEND
+      FRONTEND_SEARCH_MIN_LENGTH: "2"
+      FRONTEND_OCS_ENABLE_DENIALS: "true"
+      FRONTEND_FULL_TEXT_SEARCH_ENABLED: "true"
+
+      # TIKA
+      SEARCH_EXTRACTOR_TYPE: "tika"
+      SEARCH_EXTRACTOR_TIKA_TIKA_URL: "http://tika:9998"
+      SEARCH_EXTRACTOR_CS3SOURCE_INSECURE: "true"
     volumes:
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
@@ -117,6 +127,12 @@ services:
       - "traefik.http.services.minio.loadbalancer.server.port=9001"
     logging:
       driver: "local"
+    restart: always
+
+  tika:
+    image: ${TIKA_IMAGE:-apache/tika:latest-full}
+    networks:
+      ocis-net:
     restart: always
 
 volumes:
