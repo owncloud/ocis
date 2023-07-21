@@ -41,9 +41,8 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee list")
+	granteeList := s.ensureGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	if granteeList == nil {
 		return
 	}
 
@@ -88,9 +87,8 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("Could not get grantee name")
+	granteeList := s.ensureGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	if granteeList == nil {
 		return
 	}
 

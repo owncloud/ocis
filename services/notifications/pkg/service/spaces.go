@@ -54,9 +54,8 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	spaceGrantee, err := s.getGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if err != nil {
-		logger.Error().Err(err).Str("event", "SpaceGrantee").Msg("Could not get grantee list")
+	granteeList := s.ensureGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	if granteeList == nil {
 		return
 	}
 
@@ -67,7 +66,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().GetName(),
 			"ShareLink":   shareLink,
-		}, spaceGrantee, sharerDisplayName)
+		}, granteeList, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "SharedSpace").Msg("could not get render the email")
 		return
@@ -120,9 +119,8 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	spaceGrantee, err := s.getGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if err != nil {
-		logger.Error().Err(err).Str("event", "SpaceGrantee").Msg("Could not get grantee list")
+	granteeList := s.ensureGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	if granteeList == nil {
 		return
 	}
 
@@ -133,7 +131,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().Name,
 			"ShareLink":   shareLink,
-		}, spaceGrantee, sharerDisplayName)
+		}, granteeList, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "UnsharedSpace").Msg("Could not get render the email")
 		return
@@ -159,9 +157,8 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		return
 	}
 
-	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("Could not get grantee list")
+	granteeList := s.ensureGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	if granteeList == nil {
 		return
 	}
 
