@@ -1,13 +1,14 @@
 package opa
 
 import (
+	"log"
 	"mime"
 	"strings"
 
-	"github.com/gabriel-vasile/mimetype"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/types"
+	"github.com/rakyll/magicmime"
 )
 
 var RFMimetypeExtensions = rego.Function1(
@@ -23,7 +24,9 @@ var RFMimetypeExtensions = rego.Function1(
 		if err := ast.As(a.Value, &mt); err != nil {
 			return nil, err
 		}
-
+		if err := mime.AddExtensionType(".oform", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"); err != nil {
+			return nil, err
+		}
 		detectedExtensions, err := mime.ExtensionsByType(mt)
 		if err != nil {
 			return nil, err
@@ -52,8 +55,14 @@ var RFMimetypeDetect = rego.Function1(
 			return nil, err
 		}
 
-		mimetype := mimetype.Detect(body).String()
-
+		if err := magicmime.Open(magicmime.MAGIC_MIME_TYPE | magicmime.MAGIC_SYMLINK | magicmime.MAGIC_ERROR); err != nil {
+			log.Fatal(err)
+		}
+		defer magicmime.Close()
+		mimetype, err := magicmime.TypeByBuffer(body)
+		if err != nil {
+			return nil, err
+		}
 		return ast.StringTerm(strings.Split(mimetype, ";")[0]), nil
 	},
 )
