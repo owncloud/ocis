@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/metrics"
 	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/grpc/v0"
 	"github.com/urfave/cli/v2"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -15,14 +16,15 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Name      string
-	Logger    log.Logger
-	Context   context.Context
-	Config    *config.Config
-	Metrics   *metrics.Metrics
-	Flags     []cli.Flag
-	Handler   *svc.Service
-	JWTSecret string
+	Name          string
+	Logger        log.Logger
+	Context       context.Context
+	Config        *config.Config
+	Metrics       *metrics.Metrics
+	Flags         []cli.Flag
+	Handler       *svc.Service
+	JWTSecret     string
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -89,5 +91,12 @@ func Handler(val *svc.Service) Option {
 func JWTSecret(val string) Option {
 	return func(o *Options) {
 		o.JWTSecret = val
+	}
+}
+
+// TraceProvider provides a function to set the trace provider option.
+func TraceProvider(val trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = val
 	}
 }

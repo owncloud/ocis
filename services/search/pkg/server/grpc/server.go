@@ -24,6 +24,7 @@ func Server(opts ...Option) (grpc.Service, func(), error) {
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
+		grpc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating search service")
