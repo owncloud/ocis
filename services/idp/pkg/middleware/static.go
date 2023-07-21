@@ -1,3 +1,4 @@
+// Package middleware provides middleware for the idp service.
 package middleware
 
 import (
