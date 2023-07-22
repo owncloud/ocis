@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-07-11 00:40+0000\n"
+"POT-Creation-Date: 2023-07-22 00:53+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Juan Carlos Garrote, 2023\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
@@ -35,6 +35,9 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
+"¡Atención! La instancia se cerrará y se desaprovisionará el {date}. Descarga"
+" todos tus datos antes de esa fecha, puesto que el acceso pasada la fecha no"
+" será posible."
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
@@ -42,7 +45,7 @@ msgstr "El archivo {resource} ha sido eliminado porque viola las políticas"
 
 #: pkg/service/templates.go:59
 msgid "Instance will be shut down and deprovisioned"
-msgstr ""
+msgstr "La instancia se cerrará y se desaprovisionará"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
