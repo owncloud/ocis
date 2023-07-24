@@ -344,6 +344,38 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @Then user :user should get a notification for resource :resource with subject :subject and message:
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $subject
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldGetNotificationForResourceWithMessage(string $user, string $resource, string $subject, TableNode $table):void {
+		$this->userListAllNotifications($user);
+		$notification = $this->filterResponseByNotificationSubjectAndResource($subject, $resource);
+
+		if (\count($notification) === 1) {
+			$actualMessage = str_replace(["\r", "\r"], " ", $notification[0]->message);
+			$expectedMessage = $table->getColumnsHash()[0]['message'];
+			Assert::assertSame(
+				$expectedMessage,
+				$actualMessage,
+				__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
+			);
+			$this->userDeletesNotificationOfResourceAndSubject($user, $resource, $subject);
+			$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		} elseif (\count($notification) === 0) {
+			throw new \Exception("Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n$notification");
+		} else {
+			throw new \Exception("Response contains more than one notification with resource '$resource' and subject '$subject'.\n$notification");
+		}
+	}
+
+	/**
 	 * @Then user :user should not have a notification related to resource :resource with subject :subject
 	 *
 	 * @param string $user
