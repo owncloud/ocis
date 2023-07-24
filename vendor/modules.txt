@@ -352,7 +352,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.15.1-0.20230718140539-0af2a07c7fd9
+# github.com/cs3org/reva/v2 v2.15.1-0.20230724142905-f4507ac94bd4
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -420,6 +420,7 @@ github.com/cs3org/reva/v2/internal/http/services/meshdirectory
 github.com/cs3org/reva/v2/internal/http/services/metrics
 github.com/cs3org/reva/v2/internal/http/services/ocmd
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav
+github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/prop

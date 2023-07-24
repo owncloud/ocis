@@ -28,6 +28,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -57,7 +58,7 @@ type DavHandler struct {
 	SharesHandler       *WebDavHandler
 }
 
-func (h *DavHandler) init(c *Config) error {
+func (h *DavHandler) init(c *config.Config) error {
 	h.AvatarsHandler = new(AvatarsHandler)
 	if err := h.AvatarsHandler.init(c); err != nil {
 		return err

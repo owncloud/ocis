@@ -20,8 +20,11 @@ package pool
 
 import (
 	"crypto/tls"
+	"os"
+	"strconv"
 
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -29,13 +32,12 @@ import (
 )
 
 var (
-	maxCallRecvMsgSize = 10240000
+	_defaultMaxCallRecvMsgSize = 10240000
 )
 
 // NewConn creates a new connection to a grpc server
 // with open census tracing support.
 // TODO(labkode): make grpc tls configurable.
-// TODO make maxCallRecvMsgSize configurable, raised from the default 4MB to be able to list 10k files
 func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 
 	options := ClientOptions{}
@@ -69,11 +71,24 @@ func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 		}
 	}
 
+	// NOTE: We need to configure some grpc options in a central place.
+	// If many services configure the (e.g.) gateway client differently, one will be pick randomly. This leads to inconsistencies when using the single binary.
+	// To avoid inconsistencies and race conditions we get the configuration here.
+	// Please do NOT follow the pattern of calling `os.Getenv` in the wild without consulting docu team first.
+	maxRcvMsgSize := _defaultMaxCallRecvMsgSize
+	if e := os.Getenv("OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE"); e != "" {
+		s, err := strconv.Atoi(e)
+		if err != nil || s <= 0 {
+			return nil, errors.Wrap(err, "grpc max message size is not a valid int")
+		}
+		maxRcvMsgSize = s
+	}
+
 	conn, err := grpc.Dial(
 		address,
 		grpc.WithTransportCredentials(cred),
 		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(maxCallRecvMsgSize),
+			grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
 		),
 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor(
 			otelgrpc.WithTracerProvider(

@@ -22,6 +22,7 @@ import (
 	"encoding/hex"
 	"net/http"
 
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
@@ -31,7 +32,7 @@ import (
 type AvatarsHandler struct {
 }
 
-func (h *AvatarsHandler) init(c *Config) error {
+func (h *AvatarsHandler) init(c *config.Config) error {
 	return nil
 }
 

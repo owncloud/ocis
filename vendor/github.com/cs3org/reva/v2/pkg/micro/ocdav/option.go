@@ -24,6 +24,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/favorite"
 	"github.com/rs/zerolog"
@@ -43,9 +44,8 @@ type Options struct {
 	Context   context.Context
 	// Metrics   *metrics.Metrics
 	// Flags     []cli.Flag
-	Name           string
-	JWTSecret      string
-	TransferSecret string
+	Name      string
+	JWTSecret string
 
 	FavoriteManager favorite.Manager
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
@@ -63,12 +63,13 @@ type Options struct {
 	MetricsSubsystem string
 
 	// ocdav.* is internal so we need to set config options individually
-	config           ocdav.Config
-	lockSystem       ocdav.LockSystem
-	AllowCredentials bool
-	AllowedOrigins   []string
-	AllowedHeaders   []string
-	AllowedMethods   []string
+	config             config.Config
+	lockSystem         ocdav.LockSystem
+	AllowCredentials   bool
+	AllowedOrigins     []string
+	AllowedHeaders     []string
+	AllowedMethods     []string
+	AllowDepthInfinity bool
 }
 
 // newOptions initializes the available default options.
@@ -103,17 +104,16 @@ func Address(val string) Option {
 	}
 }
 
+func AllowDepthInfinity(val bool) Option {
+	return func(o *Options) {
+		o.AllowDepthInfinity = val
+	}
+}
+
 // JWTSecret provides a function to set the jwt secret option.
 func JWTSecret(s string) Option {
 	return func(o *Options) {
 		o.JWTSecret = s
-	}
-}
-
-// TransferSecret provides a function to set the transfer secret option.
-func TransferSecret(s string) Option {
-	return func(o *Options) {
-		o.config.TransferSharedSecret = s
 	}
 }
 

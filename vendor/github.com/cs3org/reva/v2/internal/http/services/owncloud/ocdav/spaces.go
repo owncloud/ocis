@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
@@ -38,7 +39,7 @@ type SpacesHandler struct {
 	useLoggedInUserNS bool
 }
 
-func (h *SpacesHandler) init(c *Config) error {
+func (h *SpacesHandler) init(c *config.Config) error {
 	h.gatewaySvc = c.GatewaySvc
 	h.namespace = path.Join("/", c.WebdavNamespace)
 	h.useLoggedInUserNS = true
@@ -78,7 +79,7 @@ func (h *SpacesHandler) Handler(s *svc, trashbinHandler *TrashbinHandler) http.H
 		var err error
 		switch r.Method {
 		case MethodPropfind:
-			p := propfind.NewHandler(config.PublicURL, s.gatewaySelector)
+			p := propfind.NewHandler(config.PublicURL, s.gatewaySelector, config)
 			p.HandleSpacesPropfind(w, r, spaceID)
 		case MethodProppatch:
 			status, err = s.handleSpacesProppatch(w, r, spaceID)

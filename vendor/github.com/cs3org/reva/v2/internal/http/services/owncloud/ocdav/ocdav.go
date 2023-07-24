@@ -29,6 +29,7 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -37,7 +38,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/rhttp/global"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
-	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/storage/favorite"
 	"github.com/cs3org/reva/v2/pkg/storage/favorite/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
@@ -57,91 +57,8 @@ func init() {
 	global.Register("ocdav", New)
 }
 
-// Config holds the config options that need to be passed down to all ocdav handlers
-type Config struct {
-	Prefix string `mapstructure:"prefix"`
-	// FilesNamespace prefixes the namespace, optionally with user information.
-	// Example: if FilesNamespace is /users/{{substr 0 1 .Username}}/{{.Username}}
-	// and received path is /docs the internal path will be:
-	// /users/<first char of username>/<username>/docs
-	FilesNamespace string `mapstructure:"files_namespace"`
-	// WebdavNamespace prefixes the namespace, optionally with user information.
-	// Example: if WebdavNamespace is /users/{{substr 0 1 .Username}}/{{.Username}}
-	// and received path is /docs the internal path will be:
-	// /users/<first char of username>/<username>/docs
-	WebdavNamespace string `mapstructure:"webdav_namespace"`
-	SharesNamespace string `mapstructure:"shares_namespace"`
-	GatewaySvc      string `mapstructure:"gatewaysvc"`
-	Timeout         int64  `mapstructure:"timeout"`
-	Insecure        bool   `mapstructure:"insecure"`
-	// If true, HTTP COPY will expect the HTTP-TPC (third-party copy) headers
-	EnableHTTPTpc          bool                              `mapstructure:"enable_http_tpc"`
-	PublicURL              string                            `mapstructure:"public_url"`
-	FavoriteStorageDriver  string                            `mapstructure:"favorite_storage_driver"`
-	FavoriteStorageDrivers map[string]map[string]interface{} `mapstructure:"favorite_storage_drivers"`
-	Version                string                            `mapstructure:"version"`
-	VersionString          string                            `mapstructure:"version_string"`
-	Edition                string                            `mapstructure:"edition"`
-	Product                string                            `mapstructure:"product"`
-	ProductName            string                            `mapstructure:"product_name"`
-	ProductVersion         string                            `mapstructure:"product_version"`
-	// optional, if set will unpack the transfer token and directly send uploads to the data provider
-	TransferSharedSecret string `mapstructure:"transfer_shared_secret"`
-
-	NameValidation NameValidation `mapstructure:"validation"`
-
-	MachineAuthAPIKey string `mapstructure:"machine_auth_apikey"`
-}
-
-// NameValidation is the validation configuration for file and folder names
-type NameValidation struct {
-	InvalidChars []string `mapstructure:"invalid_chars"`
-	MaxLength    int      `mapstructure:"max_length"`
-}
-
-func (c *Config) init() {
-	// note: default c.Prefix is an empty string
-	c.GatewaySvc = sharedconf.GetGatewaySVC(c.GatewaySvc)
-
-	if c.FavoriteStorageDriver == "" {
-		c.FavoriteStorageDriver = "memory"
-	}
-
-	if c.Version == "" {
-		c.Version = "10.0.11.5"
-	}
-
-	if c.VersionString == "" {
-		c.VersionString = "10.0.11"
-	}
-
-	if c.Product == "" {
-		c.Product = "reva"
-	}
-
-	if c.ProductName == "" {
-		c.ProductName = "reva"
-	}
-
-	if c.ProductVersion == "" {
-		c.ProductVersion = "10.0.11"
-	}
-
-	if c.Edition == "" {
-		c.Edition = "community"
-	}
-
-	if c.NameValidation.InvalidChars == nil {
-		c.NameValidation.InvalidChars = []string{"\f", "\r", "\n", "\\"}
-	}
-
-	if c.NameValidation.MaxLength == 0 {
-		c.NameValidation.MaxLength = 255
-	}
-}
-
 type svc struct {
-	c                *Config
+	c                *config.Config
 	webDavHandler    *WebDavHandler
 	davHandler       *DavHandler
 	favoritesManager favorite.Manager
@@ -153,17 +70,17 @@ type svc struct {
 	nameValidators      []Validator
 }
 
-func (s *svc) Config() *Config {
+func (s *svc) Config() *config.Config {
 	return s.c
 }
 
-func getFavoritesManager(c *Config) (favorite.Manager, error) {
+func getFavoritesManager(c *config.Config) (favorite.Manager, error) {
 	if f, ok := registry.NewFuncs[c.FavoriteStorageDriver]; ok {
 		return f(c.FavoriteStorageDrivers[c.FavoriteStorageDriver])
 	}
 	return nil, errtypes.NotFound("driver not found: " + c.FavoriteStorageDriver)
 }
-func getLockSystem(c *Config) (LockSystem, error) {
+func getLockSystem(c *config.Config) (LockSystem, error) {
 	// TODO in memory implementation
 	selector, err := pool.GatewaySelector(c.GatewaySvc)
 	if err != nil {
@@ -174,12 +91,12 @@ func getLockSystem(c *Config) (LockSystem, error) {
 
 // New returns a new ocdav service
 func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) {
-	conf := &Config{}
+	conf := &config.Config{}
 	if err := mapstructure.Decode(m, conf); err != nil {
 		return nil, err
 	}
 
-	conf.init()
+	conf.Init()
 
 	fm, err := getFavoritesManager(conf)
 	if err != nil {
@@ -194,9 +111,9 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 }
 
 // NewWith returns a new ocdav service
-func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, selector pool.Selectable[gateway.GatewayAPIClient]) (global.Service, error) {
+func NewWith(conf *config.Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, selector pool.Selectable[gateway.GatewayAPIClient]) (global.Service, error) {
 	// be safe - init the conf again
-	conf.init()
+	conf.Init()
 
 	s := &svc{
 		c:             conf,

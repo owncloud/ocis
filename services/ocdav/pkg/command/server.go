@@ -62,6 +62,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.AllowedOrigins(cfg.HTTP.CORS.AllowedOrigins),
 					ocdav.FilesNamespace(cfg.FilesNamespace),
 					ocdav.WebdavNamespace(cfg.WebdavNamespace),
+					ocdav.AllowDepthInfinity(cfg.AllowPropfindDepthInfinity),
 					ocdav.SharesNamespace(cfg.SharesNamespace),
 					ocdav.Timeout(cfg.Timeout),
 					ocdav.Insecure(cfg.Insecure),

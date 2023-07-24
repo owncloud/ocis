@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 )
 
 // Validator validates strings
 type Validator func(string) error
 
 // ValidatorsFromConfig returns the configured Validators
-func ValidatorsFromConfig(c *Config) []Validator {
+func ValidatorsFromConfig(c *config.Config) []Validator {
 	// we always want to exclude empty names
 	vals := []Validator{notEmpty()}
 

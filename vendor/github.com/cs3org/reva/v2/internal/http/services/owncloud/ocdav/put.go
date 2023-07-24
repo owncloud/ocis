@@ -298,18 +298,6 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	// if we know the transfer secret we can directly talk to the dataprovider
-	if s.c.TransferSharedSecret != "" {
-		claims, err := datagateway.Verify(ctx, token, s.c.TransferSharedSecret)
-		if err != nil {
-			log.Error().Err(err).Msg("error verifying transfer token")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		// directly send request to target
-		ep = claims.Target
-	}
-
 	httpReq, err := rhttp.NewRequest(ctx, http.MethodPut, ep, r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
