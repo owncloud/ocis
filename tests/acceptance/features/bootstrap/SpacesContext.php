@@ -3242,18 +3242,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the space :spaceName using the WebDAV API
+	 * @When user :user tries to download the space :spaceName owned by user :owner using the WebDAV API
+	 * @When /^user "([^"]*)" (?:downloads|tries to download) the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param string $owner
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userDownloadsTheSpaceUsingTheWebdavApi(string $user, string $spaceName):void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$url = $this->featureContext->getBaseUrl() . '/archiver?id=' . $space["id"];
+	public function userDownloadsTheSpaceUsingTheWebdavApi(string $user, string $spaceName, string $owner = ''):void {
+		$space = $this->getSpaceByName($owner ?: $user, $spaceName);
+		$url = $this->featureContext->getBaseUrl() . '/archiver?id=' . $space['id'];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$url,
