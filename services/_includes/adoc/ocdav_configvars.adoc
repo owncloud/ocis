@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-24-05-49-50]
+[#deprecation-note-2023-07-24-15-56-47]
 [caption=]
 .Deprecation notes for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -226,7 +226,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-07-24-05-49-50[Deprecation Note]
+xref:deprecation-note-2023-07-24-15-56-47[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -336,5 +336,14 @@ a| [subs=-attributes]
 ++Community ++
 a| [subs=-attributes]
 
+
+a|`OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow the use of depth infinity in PROPFINDS. When enabled, a propfind will traverse through all subfolders. If many subfolders are expected, depth infinity can cause heavy server load and/or delayed response times.
 |===
 

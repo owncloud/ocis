@@ -34,3 +34,4 @@
 | OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the GATEWAY service.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>OCDAV_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | OCIS_EDITION<br/>OCDAV_EDITION | string | Community | |
+| OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY | bool | false | Allow the use of depth infinity in PROPFINDS. When enabled, a propfind will traverse through all subfolders. If many subfolders are expected, depth infinity can cause heavy server load and/or delayed response times.|

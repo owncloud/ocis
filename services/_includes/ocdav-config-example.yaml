@@ -76,3 +76,4 @@ public_url: https://localhost:9200
 insecure: false
 gateway_request_timeout: 84300
 machine_auth_api_key: ""
+allow_propfind_depth_infinity: false
