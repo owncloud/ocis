@@ -205,7 +205,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * The method finds the space of a user by name and returns the space id
+	 * The method finds available spaces to the user and returns the spaceId by spaceName
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -215,10 +215,6 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceIdByName(string $user, string $spaceName): string {
 		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space, "Space with name $spaceName not found");
-		if (!isset($space["id"])) {
-			throw new Exception(__METHOD__ . " space with name $spaceName not found in $space");
-		}
 		return $space["id"];
 	}
 
@@ -396,14 +392,20 @@ class SpacesContext implements Context {
 	public function setUpScenario(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
+		// register new context
+		$this->trashbinContext = new TrashbinContext();
+		$this->webDavPropertiesContext = new WebDavPropertiesContext();
+		$this->favoritesContext = new FavoritesContext();
+		$this->checksumContext = new ChecksumContext();
+		$this->filesVersionsContext = new FilesVersionsContext();
+		$environment->registerContext($this->trashbinContext);
+		$environment->registerContext($this->webDavPropertiesContext);
+		$environment->registerContext($this->favoritesContext);
+		$environment->registerContext($this->checksumContext);
+		$environment->registerContext($this->filesVersionsContext);
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->ocsContext = $environment->getContext('OCSContext');
-		$this->trashbinContext = $environment->getContext('TrashbinContext');
-		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
-		$this->favoritesContext = $environment->getContext('FavoritesContext');
-		$this->checksumContext = $environment->getContext('ChecksumContext');
-		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");

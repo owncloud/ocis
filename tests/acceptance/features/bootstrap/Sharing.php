@@ -2753,6 +2753,69 @@ trait Sharing {
 	}
 
 	/**
+	 * @Then the fields of the last response to user :user and space :space should include
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkFieldsOfSpaceSharingResponse(string $user, string $space, ?TableNode $body):void {
+		$this->verifyTableNodeColumnsCount($body, 2);
+	
+		$bodyRows = $body->getRowsHash();
+		$userRelatedFieldNames = [
+			"owner",
+			"user",
+			"uid_owner",
+			"uid_file_owner",
+			"share_with",
+			"displayname_file_owner",
+			"displayname_owner",
+			"additional_info_owner",
+			"additional_info_file_owner",
+			"space_id"
+		];
+
+		$this->setLastPublicShareData($this->getResponseXml(null, __METHOD__));
+		foreach ($bodyRows as $field => $value) {
+			if (\in_array($field, $userRelatedFieldNames)) {
+				$value = $this->substituteInLineCodes(
+					$value,
+					$user,
+					[],
+					[
+						[
+							"code" => "%space_id%",
+							"function" =>
+								[$this->spacesContext, "getSpaceIdByName"],
+							"parameter" => [$user, $space]
+						],
+					],
+					null,
+					null
+				);
+				if ($field === "uid_file_owner") {
+					$value = (explode("$", $value))[1];
+				}
+				if ($field === "space_id") {
+					$exploadedSpaceId = explode("$", $value);
+					$value = $exploadedSpaceId[0] . "$" . $exploadedSpaceId[1] . "!" . $exploadedSpaceId[1];
+				}
+			}
+			$value = $this->getActualUsername($value);
+			$value = $this->replaceValuesFromTable($field, $value);
+   
+			Assert::assertTrue(
+				$this->isFieldInResponse($field, $value, true, $this->getLastPublicShareData()->data[0]),
+				"$field doesn't have value '$value'"
+			);
+		}
+	}
+
+	/**
 	 * @Then /^the fields of the last response (?:to|about) user "([^"]*)" sharing with (?:user|group) "([^"]*)" should include$/
 	 *
 	 * @param string $sharer

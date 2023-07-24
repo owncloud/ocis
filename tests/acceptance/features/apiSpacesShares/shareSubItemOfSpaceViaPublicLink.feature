@@ -1,22 +1,22 @@
-@api 
+@api
 Feature: Share a file or folder that is inside a space via public link
   As a user with manager space role
   I want to be able to share the data inside the space via public link
   So that an anonymous user can have access to certain resources
 
   folder permissions:
-    | role        | permissions |
-    | internal    | 0           |
-    | viewer      | 1           |
-    | uploader    | 4           |
-    | contributor | 5           |
-    | editor      | 15          |
+  | role        | permissions |
+  | internal    | 0           |
+  | viewer      | 1           |
+  | uploader    | 4           |
+  | contributor | 5           |
+  | editor      | 15          |
 
   file permissions:
-    | role     | permissions |
-    | internal | 0           |
-    | viewer   | 1           |
-    | editor   | 3           |
+  | role     | permissions |
+  | internal | 0           |
+  | viewer   | 1           |
+  | editor   | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -44,7 +44,7 @@ Feature: Share a file or folder that is inside a space via public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the fields of the last response to user "Alice" should include
+    And the fields of the last response to user "Alice" and space "share sub-item" should include
       | item_type         | <item_type>   |
       | mimetype          | <mimetype>    |
       | file_target       | <file_target> |
@@ -79,7 +79,7 @@ Feature: Share a file or folder that is inside a space via public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the fields of the last response to user "Brian" should include
+    And the fields of the last response to user "Brian" and space "share sub-item" should include
       | item_type         | <item_type>   |
       | mimetype          | <mimetype>    |
       | file_target       | <file_target> |
@@ -115,7 +115,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | viewer    |
 
 
-  Scenario Outline: user creates a new public link share of a file with edit permissions
+  Scenario Outline: user creates a new public link share of a file inside the personal space with edit permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/file.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -150,17 +150,17 @@ Feature: Share a file or folder that is inside a space via public link
       | path        | folder/file.txt |
       | shareType   | 3               |
       | permissions | 1               |
-    Then the fields of the last response to user "Alice" should include
-      | item_type              | file            |
-      | mimetype               | text/plain      |
-      | file_target            | /file.txt       |
-      | path                   | folder/file.txt |
-      | permissions            | 1               |
-      | share_type             | public_link     |
-      | displayname_file_owner | %displayname%   |
-      | displayname_owner      | %displayname%   |
-      | uid_file_owner         | %username%      |
-      | uid_owner              | %username%      |
+    Then the fields of the last response to user "Alice" and space "share sub-item" should include
+      | item_type              | file             |
+      | mimetype               | text/plain       |
+      | file_target            | /file.txt        |
+      | path                   | /folder/file.txt |
+      | permissions            | 1                |
+      | share_type             | public_link      |
+      | displayname_file_owner |                  |
+      | displayname_owner      | %displayname%    |
+      | uid_owner              | %username%       |
+      | uid_file_owner         | %username%       |
     And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
       | spaceRole |
