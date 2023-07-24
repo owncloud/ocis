@@ -22,7 +22,7 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario Outline: manager of the space can share an entity inside project space to another user with role
-    And user "Alice" creates a share inside of space "share sub-item" with settings:
+    When user "Alice" creates a share inside of space "share sub-item" with settings:
       | path       | <entity>     |
       | shareWith  | Brian        |
       | role       | <role>       |
