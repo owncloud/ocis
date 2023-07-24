@@ -109,6 +109,7 @@ config = {
                 "apiSpacesShares",
                 "apiCors",
                 "apiAsyncUpload",
+                "apiDownloads",
             ],
             "skip": False,
         },
