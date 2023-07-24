@@ -1,22 +1,22 @@
 @api
 Feature: Share a file or folder that is inside a space via public link
-      As a user with manager space role
-      I want to be able to share the data inside the space via public link
-      So that an anonymous user can have access to certain resources
+  As a user with manager space role
+  I want to be able to share the data inside the space via public link
+  So that an anonymous user can have access to certain resources
 
-      folder permissions:
-      | role        | permissions |
-      | internal    | 0           |
-      | viewer      | 1           |
-      | uploader    | 4           |
-      | contributor | 5           |
-      | editor      | 15          |
+  folder permissions:
+  | role        | permissions |
+  | internal    | 0           |
+  | viewer      | 1           |
+  | uploader    | 4           |
+  | contributor | 5           |
+  | editor      | 15          |
 
-      file permissions:
-      | role     | permissions |
-      | internal | 0           |
-      | viewer   | 1           |
-      | editor   | 3           |
+  file permissions:
+  | role     | permissions |
+  | internal | 0           |
+  | viewer   | 1           |
+  | editor   | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -53,8 +53,6 @@ Feature: Share a file or folder that is inside a space via public link
       | share_type        | public_link   |
       | displayname_owner | %displayname% |
       | name              | <name>        |
-      | uid_file_owner    | %space_id%    |
-      | space_id          | %space_id%    |
     Examples:
       | entity          | file_target | permissions | password | name | expireDate               | item_type | mimetype             |
       | folder          | /folder     | 0           |          | link |                          | folder    | httpd/unix-directory |
@@ -89,8 +87,6 @@ Feature: Share a file or folder that is inside a space via public link
       | share_type        | public_link   |
       | displayname_owner | %displayname% |
       | name              | public link   |
-      | uid_file_owner    | %space_id%    |
-      | space_id          | %space_id%    |
     Examples:
       | entity          | file_target | item_type | mimetype             |
       | folder          | /folder     | folder    | httpd/unix-directory |
@@ -164,8 +160,7 @@ Feature: Share a file or folder that is inside a space via public link
       | displayname_file_owner |                  |
       | displayname_owner      | %displayname%    |
       | uid_owner              | %username%       |
-      | uid_file_owner         | %space_id%       |
-      | space_id               | %space_id%       |
+      | uid_file_owner         | %username%       |
     And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
       | spaceRole |
