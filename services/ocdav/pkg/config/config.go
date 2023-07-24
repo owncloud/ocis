@@ -36,7 +36,7 @@ type Config struct {
 	Context context.Context `yaml:"-"`
 	Status  Status          `yaml:"-"`
 
-	AllowPropfindDepthInfinitiy bool `yaml:"allow_propfind_depth_infinitiy" env:"OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" desc:"Allow the use of depth infinity in PROPFINDS. Can cause heavy serverload"`
+	AllowPropfindDepthInfinity bool `yaml:"allow_propfind_depth_infinity" env:"OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" desc:"Allow the use of depth infinity in PROPFINDS. Can cause heavy serverload"`
 }
 
 type Tracing struct {
