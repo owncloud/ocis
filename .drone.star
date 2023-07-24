@@ -1951,6 +1951,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_EVENTS_ENABLE_TLS": False,
             "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
             "FRONTEND_OCS_ENABLE_DENIALS": True,
+            "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY": True,
         }
         if tika_enabled:
             environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
