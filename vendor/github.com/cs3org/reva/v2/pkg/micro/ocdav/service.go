@@ -155,6 +155,9 @@ func setDefaults(sopts *Options) error {
 	if sopts.config.VersionString == "" {
 		sopts.config.VersionString = "0.0.0"
 	}
+
+	sopts.config.AllowPropfindDepthInfinitiy = sopts.AllowDepthInfinity
+
 	return nil
 }
 

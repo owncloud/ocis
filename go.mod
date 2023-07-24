@@ -341,4 +341,4 @@ replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-202
 
 // replace github.com/cs3org/reva/v2 => github.com/micbar/reva/v2 v2.0.0-20230626125956-c381fe19a108
 
-replace github.com/cs3org/reva/v2 => github.com/dragonchaser/reva/v2 v2.4.1-0.20230721092423-decf58981cfd
+replace github.com/cs3org/reva/v2 => github.com/dragonchaser/reva/v2 v2.4.1-0.20230724131208-75f0f69666f9

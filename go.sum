@@ -657,8 +657,8 @@ github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyG
 github.com/dnsimple/dnsimple-go v0.63.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
 github.com/docker/go-units v0.4.0 h1:3uh0PgVws3nIA0Q+MwDC8yjEPf9zjRfZZWXZYDct3Tw=
 github.com/docker/go-units v0.4.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/dragonchaser/reva/v2 v2.4.1-0.20230721092423-decf58981cfd h1:ngsy/v6TBnhJ2CqrXUmQBhlEhUs3y/TOMu7e2kSuonY=
-github.com/dragonchaser/reva/v2 v2.4.1-0.20230721092423-decf58981cfd/go.mod h1:4z5EQghS2LhSWZWocH51Dw9VAs16No1zSFvFgQtgS7w=
+github.com/dragonchaser/reva/v2 v2.4.1-0.20230724131208-75f0f69666f9 h1:vX6+r4itC3fNzPbWquOoR1VlRcZYIs453j9a4GGmeOw=
+github.com/dragonchaser/reva/v2 v2.4.1-0.20230724131208-75f0f69666f9/go.mod h1:4z5EQghS2LhSWZWocH51Dw9VAs16No1zSFvFgQtgS7w=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e h1:rcHHSQqzCgvlwP0I/fQ8rQMn/MpHE5gWSLdtpxtP6KQ=

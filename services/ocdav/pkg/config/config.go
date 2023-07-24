@@ -35,7 +35,10 @@ type Config struct {
 
 	Context context.Context `yaml:"-"`
 	Status  Status          `yaml:"-"`
+
+	AllowPropfindDepthInfinitiy bool `yaml:"allow_propfind_depth_infinitiy" env:"OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" desc:"Allow the use of depth infinity in PROPFINDS. Can cause heavy serverload"`
 }
+
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;OCDAV_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`

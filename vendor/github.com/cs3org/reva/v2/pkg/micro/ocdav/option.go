@@ -63,12 +63,13 @@ type Options struct {
 	MetricsSubsystem string
 
 	// ocdav.* is internal so we need to set config options individually
-	config           config.Config
-	lockSystem       ocdav.LockSystem
-	AllowCredentials bool
-	AllowedOrigins   []string
-	AllowedHeaders   []string
-	AllowedMethods   []string
+	config             config.Config
+	lockSystem         ocdav.LockSystem
+	AllowCredentials   bool
+	AllowedOrigins     []string
+	AllowedHeaders     []string
+	AllowedMethods     []string
+	AllowDepthInfinity bool
 }
 
 // newOptions initializes the available default options.
@@ -100,6 +101,12 @@ func Broker(b broker.Broker) Option {
 func Address(val string) Option {
 	return func(o *Options) {
 		o.Address = val
+	}
+}
+
+func AllowDepthInfinity(val bool) Option {
+	return func(o *Options) {
+		o.AllowDepthInfinity = val
 	}
 }
 
