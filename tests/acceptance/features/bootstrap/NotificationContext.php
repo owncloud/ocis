@@ -319,11 +319,9 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
 		$count = 0;
-		$this->userListAllNotifications($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200);
 		// sometimes the test might try to get notification before the notification is created by the server
 		// in order to prevent test from failing because of that try to list the notifications again
-		while (!isset($this->filterResponseAccordingToNotificationSubject($subject)->message) && $count <= 5) {
+		do {
 			if ($count > 0) {
 				\sleep(1);
 			}
@@ -331,7 +329,7 @@ class NotificationContext implements Context {
 			$this->userListAllNotifications($user);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200);
 			++$count;
-		}
+		} while (!isset($this->filterResponseAccordingToNotificationSubject($subject)->message) && $count <= 5);
 		if (isset($this->filterResponseAccordingToNotificationSubject($subject)->message)) {
 			$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject)->message);
 		} else {
