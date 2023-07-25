@@ -6,9 +6,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
 ## Details
+
+* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
+
+   Add a configuration option for the grpc max message size
+
+   https://github.com/owncloud/ocis/pull/6849
 
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
