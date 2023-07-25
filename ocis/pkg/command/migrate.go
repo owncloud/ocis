@@ -2,15 +2,20 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sync"
 
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	publicregistry "github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
-
+	storageregistry "github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
@@ -18,6 +23,8 @@ import (
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 	sharingparser "github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
+	storageparser "github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,6 +35,7 @@ func Migrate(cfg *config.Config) *cli.Command {
 		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
 		Subcommands: []*cli.Command{
+			MigrateSpace(cfg),
 			MigrateShares(cfg),
 			MigratePublicShares(cfg),
 		},
@@ -36,6 +44,162 @@ func Migrate(cfg *config.Config) *cli.Command {
 
 func init() {
 	register.AddCommand(Migrate)
+}
+
+func MigrateSpace(cfg *config.Config) *cli.Command {
+	return &cli.Command{
+		Name:  "space",
+		Usage: "migrates a space from one storage provider to another using the storage interface",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "from",
+				Value: "owncloudsql",
+				Usage: "source type to read files from",
+			},
+			&cli.StringFlag{
+				Name:  "to",
+				Value: "ocis",
+				Usage: "target type to write files to",
+			},
+			&cli.StringFlag{
+				Name:  "space",
+				Value: "",
+				Usage: "space to migrate",
+			},
+			&cli.StringFlag{
+				Name:  "username",
+				Value: "",
+				Usage: "username to migrate",
+			},
+			// TODO add continue-on-error option
+		},
+		Before: func(c *cli.Context) error {
+			// Parse base config
+			if err := parser.ParseConfig(cfg, true); err != nil {
+				return configlog.ReturnError(err)
+			}
+
+			// Parse storage config
+			cfg.StorageUsers.Commons = cfg.Commons
+
+			// TODO hopefully we don't have to actually talk to other services
+			cfg.StorageUsers.Commons.TokenManager.JWTSecret = "unused"
+			cfg.StorageUsers.MountID = "unused"
+			return configlog.ReturnError(storageparser.ParseConfig(cfg.StorageUsers))
+		},
+		Action: func(c *cli.Context) error {
+			log := oclog.LoggerFromConfig("migrate", cfg.Log)
+			ctx := log.WithContext(context.Background())
+
+			rcfg := revaconfig.StorageProviderDrivers(cfg.StorageUsers)
+
+			oldDriver := c.String("from")
+			newDriver := c.String("to")
+			space := c.String("space")
+			username := c.String("username")
+			u := &userv1beta1.User{
+				Username: username, // needed for owncloudsql
+			}
+			ctx = revactx.ContextSetUser(ctx, u)
+
+			f, ok := storageregistry.NewFuncs[oldDriver]
+			if !ok {
+				log.Error().Msg("Unknown source storage type '" + oldDriver + "'")
+				os.Exit(1)
+			}
+			sourceFS, err := f(rcfg[oldDriver].(map[string]interface{}), nil)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to initiate source storage driver")
+				os.Exit(1)
+			}
+
+			f, ok = storageregistry.NewFuncs[newDriver]
+			if !ok {
+				log.Error().Msg("Unknown target storage type '" + newDriver + "'")
+				os.Exit(1)
+			}
+
+			// disable propagation during the import run
+			//rcfg[newDriver]
+			targetFS, err := f(rcfg[newDriver].(map[string]interface{}), nil)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to initiate destination public share manager")
+				os.Exit(1)
+			}
+
+			// 1. create space
+			spaces, err := sourceFS.ListStorageSpaces(ctx, []*providerv1beta1.ListStorageSpacesRequest_Filter{{
+				Type: providerv1beta1.ListStorageSpacesRequest_Filter_TYPE_ID,
+				Term: &providerv1beta1.ListStorageSpacesRequest_Filter_Id{
+					Id: &providerv1beta1.StorageSpaceId{OpaqueId: space},
+				},
+			}}, true)
+			if err != nil {
+				return err
+			}
+
+			switch len(spaces) {
+			case 0:
+				return fmt.Errorf("unknown space %s", space)
+			case 1:
+				// cool
+				res, err := targetFS.CreateStorageSpace(ctx, &providerv1beta1.CreateStorageSpaceRequest{Type: "personal"})
+				if err != nil {
+					return err
+				}
+				if res.Status.Code != cs3rpc.Code_CODE_OK {
+					return fmt.Errorf("could not create space: (%d) %s", res.Status.Code, res.Status.Message)
+				}
+			default:
+				return fmt.Errorf("expected on space with id %s, found %d", space, len(spaces))
+			}
+
+			// FIXME ... owncloudsql reads metadata from the database. This is probably the wrong approach to do an offline migration
+
+			// 2. recreate tree
+
+			children, err := sourceFS.ListFolder(ctx, &providerv1beta1.Reference{ResourceId: spaces[0].Root}, nil, nil) // TODO list all metadata keys with *?
+			if err != nil {
+				return err
+			}
+
+			for _, child := range children {
+				childRef := &providerv1beta1.Reference{ResourceId: spaces[0].Root, Path: child.Name}
+				switch child.Type {
+				case providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER:
+					err := targetFS.CreateDir(ctx, childRef)
+					if err != nil {
+						return err
+					}
+					err = targetFS.SetArbitraryMetadata(ctx, childRef, &providerv1beta1.ArbitraryMetadata{
+						Metadata: map[string]string{
+							"mtime": fmt.Sprintf("%d.%d", child.Mtime.Seconds, child.Mtime.Nanos),
+							// TODO set etag? maybe not because we want to enforce updateing the fileid?
+						},
+					})
+					if err != nil {
+						return err
+					}
+					// TODO recursively descend
+
+				case providerv1beta1.ResourceType_RESOURCE_TYPE_FILE:
+					stream, err := sourceFS.Download(ctx, &providerv1beta1.Reference{ResourceId: child.Id})
+					if err != nil {
+						return err
+					}
+					_, err = targetFS.Upload(ctx, childRef, stream, nil)
+					if err != nil {
+						return err
+					}
+				default:
+					// ignore
+					continue
+				}
+			}
+
+			return nil
+		},
+	}
 }
 
 func MigrateShares(cfg *config.Config) *cli.Command {
