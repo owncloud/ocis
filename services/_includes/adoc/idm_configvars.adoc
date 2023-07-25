@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-25-11-19-37]
+[#deprecation-note-2023-07-25-13-10-01]
 [caption=]
 .Deprecation notes for the idm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -194,7 +194,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Password to set for the oCIS "admin" user. Either cleartext or an argon2id hash.
+Password to set for the oCIS 'admin' user. Either cleartext or an argon2id hash.
 
 a|`IDM_SVC_PASSWORD` +
 
@@ -203,7 +203,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Password to set for the "idm" service user. Either cleartext or an argon2id hash.
+Password to set for the 'idm' service user. Either cleartext or an argon2id hash.
 
 a|`IDM_REVASVC_PASSWORD` +
 
@@ -212,7 +212,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Password to set for the "reva" service user. Either cleartext or an argon2id hash.
+Password to set for the 'reva' service user. Either cleartext or an argon2id hash.
 
 a|`IDM_IDPSVC_PASSWORD` +
 
@@ -221,7 +221,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Password to set for the "idp" service user. Either cleartext or an argon2id hash.
+Password to set for the 'idp' service user. Either cleartext or an argon2id hash.
 
 a|`OCIS_ADMIN_USER_ID` +
 `IDM_ADMIN_USER_ID` +

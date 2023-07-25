@@ -27,7 +27,7 @@
 | IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | The OIDC issuer URL to use.|
 | IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'.|
-| IDP_URI_BASE_PATH | string |  | IDP uri base path (defaults to "").|
+| IDP_URI_BASE_PATH | string |  | IDP uri base path (defaults to '').|
 | IDP_SIGN_IN_URI | string |  | IDP sign-in url.|
 | IDP_SIGN_OUT_URI | string |  | IDP sign-out url.|
 | IDP_ENDPOINT_URI | string |  | URL of the IDP endpoint.|
