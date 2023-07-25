@@ -254,9 +254,9 @@ func (p *wopiProvider) GetAppURL(ctx context.Context, resource *provider.Resourc
 
 	urlQuery := url.Query()
 	if language != "" {
-		urlQuery.Set("ui", language)      // OnlyOffice
-		urlQuery.Set("lang", language)    // Collabora
-		urlQuery.Set("UI_LLCC", language) // Office365
+		urlQuery.Set("ui", language)                  // OnlyOffice
+		urlQuery.Set("lang", covertLangTag(language)) // Collabora, Impact on the default document language of OnlyOffice
+		urlQuery.Set("UI_LLCC", language)             // Office365
 	}
 	if p.conf.AppDisableChat {
 		urlQuery.Set("dchat", "1") // OnlyOffice disable chat
@@ -469,4 +469,23 @@ func getEtherpadExtensions(appURL string) map[string]map[string]string {
 		".epd": appURL,
 	}
 	return appURLs
+}
+
+// TODO Find better solution
+// This conversion was made because no other way to set the default document language to OnlyOffice was found.
+func covertLangTag(lang string) string {
+	switch lang {
+	case "cs":
+		return "cs-CZ"
+	case "de":
+		return "de-DE"
+	case "es":
+		return "es-ES"
+	case "fr":
+		return "fr-FR"
+	case "it":
+		return "it-IT"
+	default:
+		return "en"
+	}
 }
