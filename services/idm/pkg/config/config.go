@@ -33,8 +33,8 @@ type Settings struct {
 }
 
 type ServiceUserPasswords struct {
-	OcisAdmin string `yaml:"admin_password" env:"IDM_ADMIN_PASSWORD" desc:"Password to set for the oCIS \"admin\" user. Either cleartext or an argon2id hash."`
-	Idm       string `yaml:"idm_password" env:"IDM_SVC_PASSWORD" desc:"Password to set for the \"idm\" service user. Either cleartext or an argon2id hash."`
-	Reva      string `yaml:"reva_password" env:"IDM_REVASVC_PASSWORD" desc:"Password to set for the \"reva\" service user. Either cleartext or an argon2id hash."`
-	Idp       string `yaml:"idp_password" env:"IDM_IDPSVC_PASSWORD" desc:"Password to set for the \"idp\" service user. Either cleartext or an argon2id hash."`
+	OcisAdmin string `yaml:"admin_password" env:"IDM_ADMIN_PASSWORD" desc:"Password to set for the oCIS 'admin' user. Either cleartext or an argon2id hash."`
+	Idm       string `yaml:"idm_password" env:"IDM_SVC_PASSWORD" desc:"Password to set for the 'idm' service user. Either cleartext or an argon2id hash."`
+	Reva      string `yaml:"reva_password" env:"IDM_REVASVC_PASSWORD" desc:"Password to set for the 'reva' service user. Either cleartext or an argon2id hash."`
+	Idp       string `yaml:"idp_password" env:"IDM_IDPSVC_PASSWORD" desc:"Password to set for the 'idp' service user. Either cleartext or an argon2id hash."`
 }
