@@ -175,6 +175,26 @@ default:
         - OcisConfigContext:
         - PublicWebDavContext:
 
+    apiDownloads:
+      paths:
+        - '%paths.base%/../features/apiDownloads'
+      context: *common_ldap_suite_context
+      contexts:
+        - NotificationContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - WebDavPropertiesContext:
+        - OCSContext:
+        - GraphContext:
+        - TrashbinContext:
+        - FavoritesContext:
+        - ChecksumContext:
+        - FilesVersionsContext:
+        - SettingsContext:
+        - OcisConfigContext:
+        - PublicWebDavContext:
+        - ArchiverContext:
+
     apiFullTextSearch:
       paths:
         - '%paths.base%/../features/apiFullTextSearch'

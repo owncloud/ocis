@@ -26,7 +26,6 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
-use wapmorgan\UnifiedArchive\UnifiedArchive;
 use PHPUnit\Framework\Assert;
 use \Psr\Http\Message\ResponseInterface;
 
@@ -219,18 +218,41 @@ class ArchiverContext implements Context {
 	 */
 	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles):void {
 		$this->featureContext->verifyTableNodeColumns($expectedFiles, ['name', 'content']);
+		$contents = $this->featureContext->getResponse()->getBody()->getContents();
 		$tempFile = \tempnam(\sys_get_temp_dir(), 'OcAcceptanceTests_');
 		\unlink($tempFile); // we only need the name
 		$tempFile = $tempFile . '.' . $type; // it needs the extension
-		\file_put_contents($tempFile, $this->featureContext->getResponse()->getBody()->getContents());
-		$archive = UnifiedArchive::open($tempFile);
-		foreach ($expectedFiles->getHash() as $expectedFile) {
-			Assert::assertEquals(
-				$expectedFile['content'],
-				$archive->getFileContent($expectedFile['name']),
-				__METHOD__ .
-				" content of '" . $expectedFile['name'] . "' not as expected"
-			);
+		\file_put_contents($tempFile, $contents);
+
+		// open the archive
+		$archiveData = new RecursiveIteratorIterator(
+			new PharData($tempFile),
+			RecursiveIteratorIterator::SELF_FIRST
+		);
+		foreach ($expectedFiles->getHash() as $expectedItem) {
+			$expectedPath = trim($expectedItem['name'], "/");
+			$found = false;
+			foreach ($archiveData as $info) {
+				// get only the parent folder path for the given item
+				$actualPath = explode(".$type", $info->getPathname())[1];
+				$actualPath = trim($actualPath, "/");
+
+				if ($expectedPath === $actualPath) {
+					if (!$info->isDir()) {
+						Assert::assertEquals(
+							$expectedItem['content'],
+							$info->getContent(),
+							__METHOD__ .
+							" content of '" . $expectedPath . "' not as expected"
+						);
+					}
+					$found = true;
+					break;
+				}
+			}
+			if (!$found) {
+				Assert::fail("Resource '" . $expectedPath . "' is not in the downloaded archive.");
+			}
 		}
 		\unlink($tempFile);
 	}
