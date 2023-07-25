@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"syscall"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -126,6 +127,17 @@ func (s eventsNotifier) send(ctx context.Context, recipientList []*channels.Mess
 	}
 }
 
+func (s eventsNotifier) ensureGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId) []*user.User {
+	granteeList, err := s.getGranteeList(ctx, executant, u, g)
+	if err != nil {
+		s.logger.Error().Err(err).Str("event", "ensureGranteeList").Msg("Could not get grantee list")
+		return nil
+	} else if len(granteeList) == 0 {
+		return nil
+	}
+	return granteeList
+}
+
 func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId) ([]*user.User, error) {
 	switch {
 	case u != nil:
@@ -135,6 +147,10 @@ func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.U
 		usr, err := s.getUser(ctx, u)
 		if err != nil {
 			return nil, err
+		}
+		if strings.TrimSpace(usr.GetMail()) == "" {
+			s.logger.Debug().Str("event", "getGranteeList").Msgf("User %s has no email, skipped", usr.GetUsername())
+			return nil, nil
 		}
 		return []*user.User{usr}, nil
 	case g != nil:
@@ -164,6 +180,10 @@ func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.U
 			usr, err := s.getUser(ctx, userID)
 			if err != nil {
 				return nil, err
+			}
+			if strings.TrimSpace(usr.GetMail()) == "" {
+				s.logger.Debug().Str("event", "getGranteeList").Msgf("User %s has no email, skipped", usr.GetUsername())
+				continue
 			}
 			userList = append(userList, usr)
 		}
