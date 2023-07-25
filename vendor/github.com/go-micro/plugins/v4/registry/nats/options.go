@@ -11,6 +11,7 @@ type contextQuorumKey struct{}
 type optionsKey struct{}
 type watchTopicKey struct{}
 type queryTopicKey struct{}
+type registerActionKey struct{}
 
 var (
 	DefaultQuorum = 0
@@ -68,5 +69,19 @@ func WatchTopic(s string) registry.Option {
 			o.Context = context.Background()
 		}
 		o.Context = context.WithValue(o.Context, watchTopicKey{}, s)
+	}
+}
+
+// RegisterAction allows to set the action to use when registering to nats.
+// As of now there are three different options:
+// - "create" (default) only registers if there is noone already registered under the same key.
+// - "update" only updates the registration if it already exists.
+// - "put" creates or updates a registration
+func RegisterAction(s string) registry.Option {
+	return func(o *registry.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
+		o.Context = context.WithValue(o.Context, registerActionKey{}, s)
 	}
 }
