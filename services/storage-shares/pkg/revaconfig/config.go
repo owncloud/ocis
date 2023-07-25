@@ -1,3 +1,4 @@
+// Package revaconfig contains the reva config for storage-shares.
 package revaconfig
 
 import (
