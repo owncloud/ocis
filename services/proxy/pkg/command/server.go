@@ -8,14 +8,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/store"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -38,10 +43,6 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Server is the entrypoint for the server command.
@@ -411,7 +412,11 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-		middleware.Policies(logger, cfg.PoliciesMiddleware.Query, cfg.GrpcClient),
+		middleware.Policies(
+			cfg.PoliciesMiddleware.Query,
+			middleware.Logger(logger),
+			middleware.WithRevaGatewaySelector(gatewaySelector),
+		),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),

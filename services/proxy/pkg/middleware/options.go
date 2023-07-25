@@ -5,7 +5,11 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -13,8 +17,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-	store "go-micro.dev/v4/store"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -118,7 +120,7 @@ func SettingsRoleService(rc settingssvc.RoleService) Option {
 	}
 }
 
-// OIDCClient provides a function to set the the oidc client option.
+// OIDCClient provides a function to set the oidc client option.
 func OIDCClient(val oidc.OIDCClient) Option {
 	return func(o *Options) {
 		o.OIDCClient = val
@@ -139,7 +141,7 @@ func CredentialsByUserAgent(v map[string]string) Option {
 	}
 }
 
-// WithRevaGatewaySelector provides a function to set the the reva gateway service selector option.
+// WithRevaGatewaySelector provides a function to set the reva gateway service selector option.
 func WithRevaGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.RevaGatewaySelector = val

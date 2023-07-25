@@ -57,5 +57,7 @@ func (o OPA) Evaluate(ctx context.Context, qs string, env engine.Environment) (b
 		return false, err
 	}
 
-	return result.Allowed(), nil
+	allowed := result.Allowed()
+
+	return allowed, nil
 }
