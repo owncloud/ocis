@@ -209,6 +209,7 @@ default:
         - CapabilitiesContext:
         - FilesVersionsContext:
         - OCSContext:
+        - TrashbinContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
