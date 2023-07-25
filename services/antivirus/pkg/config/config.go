@@ -20,7 +20,7 @@ type Config struct {
 
 	Context context.Context `yaml:"-" json:"-"`
 
-	DebugScanOutcome string `yaml:"-" env:"ANTIVIRUS_DEBUG_SCAN_OUTCOME" desc:"A predefined outcome for virus scanning, FOR DEBUG PURPOSES ONLY! (example values: \"found,infected\")"`
+	DebugScanOutcome string `yaml:"-" env:"ANTIVIRUS_DEBUG_SCAN_OUTCOME" desc:"A predefined outcome for virus scanning, FOR DEBUG PURPOSES ONLY! (example values: 'found,infected')"`
 }
 
 // Service defines the available service configuration.
