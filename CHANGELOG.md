@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v3.1.0...master
+
+## Summary
+
+* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
+
+## Details
+
+* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
+
+   Improve the notification logs when the user has no email address
+
+   https://github.com/owncloud/ocis/issues/6855
+   https://github.com/owncloud/ocis/pull/6862
 # Changelog for [3.1.0] (2023-07-18)
 
 The following sections list the changes for 3.1.0.
