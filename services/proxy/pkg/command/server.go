@@ -349,6 +349,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		})
 	}
 
+	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
+		Logger:              logger,
+		RevaGatewaySelector: gatewaySelector,
+	})
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),
@@ -363,10 +367,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 		)),
 	))
-	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
-		Logger:              logger,
-		RevaGatewaySelector: gatewaySelector,
-	})
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
 		PreSignedURLConfig: cfg.PreSignedURL,
