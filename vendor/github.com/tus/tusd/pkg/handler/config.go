@@ -22,12 +22,19 @@ type Config struct {
 	// absolute URL containing a scheme, e.g. "http://tus.io"
 	BasePath string
 	isAbs    bool
+	// EnableExperimentalProtocol controls whether the new resumable upload protocol draft
+	// from the IETF's HTTP working group is accepted next to the current tus v1 protocol.
+	// See https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/
+	EnableExperimentalProtocol bool
 	// DisableDownload indicates whether the server will refuse downloads of the
 	// uploaded file, by not mounting the GET handler.
 	DisableDownload bool
 	// DisableTermination indicates whether the server will refuse termination
 	// requests of the uploaded file, by not mounting the DELETE handler.
 	DisableTermination bool
+	// Disable cors headers. If set to true, tusd will not send any CORS related header.
+	// This is useful if you have a proxy sitting in front of tusd that handles CORS.
+	DisableCors bool
 	// NotifyCompleteUploads indicates whether sending notifications about
 	// completed uploads using the CompleteUploads channel should be enabled.
 	NotifyCompleteUploads bool
