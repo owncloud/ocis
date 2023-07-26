@@ -6,11 +6,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
 ## Details
+
+* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
+
+   Using `nats` as service registry did work, but when a service would restart and gets a new ip it
+   couldn't re-register. We fixed this by using `"put"` register action instead of the default
+   `"create"`
+
+   https://github.com/owncloud/ocis/pull/6881
 
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 
