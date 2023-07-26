@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
+* Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
@@ -27,6 +28,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/enterprise/issues/5807
    https://github.com/owncloud/ocis/pull/6878
+
+* Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/6899
 
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 
