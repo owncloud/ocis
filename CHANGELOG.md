@@ -6,10 +6,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
 ## Details
+
+* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
+
+   Fix the default document language for OnlyOffice
+
+   https://github.com/owncloud/enterprise/issues/5807
+   https://github.com/owncloud/ocis/pull/6878
 
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 
