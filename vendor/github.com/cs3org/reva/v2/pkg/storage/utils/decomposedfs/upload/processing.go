@@ -234,7 +234,7 @@ func Get(ctx context.Context, id string, lu *lookup.Lookup, tp Tree, fsRoot stri
 
 	up := buildUpload(ctx, info, info.Storage["BinPath"], infoPath, lu, tp, pub, async, tknopts)
 	up.versionsPath = info.MetaData["versionsPath"]
-	up.sizeDiff, _ = strconv.ParseInt(info.MetaData["sizeDiff"], 10, 64)
+	up.SizeDiff, _ = strconv.ParseInt(info.MetaData["sizeDiff"], 10, 64)
 	return up, nil
 }
 
@@ -364,8 +364,8 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 	}
 
 	// on a new file the sizeDiff is the fileSize
-	upload.sizeDiff = int64(fsize)
-	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.sizeDiff))
+	upload.SizeDiff = int64(fsize)
+	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.SizeDiff))
 	return f, nil
 }
 
@@ -393,9 +393,9 @@ func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint
 	}
 
 	upload.versionsPath = upload.lu.InternalPath(spaceID, n.ID+node.RevisionIDDelimiter+tmtime.UTC().Format(time.RFC3339Nano))
-	upload.sizeDiff = int64(fsize) - old.Blobsize
+	upload.SizeDiff = int64(fsize) - old.Blobsize
 	upload.Info.MetaData["versionsPath"] = upload.versionsPath
-	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.sizeDiff))
+	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.SizeDiff))
 
 	targetPath := n.InternalPath()
 

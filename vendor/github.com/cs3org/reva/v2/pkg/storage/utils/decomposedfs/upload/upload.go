@@ -91,6 +91,8 @@ type Upload struct {
 	Info tusd.FileInfo
 	// node for easy access
 	Node *node.Node
+	// SizeDiff size difference between new and old file version
+	SizeDiff int64
 	// infoPath is the path to the .info file
 	infoPath string
 	// binPath is the path to the binary file (which has no extension)
@@ -100,8 +102,6 @@ type Upload struct {
 	tp Tree
 	// versionsPath will be empty if there was no file before
 	versionsPath string
-	// sizeDiff size difference between new and old file version
-	sizeDiff int64
 	// and a logger as well
 	log zerolog.Logger
 	// publisher used to publish events
@@ -296,7 +296,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 		}
 	}
 
-	return upload.tp.Propagate(upload.Ctx, n, upload.sizeDiff)
+	return upload.tp.Propagate(upload.Ctx, n, upload.SizeDiff)
 }
 
 // Terminate terminates the upload
