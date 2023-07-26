@@ -50,8 +50,9 @@ func WithTraceProvider(tp trace.TracerProvider) ClientOption {
 	return func(o *ClientOptions) {
 		if tp != nil {
 			o.tp = tp
+		} else {
+			o.tp = trace.NewNoopTracerProvider()
 		}
-		o.tp = trace.NewNoopTracerProvider()
 	}
 }
 

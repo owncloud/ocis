@@ -114,6 +114,10 @@ func Consumer(consumer events.Consumer) Option {
 // TraceProvider provides a function to configure the trace provider
 func TraceProvider(traceProvider trace.TracerProvider) Option {
 	return func(o *Options) {
-		o.TraceProvider = traceProvider
+		if traceProvider != nil {
+			o.TraceProvider = traceProvider
+		} else {
+			o.TraceProvider = trace.NewNoopTracerProvider()
+		}
 	}
 }
