@@ -226,14 +226,14 @@ Feature: antivirus
     And user "Alice" has created a folder "uploadFolder" in space "new-space"
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should get a notification with subject "Virus found" and message:
+    And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
       | message                                                                        |
       | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Alice" the space "new-space" should not contain these entries:
       | /uploadFolder/<newfilename> |
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should get a notification with subject "Virus found" and message:
+    And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
       | message                                                                        |
       | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Alice" the space "new-space" should not contain these entries:
@@ -422,15 +422,15 @@ Feature: antivirus
     And user "Brian" has accepted share "/test.txt" offered by user "Alice"
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "Shares/uploadFolder/test.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And user "Brian" should get a notification with subject "Virus found" and message:
+    And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
       | message                                                                   |
       | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And the content of file "Shares/uploadFolder/test.txt" for user "Brian" should be "this is a test file."
     And the content of file "uploadFolder/test.txt" for user "Alice" should be "this is a test file."
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "Shares/test.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                       |
+    And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
+      | message                                                                   |
       | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And the content of file "Shares/test.txt" for user "Brian" should be "this is a test file."
     And the content of file "/test.txt" for user "Alice" should be "this is a test file."
@@ -452,14 +452,14 @@ Feature: antivirus
     And user "Brian" has accepted share "/test.txt" offered by user "Alice"
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/uploadFolder/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And user "Brian" should get a notification with subject "Virus found" and message:
+    And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
       | message                                                                   |
       | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Brian" the content of the file "/uploadFolder/test.txt" of the space "Shares" should be "this is a test file."
     And the content of file "uploadFolder/test.txt" for user "Alice" should be "this is a test file."
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And user "Brian" should get a notification with subject "Virus found" and message:
+    And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
       | message                                                                   |
       | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Brian" the content of the file "/test.txt" of the space "Shares" should be "this is a test file."
