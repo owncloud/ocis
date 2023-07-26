@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"os"
+	"sort"
 	"sync"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -10,6 +11,11 @@ import (
 	publicregistry "github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	tw "github.com/olekukonko/tablewriter"
+	"github.com/rs/zerolog"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -28,6 +34,7 @@ func Migrate(cfg *config.Config) *cli.Command {
 		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
 		Subcommands: []*cli.Command{
+			MigrateDecomposedfs(cfg),
 			MigrateShares(cfg),
 			MigratePublicShares(cfg),
 		},
@@ -36,6 +43,92 @@ func Migrate(cfg *config.Config) *cli.Command {
 
 func init() {
 	register.AddCommand(Migrate)
+}
+
+func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
+	return &cli.Command{
+		Name:  "decomposedfs",
+		Usage: "run a decomposedfs migration",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "direction",
+				Aliases: []string{"d"},
+				Value:   "up",
+				Usage:   "direction of the migration to run ('up' or 'down')",
+			},
+			&cli.StringFlag{
+				Name:     "migration",
+				Aliases:  []string{"m"},
+				Value:    "",
+				Required: true,
+				Usage:    "ID of the migration to run",
+			},
+			&cli.StringFlag{
+				Name:     "root",
+				Aliases:  []string{"r"},
+				Required: true,
+				Usage:    "Path to the root directory of the decomposedfs",
+			},
+			&cli.BoolFlag{
+				Name:    "list",
+				Aliases: []string{"l"},
+				Value:   false,
+				Usage:   "Print a list of migrations incl. their state",
+			},
+		},
+		Before: func(c *cli.Context) error {
+			// Parse base config
+			if err := parser.ParseConfig(cfg, true); err != nil {
+				return configlog.ReturnError(err)
+			}
+			return nil
+		},
+		Action: func(c *cli.Context) error {
+			rootFlag := c.String("root")
+			bod := lookup.DetectBackendOnDisk(rootFlag)
+			backend := backend(rootFlag, bod)
+			lu := lookup.New(backend, &options.Options{
+				Root:            rootFlag,
+				MetadataBackend: bod,
+			})
+
+			m := migrator.New(lu, logger())
+
+			if c.Bool("list") {
+				return listMigrations(m)
+			}
+
+			err := m.RunMigration(c.String("migration"), c.String("direction") == "down")
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+}
+
+func listMigrations(m migrator.Migrator) error {
+	migrationStates, err := m.Migrations()
+	if err != nil {
+		return err
+	}
+
+	migrations := []string{}
+	for m := range migrationStates {
+		migrations = append(migrations, m)
+	}
+	sort.Strings(migrations)
+
+	table := tw.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Migration", "State", "Message"})
+	table.SetAutoFormatHeaders(false)
+	for _, migration := range migrations {
+		table.Append([]string{migration, migrationStates[migration].State, migrationStates[migration].Message})
+	}
+	table.Render()
+
+	return nil
 }
 
 func MigrateShares(cfg *config.Config) *cli.Command {
@@ -65,7 +158,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			return configlog.ReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
-			log := oclog.LoggerFromConfig("migrate", cfg.Log)
+			log := logger()
 			ctx := log.WithContext(context.Background())
 			rcfg := revaShareConfig(cfg.Sharing)
 			oldDriver := c.String("from")
@@ -160,7 +253,7 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 			return configlog.ReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
-			log := oclog.LoggerFromConfig("migrate", cfg.Log)
+			log := logger()
 			ctx := log.WithContext(context.Background())
 
 			rcfg := revaPublicShareConfig(cfg.Sharing)
@@ -300,4 +393,13 @@ func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
 		},
 	}
+}
+
+func logger() *zerolog.Logger {
+	log := oclog.NewLogger(
+		oclog.Name("migrate"),
+		oclog.Level("info"),
+		oclog.Pretty(true),
+		oclog.Color(true)).Logger
+	return &log
 }
