@@ -1031,7 +1031,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 	}
 	var wdp string
 	isPublic := ls != nil
-	isShared := shareTypes != "" && !net.IsCurrentUserOwner(ctx, md.Owner)
+	isShared := shareTypes != "" && !net.IsCurrentUserOwnerOrManager(ctx, md.Owner, md)
 	if md.PermissionSet != nil {
 		wdp = role.WebDAVPermissions(
 			md.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER,
@@ -1253,7 +1253,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "public-link-share-owner":
 					if ls != nil && ls.Owner != nil {
-						if net.IsCurrentUserOwner(ctx, ls.Owner) {
+						if net.IsCurrentUserOwnerOrManager(ctx, ls.Owner, nil) {
 							u := ctxpkg.ContextMustGetUser(ctx)
 							appendToOK(prop.Escaped("oc:public-link-share-owner", u.Username))
 						} else {
@@ -1285,7 +1285,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "owner-id": // phoenix only
 					if md.Owner != nil {
-						if net.IsCurrentUserOwner(ctx, md.Owner) {
+						if net.IsCurrentUserOwnerOrManager(ctx, md.Owner, md) {
 							u := ctxpkg.ContextMustGetUser(ctx)
 							appendToOK(prop.Escaped("oc:owner-id", u.Username))
 						} else {
@@ -1375,7 +1375,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "owner-display-name": // phoenix only
 					if md.Owner != nil {
-						if net.IsCurrentUserOwner(ctx, md.Owner) {
+						if net.IsCurrentUserOwnerOrManager(ctx, md.Owner, md) {
 							u := ctxpkg.ContextMustGetUser(ctx)
 							appendToOK(prop.Escaped("oc:owner-display-name", u.DisplayName))
 						} else {
