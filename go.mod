@@ -32,7 +32,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2-0.20230605104008-a179a6b8f8e6
 	github.com/go-micro/plugins/v4/registry/mdns v1.2.0
 	github.com/go-micro/plugins/v4/registry/memory v1.2.0
-	github.com/go-micro/plugins/v4/registry/nats v1.2.1
+	github.com/go-micro/plugins/v4/registry/nats v1.2.2-0.20230723205323-1ada01245674
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0
 	github.com/go-micro/plugins/v4/server/http v1.2.1
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0

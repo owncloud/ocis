@@ -14,11 +14,12 @@ import (
 )
 
 type natsRegistry struct {
-	addrs      []string
-	opts       registry.Options
-	nopts      nats.Options
-	queryTopic string
-	watchTopic string
+	addrs          []string
+	opts           registry.Options
+	nopts          nats.Options
+	queryTopic     string
+	watchTopic     string
+	registerAction string
 
 	sync.RWMutex
 	conn      *nats.Conn
@@ -27,8 +28,9 @@ type natsRegistry struct {
 }
 
 var (
-	defaultQueryTopic = "micro.registry.nats.query"
-	defaultWatchTopic = "micro.registry.nats.watch"
+	defaultQueryTopic     = "micro.registry.nats.query"
+	defaultWatchTopic     = "micro.registry.nats.watch"
+	defaultRegisterAction = "create"
 )
 
 func init() {
@@ -55,6 +57,11 @@ func configure(n *natsRegistry, opts ...registry.Option) error {
 		watchTopic = wt
 	}
 
+	registerAction := defaultRegisterAction
+	if ra, ok := n.opts.Context.Value(registerActionKey{}).(string); ok {
+		registerAction = ra
+	}
+
 	// registry.Options have higher priority than nats.Options
 	// only if Addrs, Secure or TLSConfig were not set through a registry.Option
 	// we read them from nats.Option
@@ -78,6 +85,7 @@ func configure(n *natsRegistry, opts ...registry.Option) error {
 	n.nopts = natsOptions
 	n.queryTopic = queryTopic
 	n.watchTopic = watchTopic
+	n.registerAction = registerAction
 
 	return nil
 }
@@ -322,7 +330,7 @@ func (n *natsRegistry) Register(s *registry.Service, opts ...registry.RegisterOp
 		return err
 	}
 
-	b, err := json.Marshal(&registry.Result{Action: "create", Service: s})
+	b, err := json.Marshal(&registry.Result{Action: n.registerAction, Service: s})
 	if err != nil {
 		return err
 	}

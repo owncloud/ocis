@@ -50,6 +50,7 @@ func GetRegistry() mRegistry.Registry {
 		case "nats":
 			reg = natsr.NewRegistry(
 				mRegistry.Addrs(addresses...),
+				natsr.RegisterAction("put"),
 			)
 		case "kubernetes":
 			reg = kubernetesr.NewRegistry(
