@@ -2785,7 +2785,7 @@ class FeatureContext extends BehatVariablesContext {
 				"code" => "%last_share_id%",
 				"function" => [
 					$this,
-					"getLastShareId"
+					"getLastCreatedUserGroupShareId"
 				],
 				"parameter" => []
 			],
