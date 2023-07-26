@@ -346,7 +346,11 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		switch e.Code {
 		case http.StatusNotFound:
 			// StatusNotFound is expected for unsupported files
-			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			message := notFoundMsg(tr.Filename)
+			if strings.Contains(e.Detail, "could not find space") {
+				message = spaceNotFoundMsg(tr.Filename, user.Username)
+			}
+			renderError(w, r, errNotFound(message))
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(err.Error()))
@@ -540,4 +544,8 @@ func renderError(w http.ResponseWriter, r *http.Request, err *errResponse) {
 
 func notFoundMsg(name string) string {
 	return "File with name " + name + " could not be located"
+}
+
+func spaceNotFoundMsg(name string, space string) string {
+	return "File not found: " + name + " in '" + space + "'"
 }
