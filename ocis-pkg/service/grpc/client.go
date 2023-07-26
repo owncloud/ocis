@@ -48,7 +48,10 @@ func WithTLSCACert(v string) ClientOption {
 // WithTraceProvider allows to set the trace Provider for grpc clients
 func WithTraceProvider(tp trace.TracerProvider) ClientOption {
 	return func(o *ClientOptions) {
-		o.tp = tp
+		if tp != nil {
+			o.tp = tp
+		}
+		o.tp = trace.NewNoopTracerProvider()
 	}
 }
 
@@ -92,8 +95,8 @@ func Configure(opts ...ClientOption) error {
 				tlsConfig.RootCAs = certs
 			}
 			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
-			//case "off":
-			//default:
+			// case "off":
+			// default:
 		}
 
 		defaultClient = mgrpcc.NewClient(cOpts...)
@@ -150,8 +153,8 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 			tlsConfig.RootCAs = certs
 		}
 		cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
-		//case "off":
-		//default:
+		// case "off":
+		// default:
 	}
 
 	return mgrpcc.NewClient(cOpts...), nil
