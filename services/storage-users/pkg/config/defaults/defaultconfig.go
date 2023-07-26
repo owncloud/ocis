@@ -63,6 +63,7 @@ func DefaultConfig() *config.Config {
 			},
 			S3NG: config.S3NGDriver{
 				MetadataBackend:            "messagepack",
+				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",
@@ -75,6 +76,7 @@ func DefaultConfig() *config.Config {
 			},
 			OCIS: config.OCISDriver{
 				MetadataBackend:            "messagepack",
+				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",
