@@ -45,8 +45,17 @@ func (_m *Client) Bind(username string, password string) error {
 }
 
 // Close provides a mock function with given fields:
-func (_m *Client) Close() {
-	_m.Called()
+func (_m *Client) Close() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // Compare provides a mock function with given fields: dn, attribute, value
@@ -87,8 +96,48 @@ func (_m *Client) Del(_a0 *ldap.DelRequest) error {
 	return r0
 }
 
+// DirSync provides a mock function with given fields: searchRequest, flags, maxAttrCount, cookie
+func (_m *Client) DirSync(searchRequest *ldap.SearchRequest, flags int64, maxAttrCount int64, cookie []byte) (*ldap.SearchResult, error) {
+	ret := _m.Called(searchRequest, flags, maxAttrCount, cookie)
+
+	var r0 *ldap.SearchResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*ldap.SearchRequest, int64, int64, []byte) (*ldap.SearchResult, error)); ok {
+		return rf(searchRequest, flags, maxAttrCount, cookie)
+	}
+	if rf, ok := ret.Get(0).(func(*ldap.SearchRequest, int64, int64, []byte) *ldap.SearchResult); ok {
+		r0 = rf(searchRequest, flags, maxAttrCount, cookie)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ldap.SearchResult)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*ldap.SearchRequest, int64, int64, []byte) error); ok {
+		r1 = rf(searchRequest, flags, maxAttrCount, cookie)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ExternalBind provides a mock function with given fields:
 func (_m *Client) ExternalBind() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// GetLastError provides a mock function with given fields:
+func (_m *Client) GetLastError() error {
 	ret := _m.Called()
 
 	var r0 error

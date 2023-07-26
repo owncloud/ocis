@@ -44,6 +44,7 @@ func Server(opts ...Option) (http.Service, error) {
 			Cert:    options.Config.HTTP.TLSCert,
 			Key:     options.Config.HTTP.TLSKey,
 		}),
+		http.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Error().
@@ -69,6 +70,7 @@ func Server(opts ...Option) (http.Service, error) {
 				options.Logger,
 			),
 		),
+		svc.TraceProvider(options.TraceProvider),
 	)
 
 	{

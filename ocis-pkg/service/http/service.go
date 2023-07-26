@@ -10,6 +10,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
+	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
@@ -66,6 +67,15 @@ func NewService(opts ...Option) (Service, error) {
 		micro.Registry(registry.GetRegistry()),
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
+		micro.WrapClient(mtracer.NewClientWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
+		micro.WrapHandler(mtracer.NewHandlerWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
+		micro.WrapSubscriber(mtracer.NewSubscriberWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
 	}
 	if sopts.TLSConfig.Enabled {
 		wopts = append(wopts, micro.Metadata(map[string]string{"use_tls": "true"}))

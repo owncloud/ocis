@@ -20,10 +20,13 @@ import (
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
 	cs3BackendSupport "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/bootstrap"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
+	"github.com/riandyrn/otelchi"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
 )
@@ -81,7 +84,6 @@ func NewService(opts ...Option) Service {
 	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
 		Logger: log.LogrusWrap(logger),
 	})
-
 	if err != nil {
 		logger.Fatal().Err(err).Msg("could not bootstrap idp")
 	}
@@ -94,6 +96,7 @@ func NewService(opts ...Option) Service {
 		logger: options.Logger,
 		config: options.Config,
 		assets: assetVFS,
+		tp:     options.TraceProvider,
 	}
 
 	svc.initMux(ctx, routes, handlers, options)
@@ -106,10 +109,9 @@ type temporaryClientConfig struct {
 }
 
 func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Client) error {
-
 	folder := path.Dir(filePath)
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		if err := os.MkdirAll(folder, 0700); err != nil {
+		if err := os.MkdirAll(folder, 0o700); err != nil {
 			return err
 		}
 	}
@@ -141,18 +143,17 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 
 	defer confOnDisk.Close()
 
-	err = os.WriteFile(filePath, conf, 0600)
+	err = os.WriteFile(filePath, conf, 0o600)
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }
 
 // Init cs3 backend vars which are currently not accessible via idp api
 func initCS3EnvVars(cs3Addr, machineAuthAPIKey string) error {
-	var defaults = map[string]string{
+	defaults := map[string]string{
 		"CS3_GATEWAY":              cs3Addr,
 		"CS3_MACHINE_AUTH_API_KEY": machineAuthAPIKey,
 	}
@@ -187,7 +188,7 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 		filter = fmt.Sprintf("(&%s)", filter)
 	}
 
-	var defaults = map[string]string{
+	defaults := map[string]string{
 		"LDAP_URI":                 ldap.URI,
 		"LDAP_BINDDN":              ldap.BindDN,
 		"LDAP_BINDPW":              ldap.BindPassword,
@@ -221,6 +222,7 @@ type IDP struct {
 	config *config.Config
 	mux    *chi.Mux
 	assets http.FileSystem
+	tp     trace.TracerProvider
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to a ocis chi-router
@@ -244,7 +246,17 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 			assets.Logger(options.Logger),
 			assets.Config(options.Config),
 		),
+		idp.tp,
 	))
+
+	idp.mux.Use(
+		otelchi.Middleware(
+			"idp",
+			otelchi.WithChiRoutes(idp.mux),
+			otelchi.WithTracerProvider(idp.tp),
+			otelchi.WithPropagators(tracing.GetPropagator()),
+		),
+	)
 
 	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
 	idp.mux.Get("/signin/v1/identifier", idp.Index())
@@ -266,7 +278,6 @@ func (idp IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Index renders the static html with the
 func (idp IDP) Index() http.HandlerFunc {
-
 	f, err := idp.assets.Open("/identifier/index.html")
 	if err != nil {
 		idp.logger.Fatal().Err(err).Msg("Could not open index template")
