@@ -208,10 +208,6 @@ cannot share a folder with create permission
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:327](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L327)
 
-#### [download previews of other users file](https://github.com/owncloud/ocis/issues/2071)
-
-- [coreApiWebdavPreviews/previews.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L98)
-
 #### [different error message detail for previews of folder](https://github.com/owncloud/ocis/issues/2064)
 
 - [coreApiWebdavPreviews/previews.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L107)
