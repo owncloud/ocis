@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
@@ -13,6 +14,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
 ## Details
+
+* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
+
+   When authenticating in proxy, first check for public link authorization.
+
+   https://github.com/owncloud/ocis/pull/6900
 
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 
