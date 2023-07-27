@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"go-micro.dev/v4/client"
 )
 
 // Config combines all available configuration parts.
@@ -17,6 +18,7 @@ type Config struct {
 	Debug   Debug    `yaml:"debug"`
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient    client.Client         `yaml:"-"`
 
 	HTTP HTTP `yaml:"http"`
 

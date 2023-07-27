@@ -19,7 +19,6 @@ import (
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
@@ -77,8 +76,8 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
-		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient()),
-		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient()),
+		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", conf.GrpcClient),
+		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", conf.GrpcClient),
 		gatewaySelector:  gatewaySelector,
 	}
 
