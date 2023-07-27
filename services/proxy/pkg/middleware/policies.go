@@ -76,11 +76,10 @@ func Policies(qs string, opts ...Option) func(next http.Handler) http.Handler {
 				resource.Name = filepath.Base(r.URL.Path)
 			}
 
-			/* no resource info in path, stat the resource and try to obtain the file information.
-			this should only be used as last bastion, every request goes through the proxy and doing stats is expensive!
-			required for:
-			* if a single resource is shared -> the url only contains the resourceID (spaceRef)
-			*/
+			// no resource info in path, stat the resource and try to obtain the file information.
+			// this should only be used as last bastion, every request goes through the proxy and doing stats is expensive!
+			// needed for:
+			// - if a single resource is shared -> the url only contains the resourceID (spaceRef)
 			if resource.Name == "" && filepath.Ext(r.URL.Path) == "" && r.Method == http.MethodPut && strings.HasPrefix(r.URL.Path, "/remote.php/dav/spaces") {
 				client, err := gatewaySelector.Next()
 				if err != nil {

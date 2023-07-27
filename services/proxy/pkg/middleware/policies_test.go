@@ -37,7 +37,7 @@ func TestPolicies_ErrorsOnEvaluationError(t *testing.T) {
 		return errors.New("any error")
 	}
 
-	pmt.run(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(w.Code).To(Equal(http.StatusInternalServerError))
 	})
 }
@@ -45,7 +45,7 @@ func TestPolicies_ErrorsOnEvaluationError(t *testing.T) {
 func TestPolicies_ErrorsOnDeny(t *testing.T) {
 	pmt := newPoliciesMiddlewareTester(t)
 
-	pmt.run(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		res := w.Result()
 		defer func() {
 			g.Expect(res.Body.Close()).ToNot(HaveOccurred())
@@ -61,7 +61,7 @@ func TestPolicies_ErrorsOnDeny(t *testing.T) {
 func TestPolicies_EvaluationEnvironment_HTTPStage(t *testing.T) {
 	pmt := newPoliciesMiddlewareTester(t)
 
-	pmt.run(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(r.Environment.Stage).To(Equal(pMessage.Stage_STAGE_HTTP))
 	})
 }
@@ -70,7 +70,7 @@ func TestPolicies_EvaluationEnvironment_Request(t *testing.T) {
 	pmt := newPoliciesMiddlewareTester(t)
 	pmt.httpRequest = httptest.NewRequest(http.MethodDelete, "/whatever", nil)
 
-	pmt.run(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(r.Environment.Request.Method).To(Equal(http.MethodDelete))
 		g.Expect(r.Environment.Request.Path).To(Equal("/whatever"))
 	})
@@ -83,20 +83,20 @@ func TestPolicies_EvaluationEnvironment_Resource(t *testing.T) {
 	pmt.httpRequest = httptest.NewRequest(http.MethodPost, "/remote.php/dav/spaces", nil)
 	pmt.httpRequest.Header.Set(net.HeaderUploadMetadata, fmt.Sprintf("filename %v", base64.StdEncoding.EncodeToString([]byte("tus-file-name.png"))))
 
-	pmt.run(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(r.Environment.Resource.Name).To(Equal("tus-file-name.png"))
 	})
 
 	// url path
 	pmt.httpRequest = httptest.NewRequest(http.MethodPut, "/remote.php/dav/spaces/simple-file-name.png", nil)
-	pmt.run(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(r.Environment.Resource.Name).To(Equal("simple-file-name.png"))
 	})
 
 	// shared-resource put
 	pmt.httpRequest = httptest.NewRequest(http.MethodPut, "/remote.php/dav/spaces/897987fd978dffdfds9f78dsf97fd", nil)
 	pmt.gwClientStatResponse.Info.Name = "shared-file-name.png"
-	pmt.run(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(r.Environment.Resource.Name).To(Equal("shared-file-name.png"))
 	})
 }
@@ -105,7 +105,7 @@ func TestPolicies_NoQuery_PassThrough(t *testing.T) {
 	pmt := newPoliciesMiddlewareTester(t)
 	pmt.regoQuery = ""
 
-	pmt.run(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
+	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
 		g.Expect(w.Code).To(Equal(http.StatusOK))
 	})
 }
@@ -135,7 +135,7 @@ type policiesMiddlewareTester struct {
 	eval                 func(request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error
 }
 
-func (pmt *policiesMiddlewareTester) run(e func(g *WithT, w *httptest.ResponseRecorder, grpcRequest *policiesPG.EvaluateRequest, grpcResponse *policiesPG.EvaluateResponse)) {
+func (pmt *policiesMiddlewareTester) test(e func(g *WithT, w *httptest.ResponseRecorder, grpcRequest *policiesPG.EvaluateRequest, grpcResponse *policiesPG.EvaluateResponse)) {
 	var (
 		polServiceAddress   = fmt.Sprintf("127.0.0.1:%d", freeport.GetPort()) //non-ephemeral port didn't work
 		polServiceName      = "policies"
@@ -209,18 +209,18 @@ func (pmt *policiesMiddlewareTester) run(e func(g *WithT, w *httptest.ResponseRe
 
 	w := httptest.NewRecorder()
 
-	p := middleware.Policies(
+	mw := middleware.Policies(
 		pmt.regoQuery,
 		middleware.WithRevaGatewaySelector(gatewaySelector),
 	)(pmt)
-	p.ServeHTTP(w, pmt.httpRequest)
+	mw.ServeHTTP(w, pmt.httpRequest)
 
 	e(pmt.g, w, pmt.grpcEvaluateRequest, pmt.grpcEvaluateResponse)
 }
 
-func (pmt *policiesMiddlewareTester) ServeHTTP(writer http.ResponseWriter, request *http.Request) {}
+func (pmt *policiesMiddlewareTester) ServeHTTP(_ http.ResponseWriter, _ *http.Request) {}
 
-func (pmt *policiesMiddlewareTester) Evaluate(ctx context.Context, request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error {
+func (pmt *policiesMiddlewareTester) Evaluate(_ context.Context, request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error {
 	err := pmt.eval(request, response)
 	pmt.grpcEvaluateRequest = request
 	pmt.grpcEvaluateResponse = response
