@@ -138,9 +138,17 @@ class TagContext implements Context {
 		foreach ($rows as $row) {
 			$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
 			if ($shouldOrNot === "not") {
-				Assert::assertFalse(\in_array($row[0], $responseArray), "the response should not contain the tag $row[0]");
+				Assert::assertFalse(
+					\in_array($row[0], $responseArray),
+					"the response should not contain the tag $row[0].\nResponse\n"
+					. print_r($responseArray, true)
+				);
 			} else {
-				Assert::assertTrue(\in_array($row[0], $responseArray), "the response does not contain the tag $row[0]");
+				Assert::assertTrue(
+					\in_array($row[0], $responseArray),
+					"the response does not contain the tag $row[0].\nResponse\n"
+					. print_r($responseArray, true)
+				);
 			}
 		}
 	}
