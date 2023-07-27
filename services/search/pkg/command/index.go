@@ -10,6 +10,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config/parser"
@@ -40,10 +41,21 @@ func Index(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(ctx *cli.Context) error {
-			grpcClient := grpc.DefaultClient()
-			grpcClient.Options()
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+			grpcClient, err := grpc.NewClient(
+				append(grpc.GetClientOptions(cfg.GRPCClientTLS),
+					grpc.WithTraceProvider(traceProvider),
+				)...,
+			)
+			if err != nil {
+				return err
+			}
+
 			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
-			_, err := c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
+			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
 				UserId:  ctx.String("user"),
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
