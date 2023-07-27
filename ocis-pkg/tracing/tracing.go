@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
@@ -29,7 +30,13 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 
 // GetServiceTraceProvider returns a configured open-telemetry trace provider.
 func GetServiceTraceProvider(c ConfigConverter, serviceName string) (trace.TracerProvider, error) {
-	cfg := c.Convert()
+	var cfg Config
+	if c == nil || reflect.ValueOf(c).IsNil() {
+		cfg = Config{Enabled: false}
+	} else {
+		cfg = c.Convert()
+	}
+
 	if cfg.Enabled {
 		return GetTraceProvider(cfg.Endpoint, cfg.Collector, serviceName, cfg.Type)
 	}

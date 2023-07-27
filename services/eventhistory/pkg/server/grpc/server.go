@@ -25,6 +25,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
+		grpc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating event history service")
