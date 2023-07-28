@@ -68,7 +68,10 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			err = grpc.Configure(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			cfg.GrpcClient, err = grpc.NewClient(
+				append(
+					grpc.GetClientOptions(cfg.GRPCClientTLS),
+					grpc.WithTraceProvider(traceProvider))...)
 			if err != nil {
 				return err
 			}
@@ -269,14 +272,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
-	grpcClient, err := grpc.NewClient(
-		append(
-			grpc.GetClientOptions(cfg.GRPCClientTLS),
-			grpc.WithTraceProvider(traceProvider))...)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("Failed to get gateway client")
-	}
-	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
+	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
@@ -322,7 +318,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)
 	}
 
-	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpcClient)
+	storeClient := storesvc.NewStoreService("com.owncloud.api.store", cfg.GrpcClient)
 	if err != nil {
 		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
@@ -415,7 +411,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-		middleware.Policies(logger, cfg.PoliciesMiddleware.Query),
+		middleware.Policies(logger, cfg.PoliciesMiddleware.Query, cfg.GrpcClient),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
