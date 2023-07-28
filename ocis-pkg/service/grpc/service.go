@@ -12,6 +12,7 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
+	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
 )
 
@@ -22,6 +23,11 @@ type Service struct {
 
 // NewService initializes a new grpc service.
 func NewService(opts ...Option) (Service, error) {
+	return NewServiceWithClient(DefaultClient(), opts...)
+}
+
+// NewServiceWithClient initializes a new grpc service with explicit client.
+func NewServiceWithClient(client client.Client, opts ...Option) (Service, error) {
 	var mServer server.Server
 	sopts := newOptions(opts...)
 	tlsConfig := &tls.Config{}
@@ -52,7 +58,7 @@ func NewService(opts ...Option) (Service, error) {
 		// first add a server because it will reset any options
 		micro.Server(mServer),
 		// also add a client that can be used after initializing the service
-		micro.Client(DefaultClient()),
+		micro.Client(client),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
