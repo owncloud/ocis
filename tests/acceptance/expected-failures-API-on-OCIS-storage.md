@@ -212,10 +212,6 @@ cannot share a folder with create permission
 
 - [coreApiWebdavPreviews/previews.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L98)
 
-#### [different error message detail for previews of folder](https://github.com/owncloud/ocis/issues/2064)
-
-- [coreApiWebdavPreviews/previews.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L107)
-
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L66)
