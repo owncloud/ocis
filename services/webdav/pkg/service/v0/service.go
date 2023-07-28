@@ -260,7 +260,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errTooEarly(err.Error()))
 			return
 		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(err.Error()))
+			renderError(w, r, errBadRequest(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -348,7 +348,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
 			return
 		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(err.Error()))
+			renderError(w, r, errBadRequest(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -389,7 +389,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
 			return
 		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(err.Error()))
+			renderError(w, r, errBadRequest(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -430,7 +430,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
 			return
 		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(err.Error()))
+			renderError(w, r, errBadRequest(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
