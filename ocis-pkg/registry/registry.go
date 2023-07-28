@@ -9,6 +9,7 @@ import (
 	etcdr "github.com/go-micro/plugins/v4/registry/etcd"
 	kubernetesr "github.com/go-micro/plugins/v4/registry/kubernetes"
 	mdnsr "github.com/go-micro/plugins/v4/registry/mdns"
+	memr "github.com/go-micro/plugins/v4/registry/memory"
 	natsr "github.com/go-micro/plugins/v4/registry/nats"
 
 	"go-micro.dev/v4/registry"
@@ -44,6 +45,8 @@ func GetRegistry() registry.Registry {
 		r = consulr.NewRegistry(
 			registry.Addrs(addresses...),
 		)
+	case "memory":
+		r = memr.NewRegistry()
 	default:
 		r = mdnsr.NewRegistry()
 	}

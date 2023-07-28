@@ -19,7 +19,6 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnError(parser.ParseConfig(cfg, false))
 		},
 		Action: func(c *cli.Context) error {
-			// Prefer the in-memory registry as the default when running in single-binary mode
 			r := runtime.New(cfg)
 			return r.Start()
 		},
