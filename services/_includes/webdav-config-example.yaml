@@ -37,6 +37,7 @@ http:
     - Accept
     - X-Requested-With
     - X-Request-Id
+    - Cache-Control
     allow_credentials: true
   tls:
     enabled: false

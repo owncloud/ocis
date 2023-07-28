@@ -60,6 +60,7 @@ http:
     - Upload-Checksum
     - Upload-Offset
     - X-HTTP-Method-Override
+    - Cache-Control
     allow_credentials: true
 transfer_secret: ""
 token_manager:
