@@ -69,6 +69,7 @@ func DefaultConfig() *config.Config {
 					"Upload-Checksum",
 					"Upload-Offset",
 					"X-HTTP-Method-Override",
+					"Cache-Control",
 				},
 				AllowCredentials: true,
 			},
