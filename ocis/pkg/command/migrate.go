@@ -45,35 +45,32 @@ func init() {
 	register.AddCommand(Migrate)
 }
 
+// MigrateDecomposedfs is the entrypoint for the decomposedfs migrate command
 func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "decomposedfs",
 		Usage: "run a decomposedfs migration",
+		Subcommands: []*cli.Command{
+			ListDecomposedfsMigrations(cfg),
+		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "direction",
 				Aliases: []string{"d"},
-				Value:   "up",
-				Usage:   "direction of the migration to run ('up' or 'down')",
+				Value:   "migrate",
+				Usage:   "direction of the migration to run ('migrate' or 'rollback')",
 			},
 			&cli.StringFlag{
-				Name:     "migration",
-				Aliases:  []string{"m"},
-				Value:    "",
-				Required: true,
-				Usage:    "ID of the migration to run",
+				Name:    "migration",
+				Aliases: []string{"m"},
+				Value:   "",
+				Usage:   "ID of the migration to run",
 			},
 			&cli.StringFlag{
 				Name:     "root",
 				Aliases:  []string{"r"},
 				Required: true,
 				Usage:    "Path to the root directory of the decomposedfs",
-			},
-			&cli.BoolFlag{
-				Name:    "list",
-				Aliases: []string{"l"},
-				Value:   false,
-				Usage:   "Print a list of migrations incl. their state",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -84,6 +81,34 @@ func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
+			log := logger()
+			rootFlag := c.String("root")
+			bod := lookup.DetectBackendOnDisk(rootFlag)
+			backend := backend(rootFlag, bod)
+			lu := lookup.New(backend, &options.Options{
+				Root:            rootFlag,
+				MetadataBackend: bod,
+			})
+
+			m := migrator.New(lu, log)
+
+			err := m.RunMigration(c.String("migration"), c.String("direction") == "down")
+			if err != nil {
+				log.Error().Err(err).Msg("failed")
+				return err
+			}
+
+			return nil
+		},
+	}
+}
+
+// ListDecomposedfsMigrations is the entrypoint for the decomposedfs list migrations command
+func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
+	return &cli.Command{
+		Name:  "list",
+		Usage: "list decomposedfs migrations",
+		Action: func(c *cli.Context) error {
 			rootFlag := c.String("root")
 			bod := lookup.DetectBackendOnDisk(rootFlag)
 			backend := backend(rootFlag, bod)
@@ -93,42 +118,28 @@ func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 			})
 
 			m := migrator.New(lu, logger())
-
-			if c.Bool("list") {
-				return listMigrations(m)
-			}
-
-			err := m.RunMigration(c.String("migration"), c.String("direction") == "down")
+			migrationStates, err := m.Migrations()
 			if err != nil {
 				return err
 			}
 
+			migrations := []string{}
+			for m := range migrationStates {
+				migrations = append(migrations, m)
+			}
+			sort.Strings(migrations)
+
+			table := tw.NewWriter(os.Stdout)
+			table.SetHeader([]string{"Migration", "State", "Message"})
+			table.SetAutoFormatHeaders(false)
+			for _, migration := range migrations {
+				table.Append([]string{migration, migrationStates[migration].State, migrationStates[migration].Message})
+			}
+			table.Render()
+
 			return nil
 		},
 	}
-}
-
-func listMigrations(m migrator.Migrator) error {
-	migrationStates, err := m.Migrations()
-	if err != nil {
-		return err
-	}
-
-	migrations := []string{}
-	for m := range migrationStates {
-		migrations = append(migrations, m)
-	}
-	sort.Strings(migrations)
-
-	table := tw.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Migration", "State", "Message"})
-	table.SetAutoFormatHeaders(false)
-	for _, migration := range migrations {
-		table.Append([]string{migration, migrationStates[migration].State, migrationStates[migration].Message})
-	}
-	table.Render()
-
-	return nil
 }
 
 func MigrateShares(cfg *config.Config) *cli.Command {
