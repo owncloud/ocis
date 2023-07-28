@@ -12,6 +12,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -38,6 +39,8 @@ type Options struct {
 	UserRoleAssigner userroles.UserRoleAssigner
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settingssvc.RoleService
+	// PoliciesProviderService for policy evaluation
+	PoliciesProviderService policiessvc.PoliciesProviderService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
@@ -117,6 +120,13 @@ func HTTPClient(c *http.Client) Option {
 func SettingsRoleService(rc settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.SettingsRoleService = rc
+	}
+}
+
+// PoliciesProviderService provides a function to set the policies provider option.
+func PoliciesProviderService(pps policiessvc.PoliciesProviderService) Option {
+	return func(o *Options) {
+		o.PoliciesProviderService = pps
 	}
 }
 

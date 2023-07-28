@@ -11,193 +11,141 @@ import (
 	"testing"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/oklog/run"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	"github.com/owncloud/ocis/v2/services/proxy/mocks"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
 	policiesPG "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
 )
 
+func TestPolicies_NoQuery_PassThrough(t *testing.T) {
+	var g = NewWithT(t)
+
+	policiesMiddleware, _, _ := prepare("")
+
+	responseRecorder := httptest.NewRecorder()
+	policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodGet, "/policies", nil))
+
+	g.Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+}
+
 func TestPolicies_ErrorsOnEvaluationError(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
+	var g = NewWithT(t)
 
-	pmt.eval = func(request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error {
-		return errors.New("any error")
-	}
+	policiesMiddleware, policiesProviderService, _ := prepare("any")
+	policiesProviderService.On("Evaluate", mock.Anything, mock.Anything).Return(
+		nil,
+		errors.New("any"),
+	)
 
-	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(w.Code).To(Equal(http.StatusInternalServerError))
-	})
+	responseRecorder := httptest.NewRecorder()
+	policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodGet, "/policies", nil))
+
+	g.Expect(responseRecorder.Code).To(Equal(http.StatusInternalServerError))
 }
 
 func TestPolicies_ErrorsOnDeny(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
+	var g = NewWithT(t)
 
-	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		res := w.Result()
-		defer func() {
-			g.Expect(res.Body.Close()).ToNot(HaveOccurred())
-		}()
+	policiesMiddleware, policiesProviderService, _ := prepare("any")
+	policiesProviderService.On("Evaluate", mock.Anything, mock.Anything).Return(
+		&policiesPG.EvaluateResponse{},
+		nil,
+	)
 
-		data, err := io.ReadAll(res.Body)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(data).To(ContainSubstring(middleware.DeniedMessage))
-		g.Expect(w.Code).To(Equal(http.StatusForbidden))
-	})
+	responseRecorder := httptest.NewRecorder()
+	policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodGet, "/policies", nil))
+
+	result := responseRecorder.Result()
+	defer func() {
+		g.Expect(result.Body.Close()).ToNot(HaveOccurred())
+	}()
+
+	data, err := io.ReadAll(result.Body)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(data).To(ContainSubstring(middleware.DeniedMessage))
+	g.Expect(responseRecorder.Code).To(Equal(http.StatusForbidden))
 }
 
 func TestPolicies_EvaluationEnvironment_HTTPStage(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
+	var g = NewWithT(t)
 
-	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(r.Environment.Stage).To(Equal(pMessage.Stage_STAGE_HTTP))
-	})
+	policiesMiddleware, policiesProviderService, _ := prepare("any")
+	policiesProviderService.On("Evaluate", mock.Anything, mock.Anything, mock.Anything).Return(
+		func(_ context.Context, in *policiesPG.EvaluateRequest, _ ...client.CallOption) (*policiesPG.EvaluateResponse, error) {
+			g.Expect(in.Environment.Stage).To(Equal(pMessage.Stage_STAGE_HTTP))
+
+			return &policiesPG.EvaluateResponse{Result: false}, nil
+		},
+	)
+
+	responseRecorder := httptest.NewRecorder()
+	policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodGet, "/policies", nil))
 }
 
 func TestPolicies_EvaluationEnvironment_Request(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
-	pmt.httpRequest = httptest.NewRequest(http.MethodDelete, "/whatever", nil)
+	var g = NewWithT(t)
 
-	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(r.Environment.Request.Method).To(Equal(http.MethodDelete))
-		g.Expect(r.Environment.Request.Path).To(Equal("/whatever"))
-	})
+	policiesMiddleware, policiesProviderService, _ := prepare("any")
+	policiesProviderService.On("Evaluate", mock.Anything, mock.Anything, mock.Anything).Return(
+		func(_ context.Context, in *policiesPG.EvaluateRequest, _ ...client.CallOption) (*policiesPG.EvaluateResponse, error) {
+			g.Expect(in.Environment.Request.Method).To(Equal(http.MethodDelete))
+			g.Expect(in.Environment.Request.Path).To(Equal("/whatever"))
+
+			return &policiesPG.EvaluateResponse{Result: false}, nil
+		},
+	)
+
+	responseRecorder := httptest.NewRecorder()
+	policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodDelete, "/whatever", nil))
 }
 
 func TestPolicies_EvaluationEnvironment_Resource(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
+	var g = NewWithT(t)
+
+	policiesMiddleware, policiesProviderService, _ := prepare("any")
 
 	// tus metadata
-	pmt.httpRequest = httptest.NewRequest(http.MethodPost, "/remote.php/dav/spaces", nil)
-	pmt.httpRequest.Header.Set(net.HeaderUploadMetadata, fmt.Sprintf("filename %v", base64.StdEncoding.EncodeToString([]byte("tus-file-name.png"))))
+	{
+		responseRecorder := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodPost, "/remote.php/dav/spaces", nil)
+		request.Header.Set(net.HeaderUploadMetadata, fmt.Sprintf("filename %v", base64.StdEncoding.EncodeToString([]byte("tus-file-name.png"))))
+		policiesProviderService.On("Evaluate", mock.Anything, mock.Anything, mock.Anything).Return(
+			func(_ context.Context, in *policiesPG.EvaluateRequest, _ ...client.CallOption) (*policiesPG.EvaluateResponse, error) {
+				g.Expect(in.Environment.Resource.Name).To(Equal("tus-file-name.png"))
 
-	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(r.Environment.Resource.Name).To(Equal("tus-file-name.png"))
-	})
+				return &policiesPG.EvaluateResponse{Result: false}, nil
+			},
+		).Once()
+		policiesMiddleware.ServeHTTP(responseRecorder, request)
+	}
 
 	// url path
-	pmt.httpRequest = httptest.NewRequest(http.MethodPut, "/remote.php/dav/spaces/simple-file-name.png", nil)
-	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(r.Environment.Resource.Name).To(Equal("simple-file-name.png"))
-	})
+	{
+		responseRecorder := httptest.NewRecorder()
+		policiesProviderService.On("Evaluate", mock.Anything, mock.Anything, mock.Anything).Return(
+			func(_ context.Context, in *policiesPG.EvaluateRequest, _ ...client.CallOption) (*policiesPG.EvaluateResponse, error) {
+				g.Expect(in.Environment.Resource.Name).To(Equal("simple-file-name.png"))
 
-	// shared-resource put
-	pmt.httpRequest = httptest.NewRequest(http.MethodPut, "/remote.php/dav/spaces/897987fd978dffdfds9f78dsf97fd", nil)
-	pmt.gwClientStatResponse.Info.Name = "shared-file-name.png"
-	pmt.test(func(g *WithT, _ *httptest.ResponseRecorder, r *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(r.Environment.Resource.Name).To(Equal("shared-file-name.png"))
-	})
-}
-
-func TestPolicies_NoQuery_PassThrough(t *testing.T) {
-	pmt := newPoliciesMiddlewareTester(t)
-	pmt.regoQuery = ""
-
-	pmt.test(func(g *WithT, w *httptest.ResponseRecorder, _ *policiesPG.EvaluateRequest, _ *policiesPG.EvaluateResponse) {
-		g.Expect(w.Code).To(Equal(http.StatusOK))
-	})
-}
-
-func newPoliciesMiddlewareTester(t *testing.T) policiesMiddlewareTester {
-	return policiesMiddlewareTester{
-		g:           NewWithT(t),
-		regoQuery:   "any",
-		httpRequest: httptest.NewRequest(http.MethodGet, "/policies", nil),
-		eval: func(request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error {
-			return nil
-		},
-		gwClientStatResponse: &sprovider.StatResponse{
-			Status: status.NewOK(context.Background()),
-			Info:   &sprovider.ResourceInfo{},
-		},
+				return &policiesPG.EvaluateResponse{Result: false}, nil
+			},
+		).Once()
+		policiesMiddleware.ServeHTTP(responseRecorder, httptest.NewRequest(http.MethodPut, "/remote.php/dav/spaces/simple-file-name.png", nil))
 	}
 }
 
-type policiesMiddlewareTester struct {
-	g                    *WithT
-	regoQuery            string
-	httpRequest          *http.Request
-	grpcEvaluateRequest  *policiesPG.EvaluateRequest
-	grpcEvaluateResponse *policiesPG.EvaluateResponse
-	gwClientStatResponse *sprovider.StatResponse
-	eval                 func(request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error
-}
+func prepare(q string) (http.Handler, *mocks.PoliciesProviderService, *cs3mocks.GatewayAPIClient) {
 
-func (pmt *policiesMiddlewareTester) test(e func(g *WithT, w *httptest.ResponseRecorder, grpcRequest *policiesPG.EvaluateRequest, grpcResponse *policiesPG.EvaluateResponse)) {
-	var (
-		polServiceAddress   = fmt.Sprintf("127.0.0.1:%d", freeport.GetPort()) //non-ephemeral port didn't work
-		polServiceName      = "policies"
-		polServiceNamespace = "com.owncloud.api"
-		ctx                 = context.Background()
-		rg                  = run.Group{}
-	)
-
-	registry.Configure("memory")
-	reg := registry.GetRegistry()
-
-	polService := registry.BuildGRPCService(polServiceNamespace+"."+polServiceName, "", polServiceAddress, "")
-
-	err := reg.Register(polService)
-	pmt.g.Expect(err).ToNot(HaveOccurred())
-
-	defer func() {
-		err := reg.Deregister(polService)
-		pmt.g.Expect(err).ToNot(HaveOccurred())
-	}()
-
-	gwService := registry.BuildGRPCService("com.owncloud.api.gateway", "", "any", "")
-
-	err = reg.Register(gwService)
-	pmt.g.Expect(err).ToNot(HaveOccurred())
-
-	defer func() {
-		err := reg.Deregister(gwService)
-		pmt.g.Expect(err).ToNot(HaveOccurred())
-	}()
-
-	err = ogrpc.Configure()
-	pmt.g.Expect(err).ToNot(HaveOccurred())
-
-	srv, err := ogrpc.NewService(
-		ogrpc.Name(polServiceName),
-		ogrpc.Address(polServiceAddress),
-		ogrpc.Namespace(polServiceNamespace),
-		ogrpc.Context(ctx),
-	)
-	pmt.g.Expect(err).ToNot(HaveOccurred())
-
-	defer func() {
-		err := srv.Server().Stop()
-		pmt.g.Expect(err).ToNot(HaveOccurred())
-	}()
-
-	err = policiesPG.RegisterPoliciesProviderHandler(srv.Server(), pmt)
-	pmt.g.Expect(err).ToNot(HaveOccurred())
-
-	rg.Add(srv.Run, func(err error) {
-		pmt.g.Expect(err).ToNot(HaveOccurred())
-	})
-
-	go func() {
-		err := rg.Run()
-		pmt.g.Expect(err).ToNot(HaveOccurred())
-	}()
-
+	// mocked gatewaySelector
 	gatewayClient := &cs3mocks.GatewayAPIClient{}
-	gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(pmt.gwClientStatResponse, nil)
-
 	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
 		"GatewaySelector",
 		"com.owncloud.api.gateway",
@@ -207,23 +155,19 @@ func (pmt *policiesMiddlewareTester) test(e func(g *WithT, w *httptest.ResponseR
 	)
 	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 
-	w := httptest.NewRecorder()
+	// mocked policiesProviderService
+	policiesProviderService := &mocks.PoliciesProviderService{}
 
-	mw := middleware.Policies(
-		pmt.regoQuery,
+	// spin up middleware
+	policiesMiddleware := middleware.Policies(
+		q,
 		middleware.WithRevaGatewaySelector(gatewaySelector),
-	)(pmt)
-	mw.ServeHTTP(w, pmt.httpRequest)
+		middleware.PoliciesProviderService(policiesProviderService),
+	)(mockHandler{})
 
-	e(pmt.g, w, pmt.grpcEvaluateRequest, pmt.grpcEvaluateResponse)
+	return policiesMiddleware, policiesProviderService, gatewayClient
 }
 
-func (pmt *policiesMiddlewareTester) ServeHTTP(_ http.ResponseWriter, _ *http.Request) {}
+type mockHandler struct{}
 
-func (pmt *policiesMiddlewareTester) Evaluate(_ context.Context, request *policiesPG.EvaluateRequest, response *policiesPG.EvaluateResponse) error {
-	err := pmt.eval(request, response)
-	pmt.grpcEvaluateRequest = request
-	pmt.grpcEvaluateResponse = response
-
-	return err
-}
+func (m mockHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {}

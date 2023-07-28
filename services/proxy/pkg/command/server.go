@@ -29,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
@@ -274,6 +275,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
+	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
@@ -416,6 +418,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			cfg.PoliciesMiddleware.Query,
 			middleware.Logger(logger),
 			middleware.WithRevaGatewaySelector(gatewaySelector),
+			middleware.PoliciesProviderService(policiesProviderClient),
 		),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(

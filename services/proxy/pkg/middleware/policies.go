@@ -17,7 +17,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
 	pService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
@@ -42,10 +41,10 @@ const DeniedMessage = "Operation denied due to security policies"
 
 // Policies verifies if a request is granted or not.
 func Policies(qs string, opts ...Option) func(next http.Handler) http.Handler {
-	pClient := pService.NewPoliciesProviderService("com.owncloud.api.policies", grpc.DefaultClient())
 	options := newOptions(opts...)
 	logger := options.Logger
 	gatewaySelector := options.RevaGatewaySelector
+	policiesProviderClient := options.PoliciesProviderService
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +123,7 @@ func Policies(qs string, opts ...Option) func(next http.Handler) http.Handler {
 				}
 			}
 
-			rsp, err := pClient.Evaluate(r.Context(), req)
+			rsp, err := policiesProviderClient.Evaluate(r.Context(), req)
 			if err != nil {
 				logger.Err(err).Msg("error evaluating request")
 				w.WriteHeader(http.StatusInternalServerError)
