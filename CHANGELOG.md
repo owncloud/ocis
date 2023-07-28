@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
+* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
@@ -20,6 +21,13 @@ The following sections list the changes for unreleased.
    When authenticating in proxy, first check for public link authorization.
 
    https://github.com/owncloud/ocis/pull/6900
+
+* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
+
+   We fixed the CORS issues when client asking for the 'Cache-Control' header before load the file
+
+   https://github.com/owncloud/ocis/issues/5108
+   https://github.com/owncloud/ocis/pull/6912
 
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 
