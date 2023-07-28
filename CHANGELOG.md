@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
+* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
 * Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
 * Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
@@ -22,6 +23,13 @@ The following sections list the changes for unreleased.
    When authenticating in proxy, first check for public link authorization.
 
    https://github.com/owncloud/ocis/pull/6900
+
+* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
+
+   We needed to remove "must-revalidate" from the cache-control header to allow clients to cache
+   the web and theme assets.
+
+   https://github.com/owncloud/ocis/pull/6914
 
 * Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
 
