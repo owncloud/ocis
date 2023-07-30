@@ -1,6 +1,6 @@
 ---
 title: Invitations
-date: 2023-07-29T00:51:20.407768593Z
+date: 2023-07-30T00:48:51.909210902Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/invitations
