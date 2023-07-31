@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6899
    https://github.com/owncloud/ocis/pull/6919
+   https://github.com/owncloud/ocis/pull/6928
 
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 
