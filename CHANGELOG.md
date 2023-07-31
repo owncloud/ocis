@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/6899
+   https://github.com/owncloud/ocis/pull/6919
 
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 
