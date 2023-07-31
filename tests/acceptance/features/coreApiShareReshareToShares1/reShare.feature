@@ -18,7 +18,7 @@ Feature: sharing
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions "read,update" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" file "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -26,7 +26,7 @@ Feature: sharing
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
 
 
   Scenario Outline: user is not allowed to reshare folder when reshare permission is not given
@@ -35,7 +35,7 @@ Feature: sharing
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read,update"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" shares folder "/Shares/FOLDER" with user "Carol" with permissions "read,update" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" folder "/Shares/FOLDER" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -43,7 +43,7 @@ Feature: sharing
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
 
   @smokeTest
   Scenario Outline: user is allowed to reshare file with the same permissions
@@ -116,7 +116,7 @@ Feature: sharing
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions 17
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions <reshare_permissions> using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" file "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -125,18 +125,18 @@ Feature: sharing
       | ocs_api_version | http_status_code | reshare_permissions |
       # passing on more bits including reshare
       | 1               | 200              | 19                  |
-      | 2               | 404              | 19                  |
+      | 2               | 403              | 19                  |
       | 1               | 200              | 23                  |
-      | 2               | 404              | 23                  |
+      | 2               | 403              | 23                  |
       | 1               | 200              | 31                  |
-      | 2               | 404              | 31                  |
+      | 2               | 403              | 31                  |
       # passing on more bits but not reshare
       | 1               | 200              | 3                   |
-      | 2               | 404              | 3                   |
+      | 2               | 403              | 3                   |
       | 1               | 200              | 7                   |
-      | 2               | 404              | 7                   |
+      | 2               | 403              | 7                   |
       | 1               | 200              | 15                  |
-      | 2               | 404              | 15                  |
+      | 2               | 403              | 15                  |
 
 
   Scenario Outline: user is allowed to reshare file and set create (4) or delete (8) permissions bits, which get ignored
@@ -186,7 +186,7 @@ Feature: sharing
     And user "Alice" has shared folder "/PARENT" with user "Brian" with permissions <received_permissions>
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" shares folder "/Shares/PARENT" with user "Carol" with permissions <reshare_permissions> using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" folder "/Shares/PARENT" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -195,30 +195,30 @@ Feature: sharing
       | ocs_api_version | http_status_code | received_permissions | reshare_permissions |
       # try to pass on more bits including reshare
       | 1               | 200              | 17                   | 19                  |
-      | 2               | 404              | 17                   | 19                  |
+      | 2               | 403              | 17                   | 19                  |
       | 1               | 200              | 17                   | 21                  |
-      | 2               | 404              | 17                   | 21                  |
+      | 2               | 403              | 17                   | 21                  |
       | 1               | 200              | 17                   | 23                  |
-      | 2               | 404              | 17                   | 23                  |
+      | 2               | 403              | 17                   | 23                  |
       | 1               | 200              | 17                   | 31                  |
-      | 2               | 404              | 17                   | 31                  |
+      | 2               | 403              | 17                   | 31                  |
       | 1               | 200              | 19                   | 23                  |
-      | 2               | 404              | 19                   | 23                  |
+      | 2               | 403              | 19                   | 23                  |
       | 1               | 200              | 19                   | 31                  |
-      | 2               | 404              | 19                   | 31                  |
+      | 2               | 403              | 19                   | 31                  |
       # try to pass on more bits but not reshare
       | 1               | 200              | 17                   | 3                   |
-      | 2               | 404              | 17                   | 3                   |
+      | 2               | 403              | 17                   | 3                   |
       | 1               | 200              | 17                   | 5                   |
-      | 2               | 404              | 17                   | 5                   |
+      | 2               | 403              | 17                   | 5                   |
       | 1               | 200              | 17                   | 7                   |
-      | 2               | 404              | 17                   | 7                   |
+      | 2               | 403              | 17                   | 7                   |
       | 1               | 200              | 17                   | 15                  |
-      | 2               | 404              | 17                   | 15                  |
+      | 2               | 403              | 17                   | 15                  |
       | 1               | 200              | 19                   | 7                   |
-      | 2               | 404              | 19                   | 7                   |
+      | 2               | 403              | 19                   | 7                   |
       | 1               | 200              | 19                   | 15                  |
-      | 2               | 404              | 19                   | 15                  |
+      | 2               | 403              | 19                   | 15                  |
 
 
   Scenario Outline: user is not allowed to reshare folder and add delete permission bit (8)
@@ -227,7 +227,7 @@ Feature: sharing
     And user "Alice" has shared folder "/PARENT" with user "Brian" with permissions <received_permissions>
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" shares folder "/Shares/PARENT" with user "Carol" with permissions <reshare_permissions> using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" folder "/Shares/PARENT" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -236,18 +236,18 @@ Feature: sharing
       | ocs_api_version | http_status_code | received_permissions | reshare_permissions |
       # try to pass on extra delete (including reshare)
       | 1               | 200              | 17                   | 25                  |
-      | 2               | 404              | 17                   | 25                  |
+      | 2               | 403              | 17                   | 25                  |
       | 1               | 200              | 19                   | 27                  |
-      | 2               | 404              | 19                   | 27                  |
+      | 2               | 403              | 19                   | 27                  |
       | 1               | 200              | 23                   | 31                  |
-      | 2               | 404              | 23                   | 31                  |
+      | 2               | 403              | 23                   | 31                  |
       # try to pass on extra delete (but not reshare)
       | 1               | 200              | 17                   | 9                   |
-      | 2               | 404              | 17                   | 9                   |
+      | 2               | 403              | 17                   | 9                   |
       | 1               | 200              | 19                   | 11                  |
-      | 2               | 404              | 19                   | 11                  |
+      | 2               | 403              | 19                   | 11                  |
       | 1               | 200              | 23                   | 15                  |
-      | 2               | 404              | 23                   | 15                  |
+      | 2               | 403              | 23                   | 15                  |
 
 
   Scenario Outline: reshare a file with same name as a deleted file

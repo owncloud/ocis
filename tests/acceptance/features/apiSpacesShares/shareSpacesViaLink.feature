@@ -77,8 +77,8 @@ Feature: Share spaces via link
       | role      | <role> |
     When user "Brian" creates a public link share of the space "share space" with settings:
       | permissions | 1 |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     And for user "Alice" the space "share space" should not contain the last created public link
     Examples:

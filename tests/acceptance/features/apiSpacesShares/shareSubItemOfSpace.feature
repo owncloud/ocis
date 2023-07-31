@@ -74,8 +74,8 @@ Feature: Share a file or folder that is inside a space
       | path      | <entity> |
       | shareWith | Bob      |
       | role      | editor   |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
       | entity   | spaceRole |

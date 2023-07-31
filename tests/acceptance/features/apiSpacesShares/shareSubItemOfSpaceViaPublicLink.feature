@@ -108,8 +108,8 @@ Feature: Share a file or folder that is inside a space via public link
       | password    | 123                      |
       | name        | public link              |
       | expireDate  | 2042-03-25T23:59:59+0100 |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
       | entity          | spaceRole |

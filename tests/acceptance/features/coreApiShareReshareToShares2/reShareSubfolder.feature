@@ -35,7 +35,7 @@ Feature: a subfolder of a received share can be reshared
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions <received_permissions>
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Brian" shares folder "/Shares/TMP/SUB" with user "Carol" with permissions <reshare_permissions> using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" folder "/Shares/SUB" should not exist
     And the sharing API should report to user "Carol" that no shares are in the pending state
@@ -44,44 +44,44 @@ Feature: a subfolder of a received share can be reshared
       | ocs_api_version | http_status_code | received_permissions | reshare_permissions |
       # try to pass on more bits including reshare
       | 1               | 200              | 17                   | 19                  |
-      | 2               | 404              | 17                   | 19                  |
+      | 2               | 403              | 17                   | 19                  |
       | 1               | 200              | 17                   | 21                  |
-      | 2               | 404              | 17                   | 21                  |
+      | 2               | 403              | 17                   | 21                  |
       | 1               | 200              | 17                   | 23                  |
-      | 2               | 404              | 17                   | 23                  |
+      | 2               | 403              | 17                   | 23                  |
       | 1               | 200              | 17                   | 31                  |
-      | 2               | 404              | 17                   | 31                  |
+      | 2               | 403              | 17                   | 31                  |
       | 1               | 200              | 19                   | 23                  |
-      | 2               | 404              | 19                   | 23                  |
+      | 2               | 403              | 19                   | 23                  |
       | 1               | 200              | 19                   | 31                  |
-      | 2               | 404              | 19                   | 31                  |
+      | 2               | 403              | 19                   | 31                  |
       # try to pass on more bits but not reshare
       | 1               | 200              | 17                   | 3                   |
-      | 2               | 404              | 17                   | 3                   |
+      | 2               | 403              | 17                   | 3                   |
       | 1               | 200              | 17                   | 5                   |
-      | 2               | 404              | 17                   | 5                   |
+      | 2               | 403              | 17                   | 5                   |
       | 1               | 200              | 17                   | 7                   |
-      | 2               | 404              | 17                   | 7                   |
+      | 2               | 403              | 17                   | 7                   |
       | 1               | 200              | 17                   | 15                  |
-      | 2               | 404              | 17                   | 15                  |
+      | 2               | 403              | 17                   | 15                  |
       | 1               | 200              | 19                   | 7                   |
-      | 2               | 404              | 19                   | 7                   |
+      | 2               | 403              | 19                   | 7                   |
       | 1               | 200              | 19                   | 15                  |
-      | 2               | 404              | 19                   | 15                  |
+      | 2               | 403              | 19                   | 15                  |
       # try to pass on extra delete (including reshare)
       | 1               | 200              | 17                   | 25                  |
-      | 2               | 404              | 17                   | 25                  |
+      | 2               | 403              | 17                   | 25                  |
       | 1               | 200              | 19                   | 27                  |
-      | 2               | 404              | 19                   | 27                  |
+      | 2               | 403              | 19                   | 27                  |
       | 1               | 200              | 23                   | 31                  |
-      | 2               | 404              | 23                   | 31                  |
+      | 2               | 403              | 23                   | 31                  |
       # try to pass on extra delete (but not reshare)
       | 1               | 200              | 17                   | 9                   |
-      | 2               | 404              | 17                   | 9                   |
+      | 2               | 403              | 17                   | 9                   |
       | 1               | 200              | 19                   | 11                  |
-      | 2               | 404              | 19                   | 11                  |
+      | 2               | 403              | 19                   | 11                  |
       | 1               | 200              | 23                   | 15                  |
-      | 2               | 404              | 23                   | 15                  |
+      | 2               | 403              | 23                   | 15                  |
 
   @issue-2214
   Scenario Outline: user is allowed to update reshare of a sub-folder with less permissions
@@ -132,7 +132,7 @@ Feature: a subfolder of a received share can be reshared
     And user "Carol" has accepted share "/SUB" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | all |
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And as "Carol" folder "/Shares/SUB" should exist
     But user "Carol" should not be able to upload file "filesForUpload/textfile.txt" to "/Shares/SUB/textfile.txt"
@@ -141,4 +141,4 @@ Feature: a subfolder of a received share can be reshared
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
