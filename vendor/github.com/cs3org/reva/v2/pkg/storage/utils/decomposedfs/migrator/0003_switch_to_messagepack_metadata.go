@@ -31,23 +31,29 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 )
 
-// Migration0003 migrates the file metadata to the current backend.
+func init() {
+	registerMigration("0003", Migration0003{})
+}
+
+type Migration0003 struct{}
+
+// Migrate migrates the file metadata to the current backend.
 // Only the xattrs -> messagepack path is supported.
-func (m *Migrator) Migration0003() (Result, error) {
-	bod := lookup.DetectBackendOnDisk(m.lu.InternalRoot())
+func (m Migration0003) Migrate(migrator *Migrator) (Result, error) {
+	bod := lookup.DetectBackendOnDisk(migrator.lu.InternalRoot())
 	if bod == "" {
-		return resultFailed, errors.New("could not detect metadata backend on disk")
+		return stateFailed, errors.New("could not detect metadata backend on disk")
 	}
 
-	if bod != "xattrs" || m.lu.MetadataBackend().Name() != "messagepack" {
-		return resultSucceededRunAgain, nil
+	if bod != "xattrs" || migrator.lu.MetadataBackend().Name() != "messagepack" {
+		return stateSucceededRunAgain, nil
 	}
 
-	m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating to messagepack metadata backend...")
+	migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Migrating to messagepack metadata backend...")
 	xattrs := metadata.XattrsBackend{}
-	mpk := metadata.NewMessagePackBackend(m.lu.InternalRoot(), cache.Config{})
+	mpk := metadata.NewMessagePackBackend(migrator.lu.InternalRoot(), cache.Config{})
 
-	spaces, _ := filepath.Glob(filepath.Join(m.lu.InternalRoot(), "spaces", "*", "*"))
+	spaces, _ := filepath.Glob(filepath.Join(migrator.lu.InternalRoot(), "spaces", "*", "*"))
 	for _, space := range spaces {
 		err := filepath.WalkDir(filepath.Join(space, "nodes"), func(path string, _ fs.DirEntry, err error) error {
 			// Do not continue on error
@@ -77,7 +83,7 @@ func (m *Migrator) Migration0003() (Result, error) {
 
 			attribs, err := xattrs.All(context.Background(), path)
 			if err != nil {
-				m.log.Error().Err(err).Str("path", path).Msg("error converting file")
+				migrator.log.Error().Err(err).Str("path", path).Msg("error converting file")
 				return err
 			}
 			if len(attribs) == 0 {
@@ -86,24 +92,29 @@ func (m *Migrator) Migration0003() (Result, error) {
 
 			err = mpk.SetMultiple(context.Background(), path, attribs, false)
 			if err != nil {
-				m.log.Error().Err(err).Str("path", path).Msg("error setting attributes")
+				migrator.log.Error().Err(err).Str("path", path).Msg("error setting attributes")
 				return err
 			}
 
 			for k := range attribs {
 				err = xattrs.Remove(context.Background(), path, k)
 				if err != nil {
-					m.log.Debug().Err(err).Str("path", path).Msg("error removing xattr")
+					migrator.log.Debug().Err(err).Str("path", path).Msg("error removing xattr")
 				}
 			}
 
 			return nil
 		})
 		if err != nil {
-			m.log.Error().Err(err).Msg("error migrating nodes to messagepack metadata backend")
+			migrator.log.Error().Err(err).Msg("error migrating nodes to messagepack metadata backend")
 		}
 	}
 
-	m.log.Info().Msg("done.")
-	return resultSucceeded, nil
+	migrator.log.Info().Msg("done.")
+	return stateSucceeded, nil
+}
+
+// Rollback is not implemented
+func (Migration0003) Rollback(_ *Migrator) (Result, error) {
+	return stateFailed, errors.New("rollback not implemented")
 }

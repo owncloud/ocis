@@ -25,27 +25,33 @@ import (
 	"github.com/shamaton/msgpack/v2"
 )
 
-// Migration0005 fixes the messagepack space index data structure
-func (m *Migrator) Migration0005() (Result, error) {
-	root := m.lu.InternalRoot()
+func init() {
+	registerMigration("0005", Migration0005{})
+}
+
+type Migration0005 struct{}
+
+// Migrate fixes the messagepack space index data structure
+func (Migration0005) Migrate(migrator *Migrator) (Result, error) {
+	root := migrator.lu.InternalRoot()
 
 	indexes, err := filepath.Glob(filepath.Join(root, "indexes", "**", "*.mpk"))
 	if err != nil {
-		return resultFailed, err
+		return stateFailed, err
 	}
 	for _, i := range indexes {
-		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Fixing index format of " + i)
+		migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Fixing index format of " + i)
 
 		// Read old-format index
 		oldData, err := os.ReadFile(i)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 		oldIndex := map[string][]byte{}
 		err = msgpack.Unmarshal(oldData, &oldIndex)
 		if err != nil {
 			// likely already migrated -> skip
-			m.log.Warn().Str("root", m.lu.InternalRoot()).Msg("Invalid index format found in " + i)
+			migrator.log.Warn().Str("root", migrator.lu.InternalRoot()).Msg("Invalid index format found in " + i)
 			continue
 		}
 
@@ -56,13 +62,53 @@ func (m *Migrator) Migration0005() (Result, error) {
 		}
 		newData, err := msgpack.Marshal(newIndex)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 		err = os.WriteFile(i, newData, 0600)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 	}
-	m.log.Info().Msg("done.")
-	return resultSucceeded, nil
+	migrator.log.Info().Msg("done.")
+	return stateSucceeded, nil
+}
+
+// Rollback rolls back the migration
+func (Migration0005) Rollback(migrator *Migrator) (Result, error) {
+	root := migrator.lu.InternalRoot()
+
+	indexes, err := filepath.Glob(filepath.Join(root, "indexes", "**", "*.mpk"))
+	if err != nil {
+		return stateFailed, err
+	}
+	for _, i := range indexes {
+		migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Fixing index format of " + i)
+
+		oldData, err := os.ReadFile(i)
+		if err != nil {
+			return stateFailed, err
+		}
+		oldIndex := map[string]string{}
+		err = msgpack.Unmarshal(oldData, &oldIndex)
+		if err != nil {
+			migrator.log.Warn().Str("root", migrator.lu.InternalRoot()).Msg("Invalid index format found in " + i)
+			continue
+		}
+
+		// Write new-format index
+		newIndex := map[string][]byte{}
+		for k, v := range oldIndex {
+			newIndex[k] = []byte(v)
+		}
+		newData, err := msgpack.Marshal(newIndex)
+		if err != nil {
+			return stateFailed, err
+		}
+		err = os.WriteFile(i, newData, 0600)
+		if err != nil {
+			return stateFailed, err
+		}
+	}
+	migrator.log.Info().Msg("done.")
+	return stateDown, nil
 }

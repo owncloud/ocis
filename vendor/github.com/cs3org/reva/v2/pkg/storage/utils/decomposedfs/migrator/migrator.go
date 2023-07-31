@@ -20,28 +20,53 @@ package migrator
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
+	"sort"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/rs/zerolog"
 )
 
-var allMigrations = []string{"0001", "0002", "0003", "0004", "0005"}
-
 const (
-	resultFailed            = "failed"
-	resultSucceeded         = "succeeded"
-	resultSucceededRunAgain = "runagain"
+	statePending           = "pending"
+	stateFailed            = "failed"
+	stateSucceeded         = "succeeded"
+	stateDown              = "down"
+	stateSucceededRunAgain = "runagain"
 )
 
-type migrationState struct {
+type migration interface {
+	Migrate(*Migrator) (Result, error)
+	Rollback(*Migrator) (Result, error)
+}
+
+var migrations = map[string]migration{}
+
+type migrationStates map[string]MigrationState
+
+func registerMigration(name string, migration migration) {
+	migrations[name] = migration
+}
+
+func allMigrations() []string {
+	ms := []string{}
+
+	for k := range migrations {
+		ms = append(ms, k)
+	}
+
+	sort.Strings(ms)
+	return ms
+}
+
+// MigrationState holds the state of a migration
+type MigrationState struct {
 	State   string
 	Message string
 }
-type migrationStates map[string]migrationState
 
 // Result represents the result of a migration run
 type Result string
@@ -61,6 +86,71 @@ func New(lu *lookup.Lookup, log *zerolog.Logger) Migrator {
 	}
 }
 
+// Migrations returns the list of migrations and their states
+func (m *Migrator) Migrations() (map[string]MigrationState, error) {
+	err := m.readStates()
+	if err != nil {
+		return nil, err
+	}
+
+	states := map[string]MigrationState{}
+	for _, migration := range allMigrations() {
+		if s, ok := m.states[migration]; ok {
+			states[migration] = s
+		} else {
+			states[migration] = MigrationState{
+				State: statePending,
+			}
+		}
+	}
+
+	return states, nil
+}
+
+// RunMigration runs or rolls back a migration
+func (m *Migrator) RunMigration(id string, rollback bool) error {
+	if _, ok := migrations[id]; !ok {
+		return fmt.Errorf("invalid migration '%s'", id)
+	}
+
+	lock, err := lockedfile.OpenFile(filepath.Join(m.lu.InternalRoot(), ".migrations.lock"), os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer lock.Close()
+
+	err = m.readStates()
+	if err != nil {
+		return err
+	}
+
+	var res Result
+	if !rollback {
+		m.log.Info().Msg("Running migration " + id + "...")
+		res, err = migrations[id].Migrate(m)
+	} else {
+		m.log.Info().Msg("Rolling back migration " + id + "...")
+		res, err = migrations[id].Rollback(m)
+	}
+
+	// write back state
+	s := m.states[id]
+	s.State = string(res)
+
+	if err != nil {
+		m.log.Error().Err(err).Msg("migration " + id + " failed")
+		s.Message = err.Error()
+	}
+
+	m.states[id] = s
+	err = m.writeStates()
+	if err != nil {
+		return err
+	}
+	m.log.Info().Msg("done")
+	return nil
+}
+
 // RunMigrations runs all migrations in sequence. Note this sequence must not be changed or it might
 // damage existing decomposed fs.
 func (m *Migrator) RunMigrations() error {
@@ -75,17 +165,15 @@ func (m *Migrator) RunMigrations() error {
 		return err
 	}
 
-	for _, migration := range allMigrations {
+	for _, migration := range allMigrations() {
 		s := m.states[migration]
-		if s.State == "succeeded" {
+		if s.State == stateSucceeded || s.State == stateDown {
 			continue
 		}
 
-		migrateMethod := reflect.ValueOf(m).MethodByName("Migration" + migration)
-		v := migrateMethod.Call(nil)
-		s.State = string(v[0].Interface().(Result))
-		if v[1].Interface() != nil {
-			err := v[1].Interface().(error)
+		res, err := migrations[migration].Migrate(m)
+		s.State = string(res)
+		if err != nil {
 			m.log.Error().Err(err).Msg("migration " + migration + " failed")
 			s.Message = err.Error()
 		}
