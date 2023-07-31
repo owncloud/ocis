@@ -124,11 +124,7 @@ func NewService(opts ...Option) (Service, error) {
 		// After the issue has been solved upstream in go-chi we should switch
 		// back to using `chi.RegisterMethod`.
 		m.MethodNotAllowed(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			routePrefix := path.Join(options.Config.HTTP.Root, "/remote.php/dav/files/")
-			spacesPrefix := path.Join(options.Config.HTTP.Root, "/dav/spaces/")
-			legacyRoutePrefix := path.Join(options.Config.HTTP.Root, "/remote.php/webdav")
-			if req.Method == "REPORT" &&
-				(strings.HasPrefix(req.URL.Path, spacesPrefix) || strings.HasPrefix(req.URL.Path, routePrefix) || strings.HasPrefix(req.URL.Path, legacyRoutePrefix)) {
+			if req.Method == "REPORT" && pathHasPrefix(req.URL.Path, options.Config.HTTP.Root) {
 				// The URLParam will not be available here. If it is needed it
 				// needs to be passed manually or chi needs to be fixed
 				// To use it properly.
@@ -539,4 +535,25 @@ func renderError(w http.ResponseWriter, r *http.Request, err *errResponse) {
 
 func notFoundMsg(name string) string {
 	return "File with name " + name + " could not be located"
+}
+
+// This is a workaround for the go-chi concurrent map read write issue.
+// After the issue has been solved upstream in go-chi we should switch
+// back to using `chi.RegisterMethod`.
+var prefixList = []string{
+	"/remote.php/dav/files/",
+	"/remote.php/dav/spaces/",
+	"/remote.php/webdav",
+	"/dav/files/",
+	"/dav/spaces/",
+	"/webdav",
+}
+
+func pathHasPrefix(reqPath, root string) bool {
+	for _, p := range prefixList {
+		if strings.HasPrefix(reqPath, path.Join(root, p)) {
+			return true
+		}
+	}
+	return false
 }
