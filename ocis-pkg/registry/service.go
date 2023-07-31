@@ -10,7 +10,7 @@ import (
 	"go-micro.dev/v4/util/addr"
 )
 
-func BuildGRPCService(serviceID, uuid, address string, version string) *mRegistry.Service {
+func BuildGRPCService(serviceID, uuid, address string, version string, nodeMetadata map[string]string) *mRegistry.Service {
 	var host string
 	var port int
 
@@ -37,6 +37,9 @@ func BuildGRPCService(serviceID, uuid, address string, version string) *mRegistr
 	node.Metadata["server"] = "grpc"
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
+	for k, v := range nodeMetadata {
+		node.Metadata[k] = v
+	}
 
 	return &mRegistry.Service{
 		Name:      serviceID,
