@@ -10,7 +10,7 @@ Feature: reshare as public link
       | Alice    |
       | Brian    |
 
-
+  @skipOnRevaMaster
   Scenario Outline: creating a public link from a share with read permission only is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
@@ -46,7 +46,7 @@ Feature: reshare as public link
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: creating an upload public link from a share with share+read only permissions is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
@@ -63,7 +63,7 @@ Feature: reshare as public link
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnRevaMaster
   Scenario Outline: creating a public link from a share with read+write permissions only is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
@@ -120,7 +120,7 @@ Feature: reshare as public link
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: creating an upload public link from a sub-folder of a share with share+read only permissions is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
@@ -138,7 +138,7 @@ Feature: reshare as public link
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnRevaMaster
   Scenario Outline: increasing permissions of a public link of a share with share+read only permissions is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
@@ -159,7 +159,7 @@ Feature: reshare as public link
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnRevaMaster
   Scenario Outline: increasing permissions of a public link from a sub-folder of a share with share+read only permissions is not allowed
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"

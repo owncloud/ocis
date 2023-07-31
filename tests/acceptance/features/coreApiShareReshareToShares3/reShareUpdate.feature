@@ -46,7 +46,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: do not allow update of reshare to exceed permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"

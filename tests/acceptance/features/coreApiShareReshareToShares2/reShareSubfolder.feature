@@ -29,7 +29,7 @@ Feature: a subfolder of a received share can be reshared
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions <received_permissions>
@@ -123,7 +123,7 @@ Feature: a subfolder of a received share can be reshared
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-2214
+  @issue-2214 @skipOnRevaMaster
   Scenario Outline: user is not allowed to update reshare of a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"

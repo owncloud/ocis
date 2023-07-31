@@ -11,7 +11,7 @@ Feature: sharing
       | Brian    |
       | Carol    |
 
-  @smokeTest
+  @smokeTest @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare file when reshare permission is not given
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -28,7 +28,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare folder when reshare permission is not given
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/FOLDER"
@@ -109,7 +109,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare file and set more permissions bits
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -179,7 +179,7 @@ Feature: sharing
       | 1               | 100             | 17                   | 9                   | 1                   |
       | 2               | 200             | 17                   | 9                   | 1                   |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare folder and set more permissions bits
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
@@ -220,7 +220,7 @@ Feature: sharing
       | 1               | 200              | 19                   | 15                  |
       | 2               | 403              | 19                   | 15                  |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user is not allowed to reshare folder and add delete permission bit (8)
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
