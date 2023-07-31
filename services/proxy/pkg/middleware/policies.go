@@ -9,11 +9,11 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
 	pService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	tusd "github.com/tus/tusd/pkg/handler"
+	"go-micro.dev/v4/client"
 )
 
 type (
@@ -34,8 +34,8 @@ type (
 const DeniedMessage = "Operation denied due to security policies"
 
 // Policies verifies if a request is granted or not.
-func Policies(logger log.Logger, qs string) func(next http.Handler) http.Handler {
-	pClient := pService.NewPoliciesProviderService("com.owncloud.api.policies", grpc.DefaultClient())
+func Policies(logger log.Logger, qs string, grpcClient client.Client) func(next http.Handler) http.Handler {
+	pClient := pService.NewPoliciesProviderService("com.owncloud.api.policies", grpcClient)
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

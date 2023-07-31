@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"go-micro.dev/v4/client"
 )
 
 // Config combines all available configuration parts.
@@ -21,6 +22,7 @@ type Config struct {
 
 	Reva          *shared.Reva          `yaml:"reva"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient    client.Client         `yaml:"-"`
 
 	RoleQuotas            map[string]uint64  `yaml:"role_quotas"`
 	Policies              []Policy           `yaml:"policies"`
