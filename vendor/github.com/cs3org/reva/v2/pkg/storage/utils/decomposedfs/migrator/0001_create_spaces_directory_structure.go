@@ -29,44 +29,55 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 )
 
-// Migration0001 creates the spaces directory structure
-func (m *Migrator) Migration0001() (Result, error) {
-	m.log.Info().Msg("Migrating spaces directory structure...")
+func init() {
+	registerMigration("0001", Migration0001{})
+}
+
+type Migration0001 struct{}
+
+// Migrate creates the spaces directory structure
+func (m Migration0001) Migrate(migrator *Migrator) (Result, error) {
+	migrator.log.Info().Msg("Migrating spaces directory structure...")
 
 	// create spaces folder and iterate over existing nodes to populate it
-	nodesPath := filepath.Join(m.lu.InternalRoot(), "nodes")
+	nodesPath := filepath.Join(migrator.lu.InternalRoot(), "nodes")
 	fi, err := os.Stat(nodesPath)
 	if err == nil && fi.IsDir() {
 		f, err := os.Open(nodesPath)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 		nodes, err := f.Readdir(0)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 
 		for _, n := range nodes {
 			nodePath := filepath.Join(nodesPath, n.Name())
 
-			attr, err := m.lu.MetadataBackend().Get(context.Background(), nodePath, prefixes.ParentidAttr)
+			attr, err := migrator.lu.MetadataBackend().Get(context.Background(), nodePath, prefixes.ParentidAttr)
 			if err == nil && string(attr) == node.RootID {
-				if err := m.moveNode(n.Name(), n.Name()); err != nil {
-					m.log.Error().Err(err).
+				if err := m.moveNode(migrator, n.Name(), n.Name()); err != nil {
+					migrator.log.Error().Err(err).
 						Str("space", n.Name()).
 						Msg("could not move space")
 					continue
 				}
-				m.linkSpaceNode("personal", n.Name())
+				m.linkSpaceNode(migrator, "personal", n.Name())
 			}
 		}
 		// TODO delete nodesPath if empty
 	}
-	return resultSucceeded, nil
+	return stateSucceeded, nil
 }
 
-func (m *Migrator) moveNode(spaceID, nodeID string) error {
-	dirPath := filepath.Join(m.lu.InternalRoot(), "nodes", nodeID)
+// Rollback is not implemented
+func (Migration0001) Rollback(_ *Migrator) (Result, error) {
+	return stateFailed, errors.New("rollback not implemented")
+}
+
+func (m Migration0001) moveNode(migrator *Migrator, spaceID, nodeID string) error {
+	dirPath := filepath.Join(migrator.lu.InternalRoot(), "nodes", nodeID)
 	f, err := os.Open(dirPath)
 	if err != nil {
 		return err
@@ -76,10 +87,10 @@ func (m *Migrator) moveNode(spaceID, nodeID string) error {
 		return err
 	}
 	for _, child := range children {
-		old := filepath.Join(m.lu.InternalRoot(), "nodes", child.Name())
-		new := filepath.Join(m.lu.InternalRoot(), "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(child.Name(), 4, 2))
+		old := filepath.Join(migrator.lu.InternalRoot(), "nodes", child.Name())
+		new := filepath.Join(migrator.lu.InternalRoot(), "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(child.Name(), 4, 2))
 		if err := os.Rename(old, new); err != nil {
-			m.log.Error().Err(err).
+			migrator.log.Error().Err(err).
 				Str("space", spaceID).
 				Str("nodes", child.Name()).
 				Str("oldpath", old).
@@ -87,7 +98,7 @@ func (m *Migrator) moveNode(spaceID, nodeID string) error {
 				Msg("could not rename node")
 		}
 		if child.IsDir() {
-			if err := m.moveNode(spaceID, child.Name()); err != nil {
+			if err := m.moveNode(migrator, spaceID, child.Name()); err != nil {
 				return err
 			}
 		}
@@ -96,27 +107,27 @@ func (m *Migrator) moveNode(spaceID, nodeID string) error {
 }
 
 // linkSpace creates a new symbolic link for a space with the given type st, and node id
-func (m *Migrator) linkSpaceNode(spaceType, spaceID string) {
-	spaceTypesPath := filepath.Join(m.lu.InternalRoot(), "spacetypes", spaceType, spaceID)
+func (m Migration0001) linkSpaceNode(migrator *Migrator, spaceType, spaceID string) {
+	spaceTypesPath := filepath.Join(migrator.lu.InternalRoot(), "spacetypes", spaceType, spaceID)
 	expectedTarget := "../../spaces/" + lookup.Pathify(spaceID, 1, 2) + "/nodes/" + lookup.Pathify(spaceID, 4, 2)
 	linkTarget, err := os.Readlink(spaceTypesPath)
 	if errors.Is(err, os.ErrNotExist) {
 		err = os.Symlink(expectedTarget, spaceTypesPath)
 		if err != nil {
-			m.log.Error().Err(err).
+			migrator.log.Error().Err(err).
 				Str("space_type", spaceType).
 				Str("space", spaceID).
 				Msg("could not create symlink")
 		}
 	} else {
 		if err != nil {
-			m.log.Error().Err(err).
+			migrator.log.Error().Err(err).
 				Str("space_type", spaceType).
 				Str("space", spaceID).
 				Msg("could not read symlink")
 		}
 		if linkTarget != expectedTarget {
-			m.log.Warn().
+			migrator.log.Warn().
 				Str("space_type", spaceType).
 				Str("space", spaceID).
 				Str("expected", expectedTarget).

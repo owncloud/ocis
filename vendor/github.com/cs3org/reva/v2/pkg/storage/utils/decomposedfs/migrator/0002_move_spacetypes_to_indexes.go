@@ -19,6 +19,7 @@
 package migrator
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -26,25 +27,31 @@ import (
 	"github.com/cs3org/reva/v2/pkg/logger"
 )
 
-// Migration0002 migrates spacetypes to indexes
-func (m *Migrator) Migration0002() (Result, error) {
-	m.log.Info().Msg("Migrating space types indexes...")
+func init() {
+	registerMigration("0002", Migration0002{})
+}
 
-	spaceTypesPath := filepath.Join(m.lu.InternalRoot(), "spacetypes")
+type Migration0002 struct{}
+
+// Migrate migrates spacetypes to indexes
+func (m Migration0002) Migrate(migrator *Migrator) (Result, error) {
+	migrator.log.Info().Msg("Migrating space types indexes...")
+
+	spaceTypesPath := filepath.Join(migrator.lu.InternalRoot(), "spacetypes")
 	fi, err := os.Stat(spaceTypesPath)
 	if err == nil && fi.IsDir() {
 
 		f, err := os.Open(spaceTypesPath)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 		spaceTypes, err := f.Readdir(0)
 		if err != nil {
-			return resultFailed, err
+			return stateFailed, err
 		}
 
 		for _, st := range spaceTypes {
-			err := m.moveSpaceType(st.Name())
+			err := m.moveSpaceType(migrator, st.Name())
 			if err != nil {
 				logger.New().Error().Err(err).
 					Str("space", st.Name()).
@@ -59,7 +66,7 @@ func (m *Migrator) Migration0002() (Result, error) {
 			logger.New().Error().Err(err).
 				Str("spacetypesdir", spaceTypesPath).
 				Msg("could not open spacetypesdir")
-			return resultFailed, nil
+			return stateFailed, nil
 		}
 		defer d.Close()
 		_, err = d.Readdirnames(1) // Or f.Readdir(1)
@@ -77,11 +84,16 @@ func (m *Migrator) Migration0002() (Result, error) {
 				Msg("could not delete, not empty")
 		}
 	}
-	return resultSucceeded, nil
+	return stateSucceeded, nil
 }
 
-func (m *Migrator) moveSpaceType(spaceType string) error {
-	dirPath := filepath.Join(m.lu.InternalRoot(), "spacetypes", spaceType)
+// Rollback is not implemented
+func (Migration0002) Rollback(_ *Migrator) (Result, error) {
+	return stateFailed, errors.New("rollback not implemented")
+}
+
+func (m Migration0002) moveSpaceType(migrator *Migrator, spaceType string) error {
+	dirPath := filepath.Join(migrator.lu.InternalRoot(), "spacetypes", spaceType)
 	f, err := os.Open(dirPath)
 	if err != nil {
 		return err
@@ -91,7 +103,7 @@ func (m *Migrator) moveSpaceType(spaceType string) error {
 		return err
 	}
 	for _, child := range children {
-		old := filepath.Join(m.lu.InternalRoot(), "spacetypes", spaceType, child.Name())
+		old := filepath.Join(migrator.lu.InternalRoot(), "spacetypes", spaceType, child.Name())
 		target, err := os.Readlink(old)
 		if err != nil {
 			logger.New().Error().Err(err).
@@ -101,7 +113,7 @@ func (m *Migrator) moveSpaceType(spaceType string) error {
 				Msg("could not read old symlink")
 			continue
 		}
-		newDir := filepath.Join(m.lu.InternalRoot(), "indexes", "by-type", spaceType)
+		newDir := filepath.Join(migrator.lu.InternalRoot(), "indexes", "by-type", spaceType)
 		if err := os.MkdirAll(newDir, 0700); err != nil {
 			logger.New().Error().Err(err).
 				Str("space", spaceType).

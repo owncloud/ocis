@@ -21,18 +21,25 @@ package migrator
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/shamaton/msgpack/v2"
 )
 
-// Migration0004 migrates the directory tree based space indexes to messagepack
-func (m *Migrator) Migration0004() (Result, error) {
-	root := m.lu.InternalRoot()
+func init() {
+	registerMigration("0004", Migration0004{})
+}
+
+type Migration0004 struct{}
+
+// Migrate migrates the directory tree based space indexes to messagepack
+func (Migration0004) Migrate(migrator *Migrator) (Result, error) {
+	root := migrator.lu.InternalRoot()
 
 	// migrate user indexes
 	users, err := os.ReadDir(filepath.Join(root, "indexes", "by-user-id"))
 	if err != nil {
-		m.log.Warn().Err(err).Msg("error listing user indexes")
+		migrator.log.Warn().Err(err).Msg("error listing user indexes")
 	}
 	for _, user := range users {
 		if !user.IsDir() {
@@ -41,19 +48,18 @@ func (m *Migrator) Migration0004() (Result, error) {
 		id := user.Name()
 		indexPath := filepath.Join(root, "indexes", "by-user-id", id+".mpk")
 		dirIndexPath := filepath.Join(root, "indexes", "by-user-id", id)
-		cacheKey := "by-user-id:" + id
 
-		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
-		err := migrateSpaceIndex(indexPath, dirIndexPath, cacheKey)
+		migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
+		err := migrateSpaceIndex(indexPath, dirIndexPath)
 		if err != nil {
-			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+			migrator.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
 		}
 	}
 
 	// migrate group indexes
 	groups, err := os.ReadDir(filepath.Join(root, "indexes", "by-group-id"))
 	if err != nil {
-		m.log.Warn().Err(err).Msg("error listing group indexes")
+		migrator.log.Warn().Err(err).Msg("error listing group indexes")
 	}
 	for _, group := range groups {
 		if !group.IsDir() {
@@ -62,12 +68,11 @@ func (m *Migrator) Migration0004() (Result, error) {
 		id := group.Name()
 		indexPath := filepath.Join(root, "indexes", "by-group-id", id+".mpk")
 		dirIndexPath := filepath.Join(root, "indexes", "by-group-id", id)
-		cacheKey := "by-group-id:" + id
 
-		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
-		err := migrateSpaceIndex(indexPath, dirIndexPath, cacheKey)
+		migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
+		err := migrateSpaceIndex(indexPath, dirIndexPath)
 		if err != nil {
-			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+			migrator.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
 		}
 	}
 
@@ -75,25 +80,24 @@ func (m *Migrator) Migration0004() (Result, error) {
 	for _, spaceType := range []string{"personal", "project", "share"} {
 		indexPath := filepath.Join(root, "indexes", "by-type", spaceType+".mpk")
 		dirIndexPath := filepath.Join(root, "indexes", "by-type", spaceType)
-		cacheKey := "by-type:" + spaceType
 
 		_, err := os.Stat(dirIndexPath)
 		if err != nil {
 			continue
 		}
 
-		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
-		err = migrateSpaceIndex(indexPath, dirIndexPath, cacheKey)
+		migrator.log.Info().Str("root", migrator.lu.InternalRoot()).Msg("Migrating " + indexPath + " to messagepack index format...")
+		err = migrateSpaceIndex(indexPath, dirIndexPath)
 		if err != nil {
-			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+			migrator.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
 		}
 	}
 
-	m.log.Info().Msg("done.")
-	return resultSucceeded, nil
+	migrator.log.Info().Msg("done.")
+	return stateSucceeded, nil
 }
 
-func migrateSpaceIndex(indexPath, dirIndexPath, cacheKey string) error {
+func migrateSpaceIndex(indexPath, dirIndexPath string) error {
 	links := map[string][]byte{}
 	m, err := filepath.Glob(dirIndexPath + "/*")
 	if err != nil {
@@ -117,4 +121,83 @@ func migrateSpaceIndex(indexPath, dirIndexPath, cacheKey string) error {
 		return err
 	}
 	return os.RemoveAll(dirIndexPath)
+}
+
+// Rollback migrates the directory messagepack indexes to symlinks
+func (Migration0004) Rollback(m *Migrator) (Result, error) {
+	root := m.lu.InternalRoot()
+
+	// migrate user indexes
+	users, err := filepath.Glob(filepath.Join(root, "indexes", "by-user-id", "*.mpk"))
+	if err != nil {
+		m.log.Warn().Err(err).Msg("error listing user indexes")
+	}
+	for _, indexPath := range users {
+		dirIndexPath := strings.TrimSuffix(indexPath, ".mpk")
+
+		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to symlinks index format...")
+		err := downSpaceIndex(indexPath, dirIndexPath)
+		if err != nil {
+			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+		}
+	}
+
+	// migrate group indexes
+	groups, err := filepath.Glob(filepath.Join(root, "indexes", "by-group-id", "*.mpk"))
+	if err != nil {
+		m.log.Warn().Err(err).Msg("error listing group indexes")
+	}
+	for _, indexPath := range groups {
+		dirIndexPath := strings.TrimSuffix(indexPath, ".mpk")
+
+		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to symlinks index format...")
+		err := downSpaceIndex(indexPath, dirIndexPath)
+		if err != nil {
+			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+		}
+	}
+
+	// migrate project indexes
+	for _, spaceType := range []string{"personal", "project", "share"} {
+		indexPath := filepath.Join(root, "indexes", "by-type", spaceType+".mpk")
+		dirIndexPath := filepath.Join(root, "indexes", "by-type", spaceType)
+
+		_, err := os.Stat(indexPath)
+		if err != nil || os.IsNotExist(err) {
+			continue
+		}
+
+		m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating " + indexPath + " to symlinks index format...")
+		err = downSpaceIndex(indexPath, dirIndexPath)
+		if err != nil {
+			m.log.Error().Err(err).Str("path", dirIndexPath).Msg("error migrating index")
+		}
+	}
+	return stateDown, nil
+}
+
+func downSpaceIndex(indexPath, dirIndexPath string) error {
+	d, err := os.ReadFile(indexPath)
+	if err != nil {
+		return err
+	}
+
+	links := map[string][]byte{}
+	err = msgpack.Unmarshal(d, &links)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(dirIndexPath, 0700)
+	if err != nil {
+		return err
+	}
+	for link, target := range links {
+		err = os.Symlink(string(target), filepath.Join(dirIndexPath, link))
+		if err != nil {
+			return err
+		}
+	}
+
+	return os.Remove(indexPath)
 }
