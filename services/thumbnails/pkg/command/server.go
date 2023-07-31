@@ -7,6 +7,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config/parser"
@@ -15,7 +16,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/http"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,7 +30,8 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -62,6 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Namespace(cfg.GRPC.Namespace),
 				grpc.Address(cfg.GRPC.Addr),
 				grpc.Metrics(metrics),
+				grpc.TraceProvider(traceProvider),
 			)
 
 			gr.Add(service.Run, func(_ error) {
@@ -77,7 +79,6 @@ func Server(cfg *config.Config) *cli.Command {
 				debug.Logger(logger),
 				debug.Config(cfg),
 			)
-
 			if err != nil {
 				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 				return err
@@ -95,7 +96,6 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Metrics(metrics),
 				http.Namespace(cfg.HTTP.Namespace),
 			)
-
 			if err != nil {
 				logger.Info().
 					Err(err).

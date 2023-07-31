@@ -6,27 +6,28 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
-	thumbnailsTracing "github.com/owncloud/ocis/v2/services/thumbnails/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 )
 
 // NewTracing returns a service that instruments traces.
-func NewTracing(next DecoratedService) DecoratedService {
+func NewTracing(next DecoratedService, tp trace.TracerProvider) DecoratedService {
 	return tracing{
 		Decorator: Decorator{next: next},
+		tp:        tp,
 	}
 }
 
 type tracing struct {
 	Decorator
+	tp trace.TracerProvider
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
 func (t tracing) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
 	var span trace.Span
 
-	if thumbnailsTracing.TraceProvider != nil {
-		tracer := thumbnailsTracing.TraceProvider.Tracer("thumbnails")
+	if t.tp != nil {
+		tracer := t.tp.Tracer("thumbnails")
 		spanOpts := []trace.SpanStartOption{
 			trace.WithSpanKind(trace.SpanKindServer),
 		}
