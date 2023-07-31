@@ -29,6 +29,11 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+func init() {
+	// register method with chi before any routing is set up
+	chi.RegisterMethod("REPORT")
+}
+
 const (
 	TokenHeader = "X-Access-Token"
 )
@@ -54,9 +59,6 @@ func NewService(opts ...Option) (Service, error) {
 	conf := options.Config
 
 	m := chi.NewMux()
-	// Comment back in after resolving the issue in go-chi.
-	// See comment in line 82.
-	// chi.RegisterMethod("REPORT")
 	m.Use(options.Middleware...)
 
 	tm, err := pool.StringToTLSMode(conf.GRPCClientTLS.Mode)
@@ -94,11 +96,15 @@ func NewService(opts ...Option) (Service, error) {
 				r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
+				r.MethodFunc("REPORT", "/remote.php/dav/spaces*", svc.Search)
+				r.MethodFunc("REPORT", "/dav/spaces*", svc.Search)
 
 				r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
 				r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 				r.Get("/dav/files/{id}", svc.Thumbnail)
 				r.Get("/dav/files/{id}/*", svc.Thumbnail)
+				r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
+				r.MethodFunc("REPORT", "/dav/files*", svc.Search)
 			})
 
 			r.Group(func(r chi.Router) {
@@ -115,24 +121,12 @@ func NewService(opts ...Option) (Service, error) {
 				r.Use(svc.WebDAVContext())
 				r.Get("/remote.php/webdav/*", svc.Thumbnail)
 				r.Get("/webdav/*", svc.Thumbnail)
+
+				r.MethodFunc("REPORT", "/remote.php/webdav*", svc.Search)
+				r.MethodFunc("REPORT", "/webdav*", svc.Search)
 			})
 		}
 
-		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
-
-		// This is a workaround for the go-chi concurrent map read write issue.
-		// After the issue has been solved upstream in go-chi we should switch
-		// back to using `chi.RegisterMethod`.
-		m.MethodNotAllowed(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.Method == "REPORT" && pathHasPrefix(req.URL.Path, options.Config.HTTP.Root) {
-				// The URLParam will not be available here. If it is needed it
-				// needs to be passed manually or chi needs to be fixed
-				// To use it properly.
-				svc.Search(w, req)
-				return
-			}
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}))
 	})
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
@@ -535,25 +529,4 @@ func renderError(w http.ResponseWriter, r *http.Request, err *errResponse) {
 
 func notFoundMsg(name string) string {
 	return "File with name " + name + " could not be located"
-}
-
-// This is a workaround for the go-chi concurrent map read write issue.
-// After the issue has been solved upstream in go-chi we should switch
-// back to using `chi.RegisterMethod`.
-var prefixList = []string{
-	"/remote.php/dav/files/",
-	"/remote.php/dav/spaces/",
-	"/remote.php/webdav",
-	"/dav/files/",
-	"/dav/spaces/",
-	"/webdav",
-}
-
-func pathHasPrefix(reqPath, root string) bool {
-	for _, p := range prefixList {
-		if strings.HasPrefix(reqPath, path.Join(root, p)) {
-			return true
-		}
-	}
-	return false
 }

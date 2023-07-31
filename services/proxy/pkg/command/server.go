@@ -198,16 +198,12 @@ func (h *StaticRouteHandler) handler() http.Handler {
 		r.Post("/backchannel_logout", h.backchannelLogout)
 
 		// TODO: migrate oidc well knowns here in a second wrapper
+
+		// Send all requests to the proxy handler
 		r.HandleFunc("/*", h.proxy.ServeHTTP)
 	})
-	// This is commented out due to a race issue in chi
-	//var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
-	//for _, k := range methods {
-	//	chi.RegisterMethod(k)
-	//}
 
-	// To avoid using the chi.RegisterMethod() this is basically a catchAll for all HTTP Methods that are not
-	// covered in chi by default
+	// Also send requests for methods unknown to chi to the proxy handler as well
 	m.MethodNotAllowed(h.proxy.ServeHTTP)
 
 	return m
