@@ -44,6 +44,20 @@ func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
 }
 
+// PathLookup defines the interface for the lookup component
+type PathLookup interface {
+	NodeFromResource(ctx context.Context, ref *provider.Reference) (*node.Node, error)
+	NodeFromID(ctx context.Context, id *provider.ResourceId) (n *node.Node, err error)
+
+	InternalRoot() string
+	InternalPath(spaceID, nodeID string) string
+	Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (path string, err error)
+	MetadataBackend() metadata.Backend
+	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
+	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
+	TypeFromPath(ctx context.Context, path string) provider.ResourceType
+}
+
 // Lookup implements transformations from filepath to node and back
 type Lookup struct {
 	Options *options.Options
