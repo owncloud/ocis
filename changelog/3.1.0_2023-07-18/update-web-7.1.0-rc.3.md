@@ -1,8 +1,8 @@
-Enhancement: Update web to v7.1.0-rc.2
+Enhancement: Update web to v7.1.0-rc.3
 
 Tags: web
 
-We updated ownCloud Web to v7.1.0-rc.2. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) for details on the web release.
 
 ## Summary
 * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078): Favorites list update on removal
@@ -15,6 +15,9 @@ We updated ownCloud Web to v7.1.0-rc.2. Please refer to the changelog (linked) f
 * Bugfix [owncloud/web#9351](https://github.com/owncloud/web/pull/9351): Media controls overflow on mobile screens
 * Bugfix [owncloud/web#9389](https://github.com/owncloud/web/pull/9389): Space editors see empty trashbin and delete actions in space trashbin
 * Bugfix [owncloud/web#9461](https://github.com/owncloud/web/pull/9461): Merging folders
+* Bugfix [owncloud/web/#9496](https://github.com/owncloud/web/pull/9496): Logo not showing
+* Bugfix [owncloud/web/#9489](https://github.com/owncloud/web/pull/9489): Public drop zone
+* Bugfix [owncloud/web/#9487](https://github.com/owncloud/web/pull/9487): Respect supportedClouds config
 * Enhancement [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add hasPriority property for editors per extension
 * Enhancement [owncloud/web#8422](https://github.com/owncloud/web/issues/8422): Improve extension app topbar
 * Enhancement [owncloud/web#8445](https://github.com/owncloud/web/issues/8445): Open individually shared file in dedicated view
@@ -52,5 +55,5 @@ We updated ownCloud Web to v7.1.0-rc.2. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#9386](https://github.com/owncloud/web/pull/9386): Allow local storage for auth token
 * Enhancement [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
 
-https://github.com/owncloud/ocis/pull/6894
-https://github.com/owncloud/web/releases/tag/v7.1.0-rc.2
+https://github.com/owncloud/ocis/pull/6925
+https://github.com/owncloud/web/releases/tag/v7.1.0-rc.3
