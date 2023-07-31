@@ -46,7 +46,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: do not allow update of reshare to exceed permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
@@ -55,13 +55,13 @@ Feature: sharing
     And user "Carol" has accepted share "/TMP" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | all |
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And user "Carol" should not be able to upload file "filesForUpload/textfile.txt" to "Shares/TMP/textfile.txt"
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
 
 
   Scenario Outline: update of user reshare by the original share owner can increase permissions up to the permissions of the top-level share

@@ -232,7 +232,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		case rpc.Code_CODE_NOT_FOUND:
 			response.WriteOCSData(w, r, response.MetaPathNotFound, nil, nil)
 		case rpc.Code_CODE_PERMISSION_DENIED:
-			response.WriteOCSError(w, r, http.StatusNotFound, "No share permission", nil)
+			response.WriteOCSError(w, r, http.StatusForbidden, "No share permission", nil)
 		default:
 			sublog.Error().Interface("status", statRes.Status).Msg("CreateShare: stat failed")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -250,7 +250,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 
 	// check user has share permissions
 	if !conversions.RoleFromResourcePermissions(statRes.Info.PermissionSet, false).OCSPermissions().Contain(conversions.PermissionShare) {
-		response.WriteOCSError(w, r, http.StatusNotFound, "No share permission", nil)
+		response.WriteOCSError(w, r, http.StatusForbidden, "No share permission", nil)
 		return
 	}
 
@@ -298,7 +298,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		// public links default to read only
 		_, _, ocsErr := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole(h.resharing))
 		if ocsErr != nil && ocsErr.Error != conversions.ErrZeroPermission {
-			response.WriteOCSError(w, r, http.StatusNotFound, "No share permission", nil)
+			response.WriteOCSError(w, r, http.StatusForbidden, "No share permission", nil)
 			return
 		}
 		share, ocsErr := h.createPublicLinkShare(w, r, statRes.Info)
@@ -459,7 +459,7 @@ func (h *Handler) extractPermissions(reqRole string, reqPermissions string, ri *
 
 	if !sufficientPermissions(ri.PermissionSet, role.CS3ResourcePermissions(), false) && role.Name != conversions.RoleDenied {
 		return nil, nil, &ocsError{
-			Code:    http.StatusNotFound,
+			Code:    http.StatusForbidden,
 			Message: "Cannot set the requested share permissions",
 			Error:   errors.New("cannot set the requested share permissions"),
 		}

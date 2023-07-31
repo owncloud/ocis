@@ -96,7 +96,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder          | /folder     | folder    | httpd/unix-directory |
       | folder/file.txt | /file.txt   | file      | text/plain           |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user participant of the project space without space manager role cannot share an entity inside project space via public link
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian       |
@@ -108,8 +108,8 @@ Feature: Share a file or folder that is inside a space via public link
       | password    | 123                      |
       | name        | public link              |
       | expireDate  | 2042-03-25T23:59:59+0100 |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
       | entity          | spaceRole |

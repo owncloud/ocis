@@ -246,7 +246,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: adding public upload to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -258,14 +258,14 @@ Feature: update a public link share
       | publicUpload | false        |
     When user "Brian" updates the last public link share using the sharing API with
       | publicUpload | true |
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
 
 
   Scenario Outline:adding public upload to a shared folder as recipient is allowed with permissions using the public API
@@ -288,7 +288,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnRevaMaster
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -300,14 +300,14 @@ Feature: update a public link share
       | permissions | read         |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | read,update,create,delete |
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 403              |
 
 
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API

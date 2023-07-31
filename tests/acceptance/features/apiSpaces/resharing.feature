@@ -54,10 +54,10 @@ Feature: Resharing
     And user "Carol" should be included in the response
     And user "Damian" should be included in the response
 
-
+  @skipOnRevaMaster
   Scenario: user can't share with more permissions than they have
     When user "Damian" shares folder "Shares/folder" with user "Ember" with permissions "31" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "403"
     And the OCS status message should be "Cannot set the requested share permissions"
 
 
@@ -88,7 +88,7 @@ Feature: Resharing
       | Brian | 998  | should exist     |
       | Carol | 100  | should not exist |
 
-
+  @skipOnRevaMaster
   Scenario Outline: resharing folder with different permissions
     When user "<user>" shares folder "Shares/folder" with user "Ember" with permissions "<permissions>" using the sharing API
     Then the OCS status code should be "<code>"
@@ -97,10 +97,10 @@ Feature: Resharing
       | Brian  | 17          | 100  |
       | Carol  | 31          | 100  |
       | Damian | 17          | 100  |
-      | Damian | 27          | 404  |
-      | Damian | 31          | 404  |
+      | Damian | 27          | 403  |
+      | Damian | 31          | 403  |
 
-
+  @skipOnRevaMaster
   Scenario Outline: Resharing files with different permissions
     Given user "Alice" has uploaded file with content "Random data" to "/file.txt"
     And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<shareepermissions>"
@@ -110,7 +110,7 @@ Feature: Resharing
     Examples:
       | shareepermissions | granteepermissions | code |
       | 17                | 17                 | 100  |
-      | 17                | 19                 | 404  |
+      | 17                | 19                 | 403  |
       | 19                | 19                 | 100  |
 
 

@@ -161,9 +161,9 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 	}
 
 	if !sufficientPermissions(statInfo.PermissionSet, permissions, true) {
-		response.WriteOCSError(w, r, http.StatusNotFound, "no share permission", nil)
+		response.WriteOCSError(w, r, http.StatusForbidden, "no share permission", nil)
 		return nil, &ocsError{
-			Code:    http.StatusNotFound,
+			Code:    http.StatusForbidden,
 			Message: "Cannot set the requested share permissions",
 			Error:   errors.New("cannot set the requested share permissions"),
 		}
@@ -417,7 +417,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 
 	// empty permissions mean internal link here - NOT denial. Hence we need an extra check
 	if !sufficientPermissions(statRes.Info.PermissionSet, newPermissions, true) {
-		response.WriteOCSError(w, r, http.StatusNotFound, "no share permission", nil)
+		response.WriteOCSError(w, r, http.StatusForbidden, "no share permission", nil)
 		return
 	}
 

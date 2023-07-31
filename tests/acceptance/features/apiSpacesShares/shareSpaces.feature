@@ -131,7 +131,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user with editor or viewer role cannot share a space to another user
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
@@ -139,8 +139,8 @@ Feature: Share spaces
     When user "Brian" shares a space "share space" with settings:
       | shareWith | Bob        |
       | role      | <new_role> |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     And the user "Bob" should not have a space called "share space"
     Examples:
@@ -172,7 +172,7 @@ Feature: Share spaces
       | manager | editor   |
       | manager | viewer   |
 
-
+  @skipOnRevaMaster
   Scenario Outline: user without manager role cannot change the role of space members
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
@@ -183,8 +183,8 @@ Feature: Share spaces
     When user "Brian" updates the space "share space" with settings:
       | shareWith | Bob        |
       | role      | <new_role> |
-    Then the HTTP status code should be "404"
-    And the OCS status code should be "404"
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
     And the user "Alice" should have a space called "share space" granted to "Bob" with role "viewer"
     Examples:
       | role   | new_role |
