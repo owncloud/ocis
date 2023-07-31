@@ -143,7 +143,7 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
-* Enhancement - Update web to v7.1.0-rc.2: [#6894](https://github.com/owncloud/ocis/pull/6894)
+* Enhancement - Update web to v7.1.0-rc.3: [#6925](https://github.com/owncloud/ocis/pull/6925)
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
@@ -514,11 +514,11 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6470
    https://github.com/owncloud/web/releases/tag/v7.0.1
 
-* Enhancement - Update web to v7.1.0-rc.2: [#6894](https://github.com/owncloud/ocis/pull/6894)
+* Enhancement - Update web to v7.1.0-rc.3: [#6925](https://github.com/owncloud/ocis/pull/6925)
 
    Tags: web
 
-   We updated ownCloud Web to v7.1.0-rc.2. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) for details on
    the web release.
 
    ## Summary * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078):
@@ -540,8 +540,13 @@ The following sections list the changes for 3.1.0.
    [owncloud/web#9389](https://github.com/owncloud/web/pull/9389): Space editors see
    empty trashbin and delete actions in space trashbin * Bugfix
    [owncloud/web#9461](https://github.com/owncloud/web/pull/9461): Merging folders *
-   Enhancement [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add
-   hasPriority property for editors per extension * Enhancement
+   Bugfix [owncloud/web/#9496](https://github.com/owncloud/web/pull/9496): Logo not
+   showing * Bugfix [owncloud/web/#9489](https://github.com/owncloud/web/pull/9489):
+   Public drop zone * Bugfix
+   [owncloud/web/#9487](https://github.com/owncloud/web/pull/9487): Respect
+   supportedClouds config * Enhancement
+   [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add hasPriority
+   property for editors per extension * Enhancement
    [owncloud/web#8422](https://github.com/owncloud/web/issues/8422): Improve
    extension app topbar * Enhancement
    [owncloud/web#8445](https://github.com/owncloud/web/issues/8445): Open
@@ -608,8 +613,8 @@ The following sections list the changes for 3.1.0.
    for auth token * Enhancement
    [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
 
-   https://github.com/owncloud/ocis/pull/6894
-   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.2
+   https://github.com/owncloud/ocis/pull/6925
+   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.3
 
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
