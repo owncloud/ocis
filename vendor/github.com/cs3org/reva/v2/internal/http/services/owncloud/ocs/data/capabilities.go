@@ -76,6 +76,7 @@ type CapabilitiesCore struct {
 	WebdavRoot        string  `json:"webdav-root,omitempty" xml:"webdav-root,omitempty" mapstructure:"webdav_root"`
 	Status            *Status `json:"status" xml:"status"`
 	SupportURLSigning ocsBool `json:"support-url-signing" xml:"support-url-signing" mapstructure:"support_url_signing"`
+	SupportSSE        ocsBool `json:"support-sse" xml:"support-sse" mapstructure:"support_sse"`
 }
 
 // CapabilitiesGraph holds the graph capabilities
