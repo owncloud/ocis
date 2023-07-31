@@ -86,17 +86,7 @@ func Server(cfg *config.Config) *cli.Command {
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.GRPC.Addr,
 				version.GetString(),
-				map[string]string{
-					"cs3.app-provider.mime_type":   "text/plain", // FIXME
-					"cs3.app-provider.extension":   "txt",
-					"cs3.app-provider.name":        "demo",
-					"cs3.app-provider.description": "Demo text",
-					//"cs3.app-provider.icon":           "",
-					//"cs3.app-provider.default_app":    "",
-					"cs3.app-provider.allow_creation": "true",
-					"cs3.app-provider.priority":       "100", // TODO needs cs3 property on ProviderInfo
-					"cs3.app-provider.desktop_only":   "false",
-				},
+				nil,
 			)
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")

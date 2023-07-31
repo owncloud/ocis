@@ -99,12 +99,6 @@ func defaultMimeTypeConfig() []config.MimeTypeConfig {
 			AllowCreation: true,
 		},
 		{
-			MimeType:    "text/plain",
-			Extension:   "txt",
-			Name:        "Plaintext file",
-			Description: "Plaintext file",
-		},
-		{
 			MimeType:    "application/compressed-markdown",
 			Extension:   "zmd",
 			Name:        "Compressed markdown file",

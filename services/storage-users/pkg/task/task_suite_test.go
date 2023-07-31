@@ -12,7 +12,7 @@ import (
 
 func init() {
 	r := registry.GetRegistry()
-	service := registry.BuildGRPCService("com.owncloud.api.gateway", "", "", "")
+	service := registry.BuildGRPCService("com.owncloud.api.gateway", "", "", "", nil)
 	service.Nodes = []*mRegistry.Node{{
 		Address: "any",
 	}}
