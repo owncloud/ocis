@@ -3,6 +3,7 @@ package registry
 import (
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	consulr "github.com/go-micro/plugins/v4/registry/consul"
@@ -21,37 +22,45 @@ var (
 	registryAddressEnv = "MICRO_REGISTRY_ADDRESS"
 )
 
+var (
+	once sync.Once
+	r    registry.Registry
+)
+
 // GetRegistry returns a configured micro registry based on Micro env vars.
 // It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
 // and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
 func GetRegistry() registry.Registry {
-	addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
-
-	var r registry.Registry
-	switch os.Getenv(registryEnv) {
-	case "nats":
-		r = natsr.NewRegistry(
-			registry.Addrs(addresses...),
-		)
-	case "kubernetes":
-		r = kubernetesr.NewRegistry(
-			registry.Addrs(addresses...),
-		)
-	case "etcd":
-		r = etcdr.NewRegistry(
-			registry.Addrs(addresses...),
-		)
-	case "consul":
-		r = consulr.NewRegistry(
-			registry.Addrs(addresses...),
-		)
-	case "memory":
-		r = memr.NewRegistry()
-	default:
-		r = mdnsr.NewRegistry()
-	}
+	once.Do(func() {
+		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
+		switch os.Getenv(registryEnv) {
+		case "nats":
+			r = natsr.NewRegistry(
+				registry.Addrs(addresses...),
+			)
+		case "kubernetes":
+			r = kubernetesr.NewRegistry(
+				registry.Addrs(addresses...),
+			)
+		case "etcd":
+			r = etcdr.NewRegistry(
+				registry.Addrs(addresses...),
+			)
+		case "consul":
+			r = consulr.NewRegistry(
+				registry.Addrs(addresses...),
+			)
+		case "mdns":
+			r = mdnsr.NewRegistry()
+		case "memory":
+			fallthrough
+		default:
+			r = memr.NewRegistry()
+		}
+		r = cache.New(r, cache.WithTTL(20*time.Second))
+	})
 
 	// always use cached registry to prevent registry
 	// lookup for every request
-	return cache.New(r, cache.WithTTL(20*time.Second))
+	return r
 }

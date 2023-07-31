@@ -80,7 +80,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
-			
+
 			grpcSvc := registry.BuildGRPCService(
 				cfg.GRPC.Namespace+"."+cfg.Service.Name,
 				uuid.Must(uuid.NewV4()).String(),
