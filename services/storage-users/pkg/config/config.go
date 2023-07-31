@@ -93,7 +93,7 @@ type Drivers struct {
 
 // AsyncPropagatorOptions configures the async propagator
 type AsyncPropagatorOptions struct {
-	PropagationDelay time.Duration `yaml:"propagation_delay" env:"STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY" desc:"The delay between a change to tree and the start of the according treesize and treetime propagation."`
+	PropagationDelay time.Duration `yaml:"propagation_delay" env:"STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY" desc:"The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one."`
 }
 
 // OCISDriver is the storage driver configuration when using 'ocis' storage driver
