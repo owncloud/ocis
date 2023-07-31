@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
+* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
 ## Details
@@ -72,6 +73,13 @@ The following sections list the changes for unreleased.
    Add a configuration option for the grpc max message size
 
    https://github.com/owncloud/ocis/pull/6849
+
+* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
+
+   The policy environment for single file shares now also includes information about the
+   resource. As a result, it is now possible to set up and check rules for them.
+
+   https://github.com/owncloud/ocis/pull/6888
 
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
