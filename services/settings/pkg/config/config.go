@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	"go-micro.dev/v4/client"
 )
 
 // Config combines all available configuration parts.
@@ -22,6 +23,7 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient    client.Client         `yaml:"-"`
 
 	StoreType   string                `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are 'metadata' and 'filesystem'. Note that the value 'filesystem' is considered deprecated."`
 	DataPath    string                `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`

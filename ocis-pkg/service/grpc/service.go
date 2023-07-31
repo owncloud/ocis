@@ -21,11 +21,6 @@ type Service struct {
 	micro.Service
 }
 
-// NewService initializes a new grpc service.
-func NewService(opts ...Option) (Service, error) {
-	return NewServiceWithClient(DefaultClient(), opts...)
-}
-
 // NewServiceWithClient initializes a new grpc service with explicit client.
 func NewServiceWithClient(client client.Client, opts ...Option) (Service, error) {
 	var mServer server.Server

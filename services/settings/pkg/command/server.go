@@ -35,7 +35,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			err = ogrpc.Configure(
+			cfg.GrpcClient, err = ogrpc.NewClient(
 				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracingProvider))...,
 			)
 			if err != nil {

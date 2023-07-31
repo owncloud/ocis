@@ -15,7 +15,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -77,7 +76,6 @@ var _ = Describe("Notifications", func() {
 		func(tc testChannel, ev events.Event) {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-			_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			ch := make(chan events.Event)
 			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "")
 			go evts.Run()
@@ -276,7 +274,6 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 		func(tc testChannel, ev events.Event) {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-			_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			ch := make(chan events.Event)
 			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "")
 			go evts.Run()

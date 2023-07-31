@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"go-micro.dev/v4/client"
 )
 
 // Config combines all available configuration parts.
@@ -19,6 +20,7 @@ type Config struct {
 
 	GRPC          GRPCConfig            `yaml:"grpc"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient    client.Client         `yaml:"-"`
 
 	Events Events `yaml:"events"`
 	Store  Store  `yaml:"store"`
