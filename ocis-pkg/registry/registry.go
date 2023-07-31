@@ -33,7 +33,8 @@ var (
 func GetRegistry() registry.Registry {
 	once.Do(func() {
 		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
-		switch os.Getenv(registryEnv) {
+		registryType := os.Getenv(registryEnv)
+		switch registryType {
 		case "nats":
 			r = natsr.NewRegistry(
 				registry.Addrs(addresses...),
@@ -55,9 +56,12 @@ func GetRegistry() registry.Registry {
 		case "memory":
 			fallthrough
 		default:
+			registryType = "memory"
 			r = memr.NewRegistry()
 		}
-		r = cache.New(r, cache.WithTTL(20*time.Second))
+		if registryType != "memory" {
+			r = cache.New(r, cache.WithTTL(20*time.Second))
+		}
 	})
 
 	// always use cached registry to prevent registry
