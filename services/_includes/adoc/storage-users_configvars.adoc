@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-07-31-08-01-13]
+[#deprecation-note-2023-07-31-09-04-44]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -205,7 +205,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-07-31-08-01-13[Deprecation Note]
+xref:deprecation-note-2023-07-31-09-04-44[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -267,6 +267,25 @@ a| [subs=-attributes]
 ++messagepack ++
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+
+a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
+`STORAGE_USERS_OCIS_PROPAGATOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sync ++
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+
+a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
@@ -352,7 +371,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-07-31-08-01-13[Deprecation Note]
+xref:deprecation-note-2023-07-31-09-04-44[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -378,6 +397,25 @@ a| [subs=-attributes]
 ++messagepack ++
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
+
+a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
+`STORAGE_USERS_S3NG_PROPAGATOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sync ++
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+
+a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
 
 a|`STORAGE_USERS_S3NG_ROOT` +
 
@@ -656,7 +694,7 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-07-31-08-01-13[Deprecation Note]
+xref:deprecation-note-2023-07-31-09-04-44[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
