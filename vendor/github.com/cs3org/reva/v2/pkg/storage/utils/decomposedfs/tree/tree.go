@@ -28,7 +28,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -36,14 +35,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree/propagator"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
@@ -66,24 +64,11 @@ type Blobstore interface {
 	Delete(node *node.Node) error
 }
 
-// PathLookup defines the interface for the lookup component
-type PathLookup interface {
-	NodeFromResource(ctx context.Context, ref *provider.Reference) (*node.Node, error)
-	NodeFromID(ctx context.Context, id *provider.ResourceId) (n *node.Node, err error)
-
-	InternalRoot() string
-	InternalPath(spaceID, nodeID string) string
-	Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (path string, err error)
-	MetadataBackend() metadata.Backend
-	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
-	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
-	TypeFromPath(ctx context.Context, path string) provider.ResourceType
-}
-
 // Tree manages a hierarchical tree
 type Tree struct {
-	lookup    PathLookup
-	blobstore Blobstore
+	lookup     lookup.PathLookup
+	blobstore  Blobstore
+	propagator propagator.Propagator
 
 	options *options.Options
 
@@ -94,12 +79,13 @@ type Tree struct {
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
+func New(lu lookup.PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
 	return &Tree{
-		lookup:    lu,
-		blobstore: bs,
-		options:   o,
-		idCache:   cache,
+		lookup:     lu,
+		blobstore:  bs,
+		options:    o,
+		idCache:    cache,
+		propagator: propagator.New(lu, o),
 	}
 }
 
@@ -718,205 +704,7 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 
 // Propagate propagates changes to the root of the tree
 func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err error) {
-	ctx, span := tracer.Start(ctx, "Propagate")
-	defer span.End()
-	sublog := appctx.GetLogger(ctx).With().
-		Str("method", "tree.Propagate").
-		Str("spaceid", n.SpaceID).
-		Str("nodeid", n.ID).
-		Int64("sizeDiff", sizeDiff).
-		Logger()
-
-	if !t.options.TreeTimeAccounting && (!t.options.TreeSizeAccounting || sizeDiff == 0) {
-		// no propagation enabled
-		sublog.Debug().Msg("propagation disabled or nothing to propagate")
-		return
-	}
-
-	// is propagation enabled for the parent node?
-	root := n.SpaceRoot
-
-	// use a sync time and don't rely on the mtime of the current node, as the stat might not change when a rename happened too quickly
-	sTime := time.Now().UTC()
-
-	// we loop until we reach the root
-	for err == nil && n.ID != root.ID {
-		sublog.Debug().Msg("propagating")
-
-		attrs := node.Attributes{}
-
-		var f *lockedfile.File
-		// lock parent before reading treesize or tree time
-
-		_, subspan := tracer.Start(ctx, "lockedfile.OpenFile")
-		parentFilename := t.lookup.MetadataBackend().LockfilePath(n.ParentPath())
-		f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
-		subspan.End()
-		if err != nil {
-			sublog.Error().Err(err).
-				Str("parent filename", parentFilename).
-				Msg("Propagation failed. Could not open metadata for parent with lock.")
-			return err
-		}
-		// always log error if closing node fails
-		defer func() {
-			// ignore already closed error
-			cerr := f.Close()
-			if err == nil && cerr != nil && !errors.Is(cerr, os.ErrClosed) {
-				err = cerr // only overwrite err with en error from close if the former was nil
-			}
-		}()
-
-		if n, err = n.Parent(ctx); err != nil {
-			sublog.Error().Err(err).
-				Msg("Propagation failed. Could not read parent node.")
-			return err
-		}
-
-		// TODO none, sync and async?
-		if !n.HasPropagation(ctx) {
-			sublog.Debug().Str("attr", prefixes.PropagationAttr).Msg("propagation attribute not set or unreadable, not propagating")
-			// if the attribute is not set treat it as false / none / no propagation
-			return nil
-		}
-
-		sublog = sublog.With().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Logger()
-
-		if t.options.TreeTimeAccounting {
-			// update the parent tree time if it is older than the nodes mtime
-			updateSyncTime := false
-
-			var tmTime time.Time
-			tmTime, err = n.GetTMTime(ctx)
-			switch {
-			case err != nil:
-				// missing attribute, or invalid format, overwrite
-				sublog.Debug().Err(err).
-					Msg("could not read tmtime attribute, overwriting")
-				updateSyncTime = true
-			case tmTime.Before(sTime):
-				sublog.Debug().
-					Time("tmtime", tmTime).
-					Time("stime", sTime).
-					Msg("parent tmtime is older than node mtime, updating")
-				updateSyncTime = true
-			default:
-				sublog.Debug().
-					Time("tmtime", tmTime).
-					Time("stime", sTime).
-					Dur("delta", sTime.Sub(tmTime)).
-					Msg("parent tmtime is younger than node mtime, not updating")
-			}
-
-			if updateSyncTime {
-				// update the tree time of the parent node
-				attrs.SetString(prefixes.TreeMTimeAttr, sTime.UTC().Format(time.RFC3339Nano))
-			}
-
-			attrs.SetString(prefixes.TmpEtagAttr, "")
-		}
-
-		// size accounting
-		if t.options.TreeSizeAccounting && sizeDiff != 0 {
-			var newSize uint64
-
-			// read treesize
-			treeSize, err := n.GetTreeSize(ctx)
-			switch {
-			case metadata.IsAttrUnset(err):
-				// fallback to calculating the treesize
-				sublog.Warn().Msg("treesize attribute unset, falling back to calculating the treesize")
-				newSize, err = t.calculateTreeSize(ctx, n.InternalPath())
-				if err != nil {
-					return err
-				}
-			case err != nil:
-				sublog.Error().Err(err).
-					Msg("Faild to propagate treesize change. Error when reading the treesize attribute from parent")
-				return err
-			case sizeDiff > 0:
-				newSize = treeSize + uint64(sizeDiff)
-			case uint64(-sizeDiff) > treeSize:
-				// The sizeDiff is larger than the current treesize. Which would result in
-				// a negative new treesize. Something must have gone wrong with the accounting.
-				// Reset the current treesize to 0.
-				sublog.Error().Uint64("treeSize", treeSize).Int64("sizeDiff", sizeDiff).
-					Msg("Error when updating treesize of parent node. Updated treesize < 0. Reestting to 0")
-				newSize = 0
-			default:
-				newSize = treeSize - uint64(-sizeDiff)
-			}
-
-			// update the tree size of the node
-			attrs.SetString(prefixes.TreesizeAttr, strconv.FormatUint(newSize, 10))
-			sublog.Debug().Uint64("newSize", newSize).Msg("updated treesize of parent node")
-		}
-
-		if err = n.SetXattrsWithContext(ctx, attrs, false); err != nil {
-			sublog.Error().Err(err).Msg("Failed to update extend attributes of parent node")
-			return err
-		}
-
-		// Release node lock early, ignore already closed error
-		_, subspan = tracer.Start(ctx, "f.Close")
-		cerr := f.Close()
-		subspan.End()
-		if cerr != nil && !errors.Is(cerr, os.ErrClosed) {
-			sublog.Error().Err(cerr).Msg("Failed to close parent node and release lock")
-			return cerr
-		}
-	}
-	if err != nil {
-		sublog.Error().Err(err).Msg("error propagating")
-		return
-	}
-	return
-}
-
-func (t *Tree) calculateTreeSize(ctx context.Context, childrenPath string) (uint64, error) {
-	ctx, span := tracer.Start(ctx, "calculateTreeSize")
-	defer span.End()
-	var size uint64
-
-	f, err := os.Open(childrenPath)
-	if err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Str("childrenPath", childrenPath).Msg("could not open dir")
-		return 0, err
-	}
-	defer f.Close()
-
-	names, err := f.Readdirnames(0)
-	if err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Str("childrenPath", childrenPath).Msg("could not read dirnames")
-		return 0, err
-	}
-	for i := range names {
-		cPath := filepath.Join(childrenPath, names[i])
-		resolvedPath, err := filepath.EvalSymlinks(cPath)
-		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("childpath", cPath).Msg("could not resolve child entry symlink")
-			continue // continue after an error
-		}
-
-		// raw read of the attributes for performance reasons
-		attribs, err := t.lookup.MetadataBackend().All(ctx, resolvedPath)
-		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("childpath", cPath).Msg("could not read attributes of child entry")
-			continue // continue after an error
-		}
-		sizeAttr := ""
-		if string(attribs[prefixes.TypeAttr]) == strconv.FormatUint(uint64(provider.ResourceType_RESOURCE_TYPE_FILE), 10) {
-			sizeAttr = string(attribs[prefixes.BlobsizeAttr])
-		} else {
-			sizeAttr = string(attribs[prefixes.TreesizeAttr])
-		}
-		csize, err := strconv.ParseInt(sizeAttr, 10, 64)
-		if err != nil {
-			return 0, errors.Wrapf(err, "invalid blobsize xattr format")
-		}
-		size += uint64(csize)
-	}
-	return size, err
+	return t.propagator.Propagate(ctx, n, sizeDiff)
 }
 
 // WriteBlob writes a blob to the blobstore

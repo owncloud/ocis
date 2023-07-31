@@ -21,6 +21,7 @@ package options
 import (
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
@@ -40,6 +41,11 @@ type Options struct {
 
 	// the metadata backend to use, currently supports `xattr` or `ini`
 	MetadataBackend string `mapstructure:"metadata_backend"`
+
+	// the propagator to use for this fs. currently only `sync` is fully supported, `async` is available as an experimental feature
+	Propagator string `mapstructure:"propagator"`
+	// Options specific to the async propagator
+	AsyncPropagatorOptions AsyncPropagatorOptions `mapstructure:"async_propagator_options"`
 
 	// ocis fs works on top of a dir of uuid nodes
 	Root string `mapstructure:"root"`
@@ -76,6 +82,11 @@ type Options struct {
 	MaxConcurrency          int `mapstructure:"max_concurrency"`
 
 	MaxQuota uint64 `mapstructure:"max_quota"`
+}
+
+// AsyncPropagatorOptions holds the configuration for the async propagator
+type AsyncPropagatorOptions struct {
+	PropagationDelay time.Duration `mapstructure:"propagation_delay"`
 }
 
 // EventOptions are the configurable options for events
@@ -143,6 +154,13 @@ func New(m map[string]interface{}) (*Options, error) {
 
 	if o.MaxConcurrency <= 0 {
 		o.MaxConcurrency = 100
+	}
+
+	if o.Propagator == "" {
+		o.Propagator = "sync"
+	}
+	if o.AsyncPropagatorOptions.PropagationDelay == 0 {
+		o.AsyncPropagatorOptions.PropagationDelay = 5 * time.Second
 	}
 
 	return o, nil
