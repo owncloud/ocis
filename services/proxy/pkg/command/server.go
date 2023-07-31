@@ -8,14 +8,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/store"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -24,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
@@ -38,10 +44,6 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Server is the entrypoint for the server command.
@@ -273,6 +275,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
+	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
@@ -411,7 +414,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-		middleware.Policies(logger, cfg.PoliciesMiddleware.Query, cfg.GrpcClient),
+		middleware.Policies(
+			cfg.PoliciesMiddleware.Query,
+			middleware.Logger(logger),
+			middleware.WithRevaGatewaySelector(gatewaySelector),
+			middleware.PoliciesProviderService(policiesProviderClient),
+		),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),

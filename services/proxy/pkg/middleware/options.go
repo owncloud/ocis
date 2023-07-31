@@ -5,16 +5,19 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-	store "go-micro.dev/v4/store"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -36,6 +39,8 @@ type Options struct {
 	UserRoleAssigner userroles.UserRoleAssigner
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settingssvc.RoleService
+	// PoliciesProviderService for policy evaluation
+	PoliciesProviderService policiessvc.PoliciesProviderService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
@@ -118,7 +123,14 @@ func SettingsRoleService(rc settingssvc.RoleService) Option {
 	}
 }
 
-// OIDCClient provides a function to set the the oidc client option.
+// PoliciesProviderService provides a function to set the policies provider option.
+func PoliciesProviderService(pps policiessvc.PoliciesProviderService) Option {
+	return func(o *Options) {
+		o.PoliciesProviderService = pps
+	}
+}
+
+// OIDCClient provides a function to set the oidc client option.
 func OIDCClient(val oidc.OIDCClient) Option {
 	return func(o *Options) {
 		o.OIDCClient = val
@@ -139,7 +151,7 @@ func CredentialsByUserAgent(v map[string]string) Option {
 	}
 }
 
-// WithRevaGatewaySelector provides a function to set the the reva gateway service selector option.
+// WithRevaGatewaySelector provides a function to set the reva gateway service selector option.
 func WithRevaGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.RevaGatewaySelector = val
