@@ -1,8 +1,8 @@
-Enhancement: Update web to v7.1.0-rc.3
+Enhancement: Update web to v7.1.0-rc.4
 
 Tags: web
 
-We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v7.1.0-rc.4. Please refer to the changelog (linked) for details on the web release.
 
 ## Summary
 * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078): Favorites list update on removal
@@ -18,6 +18,9 @@ We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) f
 * Bugfix [owncloud/web/#9496](https://github.com/owncloud/web/pull/9496): Logo not showing
 * Bugfix [owncloud/web/#9489](https://github.com/owncloud/web/pull/9489): Public drop zone
 * Bugfix [owncloud/web/#9487](https://github.com/owncloud/web/pull/9487): Respect supportedClouds config
+* Bugfix [owncloud/web/#9507](https://github.com/owncloud/web/pull/9507): Space description edit modal is cut off vertically
+* Bugfix [owncloud/web/#9501](https://github.com/owncloud/web/pull/9501): Add cloud importer translations
+* Bugfix [owncloud/web/#9510](https://github.com/owncloud/web/pull/9510): Double items after moving a file with the same name
 * Enhancement [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add hasPriority property for editors per extension
 * Enhancement [owncloud/web#8422](https://github.com/owncloud/web/issues/8422): Improve extension app topbar
 * Enhancement [owncloud/web#8445](https://github.com/owncloud/web/issues/8445): Open individually shared file in dedicated view
@@ -56,4 +59,4 @@ We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
 
 https://github.com/owncloud/ocis/pull/6925
-https://github.com/owncloud/web/releases/tag/v7.1.0-rc.3
+https://github.com/owncloud/web/releases/tag/v7.1.0-rc.4
