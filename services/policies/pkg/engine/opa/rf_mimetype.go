@@ -1,46 +1,81 @@
 package opa
 
 import (
-	"log"
+	"bufio"
+	"io"
 	"mime"
 	"strings"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/types"
-	"github.com/rakyll/magicmime"
 )
 
-var RFMimetypeExtensions = rego.Function1(
-	&rego.Function{
-		Name:             "ocis.mimetype.extensions",
-		Decl:             types.NewFunction(types.Args(types.S), types.A),
-		Memoize:          true,
-		Nondeterministic: true,
-	},
-	func(_ rego.BuiltinContext, a *ast.Term) (*ast.Term, error) {
-		var mt string
+// RFMimetypeExtensions extends the rego dictionary with the possibility of mapping mimetypes to file extensions.
+// Be careful calling this multiple times with individual readers, the mime store is global,
+// which results in one global store which holds all known mimetype mappings at once.
+//
+// Rego: `ocis.mimetype.extensions("application/pdf")`
+// Result `[.pdf]`
+func RFMimetypeExtensions(f io.Reader) (func(*rego.Rego), error) {
+	if f != nil {
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			fields := strings.Fields(scanner.Text())
+			if len(fields) <= 1 || fields[0][0] == '#' {
+				continue
+			}
+			mimeType := fields[0]
+			for _, ext := range fields[1:] {
+				if ext[0] == '#' {
+					break
+				}
+				if err := mime.AddExtensionType("."+ext, mimeType); err != nil {
+					return nil, err
+				}
 
-		if err := ast.As(a.Value, &mt); err != nil {
-			return nil, err
+			}
 		}
-		if err := mime.AddExtensionType(".oform", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"); err != nil {
-			return nil, err
+		if err := scanner.Err(); err != nil {
+			panic(err)
 		}
-		detectedExtensions, err := mime.ExtensionsByType(mt)
-		if err != nil {
-			return nil, err
-		}
+	}
 
-		var mimeTerms []*ast.Term
-		for _, extension := range detectedExtensions {
-			mimeTerms = append(mimeTerms, ast.NewTerm(ast.String(extension)))
-		}
+	return rego.Function1(
+		&rego.Function{
+			Name:             "ocis.mimetype.extensions",
+			Decl:             types.NewFunction(types.Args(types.S), types.A),
+			Memoize:          true,
+			Nondeterministic: true,
+		},
+		func(_ rego.BuiltinContext, a *ast.Term) (*ast.Term, error) {
+			var mt string
 
-		return ast.ArrayTerm(mimeTerms...), nil
-	},
-)
+			if err := ast.As(a.Value, &mt); err != nil {
+				return nil, err
+			}
 
+			detectedExtensions, err := mime.ExtensionsByType(mt)
+			if err != nil {
+				return nil, err
+			}
+
+			var mimeTerms []*ast.Term
+			for _, extension := range detectedExtensions {
+				mimeTerms = append(mimeTerms, ast.NewTerm(ast.String(extension)))
+			}
+
+			return ast.ArrayTerm(mimeTerms...), nil
+		},
+	), nil
+}
+
+// RFMimetypeDetect extends the rego dictionary with the possibility to detect mimetypes.
+// Be careful, the list of known mimetypes is limited.
+//
+// Rego: `ocis.mimetype.extensions(".txt")`
+// Result `text/plain`
 var RFMimetypeDetect = rego.Function1(
 	&rego.Function{
 		Name:             "ocis.mimetype.detect",
@@ -55,14 +90,8 @@ var RFMimetypeDetect = rego.Function1(
 			return nil, err
 		}
 
-		if err := magicmime.Open(magicmime.MAGIC_MIME_TYPE | magicmime.MAGIC_SYMLINK | magicmime.MAGIC_ERROR); err != nil {
-			log.Fatal(err)
-		}
-		defer magicmime.Close()
-		mimetype, err := magicmime.TypeByBuffer(body)
-		if err != nil {
-			return nil, err
-		}
+		mimetype := mimetype.Detect(body).String()
+
 		return ast.StringTerm(strings.Split(mimetype, ";")[0]), nil
 	},
 )

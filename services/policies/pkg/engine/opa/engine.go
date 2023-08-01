@@ -2,6 +2,8 @@ package opa
 
 import (
 	"context"
+	"io"
+	"os"
 	"time"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -17,16 +19,35 @@ type OPA struct {
 	printHook print.Hook
 	policies  []string
 	timeout   time.Duration
+	options   []func(r *rego.Rego)
 }
 
 // NewOPA returns a ready to use opa engine.
 func NewOPA(timeout time.Duration, logger log.Logger, conf config.Engine) (OPA, error) {
+	var mtReader io.Reader = nil
+	if conf.Mimes != "" {
+		mtReader, err := os.Open(conf.Mimes)
+		if err != nil {
+			return OPA{}, err
+		}
+		defer mtReader.Close()
+	}
+
+	rfMimetypeExtensions, err := RFMimetypeExtensions(mtReader)
+	if err != nil {
+		return OPA{}, err
+	}
+
 	return OPA{
-			policies:  conf.Policies,
-			timeout:   timeout,
-			printHook: logPrinter{logger: logger},
+		policies:  conf.Policies,
+		timeout:   timeout,
+		printHook: logPrinter{logger: logger},
+		options: []func(r *rego.Rego){
+			RFMimetypeDetect,
+			RFResourceDownload,
+			rfMimetypeExtensions,
 		},
-		nil
+	}, nil
 }
 
 // Evaluate evaluates the opa policies and returns the result.
@@ -34,19 +55,13 @@ func (o OPA) Evaluate(ctx context.Context, qs string, env engine.Environment) (b
 	ctx, cancel := context.WithTimeout(ctx, o.timeout)
 	defer cancel()
 
-	customFns := []func(r *rego.Rego){
-		RFResourceDownload,
-		RFMimetypeDetect,
-		RFMimetypeExtensions,
-	}
-
 	q, err := rego.New(
 		append([]func(r *rego.Rego){
 			rego.Query(qs),
 			rego.Load(o.policies, nil),
 			rego.EnablePrintStatements(true),
 			rego.PrintHook(o.printHook),
-		}, customFns...)...,
+		}, o.options...)...,
 	).PrepareForEval(ctx)
 	if err != nil {
 		return false, err

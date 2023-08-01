@@ -1565,9 +1565,6 @@ github.com/prometheus/statsd_exporter/pkg/mapper/fsm
 # github.com/r3labs/sse/v2 v2.10.0
 ## explicit; go 1.13
 github.com/r3labs/sse/v2
-# github.com/rakyll/magicmime v0.1.0
-## explicit
-github.com/rakyll/magicmime
 # github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 ## explicit
 github.com/rcrowley/go-metrics
