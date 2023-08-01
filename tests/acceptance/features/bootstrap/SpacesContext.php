@@ -367,20 +367,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * using method from core to set share data
-	 *
-	 * @return void
-	 */
-	public function setLastShareData(): void {
-		// set last response as PublicShareData
-		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
-		// set last shareId if ShareData exists
-		if (isset($this->featureContext->getLastPublicShareData()->data)) {
-			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
-		}
-	}
-
-	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -1926,7 +1912,8 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
-		$this->setLastShareData();
+		$response = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->addToCreatedPublicShares($response->data);
 	}
 
 	/**
@@ -1979,7 +1966,7 @@ class SpacesContext implements Context {
 	 * @throws JsonException
 	 */
 	public function updateSharedResource(string $user, array $rows):ResponseInterface {
-		$shareId = $this->featureContext->getLastPublicLinkShareId();
+		$shareId = (string) $this->featureContext->getLastCreatedPublicShare()->id;
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
 		return  HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -2049,7 +2036,8 @@ class SpacesContext implements Context {
 			)
 		);
 
-		$this->setLastShareData();
+		$response = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->addToCreatedPublicShares($response->data);
 	}
 
 	/**
@@ -2817,7 +2805,8 @@ class SpacesContext implements Context {
 			)
 		);
 
-		$this->setLastShareData();
+		$response = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->addToCreatedPublicShares($response->data);
 	}
 
 	/**
@@ -2842,7 +2831,6 @@ class SpacesContext implements Context {
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
-		$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
 	}
 
 	/**
@@ -2887,7 +2875,7 @@ class SpacesContext implements Context {
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
 			foreach ($responseArray as $element) {
-				$expectedLinkId = $this->featureContext->getLastPublicLinkShareId();
+				$expectedLinkId = (string) $this->featureContext->getLastCreatedPublicShare()->id;
 				Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
 			}
 		} else {
@@ -3157,7 +3145,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException|JsonException
 	 */
 	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource) {
-		$token = $this->featureContext->getLastPublicShareToken();
+		$token = $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->featureContext->listFolderAndReturnResponseXml(
 			$token,
 			$resource,
