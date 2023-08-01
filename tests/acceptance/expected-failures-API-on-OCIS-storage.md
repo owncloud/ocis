@@ -558,10 +558,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavMove2/moveFileToBlacklistedName.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L19)
 - [coreApiWebdavMove2/moveFileToBlacklistedName.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L20)
 
-#### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
-
-- [coreApiWebdavPreviews/previews.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L141)
-
 #### [Share path in the response is different between share states](https://github.com/owncloud/ocis/issues/2540)
 
 - [coreApiShareManagementToShares/acceptShares.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L28)
