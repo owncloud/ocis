@@ -144,7 +144,7 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
-* Enhancement - Update web to v7.1.0-rc.3: [#6925](https://github.com/owncloud/ocis/pull/6925)
+* Enhancement - Update web to v7.1.0-rc.4: [#6925](https://github.com/owncloud/ocis/pull/6925)
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
@@ -515,11 +515,11 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6470
    https://github.com/owncloud/web/releases/tag/v7.0.1
 
-* Enhancement - Update web to v7.1.0-rc.3: [#6925](https://github.com/owncloud/ocis/pull/6925)
+* Enhancement - Update web to v7.1.0-rc.4: [#6925](https://github.com/owncloud/ocis/pull/6925)
 
    Tags: web
 
-   We updated ownCloud Web to v7.1.0-rc.3. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v7.1.0-rc.4. Please refer to the changelog (linked) for details on
    the web release.
 
    ## Summary * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078):
@@ -545,7 +545,13 @@ The following sections list the changes for 3.1.0.
    showing * Bugfix [owncloud/web/#9489](https://github.com/owncloud/web/pull/9489):
    Public drop zone * Bugfix
    [owncloud/web/#9487](https://github.com/owncloud/web/pull/9487): Respect
-   supportedClouds config * Enhancement
+   supportedClouds config * Bugfix
+   [owncloud/web/#9507](https://github.com/owncloud/web/pull/9507): Space description
+   edit modal is cut off vertically * Bugfix
+   [owncloud/web/#9501](https://github.com/owncloud/web/pull/9501): Add cloud importer
+   translations * Bugfix
+   [owncloud/web/#9510](https://github.com/owncloud/web/pull/9510): Double items after
+   moving a file with the same name * Enhancement
    [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add hasPriority
    property for editors per extension * Enhancement
    [owncloud/web#8422](https://github.com/owncloud/web/issues/8422): Improve
@@ -615,7 +621,7 @@ The following sections list the changes for 3.1.0.
    [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
 
    https://github.com/owncloud/ocis/pull/6925
-   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.3
+   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.4
 
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
