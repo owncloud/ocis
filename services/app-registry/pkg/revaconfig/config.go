@@ -31,7 +31,7 @@ func AppRegistryConfigFromStruct(cfg *config.Config, logger log.Logger) map[stri
 			},
 			"services": map[string]interface{}{
 				"appregistry": map[string]interface{}{
-					"driver": "static",
+					"driver": "micro",
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"mime_types": mimetypes(cfg, logger),

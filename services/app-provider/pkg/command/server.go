@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
+	"time"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -20,6 +22,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/server/debug"
 	"github.com/urfave/cli/v2"
+
+	registrypb "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
+	oreg "github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	mreg "go-micro.dev/v4/registry"
 )
 
 // Server is the entry point for the server command.
@@ -43,7 +49,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
-				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.New().String()+".pid")
 				rCfg := revaconfig.AppProviderConfigFromStruct(cfg)
 				reg := registry.GetRegistry()
 
@@ -83,7 +89,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			grpcSvc := registry.BuildGRPCService(
 				cfg.GRPC.Namespace+"."+cfg.Service.Name,
-				uuid.Must(uuid.NewV4()).String(),
+				uuid.New().String(),
 				cfg.GRPC.Addr,
 				version.GetString(),
 				nil,
@@ -92,9 +98,81 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
+			t := time.NewTicker(time.Second * 20)
+
+			go func() {
+				for {
+					select {
+					case <-t.C:
+						logger.Debug().Msg("ocis app provider (re-)registering")
+						err := registerWithMicroReg("cs3", //TODO: make configurable
+							cfg.Drivers.WOPI.AppAddress,
+							cfg.Drivers.WOPI.AppName,
+							cfg.Drivers.WOPI.AppDescription,
+							cfg.Drivers.WOPI.AppIconURI,
+							cfg.Drivers.WOPI.AppPriority,
+							cfg.Drivers.WOPI.AppCapabilities,
+							cfg.Drivers.WOPI.AppDesktopOnly,
+							cfg.Drivers.WOPI.AppSupportedMimeTypes,
+						)
+						if err != nil {
+							logger.Error().Err(err).Msg("could not register ocis app provider")
+							continue
+						}
+					case <-ctx.Done():
+						logger.Debug().Msg("ocis app provider stopped")
+						t.Stop()
+					}
+				}
+			}()
+
 			return gr.Run()
 		},
 	}
+}
+
+// This is to mock registering with the go-micro registry and at the same time the reference implementation
+func registerWithMicroReg(ns, address, name, desc, icon, prio string, cap int32, desktopOnly bool, mimeTypes []string) error {
+	reg := oreg.GetRegistry()
+
+	serviceID := ns + ".api.app-provider"
+
+	node := &mreg.Node{
+		//		Id:       serviceID + "-" + uuid.New().String(),
+		Id:       serviceID + "-" + strings.ToLower(name),
+		Address:  address,
+		Metadata: make(map[string]string),
+	}
+
+	node.Metadata["registry"] = reg.String()
+	node.Metadata["server"] = "grpc"
+	node.Metadata["transport"] = "grpc"
+	node.Metadata["protocol"] = "grpc"
+
+	node.Metadata[ns+".app-provider.mime_type"] = joinMimeTypes(mimeTypes)
+	node.Metadata[ns+".app-provider.name"] = name
+	node.Metadata[ns+".app-provider.description"] = desc
+	node.Metadata[ns+".app-provider.icon"] = icon
+
+	node.Metadata[ns+".app-provider.allow_creation"] = registrypb.ProviderInfo_Capability_name[cap]
+	node.Metadata[ns+".app-provider.priority"] = prio
+	if desktopOnly {
+		node.Metadata[ns+".app-provider.desktop_only"] = "true"
+	}
+
+	service := &mreg.Service{
+		Name: serviceID,
+		//Version:   version,
+		Nodes:     []*mreg.Node{node},
+		Endpoints: make([]*mreg.Endpoint, 0),
+	}
+
+	rOpts := []mreg.RegisterOption{mreg.RegisterTTL(time.Minute)}
+	if err := reg.Register(service, rOpts...); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // defineContext sets the context for the service. If there is a context configured it will create a new child from it,
@@ -106,4 +184,13 @@ func defineContext(cfg *config.Config) (context.Context, context.CancelFunc) {
 		}
 		return context.WithCancel(cfg.Context)
 	}()
+}
+
+// use the UTF-8 record separator
+func splitMimeTypes(s string) []string {
+	return strings.Split(s, "␞")
+}
+
+func joinMimeTypes(mimetypes []string) string {
+	return strings.Join(mimetypes, "␞")
 }

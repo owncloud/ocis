@@ -56,16 +56,21 @@ type Drivers struct {
 }
 
 type WOPIDriver struct {
-	AppAPIKey                 string `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"API key for the wopi app."`
-	AppDesktopOnly            bool   `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"Offer this app only on desktop."`
-	AppIconURI                string `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"URI to an app icon to be used by clients."`
-	AppInternalURL            string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, like in your DMZ."`
-	AppName                   string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name."`
-	AppURL                    string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app."`
-	AppDisableChat            bool   `yaml:"app_disable_chat" env:"APP_PROVIDER_WOPI_DISABLE_CHAT" desc:"Disable the chat functionality of the office app."`
-	Insecure                  bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments."`
-	IopSecret                 string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"Shared secret of the CS3org WOPI server."`
-	WopiURL                   string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"External url of the CS3org WOPI server."`
-	WopiFolderURLBaseURL      string `yaml:"wopi_folder_url_base_url" env:"OCIS_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL" desc:"Base url to navigate back from the app to the containing folder in the file list."`
-	WopiFolderURLPathTemplate string `yaml:"wopi_folder_url_path_template" env:"APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE" desc:"Path template to navigate back from the app to the containing folder in the file list. Supported template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}"`
+	AppAPIKey                 string   `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"API key for the wopi app."`
+	AppAddress                string   `yaml:"app_address" env:"APP_PROVIDER_WOPI_APP_ADDRESS" desc:"The Address of the app in the format <ip|appname|tld>:<port>"`
+	AppCapabilities           int32    `yaml:"app_capabilities" env:"APP_PROVIDER_WOPI_APP_CAPABILITIES" desc:"Capabilities of the app (supported values: 0 (Default) = NONE NEEDED, 1 = VIEWER, 2 = EDITOR)"`
+	AppDescription            string   `yaml:"app_description" env:"APP_PROVIDER_WOPI_APP_DESCRIPTION" desc:"The description of the app"`
+	AppDesktopOnly            bool     `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"Offer this app only on desktop."`
+	AppIconURI                string   `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"URI to an app icon to be used by clients."`
+	AppInternalURL            string   `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, like in your DMZ."`
+	AppName                   string   `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name."`
+	AppPriority               string   `yaml:"app_priority" env:"APP_PROVIDER_WOPI_PRIORITY" desc:"The Priority of the app"`
+	AppSupportedMimeTypes     []string `yaml:"app_supported_mime_types" env:"APP_PROVIDER_WOPI_SUPPORTED_MIME_TYPES" desc:"List of supported mimetypes."`
+	AppURL                    string   `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app."`
+	AppDisableChat            bool     `yaml:"app_disable_chat" env:"APP_PROVIDER_WOPI_DISABLE_CHAT" desc:"Disable the chat functionality of the office app."`
+	Insecure                  bool     `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments."`
+	IopSecret                 string   `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"Shared secret of the CS3org WOPI server."`
+	WopiURL                   string   `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"External url of the CS3org WOPI server."`
+	WopiFolderURLBaseURL      string   `yaml:"wopi_folder_url_base_url" env:"OCIS_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL" desc:"Base url to navigate back from the app to the containing folder in the file list."`
+	WopiFolderURLPathTemplate string   `yaml:"wopi_folder_url_path_template" env:"APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE" desc:"Path template to navigate back from the app to the containing folder in the file list. Supported template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}"`
 }
