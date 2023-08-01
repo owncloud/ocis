@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -33,6 +34,12 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			cfg.GrpcClient, err = ogrpc.NewClient(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
+			)
+			if err != nil {
+				return err
+			}
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
 				if cfg.Context == nil {

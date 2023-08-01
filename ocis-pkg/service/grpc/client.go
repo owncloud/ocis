@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"os"
-	"sync"
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
 	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
@@ -14,11 +13,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel/trace"
-)
-
-var (
-	defaultClient client.Client
-	once          sync.Once
 )
 
 // ClientOptions represent options (e.g. tls settings) for the grpc clients
@@ -54,60 +48,6 @@ func WithTraceProvider(tp trace.TracerProvider) ClientOption {
 			o.tp = trace.NewNoopTracerProvider()
 		}
 	}
-}
-
-// Configure configures the default oOCIS grpc client (e.g. TLS settings)
-func Configure(opts ...ClientOption) error {
-	var options ClientOptions
-	for _, opt := range opts {
-		opt(&options)
-	}
-	var outerr error
-	once.Do(func() {
-		reg := registry.GetRegistry()
-		var tlsConfig *tls.Config
-		cOpts := []client.Option{
-			client.Registry(reg),
-			client.Wrap(mbreaker.NewClientWrapper()),
-			client.Wrap(mtracer.NewClientWrapper(
-				mtracer.WithTraceProvider(options.tp),
-			)),
-		}
-		switch options.tlsMode {
-		case "insecure":
-			tlsConfig = &tls.Config{
-				InsecureSkipVerify: true,
-			}
-			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
-		case "on":
-			tlsConfig = &tls.Config{}
-			// Note: If caCert is empty we use the system's default set of trusted CAs
-			if options.caCert != "" {
-				certs := x509.NewCertPool()
-				pemData, err := os.ReadFile(options.caCert)
-				if err != nil {
-					outerr = err
-					return
-				}
-				if !certs.AppendCertsFromPEM(pemData) {
-					outerr = errors.New("could not initialize default client, adding CA cert failed")
-					return
-				}
-				tlsConfig.RootCAs = certs
-			}
-			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
-			// case "off":
-			// default:
-		}
-
-		defaultClient = mgrpcc.NewClient(cOpts...)
-	})
-	return outerr
-}
-
-// DefaultClient returns a custom oCIS grpc configured client.
-func DefaultClient() client.Client {
-	return defaultClient
 }
 
 func GetClientOptions(t *shared.GRPCClientTLS) []ClientOption {

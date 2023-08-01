@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"go-micro.dev/v4/client"
 )
 
 // Config combines all available configuration parts.
@@ -19,6 +20,7 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient    client.Client         `yaml:"-"`
 
 	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store."`
 

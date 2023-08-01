@@ -61,12 +61,13 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				err = grpc.Configure(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
+				grpcClient, err := grpc.NewClient(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
 				if err != nil {
 					return err
 				}
 
-				svc, err := grpc.NewService(
+				svc, err := grpc.NewServiceWithClient(
+					grpcClient,
 					grpc.Logger(logger),
 					grpc.TLSEnabled(cfg.GRPC.TLS.Enabled),
 					grpc.TLSCert(
