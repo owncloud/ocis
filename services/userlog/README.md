@@ -36,7 +36,11 @@ Additionally to the oc10 API, the `userlog` service also provides an `/sse` (Ser
 
 ## Posting
 
-The userlog service is able to store global messages that will be displayed in the Web UI to all users. These messages can only be activated and deleted by users with the `admin` role but not by ordinary users. If a user deletes the message in the Web UI, it reappears on reload. Global messages use the endpoint `/ocs/v2.php/apps/notifications/api/v1/notifications/global` and are activated by sending a `POST` request. Note that sending another `POST` request of the same type overwrites the previous one. For the time being, only the type `deprovision` is supported.
+The userlog service is able to store global messages that will be displayed in the Web UI to all users.  If a user deletes the message in the Web UI, it reappears on reload. Global messages use the endpoint `/ocs/v2.php/apps/notifications/api/v1/notifications/global` and are activated by sending a `POST` request. Note that sending another `POST` request of the same type overwrites the previous one. For the time being, only the type `deprovision` is supported.
+
+### Authentication
+
+`POST` and `DELETE` endpoints provide notifications to all users, therefore only certain users can access them. There are two different possiblities to authenticate for this endpoint. First, users with the `admin` role can always access the endpoints. However it is possible to define a static secret via the `USERLOG_GLOBAL_NOTIFICATIONS_SECRET`. Users knowing the secret can send a header containing it on their requests. Having the secret in the header bypasses the `admin` requirement.
 
 ### Deprovisioning
 
@@ -46,7 +50,7 @@ Deprovision messages announce a deprovision text including a deprovision date of
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
 
-Only users with the `admin` role can send a `DELETE` request to the `ocs/v2.php/apps/notifications/api/v1/notifications/global` endpoint to remove a global message, see the [Posting](#posting) section for more details.)
+Sending a `DELETE` request to the `ocs/v2.php/apps/notifications/api/v1/notifications/global` endpoint to remove a global message is a restricted action, see the [Authentication](###authentication) section for more details.)
 
 ## Translations
 
