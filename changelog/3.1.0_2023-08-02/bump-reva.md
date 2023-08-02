@@ -1,4 +1,26 @@
-Enhancement: Update reva to v2.15.0
+Enhancement: Bump reva to latest edge
+
+*   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
+*   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
+*   Bugfix [cs3org/reva#4051](https://github.com/cs3org/reva/pull/4051): Set treesize when creating a storage space
+*   Bugfix [cs3org/reva#4089](https://github.com/cs3org/reva/pull/4089): Fix wrong import
+*   Bugfix [cs3org/reva#4082](https://github.com/cs3org/reva/pull/4082): Fix propfind permissions
+*   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
+*   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
+*   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+*   Enhancement [cs3org/reva#4070](https://github.com/cs3org/reva/pull/4070): Selectable Propagators
+*   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
+*   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
+*   Enhancement [cs3org/reva#4090](https://github.com/cs3org/reva/pull/4090): Add Capability for sse
+*   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
+*   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
+*   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+
+https://github.com/owncloud/ocis/pull/6899
+https://github.com/owncloud/ocis/pull/6919
+https://github.com/owncloud/ocis/pull/6928
+
+Update reva to v2.15.0
 
 *   Bugfix [cs3org/reva#4004](https://github.com/cs3org/reva/pull/4004): Add path to public link POST
 *   Bugfix [cs3org/reva#3993](https://github.com/cs3org/reva/pull/3993): Add token to LinkAccessedEvent
