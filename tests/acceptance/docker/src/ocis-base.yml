@@ -42,6 +42,9 @@ services:
 
       # postprocessing step
       POSTPROCESSING_STEPS: $POSTPROCESSING_STEPS
+
+      # fonts map for txt thumbnails (including unicode support)
+      THUMBNAILS_TXT_FONTMAP_FILE: "/drone/src/tests/config/drone/fontsMap.json"
     volumes:
       - ../../../config:/drone/src/tests/config
       - ../../../ociswrapper/bin/ociswrapper:/usr/bin/ociswrapper
