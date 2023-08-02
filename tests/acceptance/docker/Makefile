@@ -175,7 +175,7 @@ $(targets):
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: testSuite
-testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
+testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container ../../../vendor-bin/behat/composer.lock ../../../composer.lock
 	@if [ -n "${START_CEPH}" ]; then \
 		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 		COMPOSE_FILE=src/ceph.yml \
@@ -257,3 +257,11 @@ clean-files:
 
 .PHONY: clean
 clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-files ## clean all
+
+../../../vendor-bin/behat/composer.lock: ../../../vendor-bin/behat/composer.json
+	@echo behat composer.lock is not up to date.
+	@composer update --no-progress -d ../../../vendor-bin/behat
+
+../../../composer.lock: ../../../composer.json
+	@echo composer.lock is not up to date.
+	@composer update --no-progress -d ../../../
