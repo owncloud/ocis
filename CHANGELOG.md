@@ -1,101 +1,4 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes for unreleased.
-
-[unreleased]: https://github.com/owncloud/ocis/compare/v3.1.0...master
-
-## Summary
-
-* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
-* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
-* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
-* Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
-* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
-* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
-* Bugfix - Fix the routing capability: [#9367](https://github.com/owncloud/web/issues/9367)
-* Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
-* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
-* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
-* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
-
-## Details
-
-* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
-
-   When authenticating in proxy, first check for public link authorization.
-
-   https://github.com/owncloud/ocis/pull/6900
-
-* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
-
-   We needed to remove "must-revalidate" from the cache-control header to allow clients to cache
-   the web and theme assets.
-
-   https://github.com/owncloud/ocis/pull/6914
-
-* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
-
-   We fixed the CORS issues when client asking for the 'Cache-Control' header before load the file
-
-   https://github.com/owncloud/ocis/issues/5108
-   https://github.com/owncloud/ocis/pull/6912
-
-* Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
-
-   Fix the error message when the thumbnail request returns a '400 Bad Request' response.
-
-   https://github.com/owncloud/ocis/issues/2064
-   https://github.com/owncloud/ocis/pull/6911
-
-* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
-
-   Using `nats` as service registry did work, but when a service would restart and gets a new ip it
-   couldn't re-register. We fixed this by using `"put"` register action instead of the default
-   `"create"`
-
-   https://github.com/owncloud/ocis/pull/6881
-
-* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
-
-   Fix the default document language for OnlyOffice
-
-   https://github.com/owncloud/enterprise/issues/5807
-   https://github.com/owncloud/ocis/pull/6878
-
-* Bugfix - Fix the routing capability: [#9367](https://github.com/owncloud/web/issues/9367)
-
-   Fix the routing capability
-
-   https://github.com/owncloud/web/issues/9367
-
-* Enhancement - Bump reva: [#6899](https://github.com/owncloud/ocis/pull/6899)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/6899
-   https://github.com/owncloud/ocis/pull/6919
-   https://github.com/owncloud/ocis/pull/6928
-
-* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
-
-   Add a configuration option for the grpc max message size
-
-   https://github.com/owncloud/ocis/pull/6849
-
-* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
-
-   The policy environment for single file shares now also includes information about the
-   resource. As a result, it is now possible to set up and check rules for them.
-
-   https://github.com/owncloud/ocis/pull/6888
-
-* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
-
-   Improve the notification logs when the user has no email address
-
-   https://github.com/owncloud/ocis/issues/6855
-   https://github.com/owncloud/ocis/pull/6862
-# Changelog for [3.1.0] (2023-07-18)
+# Changelog for [3.1.0] (2023-08-02)
 
 The following sections list the changes for 3.1.0.
 
@@ -106,9 +9,16 @@ The following sections list the changes for 3.1.0.
 * Bugfix - Add default store to postprocessing: [#6578](https://github.com/owncloud/ocis/pull/6578)
 * Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
+* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
 * Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
+* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
+* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
+* Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
+* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
+* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
+* Bugfix - Fix the routing capability: [#9367](https://github.com/owncloud/web/issues/9367)
 * Bugfix - Fix search shares: [#6741](https://github.com/owncloud/ocis/pull/6741)
 * Bugfix - Restart Postprocessing: [#6726](https://github.com/owncloud/ocis/pull/6726)
 * Change - YAML configuration files are restricted to yaml-1.2: [#6510](https://github.com/owncloud/ocis/issues/6510)
@@ -123,9 +33,10 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Bump Hugo: [#6787](https://github.com/owncloud/ocis/pull/6787)
-* Enhancement - Update reva to v2.15.0: [#6829](https://github.com/owncloud/ocis/pull/6829)
+* Enhancement - Bump reva to latest edge: [#6829](https://github.com/owncloud/ocis/pull/6829)
 * Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
+* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
 * Enhancement - Thumbnails can be disabled for webdav & web now: [#6577](https://github.com/owncloud/ocis/pull/6577)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
@@ -135,10 +46,12 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Provide Search filter for locations: [#6713](https://github.com/owncloud/ocis/pull/6713)
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 * Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
+* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
+* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 * Enhancement - Move graph to service tracerprovider: [#6695](https://github.com/owncloud/ocis/pull/6695)
 * Enhancement - Move proxy to service tracerprovider: [#6591](https://github.com/owncloud/ocis/pull/6591)
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
@@ -171,11 +84,31 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/issues/3753
    https://github.com/owncloud/ocis/pull/6515
 
+* Bugfix - Check public auth first: [#6900](https://github.com/owncloud/ocis/pull/6900)
+
+   When authenticating in proxy, first check for public link authorization.
+
+   https://github.com/owncloud/ocis/pull/6900
+
 * Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
 
    This leads to misleading error messages. Instead we connect on first request
 
    https://github.com/owncloud/ocis/pull/6565
+
+* Bugfix - Let clients cache web and theme assets: [#6914](https://github.com/owncloud/ocis/pull/6914)
+
+   We needed to remove "must-revalidate" from the cache-control header to allow clients to cache
+   the web and theme assets.
+
+   https://github.com/owncloud/ocis/pull/6914
+
+* Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
+
+   We fixed the CORS issues when client asking for the 'Cache-Control' header before load the file
+
+   https://github.com/owncloud/ocis/issues/5108
+   https://github.com/owncloud/ocis/pull/6912
 
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 
@@ -185,6 +118,21 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6469
    https://github.com/cs3org/reva/pull/3948
 
+* Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
+
+   Fix the error message when the thumbnail request returns a '400 Bad Request' response.
+
+   https://github.com/owncloud/ocis/issues/2064
+   https://github.com/owncloud/ocis/pull/6911
+
+* Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
+
+   Using `nats` as service registry did work, but when a service would restart and gets a new ip it
+   couldn't re-register. We fixed this by using `"put"` register action instead of the default
+   `"create"`
+
+   https://github.com/owncloud/ocis/pull/6881
+
 * Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
 
    The update role method did not allow to set a role when the user already has two roles. This makes
@@ -193,6 +141,19 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/pull/6605
    https://github.com/owncloud/ocis/pull/6618
+
+* Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
+
+   Fix the default document language for OnlyOffice
+
+   https://github.com/owncloud/enterprise/issues/5807
+   https://github.com/owncloud/ocis/pull/6878
+
+* Bugfix - Fix the routing capability: [#9367](https://github.com/owncloud/web/issues/9367)
+
+   Fix the routing capability
+
+   https://github.com/owncloud/web/issues/9367
 
 * Bugfix - Fix search shares: [#6741](https://github.com/owncloud/ocis/pull/6741)
 
@@ -295,7 +256,29 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/pull/6787
 
-* Enhancement - Update reva to v2.15.0: [#6829](https://github.com/owncloud/ocis/pull/6829)
+* Enhancement - Bump reva to latest edge: [#6829](https://github.com/owncloud/ocis/pull/6829)
+
+  *   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
+  *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
+  *   Bugfix [cs3org/reva#4051](https://github.com/cs3org/reva/pull/4051): Set treesize when creating a storage space
+  *   Bugfix [cs3org/reva#4089](https://github.com/cs3org/reva/pull/4089): Fix wrong import
+  *   Bugfix [cs3org/reva#4082](https://github.com/cs3org/reva/pull/4082): Fix propfind permissions
+  *   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
+  *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
+  *   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+  *   Enhancement [cs3org/reva#4070](https://github.com/cs3org/reva/pull/4070): Selectable Propagators
+  *   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
+  *   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
+  *   Enhancement [cs3org/reva#4090](https://github.com/cs3org/reva/pull/4090): Add Capability for sse
+  *   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
+  *   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
+  *   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+
+   Https://github.com/owncloud/ocis/pull/6899
+   https://github.com/owncloud/ocis/pull/6919
+   https://github.com/owncloud/ocis/pull/6928
+
+   Update reva to v2.15.0
 
   *   Bugfix [cs3org/reva#4004](https://github.com/cs3org/reva/pull/4004): Add path to public link POST
   *   Bugfix [cs3org/reva#3993](https://github.com/cs3org/reva/pull/3993): Add token to LinkAccessedEvent
@@ -376,6 +359,12 @@ The following sections list the changes for 3.1.0.
    https://github.com/cs3org/reva/pull/3939
    https://github.com/cs3org/reva/pull/3953
 
+* Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
+
+   Add a configuration option for the grpc max message size
+
+   https://github.com/owncloud/ocis/pull/6849
+
 * Enhancement - Thumbnails can be disabled for webdav & web now: [#6577](https://github.com/owncloud/ocis/pull/6577)
 
    We added an env var `OCIS_DISABLE_PREVIEWS` to disable the thumbnails for web & webdav via a
@@ -447,6 +436,13 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6760
    https://github.com/owncloud/ocis/pull/6771
 
+* Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
+
+   The policy environment for single file shares now also includes information about the
+   resource. As a result, it is now possible to set up and check rules for them.
+
+   https://github.com/owncloud/ocis/pull/6888
+
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
    Defaults for the envvar OCIS_LDAP_DISABLE_USER_MECHANISM were not used consistently,
@@ -475,6 +471,13 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/issues/6436
    https://github.com/owncloud/ocis/pull/6437
+
+* Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
+
+   Improve the notification logs when the user has no email address
+
+   https://github.com/owncloud/ocis/issues/6855
+   https://github.com/owncloud/ocis/pull/6862
 
 * Enhancement - Move graph to service tracerprovider: [#6695](https://github.com/owncloud/ocis/pull/6695)
 
