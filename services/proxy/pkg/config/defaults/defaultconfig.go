@@ -151,18 +151,9 @@ func DefaultPolicies() []config.Policy {
 				// TODO or we allow a REPORT on /dav/spaces to search all spaces and /dav/space/{spaceid} to search a specific space
 				// send webdav REPORT requests to search service
 				{
+					Type:     config.RegexRoute,
 					Method:   "REPORT",
-					Endpoint: "/remote.php/dav/",
-					Service:  "com.owncloud.web.webdav",
-				},
-				{
-					Method:   "REPORT",
-					Endpoint: "/remote.php/webdav",
-					Service:  "com.owncloud.web.webdav",
-				},
-				{
-					Method:   "REPORT",
-					Endpoint: "/dav/spaces",
+					Endpoint: "(/remote.php)?/(web)?dav",
 					Service:  "com.owncloud.web.webdav",
 				},
 				{
