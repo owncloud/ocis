@@ -211,6 +211,14 @@ default:
         - OCSContext:
         - TrashbinContext:
 
+    apiReshare:
+      paths:
+        - '%paths.base%/../features/apiReshare'
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - OcisConfigContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 
