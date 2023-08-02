@@ -499,3 +499,20 @@ TEST_SERVER_URL="https://localhost:9200" \
 BEHAT_FEATURE="tests/acceptance/features/apiAntivirus/antivirus.feature" \
 make test-acceptance-api
 ```
+
+## Running Text Preview Tests Containing Unicode Characters
+
+There are some tests that check the text preview of files containing Unicode characters. The oCIS server by default cannot generate the thumbnail of such files correctly but it provides an environment variable to allow the use of custom fonts that support Unicode characters. So to run such tests successfully, we have to run the oCIS server with this environment variable.
+
+```bash
+...
+THUMBNAILS_TXT_FONTMAP_FILE="/path/to/fontsMap.json"
+ocis/bin/ocis server
+```
+
+The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
+```json
+{
+  "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
+}
+```
