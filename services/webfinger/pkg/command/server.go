@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config/parser"
@@ -15,7 +16,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/webfinger/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,7 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -68,7 +68,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				svc = service.NewInstrument(svc, metrics)
 				svc = service.NewLogging(svc, logger) // this logs service specific data
-				svc = service.NewTracing(svc)
+				svc = service.NewTracing(svc, traceProvider)
 
 				server, err := http.Server(
 					http.Logger(logger),
