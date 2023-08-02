@@ -98,8 +98,8 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
 		r.Delete("/", ul.HandleDeleteEvents)
-		r.Post("/global", RequireAdmin(&m, ul.log)(ul.HandlePostGlobalEvent))
-		r.Delete("/global", RequireAdmin(&m, ul.log)(ul.HandleDeleteGlobalEvent))
+		r.Post("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandlePostGlobalEvent))
+		r.Delete("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandleDeleteGlobalEvent))
 
 		if !ul.cfg.DisableSSE {
 			r.Get("/sse", ul.HandleSSE)

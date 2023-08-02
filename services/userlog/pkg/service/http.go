@@ -1,11 +1,13 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
@@ -202,41 +204,60 @@ type PostEventsRequest struct {
 	Data map[string]string `json:"data"`
 }
 
-// RequireAdmin middleware is used to require the user in context to be an admin / have account management permissions
-func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.HandlerFunc) http.HandlerFunc {
+// RequireAdminOrSecret middleware allows only requests if the requesting user is an admin or knows the static secret
+func RequireAdminOrSecret(rm *roles.Manager, secret string) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			u, ok := revactx.ContextGetUser(r.Context())
-			if !ok || u.GetId().GetOpaqueId() == "" {
-				logger.Error().Str("userid", u.Id.OpaqueId).Msg("user not in context")
-				errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
-				return
-			}
-			// get roles from context
-			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
-			if !ok {
-				logger.Debug().Str("userid", u.Id.OpaqueId).Msg("No roles in context, contacting settings service")
-				var err error
-				roleIDs, err = rm.FindRoleIDsForUser(r.Context(), u.Id.OpaqueId)
-				if err != nil {
-					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to get roles for user")
-					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
-					return
-				}
-				if len(roleIDs) == 0 {
-					logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("user has no roles")
-					errorcode.AccessDenied.Render(w, r, http.StatusInternalServerError, "")
-					return
-				}
-			}
-
-			// check if permission is present in roles of the authenticated account
-			if rm.FindPermissionByID(r.Context(), roleIDs, settings.AccountManagementPermissionID) != nil {
+			// allow bypassing admin requirement by sending the correct secret
+			if secret != "" && r.Header.Get("secret") == secret {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			errorcode.AccessDenied.Render(w, r, http.StatusNotFound, "Forbidden")
+			isadmin, err := isAdmin(r.Context(), rm)
+			if err != nil {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+				return
+			}
+
+			if isadmin {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Not found")
+			return
 		}
 	}
+}
+
+// isAdmin determines if the user in the context is an admin / has account management permissions
+func isAdmin(ctx context.Context, rm *roles.Manager) (bool, error) {
+	logger := appctx.GetLogger(ctx)
+
+	u, ok := revactx.ContextGetUser(ctx)
+	uid := u.GetId().GetOpaqueId()
+	if !ok || uid == "" {
+		logger.Error().Str("userid", uid).Msg("user not in context")
+		return false, errors.New("no user in context")
+	}
+	// get roles from context
+	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
+	if !ok {
+		logger.Debug().Str("userid", uid).Msg("No roles in context, contacting settings service")
+		var err error
+		roleIDs, err = rm.FindRoleIDsForUser(ctx, uid)
+		if err != nil {
+			logger.Err(err).Str("userid", uid).Msg("failed to get roles for user")
+			return false, err
+		}
+
+		if len(roleIDs) == 0 {
+			logger.Err(err).Str("userid", uid).Msg("user has no roles")
+			return false, errors.New("user has no roles")
+		}
+	}
+
+	// check if permission is present in roles of the authenticated account
+	return rm.FindPermissionByID(ctx, roleIDs, settings.AccountManagementPermissionID) != nil, nil
 }
