@@ -46,7 +46,7 @@ type Engine struct {
 	Timeout  time.Duration `yaml:"timeout" env:"POLICIES_ENGINE_TIMEOUT" desc:"Sets the timeout the rego expression evaluation can take. The timeout can be set as number followed by a unit identifier like ms, s, etc. Rules default to deny if the timeout was reached."`
 	Policies []string      `yaml:"policies"`
 	// Mimes file path, RFC 4288
-	Mimes string `yaml:"mimes" env:"POLICIES_ENGINE_MIMES" desc:"Sets the mimes file path which maps media types to unique file extension(s)."`
+	Mimes string `yaml:"mimes" env:"POLICIES_ENGINE_MIMES" desc:"Sets the mimes file path which maps mimetypes to associated file extensions. See the text description for details."`
 }
 
 // Postprocessing defines the config options for the postprocessing policy handling.

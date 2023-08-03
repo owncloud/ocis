@@ -118,27 +118,29 @@ Note that additional steps can be configured and their position in the list defi
 
 To identify available keys for OPA, you need to look at [engine.go](https://github.com/owncloud/ocis/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/owncloud/ocis/blob/master/protogen/gen/ocis/services/policies/v0/policies.swagger.json) file. Note that which keys are available depends on from which module it is used.
 
-### Extend mimetype file extension mapping
+## Extend Mimetype File Extension Mapping
 
-In rego it is possible to get a list of associated file extensions based on a mimetype, e.g. 'ocis.mimetype.extensions("application/pdf")'.
+In the extended set of the rego query language, it is possible to get a list of associated file extensions based on a mimetype, for example `ocis.mimetype.extensions("application/pdf")`.
 
-The list of mappings is restricted by default and is provided by the host system.
+The list of mappings is restricted by default and is provided by the host system ocis is installed on.
 
-In order to extend this list, oCis must be provided with the path to a mime.types file.
+In order to extend this list, ocis must be provided with the path to a custom `mime.types` file that maps mimetypes to extensions.
+The location for the file must be accessible by all instances of the policy service. As a rule of thumb, use the directory where the ocis configuration files are stored.
+Note that existing mappings from the host are extended by the definitions from the mime types file, but not replaced.
 
-This can be done via yaml configuration or an environment variable.
+The path to that file can be provided via a yaml configuration or an environment variable. Note to replace the `OCIS_CONFIG_DIR` string by an existing path.
 
 ```shell
-export OCIS_MACHINE_AUTH_API_KEY=$OCIS_HOME/mime.types
+export OCIS_MACHINE_AUTH_API_KEY=OCIS_CONFIG_DIR/mime.types
 ```
 
 ```yaml
 policies:
   engine:
-    mimes: OCIS_HOME/mime.types
+    mimes: OCIS_CONFIG_DIR/mime.types
 ```
 
-A good example of how such a file should be formatted can be found in the [apache svn repository](https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types).
+A good example of how such a file should be formatted can be found in the [Apache svn repository](https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types).
 
 ## Example Policies
 
