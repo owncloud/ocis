@@ -11,6 +11,10 @@ import (
 	"github.com/open-policy-agent/opa/types"
 )
 
+// RFResourceDownload extends the rego dictionary with the possibility to download oCis resources.
+//
+// Rego: `ocis.resource.download("ocis/path/0034892347349827")`
+// Result: bytes
 var RFResourceDownload = rego.Function1(
 	&rego.Function{
 		Name:             "ocis.resource.download",
