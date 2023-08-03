@@ -34,12 +34,8 @@ Feature: create user
       | name.with.dots               | user                                    | name.w.dots@example.org | 123                          | 200  | true   | should      |
       | 123456789                    | user                                    | 123456789@example.org   | 123                          | 400  | true   | should not  |
       | 0.0                          | user                                    | float@example.org       | 123                          | 400  | true   | should not  |
-
-    @skipOnStable2.0
-    Examples:
-      | userName     | displayName   | email           | password | code | enable | shouldOrNot |
-      | withoutEmail | without email |                 | 123      | 200  | true   | should      |
-      | Alice        | same userName | new@example.org | 123      | 409  | true   | should      |
+      | withoutEmail                 | without email                           |                         | 123                          | 200  | true   | should      |
+      | Alice                        | same userName                           | new@example.org         | 123                          | 409  | true   | should      |
 
 
   Scenario: user cannot be created with empty name
@@ -82,7 +78,7 @@ Feature: create user
       | accountEnabled | true                  |
     Then the HTTP status code should be "409"
 
-  @skipOnStable2.0
+
   Scenario: user can be created with the name of the deleted user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
@@ -129,7 +125,7 @@ Feature: create user
     When the administrator retrieves the assigned role of user "sam" using the Graph API
     Then the HTTP status code should be "200"
     And the Graph API response should have no role
-    
+
 
   @env-config
   Scenario: create user with setting OCIS assign the default user role
