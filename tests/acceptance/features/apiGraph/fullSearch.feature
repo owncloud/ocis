@@ -155,3 +155,24 @@ Feature: full text search
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: search files inside the folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world inside root" to "file1.txt"
+    And user "Alice" has created folder "/Folder"
+    And user "Alice" has uploaded file with content "hello world inside folder" to "/Folder/file2.txt"
+    And user "Alice" has created folder "/Folder/SubFolder"
+    And user "Alice" has uploaded file with content "hello world inside sub-folder" to "/Folder/SubFolder/file3.txt"
+    When user "Alice" searches for "file" inside folder "/Folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | file2.txt |
+      | file3.txt |
+    But the search result of user "Alice" should not contain these entries:
+      | file1.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
