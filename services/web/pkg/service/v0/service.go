@@ -17,15 +17,15 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/riandyrn/otelchi"
 )
 
-var (
-	// ErrConfigInvalid is returned when the config parse is invalid.
-	ErrConfigInvalid = `Invalid or missing config`
-)
+// ErrConfigInvalid is returned when the config parse is invalid.
+var ErrConfigInvalid = `Invalid or missing config`
 
 // Service defines the service handlers.
 type Service interface {
@@ -42,6 +42,14 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
+	m.Use(
+		otelchi.Middleware(
+			"web",
+			otelchi.WithChiRoutes(m),
+			otelchi.WithTracerProvider(options.TraceProvider),
+			otelchi.WithPropagators(tracing.GetPropagator()),
+		),
+	)
 	svc := Web{
 		logger:          options.Logger,
 		config:          options.Config,
@@ -86,7 +94,6 @@ func (p Web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p Web) getPayload() (payload []byte, err error) {
-
 	if p.config.Web.Path == "" {
 		// render dynamically using config
 
@@ -127,7 +134,6 @@ func (p Web) getPayload() (payload []byte, err error) {
 
 // Config implements the Service interface.
 func (p Web) Config(w http.ResponseWriter, _ *http.Request) {
-
 	payload, err := p.getPayload()
 	if err != nil {
 		http.Error(w, ErrConfigInvalid, http.StatusUnprocessableEntity)

@@ -8,13 +8,13 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/web/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/web/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/web/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/web/pkg/server/http"
-	"github.com/owncloud/ocis/v2/services/web/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,7 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -67,8 +67,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
 					http.Metrics(metrics),
+					http.TraceProvider(traceProvider),
 				)
-
 				if err != nil {
 					logger.Info().
 						Err(err).
@@ -102,7 +102,6 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Context(ctx),
 					debug.Config(cfg),
 				)
-
 				if err != nil {
 					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
