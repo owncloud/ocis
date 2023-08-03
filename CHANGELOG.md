@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
+* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 
 ## Details
 
@@ -15,6 +16,15 @@ The following sections list the changes for unreleased.
    Bump sonarcloud to `5.0` to avoid java errors
 
    https://github.com/owncloud/ocis/pull/6961
+
+* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
+
+   The extension mimetype mappings known from rego can now be extended. To do this, ocis must be
+   informed where the mimetype file (apache mime.types file format) is located.
+
+   `export OCIS_MACHINE_AUTH_API_KEY=$OCIS_HOME/mime.types`
+
+   https://github.com/owncloud/ocis/pull/6869
 # Changelog for [3.1.0] (2023-08-02)
 
 The following sections list the changes for 3.1.0.
