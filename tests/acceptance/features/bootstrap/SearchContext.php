@@ -39,18 +39,21 @@ class SearchContext implements Context {
 	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API
 	 * @When user :user searches for :pattern using the WebDAV API requesting these properties:
 	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API requesting these properties:
+	 * @When user :user searches for :pattern inside folder :scope using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $pattern
 	 * @param string|null $limit
+	 * @param string|null $scope
 	 * @param TableNode|null $properties
 	 *
 	 * @return void
 	 */
 	public function userSearchesUsingWebDavAPI(
-		string    $user,
-		string  $pattern,
-		?string	  $limit = null,
+		string $user,
+		string $pattern,
+		?string	$limit = null,
+		?string $scope = null,
 		TableNode $properties = null
 	):void {
 		// Because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously, a short wait is necessary before searching files or folders.
@@ -62,8 +65,17 @@ class SearchContext implements Context {
 		$body
 			= "<?xml version='1.0' encoding='utf-8' ?>\n" .
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .
-			"		<oc:search>\n" .
-			"			<oc:pattern>$pattern</oc:pattern>\n";
+			"		<oc:search>\n";
+		if ($scope !== null) {
+			$scope = \trim($scope, "/");
+			if ($this->featureContext->getDavPathVersion() === 3) {
+				$rootPath = $this->featureContext->getPersonalSpaceIdForUser($user);
+			} else {
+				$rootPath = $this->featureContext->getUserIdByUserName($user);
+			}
+			$pattern .= " scope:$rootPath/$scope";
+		}
+		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
 			$body .= "			<oc:limit>$limit</oc:limit>\n";
 		}
