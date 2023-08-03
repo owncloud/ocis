@@ -32,5 +32,6 @@ log:
 engine:
   timeout: 10s
   policies: []
+  mimes: ""
 postprocessing:
   query: ""

@@ -1,6 +1,6 @@
 ---
 title: Policies
-date: 2023-08-03T14:36:02.325411737Z
+date: 2023-08-03T15:03:41.046787766Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/policies
@@ -30,6 +30,7 @@ Policies are written in the [rego query language](https://www.openpolicyagent.or
   * [Proxy](#proxy)
   * [Postprocessing](#postprocessing)
 * [Rego Key Match](#rego-key-match)
+* [Extend Mimetype File Extension Mapping](#extend-mimetype-file-extension-mapping)
 * [Example Policies](#example-policies)
 * [Example Yaml Config](#example-yaml-config)
 
@@ -49,7 +50,7 @@ To configure the policies service, three environment variables need to be define
 
 Note that each query setting defines the [Complete Rules](https://www.openpolicyagent.org/docs/latest/#complete-rules) variable defined in the rego rule set the corresponding step uses for the evaluation. If the variable is mistyped or not found, the evaluation defaults to deny. Individual query definitions can be defined for each module.
 
-To activate a the policies service for a module, it must be started with a yaml configuration that points to one or more rego files. Note that if the service is scaled horizontally, each instance should have access to the same rego files to avoid unpredictable results. If a file path has been configured but the file it is not present or accessible, the evaluation defaults to deny.
+To activate the policies service for a module, it must be started with a yaml configuration that points to one or more rego files. Note that if the service is scaled horizontally, each instance should have access to the same rego files to avoid unpredictable results. If a file path has been configured but the file is not present or accessible, the evaluation defaults to deny.
 
 When using async post-processing which is done via the postprocessing service, the value `policies` must be added to the `POSTPROCESSING_STEPS` configuration in postprocessing service in the order where the evaluation should take place.
 
@@ -117,8 +118,8 @@ proxy:
 
 The same can be achieved by setting the following environment variable:
 
-```yaml
-PROXY_POLICIES_QUERY=data.proxy.granted
+```shell
+export PROXY_POLICIES_QUERY=data.proxy.granted
 ```
 
 ### Postprocessing
@@ -131,14 +132,14 @@ policies:
 
 The same can be achieved by setting the following environment variable:
 
-```yaml
-POLICIES_POSTPROCESSING_QUERY=data.postprocessing.granted
+```shell
+export POLICIES_POSTPROCESSING_QUERY=data.postprocessing.granted
 ```
 
 As soon as that query is configured, the postprocessing service must be informed to use the policies step by setting the environment variable:
 
-```yaml
-POSTPROCESSING_STEPS=policies
+```shell
+export POSTPROCESSING_STEPS=policies
 ```
 
 Note that additional steps can be configured and their position in the list defines the order of processing. For details see the postprocessing service documentation.
@@ -146,6 +147,30 @@ Note that additional steps can be configured and their position in the list defi
 ## Rego Key Match
 
 To identify available keys for OPA, you need to look at [engine.go](https://github.com/owncloud/ocis/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/owncloud/ocis/blob/master/protogen/gen/ocis/services/policies/v0/policies.swagger.json) file. Note that which keys are available depends on from which module it is used.
+
+## Extend Mimetype File Extension Mapping
+
+In the extended set of the rego query language, it is possible to get a list of associated file extensions based on a mimetype, for example `ocis.mimetype.extensions("application/pdf")`.
+
+The list of mappings is restricted by default and is provided by the host system ocis is installed on.
+
+In order to extend this list, ocis must be provided with the path to a custom `mime.types` file that maps mimetypes to extensions.
+The location for the file must be accessible by all instances of the policy service. As a rule of thumb, use the directory where the ocis configuration files are stored.
+Note that existing mappings from the host are extended by the definitions from the mime types file, but not replaced.
+
+The path to that file can be provided via a yaml configuration or an environment variable. Note to replace the `OCIS_CONFIG_DIR` string by an existing path.
+
+```shell
+export OCIS_MACHINE_AUTH_API_KEY=OCIS_CONFIG_DIR/mime.types
+```
+
+```yaml
+policies:
+  engine:
+    mimes: OCIS_CONFIG_DIR/mime.types
+```
+
+A good example of how such a file should be formatted can be found in the [Apache svn repository](https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types).
 
 ## Example Policies
 
