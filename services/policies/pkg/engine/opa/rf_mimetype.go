@@ -38,7 +38,7 @@ func RFMimetypeExtensions(f io.Reader) (func(*rego.Rego), error) {
 			}
 		}
 		if err := scanner.Err(); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
