@@ -20,7 +20,7 @@ To configure the policies service, three environment variables need to be define
 
 Note that each query setting defines the [Complete Rules](https://www.openpolicyagent.org/docs/latest/#complete-rules) variable defined in the rego rule set the corresponding step uses for the evaluation. If the variable is mistyped or not found, the evaluation defaults to deny. Individual query definitions can be defined for each module.
 
-To activate the policies service for a module, it must be started with a yaml configuration that points to one or more rego files. Note that if the service is scaled horizontally, each instance should have access to the same rego files to avoid unpredictable results. If a file path has been configured but the file it is not present or accessible, the evaluation defaults to deny.
+To activate the policies service for a module, it must be started with a yaml configuration that points to one or more rego files. Note that if the service is scaled horizontally, each instance should have access to the same rego files to avoid unpredictable results. If a file path has been configured but the file is not present or accessible, the evaluation defaults to deny.
 
 When using async post-processing which is done via the postprocessing service, the value `policies` must be added to the `POSTPROCESSING_STEPS` configuration in postprocessing service in the order where the evaluation should take place.
 
