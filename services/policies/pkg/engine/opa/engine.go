@@ -24,13 +24,15 @@ type OPA struct {
 
 // NewOPA returns a ready to use opa engine.
 func NewOPA(timeout time.Duration, logger log.Logger, conf config.Engine) (OPA, error) {
-	var mtReader io.Reader
+	var mtReader io.ReadCloser
 
 	if conf.Mimes != "" {
-		mtReader, err := os.Open(conf.Mimes)
+		var err error
+		mtReader, err = os.Open(conf.Mimes)
 		if err != nil {
 			return OPA{}, err
 		}
+
 		defer mtReader.Close()
 	}
 
