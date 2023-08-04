@@ -1,6 +1,6 @@
 ---
 title: Policies
-date: 2023-08-04T09:30:23.304456198Z
+date: 2023-08-04T11:41:19.571936182Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/policies
@@ -161,7 +161,7 @@ Note that existing mappings from the host are extended by the definitions from t
 The path to that file can be provided via a yaml configuration or an environment variable. Note to replace the `OCIS_CONFIG_DIR` string by an existing path.
 
 ```shell
-export OCIS_MACHINE_AUTH_API_KEY=OCIS_CONFIG_DIR/mime.types
+export POLICIES_ENGINE_MIMES=OCIS_CONFIG_DIR/mime.types
 ```
 
 ```yaml
