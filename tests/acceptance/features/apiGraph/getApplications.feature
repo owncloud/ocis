@@ -1,4 +1,4 @@
-@api @skipOnStable2.0
+@api
 Feature: get applications
   As a user
   I want to be able to get application information with existing roles
@@ -13,9 +13,9 @@ Feature: get applications
     When user "Alice" gets all applications using the Graph API
     Then the HTTP status code should be "200"
     And the user API response should contain the following application information:
-      | key                        | value                   |
-      | displayName                | ownCloud Infinite Scale |
-      | id                         | %uuid_v4%               |
+      | key         | value                   |
+      | displayName | ownCloud Infinite Scale |
+      | id          | %uuid_v4%               |
     And the user API response should contain the following app roles:
       | Admin       |
       | Space Admin |
