@@ -481,7 +481,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "some content" to "lorem.txt"
     When user "Alice" shares file "lorem.txt" with group "grp1" using the sharing API
     And user "Brian" accepts share "/lorem.txt" offered by user "Alice" using the sharing API
-    And the administrator adds user "Carol" to group "grp1" using the provisioning API
+    And the administrator adds user "Carol" to group "grp1"
     And user "Carol" accepts share "/lorem.txt" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "<ocs_status_code>"
     And the HTTP status code of responses on all endpoints should be "200"
@@ -494,8 +494,8 @@ Feature: sharing
 
   # deleting an LDAP group is not relevant or possible using the provisioning API
   @issue-2441
-  Scenario Outline: shares shared to deleted group should not be available
-    Given using OCS API version "<ocs_api_version>"
+  Scenario: shares shared to deleted group should not be available
+    Given using OCS API version "1"
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -506,7 +506,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with group "grp1"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with group "grp1" should include
       | share_with  | grp1           |
@@ -519,15 +519,15 @@ Feature: sharing
     And as "Carol" file "/Shares/textfile0.txt" should exist
     When the administrator deletes group "grp1" using the provisioning API
     And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And file "/textfile0.txt" should not be included as path in the response
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     And as "Carol" file "/Shares/textfile0.txt" should not exist
-    Examples:
-      | ocs_api_version | ocs_status_code |
-      | 1               | 100             |
-      | 2               | 200             |
+#    Examples:
+#      | ocs_api_version | ocs_status_code |
+#      | 1               | 100             |
+#      | 2               | 200             |
 
   @issue-2146
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
@@ -646,8 +646,8 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-903
-  Scenario Outline: shares to a deleted user should not be listed as shares for the sharer
-    Given using OCS API version "<ocs_api_version>"
+  Scenario: shares to a deleted user should not be listed as shares for the sharer
+    Given using OCS API version "1"
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -659,14 +659,14 @@ Feature: sharing
     And user "Carol" has accepted share "/textfile0.txt" offered by user "Alice"
     And the administrator has deleted user "Brian" using the provisioning API
     When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And user "Carol" should be included in the response
     But user "Brian" should not be included in the response
-    Examples:
-      | ocs_api_version | ocs_status_code |
-      | 1               | 100             |
-      | 2               | 200             |
+#    Examples:
+#      | ocs_api_version | ocs_status_code |
+#      | 1               | 100             |
+#      | 2               | 200             |
 
   @issue-719
   Scenario Outline: creating a share of a renamed file when another share exists

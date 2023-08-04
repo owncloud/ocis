@@ -176,7 +176,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType | group      |
       | shareWith | grp1       |
     And user "Brian" has accepted share "/lorem.txt" offered by user "Alice"
-    When the administrator adds user "Carol" to group "grp1" using the provisioning API
+    When the administrator adds user "Carol" to group "grp1"
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Carol" should be able to accept pending share "/lorem.txt" offered by user "Alice"

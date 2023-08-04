@@ -881,15 +881,29 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator tries to add user :user to group :group using the Graph API
+	 * @When the administrator tries to add nonexistent user to group :group using the Graph API
 	 *
-	 * @param string $user
 	 * @param string $group
+	 * @param string|null $byUser
 	 *
 	 * @return void
+	 *
+	 * @throws GuzzleException | Exception
 	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
-		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $group, ?string $byUser = null): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = WebDavHelper::generateUUIDv4();
+		$this->featureContext->setResponse(
+			GraphHelper::addUserToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$userId,
+				$groupId
+			)
+		);
 	}
 
 	/**

@@ -3178,7 +3178,7 @@ trait Provisioning {
 	}
 
 	/**
-	 * @When /^the administrator adds user "([^"]*)" to group "([^"]*)" using the provisioning API$/
+	 * @When /^the administrator adds user "([^"]*)" to group "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -3187,7 +3187,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->addUserToGroup($user, $group, "api");
+		$this->addUserToGroup($user, $group, null, false);
 	}
 
 	/**
@@ -3243,26 +3243,6 @@ trait Provisioning {
 	 */
 	public function userTriesToAddHimselfToGroupUsingTheProvisioningApi(string $user, string $group):void {
 		$this->userTriesToAddUserToGroupUsingTheProvisioningApi($user, $user, $group);
-	}
-
-	/**
-	 * @When the administrator tries to add user :user to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheProvisioningApi(
-		string $user,
-		string $group
-	):void {
-		$this->userTriesToAddUserToGroupUsingTheProvisioningApi(
-			$this->getAdminUsername(),
-			$user,
-			$group
-		);
 	}
 
 	/**
@@ -3328,33 +3308,9 @@ trait Provisioning {
 			$method = "ldap";
 		} elseif ($method === null && OcisHelper::isTestingWithGraphApi()) {
 			$method = "graph";
-		} elseif ($method === null) {
-			$method = "api";
 		}
 		$method = \trim(\strtolower($method));
 		switch ($method) {
-			case "api":
-				$result = UserHelper::addUserToGroup(
-					$this->getBaseUrl(),
-					$user,
-					$group,
-					$this->getAdminUsername(),
-					$this->getAdminPassword(),
-					$this->getStepLineRef(),
-					$this->ocsApiVersion
-				);
-				if ($checkResult && ($result->getStatusCode() !== 200)) {
-					throw new Exception(
-						"could not add user to group. "
-						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				$this->response = $result;
-				if (!$checkResult) {
-					// for when step only
-					$this->pushToLastStatusCodesArrays();
-				}
-				break;
 			case "ldap":
 				try {
 					$this->addUserToLdapGroup(
@@ -3578,8 +3534,6 @@ trait Provisioning {
 				$method = "ldap";
 			} elseif (OcisHelper::isTestingWithGraphApi()) {
 				$method = "graph";
-			} else {
-				$method = "api";
 			}
 		}
 		$group = \trim($group);
@@ -3587,23 +3541,6 @@ trait Provisioning {
 		$groupCanBeDeleted = false;
 		$groupId = null;
 		switch ($method) {
-			case "api":
-				$result = UserHelper::createGroup(
-					$this->getBaseUrl(),
-					$group,
-					$this->getAdminUsername(),
-					$this->getAdminPassword(),
-					$this->getStepLineRef()
-				);
-				if ($result->getStatusCode() === 200) {
-					$groupCanBeDeleted = true;
-				} else {
-					throw new Exception(
-						"could not create group '$group'. "
-						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				break;
 			case "ldap":
 				try {
 					$this->createLdapGroup($group);
