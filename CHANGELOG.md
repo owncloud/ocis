@@ -6,10 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 * Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 
 ## Details
+
+* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
+
+   We fixed the issue when search using the current folder option shows the file/folders outside
+   the folder if search keyword is same as current folder
+
+   https://github.com/owncloud/ocis/issues/6935
+   https://github.com/owncloud/ocis/pull/6947
 
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 
