@@ -747,7 +747,7 @@ class WebDavHelper {
 			if ($type === "trash-bin") {
 				return "/remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
 			}
-			return "dav/spaces/" . $spaceId . '/';
+			return "/remote.php/dav/spaces/" . $spaceId . '/';
 		} else {
 			if ($davPathVersionToUse === self::DAV_VERSION_OLD) {
 				if ($type === "trash-bin") {

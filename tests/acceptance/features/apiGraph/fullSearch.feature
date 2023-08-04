@@ -8,20 +8,58 @@ Feature: full text search
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: search files using a tag
+  Scenario Outline: search files by tag
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "hello world" to "file1.txt"
-    And user "Alice" has uploaded file with content "Namaste nepal" to "file2.txt"
-    And user "Alice" has uploaded file with content "hello nepal" to "file3.txt"
-    And user "Alice" has created the following tags for file "file1.txt" of the space "Personal":
+    And user "Alice" has created the following folders
+      | path                      |
+      | folderWithFile            |
+      | folderWithFile/subFolder/ |
+    And user "Alice" has uploaded the following files with content "some data"
+      | path                                             |
+      | fileInRootLevel.txt                                         |
+      | folderWithFile/fileInsideFolder.txt              |
+      | folderWithFile/subFolder/fileInsideSubFolder.txt |
+    And user "Alice" has created the following tags for file "fileInRootLevel.txt" of the space "Personal":
       | tag1 |
-    And user "Alice" has created the following tags for file "file2.txt" of the space "Personal":
+    And user "Alice" has created the following tags for file "folderWithFile/fileInsideFolder.txt" of the space "Personal":
+      | tag1 |
+    And user "Alice" has created the following tags for file "folderWithFile/subFolder/fileInsideSubFolder.txt" of the space "Personal":
       | tag1 |
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | file1.txt |
-      | file2.txt |
+      | fileInRootLevel.txt     |
+      | fileInsideFolder.txt    |
+      | fileInsideSubFolder.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search project space files by tag
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "tag-space"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file" to "spacesFile.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in folder" to "spacesFolderWithFile/spacesFileInsideFolder.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in subfolder" to "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt"
+    And user "Alice" has created the following tags for file "spacesFile.txt" of the space "tag-space":
+      | tag1 |
+    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesFileInsideFolder.txt" of the space "tag-space":
+      | tag1 |
+    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt" of the space "tag-space":
+      | tag1 |
+    And using <dav-path-version> DAV path
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | spacesFile.txt                |
+      | spacesFileInsideFolder.txt    |
+      | spacesFileInsideSubFolder.txt |
     Examples:
       | dav-path-version |
       | old              |
@@ -72,6 +110,7 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: search files using a deleted tag
