@@ -23,7 +23,7 @@ var _ = Describe("Bleve", func() {
 		idx bleve.Index
 		ctx context.Context
 
-		doSearch = func(id string, query string) (*searchsvc.SearchIndexResponse, error) {
+		doSearch = func(id string, query, path string) (*searchsvc.SearchIndexResponse, error) {
 			rID, err := storagespace.ParseID(id)
 			if err != nil {
 				return nil, err
@@ -37,12 +37,13 @@ var _ = Describe("Bleve", func() {
 						SpaceId:   rID.SpaceId,
 						OpaqueId:  rID.OpaqueId,
 					},
+					Path: path,
 				},
 			})
 		}
 
 		assertDocCount = func(id string, query string, expectedCount int) []*searchmsg.Match {
-			res, err := doSearch(id, query)
+			res, err := doSearch(id, query, "")
 
 			ExpectWithOffset(1, err).ToNot(HaveOccurred())
 			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount), "query returned unexpected number of results: "+query)
@@ -177,7 +178,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				res, err := doSearch(rootResource.ID, "Name:bar*")
+				res, err := doSearch(rootResource.ID, "Name:bar*", "")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 			})
@@ -252,7 +253,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				res, err := doSearch(rootResource.ID, "Name:baz*")
+				res, err := doSearch(rootResource.ID, "Name:baz*", "")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 				Expect(res.Matches[0].Entity.Highlights).To(Equal(""))
@@ -264,12 +265,93 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				res, err := doSearch(rootResource.ID, "Content:bar")
+				res, err := doSearch(rootResource.ID, "Content:bar", "")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 				Expect(res.Matches[0].Entity.Highlights).To(Equal("foo <mark>bar</mark> baz"))
 			})
 
+		})
+
+		Context("with a file in the root of the space and folder with a file. all of them have the same name", func() {
+			BeforeEach(func() {
+				parentResource := engine.Resource{
+					ID:       "1$2!3",
+					ParentID: rootResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./doc",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER),
+					Document: content.Document{Name: "doc"},
+				}
+
+				childResource := engine.Resource{
+					ID:       "1$2!4",
+					ParentID: parentResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./doc/doc.pdf",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{Name: "doc.pdf"},
+				}
+
+				childResource2 := engine.Resource{
+					ID:       "1$2!7",
+					ParentID: parentResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./doc/file.pdf",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{Name: "file.pdf"},
+				}
+
+				rootChildResource := engine.Resource{
+					ID:       "1$2!5",
+					ParentID: rootResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./doc.pdf",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{Name: "doc.pdf"},
+				}
+
+				rootChildResource2 := engine.Resource{
+					ID:       "1$2!6",
+					ParentID: rootResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./file.pdf",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{Name: "file.pdf"},
+				}
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = eng.Upsert(rootChildResource.ID, rootChildResource)
+				Expect(err).ToNot(HaveOccurred())
+				err = eng.Upsert(rootChildResource2.ID, rootChildResource2)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = eng.Upsert(childResource.ID, childResource)
+				Expect(err).ToNot(HaveOccurred())
+				err = eng.Upsert(childResource2.ID, childResource2)
+				Expect(err).ToNot(HaveOccurred())
+			})
+			It("search *doc* in a root", func() {
+				res, err := doSearch(rootResource.ID, "Name:*doc*", "")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(3)))
+			})
+			It("search *doc* in a subfolder", func() {
+				res, err := doSearch(rootResource.ID, "Name:*doc*", "./doc")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
+			})
+			It("search *file* in a root", func() {
+				res, err := doSearch(rootResource.ID, "Name:*file*", "")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(2)))
+			})
+			It("search *file* in a subfolder", func() {
+				res, err := doSearch(rootResource.ID, "Name:*file*", "./doc")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
+			})
 		})
 	})
 
