@@ -1,7 +1,7 @@
-@api @skipOnStable2.0
+@api
 Feature: Tag
-  As a user 
-  I want to tag resources 
+  As a user
+  I want to tag resources
   So that I can sort and search them quickly
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
