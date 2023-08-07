@@ -7,6 +7,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config/parser"
@@ -14,7 +15,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/server/http"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,11 +29,14 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
-			cfg.GrpcClient, err = ogrpc.NewClient(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			cfg.GrpcClient, err = ogrpc.NewClient(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS),
+					ogrpc.WithTraceProvider(traceProvider),
+				)...)
 			if err != nil {
 				return err
 			}
@@ -59,6 +62,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
+					http.TraceProvider(traceProvider),
 				)
 
 				if err != nil {

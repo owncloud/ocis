@@ -19,12 +19,14 @@ import (
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
+	"github.com/riandyrn/otelchi"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 )
@@ -59,7 +61,14 @@ func NewService(opts ...Option) (Service, error) {
 	conf := options.Config
 
 	m := chi.NewMux()
-	m.Use(options.Middleware...)
+	m.Use(
+		otelchi.Middleware(
+			conf.Service.Name,
+			otelchi.WithChiRoutes(m),
+			otelchi.WithTracerProvider(options.TraceProvider),
+			otelchi.WithPropagators(tracing.GetPropagator()),
+		),
+	)
 
 	tm, err := pool.StringToTLSMode(conf.GRPCClientTLS.Mode)
 	if err != nil {
