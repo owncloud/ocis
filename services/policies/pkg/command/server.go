@@ -2,18 +2,13 @@ package command
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -102,33 +97,8 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				var tlsConf *tls.Config
 
-				if cfg.Events.EnableTLS {
-					var rootCAPool *x509.CertPool
-					if cfg.Events.TLSRootCACertificate != "" {
-						rootCrtFile, err := os.Open(cfg.Events.TLSRootCACertificate)
-						if err != nil {
-							return err
-						}
-
-						rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-						if err != nil {
-							return err
-						}
-						cfg.Events.TLSInsecure = false
-					}
-
-					tlsConf = &tls.Config{
-						RootCAs: rootCAPool,
-					}
-				}
-
-				bus, err := stream.Nats(
-					natsjs.TLSConfig(tlsConf),
-					natsjs.Address(cfg.Events.Endpoint),
-					natsjs.ClusterID(cfg.Events.Cluster),
-				)
+				bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
 				if err != nil {
 					return err
 				}

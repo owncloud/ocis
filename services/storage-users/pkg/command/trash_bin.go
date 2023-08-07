@@ -32,7 +32,7 @@ func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			stream, err := event.NewStream(cfg.Events)
+			stream, err := event.NewStream(cfg)
 			if err != nil {
 				return err
 			}

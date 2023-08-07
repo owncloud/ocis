@@ -38,10 +38,9 @@ func DefaultConfig() *config.Config {
 				Encryption:     "none",
 			},
 			Events: config.Events{
-				Endpoint:      "127.0.0.1:9233",
-				Cluster:       "ocis-cluster",
-				ConsumerGroup: "notifications",
-				EnableTLS:     false,
+				Endpoint:  "127.0.0.1:9233",
+				Cluster:   "ocis-cluster",
+				EnableTLS: false,
 			},
 			RevaGateway: shared.DefaultRevaConfig().Address,
 		},

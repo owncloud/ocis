@@ -2,11 +2,8 @@ package service
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -17,9 +14,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/jellydator/ttlcache/v2"
-	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
@@ -78,33 +73,13 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	var tlsConf *tls.Config
-	if cfg.Events.EnableTLS {
-		var rootCAPool *x509.CertPool
-		if cfg.Events.TLSRootCACertificate != "" {
-			rootCrtFile, err := os.Open(cfg.Events.TLSRootCACertificate)
-			if err != nil {
-				return nil, teardown, err
-			}
-
-			rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-			if err != nil {
-				return nil, teardown, err
-			}
-			cfg.Events.TLSInsecure = false
-		}
-
-		tlsConf = &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: cfg.Events.TLSInsecure, //nolint:gosec
-			RootCAs:            rootCAPool,
-		}
-	}
-	bus, err := stream.Nats(
-		natsjs.TLSConfig(tlsConf),
-		natsjs.Address(cfg.Events.Endpoint),
-		natsjs.ClusterID(cfg.Events.Cluster),
-	)
+	bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig{
+		Endpoint:             cfg.Events.Endpoint,
+		Cluster:              cfg.Events.Cluster,
+		EnableTLS:            cfg.Events.EnableTLS,
+		TLSInsecure:          cfg.Events.TLSInsecure,
+		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
+	})
 	if err != nil {
 		return nil, teardown, err
 	}

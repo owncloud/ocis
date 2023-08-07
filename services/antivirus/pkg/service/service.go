@@ -87,7 +87,7 @@ func (av Antivirus) Run() error {
 		evtsCfg.TLSInsecure = false
 	}
 
-	stream, err := stream.NatsFromConfig(stream.NatsConfig(av.c.Events))
+	stream, err := stream.NatsFromConfig(av.c.Service.Name, stream.NatsConfig(av.c.Events))
 	if err != nil {
 		return err
 	}

@@ -2,17 +2,12 @@ package command
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"os"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/oklog/run"
-	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -53,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				bus, err := getEventBus(cfg.Postprocessing.Events)
+				bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Postprocessing.Events))
 				if err != nil {
 					return err
 				}
@@ -109,33 +104,4 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
-}
-
-func getEventBus(evtsCfg config.Events) (events.Stream, error) {
-	var tlsConf *tls.Config
-	if evtsCfg.EnableTLS {
-		var rootCAPool *x509.CertPool
-		if evtsCfg.TLSRootCACertificate != "" {
-			rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-			if err != nil {
-				return nil, err
-			}
-
-			rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-			if err != nil {
-				return nil, err
-			}
-			evtsCfg.TLSInsecure = false
-		}
-
-		tlsConf = &tls.Config{
-			RootCAs: rootCAPool,
-		}
-	}
-
-	return stream.Nats(
-		natsjs.TLSConfig(tlsConf),
-		natsjs.Address(evtsCfg.Endpoint),
-		natsjs.ClusterID(evtsCfg.Cluster),
-	)
 }
