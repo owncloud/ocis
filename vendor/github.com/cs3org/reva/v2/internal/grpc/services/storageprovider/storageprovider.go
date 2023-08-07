@@ -19,13 +19,9 @@
 package storageprovider
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"path"
@@ -49,7 +45,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
@@ -76,11 +71,11 @@ type config struct {
 }
 
 type eventconfig struct {
-	NatsAddress          string `mapstructure:"nats_address" docs:"address of the nats server"`
-	NatsClusterID        string `mapstructure:"nats_clusterid" docs:"clusterid of the nats server"`
-	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
+	Endpoint             string `mapstructure:"nats_address" docs:"address of the nats server"`
+	Cluster              string `mapstructure:"nats_clusterid" docs:"clusterid of the nats server"`
 	TLSInsecure          bool   `mapstructure:"tls_insecure"  docs:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `mapstructure:"tls_root_ca_cert"  docs:"The root CA certificate used to validate the server's TLS certificate."`
+	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
 }
 
 func (c *config) init() {
@@ -1245,38 +1240,9 @@ func (v descendingMtime) Swap(i, j int) {
 }
 
 func estreamFromConfig(c eventconfig) (events.Stream, error) {
-	if c.NatsAddress == "" {
+	if c.Endpoint == "" {
 		return nil, nil
 	}
-	var (
-		rootCAPool *x509.CertPool
-		tlsConf    *tls.Config
-	)
-	if c.TLSRootCACertificate != "" {
-		rootCrtFile, err := os.Open(c.TLSRootCACertificate)
-		if err != nil {
-			return nil, err
-		}
 
-		var certBytes bytes.Buffer
-		if _, err := io.Copy(&certBytes, rootCrtFile); err != nil {
-			return nil, err
-		}
-
-		rootCAPool = x509.NewCertPool()
-		rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-		c.TLSInsecure = false
-
-		tlsConf = &tls.Config{
-			InsecureSkipVerify: c.TLSInsecure, //nolint:gosec
-			RootCAs:            rootCAPool,
-		}
-	}
-
-	s, err := stream.Nats(natsjs.Address(c.NatsAddress), natsjs.ClusterID(c.NatsClusterID), natsjs.TLSConfig(tlsConf))
-	if err != nil {
-		return nil, err
-	}
-
-	return s, nil
+	return stream.NatsFromConfig("storageprovider", stream.NatsConfig(c))
 }

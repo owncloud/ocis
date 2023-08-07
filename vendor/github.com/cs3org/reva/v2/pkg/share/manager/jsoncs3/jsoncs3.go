@@ -19,12 +19,7 @@
 package jsoncs3
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"io"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -34,7 +29,6 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -131,10 +125,11 @@ type config struct {
 
 // EventOptions are the configurable options for events
 type EventOptions struct {
-	NatsAddress          string `mapstructure:"natsaddress"`
-	NatsClusterID        string `mapstructure:"natsclusterid"`
+	Endpoint             string `mapstructure:"natsaddress"`
+	Cluster              string `mapstructure:"natsclusterid"`
 	TLSInsecure          bool   `mapstructure:"tlsinsecure"`
 	TLSRootCACertificate string `mapstructure:"tlsrootcacertificate"`
+	EnableTLS            bool   `mapstructure:"enabletls"`
 }
 
 // Manager implements a share manager using a cs3 storage backend with local caching
@@ -176,38 +171,8 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 	}
 
 	var es events.Stream
-	if c.Events.NatsAddress != "" {
-		evtsCfg := c.Events
-		var (
-			rootCAPool *x509.CertPool
-			tlsConf    *tls.Config
-		)
-		if evtsCfg.TLSRootCACertificate != "" {
-			rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-			if err != nil {
-				return nil, err
-			}
-
-			var certBytes bytes.Buffer
-			if _, err := io.Copy(&certBytes, rootCrtFile); err != nil {
-				return nil, err
-			}
-
-			rootCAPool = x509.NewCertPool()
-			rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-			evtsCfg.TLSInsecure = false
-
-			tlsConf = &tls.Config{
-				InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
-				RootCAs:            rootCAPool,
-			}
-		}
-
-		es, err = stream.Nats(
-			natsjs.TLSConfig(tlsConf),
-			natsjs.Address(evtsCfg.NatsAddress),
-			natsjs.ClusterID(evtsCfg.NatsClusterID),
-		)
+	if c.Events.Endpoint != "" {
+		es, err = stream.NatsFromConfig("jsoncs3-share-manager", stream.NatsConfig(c.Events))
 		if err != nil {
 			return nil, err
 		}

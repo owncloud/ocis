@@ -19,13 +19,8 @@
 package eventsmiddleware
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"io"
-	"os"
 
 	"go-micro.dev/v4/util/log"
 	"google.golang.org/grpc"
@@ -42,7 +37,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 )
 
 const (
@@ -229,38 +223,17 @@ func publisherFromConfig(m map[string]interface{}) (events.Publisher, error) {
 	default:
 		return nil, fmt.Errorf("stream type '%s' not supported", typ)
 	case "nats":
-		address := m["address"].(string)
-		cid := m["clusterID"].(string)
-
-		enableTLS := m["enable-tls"].(bool)
-		var tlsConf *tls.Config
-		if enableTLS {
-			skipVerify := m["tls-insecure"].(bool)
-			var rootCAPool *x509.CertPool
-			if val, ok := m["tls-root-ca-cert"]; ok {
-				rootCACertPath := val.(string)
-				if rootCACertPath != "" {
-					f, err := os.Open(rootCACertPath)
-					if err != nil {
-						return nil, err
-					}
-
-					var certBytes bytes.Buffer
-					if _, err := io.Copy(&certBytes, f); err != nil {
-						return nil, err
-					}
-
-					rootCAPool = x509.NewCertPool()
-					rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-					skipVerify = false
-				}
-			}
-
-			tlsConf = &tls.Config{
-				InsecureSkipVerify: skipVerify,
-				RootCAs:            rootCAPool,
-			}
+		var tlsCert string
+		val, ok := m["tls-root-ca-cert"]
+		if ok {
+			tlsCert = val.(string)
 		}
-		return stream.Nats(natsjs.TLSConfig(tlsConf), natsjs.Address(address), natsjs.ClusterID(cid))
+		return stream.NatsFromConfig(m["name"].(string), stream.NatsConfig{
+			Endpoint:             m["address"].(string),
+			Cluster:              m["clusterID"].(string),
+			EnableTLS:            m["enable-tls"].(bool),
+			TLSInsecure:          m["tls-insecure"].(bool),
+			TLSRootCACertificate: tlsCert,
+		})
 	}
 }

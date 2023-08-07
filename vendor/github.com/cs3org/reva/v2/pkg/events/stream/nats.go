@@ -25,7 +25,7 @@ type NatsConfig struct {
 }
 
 // NatsFromConfig returns a nats stream from the given config
-func NatsFromConfig(cfg NatsConfig) (events.Stream, error) {
+func NatsFromConfig(connName string, cfg NatsConfig) (events.Stream, error) {
 	var tlsConf *tls.Config
 	if cfg.EnableTLS {
 		var rootCAPool *x509.CertPool
@@ -53,11 +53,12 @@ func NatsFromConfig(cfg NatsConfig) (events.Stream, error) {
 		natsjs.Address(cfg.Endpoint),
 		natsjs.ClusterID(cfg.Cluster),
 		natsjs.SynchronousPublish(true),
+		natsjs.Name(connName),
 	)
 
 }
 
-// Nats returns a nats streaming client
+// nats returns a nats streaming client
 // retries exponentially to connect to a nats server
 func Nats(opts ...natsjs.Option) (events.Stream, error) {
 	b := backoff.NewExponentialBackOff()
