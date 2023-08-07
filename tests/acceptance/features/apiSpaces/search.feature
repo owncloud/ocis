@@ -1,6 +1,6 @@
-@api 
+@api
 Feature: Search
-  As a user 
+  As a user
   I want to search for resources in the space
   So that I can get them quickly
 
@@ -109,3 +109,15 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
+
+
+  Scenario: user can search inside folder in space
+    When user "Alice" searches for "folder" inside folder "/folderMain" in space "find data" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "3" entries
+    And the search result of user "Alice" should contain only these entries:
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+    But the search result of user "Alice" should not contain these entries:
+      | /folderMain |
