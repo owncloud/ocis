@@ -162,15 +162,12 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 						spaceId := share.ResourceId.StorageId + shareid.IDDelimiter + share.ResourceId.SpaceId
 						switch share.Grantee.Type {
 						case provider.GranteeType_GRANTEE_TYPE_USER:
-							// TODO: figure out whether we need to upload
 							userid := share.Grantee.GetUserId().GetOpaqueId()
-
 							rs := &collaboration.ReceivedShare{
 								Share: share,
 								State: collaboration.ShareState_SHARE_STATE_PENDING,
 							}
 							err := mgr.UserReceivedStates.Add(ctx, userid, spaceId, rs)
-
 							if err != nil {
 								fmt.Printf(" failed! (%s)\n", err.Error())
 								errorsOccured = true
@@ -178,7 +175,6 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 						case provider.GranteeType_GRANTEE_TYPE_GROUP:
 							groupid := share.Grantee.GetGroupId().GetOpaqueId()
 							err := mgr.GroupReceivedCache.Add(ctx, groupid, spaceId)
-
 							if err != nil {
 								fmt.Printf(" failed! (%s)\n", err.Error())
 								errorsOccured = true
