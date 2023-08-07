@@ -7,6 +7,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -18,6 +19,7 @@ type Options struct {
 	Config          *config.Config
 	Middleware      []func(http.Handler) http.Handler
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	TraceProvider   trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -56,5 +58,12 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.GatewaySelector = gatewaySelector
+	}
+}
+
+// TraceProvider provides a function to set the traceProvider option.
+func TraceProvider(val trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = val
 	}
 }
