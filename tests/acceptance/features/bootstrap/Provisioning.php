@@ -1610,31 +1610,31 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given /^the administrator has deleted user "([^"]*)" using the provisioning API$/
+	 * @Given /^the administrator has deleted user "([^"]*)" using the Graph API$/
 	 *
 	 * @param string|null $user
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theAdministratorHasDeletedUserUsingTheProvisioningApi(?string $user):void {
+	public function theAdministratorHasDeletedUserUsingTheGraphApi(?string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+		$this->deleteTheUserUsingTheGraphApi($user);
 		WebDavHelper::removeSpaceIdReferenceForUser($user);
 		$this->userShouldNotExist($user);
 	}
 
 	/**
-	 * @When /^the administrator deletes user "([^"]*)" using the provisioning API$/
+	 * @When /^the administrator deletes user "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theAdminDeletesUserUsingTheProvisioningApi(string $user):void {
+	public function theAdminDeletesUserUsingTheGraphApi(string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+		$this->deleteTheUserUsingTheGraphApi($user);
 		$this->rememberThatUserIsNotExpectedToExist($user);
 	}
 
@@ -1650,7 +1650,7 @@ trait Provisioning {
 		$this->verifyTableNodeColumns($table, ["username"]);
 		$usernames = $table->getHash();
 		foreach ($usernames as $username) {
-			$this->theAdminDeletesUserUsingTheProvisioningApi($username["username"]);
+			$this->theAdminDeletesUserUsingTheGraphApi($username["username"]);
 		}
 	}
 
@@ -2528,7 +2528,7 @@ trait Provisioning {
 			if ($this->isTestingWithLdap() && \in_array($user, $this->ldapCreatedUsers)) {
 				$this->deleteLdapUser($user);
 			} else {
-				$this->deleteTheUserUsingTheProvisioningApi($user);
+				$this->deleteTheUserUsingTheGraphApi($user);
 			}
 		}
 		$this->userShouldNotExist($user);
@@ -2936,7 +2936,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function deleteUser(string $user):void {
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+		$this->deleteTheUserUsingTheGraphApi($user);
 		$this->userShouldNotExist($user);
 	}
 
@@ -2954,8 +2954,6 @@ trait Provisioning {
 		try {
 			if (OcisHelper::isTestingWithGraphApi()) {
 				$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
-			} else {
-				$this->deleteTheGroupUsingTheProvisioningApi($group);
 			}
 		} catch (Exception $e) {
 			\error_log(
@@ -3855,22 +3853,13 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteTheUserUsingTheProvisioningApi(string $user):void {
+	public function deleteTheUserUsingTheGraphApi(string $user):void {
 		$this->emptyLastHTTPStatusCodesArray();
 		$this->emptyLastOCSStatusCodesArray();
 		// Always try to delete the user
 		if (OcisHelper::isTestingWithGraphApi()) {
 			// users can be deleted using the username in the GraphApi too
 			$this->graphContext->adminDeletesUserUsingTheGraphApi($user);
-		} else {
-			$this->response = UserHelper::deleteUser(
-				$this->getBaseUrl(),
-				$user,
-				$this->getAdminUsername(),
-				$this->getAdminPassword(),
-				$this->getStepLineRef(),
-				$this->ocsApiVersion
-			);
 		}
 		$this->pushToLastStatusCodesArrays();
 
@@ -3901,8 +3890,6 @@ trait Provisioning {
 		if ($this->groupExists($group)) {
 			if ($this->isTestingWithLdap() && \in_array($group, $this->ldapCreatedGroups)) {
 				$this->deleteLdapGroup($group);
-			} else {
-				$this->deleteTheGroupUsingTheProvisioningApi($group);
 			}
 		}
 	}
@@ -3946,46 +3933,6 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteTheGroupUsingTheProvisioningApi(string $group):void {
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
-		$this->response = UserHelper::deleteGroup(
-			$this->getBaseUrl(),
-			$group,
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
-		$this->pushToLastStatusCodesArrays();
-		if ($this->theGroupShouldExist($group)
-			&& $this->theGroupShouldBeAbleToBeDeleted($group)
-			&& ($this->response->getStatusCode() !== 200)
-		) {
-			\error_log(
-				"INFORMATION: could not delete group '$group'"
-				. $this->response->getStatusCode() . " " . $this->response->getBody()
-			);
-		}
-
-		$this->rememberThatGroupIsNotExpectedToExist($group);
-	}
-
-	/**
-	 * @When the administrator deletes the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorDeletesTheFollowingGroupsUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["groupname"]);
-		$groups = $table->getHash();
-		foreach ($groups as $group) {
-			$this->deleteTheGroupUsingTheProvisioningApi($group["groupname"]);
-		}
-	}
 
 	/**
 	 * @When user :user tries to delete group :group using the provisioning API
@@ -4055,42 +4002,6 @@ trait Provisioning {
 			$user,
 			$group
 		);
-	}
-
-	/**
-	 * @When the administrator removes user :user from group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$user = $this->getActualUsername($user);
-		$this->removeUserFromGroupAsAdminUsingTheProvisioningApi(
-			$user,
-			$group
-		);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @When the administrator removes the following users from the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorRemovesTheFollowingUserFromTheFollowingGroupUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ['username', 'groupname']);
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
-		foreach ($table as $row) {
-			$this->adminRemovesUserFromGroupUsingTheProvisioningApi($row['username'], $row['groupname']);
-			$this->pushToLastStatusCodesArrays();
-		}
 	}
 
 	/**

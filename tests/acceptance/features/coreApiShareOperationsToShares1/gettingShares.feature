@@ -164,8 +164,8 @@ Feature: sharing
     And user "Alice" has shared folder "/PARENT" with group "group0"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Carol" has accepted share "/PARENT" offered by user "Alice"
-    When the administrator removes user "Carol" from group "group0" using the provisioning API
-    Then the HTTP status code should be "200"
+    When the administrator removes user "Carol" from group "group0" using the Graph API
+    Then the HTTP status code should be "204"
     And user "Brian" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |

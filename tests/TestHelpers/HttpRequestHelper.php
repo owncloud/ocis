@@ -210,11 +210,6 @@ class HttpRequestHelper {
 			$password,
 			$headers,
 			$body,
-			$config,
-			$cookies,
-			$stream,
-			$timeout,
-			$client
 		);
 		do {
 			$response = self::sendRequestOnce(

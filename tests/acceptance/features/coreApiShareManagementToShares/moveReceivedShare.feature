@@ -19,7 +19,7 @@ Feature: sharing
     And user "Brian" accepts share "/TMP" offered by user "Alice" using the sharing API
     And user "Carol" accepts share "/TMP" offered by user "Alice" using the sharing API
     And user "Brian" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
-    And the administrator deletes user "Carol" using the provisioning API
+    And the administrator deletes user "Carol" using the Graph API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
