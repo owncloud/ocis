@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -132,7 +133,7 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 				}
 
 				for iSpace, space := range spaces {
-					fmt.Printf("  Rebuilding space %d/%d...", iSpace+1, len(spaces))
+					fmt.Printf("  Rebuilding space '%s' %d/%d...", strings.TrimSuffix(space, ".json"), iSpace+1, len(spaces))
 
 					spaceBlob, err := s.SimpleDownload(ctx, filepath.Join("storages", storage, space))
 					if err != nil {
@@ -150,12 +151,12 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 					for _, share := range shares.Shares {
 						err = mgr.Cache.Add(ctx, share.ResourceId.StorageId, share.ResourceId.SpaceId, share.Id.OpaqueId, share)
 						if err != nil {
-							fmt.Printf(" failed! (%s)\n", err.Error())
+							fmt.Printf(" adding share '%s' to the cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
 							errorsOccured = true
 						}
 						err = mgr.CreatedCache.Add(ctx, share.Creator.OpaqueId, share.Id.OpaqueId)
 						if err != nil {
-							fmt.Printf(" failed! (%s)\n", err.Error())
+							fmt.Printf(" adding share '%s' to the created cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
 							errorsOccured = true
 						}
 
@@ -169,14 +170,14 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 							}
 							err := mgr.UserReceivedStates.Add(ctx, userid, spaceId, rs)
 							if err != nil {
-								fmt.Printf(" failed! (%s)\n", err.Error())
+								fmt.Printf(" adding share '%s' to the user cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
 								errorsOccured = true
 							}
 						case provider.GranteeType_GRANTEE_TYPE_GROUP:
 							groupid := share.Grantee.GetGroupId().GetOpaqueId()
 							err := mgr.GroupReceivedCache.Add(ctx, groupid, spaceId)
 							if err != nil {
-								fmt.Printf(" failed! (%s)\n", err.Error())
+								fmt.Printf(" adding share '%s' to the group cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
 								errorsOccured = true
 							}
 						}
