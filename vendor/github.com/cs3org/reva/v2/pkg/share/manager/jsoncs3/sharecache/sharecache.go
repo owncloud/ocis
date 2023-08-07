@@ -92,6 +92,13 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 	unlock := c.lockUser(userid)
 	defer unlock()
 
+	if c.UserShares[userid] == nil {
+		err := c.syncWithLock(ctx, userid)
+		if err != nil {
+			return err
+		}
+	}
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
@@ -99,28 +106,50 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 	storageid, spaceid, _ := shareid.Decode(shareID)
 	ssid := storageid + shareid.IDDelimiter + spaceid
 
-	now := time.Now()
-	if c.UserShares[userid] == nil {
-		c.UserShares[userid] = &UserShareCache{
-			UserShares: map[string]*SpaceShareIDs{},
+	persistFunc := func() error {
+		now := time.Now()
+		if c.UserShares[userid] == nil {
+			c.UserShares[userid] = &UserShareCache{
+				UserShares: map[string]*SpaceShareIDs{},
+			}
 		}
-	}
-	if c.UserShares[userid].UserShares[ssid] == nil {
-		c.UserShares[userid].UserShares[ssid] = &SpaceShareIDs{
-			IDs: map[string]struct{}{},
+		if c.UserShares[userid].UserShares[ssid] == nil {
+			c.UserShares[userid].UserShares[ssid] = &SpaceShareIDs{
+				IDs: map[string]struct{}{},
+			}
 		}
+		// add share id
+		c.UserShares[userid].UserShares[ssid].Mtime = now
+		c.UserShares[userid].UserShares[ssid].IDs[shareID] = struct{}{}
+		return c.Persist(ctx, userid)
 	}
-	// add share id
-	c.UserShares[userid].Mtime = now
-	c.UserShares[userid].UserShares[ssid].Mtime = now
-	c.UserShares[userid].UserShares[ssid].IDs[shareID] = struct{}{}
-	return c.Persist(ctx, userid)
+
+	err := persistFunc()
+	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+		if err := c.syncWithLock(ctx, userid); err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+
+			return err
+		}
+
+		err = persistFunc()
+		// TODO try more often?
+	}
+	return err
 }
 
 // Remove removes a share for the given user
 func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 	unlock := c.lockUser(userid)
 	defer unlock()
+
+	if c.UserShares[userid] == nil {
+		err := c.syncWithLock(ctx, userid)
+		if err != nil {
+			return err
+		}
+	}
 
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
@@ -129,29 +158,44 @@ func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 	storageid, spaceid, _ := shareid.Decode(shareID)
 	ssid := storageid + shareid.IDDelimiter + spaceid
 
-	now := time.Now()
-	if c.UserShares[userid] == nil {
-		c.UserShares[userid] = &UserShareCache{
-			Mtime:      now,
-			UserShares: map[string]*SpaceShareIDs{},
+	persistFunc := func() error {
+		if c.UserShares[userid] == nil {
+			c.UserShares[userid] = &UserShareCache{
+				UserShares: map[string]*SpaceShareIDs{},
+			}
 		}
+
+		if c.UserShares[userid].UserShares[ssid] != nil {
+			// remove share id
+			c.UserShares[userid].UserShares[ssid].Mtime = time.Now()
+			delete(c.UserShares[userid].UserShares[ssid].IDs, shareID)
+		}
+
+		return c.Persist(ctx, userid)
 	}
 
-	if c.UserShares[userid].UserShares[ssid] != nil {
-		// remove share id
-		c.UserShares[userid].Mtime = now
-		c.UserShares[userid].UserShares[ssid].Mtime = now
-		delete(c.UserShares[userid].UserShares[ssid].IDs, shareID)
+	err := persistFunc()
+	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+		if err := c.syncWithLock(ctx, userid); err != nil {
+			return err
+		}
+		err = persistFunc()
 	}
 
-	return c.Persist(ctx, userid)
+	return err
 }
 
 // List return the list of spaces/shares for the given user/group
-func (c *Cache) List(userid string) map[string]SpaceShareIDs {
+func (c *Cache) List(ctx context.Context, userid string) (map[string]SpaceShareIDs, error) {
+	unlock := c.lockUser(userid)
+	defer unlock()
+	if err := c.syncWithLock(ctx, userid); err != nil {
+		return nil, err
+	}
+
 	r := map[string]SpaceShareIDs{}
 	if c.UserShares[userid] == nil {
-		return r
+		return r, nil
 	}
 
 	for ssid, cached := range c.UserShares[userid].UserShares {
@@ -160,14 +204,10 @@ func (c *Cache) List(userid string) map[string]SpaceShareIDs {
 			IDs:   cached.IDs,
 		}
 	}
-	return r
+	return r, nil
 }
 
-// Sync updates the in-memory data with the data from the storage if it is outdated
-func (c *Cache) Sync(ctx context.Context, userID string) error {
-	unlock := c.lockUser(userID)
-	defer unlock()
-
+func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
@@ -253,7 +293,8 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 	if err = c.storage.Upload(ctx, metadata.UploadRequest{
 		Path:              jsonPath,
 		Content:           createdBytes,
-		IfUnmodifiedSince: c.UserShares[userid].Mtime,
+		IfUnmodifiedSince: oldMtime,
+		MTime:             c.UserShares[userid].Mtime,
 	}); err != nil {
 		c.UserShares[userid].Mtime = oldMtime
 		span.RecordError(err)

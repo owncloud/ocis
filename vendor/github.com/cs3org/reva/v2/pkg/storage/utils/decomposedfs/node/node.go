@@ -60,7 +60,7 @@ func init() {
 
 // Define keys and values used in the node metadata
 const (
-	LockdiscoveryKey = "DAV:lockdiscovery"
+	LockdiscoveryKey = "lockdiscovery"
 	FavoriteKey      = "http://owncloud.org/ns/favorite"
 	ShareTypesKey    = "http://owncloud.org/ns/share-types"
 	ChecksumsKey     = "http://owncloud.org/ns/checksums"

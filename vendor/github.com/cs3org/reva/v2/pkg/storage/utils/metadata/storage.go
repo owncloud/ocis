@@ -37,6 +37,7 @@ type UploadRequest struct {
 
 	IfMatchEtag       string
 	IfUnmodifiedSince time.Time
+	MTime             time.Time
 }
 
 // Storage is the interface to maintain metadata in a storage

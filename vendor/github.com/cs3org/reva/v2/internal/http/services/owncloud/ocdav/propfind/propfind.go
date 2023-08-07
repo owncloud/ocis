@@ -840,7 +840,7 @@ func requiresExplicitFetching(n *xml.Name) bool {
 	switch n.Space {
 	case net.NsDav:
 		switch n.Local {
-		case "quota-available-bytes", "quota-used-bytes":
+		case "quota-available-bytes", "quota-used-bytes", "lockdiscovery":
 			//  A <DAV:allprop> PROPFIND request SHOULD NOT return DAV:quota-available-bytes and DAV:quota-used-bytes
 			// from https://www.rfc-editor.org/rfc/rfc4331.html#section-2
 			return true
@@ -1663,21 +1663,14 @@ func (c *countingReader) Read(p []byte) (int, error) {
 }
 
 func metadataKeyOf(n *xml.Name) string {
-	switch n.Space {
-	case net.NsDav:
-		if n.Local == "quota-available-bytes" {
-			return "quota"
-		}
-	case net.NsOwncloud:
-		if n.Local == "share-types" {
-			return "share-types"
-		}
-
-		if n.Local == "tags" {
-			return "tags"
-		}
+	switch n.Local {
+	case "quota-available-bytes":
+		return "quota"
+	case "share-types", "tags", "lockdiscovery":
+		return n.Local
+	default:
+		return fmt.Sprintf("%s/%s", n.Space, n.Local)
 	}
-	return fmt.Sprintf("%s/%s", n.Space, n.Local)
 }
 
 // UnmarshalXML appends the property names enclosed within start to pn.

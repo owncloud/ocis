@@ -44,6 +44,18 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+func init() {
+	// register method with chi before any routing is set up
+	chi.RegisterMethod(ocdav.MethodPropfind)
+	chi.RegisterMethod(ocdav.MethodProppatch)
+	chi.RegisterMethod(ocdav.MethodLock)
+	chi.RegisterMethod(ocdav.MethodUnlock)
+	chi.RegisterMethod(ocdav.MethodCopy)
+	chi.RegisterMethod(ocdav.MethodMove)
+	chi.RegisterMethod(ocdav.MethodMkcol)
+	chi.RegisterMethod(ocdav.MethodReport)
+}
+
 const (
 	// ServerName to use when announcing the service to the registry
 	ServerName = "ocdav"
@@ -73,17 +85,6 @@ func Service(opts ...Option) (micro.Service, error) {
 		return nil, err
 	}
 
-	// Comment back in after resolving the issue in go-chi.
-	// See comment in line 87.
-	// register additional webdav verbs
-	// chi.RegisterMethod(ocdav.MethodPropfind)
-	// chi.RegisterMethod(ocdav.MethodProppatch)
-	// chi.RegisterMethod(ocdav.MethodLock)
-	// chi.RegisterMethod(ocdav.MethodUnlock)
-	// chi.RegisterMethod(ocdav.MethodCopy)
-	// chi.RegisterMethod(ocdav.MethodMove)
-	// chi.RegisterMethod(ocdav.MethodMkcol)
-	// chi.RegisterMethod(ocdav.MethodReport)
 	r := chi.NewRouter()
 	tp := sopts.TraceProvider
 
@@ -107,10 +108,6 @@ func Service(opts ...Option) (micro.Service, error) {
 	}
 
 	r.Handle("/*", revaService.Handler())
-	// This is a workaround for the go-chi concurrent map read write issue.
-	// After the issue has been solved upstream in go-chi we should switch
-	// back to using `chi.RegisterMethod`.
-	r.MethodNotAllowed(http.HandlerFunc(revaService.Handler().ServeHTTP))
 
 	_ = chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		sopts.Logger.Debug().Str("service", "ocdav").Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")

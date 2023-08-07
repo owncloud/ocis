@@ -39,7 +39,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/juliangruber/go-intersect"
 	"github.com/mitchellh/mapstructure"
-	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
@@ -111,10 +110,8 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		for {
 			select {
 			case <-t.C:
-				log.Debug().Msg("app provider tick, registering Provider")
 				service.registerProvider()
 			case <-service.context.Done():
-				log.Debug().Msg("app provider stopped")
 				t.Stop()
 			}
 		}

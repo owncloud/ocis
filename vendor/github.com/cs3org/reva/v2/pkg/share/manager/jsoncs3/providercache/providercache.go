@@ -127,6 +127,13 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
 
+	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
+		err := c.syncWithLock(ctx, storageID, spaceID)
+		if err != nil {
+			return err
+		}
+	}
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
@@ -140,9 +147,25 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		return fmt.Errorf("missing share id")
 	}
 	c.initializeIfNeeded(storageID, spaceID)
-	c.Providers[storageID].Spaces[spaceID].Shares[shareID] = share
 
-	return c.Persist(ctx, storageID, spaceID)
+	persistFunc := func() error {
+		c.Providers[storageID].Spaces[spaceID].Shares[shareID] = share
+
+		return c.Persist(ctx, storageID, spaceID)
+	}
+	err := persistFunc()
+
+	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+
+			return err
+		}
+
+		err = persistFunc()
+	}
+	return err
 }
 
 // Remove removes a share from the cache
@@ -150,38 +173,68 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
 
+	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
+		err := c.syncWithLock(ctx, storageID, spaceID)
+		if err != nil {
+			return err
+		}
+	}
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
 
-	if c.Providers[storageID] == nil ||
-		c.Providers[storageID].Spaces[spaceID] == nil {
-		return nil
-	}
-	delete(c.Providers[storageID].Spaces[spaceID].Shares, shareID)
+	persistFunc := func() error {
+		if c.Providers[storageID] == nil ||
+			c.Providers[storageID].Spaces[spaceID] == nil {
+			return nil
+		}
+		delete(c.Providers[storageID].Spaces[spaceID].Shares, shareID)
 
-	return c.Persist(ctx, storageID, spaceID)
+		return c.Persist(ctx, storageID, spaceID)
+	}
+	err := persistFunc()
+	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+			return err
+		}
+		err = persistFunc()
+	}
+
+	return err
 }
 
 // Get returns one entry from the cache
-func (c *Cache) Get(storageID, spaceID, shareID string) *collaboration.Share {
+func (c *Cache) Get(ctx context.Context, storageID, spaceID, shareID string) (*collaboration.Share, error) {
+	// sync cache, maybe our data is outdated
+	err := c.Sync(ctx, storageID, spaceID)
+	if err != nil {
+		return nil, err
+	}
+
 	if c.Providers[storageID] == nil ||
 		c.Providers[storageID].Spaces[spaceID] == nil {
-		return nil
+		return nil, nil
 	}
-	return c.Providers[storageID].Spaces[spaceID].Shares[shareID]
+	return c.Providers[storageID].Spaces[spaceID].Shares[shareID], nil
 }
 
 // ListSpace returns the list of shares in a given space
-func (c *Cache) ListSpace(storageID, spaceID string) *Shares {
-	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
-		return &Shares{}
+func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shares, error) {
+	// sync cache, maybe our data is outdated
+	err := c.Sync(ctx, storageID, spaceID)
+	if err != nil {
+		return nil, err
 	}
-	return c.Providers[storageID].Spaces[spaceID]
+
+	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
+		return &Shares{}, nil
+	}
+	return c.Providers[storageID].Spaces[spaceID], nil
 }
 
-// PersistWithTime persists the data of one space if it has not been modified since the given mtime
-func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, mtime time.Time) error {
+// Persist persists the data of one space
+func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "PersistWithTime")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
@@ -192,7 +245,7 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	}
 
 	oldMtime := c.Providers[storageID].Spaces[spaceID].Mtime
-	c.Providers[storageID].Spaces[spaceID].Mtime = mtime
+	c.Providers[storageID].Spaces[spaceID].Mtime = time.Now()
 
 	// FIXME there is a race when between this time now and the below Uploed another process also updates the file -> we need a lock
 	createdBytes, err := json.Marshal(c.Providers[storageID].Spaces[spaceID])
@@ -213,7 +266,8 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	if err = c.storage.Upload(ctx, metadata.UploadRequest{
 		Path:              jsonPath,
 		Content:           createdBytes,
-		IfUnmodifiedSince: c.Providers[storageID].Spaces[spaceID].Mtime,
+		IfUnmodifiedSince: oldMtime,
+		MTime:             c.Providers[storageID].Spaces[spaceID].Mtime,
 	}); err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
 		span.RecordError(err)
@@ -224,16 +278,15 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	return nil
 }
 
-// Persist persists the data of one space
-func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
-	return c.PersistWithTime(ctx, storageID, spaceID, time.Now())
-}
-
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, storageID, spaceID string) error {
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
 
+	return c.syncWithLock(ctx, storageID, spaceID)
+}
+
+func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 

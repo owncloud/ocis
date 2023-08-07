@@ -414,9 +414,17 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "missing resource information", fmt.Errorf("error getting resource information"))
 		return
 	}
+	if statRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		if statRes.GetStatus().GetCode() == rpc.Code_CODE_NOT_FOUND {
+			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "update public share: resource not found", err)
+			return
+		}
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc stat request failed for stat when updating a public share", err)
+		return
+	}
 
 	// empty permissions mean internal link here - NOT denial. Hence we need an extra check
-	if !sufficientPermissions(statRes.Info.PermissionSet, newPermissions, true) {
+	if !sufficientPermissions(statRes.GetInfo().GetPermissionSet(), newPermissions, true) {
 		response.WriteOCSError(w, r, http.StatusForbidden, "no share permission", nil)
 		return
 	}
