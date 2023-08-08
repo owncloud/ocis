@@ -156,7 +156,7 @@ Feature: full text search
       | new              |
       | spaces           |
 
-
+  @skipOnStable3.0
   Scenario Outline: search files inside the folder
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "hello world inside root" to "file1.txt"
