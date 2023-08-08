@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/parser"
@@ -27,6 +28,10 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
 
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
@@ -47,6 +52,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(mtrcs),
+					http.TraceProvider(traceProvider),
 				)
 				if err != nil {
 					logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")
