@@ -16,7 +16,7 @@ Feature: full text search
       | folderWithFile/subFolder/ |
     And user "Alice" has uploaded the following files with content "some data"
       | path                                             |
-      | fileInRootLevel.txt                                         |
+      | fileInRootLevel.txt                              |
       | folderWithFile/fileInsideFolder.txt              |
       | folderWithFile/subFolder/fileInsideSubFolder.txt |
     And user "Alice" has created the following tags for file "fileInRootLevel.txt" of the space "Personal":
@@ -142,6 +142,25 @@ Feature: full text search
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
       | /file1.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search restored version of a file using a tag
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "version one file" to "file.txt"
+    And user "Alice" has created the following tags for file "file.txt" of the space "Personal":
+      | tag1 |
+    And user "Alice" has uploaded file with content "version two file" to "file.txt"
+    And user "Alice" has restored version index "1" of file "file.txt"
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | /file.txt |
+    And the content of file "file.txt" for user "Alice" should be "version one file"
     Examples:
       | dav-path-version |
       | old              |
