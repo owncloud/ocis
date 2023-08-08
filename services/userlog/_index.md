@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-08-08T06:31:10.730423262Z
+date: 2023-08-08T08:43:20.288127116Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -24,6 +24,7 @@ The `userlog` service is a mediator between the `eventhistory` service and clien
 * [Retrieving](#retrieving)
 * [Subscribing](#subscribing)
 * [Posting](#posting)
+  * [Authentication](#authentication)
   * [Deprovisioning](#deprovisioning)
 * [Deleting](#deleting)
 * [Translations](#translations)
@@ -64,7 +65,11 @@ Additionally to the oc10 API, the `userlog` service also provides an `/sse` (Ser
 
 ## Posting
 
-The userlog service is able to store global messages that will be displayed in the Web UI to all users. These messages can only be activated and deleted by users with the `admin` role but not by ordinary users. If a user deletes the message in the Web UI, it reappears on reload. Global messages use the endpoint `/ocs/v2.php/apps/notifications/api/v1/notifications/global` and are activated by sending a `POST` request. Note that sending another `POST` request of the same type overwrites the previous one. For the time being, only the type `deprovision` is supported.
+The userlog service is able to store global messages that will be displayed in the Web UI to all users. If a user deletes the message in the Web UI, it reappears on reload. Global messages use the endpoint `/ocs/v2.php/apps/notifications/api/v1/notifications/global` and are activated by sending a `POST` request. Note that sending another `POST` request of the same type overwrites the previous one. For the time being, only the type `deprovision` is supported.
+
+### Authentication
+
+`POST` and `DELETE` endpoints provide notifications to all users. Therefore only certain users can configure them. Two authentication methods for this endpoint are provided. Users with the `admin` role can always access these endpoints. Additionally, a static secret via the `USERLOG_GLOBAL_NOTIFICATIONS_SECRET` can be defined to enable access for users knowing this secret, which has to be sent with the header containing the request.
 
 ### Deprovisioning
 
@@ -74,7 +79,7 @@ Deprovision messages announce a deprovision text including a deprovision date of
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
 
-Only users with the `admin` role can send a `DELETE` request to the `ocs/v2.php/apps/notifications/api/v1/notifications/global` endpoint to remove a global message, see the [Posting](#posting) section for more details.)
+Sending a `DELETE` request to the `ocs/v2.php/apps/notifications/api/v1/notifications/global` endpoint to remove a global message is a restricted action, see the [Authentication](#authentication) section for more details.)
 
 ## Translations
 

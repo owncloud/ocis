@@ -84,6 +84,7 @@ enable_federated_sharing_incoming: false
 enable_federated_sharing_outgoing: false
 search_min_length: 3
 edition: Community
+disable_sse: false
 public_url: https://localhost:9200
 app_handler:
   insecure: false

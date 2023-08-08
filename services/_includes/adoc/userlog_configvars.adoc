@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-08-06-31-10]
+[#deprecation-note-2023-08-08-08-43-17]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -254,7 +254,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-08-08-06-31-10[Deprecation Note]
+xref:deprecation-note-2023-08-08-08-43-17[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -380,7 +380,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
-a|`USERLOG_DISABLE_SSE` +
+a|`OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -388,5 +388,14 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables server-sent events (sse). When disabled, clients will no longer be able to connect to the sse endpoint.
+
+a|`USERLOG_GLOBAL_NOTIFICATIONS_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.
 |===
 

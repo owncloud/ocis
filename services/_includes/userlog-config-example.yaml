@@ -57,3 +57,4 @@ persistence:
   ttl: 336h0m0s
   size: 0
 disable_sse: false
+global_notifications_secret: ""
