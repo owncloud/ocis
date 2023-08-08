@@ -192,7 +192,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 									"hostname":       "",
 								},
 								"support_url_signing": true,
-								"support_sse":         true,
+								"support_sse":         !cfg.DisableSSE,
 							},
 							"graph": map[string]interface{}{
 								"personal_data_export": true,
