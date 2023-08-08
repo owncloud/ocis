@@ -62,12 +62,10 @@ func init() {
 // RebuildJSONCS3Indexes rebuilds the share indexes from the shares json
 func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "rebuild-jsoncs3-indexes",
-		Usage: "rebuild the share indexes from the shares json",
-		Subcommands: []*cli.Command{
-			ListDecomposedfsMigrations(cfg),
-		},
-		Flags: []cli.Flag{},
+		Name:        "rebuild-jsoncs3-indexes",
+		Usage:       "rebuild the share indexes from the shares json",
+		Subcommands: []*cli.Command{},
+		Flags:       []cli.Flag{},
 		Before: func(c *cli.Context) error {
 			// Parse base config
 			if err := parser.ParseConfig(cfg, true); err != nil {
