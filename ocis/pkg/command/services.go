@@ -1,13 +1,13 @@
 package command
 
 import (
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
-	"github.com/urfave/cli/v2"
-
 	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/command"
 	appprovider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appregistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
@@ -33,6 +33,7 @@ import (
 	search "github.com/owncloud/ocis/v2/services/search/pkg/command"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/command"
+	sse "github.com/owncloud/ocis/v2/services/sse/pkg/command"
 	storagepubliclink "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
@@ -170,6 +171,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.Sharing.Service.Name, sharing.GetCommands(cfg.Sharing), func(c *config.Config) {
 			cfg.Sharing.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.SSE.Service.Name, sse.GetCommands(cfg.SSE), func(c *config.Config) {
+			cfg.SSE.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {

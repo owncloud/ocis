@@ -27,6 +27,7 @@ import (
 	search "github.com/owncloud/ocis/v2/services/search/pkg/config"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
+	sse "github.com/owncloud/ocis/v2/services/sse/pkg/config"
 	storagepublic "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
 	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
@@ -99,6 +100,7 @@ type Config struct {
 	Proxy             *proxy.Config          `yaml:"proxy"`
 	Settings          *settings.Config       `yaml:"settings"`
 	Sharing           *sharing.Config        `yaml:"sharing"`
+	SSE               *sse.Config            `yaml:"sse"`
 	StorageSystem     *storagesystem.Config  `yaml:"storage_system"`
 	StoragePublicLink *storagepublic.Config  `yaml:"storage_public"`
 	StorageShares     *storageshares.Config  `yaml:"storage_shares"`

@@ -30,7 +30,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9120-9124  | [graph]({{< ref "../graph/_index.md" >}})                                              |
 | 9125-9129  | [policies]({{< ref "../policies/_index.md" >}})                                        |
 | 9130-9134  | [idp]({{< ref "../idp/_index.md" >}})                                                  |
-| 9135-9139  | FREE (formerly used by graph-explorer)                                                 |
+| 9135-9139  | [sse]({{< ref "../sse/_index.md" >}})                                                  |
 | 9140-9141  | [frontend]({{< ref "../frontend/_index.md" >}})                                        |
 | 9142-9143  | [gateway]({{< ref "../gateway/_index.md" >}})                                          |
 | 9144-9145  | [users]({{< ref "../users/_index.md" >}})                                              |
