@@ -9,16 +9,16 @@ Feature: get quota
     And user "Alice" has been created with default attributes and small skeleton files
 
 
-  Scenario: retrieving folder quota when no quota is set
-    Given using old dav path
+  Scenario Outline: retrieving folder quota when no quota is set
+    Given using <dav-path-version> DAV path
     When the administrator gives unlimited quota to user "Alice" using the provisioning API
     Then the HTTP status code should be "200"
     And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "-3"
-#    Examples:
-#      | dav-path-version |
-#      | old              |
-#      | new              |
-#      | spaces           |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: retrieving folder quota when quota is set

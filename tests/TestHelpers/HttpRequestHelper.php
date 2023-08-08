@@ -202,15 +202,6 @@ class HttpRequestHelper {
 		$sendRetryLimit = self::numRetriesOnHttpTooEarly();
 		$sendCount = 0;
 		$sendExceptionHappened = false;
-		var_dump(
-			$url,
-			$xRequestId,
-			$method,
-			$user,
-			$password,
-			$headers,
-			$body,
-		);
 		do {
 			$response = self::sendRequestOnce(
 				$url,

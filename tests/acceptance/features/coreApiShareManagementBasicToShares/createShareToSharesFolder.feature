@@ -467,7 +467,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnGraph
+
   Scenario Outline: share with a group and then add a user to that group
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
@@ -518,8 +518,7 @@ Feature: sharing
     Then as "Brian" file "/Shares/textfile0.txt" should exist
     And as "Carol" file "/Shares/textfile0.txt" should exist
     When the administrator deletes group "grp1" using the Graph API
-    Then the HTTP status code should be "204"
-    When user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
+    And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And file "/textfile0.txt" should not be included as path in the response

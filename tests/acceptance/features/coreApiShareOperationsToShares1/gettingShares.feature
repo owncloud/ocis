@@ -152,7 +152,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
-  @issue-1289 @skipOnGraph
+  @issue-1289 
   Scenario: share a folder to a group, and remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files
