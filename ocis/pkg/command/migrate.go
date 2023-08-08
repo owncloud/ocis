@@ -187,7 +187,7 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 				fmt.Printf("done\n")
 			}
 			if errorsOccured {
-				fmt.Printf("There were errors. Please review the logs.")
+				return errors.New("There were errors. Please review the logs or try again.")
 			}
 
 			return nil
