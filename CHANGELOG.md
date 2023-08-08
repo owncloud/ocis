@@ -7,7 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
-* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6971](https://github.com/owncloud/ocis/pull/6971)
+* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 * Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 * Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
@@ -22,10 +22,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/6935
    https://github.com/owncloud/ocis/pull/6947
 
-* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6971](https://github.com/owncloud/ocis/pull/6971)
+* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
 
    We added a command for rebuilding the jsoncs3 share manager indexes.
 
+   https://github.com/owncloud/ocis/pull/6986
    https://github.com/owncloud/ocis/pull/6971
 
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
