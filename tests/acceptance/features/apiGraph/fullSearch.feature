@@ -88,6 +88,29 @@ Feature: full text search
       | spaces           |
 
 
+  Scenario Outline: search project space folders by tag
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "spacesFolder/spacesSubFolder" in space "tag-space"
+    And user "Alice" has created a folder "unTagSpacesFolder/unTagSpacesSubFolder" in space "tag-space"
+    And user "Alice" has created the following tags for folder "spacesFolder" of the space "tag-space":
+      | tag1 |
+    And user "Alice" has created the following tags for folder "spacesFolder/spacesSubFolder" of the space "tag-space":
+      | tag1 |
+    And using <dav-path-version> DAV path
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | spacesFolder    |
+      | spacesSubFolder |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
   Scenario Outline: sharee searches shared files using a tag
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
