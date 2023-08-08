@@ -22,7 +22,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 -   [webUIFavorites/favoritesFile.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L73)
 -   [webUIFavorites/favoritesFile.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L80)
 -   [webUIFavorites/favoritesFile.feature:105](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L105)
--   [webUIFavorites/favoritesFile.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L124)
+-   [webUIFavorites/favoritesFile.feature:126](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L126)
 -   [webUIFavorites/unfavoriteFile.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L12)
 -   [webUIFavorites/unfavoriteFile.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L33)
 -   [webUIFavorites/unfavoriteFile.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L53)
@@ -32,7 +32,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 -   [webUIResharing1/reshareUsers.feature:177](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L177)
 
 ### [when sharer renames the shared resource, sharee get the updated name](https://github.com/owncloud/ocis/issues/2256)
--   [webUIRenameFiles/renameFiles.feature:226](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L226)
+-   [webUIRenameFiles/renameFiles.feature:227](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L227)
 
 ### [Cannot create users with special characters](https://github.com/owncloud/ocis/issues/1417)
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L37)
@@ -120,7 +120,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 ### [Favorites deactivated in ocis temporarily](https://github.com/owncloud/ocis/issues/1228)
 -   [webUIFilesDetails/fileDetails.feature:47](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L47)
 -   [webUIFilesDetails/fileDetails.feature:67](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L67)
--   [webUIRenameFiles/renameFiles.feature:249](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L249)
+-   [webUIRenameFiles/renameFiles.feature:250](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L250)
 
 ### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
 -   [webUISharingAcceptShares/acceptShares.feature:240](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L240)
