@@ -121,3 +121,19 @@ Feature: Search
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Alice" should not contain these entries:
       | /folderMain |
+
+
+  Scenario: search inside folder in shares
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
+    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
+    When user "Brian" searches for "folder" inside folder "/folderMain" in space "Shares" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Brian" should contain only these entries:
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+    But the search result of user "Brian" should not contain these entries:
+      | /folderMain |
