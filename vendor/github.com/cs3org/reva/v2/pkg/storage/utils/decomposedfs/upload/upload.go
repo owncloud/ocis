@@ -292,6 +292,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 		err = upload.Finalize()
 		Cleanup(upload, err != nil, false)
 		if err != nil {
+			log.Error().Err(err).Msg("failed to upload")
 			return err
 		}
 	}

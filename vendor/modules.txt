@@ -352,7 +352,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.15.1-0.20230731132956-0fb5212d0551
+# github.com/cs3org/reva/v2 v2.15.1-0.20230809113840-3ceaf17cf7fb
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -702,9 +702,6 @@ github.com/cs3org/reva/v2/pkg/user/manager/registry
 github.com/cs3org/reva/v2/pkg/utils
 github.com/cs3org/reva/v2/pkg/utils/ldap
 github.com/cs3org/reva/v2/tests/cs3mocks/mocks
-# github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8
-## explicit
-github.com/cubewise-code/go-mime
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew

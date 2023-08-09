@@ -71,9 +71,9 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	}
 	defer reader.Close()
 
-	_, err1 := bs.client.PutObject(context.Background(), bs.bucket, bs.path(node), reader, node.Blobsize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = bs.client.PutObject(context.Background(), bs.bucket, bs.path(node), reader, node.Blobsize, minio.PutObjectOptions{ContentType: "application/octet-stream", SendContentMd5: true})
 
-	if err1 != nil {
+	if err != nil {
 		return errors.Wrapf(err, "could not store object '%s' into bucket '%s'", bs.path(node), bs.bucket)
 	}
 	return nil

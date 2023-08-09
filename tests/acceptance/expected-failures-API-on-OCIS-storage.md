@@ -387,8 +387,6 @@ _ocdav: api compatibility, return correct status code_
 
 - [coreApiAuthWebDav/webDavSpecialURLs.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L16)
 - [coreApiAuthWebDav/webDavSpecialURLs.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L27)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L58)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L69)
 - [coreApiAuthWebDav/webDavSpecialURLs.feature:79](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L79)
 - [coreApiAuthWebDav/webDavSpecialURLs.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L91)
 - [coreApiAuthWebDav/webDavSpecialURLs.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L103)

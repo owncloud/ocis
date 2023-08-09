@@ -25,6 +25,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -34,7 +35,6 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -149,6 +149,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 	}
 
 	ifuReq := &provider.InitiateFileUploadRequest{
+		Opaque: &types.Opaque{},
 		Ref: &provider.Reference{
 			ResourceId: cs3.SpaceRoot,
 			Path:       utils.MakeRelativePath(req.Path),
@@ -165,13 +166,17 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 			IfUnmodifiedSince: utils.TimeToTS(req.IfUnmodifiedSince),
 		}
 	}
+	if req.MTime != (time.Time{}) {
+		// The format of the X-OC-Mtime header is <epoch>.<nanoseconds>, e.g. '1691053416.934129485'
+		ifuReq.Opaque = utils.AppendPlainToOpaque(ifuReq.Opaque, "X-OC-Mtime", strconv.Itoa(int(req.MTime.Unix()))+"."+strconv.Itoa(req.MTime.Nanosecond()))
+	}
 
 	res, err := client.InitiateFileUpload(ctx, ifuReq)
 	if err != nil {
 		return err
 	}
 	if res.Status.Code != rpc.Code_CODE_OK {
-		return status.NewErrorFromCode(res.Status.Code, "cs3 metadata SimpleUpload")
+		return errtypes.NewErrtypeFromStatus(res.Status)
 	}
 
 	var endpoint string
