@@ -47,6 +47,7 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: search deleted files by content
@@ -78,6 +79,22 @@ Feature: full text search
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | keywordAtStart.txt  |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search restored version of a file by content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world" to "test.txt"
+    And user "Alice" has uploaded file with content "Namaste nepal" to "test.txt"
+    And user "Alice" has restored version index "1" of file "test.txt"
+    When user "Alice" searches for "Content:hello" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | test.txt |
     Examples:
       | dav-path-version |
       | old              |
