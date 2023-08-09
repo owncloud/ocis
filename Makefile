@@ -118,7 +118,7 @@ CORE_BEHAT_YML=tests/acceptance/config/behat-core.yml
 
 .PHONY: test-acceptance-api
 test-acceptance-api: vendor-bin/behat/vendor
-	BEHAT_BIN=$(BEHAT_BIN) $(PWD)/tests/acceptance/run.sh --type api
+	BEHAT_BIN=$(BEHAT_BIN) $(PWD)/tests/acceptance/run.sh
 
 .PHONY: test-acceptance-from-core-api
 test-acceptance-from-core-api: vendor-bin/behat/vendor
@@ -126,7 +126,7 @@ test-acceptance-from-core-api: vendor-bin/behat/vendor
 
 .PHONY: test-paralleldeployment-api
 test-paralleldeployment-api: vendor-bin/behat/vendor
-	BEHAT_BIN=$(BEHAT_BIN) BEHAT_YML=$(PARALLEL_BEHAT_YML) $(PWD)/tests/acceptance/run.sh --type api
+	BEHAT_BIN=$(BEHAT_BIN) BEHAT_YML=$(PARALLEL_BEHAT_YML) $(PWD)/tests/acceptance/run.sh
 
 vendor/bamarni/composer-bin-plugin: composer.lock
 	composer install

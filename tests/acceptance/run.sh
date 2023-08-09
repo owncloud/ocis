@@ -368,7 +368,7 @@ function run_behat_tests() {
 		# Report them in a dry-run so they can be seen
 		# Big red error output is displayed if there are no matching scenarios - send it to null
 		DRY_RUN_FILE=$(mktemp)
-		SKIP_TAGS="${TEST_TYPE_TAG}&&@skip"
+		SKIP_TAGS="@skip"
 		${BEHAT} --dry-run {$COLORS_OPTION} -c ${BEHAT_YML} -f pretty ${BEHAT_SUITE_OPTION} --tags "${SKIP_TAGS}" ${BEHAT_FEATURE} 1>${DRY_RUN_FILE} 2>/dev/null
 		if grep -q -m 1 'No scenarios' "${DRY_RUN_FILE}"
 		then
@@ -477,20 +477,17 @@ else
 	fi
 fi
 
-TEST_TYPE_TAG="@api"
+
 TEST_TYPE_TEXT="API"
 
 # Always have "@api"
-if [ -z "${BEHAT_FILTER_TAGS}" ]
+if [ ! -z "${BEHAT_FILTER_TAGS}" ]
 then
-	BEHAT_FILTER_TAGS="${TEST_TYPE_TAG}"
-else
 	# Be nice to the caller
 	# Remove any extra "&&" at the end of their tags list
 	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS%&&}"
 	# Remove any extra "&&" at the beginning of their tags list
 	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS#&&}"
-	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS}&&${TEST_TYPE_TAG}"
 fi
 
 # EMAIL_HOST defines where the system-under-test can find the email server (inbucket)
@@ -517,9 +514,12 @@ fi
 # If the caller did not mention specific tags, skip the skipped tests by default
 if [ "${BEHAT_TAGS_OPTION_FOUND}" = false ]
 then
+	if [[ -z $BEHAT_FILTER_TAGS ]]
+	then
+		BEHAT_FILTER_TAGS="~@skip"
 	# If the caller has already specified specifically to run "@skip" scenarios
 	# then do not append "not @skip"
-	if [[ ! ${BEHAT_FILTER_TAGS} =~ "&&@skip&&" ]]
+	elif [[ ! ${BEHAT_FILTER_TAGS} =~ (^|&)@skip(&|$) ]]
 	then
 		BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS}&&~@skip"
 	fi
