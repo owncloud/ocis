@@ -110,7 +110,7 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
-* Enhancement - Update web to v7.1.0-rc.4: [#6925](https://github.com/owncloud/ocis/pull/6925)
+* Enhancement - Update web to v7.1.0-rc.5: [#6944](https://github.com/owncloud/ocis/pull/6944)
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
@@ -571,11 +571,11 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6470
    https://github.com/owncloud/web/releases/tag/v7.0.1
 
-* Enhancement - Update web to v7.1.0-rc.4: [#6925](https://github.com/owncloud/ocis/pull/6925)
+* Enhancement - Update web to v7.1.0-rc.5: [#6944](https://github.com/owncloud/ocis/pull/6944)
 
    Tags: web
 
-   We updated ownCloud Web to v7.1.0-rc.4. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v7.1.0-rc.5. Please refer to the changelog (linked) for details on
    the web release.
 
    ## Summary * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078):
@@ -674,10 +674,14 @@ The following sections list the changes for 3.1.0.
    notification for blocked pop-ups and redirects * Enhancement
    [owncloud/web#9386](https://github.com/owncloud/web/pull/9386): Allow local storage
    for auth token * Enhancement
-   [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
+   [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling *
+   Enhancement [owncloud/web#9449](https://github.com/owncloud/web/issues/9449):
+   Error notifications include x-request-id * Enhancement
+   [owncloud/web#9426](https://github.com/owncloud/web/pull/9426): Add error log to
+   upload dialog
 
-   https://github.com/owncloud/ocis/pull/6925
-   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.4
+   https://github.com/owncloud/ocis/pull/6944
+   https://github.com/owncloud/web/releases/tag/v7.1.0-rc.5
 
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
