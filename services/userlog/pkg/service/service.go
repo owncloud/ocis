@@ -13,7 +13,6 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -29,7 +28,6 @@ import (
 	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc/metadata"
 )
 
 // UserlogService is the service responsible for user activities
@@ -137,12 +135,12 @@ func (ul *UserlogService) processEvent(event events.Event) {
 			users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
 		default:
 			return
-
 		}
+
 	// space related // TODO: how to find spaceadmins?
 	case events.SpaceDisabled:
 		executant = e.Executant
-		users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
+		users, err = ul.findSpaceMembers(ul.mustAuthenticate(), e.ID.GetOpaqueId(), viewer)
 	case events.SpaceDeleted:
 		executant = e.Executant
 		for u := range e.FinalMembers {
@@ -150,22 +148,22 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		}
 	case events.SpaceShared:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 	case events.SpaceUnshared:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 	case events.SpaceMembershipExpired:
-		users, err = ul.resolveID(ul.impersonate(e.SpaceOwner), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 
 	// share related
 	case events.ShareCreated:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareRemoved:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareExpired:
-		users, err = ul.resolveID(ul.impersonate(e.ShareOwner), e.GranteeUserID, e.GranteeGroupID)
+		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
 	}
 
 	if err != nil {
@@ -520,26 +518,6 @@ func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]s
 	return userIDs, nil
 }
 
-func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
-	if uid == nil {
-		ul.log.Error().Msg("cannot impersonate nil user")
-		return nil
-	}
-
-	u, err := getUser(context.Background(), uid, ul.gatewaySelector)
-	if err != nil {
-		ul.log.Error().Err(err).Msg("cannot get user")
-		return nil
-	}
-
-	ctx, err := authenticate(u, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey)
-	if err != nil {
-		ul.log.Error().Err(err).Str("userid", u.GetId().GetOpaqueId()).Msg("failed to impersonate user")
-		return nil
-	}
-	return ctx
-}
-
 func (ul *UserlogService) getUserLocale(userid string) string {
 	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
 		micrometadata.Set(context.Background(), middleware.AccountID, userid),
@@ -560,29 +538,25 @@ func (ul *UserlogService) getUserLocale(userid string) string {
 }
 
 func (ul *UserlogService) getConverter(locale string) *Converter {
-	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath)
+	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.ServiceAccount.ServiceAccountID, ul.cfg.ServiceAccount.ServiceAccountSecret)
 }
 
-func authenticate(usr *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {
+func (ul *UserlogService) mustAuthenticate() context.Context {
+	ctx, err := authenticate(ul.cfg.ServiceAccount.ServiceAccountID, ul.gatewaySelector, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		ul.log.Error().Err(err).Str("accountid", ul.cfg.ServiceAccount.ServiceAccountID).Msg("failed to impersonate service account")
+		return nil
+	}
+	return ctx
+}
+
+func authenticate(serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceAccountSecret string) (context.Context, error) {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := revactx.ContextSetUser(context.Background(), usr)
-	authRes, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
-		Type:         "machine",
-		ClientId:     "userid:" + usr.GetId().GetOpaqueId(),
-		ClientSecret: machineAuthAPIKey,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error impersonating user: %s", authRes.Status.Message)
-	}
-
-	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
+	return utils.GetServiceUserContext(serviceAccountID, gatewayClient, serviceAccountSecret)
 }
 
 func getSpace(ctx context.Context, spaceID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.StorageSpace, error) {
@@ -665,6 +639,7 @@ func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, ga
 
 func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesRequest {
 	return &storageprovider.ListStorageSpacesRequest{
+		Opaque: utils.AppendPlainToOpaque(nil, "unrestricted", "true"),
 		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
 			{
 				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,

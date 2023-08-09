@@ -52,31 +52,32 @@ type OC10Notification struct {
 
 // Converter is responsible for converting eventhistory events to OC10Notifications
 type Converter struct {
-	locale            string
-	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
-	machineAuthAPIKey string
-	serviceName       string
-	translationPath   string
+	locale               string
+	gatewaySelector      pool.Selectable[gateway.GatewayAPIClient]
+	serviceAccountID     string
+	serviceAccountSecret string
+	serviceName          string
+	translationPath      string
 
 	// cached within one request not to query other service too much
-	spaces    map[string]*storageprovider.StorageSpace
-	users     map[string]*user.User
-	resources map[string]*storageprovider.ResourceInfo
-	contexts  map[string]context.Context
+	spaces                map[string]*storageprovider.StorageSpace
+	users                 map[string]*user.User
+	resources             map[string]*storageprovider.ResourceInfo
+	serviceAccountContext context.Context
 }
 
 // NewConverter returns a new Converter
-func NewConverter(loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string, name string, translationPath string) *Converter {
+func NewConverter(loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string, name string, translationPath string, serviceAccountID string, serviceAccountSecret string) *Converter {
 	return &Converter{
-		locale:            loc,
-		gatewaySelector:   gatewaySelector,
-		machineAuthAPIKey: machineAuthAPIKey,
-		serviceName:       name,
-		translationPath:   translationPath,
-		spaces:            make(map[string]*storageprovider.StorageSpace),
-		users:             make(map[string]*user.User),
-		resources:         make(map[string]*storageprovider.ResourceInfo),
-		contexts:          make(map[string]context.Context),
+		locale:               loc,
+		gatewaySelector:      gatewaySelector,
+		serviceAccountID:     serviceAccountID,
+		serviceAccountSecret: serviceAccountSecret,
+		serviceName:          name,
+		translationPath:      translationPath,
+		spaces:               make(map[string]*storageprovider.StorageSpace),
+		users:                make(map[string]*user.User),
+		resources:            make(map[string]*storageprovider.ResourceInfo),
 	}
 }
 
@@ -171,7 +172,7 @@ func (c *Converter) spaceMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	ctx, err := c.authenticate(usr)
+	ctx, err := c.authenticate()
 	if err != nil {
 		return OC10Notification{}, err
 	}
@@ -210,7 +211,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	ctx, err := c.authenticate(usr)
+	ctx, err := c.authenticate()
 	if err != nil {
 		return OC10Notification{}, err
 	}
@@ -327,13 +328,18 @@ func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string
 	}, nil
 }
 
-func (c *Converter) authenticate(usr *user.User) (context.Context, error) {
-	if ctx, ok := c.contexts[usr.GetId().GetOpaqueId()]; ok {
-		return ctx, nil
+func (c *Converter) authenticate() (context.Context, error) {
+	if c.serviceAccountContext != nil {
+		return c.serviceAccountContext, nil
 	}
-	ctx, err := authenticate(usr, c.gatewaySelector, c.machineAuthAPIKey)
+
+	gatewayClient, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	ctx, err := utils.GetServiceUserContext(c.serviceAccountID, gatewayClient, c.serviceAccountSecret)
 	if err == nil {
-		c.contexts[usr.GetId().GetOpaqueId()] = ctx
+		c.serviceAccountContext = ctx
 	}
 	return ctx, err
 }
