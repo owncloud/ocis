@@ -29,7 +29,7 @@ require (
 	github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 	github.com/go-micro/plugins/v4/registry/consul v1.2.1
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
-	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2-0.20230605104008-a179a6b8f8e6
+	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2
 	github.com/go-micro/plugins/v4/registry/mdns v1.2.0
 	github.com/go-micro/plugins/v4/registry/memory v1.2.0
 	github.com/go-micro/plugins/v4/registry/nats v1.2.2-0.20230723205323-1ada01245674
