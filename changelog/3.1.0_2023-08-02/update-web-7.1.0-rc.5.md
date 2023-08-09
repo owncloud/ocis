@@ -1,8 +1,8 @@
-Enhancement: Update web to v7.1.0-rc.4
+Enhancement: Update web to v7.1.0-rc.5
 
 Tags: web
 
-We updated ownCloud Web to v7.1.0-rc.4. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v7.1.0-rc.5. Please refer to the changelog (linked) for details on the web release.
 
 ## Summary
 * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078): Favorites list update on removal
@@ -57,6 +57,9 @@ We updated ownCloud Web to v7.1.0-rc.4. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#9377](https://github.com/owncloud/web/issues/9377): User notification for blocked pop-ups and redirects
 * Enhancement [owncloud/web#9386](https://github.com/owncloud/web/pull/9386): Allow local storage for auth token
 * Enhancement [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling
+* Enhancement [owncloud/web#9449](https://github.com/owncloud/web/issues/9449): Error notifications include x-request-id
+* Enhancement [owncloud/web#9426](https://github.com/owncloud/web/pull/9426): Add error log to upload dialog
 
-https://github.com/owncloud/ocis/pull/6925
-https://github.com/owncloud/web/releases/tag/v7.1.0-rc.4
+
+https://github.com/owncloud/ocis/pull/6944
+https://github.com/owncloud/web/releases/tag/v7.1.0-rc.5
