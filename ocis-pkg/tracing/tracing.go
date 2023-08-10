@@ -9,7 +9,6 @@ import (
 	"time"
 
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -162,40 +161,4 @@ func parseAgentConfig(ae string) (string, string, error) {
 		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
 	}
 	return p[0], p[1], nil
-}
-
-// Configure for Reva serves only as informational / instructive log messages. Tracing config will be delegated directly
-// to Reva services.
-func Configure(enabled bool, tracingType string, logger log.Logger) {
-	if enabled {
-		switch tracingType {
-		case "agent":
-			logger.Error().
-				Str("type", tracingType).
-				Msg("Reva only supports the jaeger or otel tracing exporter")
-
-		case "jaeger":
-			logger.Info().
-				Str("type", tracingType).
-				Msg("configuring storage to use the jaeger tracing exporter")
-
-		case "otlp":
-			logger.Info().
-				Str("type", tracingType).
-				Msg("configuring storage to use the otlp tracing exporter")
-
-		case "zipkin":
-			logger.Error().
-				Str("type", tracingType).
-				Msg("Reva only supports the jaeger or otel tracing exporter")
-
-		default:
-			logger.Warn().
-				Str("type", tracingType).
-				Msg("Unknown tracing exporter")
-		}
-	} else {
-		logger.Debug().
-			Msg("Tracing is not enabled")
-	}
 }

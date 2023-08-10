@@ -13,13 +13,13 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/sharing/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -34,7 +34,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg, logger)
+			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -63,6 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 				runtime.RunWithOptions(rCfg, pidFile,
 					runtime.WithLogger(&logger.Logger),
 					runtime.WithRegistry(reg),
+					runtime.WithTraceProvider(tracingProvider),
 				)
 
 				return nil
