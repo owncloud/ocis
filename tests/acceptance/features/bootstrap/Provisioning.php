@@ -417,92 +417,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has been created with default attributes and (tiny|small|large)\s?skeleton files$/
-	 *
-	 * @param string $user
-	 * @param string $skeletonType
-	 * @param boolean $skeleton
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenCreatedWithDefaultAttributes(
-		string $user,
-		string $skeletonType = "",
-		bool $skeleton = true
-	):void {
-		if ($skeletonType === "") {
-			$skeletonType = $this->getSmallestSkeletonDirName();
-		}
-
-		$originalSkeletonPath = $this->setSkeletonDirByType($skeletonType);
-
-		try {
-			$this->createUser(
-				$user,
-				null,
-				null,
-				null,
-				true,
-				null,
-				true,
-				$skeleton
-			);
-			$this->userShouldExist($user);
-		} finally {
-			$this->setSkeletonDir($originalSkeletonPath);
-		}
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been created with default attributes and without skeleton files$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(string $user):void {
-		$this->userHasBeenCreatedWithDefaultAttributes($user);
-	}
-
-	/**
-	 * @Given these users have been created with default attributes and without skeleton files:
-	 * expects a table of users with the heading
-	 * "|username|"
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
-		$originalSkeletonPath = $this->setSkeletonDirByType($this->getSmallestSkeletonDirName());
-		try {
-			$this->createTheseUsers(true, true, true, $table);
-		} finally {
-			// restore skeleton directory even if user creation failed
-			$this->setSkeletonDir($originalSkeletonPath);
-		}
-	}
-
-	/**
-	 * @Given /^these users have been created without skeleton files ?(and not initialized|):$/
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param TableNode $table
-	 * @param string $doNotInitialize
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theseUsersHaveBeenCreatedWithoutSkeletonFiles(TableNode $table, string $doNotInitialize):void {
-		$this->theseUsersHaveBeenCreated("", "", $doNotInitialize, $table);
-	}
-
-	/**
 	 *
 	 * @param string $path
 	 *
@@ -842,7 +756,7 @@ trait Provisioning {
 	 *
 	 * @param boolean $initialize
 	 * @param array|null $usersAttributes
-	 * @param string|null $method create the user with "ldap" or "api"
+	 * @param string|null $method create the user with "ldap" or "graph"
 	 * @param boolean $skeleton
 	 *
 	 * @return void
@@ -1052,47 +966,6 @@ trait Provisioning {
 		);
 		foreach ($usersAttributes as $expectedUser) {
 			$this->userShouldExist($expectedUser["userid"]);
-		}
-	}
-
-	/**
-	 * @Given /^these users have been created with ?(default attributes and|) (tiny|small|large)\s?skeleton files ?(but not initialized|):$/
-	 *
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param string $defaultAttributesText
-	 * @param string $skeletonType
-	 * @param string $doNotInitialize
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theseUsersHaveBeenCreated(
-		string $defaultAttributesText,
-		string $skeletonType,
-		string $doNotInitialize,
-		TableNode $table
-	):void {
-		if ($skeletonType === "") {
-			$skeletonType = $this->getSmallestSkeletonDirName();
-		}
-
-		$originalSkeletonPath = $this->setSkeletonDirByType($skeletonType);
-		$setDefaultAttributes = $defaultAttributesText !== "";
-		$initialize = $doNotInitialize === "";
-		try {
-			$this->createTheseUsers($setDefaultAttributes, $initialize, true, $table);
-		} finally {
-			// The effective skeleton directory is the one when the user is initialized
-			// If we did not initialize the user on creation, then we need to leave
-			// the skeleton directory in effect so that it applies when some action
-			// happens later in the scenario that causes the user to be initialized.
-			if ($initialize) {
-				$this->setSkeletonDir($originalSkeletonPath);
-			}
 		}
 	}
 
@@ -2880,13 +2753,10 @@ trait Provisioning {
 			$method = "ldap";
 		} elseif (OcisHelper::isTestingWithGraphApi()) {
 			$method = "graph";
-		} elseif ($method === null) {
-			$method = "api";
 		}
 		$user = \trim($user);
 		$method = \trim(\strtolower($method));
 		switch ($method) {
-			case "api":
 			case "ldap":
 				$settings = [];
 				$setting["userid"] = $user;
@@ -5340,7 +5210,7 @@ trait Provisioning {
 	 *
 	 * @return string name of the smallest skeleton folder
 	 */
-	private function getSmallestSkeletonDirName(): string {
+	public function getSmallestSkeletonDirName(): string {
 		return "empty";
 	}
 
@@ -5365,7 +5235,7 @@ trait Provisioning {
 	 * @return string skeleton folder before the change
 	 * @throws Exception
 	 */
-	private function setSkeletonDirByType(string $skeletonType): string {
+	public function setSkeletonDirByType(string $skeletonType): string {
 		$originalSkeletonPath = \getenv("SKELETON_DIR");
 		if ($originalSkeletonPath === false) {
 			$originalSkeletonPath = '';
@@ -5390,7 +5260,7 @@ trait Provisioning {
 	 * @return string skeleton folder before the change
 	 * @throws Exception
 	 */
-	private function setSkeletonDir(string $skeletonDir): string {
+	public function setSkeletonDir(string $skeletonDir): string {
 		$originalSkeletonPath = \getenv("SKELETON_DIR");
 		if ($skeletonDir !== '') {
 			\putenv("SKELETON_DIR=" . $skeletonDir);
