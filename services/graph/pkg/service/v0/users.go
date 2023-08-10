@@ -332,7 +332,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, u)
@@ -375,7 +375,6 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug().Str("id", userID).Msg("calling get user from backend")
 	user, err := g.identityBackend.GetUser(r.Context(), userID, odataReq)
-
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
 		errorcode.RenderError(w, r, err)
@@ -594,7 +593,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -725,11 +724,10 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used
 	render.JSON(w, r, u)
-
 }
 
 const (

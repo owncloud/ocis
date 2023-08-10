@@ -274,7 +274,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 			return err
 		}
 
-		if err := events.Publish(upload.pub, events.BytesReceived{
+		if err := events.Publish(ctx, upload.pub, events.BytesReceived{
 			UploadID:      upload.Info.ID,
 			URL:           s,
 			SpaceOwner:    n.SpaceOwnerOrManager(upload.Ctx),

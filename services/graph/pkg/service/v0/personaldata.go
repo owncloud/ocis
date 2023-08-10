@@ -141,7 +141,7 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 		errmsg = err.Error()
 	}
 
-	if err := events.Publish(g.eventsPublisher, events.PersonalDataExtracted{
+	if err := events.Publish(ctx, g.eventsPublisher, events.PersonalDataExtracted{
 		Executant: usr.GetId(),
 		Timestamp: utils.TSNow(),
 		ErrorMsg:  errmsg,

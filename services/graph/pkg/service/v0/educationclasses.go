@@ -185,7 +185,7 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 			e.Executant = currentUser.GetId()
 		}
-		g.publishEvent(e)
+		g.publishEvent(r.Context(), e)
 
 	}
 

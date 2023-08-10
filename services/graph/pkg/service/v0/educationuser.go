@@ -146,7 +146,7 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
@@ -172,7 +172,6 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug().Str("id", userID).Msg("calling get education user from backend")
 	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID)
-
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
 		errorcode.RenderError(w, r, err)
@@ -288,7 +287,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -368,11 +367,10 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 
 	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used
 	render.JSON(w, r, u)
-
 }
 
 func sortEducationUsers(req *godata.GoDataRequest, users []*libregraph.EducationUser) ([]*libregraph.EducationUser, error) {

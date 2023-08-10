@@ -95,7 +95,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 			e.Executant = currentUser.GetId()
 		}
-		g.publishEvent(e)
+		g.publishEvent(r.Context(), e)
 	}
 	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, grp)
@@ -256,7 +256,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -366,7 +366,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -418,7 +418,7 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }

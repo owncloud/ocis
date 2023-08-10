@@ -104,7 +104,7 @@ func (av Antivirus) Run() error {
 
 		if av.c.DebugScanOutcome != "" {
 			av.l.Warn().Str("antivir, clamav", ">>>>>>> ANTIVIRUS_DEBUG_SCAN_OUTCOME IS SET NO ACTUAL VIRUS SCAN IS PERFORMED!")
-			if err := events.Publish(stream, events.PostprocessingStepFinished{
+			if err := events.Publish(context.Background(), stream, events.PostprocessingStepFinished{
 				FinishedStep:  events.PPStepAntivirus,
 				Outcome:       events.PostprocessingOutcome(av.c.DebugScanOutcome),
 				UploadID:      ev.UploadID,
@@ -142,7 +142,7 @@ func (av Antivirus) Run() error {
 		}
 
 		av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Msg("File scanned")
-		if err := events.Publish(stream, events.PostprocessingStepFinished{
+		if err := events.Publish(context.Background(), stream, events.PostprocessingStepFinished{
 			FinishedStep:  events.PPStepAntivirus,
 			Outcome:       outcome,
 			UploadID:      ev.UploadID,
@@ -195,7 +195,6 @@ func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.ScanRes
 	}
 
 	return res, err
-
 }
 
 // download will download the file

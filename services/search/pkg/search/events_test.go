@@ -1,6 +1,8 @@
 package search_test
 
 import (
+	"context"
+
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	. "github.com/onsi/ginkgo/v2"
@@ -34,7 +36,7 @@ var _ = DescribeTable("events",
 			})
 		}
 
-		err := events.Publish(bus, e)
+		err := events.Publish(context.Background(), bus, e)
 
 		Expect(err).To(BeNil())
 		Eventually(func() int {

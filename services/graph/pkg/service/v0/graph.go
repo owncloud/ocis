@@ -89,9 +89,9 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-func (g Graph) publishEvent(ev interface{}) {
+func (g Graph) publishEvent(ctx context.Context, ev interface{}) {
 	if g.eventsPublisher != nil {
-		if err := events.Publish(g.eventsPublisher, ev); err != nil {
+		if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
 			g.logger.Error().
 				Err(err).
 				Msg("could not publish user created event")
