@@ -1155,6 +1155,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
+        var_dump($url);
 		$user = $this->getActualUsername($user);
 		$this->sendingToWithDirectUrl($user, $verb, $url, null);
 	}

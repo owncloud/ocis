@@ -697,7 +697,7 @@ trait WebDav {
 				$fileSource,
 				$headers,
 				null,
-				"files",
+				$type,
 				null,
 				$stream
 			);
@@ -5444,4 +5444,69 @@ trait WebDav {
 		$this->downloadFileAsUserUsingPassword($user, $pathToFile, $password);
 		$this->pushToLastStatusCodesArrays();
 	}
+
+    /**
+     * @Given /^user "([^"]*)" renames file "([^"]*)" to "([^"]*)" using MOVE request with dav-path "([^"]*)"$/
+     */
+    public function userRenamesFileToUsingMoveRequest(string $user, string $source, string $destination, string $davPath)
+    {
+
+        $spaceId = $this->getPersonalSpaceIdForUser($user);
+        $fileId = $this->getFileIdForPath($user, $source);
+        $fullUrl = $this->getBaseUrl() . $davPath . $fileId;
+        $headers['Destination'] = $this->getBaseUrl() . $davPath . $spaceId . $destination;
+
+//        return HttpRequestHelper::sendRequest($fullUrl, '', 'MOVE', $this->getActualUsername($user), $this->getUserPassword($user), $headers);
+
+        try {
+            $this->response = HttpRequestHelper::sendRequest(
+                $fullUrl,
+                '',
+                "MOVE",
+                $this->getActualUsername($user),
+                $this->getUserPassword($user),
+            $headers
+            );
+            $this->setResponseXml(
+                HttpRequestHelper::parseResponseAsXml($this->response)
+            );
+            $this->pushToLastHttpStatusCodesArray(
+                (string) $this->getResponse()->getStatusCode()
+            );
+        } catch (ConnectException $e) {
+        }
+
+    }
+
+    /**
+     * @Given user :user makes HTTP request :method file :source to :destination
+     */
+    public function userMakesHttpRequestFileTo($user, $method, $source, $destination)
+    {
+        $fullUrl = $this->getBaseUrl() . $source;
+        $destinationUrl = $this->substituteInLineCodes(
+            $destination,
+            $user
+        );
+        $headers['Destination'] = $this->getBaseUrl() . $destinationUrl;
+
+        try {
+            $this->response = HttpRequestHelper::sendRequest(
+                $fullUrl,
+                '',
+                $method,
+                $this->getActualUsername($user),
+                $this->getUserPassword($user),
+                $headers
+            );
+            $this->setResponseXml(
+                HttpRequestHelper::parseResponseAsXml($this->response)
+            );
+            $this->pushToLastHttpStatusCodesArray(
+                (string) $this->getResponse()->getStatusCode()
+            );
+        } catch (ConnectException $e) {
+        }
+    }
+
 }
