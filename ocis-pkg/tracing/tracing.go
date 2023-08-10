@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -86,15 +85,6 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		tp := rtrace.NewTracerProvider(
-			rtrace.WithEnabled(),
-			rtrace.WithExporter(traceType),
-			rtrace.WithInsecure(),
-			rtrace.WithCollector(collector),
-			rtrace.WithEndpoint(endpoint),
-			rtrace.WithServiceName(serviceName),
-		)
-		rtrace.SetDefaultTracerProvider(tp)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
 			sdktrace.WithResource(resource.NewWithAttributes(
@@ -131,15 +121,6 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		tp := rtrace.NewTracerProvider(
-			rtrace.WithEnabled(),
-			rtrace.WithExporter(traceType),
-			rtrace.WithInsecure(),
-			rtrace.WithCollector(collector),
-			rtrace.WithEndpoint(endpoint),
-			rtrace.WithServiceName(serviceName),
-		)
-		rtrace.SetDefaultTracerProvider(tp)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithSampler(sdktrace.AlwaysSample()),
 			sdktrace.WithBatcher(exporter),
