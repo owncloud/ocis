@@ -3,7 +3,7 @@ module github.com/owncloud/ocis/v2
 go 1.20
 
 require (
-	github.com/CiscoM31/godata v1.0.7
+	github.com/CiscoM31/godata v1.0.8
 	github.com/KimMachineGun/automemlimit v0.2.4
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
