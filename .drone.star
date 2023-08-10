@@ -595,7 +595,6 @@ def uploadScanResults(ctx):
                                 "git checkout $DRONE_COMMIT",
                             ],
             },
-        ] + skipIfUnchanged(ctx, "unit-tests") + [
             {
                 "name": "sync-from-cache",
                 "image": MINIO_MC,
@@ -603,7 +602,7 @@ def uploadScanResults(ctx):
                 "commands": [
                     "mkdir -p cache",
                     "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc mirror cachebucket/$CACHE_BUCKET/%s/%s/cache cache/" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc mirror cachebucket/$CACHE_BUCKET/%s/%s/cache cache/ || true" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
             {
@@ -626,7 +625,7 @@ def uploadScanResults(ctx):
                 "environment": MINIO_MC_ENV,
                 "commands": [
                     "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache || true" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
         ],
