@@ -398,7 +398,7 @@ Feature: sharing
 
 
   Scenario: share with user when username contains capital letters
-    Given these users have been created without skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | brian    |
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
@@ -415,12 +415,12 @@ Feature: sharing
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And user "brian" should see the following elements
-     | /Shares/randomfile.txt |
+      | /Shares/randomfile.txt |
     And the content of file "Shares/randomfile.txt" for user "brian" should be "Random data"
 
 
   Scenario: creating a new share with user of a group when username contains capital letters
-    Given these users have been created without skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
     And group "grp1" has been created
@@ -571,7 +571,7 @@ Feature: sharing
     And user "Carol" has accepted share "/userOneFolder" offered by user "Brian"
     When user "Carol" shares folder "/Shares/userOneFolder" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
-#    Then the HTTP status code should be "405"
+    #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Brian" that no shares are in the pending state
     And as "Brian" folder "/Shares/userOneFolder" should not exist
 
@@ -589,7 +589,7 @@ Feature: sharing
     And user "Carol" has accepted share "/userOneFolder" offered by user "Brian"
     When user "Carol" shares folder "/Shares/userOneFolder" with user "Alice" using the sharing API
     Then the HTTP status code should be "200"
-#    Then the HTTP status code should be "405"
+    #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Alice" that no shares are in the pending state
     And as "Alice" folder "/Shares/userOneFolder" should not exist
 
@@ -610,7 +610,7 @@ Feature: sharing
     And user "David" has accepted share "/userOneFolder" offered by user "Brian"
     When user "David" shares folder "/Shares/userOneFolder" with user "Carol" using the sharing API
     Then the HTTP status code should be "200"
-#    Then the HTTP status code should be "405"
+    #    Then the HTTP status code should be "405"
     And the sharing API should report to user "Carol" that no shares are in the pending state
     And as "Carol" folder "/Shares/userOneFolder" should not exist
 
@@ -624,17 +624,17 @@ Feature: sharing
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
-      | share_with             | %username%            |
-      | share_with_displayname | %displayname%         |
+      | share_with             | %username%          |
+      | share_with_displayname | %displayname%       |
       | file_target            | /Shares/renamed.txt |
       | path                   | /renamed.txt        |
-      | permissions            | share,read,update     |
-      | uid_owner              | %username%            |
-      | displayname_owner      | %displayname%         |
-      | item_type              | file                  |
-      | mimetype               | text/plain            |
-      | storage_id             | ANY_VALUE             |
-      | share_type             | user                  |
+      | permissions            | share,read,update   |
+      | uid_owner              | %username%          |
+      | displayname_owner      | %displayname%       |
+      | item_type              | file                |
+      | mimetype               | text/plain          |
+      | storage_id             | ANY_VALUE           |
+      | share_type             | user                |
     When user "Brian" accepts share "/renamed.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

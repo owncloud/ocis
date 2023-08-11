@@ -230,7 +230,7 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And the sharing API should report to user "Brian" that these shares are in the pending state
-      | path                 |
+      | path            |
       | /Shares/PARENT/ |
     And the sharing API should report that no shares are shared with user "Alice"
 
@@ -419,7 +419,7 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares folder with matching folder name to  a user before that user has logged in
-    Given these users have been created without skeleton files and not initialized:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | David    |
     And user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"

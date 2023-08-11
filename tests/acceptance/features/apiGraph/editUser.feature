@@ -42,7 +42,7 @@ Feature: edit user
       | empty mail                |                      | 400  | brian@example.com    |
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
-   @issue-5763
+  @issue-7044
   Scenario Outline: admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
@@ -153,7 +153,7 @@ Feature: edit user
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
-      | email       | carol@example.com |
+      | email       | carol@example.org |
       | password    | 1234              |
     And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
@@ -168,7 +168,7 @@ Feature: edit user
       "properties": {
         "mail": {
           "type": "string",
-          "enum": ["carol@example.com"]
+          "enum": ["carol@example.org"]
         }
       }
     }
@@ -306,16 +306,35 @@ Feature: edit user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | User Light  |
       | User        | Admin       |
       | User Light  | Space Admin |
       | User Light  | User        |
-      | User Light  | User Light  |
       | User Light  | Admin       |
+
+
+  Scenario Outline: normal user should not be able to reset the password of another user light user
+    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    And user "Alice" has uploaded file with content "for guest" to "/forguest.txt"
+    And the user "Alice" has created a new user using the Graph API with the following settings:
+      | userName    | Carol             |
+      | displayName | Carol King        |
+      | email       | carol@example.com |
+      | password    | 1234              |
+    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
+    And user "Alice" has shared file "/forguest.txt" with user "Carol"
+    And user "Carol" has accepted share "/forguest.txt" offered by user "Alice"
+    When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
+    Then the HTTP status code should be "401"
+    And the content of file "Shares/forguest.txt" for user "Carol" using password "1234" should be "for guest"
+    But user "Carol" using password "newpassword" should not be able to download file "Shares/forguest.txt"
+    Examples:
+      | userRole    | role       |
+      | Space Admin | User Light |
+      | User        | User Light |
+      | User Light  | User Light |
 
 
   Scenario: admin user disables another user

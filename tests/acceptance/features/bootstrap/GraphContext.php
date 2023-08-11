@@ -725,38 +725,49 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * creates a user with provided data
-	 * actor: the administrator
+	 * @Given user :user has been created with default attributes and without skeleton files
 	 *
 	 * @param string $user
-	 * @param string $password
-	 * @param string $email
-	 * @param string $displayName
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function theAdminHasCreatedUser(
-		string $user,
-		string $password,
-		string $email,
-		string $displayName
-	): void {
-		$response = GraphHelper::createUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$user,
-			$password,
-			$email,
-			$displayName
+	public function userHasBeenCreatedWithDefaultAttributes(
+		string $user
+	):void {
+		$this->featureContext->userHasBeenCreated(["userName" => $user]);
+	}
+
+	/**
+	 * @Given these users have been created with default attributes and without skeleton files:
+	 * expects a table of users with the heading
+	 * "|username|"
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
+		$this->featureContext->usersHaveBeenCreated($table);
+	}
+
+	/**
+	 * @Given the administrator has created a new user with the following attributes:
+	 * @Given the user :byUser has created a new user using the Graph API with the following settings:
+	 *
+	 * @param string $byUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theAdministratorHasCreatedANewUserWithFollowingAttributes(string $byUser, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		$this->featureContext->userHasBeenCreated(
+			$rows,
+			$byUser
 		);
-		if ($response->getStatusCode() !== 200) {
-			$this->throwHttpException($response, "Could not create user $user");
-		} else {
-			$this->featureContext->setResponse($response);
-		}
 	}
 
 	/**
@@ -793,28 +804,6 @@ class GraphContext implements Context {
 			);
 		}
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given /^the user "([^"]*)" has created a new user using the Graph API with the following settings:$/
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $user, TableNode $table): void {
-		$this->theUserCreatesNewUser(
-			$user,
-			$table
-		);
-		$rows = $table->getRowsHash();
-		$response = $this->featureContext->getResponse();
-
-		if ($response->getStatusCode() !== 200) {
-			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
-		}
 	}
 
 	/**

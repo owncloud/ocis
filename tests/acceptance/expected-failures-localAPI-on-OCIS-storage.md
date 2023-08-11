@@ -90,7 +90,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getGroup.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L382)
 - [apiGraph/getGroup.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L383)
 
-#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
+#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/7044)
 
 - [apiGraph/editUser.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L67)
 

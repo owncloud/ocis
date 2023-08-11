@@ -125,7 +125,6 @@ Feature: create user
     Then the HTTP status code should be "200"
     And the Graph API response should have no role
 
-
   @env-config
   Scenario: create user with setting OCIS assign the default user role
     Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "true"

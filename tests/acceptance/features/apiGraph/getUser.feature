@@ -506,8 +506,60 @@ Feature: get users
       | userRole    |
       | Space Admin |
       | User        |
-      | User Light  |
 
+
+  Scenario: user with User Light role cannot get his/her own drive information
+    Given the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    When the user "Brian" gets his drive information using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+      {
+        "type": "object",
+        "required": [
+          "displayName",
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "drive",
+          "accountEnabled"
+        ],
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "enum": ["Brian Murphy"]
+          },
+          "id" : {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "enum": ["brian@example.org"]
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "enum": ["Brian"]
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "drive": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": [""]
+              }
+            }
+          }
+        }
+      }
+    """
 
   Scenario: admin user gets the group information of a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API

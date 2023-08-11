@@ -29,6 +29,7 @@ use TestHelpers\UserHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\GraphHelper;
 use Laminas\Ldap\Exception\LdapException;
 use Laminas\Ldap\Ldap;
 
@@ -384,125 +385,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @When /^the administrator creates user "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string|null $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminCreatesUserUsingTheProvisioningApi(?string $user):void {
-		$this->createUser(
-			$user,
-			null,
-			null,
-			null,
-			true,
-			'api'
-		);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been created with default attributes in the database user backend$/
-	 *
-	 * @param string|null $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenCreatedOnDatabaseBackend(?string $user):void {
-		$this->adminCreatesUserUsingTheProvisioningApi($user);
-		$this->userShouldExist($user);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been created with default attributes and (tiny|small|large)\s?skeleton files$/
-	 *
-	 * @param string $user
-	 * @param string $skeletonType
-	 * @param boolean $skeleton
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenCreatedWithDefaultAttributes(
-		string $user,
-		string $skeletonType = "",
-		bool $skeleton = true
-	):void {
-		if ($skeletonType === "") {
-			$skeletonType = $this->getSmallestSkeletonDirName();
-		}
-
-		$originalSkeletonPath = $this->setSkeletonDirByType($skeletonType);
-
-		try {
-			$this->createUser(
-				$user,
-				null,
-				null,
-				null,
-				true,
-				null,
-				true,
-				$skeleton
-			);
-			$this->userShouldExist($user);
-		} finally {
-			$this->setSkeletonDir($originalSkeletonPath);
-		}
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been created with default attributes and without skeleton files$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(string $user):void {
-		$this->userHasBeenCreatedWithDefaultAttributes($user);
-	}
-
-	/**
-	 * @Given these users have been created with default attributes and without skeleton files:
-	 * expects a table of users with the heading
-	 * "|username|"
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
-		$originalSkeletonPath = $this->setSkeletonDirByType($this->getSmallestSkeletonDirName());
-		try {
-			$this->createTheseUsers(true, true, true, $table);
-		} finally {
-			// restore skeleton directory even if user creation failed
-			$this->setSkeletonDir($originalSkeletonPath);
-		}
-	}
-
-	/**
-	 * @Given /^these users have been created without skeleton files ?(and not initialized|):$/
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param TableNode $table
-	 * @param string $doNotInitialize
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theseUsersHaveBeenCreatedWithoutSkeletonFiles(TableNode $table, string $doNotInitialize):void {
-		$this->theseUsersHaveBeenCreated("", "", $doNotInitialize, $table);
-	}
-
-	/**
 	 *
 	 * @param string $path
 	 *
@@ -837,43 +719,34 @@ trait Provisioning {
 	}
 
 	/**
+	 * Creates multiple users
+	 *
 	 * This function will allow us to send user creation requests in parallel.
 	 * This will be faster in comparison to waiting for each request to complete before sending another request.
 	 *
-	 * @param boolean $initialize
-	 * @param array|null $usersAttributes
-	 * @param string|null $method create the user with "ldap" or "api"
-	 * @param boolean $skeleton
+	 * @param TableNode $table
+	 * @param bool $useDefault
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
 	public function usersHaveBeenCreated(
-		bool $initialize,
-		?array $usersAttributes,
-		?string $method = null,
-		?bool $skeleton = true
+		TableNode $table,
+		bool $useDefault=true
 	) {
+		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
+		$table = $table->getColumnsHash();
+		$users = $this->buildUsersAttributesArray($useDefault, $table);
+
 		$requests = [];
 		$client = HttpRequestHelper::createClient(
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
 
-		$useLdap = false;
-		$useGraph = false;
-		if ($method === null) {
-			$useLdap = $this->isTestingWithLdap();
-			$useGraph = OcisHelper::isTestingWithGraphApi();
-		} elseif ($method === "ldap") {
-			$useLdap = true;
-		} elseif ($method === "graph") {
-			$useGraph = true;
-		}
-
-		foreach ($usersAttributes as $userAttributes) {
-			if ($useLdap) {
+		foreach ($users as $userAttributes) {
+			if ($this->isTestingWithLdap()) {
 				$this->createLdapUser($userAttributes);
 			} else {
 				$attributesToCreateUser['userid'] = $userAttributes['userid'];
@@ -890,81 +763,54 @@ trait Provisioning {
 				} else {
 					$attributesToCreateUser['email'] = $userAttributes['email'];
 				}
-				if ($useGraph) {
-					$body = \TestHelpers\GraphHelper::prepareCreateUserPayload(
-						$attributesToCreateUser['userid'],
-						$attributesToCreateUser['password'],
-						$attributesToCreateUser['email'],
-						$attributesToCreateUser['displayname']
-					);
-					$request = \TestHelpers\GraphHelper::createRequest(
-						$this->getBaseUrl(),
-						$this->getStepLineRef(),
-						"POST",
-						'users',
-						$body,
-					);
-				} else {
-					// Create an OCS request for creating the user. The request is not sent to the server yet.
-					$request = OcsApiHelper::createOcsRequest(
-						$this->getBaseUrl(),
-						'POST',
-						"/cloud/users",
-						$this->stepLineRef,
-						$attributesToCreateUser
-					);
-				}
+				$body = GraphHelper::prepareCreateUserPayload(
+					$attributesToCreateUser['userid'],
+					$attributesToCreateUser['password'],
+					$attributesToCreateUser['email'],
+					$attributesToCreateUser['displayname']
+				);
+				$request = GraphHelper::createRequest(
+					$this->getBaseUrl(),
+					$this->getStepLineRef(),
+					"POST",
+					'users',
+					$body,
+				);
 				// Add the request to the $requests array so that they can be sent in parallel.
 				$requests[] = $request;
 			}
 		}
 
 		$exceptionToThrow = null;
-		if (!$useLdap) {
+		if (!$this->isTestingWithLdap()) {
 			$results = HttpRequestHelper::sendBatchRequest($requests, $client);
 			// Check all requests to inspect failures.
 			foreach ($results as $key => $e) {
 				if ($e instanceof ClientException) {
-					if ($useGraph) {
-						$responseBody = $this->getJsonDecodedResponse($e->getResponse());
-						$httpStatusCode = $e->getResponse()->getStatusCode();
-						$graphStatusCode = $responseBody['error']['code'];
-						$messageText = $responseBody['error']['message'];
-						$exceptionToThrow = new Exception(
-							__METHOD__ .
-							" Unexpected failure when creating the user '" .
-							$usersAttributes[$key]['userid'] . "'" .
-							"\nHTTP status $httpStatusCode " .
-							"\nGraph status $graphStatusCode " .
-							"\nError message $messageText"
-						);
-					} else {
-						$responseXml = $this->getResponseXml($e->getResponse(), __METHOD__);
-						$messageText = (string) $responseXml->xpath("/ocs/meta/message")[0];
-						$ocsStatusCode = (string) $responseXml->xpath("/ocs/meta/statuscode")[0];
-						$httpStatusCode = $e->getResponse()->getStatusCode();
-						$reasonPhrase = $e->getResponse()->getReasonPhrase();
-						$exceptionToThrow = new Exception(
-							__METHOD__ . " Unexpected failure when creating the user '" .
-							$usersAttributes[$key]['userid'] . "': HTTP status $httpStatusCode " .
-							"HTTP reason $reasonPhrase OCS status $ocsStatusCode " .
-							"OCS message $messageText"
-						);
-					}
+					$responseBody = $this->getJsonDecodedResponse($e->getResponse());
+					$httpStatusCode = $e->getResponse()->getStatusCode();
+					$graphStatusCode = $responseBody['error']['code'];
+					$messageText = $responseBody['error']['message'];
+					$exceptionToThrow = new Exception(
+						__METHOD__ .
+						" Unexpected failure when creating the user '" .
+						$users[$key]['userid'] . "'" .
+						"\nHTTP status $httpStatusCode " .
+						"\nGraph status $graphStatusCode " .
+						"\nError message $messageText"
+					);
 				}
 			}
 		}
 
 		// Create requests for setting displayname and email for the newly created users.
 		// These values cannot be set while creating the user, so we have to edit the newly created user to set these values.
-		foreach ($usersAttributes as $userAttributes) {
-			if ($useGraph) {
+		foreach ($users as $userAttributes) {
+			if (!$this->isTestingWithLdap()) {
 				// for graph api, we need to save the user id to be able to add it in some group
 				// can be fetched with the "onPremisesSamAccountName" i.e. userid
 				$this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
 				$userAttributes['id'] = $this->getJsonDecodedResponse()['id'];
-			} else {
-				$userAttributes['id'] = null;
 			}
 			$this->addUserToCreatedUsersList(
 				$userAttributes['userid'],
@@ -973,126 +819,17 @@ trait Provisioning {
 				$userAttributes['email'],
 				$userAttributes['id']
 			);
-
-			OcisHelper::createEOSStorageHome(
-				$this->getBaseUrl(),
-				$userAttributes['userid'],
-				$userAttributes['password'],
-				$this->getStepLineRef()
-			);
 		}
 
 		if (isset($exceptionToThrow)) {
 			throw $exceptionToThrow;
 		}
 
-		// If the user should have skeleton files, and we are testing on OCIS
-		// then do some work to "manually" put the skeleton files in place.
-		// When testing on ownCloud 10 the user is already getting whatever
-		// skeleton dir is defined in the server-under-test.
-		if ($skeleton) {
-			$this->manuallyAddSkeletonFiles($usersAttributes);
-		}
-	}
-
-	/**
-	 * @When /^the administrator creates these users with ?(default attributes and|) skeleton files ?(but not initialized|):$/
-	 *
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param string $setDefaultAttributes
-	 * @param string $doNotInitialize
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorCreatesTheseUsers(
-		string $setDefaultAttributes,
-		string $doNotInitialize,
-		TableNode $table
-	): void {
-		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
-		$table = $table->getColumnsHash();
-		$setDefaultAttributes = $setDefaultAttributes !== "";
-		$initialize = $doNotInitialize === "";
-		$usersAttributes = $this->buildUsersAttributesArray($setDefaultAttributes, $table);
-		$this->usersHaveBeenCreated(
-			$initialize,
-			$usersAttributes
-		);
-	}
-
-	/**
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param boolean $setDefaultAttributes
-	 * @param boolean $initialize
-	 * @param boolean $skeleton
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function createTheseUsers(bool $setDefaultAttributes, bool $initialize, bool $skeleton, TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
-		$table = $table->getColumnsHash();
-		$usersAttributes = $this->buildUsersAttributesArray($setDefaultAttributes, $table);
-		$this->usersHaveBeenCreated(
-			$initialize,
-			$usersAttributes,
-			null,
-			$skeleton
-		);
-		foreach ($usersAttributes as $expectedUser) {
-			$this->userShouldExist($expectedUser["userid"]);
-		}
-	}
-
-	/**
-	 * @Given /^these users have been created with ?(default attributes and|) (tiny|small|large)\s?skeleton files ?(but not initialized|):$/
-	 *
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param string $defaultAttributesText
-	 * @param string $skeletonType
-	 * @param string $doNotInitialize
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theseUsersHaveBeenCreated(
-		string $defaultAttributesText,
-		string $skeletonType,
-		string $doNotInitialize,
-		TableNode $table
-	):void {
-		if ($skeletonType === "") {
-			$skeletonType = $this->getSmallestSkeletonDirName();
-		}
-
-		$originalSkeletonPath = $this->setSkeletonDirByType($skeletonType);
-		$setDefaultAttributes = $defaultAttributesText !== "";
-		$initialize = $doNotInitialize === "";
-		try {
-			$this->createTheseUsers($setDefaultAttributes, $initialize, true, $table);
-		} finally {
-			// The effective skeleton directory is the one when the user is initialized
-			// If we did not initialize the user on creation, then we need to leave
-			// the skeleton directory in effect so that it applies when some action
-			// happens later in the scenario that causes the user to be initialized.
-			if ($initialize) {
-				$this->setSkeletonDir($originalSkeletonPath);
-			}
+		foreach ($users as $user) {
+			Assert::assertTrue(
+				$this->userExists($user["userid"]),
+				"User '" . $user["userid"] . "' should exist but does not exist"
+			);
 		}
 	}
 
@@ -2380,7 +2117,6 @@ trait Provisioning {
 	 * @throws JsonException
 	 */
 	public function userShouldExist(string $user):void {
-		$user = $this->getActualUsername($user);
 		Assert::assertTrue(
 			$this->userExists($user),
 			"User '$user' should exist but does not exist"
@@ -2830,41 +2566,35 @@ trait Provisioning {
 	/**
 	 * creates a single user
 	 *
-	 * @param string|null $user
-	 * @param string|null $password if null, then select a password
-	 * @param string|null $displayName
-	 * @param string|null $email
-	 * @param bool $initialize initialize the user skeleton files etc
-	 * @param string|null $method how to create the user api|occ, default api
-	 * @param bool $setDefault sets the missing values to some default
-	 * @param bool $skeleton
+	 * @param array $userData
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function createUser(
-		?string $user,
-		?string $password = null,
-		?string $displayName = null,
-		?string $email = null,
-		bool $initialize = true,
-		?string $method = null,
-		bool $setDefault = true,
-		bool $skeleton = true
+	public function userHasBeenCreated(
+		array $userData,
+		string $byUser = null
 	):void {
 		$userId = null;
+
+		$user = $userData["userName"];
+		$displayName = $userData["displayName"] ?? null;
+		$email = $userData["email"] ?? null;
+		$password = $userData["password"] ?? null;
+
 		if ($password === null) {
 			$password = $this->getPasswordForUser($user);
 		}
 
-		if ($displayName === null && $setDefault === true) {
+		if ($displayName === null) {
 			$displayName = $this->getDisplayNameForUser($user);
 			if ($displayName === null) {
 				$displayName = $this->getDisplayNameForUser('regularuser');
 			}
 		}
 
-		if ($email === null && $setDefault === true) {
+		if ($email === null) {
 			$email = $this->getEmailAddressForUser($user);
 
 			if ($email === null) {
@@ -2872,61 +2602,50 @@ trait Provisioning {
 				$email = \str_replace(["@", " "], "", $user) . '@owncloud.com';
 			}
 		}
-
 		$user = $this->getActualUsername($user);
-
-		if ($method === null && $this->isTestingWithLdap()) {
-			//guess yourself
-			$method = "ldap";
-		} elseif (OcisHelper::isTestingWithGraphApi()) {
-			$method = "graph";
-		} elseif ($method === null) {
-			$method = "api";
-		}
 		$user = \trim($user);
-		$method = \trim(\strtolower($method));
-		switch ($method) {
-			case "api":
-			case "ldap":
-				$settings = [];
-				$setting["userid"] = $user;
-				$setting["displayName"] = $displayName;
-				$setting["password"] = $password;
-				$setting["email"] = $email;
-				$settings[] = $setting;
-				try {
-					$this->usersHaveBeenCreated(
-						$initialize,
-						$settings,
-						$method,
-						$skeleton
-					);
-				} catch (LdapException $exception) {
-					throw new Exception(
-						__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception"
-					);
-				}
-				break;
-			case "graph":
-				$this->graphContext->theAdminHasCreatedUser(
-					$user,
-					$password,
-					$email,
-					$displayName,
+
+		if ($this->isTestingWithLdap()) {
+			$settings = [];
+			$setting["userid"] = $user;
+			$setting["displayName"] = $displayName;
+			$setting["password"] = $password;
+			$setting["email"] = $email;
+			$settings[] = $setting;
+			try {
+				$this->createLdapUser($settings);
+			} catch (LdapException $exception) {
+				throw new Exception(
+					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception"
 				);
-				$newUser = $this->getJsonDecodedResponse();
-				$userId = $newUser['id'];
-				break;
-			default:
-				throw new InvalidArgumentException(
-					__METHOD__ . " Invalid method to create a user"
-				);
+			}
+		} else {
+			$reqUser = $byUser ? $this->getActualUsername($byUser) : $this->getAdminUsername();
+			$response = GraphHelper::createUser(
+				$this->getBaseUrl(),
+				$this->getStepLineRef(),
+				$reqUser,
+				$this->getPasswordForUser($reqUser),
+				$user,
+				$password,
+				$email,
+				$displayName,
+			);
+			Assert::assertEquals(
+				200,
+				$response->getStatusCode(),
+				__METHOD__ . " cannot create user '$user' using Graph API.\nResponse:" .
+				json_encode($this->getJsonDecodedResponse($response))
+			);
+			$userId = $this->getJsonDecodedResponse($response)['id'];
 		}
 
 		$this->addUserToCreatedUsersList($user, $password, $displayName, $email, $userId);
-		if ($initialize) {
-			$this->initializeUser($user, $password);
-		}
+
+		Assert::assertTrue(
+			$this->userExists($user),
+			"User '$user' should exist but does not exist"
+		);
 	}
 
 	/**
@@ -2976,46 +2695,24 @@ trait Provisioning {
 	}
 
 	/**
-	 * @param string|null $user
+	 * @param string $user
 	 *
 	 * @return bool
 	 * @throws JsonException
 	 */
-	public function userExists(?string $user):bool {
-		// in OCIS there is no admin user and in oC10 there are issues when
-		// sending the username in lowercase in the auth but in uppercase in
-		// the URL see https://github.com/owncloud/core/issues/36822
-		$user = $this->getActualUsername($user);
-		// In OCIS an intermittent issue restricts users to list their own account
-		// So use admin account to list the user
-		// https://github.com/owncloud/ocis/issues/820
-		// The special code can be reverted once the issue is fixed
-		if (OcisHelper::isTestingParallelDeployment()) {
-			$requestingUser = $this->getActualUsername($user);
-			$requestingPassword = $this->getPasswordForUser($user);
-		} elseif (OcisHelper::isTestingWithGraphApi()) {
-			$requestingUser = $this->getAdminUsername();
-			$requestingPassword = $this->getAdminPassword();
-		} elseif (!OcisHelper::isTestingOnReva()) {
-			$requestingUser = 'moss';
-			$requestingPassword = 'vista';
-		} else {
-			$requestingUser = $this->getActualUsername($user);
-			$requestingPassword = $this->getPasswordForUser($requestingUser);
-		}
-
-		$path = (OcisHelper::isTestingWithGraphApi())
+	public function userExists(string $user):bool {
+		$path = (!OcisHelper::isTestingOnReva())
 			? "/graph/v1.0"
 			: "/ocs/v2.php/cloud";
 		$fullUrl = $this->getBaseUrl() . $path . "/users/$user";
 
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
-			$requestingUser,
-			$requestingPassword
+			$this->getAdminUsername(),
+			$this->getAdminPassword()
 		);
-		if ($this->response->getStatusCode() >= 400) {
+		if ($response->getStatusCode() >= 400) {
 			return false;
 		}
 		return true;
@@ -5542,7 +5239,7 @@ trait Provisioning {
 	 * @return string skeleton folder before the change
 	 * @throws Exception
 	 */
-	private function setSkeletonDir(string $skeletonDir): string {
+	public function setSkeletonDir(string $skeletonDir): string {
 		$originalSkeletonPath = \getenv("SKELETON_DIR");
 		if ($skeletonDir !== '') {
 			\putenv("SKELETON_DIR=" . $skeletonDir);
