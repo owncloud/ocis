@@ -47,6 +47,7 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, sto store
 
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
+	ctx := context.Background()
 	for e := range pps.events {
 		var (
 			next interface{}
@@ -89,7 +90,7 @@ func (pps *PostprocessingService) Run() error {
 			pp, err = getPP(pps.store, ev.UploadID)
 			if err != nil {
 				if err == store.ErrNotFound {
-					if err := events.Publish(context.Background(), pps.pub, events.RestartPostprocessing{
+					if err := events.Publish(ctx, pps.pub, events.RestartPostprocessing{
 						UploadID:  ev.UploadID,
 						Timestamp: ev.Timestamp,
 					}); err != nil {
@@ -110,7 +111,7 @@ func (pps *PostprocessingService) Run() error {
 			}
 		}
 		if next != nil {
-			if err := events.Publish(context.Background(), pps.pub, next); err != nil {
+			if err := events.Publish(ctx, pps.pub, next); err != nil {
 				pps.log.Error().Err(err).Msg("unable to publish event")
 				return err // we can't publish -> we are screwed
 			}
