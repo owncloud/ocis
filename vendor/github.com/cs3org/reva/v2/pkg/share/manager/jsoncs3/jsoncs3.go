@@ -304,7 +304,7 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 
 	// check if share already exists.
 	key := &collaboration.ShareKey{
-		//Owner:      md.Owner, owner no longer matters as it belongs to the space
+		// Owner:      md.Owner, owner no longer matters as it belongs to the space
 		ResourceId: md.Id,
 		Grantee:    g.Grantee,
 	}
@@ -337,7 +337,6 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 
 	eg.Go(func() error {
 		err := m.Cache.Add(ctx, md.Id.StorageId, md.Id.SpaceId, shareID, s)
-
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
@@ -348,7 +347,6 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 
 	eg.Go(func() error {
 		err := m.CreatedCache.Add(ctx, s.GetCreator().GetOpaqueId(), shareID)
-
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
@@ -369,7 +367,6 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 				State: collaboration.ShareState_SHARE_STATE_PENDING,
 			}
 			err := m.UserReceivedStates.Add(ctx, userid, spaceID, rs)
-
 			if err != nil {
 				span.RecordError(err)
 				span.SetStatus(codes.Error, err.Error())
@@ -381,7 +378,6 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 		eg.Go(func() error {
 			groupid := g.Grantee.GetGroupId().GetOpaqueId()
 			err := m.GroupReceivedCache.Add(ctx, groupid, shareID)
-
 			if err != nil {
 				span.RecordError(err)
 				span.SetStatus(codes.Error, err.Error())
@@ -458,7 +454,7 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 			log.Error().Err(err).
 				Msg("failed to unshare expired share")
 		}
-		if err := events.Publish(m.eventStream, events.ShareExpired{
+		if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
 			ShareID:        s.GetId(),
 			ShareOwner:     s.GetOwner(),
 			ItemID:         s.GetResourceId(),
@@ -643,7 +639,7 @@ func (m *Manager) listSharesByIDs(ctx context.Context, user *userv1beta1.User, f
 						log.Error().Err(err).
 							Msg("failed to unshare expired share")
 					}
-					if err := events.Publish(m.eventStream, events.ShareExpired{
+					if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
 						ShareOwner:     s.GetOwner(),
 						ItemID:         s.GetResourceId(),
 						ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
@@ -711,7 +707,7 @@ func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User,
 					log.Error().Err(err).
 						Msg("failed to unshare expired share")
 				}
-				if err := events.Publish(m.eventStream, events.ShareExpired{
+				if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
 					ShareOwner:     s.GetOwner(),
 					ItemID:         s.GetResourceId(),
 					ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
@@ -834,7 +830,7 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 							log.Error().Err(err).
 								Msg("failed to unshare expired share")
 						}
-						if err := events.Publish(m.eventStream, events.ShareExpired{
+						if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
 							ShareOwner:     s.GetOwner(),
 							ItemID:         s.GetResourceId(),
 							ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
@@ -934,7 +930,7 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 			log.Error().Err(err).
 				Msg("failed to unshare expired share")
 		}
-		if err := events.Publish(m.eventStream, events.ShareExpired{
+		if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
 			ShareOwner:     s.GetOwner(),
 			ItemID:         s.GetResourceId(),
 			ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
@@ -988,6 +984,7 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 func shareIsRoutable(share *collaboration.Share) bool {
 	return strings.Contains(share.Id.OpaqueId, shareid.IDDelimiter)
 }
+
 func updateShareID(share *collaboration.Share) {
 	share.Id.OpaqueId = shareid.Encode(share.ResourceId.StorageId, share.ResourceId.SpaceId, share.Id.OpaqueId)
 }

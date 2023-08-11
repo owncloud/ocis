@@ -104,7 +104,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(e)
+	g.publishEvent(r.Context(), e)
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, g.assignmentToAppRoleAssignment(artur.GetAssignment()))
 }

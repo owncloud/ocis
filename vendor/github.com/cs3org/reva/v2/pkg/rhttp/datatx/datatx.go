@@ -51,7 +51,7 @@ func EmitFileUploadedEvent(spaceOwnerOrManager, executant *userv1beta1.UserId, r
 		Timestamp:  utils.TSNow(),
 	}
 
-	return events.Publish(publisher, uploadedEv)
+	return events.Publish(context.Background(), publisher, uploadedEv)
 }
 
 // InvalidateCache is a helper function which invalidates the stat cache

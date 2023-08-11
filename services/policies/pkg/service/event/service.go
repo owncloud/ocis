@@ -72,7 +72,7 @@ func (s Service) Run() error {
 				}
 			}
 
-			if err := events.Publish(s.stream, events.PostprocessingStepFinished{
+			if err := events.Publish(context.Background(), s.stream, events.PostprocessingStepFinished{
 				Outcome:       outcome,
 				UploadID:      ev.UploadID,
 				ExecutingUser: ev.ExecutingUser,

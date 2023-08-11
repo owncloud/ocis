@@ -96,6 +96,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 
 	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(
+		ctx,
 		events.UserFeatureChanged{
 			Executant: currentUser.Id,
 			UserID:    u.Id.OpaqueId,

@@ -194,7 +194,7 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 		}
 
 		if ev != nil {
-			if err := events.Publish(publisher, ev); err != nil {
+			if err := events.Publish(ctx, publisher, ev); err != nil {
 				log.Error(err)
 			}
 		}

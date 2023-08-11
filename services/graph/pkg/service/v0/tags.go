@@ -135,7 +135,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 			SpaceOwner: sres.Info.Owner,
 			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
 		}
-		if err := events.Publish(g.eventsPublisher, ev); err != nil {
+		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
 			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
 		}
 	}
@@ -230,7 +230,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 			SpaceOwner: sres.Info.Owner,
 			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
 		}
-		if err := events.Publish(g.eventsPublisher, ev); err != nil {
+		if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
 			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
 		}
 	}

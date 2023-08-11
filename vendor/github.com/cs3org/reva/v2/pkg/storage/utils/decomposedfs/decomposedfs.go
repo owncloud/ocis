@@ -305,6 +305,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 
 			if err := events.Publish(
+				ctx,
 				fs.stream,
 				events.UploadReady{
 					UploadID:      ev.UploadID,
@@ -342,7 +343,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				continue
 			}
 			// restart postprocessing
-			if err := events.Publish(fs.stream, events.BytesReceived{
+			if err := events.Publish(ctx, fs.stream, events.BytesReceived{
 				UploadID:      up.Info.ID,
 				URL:           s,
 				SpaceOwner:    n.SpaceOwnerOrManager(up.Ctx),
@@ -474,7 +475,6 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			log.Error().Interface("event", ev).Msg("Unknown event")
 		}
 	}
-
 }
 
 // Shutdown shuts down the storage

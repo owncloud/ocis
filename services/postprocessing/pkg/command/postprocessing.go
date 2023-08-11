@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -38,7 +39,7 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 				Timestamp: utils.TSNow(),
 			}
 
-			if err := events.Publish(stream, ev); err != nil {
+			if err := events.Publish(context.Background(), stream, ev); err != nil {
 				return err
 			}
 

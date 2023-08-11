@@ -19,11 +19,13 @@
 package events
 
 import (
+	"context"
 	"log"
 	"reflect"
 
 	"github.com/google/uuid"
 	"go-micro.dev/v4/events"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 var (
@@ -38,6 +40,9 @@ var (
 
 	// MetadatakeyEventID is the key used for the eventID in the metadata map of the event
 	MetadatakeyEventID = "eventid"
+
+	// MetadatakeyTraceParent is the key used for the traceparent in the metadata map of the event
+	MetadatakeyTraceParent = "traceparent"
 )
 
 type (
@@ -64,9 +69,10 @@ type (
 
 	// Event is the envelope for events
 	Event struct {
-		Type  string
-		ID    string
-		Event interface{}
+		Type        string
+		ID          string
+		TraceParent string
+		Event       interface{}
 	}
 )
 
@@ -102,9 +108,10 @@ func Consume(s Consumer, group string, evs ...Unmarshaller) (<-chan Event, error
 			}
 
 			outchan <- Event{
-				Type:  et,
-				ID:    e.Metadata[MetadatakeyEventID],
-				Event: event,
+				Type:        et,
+				ID:          e.Metadata[MetadatakeyEventID],
+				TraceParent: e.Metadata[MetadatakeyTraceParent],
+				Event:       event,
 			}
 		}
 	}()
@@ -123,9 +130,10 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 		for {
 			e := <-c
 			outchan <- Event{
-				Type:  e.Metadata[MetadatakeyEventType],
-				ID:    e.Metadata[MetadatakeyEventID],
-				Event: e.Payload,
+				Type:        e.Metadata[MetadatakeyEventType],
+				ID:          e.Metadata[MetadatakeyEventID],
+				TraceParent: e.Metadata[MetadatakeyTraceParent],
+				Event:       e.Payload,
 			}
 		}
 	}()
@@ -134,10 +142,30 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 
 // Publish publishes the ev to the MainQueue from where it is distributed to all subscribers
 // NOTE: needs to use reflect on runtime
-func Publish(s Publisher, ev interface{}) error {
+func Publish(ctx context.Context, s Publisher, ev interface{}) error {
 	evName := reflect.TypeOf(ev).String()
+	traceParent := getTraceParentFromCtx(ctx)
 	return s.Publish(MainQueueName, ev, events.WithMetadata(map[string]string{
-		MetadatakeyEventType: evName,
-		MetadatakeyEventID:   uuid.New().String(),
+		MetadatakeyEventType:   evName,
+		MetadatakeyEventID:     uuid.New().String(),
+		MetadatakeyTraceParent: traceParent,
 	}))
+}
+
+// GetTraceContext extracts the trace context from the event and injects it into the given
+// context.
+func (e *Event) GetTraceContext(ctx context.Context) context.Context {
+	return propagation.TraceContext{}.Extract(ctx, propagation.MapCarrier{
+		"traceparent": e.TraceParent,
+	})
+}
+
+// getTraceParentFromCtx will return a traceparent from the context if it exists.
+// it will be a string as specificied here: https://www.w3.org/TR/trace-context/
+// If no trace info in the context, the return will be an empty string
+func getTraceParentFromCtx(ctx context.Context) string {
+	mc := propagation.MapCarrier{}
+	tc := propagation.TraceContext{}
+	tc.Inject(ctx, &mc)
+	return mc["traceparent"]
 }

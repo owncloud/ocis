@@ -37,7 +37,7 @@ func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if err := events.Publish(stream, event.PurgeTrashBin{ExecutionTime: time.Now()}); err != nil {
+			if err := events.Publish(c.Context, stream, event.PurgeTrashBin{ExecutionTime: time.Now()}); err != nil {
 				return err
 			}
 
