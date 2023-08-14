@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
+	"github.com/mholt/goheif"
 	"github.com/pkg/errors"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -35,6 +36,16 @@ type GifDecoder struct{}
 
 func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 	img, err := gif.DecodeAll(r)
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the image`)
+	}
+	return img, nil
+}
+
+type HeifDecoder struct{}
+
+func (i HeifDecoder) Convert(r io.Reader) (interface{}, error) {
+	img, err := goheif.Decode(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
@@ -197,6 +208,8 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 		}
 	case "image/gif":
 		return GifDecoder{}
+	case "image/heic":
+		return HeifDecoder{}
 	default:
 		return ImageDecoder{}
 	}

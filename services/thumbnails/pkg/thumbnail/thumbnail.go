@@ -21,6 +21,7 @@ var (
 		"image/x-ms-bmp": {},
 		"image/tiff":     {},
 		"text/plain":     {},
+		"image/heic":     {},
 	}
 )
 

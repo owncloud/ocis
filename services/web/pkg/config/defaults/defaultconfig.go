@@ -113,7 +113,7 @@ func DefaultConfig() *config.Config {
 				},
 				Options: config.Options{
 					ContextHelpersReadMore:   true,
-					PreviewFileMimeTypes:     []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
+					PreviewFileMimeTypes:     []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp", "image/heic"},
 					SharingRecipientsPerPage: 200,
 					AccountEditLink:          &config.AccountEditLink{},
 					Editor:                   &config.Editor{},
