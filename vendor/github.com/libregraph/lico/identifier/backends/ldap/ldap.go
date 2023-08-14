@@ -645,7 +645,7 @@ func (b *LDAPIdentifierBackend) baseAndGetFilterFromEntryID(entryID string) (str
 			filter := ""
 			for k, values := range values {
 				for _, value := range values {
-					filter = fmt.Sprintf("%s(%s=%s)", filter, k, value)
+					filter = fmt.Sprintf("%s(%s=%s)", filter, k, ldap.EscapeFilter(value))
 				}
 			}
 			if filter != "" {
@@ -666,5 +666,5 @@ func (b *LDAPIdentifierBackend) baseAndGetFilterFromEntryID(entryID string) (str
 
 func (b *LDAPIdentifierBackend) baseAndSearchFilterFromUsername(username string) (string, string) {
 	// Build search filter with username.
-	return b.baseDN, fmt.Sprintf(b.searchFilter, username)
+	return b.baseDN, fmt.Sprintf(b.searchFilter, ldap.EscapeFilter(username))
 }
