@@ -1,4 +1,3 @@
-@api
 Feature: default capabilities for normal user
   As a user
   I want to list capabilities

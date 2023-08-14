@@ -1,4 +1,3 @@
-@api
 Feature: list files
   As a user
   I want to be able to list my files and folders (resources)

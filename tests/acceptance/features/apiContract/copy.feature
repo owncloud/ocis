@@ -1,4 +1,3 @@
-@api
 Feature: Copy test
   As a user
   I want to check the PROPFIND response
@@ -23,4 +22,4 @@ Feature: Copy test
       | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/ |
       | Access-Control-Allow-Origin | /^[*]{1}$/             |
       | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
-      
+

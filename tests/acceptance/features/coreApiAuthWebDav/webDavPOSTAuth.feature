@@ -1,4 +1,3 @@
-@api
 Feature: POST file/folder
   As a user
   I want to send POST request to various endpoints

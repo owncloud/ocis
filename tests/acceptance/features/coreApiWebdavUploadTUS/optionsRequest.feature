@@ -1,4 +1,3 @@
-@api
 Feature: OPTIONS request
   As a user
   I want to check OPTIONS request

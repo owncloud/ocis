@@ -1,4 +1,3 @@
-@api
 Feature: sharing
   As a user
   I want to get all the shares

@@ -1,4 +1,3 @@
-@api
 Feature: search sharees
   As a user
   I want to search sharees

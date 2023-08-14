@@ -1,4 +1,3 @@
-@api
 Feature: refuse access
   As an administrator
   I want to refuse access to unauthenticated and disabled users

@@ -1,4 +1,3 @@
-@api
 Feature: REPORT request to Shares space
   As a user
   I want to check the share REPORT response

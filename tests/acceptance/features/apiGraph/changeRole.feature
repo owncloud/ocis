@@ -1,4 +1,3 @@
-@api
 Feature: change role
   As an admin
   I want to change the role of user

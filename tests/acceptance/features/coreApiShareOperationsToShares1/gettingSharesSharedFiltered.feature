@@ -1,4 +1,3 @@
-@api
 Feature: get shares filtered by type (user, group etc)
   As a user
   I want to filter the shares that I have received of a particular type (user, group etc)

@@ -1,4 +1,3 @@
-@api
 Feature: edit group name
   As an admin
   I want to be able to edit group name

@@ -1,4 +1,3 @@
-@api
 Feature: low level tests for upload of chunks
   As a user
   I want to be able to upload resources in chunks

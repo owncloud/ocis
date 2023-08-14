@@ -1,4 +1,3 @@
-@api
 Feature: PROPFIND file/folder
   As a user
   I want to send PROPFIND request to various endpoints

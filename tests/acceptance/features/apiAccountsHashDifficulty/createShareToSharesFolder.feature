@@ -1,4 +1,4 @@
-@api @skipOnReva
+@skipOnReva
 Feature: sharing
   As a user
   I want to be able to share files when passwords are stored with the full hash difficulty

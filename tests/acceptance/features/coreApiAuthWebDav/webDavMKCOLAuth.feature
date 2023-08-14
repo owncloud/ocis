@@ -1,4 +1,3 @@
-@api
 Feature: create folder using MKCOL
   As a user
   I want to create folders

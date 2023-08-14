@@ -1,4 +1,3 @@
-@api
 Feature: dav-versions
   As a user
   I want the versions of files to be available

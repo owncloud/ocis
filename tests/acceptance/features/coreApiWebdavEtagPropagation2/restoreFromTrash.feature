@@ -1,4 +1,3 @@
-@api
 Feature: propagation of etags when restoring a file or folder from trash
   As a client app
   I want metadata (etags) of parent folders to change when a file or folder is restored

@@ -1,4 +1,3 @@
-@api
 Feature: Set quota
   As a user
   I want to set quota to different users

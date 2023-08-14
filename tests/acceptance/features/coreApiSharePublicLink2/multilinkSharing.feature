@@ -1,4 +1,3 @@
-@api
 Feature: multi-link sharing
   As a user
   I want to create multiple public links for a single resource

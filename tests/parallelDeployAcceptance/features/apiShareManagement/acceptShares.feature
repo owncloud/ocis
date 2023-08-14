@@ -1,4 +1,3 @@
-@api
 Feature: sharing files and folders
   As a user
   I want to share files/folders with other users

@@ -1,4 +1,3 @@
-@api 
 Feature: public link for a space
 
   Background:

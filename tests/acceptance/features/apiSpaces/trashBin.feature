@@ -1,4 +1,3 @@
-@api
 Feature: Restore files, folder
   As a user with manager and editor role
   I want to be able to restore files, folders

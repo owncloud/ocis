@@ -1,4 +1,3 @@
-@api
 Feature: user GDPR (General Data Protection Regulation) report
   As a user
   I want to generate my GDPR report

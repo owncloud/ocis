@@ -1,4 +1,3 @@
-@api
 Feature: share access by ID
   As an API consumer (app)
   I want to access a share by its id

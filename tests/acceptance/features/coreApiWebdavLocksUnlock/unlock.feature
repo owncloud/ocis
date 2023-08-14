@@ -1,4 +1,4 @@
-@api @issue-1284
+@issue-1284
 Feature: Unlock locked items
   As a user
   I want to unlock the resources previously locked by myself

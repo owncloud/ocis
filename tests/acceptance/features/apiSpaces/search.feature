@@ -1,4 +1,3 @@
-@api
 Feature: Search
   As a user
   I want to search for resources in the space
