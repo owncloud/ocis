@@ -9,7 +9,7 @@ Feature: Deprovisioning notification
       | Alice    |
 
 
-  Scenario: the administrator user creates a deprovisioning notification about shutting down the instance
+  Scenario: administrator creates a deprovisioning notification about shutting down the instance
     When the administrator creates a deprovisioning notification
     Then the HTTP status code should be "200"
     When user "Alice" lists all notifications
@@ -152,14 +152,14 @@ Feature: Deprovisioning notification
       """
 
 
-  Scenario: the administrator user tries to delete the deprovisioning notification
+  Scenario: administrator tries to delete the deprovisioning notification
     Given the administrator has created a deprovisioning notification
     When the administrator deletes the deprovisioning notification
     Then the HTTP status code should be "200"
     And user "Alice" should not have any notification
 
-  
-  Scenario Outline: non-admin user cannot delete the deprovisioning notification
+
+  Scenario Outline: non-admin user tries to delete the deprovisioning notification
     Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" tries to delete the deprovisioning notification
     Then the HTTP status code should be "404"
