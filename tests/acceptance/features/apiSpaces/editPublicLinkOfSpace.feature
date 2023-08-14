@@ -1,4 +1,3 @@
-@api 
 Feature: A manager of the space can edit public link
   As an user with manager space role
   I want to be able to edit a public link.

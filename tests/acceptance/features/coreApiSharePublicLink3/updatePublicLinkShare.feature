@@ -1,4 +1,3 @@
-@api
 Feature: update a public link share
   As a user
   I want to update a public link

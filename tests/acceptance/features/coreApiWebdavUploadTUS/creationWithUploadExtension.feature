@@ -1,4 +1,3 @@
-@api
 Feature: tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation-with-upload
 
   Background:

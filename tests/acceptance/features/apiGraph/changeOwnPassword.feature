@@ -1,4 +1,3 @@
-@api
 Feature: an user changes its own password
   As a user
   I want to change my password

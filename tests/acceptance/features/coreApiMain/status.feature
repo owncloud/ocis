@@ -1,4 +1,3 @@
-@api
 Feature: Status
   As a admin
   I want to check status of the server

@@ -1,4 +1,3 @@
-@api
 Feature: Remove files, folder
   As a user
   I want to be able to remove files, folders

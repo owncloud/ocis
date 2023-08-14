@@ -1,9 +1,8 @@
-@api 
 Feature: Copy test
   As a user
   I want to check the PROPFIND response
   So that I can make sure that the response contains all the relevant values
-  
+
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

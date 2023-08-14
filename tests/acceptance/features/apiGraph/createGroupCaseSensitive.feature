@@ -1,4 +1,3 @@
-@api
 Feature: create groups, group names are case insensitive
   As an admin
   I want to create groups with similar cases

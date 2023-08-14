@@ -1,4 +1,3 @@
-@api
 Feature: Share a file or folder that is inside a space
   As a user with manager space role
   I want to be able to share the data inside the space
@@ -119,7 +118,7 @@ Feature: Share a file or folder that is inside a space
     And the information about the last share for user "Brian" should include
       | expiration | 2042-01-01 |
 
-  
+
   Scenario: user changes the expiration date
     Given user "Alice" has created a share inside of space "share sub-item" with settings:
       | path       | folder                   |
@@ -147,7 +146,7 @@ Feature: Share a file or folder that is inside a space
     And the information about the last share for user "Brian" should include
       | expiration |  |
 
-  
+
   Scenario: check the end of expiration date in user share
     Given user "Alice" has created a share inside of space "share sub-item" with settings:
       | path       | folder                   |
@@ -159,7 +158,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     Then as "Brian" folder "Shares/folder" should not exist
 
-  @issue-5823 
+  @issue-5823
   Scenario: check the end of expiration date in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi

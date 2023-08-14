@@ -1,4 +1,4 @@
-@api @env-config
+@env-config
 Feature: share by disabling re-share
   As a user
   I want to share resources

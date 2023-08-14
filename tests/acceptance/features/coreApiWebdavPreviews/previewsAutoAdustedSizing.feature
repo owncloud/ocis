@@ -1,4 +1,3 @@
-@api
 Feature: sizing of previews of files downloaded through the webdav API
   As a user
   I want the aspect-ratio of previews to be preserved even when I ask for an unusual preview size

@@ -1,4 +1,3 @@
-@api
 Feature: PROPFIND
 
   @issue-751

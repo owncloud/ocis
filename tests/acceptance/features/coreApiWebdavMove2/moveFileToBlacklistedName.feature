@@ -1,4 +1,3 @@
-@api
 Feature: users cannot move (rename) a file to a blacklisted name
   As an administrator
   I want to be able to prevent users from moving (renaming) files to specified file names

@@ -1,4 +1,3 @@
-@api 
 Feature: move (rename) file
   As a user
   I want to be able to move and rename files

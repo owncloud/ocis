@@ -1,4 +1,3 @@
-@api
 Feature: users cannot move (rename) a folder to a blacklisted name
   As an administrator
   I want to be able to prevent users from moving (renaming) folders to specified names

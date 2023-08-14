@@ -1,4 +1,3 @@
-@api
 Feature: using trashbin together with sharing
 
   Background:

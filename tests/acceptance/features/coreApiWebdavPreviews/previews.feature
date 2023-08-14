@@ -1,4 +1,3 @@
-@api
 Feature: previews of files downloaded through the webdav API
 
   Background:

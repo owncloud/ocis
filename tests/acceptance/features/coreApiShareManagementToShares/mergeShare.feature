@@ -1,4 +1,4 @@
-@api @issue-1328 @issues-1289
+@issue-1328 @issues-1289
 Feature: sharing
 
   Background:

@@ -1,4 +1,3 @@
-@api 
 Feature: Report test
   As a user
   I want to check the share REPORT response
@@ -57,7 +56,7 @@ Feature: Report test
       | oc:permissions     | SD                                               |
       | d:getcontentlength | 12                                               |
 
-    
+
   Scenario: search for the shared folder when the share is not accepted
     Given user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |

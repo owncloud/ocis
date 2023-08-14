@@ -1,4 +1,3 @@
-@api
 Feature: Share a file or folder that is inside a space via public link
   As a user with manager space role
   I want to be able to share the data inside the space via public link

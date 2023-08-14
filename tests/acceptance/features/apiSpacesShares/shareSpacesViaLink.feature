@@ -1,4 +1,3 @@
-@api 
 Feature: Share spaces via link
   As the manager of a space
   I want to be able to share a space via public link
