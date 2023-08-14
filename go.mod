@@ -52,7 +52,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
-	github.com/libregraph/lico v0.60.1-0.20230516115351-f904ff5fd200
+	github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.9.19
