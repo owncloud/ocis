@@ -1,0 +1,50 @@
+{
+    package grammar
+}
+
+Grammar
+    <- ast:(KnownTokens / FallbackTokens)* {
+        return ast, nil
+    }
+
+KnownTokens <- (TagToken / ContentToken / NameToken)
+
+FallbackTokens <- (WordColonToken / StringToken)
+
+TagToken
+    <- _ ("tags:" / "tag:") tail:(String / Word) {
+        return NewToken(TagToken, tail)
+    }
+
+ContentToken
+    <- _ ("content:") tail:(String / Word) {
+        return NewToken(ContentToken, tail)
+    }
+
+NameToken
+    <- _ ("name:") tail:(String / Word) {
+        return NewToken(NameToken, tail)
+    }
+
+WordColonToken
+    <- _ v:Word (":" / _ ":" / _ ":" _)  {
+        return NewToken(FallbackToken, v)
+    }
+
+StringToken
+    <- _ v:String  {
+        return NewToken(FallbackToken, v)
+    }
+
+String
+    <- '"' v:[^"]* '"' {
+        return v, nil
+    }
+
+Word
+    <- v:[^( :)]* {
+        return v, nil
+    }
+
+_
+    <- [ \t]*

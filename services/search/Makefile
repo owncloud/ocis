@@ -30,6 +30,10 @@ ci-go-generate:  $(MOCKERY) # CI runs ci-node-generate automatically before this
 	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Retriever
 	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name Searcher
 
+.PHONY: ci-peg-generate
+ci-peg-generate: $(PIGEON)
+	$(PIGEON) -o pkg/kql/grammar/grammar_gen.go pkg/kql/grammar/grammar.peg
+
 .PHONY: ci-node-generate
 ci-node-generate:
 

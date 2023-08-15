@@ -71,6 +71,12 @@ $(MUTAGEN): $(BINGO_DIR)/mutagen.mod
 	@echo "(re)installing $(GOBIN)/mutagen-v0.13.1"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.13.1 "github.com/mutagen-io/mutagen/cmd/mutagen"
 
+PIGEON := $(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8
+$(PIGEON): $(BINGO_DIR)/pigeon.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=pigeon.mod -o=$(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8 "github.com/mna/pigeon"
+
 PROTOC_GEN_DOC := $(GOBIN)/protoc-gen-doc-v1.5.1
 $(PROTOC_GEN_DOC): $(BINGO_DIR)/protoc-gen-doc.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
