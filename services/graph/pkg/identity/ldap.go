@@ -20,10 +20,8 @@ import (
 )
 
 const (
-	_givenNameAttribute        = "givenname"
-	_surNameAttribute          = "sn"
-	_ldapGroupOfNamesAttribute = "(objectClass=groupOfNames)"
-	_ldapGroupMemberAttribute  = "member"
+	_givenNameAttribute = "givenname"
+	_surNameAttribute   = "sn"
 )
 
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
@@ -121,10 +119,9 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		return nil, errors.New("invalid group attribute mappings")
 	}
 	gam := groupAttributeMap{
-		name:         config.GroupNameAttribute,
-		id:           config.GroupIDAttribute,
-		member:       _ldapGroupMemberAttribute,
-		memberSyntax: "dn",
+		name:   config.GroupNameAttribute,
+		id:     config.GroupIDAttribute,
+		member: config.GroupMemberAttribute,
 	}
 
 	var userScope, groupScope int
@@ -1040,15 +1037,16 @@ func (i *LDAP) CreateLDAPGroupByDN(dn string) error {
 	return i.conn.Add(ar)
 }
 
-func (i *LDAP) disableUser(logger log.Logger, userDN string) (err error) {
-	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+func (i *LDAP) addUserToDisableGroup(logger log.Logger, userDN string) (err error) {
+	groupFilter := fmt.Sprintf("(objectClass=%s)", i.groupObjectClass)
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{i.groupAttributeMap.member}, groupFilter)
 
 	if err != nil {
 		return err
 	}
 
 	mr := ldap.ModifyRequest{DN: group.DN}
-	mr.Add(_ldapGroupMemberAttribute, []string{userDN})
+	mr.Add(i.groupAttributeMap.member, []string{userDN})
 
 	err = i.conn.Modify(&mr)
 	var lerr *ldap.Error
@@ -1063,15 +1061,16 @@ func (i *LDAP) disableUser(logger log.Logger, userDN string) (err error) {
 	return err
 }
 
-func (i *LDAP) enableUser(logger log.Logger, userDN string) (err error) {
-	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+func (i *LDAP) removeUserFromDisableGroup(logger log.Logger, userDN string) (err error) {
+	groupFilter := fmt.Sprintf("(objectClass=%s)", i.groupObjectClass)
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{i.groupAttributeMap.member}, groupFilter)
 
 	if err != nil {
 		return err
 	}
 
 	mr := ldap.ModifyRequest{DN: group.DN}
-	mr.Delete(_ldapGroupMemberAttribute, []string{userDN})
+	mr.Delete(i.groupAttributeMap.member, []string{userDN})
 
 	err = i.conn.Modify(&mr)
 	var lerr *ldap.Error
@@ -1097,7 +1096,8 @@ func (i *LDAP) userEnabledByAttribute(user *ldap.Entry) bool {
 }
 
 func (i *LDAP) usersEnabledStateFromGroup(users []string) (usersEnabledState map[string]bool, err error) {
-	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+	groupFilter := fmt.Sprintf("(objectClass=%s)", i.groupObjectClass)
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{i.groupAttributeMap.member}, groupFilter)
 
 	if err != nil {
 		return nil, err
@@ -1108,7 +1108,7 @@ func (i *LDAP) usersEnabledStateFromGroup(users []string) (usersEnabledState map
 		usersEnabledState[user] = true
 	}
 
-	for _, memberDN := range group.GetEqualFoldAttributeValues(_ldapGroupMemberAttribute) {
+	for _, memberDN := range group.GetEqualFoldAttributeValues(i.groupAttributeMap.member) {
 		usersEnabledState[memberDN] = false
 	}
 
@@ -1174,9 +1174,9 @@ func (i *LDAP) updateAccountEnabledState(logger log.Logger, accountEnabled bool,
 		updateNeeded = true
 	case DisableMechanismGroup:
 		if accountEnabled {
-			err = i.enableUser(logger, e.DN)
+			err = i.removeUserFromDisableGroup(logger, e.DN)
 		} else {
-			err = i.disableUser(logger, e.DN)
+			err = i.addUserToDisableGroup(logger, e.DN)
 		}
 		updateNeeded = false
 	}

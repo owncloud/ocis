@@ -17,10 +17,9 @@ import (
 )
 
 type groupAttributeMap struct {
-	name         string
-	id           string
-	member       string
-	memberSyntax string
+	name   string
+	id     string
+	member string
 }
 
 // GetGroup implements the Backend Interface for the LDAP Backend

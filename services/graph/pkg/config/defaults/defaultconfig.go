@@ -89,6 +89,7 @@ func DefaultConfig() *config.Config {
 				GroupFilter:               "",
 				GroupObjectClass:          "groupOfNames",
 				GroupNameAttribute:        "cn",
+				GroupMemberAttribute:      "member",
 				GroupIDAttribute:          "owncloudUUID",
 				EducationResourcesEnabled: false,
 			},
