@@ -135,6 +135,43 @@ Feature: full text search
       | spaces           |
 
 
+  Scenario Outline: sharee searches shared project space files using a tag
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "tag-space" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "tag-space"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file" to "spacesFile.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in folder" to "spacesFolderWithFile/spacesFileInsideFolder.txt"
+    And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in subfolder" to "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt"
+    And user "Alice" has created the following tags for file "spacesFile.txt" of the space "tag-space":
+      | tag1 |
+    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesFileInsideFolder.txt" of the space "tag-space":
+      | tag1 |
+    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt" of the space "tag-space":
+      | tag1 |
+    And using <dav-path-version> DAV path
+    When user "Brian" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | spacesFile.txt                                                     |
+      | spacesFolderWithFile/spacesFileInsideFolder.txt                    |
+      | spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnStable3.0
+    Examples:
+      | dav-path-version |
+      | spaces           |
+
+
   Scenario Outline: search files using a deleted tag
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "hello world" to "file1.txt"
