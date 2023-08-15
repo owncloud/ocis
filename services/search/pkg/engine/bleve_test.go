@@ -6,7 +6,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
-	"github.com/blevesearch/bleve/v2"
+	bleveSearch "github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,12 +15,13 @@ import (
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
 var _ = Describe("Bleve", func() {
 	var (
 		eng *engine.Bleve
-		idx bleve.Index
+		idx bleveSearch.Index
 		ctx context.Context
 
 		doSearch = func(id string, query, path string) (*searchsvc.SearchIndexResponse, error) {
@@ -59,10 +60,10 @@ var _ = Describe("Bleve", func() {
 		mapping, err := engine.BuildBleveMapping()
 		Expect(err).ToNot(HaveOccurred())
 
-		idx, err = bleve.NewMemOnly(mapping)
+		idx, err = bleveSearch.NewMemOnly(mapping)
 		Expect(err).ToNot(HaveOccurred())
 
-		eng = engine.NewBleveEngine(idx)
+		eng = engine.NewBleveEngine(idx, bleve.LegacyCreator)
 		Expect(err).ToNot(HaveOccurred())
 
 		rootResource = engine.Resource{
@@ -93,7 +94,7 @@ var _ = Describe("Bleve", func() {
 
 	Describe("New", func() {
 		It("returns a new index instance", func() {
-			b := engine.NewBleveEngine(idx)
+			b := engine.NewBleveEngine(idx, bleve.LegacyCreator)
 			Expect(b).ToNot(BeNil())
 		})
 	})
@@ -364,8 +365,8 @@ var _ = Describe("Bleve", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(count).To(Equal(uint64(1)))
 
-			query := bleve.NewMatchQuery("child.pdf")
-			res, err := idx.Search(bleve.NewSearchRequest(query))
+			query := bleveSearch.NewMatchQuery("child.pdf")
+			res, err := idx.Search(bleveSearch.NewSearchRequest(query))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(res.Hits.Len()).To(Equal(1))
 		})

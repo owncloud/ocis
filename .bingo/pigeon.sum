@@ -1,0 +1,8 @@
+github.com/mna/pigeon v1.1.1-0.20230620190048-b0211796baa8 h1:2RUthOP9SuOSYZ82coupeF75l8+xbN6CT8XOmPjb5Lg=
+github.com/mna/pigeon v1.1.1-0.20230620190048-b0211796baa8/go.mod h1:29NwZL9OpqNw76pbKuWCqh+fVc3byFZShJz+6uYxGEo=
+golang.org/x/mod v0.11.0 h1:bUO06HqtnRcc/7l71XBe4WcqTZ+3AH1J59zWDDwLKgU=
+golang.org/x/mod v0.11.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
+golang.org/x/sys v0.9.0 h1:KS/R3tvhPqvJvwcKfnBHJwwthS11LRhmM5D59eEXa0s=
+golang.org/x/sys v0.9.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/tools v0.10.0 h1:tvDr/iQoUqNdohiYm0LmmKcBk+q86lb9EprIUFhHHGg=
+golang.org/x/tools v0.10.0/go.mod h1:UJwyiVBsOA2uwvK/e5OY3GTpDUJriEd+/YlqAwLPmyM=

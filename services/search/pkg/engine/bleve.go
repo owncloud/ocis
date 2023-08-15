@@ -6,7 +6,6 @@ import (
 	"math"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -18,20 +17,23 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
 	"github.com/blevesearch/bleve/v2/mapping"
-	"github.com/blevesearch/bleve/v2/search/query"
+	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
 	index bleve.Index
+	query query.Creator[bleveQuery.Query]
 }
 
 // NewBleveIndex returns a new bleve index
@@ -56,9 +58,10 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 }
 
 // NewBleveEngine creates a new Bleve instance
-func NewBleveEngine(index bleve.Index) *Bleve {
+func NewBleveEngine(index bleve.Index, qbc query.Creator[bleveQuery.Query]) *Bleve {
 	return &Bleve{
 		index: index,
+		query: qbc,
 	}
 }
 
@@ -116,21 +119,24 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
+	createdQuery, err := b.query.Create(sir.Query)
+	if err != nil {
+		return nil, err
+	}
+
 	q := bleve.NewConjunctionQuery(
 		// Skip documents that have been marked as deleted
-		&query.BoolFieldQuery{
+		&bleveQuery.BoolFieldQuery{
 			Bool:     false,
 			FieldVal: "Deleted",
 		},
-		&query.QueryStringQuery{
-			Query: formatQuery(sir.Query),
-		},
+		createdQuery,
 	)
 
 	if sir.Ref != nil {
 		q.Conjuncts = append(
 			q.Conjuncts,
-			&query.TermQuery{
+			&bleveQuery.TermQuery{
 				FieldVal: "RootID",
 				Term: storagespace.FormatResourceID(
 					storageProvider.ResourceId{
@@ -364,38 +370,4 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 	}
 
 	return nil
-}
-
-func formatQuery(q string) string {
-	cq := q
-	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
-	for _, field := range fields {
-		cq = strings.ReplaceAll(cq, strings.ToLower(field)+":", field+":")
-	}
-
-	fieldRe := regexp.MustCompile(`\w+:[^ ]+`)
-	if fieldRe.MatchString(cq) {
-		nameTagesRe := regexp.MustCompile(`\+?(Name|Tags)`) // detect "Name", "+Name, "Tags" and "+Tags"
-		parts := strings.Split(cq, " ")
-
-		cq = ""
-		for _, part := range parts {
-			fieldParts := strings.SplitN(part, ":", 2)
-			if len(fieldParts) > 1 {
-				key := fieldParts[0]
-				value := fieldParts[1]
-				if nameTagesRe.MatchString(key) {
-					value = strings.ToLower(value) // do a lowercase query on the lowercased fields
-				}
-				cq += key + ":" + value + " "
-			} else {
-				cq += part + " "
-			}
-		}
-		return cq // Sophisticated field based search
-	}
-
-	// this is a basic filename search
-	cq = strings.ReplaceAll(cq, ":", `\:`)
-	return "Name:*" + strings.ReplaceAll(strings.ToLower(cq), " ", `\ `) + "*"
 }

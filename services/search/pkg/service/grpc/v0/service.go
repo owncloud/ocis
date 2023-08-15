@@ -15,16 +15,18 @@ import (
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/jellydator/ttlcache/v2"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
+	grpcmetadata "google.golang.org/grpc/metadata"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
-	merrors "go-micro.dev/v4/errors"
-	"go-micro.dev/v4/metadata"
-	grpcmetadata "google.golang.org/grpc/metadata"
 )
 
 // NewHandler returns a service implementation for Service.
@@ -47,7 +49,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			_ = idx.Close()
 		}
 
-		eng = engine.NewBleveEngine(idx)
+		eng = engine.NewBleveEngine(idx, bleve.LegacyCreator)
 	default:
 		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
 	}
