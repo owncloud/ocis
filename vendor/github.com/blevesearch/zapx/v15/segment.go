@@ -103,7 +103,7 @@ type SegmentBase struct {
 	fieldDvNames      []string                   // field names cached in fieldDvReaders
 	size              uint64
 
-	// atomic access to this variable
+	// atomic access to these variables
 	bytesRead    uint64
 	bytesWritten uint64
 
@@ -319,6 +319,10 @@ func (sb *SegmentBase) dictionary(field string) (rv *Dictionary, err error) {
 			if rv.fst, ok = sb.fieldFSTs[rv.fieldID]; !ok {
 				// read the length of the vellum data
 				vellumLen, read := binary.Uvarint(sb.mem[dictStart : dictStart+binary.MaxVarintLen64])
+				if vellumLen == 0 {
+					sb.m.Unlock()
+					return nil, fmt.Errorf("empty dictionary for field: %v", field)
+				}
 				fstBytes := sb.mem[dictStart+uint64(read) : dictStart+uint64(read)+vellumLen]
 				rv.incrementBytesRead(uint64(read) + vellumLen)
 				rv.fst, err = vellum.Load(fstBytes)

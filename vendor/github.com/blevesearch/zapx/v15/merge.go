@@ -719,6 +719,10 @@ func mergeStoredAndRemap(segments []*SegmentBase, drops []*roaring.Bitmap,
 			}
 			err := segment.visitStoredFields(vdc, docNum, func(field string, typ byte, value []byte, pos []uint64) bool {
 				fieldID := int(fieldsMap[field]) - 1
+				if fieldID < 0 {
+					// no entry for field in fieldsMap
+					return false
+				}
 				vals[fieldID] = append(vals[fieldID], value)
 				typs[fieldID] = append(typs[fieldID], typ)
 
