@@ -200,6 +200,7 @@ func (hc *TopNCollector) Collect(ctx context.Context, searcher search.Searcher, 
 	hc.needDocIds = hc.needDocIds || loadID
 	select {
 	case <-ctx.Done():
+		search.RecordSearchCost(ctx, search.AbortM, 0)
 		return ctx.Err()
 	default:
 		next, err = searcher.Next(searchContext)
@@ -208,6 +209,7 @@ func (hc *TopNCollector) Collect(ctx context.Context, searcher search.Searcher, 
 		if hc.total%CheckDoneEvery == 0 {
 			select {
 			case <-ctx.Done():
+				search.RecordSearchCost(ctx, search.AbortM, 0)
 				return ctx.Err()
 			default:
 			}
@@ -232,6 +234,8 @@ func (hc *TopNCollector) Collect(ctx context.Context, searcher search.Searcher, 
 		// total bytes read as part of docValues being read every hit
 		// which must be accounted by invoking the callback.
 		statsCallbackFn.(search.SearchIOStatsCallbackFunc)(hc.bytesRead)
+
+		search.RecordSearchCost(ctx, search.AddM, hc.bytesRead)
 	}
 
 	// help finalize/flush the results in case
@@ -367,7 +371,20 @@ func (hc *TopNCollector) visitFieldTerms(reader index.IndexReader, d *search.Doc
 // SetFacetsBuilder registers a facet builder for this collector
 func (hc *TopNCollector) SetFacetsBuilder(facetsBuilder *search.FacetsBuilder) {
 	hc.facetsBuilder = facetsBuilder
-	hc.neededFields = append(hc.neededFields, hc.facetsBuilder.RequiredFields()...)
+	fieldsRequiredForFaceting := facetsBuilder.RequiredFields()
+	// for each of these fields, append only if not already there in hc.neededFields.
+	for _, field := range fieldsRequiredForFaceting {
+		found := false
+		for _, neededField := range hc.neededFields {
+			if field == neededField {
+				found = true
+				break
+			}
+		}
+		if !found {
+			hc.neededFields = append(hc.neededFields, field)
+		}
+	}
 }
 
 // finalizeResults starts with the heap containing the final top size+skip
