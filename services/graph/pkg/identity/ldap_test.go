@@ -40,12 +40,13 @@ var lconfig = config.LDAP{
 	LdapDisabledUsersGroupDN: disableUsersGroup,
 	DisableUserMechanism:     "attribute",
 
-	GroupBaseDN:        "ou=groups,dc=test",
-	GroupObjectClass:   "groupOfNames",
-	GroupSearchScope:   "sub",
-	GroupFilter:        "",
-	GroupNameAttribute: "cn",
-	GroupIDAttribute:   "entryUUID",
+	GroupBaseDN:          "ou=groups,dc=test",
+	GroupObjectClass:     "groupOfNames",
+	GroupSearchScope:     "sub",
+	GroupFilter:          "",
+	GroupNameAttribute:   "cn",
+	GroupMemberAttribute: "member",
+	GroupIDAttribute:     "entryUUID",
 
 	WriteEnabled: true,
 }
