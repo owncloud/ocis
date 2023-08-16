@@ -19,13 +19,8 @@
 package dataprovider
 
 import (
-	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -35,7 +30,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 )
@@ -86,30 +80,13 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	if conf.NatsAddress == "" || conf.NatsClusterID == "" {
 		log.Warn().Msg("missing or incomplete nats configuration. Events will not be published.")
 	} else {
-		var tlsConf *tls.Config
-		if conf.NatsEnableTLS {
-			var rootCAPool *x509.CertPool
-			if conf.NatsRootCACertPath != "" {
-				f, err := os.Open(conf.NatsRootCACertPath)
-				if err != nil {
-					return nil, err
-				}
-
-				var certBytes bytes.Buffer
-				if _, err := io.Copy(&certBytes, f); err != nil {
-					return nil, err
-				}
-
-				rootCAPool = x509.NewCertPool()
-				rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-				conf.NatsTLSInsecure = false
-			}
-			tlsConf = &tls.Config{
-				InsecureSkipVerify: conf.NatsTLSInsecure,
-				RootCAs:            rootCAPool,
-			}
-		}
-		s, err := stream.Nats(natsjs.TLSConfig(tlsConf), natsjs.Address(conf.NatsAddress), natsjs.ClusterID(conf.NatsClusterID))
+		s, err := stream.NatsFromConfig("dataprovider", stream.NatsConfig{
+			Endpoint:             conf.NatsAddress,
+			Cluster:              conf.NatsClusterID,
+			EnableTLS:            conf.NatsEnableTLS,
+			TLSInsecure:          conf.NatsTLSInsecure,
+			TLSRootCACertificate: conf.NatsRootCACertPath,
+		})
 		if err != nil {
 			return nil, err
 		}

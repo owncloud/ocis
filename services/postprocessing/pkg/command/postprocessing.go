@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
@@ -29,7 +30,7 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			stream, err := getEventBus(cfg.Postprocessing.Events)
+			stream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Postprocessing.Events))
 			if err != nil {
 				return err
 			}

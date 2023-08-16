@@ -2,18 +2,13 @@ package command
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
@@ -94,40 +89,11 @@ func Server(cfg *config.Config) *cli.Command {
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
 			}
-
-			evtsCfg := cfg.Notifications.Events
-
-			var tlsConf *tls.Config
-			if evtsCfg.EnableTLS {
-				var rootCAPool *x509.CertPool
-				if evtsCfg.TLSRootCACertificate != "" {
-					rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-					if err != nil {
-						return err
-					}
-
-					rootCAPool, err = crypto.NewCertPoolFromPEM(rootCrtFile)
-					if err != nil {
-						return err
-					}
-					evtsCfg.TLSInsecure = false
-				}
-
-				tlsConf = &tls.Config{
-					MinVersion:         tls.VersionTLS12,
-					InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
-					RootCAs:            rootCAPool,
-				}
-			}
-			client, err := stream.Nats(
-				natsjs.TLSConfig(tlsConf),
-				natsjs.Address(evtsCfg.Endpoint),
-				natsjs.ClusterID(evtsCfg.Cluster),
-			)
+			client, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
 				return err
 			}
-			evts, err := events.Consume(client, evtsCfg.ConsumerGroup, evs...)
+			evts, err := events.Consume(client, "notifications", evs...)
 			if err != nil {
 				return err
 			}

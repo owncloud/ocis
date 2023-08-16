@@ -89,7 +89,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				stream, err := event.NewStream(cfg.Events)
+				stream, err := event.NewStream(cfg)
 				if err != nil {
 					logger.Fatal().Err(err).Msg("can't connect to nats")
 				}

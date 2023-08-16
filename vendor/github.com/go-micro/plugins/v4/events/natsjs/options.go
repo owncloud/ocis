@@ -11,9 +11,11 @@ type Options struct {
 	ClusterID   string
 	ClientID    string
 	Address     string
+	NkeyConfig  string
 	TLSConfig   *tls.Config
 	Logger      logger.Logger
 	SyncPublish bool
+	Name        string
 }
 
 // Option is a function which configures options.
@@ -47,6 +49,13 @@ func TLSConfig(t *tls.Config) Option {
 	}
 }
 
+// Nkey string to use when connecting to the cluster.
+func NkeyConfig(nkey string) Option {
+	return func(o *Options) {
+		o.NkeyConfig = nkey
+	}
+}
+
 // Logger sets the underlyin logger
 func Logger(log logger.Logger) Option {
 	return func(o *Options) {
@@ -58,5 +67,12 @@ func Logger(log logger.Logger) Option {
 func SynchronousPublish(sync bool) Option {
 	return func(o *Options) {
 		o.SyncPublish = sync
+	}
+}
+
+// Name allows to add a name to the natsjs connection
+func Name(name string) Option {
+	return func(o *Options) {
+		o.Name = name
 	}
 }

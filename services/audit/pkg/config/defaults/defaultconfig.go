@@ -24,10 +24,9 @@ func DefaultConfig() *config.Config {
 			Name: "audit",
 		},
 		Events: config.Events{
-			Endpoint:      "127.0.0.1:9233",
-			Cluster:       "ocis-cluster",
-			ConsumerGroup: "audit",
-			EnableTLS:     false,
+			Endpoint:  "127.0.0.1:9233",
+			Cluster:   "ocis-cluster",
+			EnableTLS: false,
 		},
 		Auditlog: config.Auditlog{
 			LogToConsole: true,

@@ -47,6 +47,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"tls-insecure":     cfg.Events.TLSInsecure,
 					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
 					"enable-tls":       cfg.Events.EnableTLS,
+					"name":             "storage-users-eventsmiddleware",
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",
