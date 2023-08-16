@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-16-07-13-06]
+[#deprecation-note-2023-08-16-09-21-07]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -249,15 +249,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
-a|`NOTIFICATIONS_EVENTS_GROUP` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++notifications ++
-a| [subs=-attributes]
-Name of the event group / queue on the event system.
-
 a|`OCIS_INSECURE` +
 `NOTIFICATIONS_EVENTS_TLS_INSECURE` +
 
@@ -319,7 +310,7 @@ a| [subs=-attributes]
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-08-16-07-13-06[Deprecation Note]
+xref:deprecation-note-2023-08-16-09-21-07[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
