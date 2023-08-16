@@ -1,4 +1,3 @@
-@api
 Feature: change shared resource
   As a user
   I want to change the shared resource

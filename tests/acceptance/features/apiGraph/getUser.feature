@@ -1,4 +1,3 @@
-@api
 Feature: get users
   As an admin
   I want to be able to retrieve user information
@@ -10,7 +9,7 @@ Feature: get users
       | Alice    |
       | Brian    |
 
-  
+
   Scenario: admin user gets the information of a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Alice" gets information of user "Brian" using Graph API
@@ -93,7 +92,7 @@ Feature: get users
       | User Light  | User Light  |
       | User Light  | Admin       |
 
-  
+
   Scenario: admin user gets all users
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Alice" gets all users using the Graph API
@@ -159,7 +158,7 @@ Feature: get users
     }
     """
 
-  
+
   Scenario: admin user gets all users include disabled users
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has disabled user "Brian" using the Graph API
@@ -258,7 +257,7 @@ Feature: get users
       | User        |
       | User Light  |
 
-  
+
   Scenario: admin user gets the drive information of a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" gets user "Brian" along with his drive information using Graph API
@@ -381,7 +380,7 @@ Feature: get users
       }
     """
 
-  
+
   Scenario Outline: non-admin user gets his/her own drive information
     Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     When the user "Brian" gets his drive information using Graph API
@@ -509,7 +508,7 @@ Feature: get users
       | User        |
       | User Light  |
 
-  
+
   Scenario: admin user gets the group information of a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And group "tea-lover" has been created
@@ -617,7 +616,7 @@ Feature: get users
       | User Light  | User Light  |
       | User Light  | Admin       |
 
-  
+
   Scenario: admin user gets all users of certain groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes and without skeleton files
@@ -751,7 +750,7 @@ Feature: get users
     And the JSON data of the response should not contain the user "Alice Hansen" in the item 'value'
 
 
-  
+
   Scenario: admin user gets all users of two groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes and without skeleton files
@@ -825,7 +824,7 @@ Feature: get users
     """
     But the JSON data of the response should not contain the user "Carol King" in the item 'value'
 
-  
+
   Scenario Outline: non admin user tries to get users of certain groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
@@ -860,7 +859,7 @@ Feature: get users
       | User        |
       | User Light  |
 
-  
+
   Scenario: admin user gets all users with certain roles and members of a certain group
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes and without skeleton files
@@ -965,7 +964,7 @@ Feature: get users
     """
     But the JSON data of the response should not contain the user "Carol King" in the item 'value'
 
-  
+
   Scenario Outline: non-admin user tries to get users with a certain role
     Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     When the user "Alice" gets all users with role "<role>" using the Graph API

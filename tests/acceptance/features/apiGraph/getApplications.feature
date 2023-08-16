@@ -1,4 +1,3 @@
-@api
 Feature: get applications
   As a user
   I want to be able to get application information with existing roles

@@ -1,4 +1,3 @@
-@api
 Feature: check etag propagation after different file alterations
   As a user
   I want to check the etag

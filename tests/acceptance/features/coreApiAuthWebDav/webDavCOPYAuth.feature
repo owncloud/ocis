@@ -1,4 +1,3 @@
-@api
 Feature: COPY file/folder
   As a user
   I want to copy a file or folder

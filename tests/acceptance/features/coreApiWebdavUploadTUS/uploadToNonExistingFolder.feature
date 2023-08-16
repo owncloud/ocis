@@ -1,4 +1,3 @@
-@api
 Feature: upload file
   As a user
   I want to try uploading files to a nonexistent folder

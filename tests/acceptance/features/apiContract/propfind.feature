@@ -1,4 +1,3 @@
-@api
 Feature: Propfind test
   As a user
   I want to check the PROPFIND response

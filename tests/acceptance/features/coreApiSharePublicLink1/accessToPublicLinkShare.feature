@@ -1,4 +1,3 @@
-@api
 Feature: accessing a public link share
   As a person who knows a public link
   I want be able to access the preview of a public link file

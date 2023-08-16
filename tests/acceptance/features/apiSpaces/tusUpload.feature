@@ -1,4 +1,3 @@
-@api
 Feature: upload resources using TUS protocol
   As a user
   I want to be able to upload files

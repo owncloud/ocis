@@ -1,4 +1,3 @@
-@api
 Feature: create a public link share when share_folder is set to Shares
   As a user
   I want to create public links

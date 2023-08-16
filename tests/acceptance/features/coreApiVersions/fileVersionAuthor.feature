@@ -1,4 +1,4 @@
-@api @issue-2914
+@issue-2914
 Feature: file versions remember the author of each version
   As a user
   I want to know the author of each version of a file

@@ -1,4 +1,3 @@
-@api
 Feature: reshare as public link
   As a user
   I want to create public link shares from files/folders shared with me

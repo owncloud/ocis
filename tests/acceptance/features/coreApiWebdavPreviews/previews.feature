@@ -1,4 +1,4 @@
-@api @skipOnReva
+@skipOnReva
 Feature: previews of files downloaded through the webdav API
   As a user
   I want to be able to download the preview of the files

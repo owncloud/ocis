@@ -1,4 +1,3 @@
-@api
 Feature: delete folder
   As a user
   I want to be able to delete folders

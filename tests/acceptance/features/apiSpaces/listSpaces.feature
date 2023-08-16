@@ -1,4 +1,3 @@
-@api
 Feature: List and create spaces
   As a user
   I want to be able to list project spaces

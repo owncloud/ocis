@@ -1,4 +1,3 @@
-@api
 Feature: edit user
   As an admin
   I want to be able to edit user information
@@ -70,7 +69,7 @@ Feature: edit user
       | change to existing user name | Brian    | 409  | Brian       |
       | empty user name              |          | 400  | Brian       |
 
-  
+
   Scenario: admin user changes the name of a user to the name of an existing disabled user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
@@ -96,7 +95,7 @@ Feature: edit user
     }
     """
 
-  
+
   Scenario: admin user changes the name of a user to the name of a previously deleted user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
@@ -318,7 +317,7 @@ Feature: edit user
       | User Light  | User Light  |
       | User Light  | Admin       |
 
-  
+
   Scenario: admin user disables another user
     When the user "Alice" disables user "Brian" using the Graph API
     Then the HTTP status code should be "200"
@@ -360,7 +359,7 @@ Feature: edit user
     }
     """
 
-  
+
   Scenario Outline: normal user should not be able to disable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
@@ -409,7 +408,7 @@ Feature: edit user
       | User        |
       | User Light  |
 
-  
+
   Scenario: admin user enables disabled user
     Given the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" enables user "Brian" using the Graph API
@@ -452,7 +451,7 @@ Feature: edit user
     }
     """
 
-  
+
   Scenario Outline: normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Carol" using the Graph API

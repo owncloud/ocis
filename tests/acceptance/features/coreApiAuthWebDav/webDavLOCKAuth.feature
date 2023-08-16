@@ -1,4 +1,3 @@
-@api
 Feature: LOCK file/folder
   As a user
   I want to lock a file or folder

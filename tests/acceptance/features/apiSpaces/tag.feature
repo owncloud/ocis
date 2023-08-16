@@ -1,4 +1,3 @@
-@api 
 Feature: Tag
   As a user
   I want to tag resources

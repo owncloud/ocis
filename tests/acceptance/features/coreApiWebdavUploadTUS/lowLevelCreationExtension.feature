@@ -1,4 +1,3 @@
-@api
 Feature: low level tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation
   As a user
   I want to able to create resources

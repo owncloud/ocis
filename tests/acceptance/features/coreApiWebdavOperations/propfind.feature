@@ -1,4 +1,3 @@
-@api
 Feature: PROPFIND
   As a user
   I want to retrieve all properties of a resource

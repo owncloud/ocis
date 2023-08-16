@@ -1,4 +1,3 @@
-@api
 Feature: PROPPATCH file/folder
   As a user
   I want to send PROPPATCH request to various endpoints

@@ -1,4 +1,3 @@
-@api
 Feature: propagation of etags when moving files or folders
   As a client app
   I want metadata (etags) of parent folder(s) to change when a file or folder is moved

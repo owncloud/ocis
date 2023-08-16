@@ -1,4 +1,3 @@
-@api
 Feature: create space
   As an admin and space admin
   I want to create new spaces
