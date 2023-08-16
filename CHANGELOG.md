@@ -8,9 +8,11 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
 * Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
+* Enhancement - Bump reva to latest edge: [#6979](https://github.com/owncloud/ocis/pull/6979)
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 * Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 * Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
+* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
 
 ## Details
 
@@ -28,6 +30,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6986
    https://github.com/owncloud/ocis/pull/6971
+
+* Enhancement - Bump reva to latest edge: [#6979](https://github.com/owncloud/ocis/pull/6979)
+
+   Bumps reva to latest edge
+
+   https://github.com/owncloud/ocis/pull/6979
 
 * Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 
@@ -51,6 +59,12 @@ The following sections list the changes for unreleased.
    this endpoint without knowing the secret
 
    https://github.com/owncloud/ocis/pull/6946
+
+* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
+
+   Names the nats connections for easier debugging
+
+   https://github.com/owncloud/ocis/pull/6979
 # Changelog for [3.1.0] (2023-08-02)
 
 The following sections list the changes for 3.1.0.
