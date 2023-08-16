@@ -197,7 +197,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for space := range work {
-				res, err := s.searchIndex(ctx, req, space, mountpointMap[space.Id.OpaqueId])
+				res, err := s.searchIndex(ctx, *req, space, mountpointMap[space.Id.OpaqueId])
 				if err != nil && err != errSkipSpace {
 					return err
 				}
@@ -255,7 +255,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}, nil
 }
 
-func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string) (*searchsvc.SearchIndexResponse, error) {
+func (s *Service) searchIndex(ctx context.Context, req searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string) (*searchsvc.SearchIndexResponse, error) {
 	if req.Ref != nil &&
 		(req.Ref.ResourceId.StorageId != space.Root.StorageId ||
 			req.Ref.ResourceId.SpaceId != space.Root.SpaceId) {
@@ -277,7 +277,18 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	searchPathPrefix := req.Ref.GetPath()
 	switch space.SpaceType {
 	case _spaceTypeMountpoint:
-		return nil, errSkipSpace // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
+		// In case when we search across All files, and we have to include the mountpoints to the search result
+		if searchPathPrefix != "" || space.GetRootInfo().GetId() == nil {
+			return nil, errSkipSpace
+		}
+		searchRootID = &searchmsg.ResourceID{
+			StorageId: space.GetRootInfo().GetId().GetStorageId(),
+			SpaceId:   space.GetRootInfo().GetId().GetSpaceId(),
+			OpaqueId:  space.GetRootInfo().GetId().GetSpaceId(),
+		}
+		searchPathPrefix = "."
+		//
+		req.Query = req.Query + " +ID:" + storagespace.FormatResourceID(*space.GetRootInfo().GetId())
 	case _spaceTypeGrant:
 		// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
 		searchRootID.OpaqueId = space.Root.SpaceId
@@ -332,8 +343,8 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		}
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
-		if req.Ref == nil && utils.MakeRelativePath(searchPathPrefix) == utils.MakeRelativePath(rootName) {
-			searchPathPrefix = "."
+		if req.Ref != nil && !strings.HasPrefix(utils.MakeRelativePath(searchPathPrefix), utils.MakeRelativePath(rootName)) {
+			return nil, errSkipSpace
 		}
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 	case _spaceTypePersonal, _spaceTypeProject:
@@ -360,7 +371,9 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	} else {
 		s.logger.Debug().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 	}
-
+	if len(res.Matches) == 0 {
+		return nil, errSkipSpace
+	}
 	for _, match := range res.Matches {
 		if mountpointPrefix != "" {
 			match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
