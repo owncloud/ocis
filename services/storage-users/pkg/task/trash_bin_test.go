@@ -115,7 +115,7 @@ var _ = Describe("trash", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("throws an error if space listing fails", func() {
@@ -123,44 +123,8 @@ var _ = Describe("trash", func() {
 			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(HaveOccurred())
-		})
-		It("throws an error if a personal space user can't be impersonated", func() {
-			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{personalSpace}
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
-			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
-
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
-			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: personal")))
-		})
-		It("throws an error if a project space user can't be impersonated", func() {
-			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{projectSpace}
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
-			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
-
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
-			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: project")))
-		})
-		It("throws an error if a project space has no user with delete permissions", func() {
-			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{projectSpace}
-			projectSpace.Opaque.Map = map[string]*apiTypes.OpaqueEntry{
-				"grants": {
-					Value: MustMarshal(map[string]*apiProvider.ResourcePermissions{
-						"admin": {
-							Delete: false,
-						},
-					}),
-				},
-			}
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
-			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
-
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
-			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: project")))
 		})
 		It("only deletes items older than the specified period", func() {
 			var (
@@ -231,7 +195,7 @@ var _ = Describe("trash", func() {
 				}, nil,
 			)
 
-			err := task.PurgeTrashBin(user.Id, now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(BeNil())
 			Expect(recycleItems["personal"]).To(HaveLen(2))
 			Expect(recycleItems["project"]).To(HaveLen(2))

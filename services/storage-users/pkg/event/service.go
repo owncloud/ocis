@@ -4,7 +4,6 @@ import (
 	"time"
 
 	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	apiUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -53,11 +52,6 @@ func (s Service) Run() error {
 				executionTime = time.Now()
 			}
 
-			executantID := ev.ExecutantID
-			if executantID == nil {
-				executantID = &apiUser.UserId{OpaqueId: s.config.Tasks.PurgeTrashBin.UserID}
-			}
-
 			tasks := map[task.SpaceType]time.Time{
 				task.Project:  executionTime.Add(-s.config.Tasks.PurgeTrashBin.ProjectDeleteBefore),
 				task.Personal: executionTime.Add(-s.config.Tasks.PurgeTrashBin.PersonalDeleteBefore),
@@ -70,7 +64,7 @@ func (s Service) Run() error {
 					continue
 				}
 
-				if err = task.PurgeTrashBin(executantID, deleteBefore, spaceType, s.gatewaySelector, s.config.Commons.MachineAuthAPIKey); err != nil {
+				if err = task.PurgeTrashBin(s.config.ServiceAccount.ServiceAccountID, deleteBefore, spaceType, s.gatewaySelector, s.config.ServiceAccount.ServiceAccountSecret); err != nil {
 					errs = append(errs, err)
 				}
 			}
