@@ -44,6 +44,10 @@ func DefaultConfig() *config.Config {
 			},
 			RevaGateway: shared.DefaultRevaConfig().Address,
 		},
+		ServiceAccount: config.ServiceAccount{
+			ServiceAccountID:     "service-user-id",
+			ServiceAccountSecret: "secret-string",
+		},
 	}
 }
 
@@ -73,9 +77,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.Notifications.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.Notifications.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	}
 	if cfg.Notifications.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.Notifications.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}

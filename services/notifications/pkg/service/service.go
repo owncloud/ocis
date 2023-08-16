@@ -42,32 +42,34 @@ func NewEventsNotifier(
 	logger log.Logger,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
-	machineAuthAPIKey, emailTemplatePath, ocisURL string) Service {
+	serviceAccountID, serviceAccountSecret, emailTemplatePath, ocisURL string) Service {
 
 	return eventsNotifier{
-		logger:            logger,
-		channel:           channel,
-		events:            events,
-		signals:           make(chan os.Signal, 1),
-		gatewaySelector:   gatewaySelector,
-		valueService:      valueService,
-		machineAuthAPIKey: machineAuthAPIKey,
-		emailTemplatePath: emailTemplatePath,
-		ocisURL:           ocisURL,
+		logger:               logger,
+		channel:              channel,
+		events:               events,
+		signals:              make(chan os.Signal, 1),
+		gatewaySelector:      gatewaySelector,
+		valueService:         valueService,
+		serviceAccountID:     serviceAccountID,
+		serviceAccountSecret: serviceAccountSecret,
+		emailTemplatePath:    emailTemplatePath,
+		ocisURL:              ocisURL,
 	}
 }
 
 type eventsNotifier struct {
-	logger            log.Logger
-	channel           channels.Channel
-	events            <-chan events.Event
-	signals           chan os.Signal
-	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
-	valueService      settingssvc.ValueService
-	machineAuthAPIKey string
-	emailTemplatePath string
-	translationPath   string
-	ocisURL           string
+	logger               log.Logger
+	channel              channels.Channel
+	events               <-chan events.Event
+	signals              chan os.Signal
+	gatewaySelector      pool.Selectable[gateway.GatewayAPIClient]
+	valueService         settingssvc.ValueService
+	emailTemplatePath    string
+	translationPath      string
+	ocisURL              string
+	serviceAccountID     string
+	serviceAccountSecret string
 }
 
 func (s eventsNotifier) Run() error {

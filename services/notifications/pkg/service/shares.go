@@ -19,13 +19,13 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	ownerCtx, owner, err := utils.Impersonate(e.Sharer, gatewayClient, s.machineAuthAPIKey)
+	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not impersonate sharer")
+		logger.Error().Err(err).Msg("Could not impersonate service user")
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -41,13 +41,19 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	granteeList := s.ensureGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	owner, err := utils.GetUser(e.Sharer, gatewayClient)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not get user")
+		return
+	}
+
+	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if granteeList == nil {
 		return
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	recipientList, err := s.render(ownerCtx, email.ShareCreated,
+	recipientList, err := s.render(ctx, email.ShareCreated,
 		"ShareGrantee",
 		map[string]string{
 			"ShareSharer": sharerDisplayName,
@@ -58,7 +64,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("could not get render the email")
 		return
 	}
-	s.send(ownerCtx, recipientList)
+	s.send(ctx, recipientList)
 }
 
 func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
@@ -73,13 +79,13 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, gatewayClient, s.machineAuthAPIKey)
+	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -87,12 +93,18 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	granteeList := s.ensureGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	owner, err := utils.GetUser(e.ShareOwner, gatewayClient)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not get user")
+		return
+	}
+
+	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if granteeList == nil {
 		return
 	}
 
-	recipientList, err := s.render(ownerCtx, email.ShareExpired,
+	recipientList, err := s.render(ctx, email.ShareExpired,
 		"ShareGrantee",
 		map[string]string{
 			"ShareFolder": resourceInfo.GetName(),
@@ -102,5 +114,5 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("could not get render the email")
 		return
 	}
-	s.send(ownerCtx, recipientList)
+	s.send(ctx, recipientList)
 }
