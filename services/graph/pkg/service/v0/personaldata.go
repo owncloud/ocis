@@ -99,7 +99,7 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 	}
 
 	// the context might already be cancelled. We need to impersonate the acting user again
-	ctx, err := utils.ImpersonateUser(usr, gatewayClient, g.config.MachineAuthAPIKey)
+	ctx, err := utils.GetServiceUserContext(g.config.ServiceAccount.ServiceAccountID, gatewayClient, g.config.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
 	}
@@ -162,7 +162,7 @@ func (g Graph) upload(u *user.User, data []byte, ref *provider.Reference, th str
 		return err
 	}
 
-	ctx, err := utils.ImpersonateUser(u, gatewayClient, g.config.MachineAuthAPIKey)
+	ctx, err := utils.GetServiceUserContext(g.config.ServiceAccount.ServiceAccountID, gatewayClient, g.config.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return err
 	}

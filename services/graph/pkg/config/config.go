@@ -30,8 +30,8 @@ type Config struct {
 	Identity    Identity    `yaml:"identity"`
 	Events      Events      `yaml:"events"`
 
-	MachineAuthAPIKey string   `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
-	Keycloak          Keycloak `yaml:"keycloak"`
+	Keycloak       Keycloak       `yaml:"keycloak"`
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -136,4 +136,10 @@ type Keycloak struct {
 	ClientRealm        string `yaml:"client_realm" env:"OCIS_KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM" desc:"The realm the client is defined in."`
 	UserRealm          string `yaml:"user_realm" env:"OCIS_KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM" desc:"The realm users are defined."`
 	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" env:"OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY" desc:"Disable TLS certificate validation for Keycloak connections. Do not set this in production environments."`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }
