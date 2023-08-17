@@ -1,9 +1,11 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
 	"net/url"
 	"testing"
 
@@ -146,10 +148,14 @@ func TestRouter(t *testing.T) {
 			t.Errorf("TestRouter route flag unprotected expected to be %t got %t", test.unprotected, routingInfo.IsRouteUnprotected())
 		}
 
-		routingInfo.Director()(r)
+		pr := &httputil.ProxyRequest{
+			In:  r,
+			Out: r.Clone(context.Background()),
+		}
+		routingInfo.Rewrite()(pr)
 
-		if r.URL.Host != test.target {
-			t.Errorf("TestRouter got host %s expected %s", r.URL.Host, test.target)
+		if pr.Out.URL.Host != test.target {
+			t.Errorf("TestRouter got host %s expected %s", pr.Out.URL.Host, test.target)
 		}
 	}
 }
