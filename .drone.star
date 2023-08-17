@@ -101,7 +101,6 @@ config = {
     "localApiTests": {
         "basic": {
             "suites": [
-                "apiAccountsHashDifficulty",
                 "apiArchiver",
                 "apiContract",
                 "apiGraph",
@@ -113,6 +112,12 @@ config = {
                 "apiReshare",
             ],
             "skip": False,
+        },
+        "apiAccountsHashDifficulty": {
+            "suites": [
+                "apiAccountsHashDifficulty",
+            ],
+            "accounts_hash_difficulty": "default",
         },
         "apiNotification": {
             "suites": [
