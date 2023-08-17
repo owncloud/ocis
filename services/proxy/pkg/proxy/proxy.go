@@ -36,9 +36,9 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		config:    options.Config,
 	}
 
-	rp.Director = func(r *http.Request) {
-		ri := router.ContextRoutingInfo(r.Context())
-		ri.Director()(r)
+	rp.Rewrite = func(r *httputil.ProxyRequest) {
+		ri := router.ContextRoutingInfo(r.In.Context())
+		ri.Rewrite()(r)
 	}
 
 	tlsConf := &tls.Config{
