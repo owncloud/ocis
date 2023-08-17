@@ -74,6 +74,7 @@
 | OCIS_LDAP_GROUP_FILTER<br/>LDAP_GROUP_FILTER<br/>GRAPH_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | OCIS_LDAP_GROUP_OBJECTCLASS<br/>LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames').|
 | OCIS_LDAP_GROUP_SCHEMA_GROUPNAME<br/>LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | LDAP Attribute to use for the name of groups.|
+| OCIS_LDAP_GROUP_SCHEMA_MEMBER<br/>LDAP_GROUP_SCHEMA_MEMBER<br/>GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE | string | member | LDAP Attribute that is used for group members.|
 | OCIS_LDAP_GROUP_SCHEMA_ID<br/>LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.|
 | OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's.|
 | GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED | bool | false | Enable LDAP support for managing education related resources.|

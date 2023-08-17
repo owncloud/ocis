@@ -104,6 +104,7 @@ identity:
     group_filter: ""
     group_objectclass: groupOfNames
     group_name_attribute: cn
+    group_member_attribute: member
     group_id_attribute: owncloudUUID
     group_id_is_octet_string: false
     education_resources_enabled: false
