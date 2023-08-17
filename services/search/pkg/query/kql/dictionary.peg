@@ -1,0 +1,100 @@
+{
+    package kql
+}
+
+Root
+    = _ nodes:Nodes _ {
+        return root(nodes, c.text, c.pos)
+    }
+
+Nodes
+    = head:Element tail:(_ Element _ )* {
+      return nodes(head, tail)
+    }
+
+Element
+    =   TagQuery /
+        NameQuery /
+        ContentQuery /
+        AndOperator /
+        Phrase
+
+TagQuery
+    = ("tags" / "tag") (ColonOperator / EqualOperator) v:Val {
+        return tagQuery(v, c.text, c.pos)
+    }
+
+NameQuery
+    = "name" (ColonOperator / EqualOperator) v:Val {
+        return nameQuery(v, c.text, c.pos)
+    }
+
+ContentQuery
+    = "content" (ColonOperator / EqualOperator) v:Val {
+        return contentQuery(v, c.text, c.pos)
+    }
+
+Phrase
+    = ColonOperator? _ v:(Char+ / String) _ ColonOperator? {
+        return phrase(v, c.text, c.pos)
+    }
+
+////////////////////////////////////////////////////////
+// Operators
+////////////////////////////////////////////////////////
+
+AndOperator
+    = "AND" {
+        return operator(c.text, c.pos)
+    }
+
+ColonOperator
+    = ":" {
+        return c.text, nil
+    }
+
+EqualOperator
+    = "=" {
+        return c.text, nil
+    }
+
+LessOperator
+    = "<" {
+        return c.text, nil
+    }
+
+GreaterOperator
+    = ">" {
+        return c.text, nil
+    }
+
+LessEqualOperator
+    = "<=" {
+        return c.text, nil
+    }
+
+GreaterEqualOperator
+    = ">=" {
+        return c.text, nil
+    }
+
+////////////////////////////////////////////////////////
+// Misc rules
+////////////////////////////////////////////////////////
+
+Val
+    = (String / [^ ]* / Char+) {
+        return c.text, nil
+    }
+Char
+    = [A-Za-z] {
+        return c.text, nil
+    }
+
+String
+    <- '"' v:[^"]* '"' {
+        return v, nil
+    }
+
+_
+    = [ \t]*
