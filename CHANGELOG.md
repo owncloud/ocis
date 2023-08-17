@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
 * Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
 * Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
 * Enhancement - Bump reva to latest edge: [#6979](https://github.com/owncloud/ocis/pull/6979)
@@ -15,6 +16,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
 
 ## Details
+
+* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
+
+   We fixed issue when using a custom LDAP attribute for group members. The graph service did not
+   honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER environment variable
+
+   https://github.com/owncloud/ocis/issues/7032
 
 * Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
 
