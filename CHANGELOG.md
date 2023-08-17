@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v3.0.0...master
+
+## Summary
+
+* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
+
+## Details
+
+* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
+
+   Bump sonarcloud to `5.0` to avoid java errors
+
+   https://github.com/owncloud/ocis/pull/6961
 # Changelog for [3.0.0] (2023-06-06)
 
 The following sections list the changes for 3.0.0.
