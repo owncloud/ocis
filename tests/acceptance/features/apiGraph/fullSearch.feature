@@ -1,4 +1,3 @@
-@api
 Feature: full text search
   As a user
   I want to do full text search

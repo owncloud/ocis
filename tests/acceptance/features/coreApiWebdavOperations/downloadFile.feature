@@ -1,4 +1,3 @@
-@api
 Feature: download file
   As a user
   I want to be able to download files

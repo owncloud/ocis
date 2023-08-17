@@ -1,4 +1,3 @@
-@api
 Feature: checksums
   As a user
   I want to upload files with checksum

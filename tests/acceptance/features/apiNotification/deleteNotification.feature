@@ -1,4 +1,3 @@
-@api
 Feature: Delete notification
   As a user
   I want to delete notifications

@@ -1,4 +1,3 @@
-@api
 Feature: unassign user role
   As an admin
   I want to unassign the role of user

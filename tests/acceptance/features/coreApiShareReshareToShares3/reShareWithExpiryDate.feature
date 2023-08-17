@@ -1,4 +1,4 @@
-@api @issue-1328
+@issue-1328
 Feature: resharing a resource with an expiration date
   As a user
   I want to reshare resources with expiration date

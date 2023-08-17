@@ -1,4 +1,3 @@
-@api
 Feature: PUT file/folder
   As a user
   I want to send PUT request to various endpoints

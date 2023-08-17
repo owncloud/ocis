@@ -1,4 +1,4 @@
-@api @issue-1330
+@issue-1330
 Feature: Search
   As a user
   I would like to be able to search for files

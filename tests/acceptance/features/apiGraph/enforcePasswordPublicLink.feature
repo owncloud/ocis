@@ -1,4 +1,4 @@
-@api @env-config @skipOnStable3.0
+@env-config @skipOnStable3.0
 Feature: enforce password on public link
   As a user
   I want to enforce passwords on public links shared with upload, edit, or contribute permission

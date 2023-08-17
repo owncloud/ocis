@@ -1,4 +1,3 @@
-@api
 Feature: make webdav request with special urls
   As a user
   I want to make webdav request with special urls

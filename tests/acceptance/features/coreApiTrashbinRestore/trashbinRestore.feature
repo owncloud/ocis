@@ -1,4 +1,4 @@
-@api @issue-1324
+@issue-1324
 Feature: restore deleted files/folders
   As a user
   I would like to restore files/folders

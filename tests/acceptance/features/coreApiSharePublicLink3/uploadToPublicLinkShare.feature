@@ -1,4 +1,4 @@
-@api @issue-1276 @issue-1277
+@issue-1276 @issue-1277
 
 Feature: upload to a public link share
   As a user

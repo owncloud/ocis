@@ -1,4 +1,3 @@
-@api
 Feature: upload file to shared folder
   As a user
   I want to upload files on a shared folder

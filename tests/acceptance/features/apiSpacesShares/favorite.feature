@@ -1,4 +1,3 @@
-@api 
 Feature: favorite
   As a user
   I want to favorite resources

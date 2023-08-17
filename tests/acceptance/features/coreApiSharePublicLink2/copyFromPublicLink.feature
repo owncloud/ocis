@@ -1,4 +1,3 @@
-@api
 Feature: copying from public link share
   As a user
   I want to make a copy of a resource within a public link

@@ -1,4 +1,3 @@
-@api
 Feature: MOVE file/folder
   As a user
   I want to move resources

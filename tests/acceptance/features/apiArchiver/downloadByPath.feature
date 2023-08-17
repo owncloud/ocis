@@ -1,4 +1,3 @@
-@api 
 Feature: download multiple resources bundled into an archive
   As a user
   I want to be able to download multiple items at once
@@ -65,7 +64,7 @@ Feature: download multiple resources bundled into an archive
       | my_data/textfile2.txt       | some data  |
       | more_data/an_other_file.txt | more data  |
 
-  
+
   Scenario: download a not existing single file
     When user "Alice" downloads the archive of "/doesnotexist.txt" of user "Alice" using the resource path
     Then the HTTP status code should be "404"

@@ -1,4 +1,3 @@
-@api
 Feature: auth
   As a user
   I want to send delete request with wrong password

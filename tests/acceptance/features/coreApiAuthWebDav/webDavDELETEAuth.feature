@@ -1,4 +1,3 @@
-@api
 Feature: delete file/folder
   As a user
   I want to delete a file or folder

@@ -1,4 +1,3 @@
-@api
 Feature: capabilities
   As an admin
   I want to list the capabilities

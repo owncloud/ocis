@@ -1,4 +1,3 @@
-@api
 Feature: Upload files into a space
   As a user
   I want to be able to create folders and files in the space

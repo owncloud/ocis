@@ -1,4 +1,3 @@
-@api
 Feature: get groups and their members
   As an admin
   I want to be able to get groups
@@ -8,7 +7,7 @@ Feature: get groups and their members
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
-  
+
   Scenario: admin user lists all the groups
     Given group "tea-lover" has been created
     And group "coffee-lover" has been created

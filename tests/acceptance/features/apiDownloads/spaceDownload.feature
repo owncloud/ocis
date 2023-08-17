@@ -1,4 +1,3 @@
-@api
 Feature: Download space
   As a user
   I want to download space

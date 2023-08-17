@@ -1,4 +1,4 @@
-@api @issue-1284
+@issue-1284
 Feature: there can be only one exclusive lock on a resource
   As a user
   I want to lock a resource

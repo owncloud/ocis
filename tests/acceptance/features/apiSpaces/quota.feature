@@ -1,4 +1,3 @@
-@api
 Feature: State of the quota
   As a user
   I want to be able to see the state of the quota

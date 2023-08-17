@@ -1,4 +1,3 @@
-@api
 Feature: Notification
   As a user
   I want to be notified of various events

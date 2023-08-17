@@ -1,4 +1,3 @@
-@api
 Feature: assign role
   As an admin,
   I want to assign roles to users.

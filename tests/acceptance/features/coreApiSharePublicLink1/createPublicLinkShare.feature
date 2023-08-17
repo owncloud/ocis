@@ -1,4 +1,4 @@
-@api @issue-1269 @issue-1293
+@issue-1269 @issue-1293
 
 Feature: create a public link share
   As a user

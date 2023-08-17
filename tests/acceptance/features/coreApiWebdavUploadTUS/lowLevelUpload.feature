@@ -1,4 +1,3 @@
-@api
 Feature: low level tests for upload of chunks
 
   Background:

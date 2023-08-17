@@ -1,4 +1,3 @@
-@api
 Feature: share resources where the sharee receives the share in multiple ways
   As a user
   I want to receives the same resource share from multiple channels

@@ -1,4 +1,3 @@
-@api
 Feature: propagation of etags when creating folders
   As a client app
   I want metadata (etags) of parent folders to change when a sub-folder is created

@@ -1,4 +1,3 @@
-@api
 Feature: OPTIONS request
 
   Background:

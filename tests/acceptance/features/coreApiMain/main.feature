@@ -1,4 +1,3 @@
-@api
 Feature: get robots.txt
   As a user
   I want to get file robots.txt
