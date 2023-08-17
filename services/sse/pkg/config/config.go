@@ -11,11 +11,14 @@ type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Log     *Log
 
-	Debug Debug `mask:"struct" yaml:"debug"`
+	Debug   Debug    `mask:"struct" yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
 
 	Service Service `yaml:"-"`
 
-	Events Events
+	Events       Events
+	HTTP         HTTP          `yaml:"http"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Context context.Context `yaml:"-" json:"-"`
 }
@@ -48,4 +51,26 @@ type Events struct {
 	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;SSE_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SSE_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SSE_EVENTS_TLS_INSECURE will be seen as false."`
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;SSE_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services."`
+}
+
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;SSE_CORS_ALLOW_ORIGINS" desc:"A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;SSE_CORS_ALLOW_METHODS" desc:"A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;SSE_CORS_ALLOW_HEADERS" desc:"A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers."`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;SSE_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials."`
+}
+
+// HTTP defines the available http configuration.
+type HTTP struct {
+	Addr      string                `yaml:"addr" env:"SSE_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Namespace string                `yaml:"-"`
+	Root      string                `yaml:"root" env:"SSE_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
+	CORS      CORS                  `yaml:"cors"`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+}
+
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;SSE_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
 }

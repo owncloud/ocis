@@ -78,6 +78,7 @@ config = {
         "services/search",
         "services/settings",
         "services/sharing",
+        "services/sse",
         "services/storage-system",
         "services/storage-publiclink",
         "services/storage-shares",

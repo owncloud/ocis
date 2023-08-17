@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
@@ -11,11 +13,17 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/sse/pkg/service"
+	"github.com/owncloud/ocis/v2/services/sse/pkg/server/http"
 )
+
+// all events we care about
+var _registeredEvents = []events.Unmarshaller{
+	events.SendSSE{},
+}
 
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
@@ -45,13 +53,27 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 			defer cancel()
 
+			tracerProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+
 			{
-				svc, err := service.NewSSE(cfg, logger)
+				natsStream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
 				if err != nil {
 					return err
 				}
 
-				gr.Add(svc.Run, func(_ error) {
+				server, err := http.Server(
+					http.Logger(logger),
+					http.Context(ctx),
+					http.Config(cfg),
+					http.Consumer(natsStream),
+					http.RegisteredEvents(_registeredEvents),
+					http.TracerProvider(tracerProvider),
+				)
+
+				gr.Add(server.Run, func(_ error) {
 					cancel()
 				})
 			}

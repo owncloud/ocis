@@ -1,71 +1,89 @@
 package service
 
 import (
-	"bytes"
-	"crypto/x509"
-	"fmt"
-	"io"
 	"net/http"
-	"os"
 
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/rhttp"
+	"github.com/go-chi/chi/v5"
+	"github.com/r3labs/sse/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
 )
 
+// SSE defines implements the business logic for Service.
+type SSE struct {
+	c         *config.Config
+	l         log.Logger
+	m         *chi.Mux
+	sse       *sse.Server
+	evChannel <-chan events.Event
+}
+
 // NewSSE returns a service implementation for Service.
-func NewSSE(c *config.Config, l log.Logger) (SSE, error) {
-	s := SSE{c: c, l: l, client: rhttp.GetHTTPClient(rhttp.Insecure(true))}
+func NewSSE(c *config.Config, l log.Logger, ch <-chan events.Event, mux *chi.Mux) (SSE, error) {
+	s := SSE{
+		c:         c,
+		l:         l,
+		m:         mux,
+		sse:       sse.New(),
+		evChannel: ch,
+	}
+	mux.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
+		r.Get("/sse", s.HandleSSE)
+	})
+
+	go s.ListenForEvents()
 
 	return s, nil
 }
 
-// SSE defines implements the business logic for Service.
-type SSE struct {
-	c *config.Config
-	l log.Logger
-	m uint64
-
-	client *http.Client
+// ServeHTTP fulfills Handler interface
+func (s SSE) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.m.ServeHTTP(w, r)
 }
 
-// Run runs the service
-func (s SSE) Run() error {
-	evtsCfg := s.c.Events
-
-	var rootCAPool *x509.CertPool
-	if evtsCfg.TLSRootCACertificate != "" {
-		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-		if err != nil {
-			return err
+// ListenForEvents listens for events
+func (s SSE) ListenForEvents() error {
+	for e := range s.evChannel {
+		switch ev := e.Event.(type) {
+		default:
+			s.l.Error().Interface("event", ev).Msg("unhandled event")
+		case events.SendSSE:
+			s.sse.Publish(ev.UserID, &sse.Event{
+				Event: []byte(ev.Type),
+				Data:  ev.Message,
+			})
 		}
-
-		var certBytes bytes.Buffer
-		if _, err := io.Copy(&certBytes, rootCrtFile); err != nil {
-			return err
-		}
-
-		rootCAPool = x509.NewCertPool()
-		rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-		evtsCfg.TLSInsecure = false
-	}
-
-	natsStream, err := stream.NatsFromConfig(stream.NatsConfig(s.c.Events))
-	if err != nil {
-		return err
-	}
-
-	ch, err := events.Consume(natsStream, "sse", events.StartPostprocessingStep{})
-	if err != nil {
-		return err
-	}
-
-	for e := range ch {
-		fmt.Println(e) // todo
 	}
 
 	return nil
+}
+
+// HandleSSE is the GET handler for events
+func (s SSE) HandleSSE(w http.ResponseWriter, r *http.Request) {
+	u, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		s.l.Error().Msg("sse: no user in context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	uid := u.GetId().GetOpaqueId()
+	if uid == "" {
+		s.l.Error().Msg("sse: user in context is broken")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	stream := s.sse.CreateStream(uid)
+	stream.AutoReplay = false
+
+	// add stream to URL
+	q := r.URL.Query()
+	q.Set("stream", uid)
+	r.URL.RawQuery = q.Encode()
+
+	s.sse.ServeHTTP(w, r)
 }
