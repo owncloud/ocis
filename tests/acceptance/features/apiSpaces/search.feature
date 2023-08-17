@@ -1,4 +1,3 @@
-@api
 Feature: Search
   As a user
   I want to search for resources in the space
@@ -110,7 +109,7 @@ Feature: Search
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
 
-
+  @skipOnStable3.0
   Scenario: user can search inside folder in space
     When user "Alice" searches for "folder" inside folder "/folderMain" in space "find data" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -122,7 +121,7 @@ Feature: Search
     But the search result of user "Alice" should not contain these entries:
       | /folderMain |
 
-
+  @skipOnStable3.0
   Scenario: search inside folder in shares
     Given user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
