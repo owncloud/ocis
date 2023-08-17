@@ -69,8 +69,7 @@ class TagContext implements Context {
 		foreach ($table->getRows() as $value) {
 			$tagNameArray[] = $value[0];
 		}
-
-		if ($fileOrFolder === 'folder') {
+		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
 			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
 			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
@@ -102,6 +101,27 @@ class TagContext implements Context {
 	public function theUserHasCreatedFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
 		$this->theUserCreatesFollowingTags($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->theHttpStatusCodeShouldBe(200);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has tagged the following (folders|files) of the space "([^"]*)":$/
+	 *
+	 * @param string $user
+	 * @param string $filesOrFolders (files|folders)
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasCreatedTheFollowingTagsForFilesOfTheSpace(string $user, string $filesOrFolders, string $space, TableNode $table):void {
+		$this->featureContext->verifyTableNodeColumns($table, ["path", "tagName"]);
+		$rows = $table->getHash();
+		foreach ($rows as $row) {
+			$resource = $row['path'];
+			$tags = explode(',', $row['tagName']);
+			$this->theUserHasCreatedFollowingTags($user, $filesOrFolders, $resource, $space, new TableNode([$tags]));
+		}
 	}
 
 	/**

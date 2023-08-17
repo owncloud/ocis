@@ -18,12 +18,11 @@ Feature: full text search
       | fileInRootLevel.txt                              |
       | folderWithFile/fileInsideFolder.txt              |
       | folderWithFile/subFolder/fileInsideSubFolder.txt |
-    And user "Alice" has created the following tags for file "fileInRootLevel.txt" of the space "Personal":
-      | tag1 |
-    And user "Alice" has created the following tags for file "folderWithFile/fileInsideFolder.txt" of the space "Personal":
-      | tag1 |
-    And user "Alice" has created the following tags for file "folderWithFile/subFolder/fileInsideSubFolder.txt" of the space "Personal":
-      | tag1 |
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path                                             | tagName |
+      | fileInRootLevel.txt                              | tag1    |
+      | folderWithFile/fileInsideFolder.txt              | tag1    |
+      | folderWithFile/subFolder/fileInsideSubFolder.txt | tag1    |
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
@@ -46,12 +45,11 @@ Feature: full text search
     And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in folder" to "spacesFolderWithFile/spacesFileInsideFolder.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in subfolder" to "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt"
-    And user "Alice" has created the following tags for file "spacesFile.txt" of the space "tag-space":
-      | tag1 |
-    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesFileInsideFolder.txt" of the space "tag-space":
-      | tag1 |
-    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt" of the space "tag-space":
-      | tag1 |
+    And user "Alice" has tagged the following files of the space "tag-space":
+      | path                                                               | tagName |
+      | spacesFile.txt                                                     | tag1    |
+      | spacesFolderWithFile/spacesFileInsideFolder.txt                    | tag1    |
+      | spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt | tag1    |
     And using <dav-path-version> DAV path
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -75,10 +73,10 @@ Feature: full text search
     And user "Alice" has created folder "uploadFolder1"
     And user "Alice" has created folder "uploadFolder2"
     And user "Alice" has created folder "uploadFolder3"
-    And user "Alice" has created the following tags for folder "uploadFolder1" of the space "Personal":
-      | tag1 |
-    And user "Alice" has created the following tags for folder "uploadFolder2" of the space "Personal":
-      | tag1 |
+    And user "Alice" has tagged the following folders of the space "Personal":
+      | path          | tagName |
+      | uploadFolder1 | tag1    |
+      | uploadFolder2 | tag1    |
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
@@ -97,10 +95,10 @@ Feature: full text search
     And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
     And user "Alice" has created a folder "spacesFolder/spacesSubFolder" in space "tag-space"
     And user "Alice" has created a folder "unTagSpacesFolder/unTagSpacesSubFolder" in space "tag-space"
-    And user "Alice" has created the following tags for folder "spacesFolder" of the space "tag-space":
-      | tag1 |
-    And user "Alice" has created the following tags for folder "spacesFolder/spacesSubFolder" of the space "tag-space":
-      | tag1 |
+    And user "Alice" has tagged the following folders of the space "tag-space":
+      | path                         | tagName |
+      | spacesFolder                 | tag1    |
+      | spacesFolder/spacesSubFolder | tag1    |
     And using <dav-path-version> DAV path
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
