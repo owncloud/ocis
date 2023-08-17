@@ -77,7 +77,7 @@ Feature: full text search
     When user "Alice" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | keywordAtStart.txt  |
+      | keywordAtStart.txt |
     Examples:
       | dav-path-version |
       | old              |
@@ -121,4 +121,35 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
+
+
+  Scenario Outline: sharee searches shared project space files by content
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "project-space" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "project-space"
+    And user "Alice" has uploaded a file inside space "project-space" with content "hello world from nepal" to "keywordAtStart.txt"
+    And user "Alice" has uploaded a file inside space "project-space" with content "saying hello to the world" to "spacesFolderWithFile/keywordAtMiddle.txt"
+    And user "Alice" has uploaded a file inside space "project-space" with content "nepal wants to say hello" to "spacesFolderWithFile/spacesSubFolder/keywordAtLast.txt"
+    And user "Alice" has uploaded a file inside space "project-space" with content "namaste from nepal" to "hello.txt"
+    And using <dav-path-version> DAV path
+    When user "Brian" searches for "Content:hello" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | keywordAtStart.txt                                     |
+      | spacesFolderWithFile/keywordAtMiddle.txt               |
+      | spacesFolderWithFile/spacesSubFolder/keywordAtLast.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnStable3.0
+    Examples:
+      | dav-path-version |
       | spaces           |
