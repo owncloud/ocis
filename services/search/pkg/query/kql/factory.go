@@ -41,38 +41,20 @@ func nodes(head, tails interface{}) ([]ast.Node, error) {
 	return elems, nil
 }
 
-func tagQuery(v interface{}, text []byte, pos position) (*ast.TagQuery, error) {
+func textPropertyRestriction(k, v interface{}, text []byte, pos position) (*ast.TextPropertyRestriction, error) {
+	key, err := toString(k)
+	if err != nil {
+		return nil, err
+	}
+
 	value, err := toString(v)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ast.TagQuery{
+	return &ast.TextPropertyRestriction{
 		Base:  base(text, pos),
-		Value: value,
-	}, nil
-}
-
-func nameQuery(v interface{}, text []byte, pos position) (*ast.NameQuery, error) {
-	value, err := toString(v)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.NameQuery{
-		Base:  base(text, pos),
-		Value: value,
-	}, nil
-}
-
-func contentQuery(v interface{}, text []byte, pos position) (*ast.ContentQuery, error) {
-	value, err := toString(v)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.ContentQuery{
-		Base:  base(text, pos),
+		Key:   key,
 		Value: value,
 	}, nil
 }
@@ -89,8 +71,20 @@ func phrase(v interface{}, text []byte, pos position) (*ast.Phrase, error) {
 	}, nil
 }
 
-func operator(text []byte, pos position) (*ast.Operator, error) {
-	return &ast.Operator{
+func word(v interface{}, text []byte, pos position) (*ast.Word, error) {
+	value, err := toString(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.Word{
+		Base:  base(text, pos),
+		Value: value,
+	}, nil
+}
+
+func booleanOperator(text []byte, pos position) (*ast.BooleanOperator, error) {
+	return &ast.BooleanOperator{
 		Base:  base(text, pos),
 		Value: string(text),
 	}, nil

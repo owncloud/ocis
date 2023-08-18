@@ -5,16 +5,16 @@ import (
 	"testing"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast/test"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
-var FullDictionaryBleve = []string{
-	`tag:foo`,
-	`tag:bar`,
-	`name:book.pdf`,
-	`content:letter.docx`,
-	`name:book.pdf`,
+var FullAst = &ast.Ast{
+	Nodes: []ast.Node{
+		&ast.TextPropertyRestriction{Key: "tag", Value: "foo"},
+		&ast.TextPropertyRestriction{Key: "tag", Value: "bar"},
+		&ast.TextPropertyRestriction{Key: "name", Value: "book.pdf"},
+		&ast.TextPropertyRestriction{Key: "content", Value: "ahab"},
+	},
 }
 
 func TestCompile(t *testing.T) {
@@ -26,9 +26,14 @@ func TestCompile(t *testing.T) {
 	}{
 		{
 			name: "FullDictionaryBleve",
-			got:  test.FullDictionaryAst,
-			want: FullDictionaryBleve,
-			err:  false,
+			got:  FullAst,
+			want: []string{
+				`tag:foo`,
+				`tag:bar`,
+				`name:book.pdf`,
+				`content:ahab`,
+			},
+			err: false,
 		},
 	}
 
@@ -55,7 +60,7 @@ func TestCompile(t *testing.T) {
 func BenchmarkCompile(b *testing.B) {
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
-		if err := bleve.Compile(&strings.Builder{}, test.FullDictionaryAst); err != nil {
+		if err := bleve.Compile(&strings.Builder{}, FullAst); err != nil {
 			b.Fatal(err)
 		}
 	}

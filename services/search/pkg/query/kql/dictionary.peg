@@ -2,106 +2,96 @@
     package kql
 }
 
-Root
-    = _ nodes:Nodes _ {
+////////////////////////////////////////////////////////
+// ast
+////////////////////////////////////////////////////////
+
+Root <-
+    _ nodes:Nodes _ {
         return root(nodes, c.text, c.pos)
     }
 
-Nodes
-    = head:Element tail:(_ Element _)* {
+Nodes <-
+    head:Element tail:(_ Element _)* {
       return nodes(head, tail)
     }
 
-Element
-    =   Group /
-        TagQuery /
-        NameQuery /
-        ContentQuery /
-        AndOperator /
-        Phrase
+Element <-
+        Group /
+        PropertyRestrictions /
+        BooleanOperators /
+        FreeTextKeywords
 
-Group
-    = "(" v:Nodes ")" {
+////////////////////////////////////////////////////////
+// nesting
+////////////////////////////////////////////////////////
+
+Group <-
+    "(" v:Nodes ")" {
         return group(v, c.text, c.pos)
     }
 
-TagQuery
-    = ("tags" / "tag") (ColonOperator / EqualOperator) v:Val {
-        return tagQuery(v, c.text, c.pos)
+////////////////////////////////////////////////////////
+// property restrictions
+////////////////////////////////////////////////////////
+
+PropertyRestrictions <-
+    TextPropertyRestriction
+
+TextPropertyRestriction <-
+    k:Char+ (ColonOperator / EqualOperator) v:(String / [^ ()]+){
+        return textPropertyRestriction(k, v, c.text, c.pos)
     }
 
-NameQuery
-    = "name" (ColonOperator / EqualOperator) v:Val {
-        return nameQuery(v, c.text, c.pos)
-    }
+////////////////////////////////////////////////////////
+// free text-keywords
+////////////////////////////////////////////////////////
 
-ContentQuery
-    = "content" (ColonOperator / EqualOperator) v:Val {
-        return contentQuery(v, c.text, c.pos)
-    }
+FreeTextKeywords <-
+    (Phrase / Word)
 
-Phrase
-    = ColonOperator? _ v:(Char+ / String) _ ColonOperator? {
+Phrase <-
+     ColonOperator? _ v:String _ ColonOperator? {
         return phrase(v, c.text, c.pos)
     }
 
+Word <-
+     ColonOperator? _ v:[^ :()]+ _ ColonOperator? {
+        return word(v, c.text, c.pos)
+    }
+
 ////////////////////////////////////////////////////////
-// Operators
+// operators
 ////////////////////////////////////////////////////////
 
-AndOperator
-    = "AND" {
-        return operator(c.text, c.pos)
+BooleanOperators <-
+    ("AND" / "OR" / "NOT") {
+        return booleanOperator(c.text, c.pos)
     }
 
-ColonOperator
-    = ":" {
+ColonOperator <-
+    ":" {
         return c.text, nil
     }
 
-EqualOperator
-    = "=" {
-        return c.text, nil
-    }
-
-LessOperator
-    = "<" {
-        return c.text, nil
-    }
-
-GreaterOperator
-    = ">" {
-        return c.text, nil
-    }
-
-LessEqualOperator
-    = "<=" {
-        return c.text, nil
-    }
-
-GreaterEqualOperator
-    = ">=" {
+EqualOperator <-
+    "=" {
         return c.text, nil
     }
 
 ////////////////////////////////////////////////////////
-// Misc rules
+// misc
 ////////////////////////////////////////////////////////
 
-Val
-    = (String / [^ ()]* / Char+) {
+Char <-
+    [A-Za-z] {
         return c.text, nil
     }
 
-Char
-    = [A-Za-z] {
-        return c.text, nil
-    }
-
-String
-    <- '"' v:[^"]* '"' {
+String <-
+    '"' v:[^"]* '"' {
         return v, nil
     }
 
-_
-    = [ \t]*
+_ <-
+    [ \t]*

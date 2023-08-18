@@ -19,27 +19,21 @@ func Compile(w io.Writer, a *ast.Ast) error {
 
 	for _, node := range a.Nodes {
 		switch n := node.(type) {
-		case *ast.TagQuery:
-			s = append(s, fmt.Sprintf("%s:%s", _tagKey, n.Value))
+		case *ast.TextPropertyRestriction:
+			s = append(s, textQuery(n))
 			continue
-		case *ast.NameQuery:
-			s = append(s, fmt.Sprintf("%s:%s", _nameKey, n.Value))
-			continue
-		case *ast.ContentQuery:
-			s = append(s, fmt.Sprintf("%s:%s", _contentKey, n.Value))
-			continue
-		case *ast.Operator:
+		case *ast.Phrase, *ast.Word:
 			// fixMe:
-			// how should bleve treat an operator
-			continue
-		case *ast.Phrase:
-			// fixMe:
-			// how should bleve treat an phrase
+			// how should bleve treat an phrase or word
 			continue
 		case *ast.Group:
 			// fixMe:
 			// how should bleve treat an group
 			// hint, recursion
+			continue
+		case *ast.BooleanOperator:
+			// fixMe:
+			// how should bleve treat an boolean operator
 			continue
 		}
 	}
@@ -47,4 +41,17 @@ func Compile(w io.Writer, a *ast.Ast) error {
 	_, err := io.WriteString(w, strings.Join(s, " "))
 
 	return err
+}
+
+func textQuery(n *ast.TextPropertyRestriction) string {
+	switch n.Key {
+	case _tagKey:
+		return fmt.Sprintf("%s:%s", _tagKey, n.Value)
+	case _nameKey:
+		return fmt.Sprintf("%s:%s", _nameKey, n.Value)
+	case _contentKey:
+		return fmt.Sprintf("%s:%s", _contentKey, n.Value)
+	}
+
+	return ""
 }

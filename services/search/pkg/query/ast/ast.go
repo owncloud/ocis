@@ -26,17 +26,13 @@ type Ast struct {
 	Nodes []Node `json:"body"`
 }
 
-type TagQuery struct {
+type TextPropertyRestriction struct {
 	*Base
+	Key   string
 	Value string
 }
 
-type NameQuery struct {
-	*Base
-	Value string
-}
-
-type ContentQuery struct {
+type Word struct {
 	*Base
 	Value string
 }
@@ -46,7 +42,7 @@ type Phrase struct {
 	Value string
 }
 
-type Operator struct {
+type BooleanOperator struct {
 	*Base
 	Value string
 }

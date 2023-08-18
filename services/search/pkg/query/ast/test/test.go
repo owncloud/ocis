@@ -7,27 +7,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
-var FullDictionaryAst = &ast.Ast{
-	Nodes: []ast.Node{
-		&ast.Phrase{Value: "author"},
-		&ast.Phrase{Value: "John Smith"},
-		&ast.Phrase{Value: "author"},
-		&ast.Phrase{Value: "John Smith"},
-		&ast.Phrase{Value: "author"},
-		&ast.Phrase{Value: "John Smith"},
-		&ast.TagQuery{Value: "foo"},
-		&ast.Operator{Value: "AND"},
-		&ast.TagQuery{Value: "bar"},
-		&ast.NameQuery{Value: "book.pdf"},
-		&ast.ContentQuery{Value: "letter.docx"},
-		&ast.NameQuery{Value: "book.pdf"},
-		&ast.Group{Nodes: []ast.Node{
-			&ast.ContentQuery{Value: "letter.docx"},
-			&ast.TagQuery{Value: "foo"},
-		}},
-	},
-}
-
 func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 	return cmp.Diff(
 		x,
@@ -35,11 +14,10 @@ func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 		append(
 			opts,
 			cmpopts.IgnoreFields(ast.Ast{}, "Base"),
+			cmpopts.IgnoreFields(ast.Word{}, "Base"),
 			cmpopts.IgnoreFields(ast.Phrase{}, "Base"),
-			cmpopts.IgnoreFields(ast.TagQuery{}, "Base"),
-			cmpopts.IgnoreFields(ast.NameQuery{}, "Base"),
-			cmpopts.IgnoreFields(ast.ContentQuery{}, "Base"),
-			cmpopts.IgnoreFields(ast.Operator{}, "Base"),
+			cmpopts.IgnoreFields(ast.TextPropertyRestriction{}, "Base"),
+			cmpopts.IgnoreFields(ast.BooleanOperator{}, "Base"),
 			cmpopts.IgnoreFields(ast.Group{}, "Base"),
 		)...,
 	)
