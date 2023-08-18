@@ -9,7 +9,7 @@ import (
 
 func TestKqlToBleveQuery(t *testing.T) {
 	want := "tag:ownCloud"
-	r := strings.NewReader("tags:ownCloud")
+	r := strings.NewReader("tag:ownCloud")
 	w := &strings.Builder{}
 
 	if err := query.KqlToBleveQuery(r, w); err != nil {

@@ -20,7 +20,7 @@ func Compile(w io.Writer, a *ast.Ast) error {
 	for _, node := range a.Nodes {
 		switch n := node.(type) {
 		case *ast.TextPropertyRestriction:
-			s = append(s, textQuery(n))
+			s = append(s, textPropertyRestriction(n))
 			continue
 		case *ast.Phrase, *ast.Word:
 			// fixMe:
@@ -43,7 +43,7 @@ func Compile(w io.Writer, a *ast.Ast) error {
 	return err
 }
 
-func textQuery(n *ast.TextPropertyRestriction) string {
+func textPropertyRestriction(n *ast.TextPropertyRestriction) string {
 	switch n.Key {
 	case _tagKey:
 		return fmt.Sprintf("%s:%s", _tagKey, n.Value)
