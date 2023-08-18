@@ -124,6 +124,11 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					// reroute oc10 notifications endpoint to userlog service
+					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications/sse",
+					Service:  "com.owncloud.sse.sse",
+				},
+				{
+					// reroute oc10 notifications endpoint to userlog service
 					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications",
 					Service:  "com.owncloud.userlog.userlog",
 				},
