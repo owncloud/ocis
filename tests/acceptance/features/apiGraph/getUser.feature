@@ -381,7 +381,7 @@ Feature: get users
     """
 
 
-  Scenario Outline: non-admin user gets his/her own drive information
+  Scenario Outline: user gets his/her own information along with drive information
     Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     When the user "Brian" gets his drive information using Graph API
     Then the HTTP status code should be "200"
@@ -504,11 +504,12 @@ Feature: get users
     """
     Examples:
       | userRole    |
+      | Admin       |
       | Space Admin |
       | User        |
 
 
-  Scenario: user with User Light role cannot get his/her own drive information
+  Scenario: user with User Light role gets his/her own information along with drive information
     Given the administrator has assigned the role "User Light" to user "Brian" using the Graph API
     When the user "Brian" gets his drive information using Graph API
     Then the HTTP status code should be "200"
@@ -800,7 +801,6 @@ Feature: get users
     """
     And the JSON data of the response should not contain the user "Carol King" in the item 'value'
     And the JSON data of the response should not contain the user "Alice Hansen" in the item 'value'
-
 
 
   Scenario: admin user gets all users of two groups
@@ -1156,12 +1156,47 @@ Feature: get users
       | Admin       | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
-      | Admin       | User Light  |
       | Space Admin | Admin       |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | User Light  |
 
+  Scenario Outline: admin user gets the drive information of a user with user light role
+    Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
+    When user "Alice" gets the personal drive information of user "Brian" using Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": ["itemNotFound"]
+            },
+            "message": {
+              "type": "string",
+              "enum": ["no drive returned from storage"]
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | user-role-1 | user-role-2 |
+      | Admin       | User Light  |
+      | Space Admin | User Light  |
 
   Scenario Outline: non-admin user tries to get drive information of other user with different user role
     Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
@@ -1304,4 +1339,37 @@ Feature: get users
       | Admin       |
       | Space Admin |
       | User        |
-      | User Light  |
+
+
+  Scenario: user with User Light role tries to get his/her own drive information
+    Given the administrator has assigned the role "User Light" to user "Alice" using the Graph API
+    When user "Alice" gets own personal drive information using Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": ["itemNotFound"]
+            },
+            "message": {
+              "type": "string",
+              "enum": ["no drive returned from storage"]
+            }
+          }
+        }
+      }
+    }
+    """
