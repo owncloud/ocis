@@ -27,6 +27,7 @@ use GuzzleHttp\Ring\Exception\ConnectException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
+use TestHelpers\SpaceNotFoundException;
 use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
@@ -456,28 +457,37 @@ trait WebDav {
 	 * @param string|null $height
 	 *
 	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
+
 	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):void {
-		$user = $this->getActualUsername($user);
-		$doDavRequestAsUser = $this->getActualUsername($doDavRequestAsUser);
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'forceIcon' => '0',
 			'preview' => '1'
 		];
-		$this->response = $this->makeDavRequest(
+		$url = $this->getBaseUrl() . '/remote.php';
+		$davVersion = $this->getDavPathVersion();
+		if ($davVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->getPersonalSpaceIdForUser($user);
+			$url .= '/dav/spaces/' . $spaceId . '/';
+		} elseif ($davVersion === WebDavHelper::DAV_VERSION_NEW) {
+			$url .= '/dav/files/' . $user . '/';
+		} else {
+			$url .= '/webdav/';
+		}
+
+		$urlParameter = \http_build_query($urlParameter, '', '&');
+		$path .= '?' . $urlParameter;
+		$fullUrl = WebDavHelper::sanitizeUrl($url . $path);
+
+		$this->response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			'',
+			'GET',
 			$user,
-			"GET",
-			$path,
-			[],
-			null,
-			"files",
-			'2',
-			false,
-			null,
-			$urlParameter,
-			$doDavRequestAsUser
+			$this->getPasswordForUser($user)
 		);
 	}
 
@@ -4626,6 +4636,51 @@ trait WebDav {
 	 */
 	public function userHasDeletedEverythingInFolder(string $user, string $folder):void {
 		$this->userDeletesEverythingInFolder($user, $folder, true);
+	}
+
+	/**
+	 * @When user :user tries to download the preview of nonexistent file :path with width :width and height :height using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userTriesToDownloadThePreviewOfNonexistentFileWithWidthAndHeightUsingTheWebdavApi(string $user, string $path, string $width, string $height):void {
+		$urlParameter = [
+			'x' => $width,
+			'y' => $height,
+			'preview' => '1'
+		];
+
+		$user = $this->getActualUsername($user);
+		$url = $this->getBaseUrl() . '/remote.php';
+		$davVersion = $this->getDavPathVersion();
+
+		if ($davVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->getPersonalSpaceIdForUser($user);
+			$url .= '/dav/spaces/' . $spaceId . '/';
+		} elseif ($davVersion === WebDavHelper::DAV_VERSION_NEW) {
+			$url .= '/dav/files/' . $user . '/';
+		} else {
+			$url .= '/webdav/';
+		}
+
+		$urlParameter = \http_build_query($urlParameter, '', '&');
+		$path .= '?' . $urlParameter;
+		$fullUrl = WebDavHelper::sanitizeUrl($url . $path);
+
+		$this->response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			'',
+			'GET',
+			$user,
+			$this->getPasswordForUser($user)
+		);
 	}
 
 	/**

@@ -946,7 +946,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
-    filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage&&~@skipOnStable3.0" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
 
     return {
