@@ -110,6 +110,7 @@ config = {
                 "apiAsyncUpload",
                 "apiDownloads",
                 "apiReshare",
+                "apiSpacesDavOperation",
             ],
             "skip": False,
         },

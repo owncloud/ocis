@@ -1160,7 +1160,7 @@ class SpacesContext implements Context {
 	 * @param string $content
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return string[]
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
@@ -1169,9 +1169,9 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $content,
 		string $destination
-	): void {
+	): array {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->uploadFileWithContent($user, $content, $destination);
+		return $this->featureContext->uploadFileWithContent($user, $content, $destination);
 	}
 
 	/**
@@ -1785,7 +1785,7 @@ class SpacesContext implements Context {
 	 * @param string $fileContent
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return string[]
 	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFile(
@@ -1793,10 +1793,11 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $fileContent,
 		string $destination
-	): void {
+	): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		$this->theUserUploadsAFileToSpace($user, $spaceName, $fileContent, $destination);
+		$fileId = $this->theUserUploadsAFileToSpace($user, $spaceName, $fileContent, $destination);
 		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
+		return $fileId;
 	}
 
 	/**
