@@ -29,10 +29,17 @@ func Compile(w io.Writer, a *ast.Ast) error {
 			s = append(s, fmt.Sprintf("%s:%s", _contentKey, n.Value))
 			continue
 		case *ast.Operator:
-			// fixMe: how should bleve handle operators
+			// fixMe:
+			// how should bleve treat an operator
 			continue
 		case *ast.Phrase:
-			// fixMe: how should bleve handle phrases
+			// fixMe:
+			// how should bleve treat an phrase
+			continue
+		case *ast.Group:
+			// fixMe:
+			// how should bleve treat an group
+			// hint, recursion
 			continue
 		}
 	}

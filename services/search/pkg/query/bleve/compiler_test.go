@@ -14,6 +14,7 @@ var FullDictionaryBleve = []string{
 	`tag:bar`,
 	`name:book.pdf`,
 	`content:letter.docx`,
+	`name:book.pdf`,
 }
 
 func TestCompile(t *testing.T) {

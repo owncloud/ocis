@@ -20,6 +20,11 @@ var FullDictionaryAst = &ast.Ast{
 		&ast.TagQuery{Value: "bar"},
 		&ast.NameQuery{Value: "book.pdf"},
 		&ast.ContentQuery{Value: "letter.docx"},
+		&ast.NameQuery{Value: "book.pdf"},
+		&ast.Group{Nodes: []ast.Node{
+			&ast.ContentQuery{Value: "letter.docx"},
+			&ast.TagQuery{Value: "foo"},
+		}},
 	},
 }
 
@@ -35,6 +40,7 @@ func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 			cmpopts.IgnoreFields(ast.NameQuery{}, "Base"),
 			cmpopts.IgnoreFields(ast.ContentQuery{}, "Base"),
 			cmpopts.IgnoreFields(ast.Operator{}, "Base"),
+			cmpopts.IgnoreFields(ast.Group{}, "Base"),
 		)...,
 	)
 }

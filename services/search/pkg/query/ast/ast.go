@@ -50,3 +50,8 @@ type Operator struct {
 	*Base
 	Value string
 }
+
+type Group struct {
+	*Base
+	Nodes []Node `json:"body"`
+}

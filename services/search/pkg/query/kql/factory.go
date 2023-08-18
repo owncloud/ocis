@@ -95,3 +95,10 @@ func operator(text []byte, pos position) (*ast.Operator, error) {
 		Value: string(text),
 	}, nil
 }
+
+func group(elements interface{}, text []byte, pos position) (*ast.Group, error) {
+	return &ast.Group{
+		Base:  base(text, pos),
+		Nodes: elements.([]ast.Node),
+	}, nil
+}

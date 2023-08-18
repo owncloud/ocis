@@ -10,12 +10,13 @@ import (
 )
 
 var FullDictionaryKql = []string{
-	`author: "John Smith"`,  // Phrase, Phrase
-	`author :"John Smith"`,  // Phrase, Phrase
-	`author : "John Smith"`, // Phrase, Phrase
-	`tags:foo AND tag:bar`,  // TagPropertyRestriction, Operator, TagPropertyRestriction
-	`name:book.pdf`,         // NameQuery
-	`content:letter.docx`,   // Operator
+	`author: "John Smith"`,                         // Phrase, Phrase
+	`author :"John Smith"`,                         // Phrase, Phrase
+	`author : "John Smith"`,                        // Phrase, Phrase
+	`tags:foo AND tag:bar`,                         // TagQuery, Operator, TagQuery
+	`name:book.pdf`,                                // NameQuery
+	`content:letter.docx`,                          // ContentQuery
+	`name:book.pdf (content:letter.docx tags:foo)`, // NameQuery, GROUP |> ContentQuery, TagQuery <|
 }
 
 func TestParse(t *testing.T) {

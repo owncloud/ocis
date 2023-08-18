@@ -8,16 +8,22 @@ Root
     }
 
 Nodes
-    = head:Element tail:(_ Element _ )* {
+    = head:Element tail:(_ Element _)* {
       return nodes(head, tail)
     }
 
 Element
-    =   TagQuery /
+    =   Group /
+        TagQuery /
         NameQuery /
         ContentQuery /
         AndOperator /
         Phrase
+
+Group
+    = "(" v:Nodes ")" {
+        return group(v, c.text, c.pos)
+    }
 
 TagQuery
     = ("tags" / "tag") (ColonOperator / EqualOperator) v:Val {
@@ -83,9 +89,10 @@ GreaterEqualOperator
 ////////////////////////////////////////////////////////
 
 Val
-    = (String / [^ ]* / Char+) {
+    = (String / [^ ()]* / Char+) {
         return c.text, nil
     }
+
 Char
     = [A-Za-z] {
         return c.text, nil
