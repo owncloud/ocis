@@ -169,3 +169,71 @@ Feature: Deprovisioning notification
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario Outline: administrator creates a deprovisioning notification with different date formats
+    When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
+    Then the HTTP status code should be "200"
+    When user "Alice" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
+        """
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "enum": [
+                "Attention! The instance will be shut down and deprovisioned on <deprovision_date>. Download all your data before that date as no access past that date is possible."
+              ]
+            }
+          }
+        }
+        """
+    Examples:
+      | deprovision_date                    | deprovision_date_format             |
+      | 2030-04-09T15:04:05.999999999+07:00 | 2006-01-02T15:04:05.999999999Z07:00 |
+      | 5:15PM                              | 3:04PM                              |
+      # with date format like `Jan _2 15:04:05`, `_` gets replaced with a space in the response.
+      | Jan  8 23:04:05                     | Jan _2 15:04:05                     |
+      | Jan 12 15:04:05.000000000           | Jan _2 15:04:05.000000000           |
+      | 2023-01-02 15:04:05                 | 2006-01-02 15:04:05                 |
+      | 2023-01-02                          | 2006-01-02                          |
+      | 18:24:55                            | 15:04:05                            |
+
+
+  Scenario Outline: administrator change a deprovisioning notification with different date formats
+    Given the administrator has created a deprovisioning notification
+    When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
+    Then the HTTP status code should be "200"
+    When user "Alice" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
+        """
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "enum": [
+                "Attention! The instance will be shut down and deprovisioned on <deprovision_date>. Download all your data before that date as no access past that date is possible."
+              ]
+            }
+          }
+        }
+        """
+    Examples:
+      | deprovision_date                | deprovision_date_format         |
+      | 01/02 03:04:05PM '23 -0700      | 01/02 03:04:05PM '06 -0700      |
+      | Mon Jan  2 15:04:05 UTC 2023    | Mon Jan _2 15:04:05 UTC 2006    |
+      | Mon Jan 02 15:04:05 -0700 2023  | Mon Jan 02 15:04:05 -0700 2006  |
+      | 02 Jan 23 15:04 -0700           | 02 Jan 06 15:04 -0700           |
+      | Monday, 02-Jan-23 15:04:05 UTC  | Monday, 02-Jan-06 15:04:05 UTC  |
+      | Mon, 02 Jan 2023 15:04:05 -0700 | Mon, 02 Jan 2006 15:04:05 -0700 |
+      | 2023-01-02T15:04:05+07:00       | 2006-01-02T15:04:05Z07:00       |
