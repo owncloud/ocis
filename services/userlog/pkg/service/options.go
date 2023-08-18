@@ -19,7 +19,7 @@ type Option func(*Options)
 // Options for the userlog service
 type Options struct {
 	Logger           log.Logger
-	Consumer         events.Consumer
+	Stream           events.Stream
 	Mux              *chi.Mux
 	Store            store.Store
 	Config           *config.Config
@@ -38,10 +38,10 @@ func Logger(log log.Logger) Option {
 	}
 }
 
-// Consumer configures an event consumer for the userlog service
-func Consumer(c events.Consumer) Option {
+// Stream configures an event stream for the userlog service
+func Stream(s events.Stream) Option {
 	return func(o *Options) {
-		o.Consumer = c
+		o.Stream = s
 	}
 }
 

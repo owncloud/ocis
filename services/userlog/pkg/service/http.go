@@ -91,33 +91,6 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 	w.Write(b)
 }
 
-// HandleSSE is the GET handler for events
-func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
-	u, ok := revactx.ContextGetUser(r.Context())
-	if !ok {
-		ul.log.Error().Msg("sse: no user in context")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	uid := u.GetId().GetOpaqueId()
-	if uid == "" {
-		ul.log.Error().Msg("sse: user in context is broken")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	stream := ul.sse.CreateStream(uid)
-	stream.AutoReplay = false
-
-	// add stream to URL
-	q := r.URL.Query()
-	q.Set("stream", uid)
-	r.URL.RawQuery = q.Encode()
-
-	ul.sse.ServeHTTP(w, r)
-}
-
 // HandlePostGlobaelEvent is the POST handler for global events
 func (ul *UserlogService) HandlePostGlobalEvent(w http.ResponseWriter, r *http.Request) {
 	var req PostEventsRequest

@@ -81,7 +81,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			consumer, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
+			stream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
 			if err != nil {
 				return err
 			}
@@ -121,7 +121,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Config(cfg),
 					http.Metrics(mtrcs),
 					http.Store(st),
-					http.Consumer(consumer),
+					http.Stream(stream),
 					http.GatewaySelector(gatewaySelector),
 					http.History(hClient),
 					http.Value(vClient),

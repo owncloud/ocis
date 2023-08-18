@@ -80,7 +80,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	handle, err := svc.NewUserlogService(
 		svc.Logger(options.Logger),
-		svc.Consumer(options.Consumer),
+		svc.Stream(options.Stream),
 		svc.Mux(mux),
 		svc.Store(options.Store),
 		svc.Config(options.Config),
