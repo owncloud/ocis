@@ -634,6 +634,10 @@ def uploadScanResults(ctx):
                 "refs/heads/stable-*",
                 "refs/pull/**",
             ],
+            "status": [
+                "success",
+                "failure",
+            ],
         },
     }
 
