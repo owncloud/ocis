@@ -27,6 +27,7 @@ class NotificationContext implements Context {
 	private SpacesContext $spacesContext;
 	private SettingsContext $settingsContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
+	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
 	private array $notificationIds;
 
@@ -42,6 +43,15 @@ class NotificationContext implements Context {
 	 */
 	public function getLastNotificationId():array {
 		return \end($this->notificationIds);
+	}
+
+	/**
+	 * @AfterScenario
+	 *
+	 * @return void
+	 */
+	public function deleteDeprovisioningNotification(): void {
+		$this->userDeletesDeprovisioningNotification();
 	}
 
 	/**
@@ -125,6 +135,20 @@ class NotificationContext implements Context {
 			}
 		}
 		$this->featureContext->setResponse($this->userDeletesNotification($user));
+	}
+
+	/**
+	 * @Given user :user has deleted all notifications
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasDeletedAllNotifications(string $user):void {
+		$this->userDeletesAllNotifications($user);
+		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
 	/**
@@ -489,5 +513,88 @@ class NotificationContext implements Context {
 				" could not delete inbucket messages, is inbucket set up?\n" .
 				$e->getMessage();
 		}
+	}
+
+	/**
+	 * @When the administrator creates a deprovisioning notification
+	 * @When user :user tries to create a deprovisioning notification
+	 *
+	 * @param string|null $user
+	 * @param string|null $deprovision_date
+	 * @param string|null $deprovision_date_format
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 *
+	 * @throws JsonException
+	 */
+	public function userCreatesDeprovisioningNotification(
+		?string $user = null,
+		?string $deprovision_date = "2043-07-04T11:23:12Z",
+		?string $deprovision_date_format= "2006-01-02T15:04:05Z07:00"
+	):void {
+		$payload["type"] = "deprovision";
+		$payload["data"] = ["deprovision_date" => $deprovision_date, "deprovision_date_format" => $deprovision_date_format];
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername(),
+			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
+			'POST',
+			$this->globalNotificationEndpointPath,
+			'',
+			json_encode($payload),
+			2
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator creates a deprovisioning notification for date :deprovision_date of format :deprovision_date_format
+	 *
+	 * @param $deprovision_date
+	 * @param $deprovision_date_format
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat($deprovision_date, $deprovision_date_format) {
+		$this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
+	}
+
+	/**
+	 * @Given the administrator has created a deprovisioning notification
+	 *
+	 * @return void
+	 */
+	public function userHasCreatedDeprovisioningNotification():void {
+		$this->userCreatesDeprovisioningNotification();
+		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
+	}
+
+	/**
+	 * @When the administrator deletes the deprovisioning notification
+	 * @When user :user tries to delete the deprovisioning notification
+	 *
+	 * @param string|null $user
+	 *
+	 * @return void
+	 */
+	public function userDeletesDeprovisioningNotification(?string $user = null):void {
+		$payload["ids"] = ["deprovision"];
+
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername(),
+			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->globalNotificationEndpointPath,
+			'',
+			json_encode($payload),
+			2
+		);
+		$this->featureContext->setResponse($response);
 	}
 }
