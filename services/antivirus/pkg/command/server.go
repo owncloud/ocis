@@ -9,6 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config/parser"
@@ -43,9 +44,12 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 			)
 			defer cancel()
-
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
 			{
-				svc, err := service.NewAntivirus(cfg, logger)
+				svc, err := service.NewAntivirus(cfg, logger, traceProvider)
 				if err != nil {
 					return err
 				}

@@ -46,9 +46,12 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Log == nil {
 		cfg.Log = &config.Log{}
 	}
+
+	if cfg.Tracing == nil {
+		cfg.Tracing = &config.Tracing{}
+	}
 }
 
 // Sanitize sanitizes the configuration
 func Sanitize(cfg *config.Config) {
-
 }
