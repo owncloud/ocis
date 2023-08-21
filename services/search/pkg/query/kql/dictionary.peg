@@ -57,7 +57,8 @@ TextPropertyRestriction <-
 ////////////////////////////////////////////////////////
 
 FreeTextKeywords <-
-    (Phrase / Word)
+    Phrase /
+    Word
 
 Phrase <-
      ColonOperator? _ v:String _ ColonOperator? {
