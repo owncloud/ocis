@@ -298,7 +298,7 @@ cannot share a folder with create permission
 #### [Empty OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 
 - [coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L21)
-- [coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L12)
+- [coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L22)
 
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
