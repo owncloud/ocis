@@ -26,7 +26,7 @@ type Ast struct {
 	Nodes []Node `json:"body"`
 }
 
-type TextPropertyRestriction struct {
+type StringProperty struct {
 	*Base
 	Key   string
 	Value string
@@ -49,5 +49,11 @@ type BooleanOperator struct {
 
 type Group struct {
 	*Base
+	Nodes []Node `json:"body"`
+}
+
+type KeyGroup struct {
+	*Base
+	Key   string
 	Nodes []Node `json:"body"`
 }

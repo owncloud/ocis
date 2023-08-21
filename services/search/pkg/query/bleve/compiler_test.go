@@ -10,10 +10,10 @@ import (
 
 var FullAst = &ast.Ast{
 	Nodes: []ast.Node{
-		&ast.TextPropertyRestriction{Key: "tag", Value: "foo"},
-		&ast.TextPropertyRestriction{Key: "tag", Value: "bar"},
-		&ast.TextPropertyRestriction{Key: "name", Value: "book.pdf"},
-		&ast.TextPropertyRestriction{Key: "content", Value: "ahab"},
+		&ast.StringProperty{Key: "tag", Value: "foo"},
+		&ast.StringProperty{Key: "tag", Value: "bar"},
+		&ast.StringProperty{Key: "name", Value: "book.pdf"},
+		&ast.StringProperty{Key: "content", Value: "ahab"},
 	},
 }
 

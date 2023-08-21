@@ -17,7 +17,7 @@ Nodes <-
     }
 
 Element <-
-        Group /
+        Groups /
         PropertyRestrictions /
         BooleanOperators /
         FreeTextKeywords
@@ -26,9 +26,18 @@ Element <-
 // nesting
 ////////////////////////////////////////////////////////
 
+Groups <-
+    Group /
+    PropertyGroup
+
 Group <-
     "(" v:Nodes ")" {
         return group(v, c.text, c.pos)
+    }
+
+PropertyGroup <-
+    k:Char+ (ColonOperator / EqualOperator) "(" v:FreeTextKeywords+ ")" {
+        return propertyGroup(k, v, c.text, c.pos)
     }
 
 ////////////////////////////////////////////////////////
