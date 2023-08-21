@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -85,13 +86,15 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		return sdktrace.NewTracerProvider(
+		tp := sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
 			sdktrace.WithResource(resource.NewWithAttributes(
 				semconv.SchemaURL,
 				semconv.ServiceNameKey.String(serviceName)),
 			),
-		), nil
+		)
+		rtrace.SetDefaultTracerProvider(tp)
+		return tp, nil
 	case "otlp":
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
@@ -121,11 +124,13 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		return sdktrace.NewTracerProvider(
+		tp := sdktrace.NewTracerProvider(
 			sdktrace.WithSampler(sdktrace.AlwaysSample()),
 			sdktrace.WithBatcher(exporter),
 			sdktrace.WithResource(resources),
-		), nil
+		)
+		rtrace.SetDefaultTracerProvider(tp)
+		return tp, nil
 	case "agent":
 		fallthrough
 	case "zipkin":
