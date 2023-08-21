@@ -1,4 +1,4 @@
-Enhancement: Bump reva to latest edge
+Enhancement: Bump reva to 2.16.0
 
 *   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
 *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
@@ -8,6 +8,22 @@ Enhancement: Bump reva to latest edge
 *   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
 *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
 *   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+*   Bugfix [cs3org/reva#4051](https://github.com/cs3org/reva/pull/4051): Set treesize when creating a storage space
+*   Bugfix [cs3org/reva#4093](https://github.com/cs3org/reva/pull/4093): Fix the error handling
+*   Bugfix [cs3org/reva#4111](https://github.com/cs3org/reva/pull/4111): Return already exists error when child already exists
+*   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
+*   Bugfix [cs3org/reva#4101](https://github.com/cs3org/reva/pull/4101): Make the jsoncs3 share manager indexes more robust
+*   Bugfix [cs3org/reva#4099](https://github.com/cs3org/reva/pull/4099): Fix logging upload errors
+*   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): Fix the default document language for OnlyOffice
+*   Bugfix [cs3org/reva#4082](https://github.com/cs3org/reva/pull/4082): Fix propfind permissions
+*   Bugfix [cs3org/reva#4100](https://github.com/cs3org/reva/pull/4100): S3ng include md5 checksum on put
+*   Bugfix [cs3org/reva#4096](https://github.com/cs3org/reva/pull/4096): Fix the user shares list
+*   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
+*   Bugfix [cs3org/reva#4117](https://github.com/cs3org/reva/pull/4117): Fix jsoncs3 atomic persistence
+*   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+*   Bugfix [cs3org/reva#4091](https://github.com/cs3org/reva/pull/4091): Register WebDAV HTTP methods with chi
+*   Bugfix [cs3org/reva#4107](https://github.com/cs3org/reva/pull/4107): Return lock when requested
+*   Bugfix [cs3org/reva#4075](https://github.com/cs3org/reva/pull/4075): Revert 4065 - bypass proxy on upload
 *   Enhancement [cs3org/reva#4070](https://github.com/cs3org/reva/pull/4070): Selectable Propagators
 *   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
 *   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
@@ -15,10 +31,22 @@ Enhancement: Bump reva to latest edge
 *   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
 *   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
 *   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+*   Enhancement [cs3org/reva#4089](https://github.com/cs3org/reva/pull/4089): Async propagation (experimental)
+*   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
+*   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
+*   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+*   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
+*   Enhancement [cs3org/reva#4103](https://github.com/cs3org/reva/pull/4103): Add .oform mimetype
+*   Enhancement [cs3org/reva#4098](https://github.com/cs3org/reva/pull/4098): Allow naming nats connections
+*   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
+*   Enhancement [cs3org/reva#4097](https://github.com/cs3org/reva/pull/4097): Remove app ticker logs
+*   Enhancement [cs3org/reva#4090](https://github.com/cs3org/reva/pull/4090): Add Capability for sse
+*   Enhancement [cs3org/reva#4110](https://github.com/cs3org/reva/pull/4110): Tracing events propgation
 
 https://github.com/owncloud/ocis/pull/6899
 https://github.com/owncloud/ocis/pull/6919
 https://github.com/owncloud/ocis/pull/6928
+https://github.com/owncloud/ocis/pull/6979
 
 Update reva to v2.15.0
 

@@ -33,6 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/pkg/errors"
+	"github.com/rogpeppe/go-internal/lockedfile"
 )
 
 // Revision entries are stored inside the node folder and start with the same uuid as the current version.
@@ -90,7 +91,7 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("error reading blobsize xattr, using 0")
 				}
 				rev.Size = uint64(blobSize)
-				etag, err := node.CalculateEtag(np, mtime)
+				etag, err := node.CalculateEtag(n, mtime)
 				if err != nil {
 					return nil, errors.Wrapf(err, "error calculating etag")
 				}
@@ -207,83 +208,98 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 		return err
 	}
 
+	// write lock node before copying metadata
+	f, err := lockedfile.OpenFile(fs.lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
 	// move current version to new revision
 	nodePath := fs.lu.InternalPath(spaceID, kp[0])
-	var fi os.FileInfo
-	if fi, err = os.Stat(nodePath); err == nil {
-		// revisions are stored alongside the actual file, so a rename can be efficient and does not cross storage / partition boundaries
-		newRevisionPath := fs.lu.InternalPath(spaceID, kp[0]+node.RevisionIDDelimiter+fi.ModTime().UTC().Format(time.RFC3339Nano))
-
-		// touch new revision
-		if _, err := os.Create(newRevisionPath); err != nil {
-			return err
-		}
-		defer func() {
-			if returnErr != nil {
-				if err := os.Remove(newRevisionPath); err != nil {
-					log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
-				}
-				if err := fs.lu.MetadataBackend().Purge(newRevisionPath); err != nil {
-					log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
-				}
-			}
-		}()
-
-		// copy blob metadata from node to new revision node
-		err = fs.lu.CopyMetadata(ctx, nodePath, newRevisionPath, func(attributeName string) bool {
-			return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) || // for checksums
-				attributeName == prefixes.TypeAttr ||
-				attributeName == prefixes.BlobIDAttr ||
-				attributeName == prefixes.BlobsizeAttr
-		})
-		if err != nil {
-			return errtypes.InternalError("failed to copy blob xattrs to version node: " + err.Error())
-		}
-
-		// remember mtime from node as new revision mtime
-		if err = os.Chtimes(newRevisionPath, fi.ModTime(), fi.ModTime()); err != nil {
-			return errtypes.InternalError("failed to change mtime of version node")
-		}
-
-		// update blob id in node
-
-		// copy blob metadata from restored revision to node
-		restoredRevisionPath := fs.lu.InternalPath(spaceID, revisionKey)
-		err = fs.lu.CopyMetadata(ctx, restoredRevisionPath, nodePath, func(attributeName string) bool {
-			return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
-				attributeName == prefixes.TypeAttr ||
-				attributeName == prefixes.BlobIDAttr ||
-				attributeName == prefixes.BlobsizeAttr
-		})
-		if err != nil {
-			return errtypes.InternalError("failed to copy blob xattrs to old revision to node: " + err.Error())
-		}
-
-		revisionSize, err := fs.lu.MetadataBackend().GetInt64(ctx, restoredRevisionPath, prefixes.BlobsizeAttr)
-		if err != nil {
-			return errtypes.InternalError("failed to read blob size xattr from old revision")
-		}
-
-		// drop old revision
-		if err := os.Remove(restoredRevisionPath); err != nil {
-			log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision, continuing")
-		}
-
-		// explicitly update mtime of node as writing xattrs does not change mtime
-		now := time.Now()
-		if err := os.Chtimes(nodePath, now, now); err != nil {
-			return errtypes.InternalError("failed to change mtime of version node")
-		}
-
-		// revision 5, current 10 (restore a smaller blob) -> 5-10 = -5
-		// revision 10, current 5 (restore a bigger blob) -> 10-5 = +5
-		sizeDiff := revisionSize - n.Blobsize
-
-		return fs.tp.Propagate(ctx, n, sizeDiff)
+	mtime, err := n.GetMTime(ctx)
+	if err != nil {
+		log.Error().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("cannot read mtime")
+		return err
 	}
 
-	log.Error().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("original node does not exist")
-	return nil
+	// revisions are stored alongside the actual file, so a rename can be efficient and does not cross storage / partition boundaries
+	newRevisionPath := fs.lu.InternalPath(spaceID, kp[0]+node.RevisionIDDelimiter+mtime.UTC().Format(time.RFC3339Nano))
+
+	// touch new revision
+	if _, err := os.Create(newRevisionPath); err != nil {
+		return err
+	}
+	defer func() {
+		if returnErr != nil {
+			if err := os.Remove(newRevisionPath); err != nil {
+				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
+			}
+			if err := fs.lu.MetadataBackend().Purge(newRevisionPath); err != nil {
+				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
+			}
+		}
+	}()
+
+	// copy blob metadata from node to new revision node
+	err = fs.lu.CopyMetadataWithSourceLock(ctx, nodePath, newRevisionPath, func(attributeName string, value []byte) (newValue []byte, copy bool) {
+		return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) || // for checksums
+			attributeName == prefixes.TypeAttr ||
+			attributeName == prefixes.BlobIDAttr ||
+			attributeName == prefixes.BlobsizeAttr ||
+			attributeName == prefixes.MTimeAttr // FIXME somewhere I mix up the revision time and the mtime, causing the restore to overwrite the other existing revisien
+	}, f, true)
+	if err != nil {
+		return errtypes.InternalError("failed to copy blob xattrs to version node: " + err.Error())
+	}
+
+	// remember mtime from node as new revision mtime
+	if err = os.Chtimes(newRevisionPath, mtime, mtime); err != nil {
+		return errtypes.InternalError("failed to change mtime of version node")
+	}
+
+	// update blob id in node
+
+	// copy blob metadata from restored revision to node
+	restoredRevisionPath := fs.lu.InternalPath(spaceID, revisionKey)
+	err = fs.lu.CopyMetadata(ctx, restoredRevisionPath, nodePath, func(attributeName string, value []byte) (newValue []byte, copy bool) {
+		if attributeName == prefixes.MTimeAttr {
+			// update mtime
+			return []byte(time.Now().UTC().Format(time.RFC3339Nano)), true
+		}
+		return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
+			attributeName == prefixes.TypeAttr ||
+			attributeName == prefixes.BlobIDAttr ||
+			attributeName == prefixes.BlobsizeAttr
+	}, false)
+	if err != nil {
+		return errtypes.InternalError("failed to copy blob xattrs to old revision to node: " + err.Error())
+	}
+
+	revisionSize, err := fs.lu.MetadataBackend().GetInt64(ctx, restoredRevisionPath, prefixes.BlobsizeAttr)
+	if err != nil {
+		return errtypes.InternalError("failed to read blob size xattr from old revision")
+	}
+
+	// drop old revision
+	if err := os.Remove(restoredRevisionPath); err != nil {
+		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision, continuing")
+	}
+	if err := os.Remove(fs.lu.MetadataBackend().MetadataPath(restoredRevisionPath)); err != nil {
+		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision metadata, continuing")
+	}
+	if err := os.Remove(fs.lu.MetadataBackend().LockfilePath(restoredRevisionPath)); err != nil {
+		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision metadata lockfile, continuing")
+	}
+	if err := fs.lu.MetadataBackend().Purge(restoredRevisionPath); err != nil {
+		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not purge old revision from cache, continuing")
+	}
+
+	// revision 5, current 10 (restore a smaller blob) -> 5-10 = -5
+	// revision 10, current 5 (restore a bigger blob) -> 10-5 = +5
+	sizeDiff := revisionSize - n.Blobsize
+
+	return fs.tp.Propagate(ctx, n, sizeDiff)
 }
 
 // DeleteRevision deletes the specified revision of the resource

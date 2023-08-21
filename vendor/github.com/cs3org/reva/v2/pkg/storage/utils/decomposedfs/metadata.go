@@ -74,7 +74,7 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 	if md.Metadata != nil {
 		if val, ok := md.Metadata["mtime"]; ok {
 			delete(md.Metadata, "mtime")
-			if err := n.SetMtimeString(val); err != nil {
+			if err := n.SetMtimeString(ctx, val); err != nil {
 				errs = append(errs, errors.Wrap(err, "could not set mtime"))
 			}
 		}
@@ -184,7 +184,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 				continue
 			}
 			fa := fmt.Sprintf("%s:%s:%s@%s", prefixes.FavPrefix, utils.UserTypeToString(uid.GetType()), uid.GetOpaqueId(), uid.GetIdp())
-			if err := n.RemoveXattr(ctx, fa); err != nil {
+			if err := n.RemoveXattr(ctx, fa, true); err != nil {
 				if metadata.IsAttrUnset(err) {
 					continue // already gone, ignore
 				}
@@ -195,7 +195,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 				errs = append(errs, errors.Wrap(err, "could not unset favorite flag"))
 			}
 		default:
-			if err = n.RemoveXattr(ctx, prefixes.MetadataPrefix+k); err != nil {
+			if err = n.RemoveXattr(ctx, prefixes.MetadataPrefix+k, true); err != nil {
 				if metadata.IsAttrUnset(err) {
 					continue // already gone, ignore
 				}
