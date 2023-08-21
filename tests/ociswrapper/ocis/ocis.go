@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"syscall"
 	"time"
 
 	"ociswrapper/common"
@@ -58,23 +59,38 @@ func Start(envMap map[string]any) {
 	for outputScanner.Scan() {
 		m := outputScanner.Text()
 		fmt.Println(m)
-		retryCount++
+	}
 
-		maxRetry, _ := strconv.Atoi(config.Get("retry"))
-		if retryCount <= maxRetry {
-			log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
-			// Stop and start again
-			Stop()
-			Start(envMap)
+	if err := cmd.Wait(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			status := exitErr.Sys().(syscall.WaitStatus)
+			// retry only if oCIS server exited with code > 0
+			// -1 exit code means that the process was killed by a signal (cmd.Process.Kill())
+			if status.ExitStatus() > 0 {
+				log.Println(fmt.Sprintf("oCIS server exited with code %v", status.ExitStatus()))
+
+				// retry to start oCIS server
+				retryCount++
+				retryCount++
+
+				retryCount++
+
+				maxRetry, _ := strconv.Atoi(config.Get("retry"))
+				if retryCount <= maxRetry {
+					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+					// Stop and start again
+					Stop()
+					Start(envMap)
+				}
+			}
 		}
 	}
-	cmd.Wait()
 }
 
 func Stop() {
 	err := cmd.Process.Kill()
 	if err != nil {
-		log.Panic(err)
+		log.Fatalln(err)
 	}
 	cmd.Wait()
 }
