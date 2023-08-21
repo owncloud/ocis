@@ -831,6 +831,9 @@ trait Provisioning {
 				"User '" . $user["userid"] . "' should exist but does not exist"
 			);
 		}
+		foreach ($users as $user) {
+			$this->initializeUser($user['userid'], $user['password']);
+		}
 	}
 
 	/**
@@ -2646,6 +2649,8 @@ trait Provisioning {
 			$this->userExists($user),
 			"User '$user' should exist but does not exist"
 		);
+
+		$this->initializeUser($user, $password);
 	}
 
 	/**
