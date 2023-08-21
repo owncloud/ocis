@@ -6,10 +6,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
-#### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
-
-- [coreApiWebdavProperties1/copyFile.feature:271](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L271)
-- [coreApiWebdavProperties1/copyFile.feature:272](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L272)
+#### [copy personal space file to shared folder root result share in decline state](https://github.com/owncloud/ocis/issues/6999)
 - [coreApiWebdavProperties1/copyFile.feature:289](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L289)
 - [coreApiWebdavProperties1/copyFile.feature:290](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L290)
 
@@ -522,6 +519,8 @@ And other missing implementation of favorites
 - [coreApiWebdavProperties1/copyFile.feature:433](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L433)
 - [coreApiWebdavProperties1/copyFile.feature:434](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L434)
 - [coreApiWebdavProperties1/copyFile.feature:439](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L439)
+- [coreApiWebdavProperties1/copyFile.feature:271](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L271)
+- [coreApiWebdavProperties1/copyFile.feature:272](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L272)
 
 ### Won't fix
 
