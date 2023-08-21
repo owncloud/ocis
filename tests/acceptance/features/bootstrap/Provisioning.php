@@ -726,6 +726,7 @@ trait Provisioning {
 	 *
 	 * @param TableNode $table
 	 * @param bool $useDefault
+	 * @param bool $initialize
 	 *
 	 * @return void
 	 * @throws Exception
@@ -733,7 +734,8 @@ trait Provisioning {
 	 */
 	public function usersHaveBeenCreated(
 		TableNode $table,
-		bool $useDefault=true
+		bool $useDefault=true,
+		bool $initialize=true
 	) {
 		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
 		$table = $table->getColumnsHash();
@@ -831,8 +833,11 @@ trait Provisioning {
 				"User '" . $user["userid"] . "' should exist but does not exist"
 			);
 		}
-		foreach ($users as $user) {
-			$this->initializeUser($user['userid'], $user['password']);
+
+		if ($initialize) {
+			foreach ($users as $user) {
+				$this->initializeUser($user['userid'], $user['password']);
+			}
 		}
 	}
 
