@@ -2390,8 +2390,6 @@ trait WebDav {
 			false,
 			'new'
 		);
-
-		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
