@@ -166,7 +166,7 @@ services:
     networks:
       ocis-net:
     entrypoint:
-      - /bin/sh
+      - /bin/bash
       - /entrypoint-override.sh
     environment:
       WOPISERVER_INSECURE: "${INSECURE:-false}"
