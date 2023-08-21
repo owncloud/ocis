@@ -94,40 +94,40 @@ func Server(cfg *config.Config) *cli.Command {
 				version.GetString(),
 				nil,
 			)
+			updateRegistryNode(grpcSvc.Nodes[0],
+				"cs3", //TODO: make configurable
+				cfg.Drivers.WOPI.AppAddress,
+				cfg.Drivers.WOPI.AppName,
+				cfg.Drivers.WOPI.AppDescription,
+				cfg.Drivers.WOPI.AppIconURI,
+				cfg.Drivers.WOPI.AppPriority,
+				cfg.Drivers.WOPI.AppCapabilities,
+				cfg.Drivers.WOPI.AppDesktopOnly,
+				cfg.Drivers.WOPI.AppSupportedMimeTypes,
+			)
+
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
-			t := time.NewTicker(time.Second * 20)
-
-			go func() {
-				for {
-					select {
-					case <-t.C:
-						logger.Debug().Msg("ocis app provider (re-)registering")
-						err := registerWithMicroReg("cs3", //TODO: make configurable
-							cfg.Drivers.WOPI.AppAddress,
-							cfg.Drivers.WOPI.AppName,
-							cfg.Drivers.WOPI.AppDescription,
-							cfg.Drivers.WOPI.AppIconURI,
-							cfg.Drivers.WOPI.AppPriority,
-							cfg.Drivers.WOPI.AppCapabilities,
-							cfg.Drivers.WOPI.AppDesktopOnly,
-							cfg.Drivers.WOPI.AppSupportedMimeTypes,
-						)
-						if err != nil {
-							logger.Error().Err(err).Msg("could not register ocis app provider")
-							continue
-						}
-					case <-ctx.Done():
-						logger.Debug().Msg("ocis app provider stopped")
-						t.Stop()
-					}
-				}
-			}()
-
 			return gr.Run()
 		},
+	}
+}
+
+func updateRegistryNode(node *mreg.Node, ns, address, name, desc, icon, prio string, cap int32, desktopOnly bool, mimeTypes []string) {
+	// TODO: the string "app-provider" needs to be supplied through cfg.Service.Name
+	//node.Address = address
+	//node.Id = ns + "api.app-provider"
+	node.Metadata[ns+".app-provider.mime_type"] = joinMimeTypes(mimeTypes)
+	node.Metadata[ns+".app-provider.name"] = name
+	node.Metadata[ns+".app-provider.description"] = desc
+	node.Metadata[ns+".app-provider.icon"] = icon
+
+	node.Metadata[ns+".app-provider.allow_creation"] = registrypb.ProviderInfo_Capability_name[cap]
+	node.Metadata[ns+".app-provider.priority"] = prio
+	if desktopOnly {
+		node.Metadata[ns+".app-provider.desktop_only"] = "true"
 	}
 }
 

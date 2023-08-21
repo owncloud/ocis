@@ -21,7 +21,7 @@ func RegisterService(ctx context.Context, service *mRegistry.Service, logger log
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", service.Name)
 	}
 
-	t := time.NewTicker(time.Second * 30)
+	t := time.NewTicker(time.Second * 20)
 
 	go func() {
 		for {
