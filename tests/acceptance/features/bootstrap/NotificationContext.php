@@ -114,6 +114,7 @@ class NotificationContext implements Context {
 			$headers
 		);
 		$this->featureContext->setResponse($response);
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -516,8 +517,6 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates a deprovisioning notification
-	 * @When user :user tries to create a deprovisioning notification
 	 *
 	 * @param string|null $user
 	 * @param string|null $deprovision_date
@@ -533,10 +532,10 @@ class NotificationContext implements Context {
 		?string $user = null,
 		?string $deprovision_date = "2043-07-04T11:23:12Z",
 		?string $deprovision_date_format= "2006-01-02T15:04:05Z07:00"
-	):void {
+	):ResponseInterface {
 		$payload["type"] = "deprovision";
 		$payload["data"] = ["deprovision_date" => $deprovision_date, "deprovision_date_format" => $deprovision_date_format];
-		$response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername(),
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
@@ -546,7 +545,23 @@ class NotificationContext implements Context {
 			json_encode($payload),
 			2
 		);
+	}
+
+	/**
+	 * @When the administrator creates a deprovisioning notification
+	 * @When user :user tries to create a deprovisioning notification
+	 *
+	 * @param string|null $user
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function theAdministratorCreatesADeprovisioningNotification(?string $user = null) {
+		$response = $this->userCreatesDeprovisioningNotification($user);
 		$this->featureContext->setResponse($response);
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -561,7 +576,9 @@ class NotificationContext implements Context {
 	 * @throws JsonException
 	 */
 	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat($deprovision_date, $deprovision_date_format) {
-		$this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
+		$response = $this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
