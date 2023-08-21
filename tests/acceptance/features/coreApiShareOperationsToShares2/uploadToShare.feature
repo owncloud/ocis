@@ -57,11 +57,11 @@ Feature: sharing
     And the following headers should match these regular expressions for user "Brian"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-      """
-      This is a testfile.
+    """
+    This is a testfile.
 
-      Cheers.
-      """
+    Cheers.
+    """
     Examples:
       | dav-path-version |
       | old              |
@@ -85,11 +85,11 @@ Feature: sharing
     And the following headers should match these regular expressions for user "Brian"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-      """
-      This is a testfile.
+    """
+    This is a testfile.
 
-      Cheers.
-      """
+    Cheers.
+    """
     Examples:
       | dav-path-version |
       | old              |
@@ -109,11 +109,11 @@ Feature: sharing
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-      """
-      This is a testfile.
+    """
+    This is a testfile.
 
-      Cheers.
-      """
+    Cheers.
+    """
     Examples:
       | dav-path-version |
       | old              |
@@ -135,11 +135,11 @@ Feature: sharing
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-      """
-      This is a testfile.
+    """
+    This is a testfile.
 
-      Cheers.
-      """
+    Cheers.
+    """
     Examples:
       | dav-path-version |
       | old              |
@@ -158,11 +158,11 @@ Feature: sharing
     And the following headers should match these regular expressions for user "Brian"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
     And the content of file "/myfile.txt" for user "Alice" should be:
-      """
-      This is a testfile.
+    """
+    This is a testfile.
 
-      Cheers.
-      """
+    Cheers.
+    """
     Examples:
       | dav-path-version |
       | old              |
@@ -171,7 +171,7 @@ Feature: sharing
   @skipOnGraph
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes and small skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |

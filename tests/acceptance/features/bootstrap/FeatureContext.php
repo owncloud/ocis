@@ -1341,7 +1341,6 @@ class FeatureContext extends BehatVariablesContext {
 		$schemaString = $this->substituteInLineCodes($schemaString);
 		$schema = \json_decode($schemaString);
 		Assert::assertNotNull($schema, 'schema is not valid JSON');
-
 		return $schema;
 	}
 
