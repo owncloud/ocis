@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-20-00-20-12]
+[#deprecation-note-2023-08-21-00-20-26]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -438,7 +438,7 @@ Whether to assign newly created users the default role 'User'. Set this to 'fals
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -559,7 +559,7 @@ The user identity backend to use. Supported backend types are 'ldap' and 'cs3'.
 a|`OCIS_LDAP_URI` +
 `LDAP_URI` +
 `GRAPH_LDAP_URI` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -570,7 +570,7 @@ URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and '
 a|`OCIS_LDAP_CACERT` +
 `LDAP_CACERT` +
 `GRAPH_LDAP_CACERT` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -581,7 +581,7 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`OCIS_LDAP_INSECURE` +
 `LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -592,7 +592,7 @@ Disable TLS certificate validation for the LDAP connections. Do not set this in 
 a|`OCIS_LDAP_BIND_DN` +
 `LDAP_BIND_DN` +
 `GRAPH_LDAP_BIND_DN` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -650,7 +650,7 @@ Signals that the server has the refint plugin enabled, which makes some actions 
 a|`OCIS_LDAP_USER_BASE_DN` +
 `LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -661,7 +661,7 @@ Search base DN for looking up LDAP users.
 a|`OCIS_LDAP_USER_SCOPE` +
 `LDAP_USER_SCOPE` +
 `GRAPH_LDAP_USER_SCOPE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -672,7 +672,7 @@ LDAP search scope to use when looking up users. Supported scopes are 'base', 'on
 a|`OCIS_LDAP_USER_FILTER` +
 `LDAP_USER_FILTER` +
 `GRAPH_LDAP_USER_FILTER` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -683,7 +683,7 @@ LDAP filter to add to the default filters for user search like '(objectclass=own
 a|`OCIS_LDAP_USER_OBJECTCLASS` +
 `LDAP_USER_OBJECTCLASS` +
 `GRAPH_LDAP_USER_OBJECTCLASS` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -694,7 +694,7 @@ The object class to use for users in the default user search filter ('inetOrgPer
 a|`OCIS_LDAP_USER_SCHEMA_MAIL` +
 `LDAP_USER_SCHEMA_MAIL` +
 `GRAPH_LDAP_USER_EMAIL_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -715,7 +715,7 @@ LDAP Attribute to use for the displayname of users.
 a|`OCIS_LDAP_USER_SCHEMA_USERNAME` +
 `LDAP_USER_SCHEMA_USERNAME` +
 `GRAPH_LDAP_USER_NAME_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -726,7 +726,7 @@ LDAP Attribute to use for username of users.
 a|`OCIS_LDAP_USER_SCHEMA_ID` +
 `LDAP_USER_SCHEMA_ID` +
 `GRAPH_LDAP_USER_UID_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -747,7 +747,7 @@ Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING'
 a|`OCIS_LDAP_USER_SCHEMA_USER_TYPE` +
 `LDAP_USER_SCHEMA_USER_TYPE` +
 `GRAPH_LDAP_USER_TYPE_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -758,7 +758,7 @@ LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ow
 a|`OCIS_LDAP_USER_ENABLED_ATTRIBUTE` +
 `LDAP_USER_ENABLED_ATTRIBUTE` +
 `GRAPH_USER_ENABLED_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -769,7 +769,7 @@ LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 a|`OCIS_LDAP_DISABLE_USER_MECHANISM` +
 `LDAP_DISABLE_USER_MECHANISM` +
 `GRAPH_DISABLE_USER_MECHANISM` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -780,7 +780,7 @@ An option to control the behavior for disabling users. Supported options are 'no
 a|`OCIS_LDAP_DISABLED_USERS_GROUP_DN` +
 `LDAP_DISABLED_USERS_GROUP_DN` +
 `GRAPH_DISABLED_USERS_GROUP_DN` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -791,7 +791,7 @@ The distinguished name of the group to which added users will be classified as d
 a|`OCIS_LDAP_GROUP_BASE_DN` +
 `LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -811,7 +811,7 @@ Parent DN under which new groups are created. This DN needs to be subordinate to
 a|`OCIS_LDAP_GROUP_SCOPE` +
 `LDAP_GROUP_SCOPE` +
 `GRAPH_LDAP_GROUP_SEARCH_SCOPE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -822,7 +822,7 @@ LDAP search scope to use when looking up groups. Supported scopes are 'base', 'o
 a|`OCIS_LDAP_GROUP_FILTER` +
 `LDAP_GROUP_FILTER` +
 `GRAPH_LDAP_GROUP_FILTER` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -833,7 +833,7 @@ LDAP filter to add to the default filters for group searches.
 a|`OCIS_LDAP_GROUP_OBJECTCLASS` +
 `LDAP_GROUP_OBJECTCLASS` +
 `GRAPH_LDAP_GROUP_OBJECTCLASS` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -844,7 +844,7 @@ The object class to use for groups in the default group search filter ('groupOfN
 a|`OCIS_LDAP_GROUP_SCHEMA_GROUPNAME` +
 `LDAP_GROUP_SCHEMA_GROUPNAME` +
 `GRAPH_LDAP_GROUP_NAME_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -855,7 +855,7 @@ LDAP Attribute to use for the name of groups.
 a|`OCIS_LDAP_GROUP_SCHEMA_MEMBER` +
 `LDAP_GROUP_SCHEMA_MEMBER` +
 `GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -866,7 +866,7 @@ LDAP Attribute that is used for group members.
 a|`OCIS_LDAP_GROUP_SCHEMA_ID` +
 `LDAP_GROUP_SCHEMA_ID` +
 `GRAPH_LDAP_GROUP_ID_ATTRIBUTE` +
-xref:deprecation-note-2023-08-20-00-20-12[Deprecation Note]
+xref:deprecation-note-2023-08-21-00-20-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
