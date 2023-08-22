@@ -315,7 +315,8 @@ class SettingsContext implements Context {
 			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
 		);
 
-		$this->featureContext->theHTTPStatusCodeShouldBe(
+		Assert::assertEquals(
+			$this->featureContext->getResponse()->getStatusCode(),
 			201,
 			"Expected response status code should be 201"
 		);
