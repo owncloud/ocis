@@ -60,7 +60,7 @@ Feature: Upload files into a space
     When user "Alice" creates a folder "NewFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "201"
     And user "Alice" uploads a file inside space "Project Ceres" with content "Test" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
+    And the HTTP status code should be "201"
     And for user "Alice" the space "Project Ceres" should contain these entries:
       | NewFolder |
       | test.txt  |
