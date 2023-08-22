@@ -73,7 +73,8 @@ type IdmService struct {
 }
 
 type FrontendService struct {
-	Archiver InsecureService
+	Archiver       InsecureService
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
 type AuthbasicService struct {
@@ -377,6 +378,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		Notifications: Notifications{
 			ServiceAccount: serviceAccount,
 		},
+		Frontend: FrontendService{
+			ServiceAccount: serviceAccount,
+		},
 	}
 
 	if insecure {
@@ -384,7 +388,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
-		cfg.Frontend = FrontendService{Archiver: _insecureService}
+		cfg.Frontend.Archiver = _insecureService
 		cfg.Graph.Spaces = _insecureService
 		cfg.Graph.Events = _insecureEvents
 		cfg.Notifications.Notifications.Events = _insecureEvents

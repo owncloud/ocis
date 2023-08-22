@@ -40,6 +40,13 @@ const (
 	// DisableEmailNotificationsPermissionDisplayName is the hardcoded setting name for the disable email notifications permission
 	DisableEmailNotificationsPermissionDisplayName string = "Disable Email Notifications"
 
+	// AutoAcceptSharesPermissionID is the hardcoded setting UUID for the disable email notifications permission
+	AutoAcceptSharesPermissionID string = "4e41363c-a058-40a5-aec8-958897511209"
+	// AutoAcceptSharesPermissionName is the hardcoded setting name for the disable email notifications permission
+	AutoAcceptSharesPermissionName string = "AutoAcceptShares.ReadWriteDisabled"
+	// AutoAcceptSharesPermissionDisplayName is the hardcoded setting name for the disable email notifications permission
+	AutoAcceptSharesPermissionDisplayName string = "enable/disable auto accept shares"
+
 	// SetPersonalSpaceQuotaPermissionID is the hardcoded setting UUID for the set personal space quota permission
 	SetPersonalSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
 	// SetPersonalSpaceQuotaPermissionName is the hardcoded setting name for the set personal space quota permission
@@ -84,6 +91,8 @@ const (
 	SettingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 	// SettingUUIDProfileDisableNotifications is the hardcoded setting UUID for the disable notifications setting
 	SettingUUIDProfileDisableNotifications = "33ffb5d6-cd07-4dc0-afb0-84f7559ae438"
+	// SettingUUIDProfileAutoAcceptShares is the hardcoded setting UUID for the disable notifications setting
+	SettingUUIDProfileAutoAcceptShares = "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
 	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
@@ -185,6 +194,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   SettingUUIDProfileDisableNotifications,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
+				Id:          AutoAcceptSharesPermissionID,
+				Name:        AutoAcceptSharesPermissionName,
+				DisplayName: AutoAcceptSharesPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileAutoAcceptShares,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -511,6 +535,21 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
+				Id:          AutoAcceptSharesPermissionID,
+				Name:        AutoAcceptSharesPermissionName,
+				DisplayName: AutoAcceptSharesPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileAutoAcceptShares,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
 				Id:          SelfManagementPermissionID,
 				Name:        SelfManagementPermissionName,
 				DisplayName: "Self Management",
@@ -593,6 +632,21 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   SettingUUIDProfileDisableNotifications,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
+				Id:          AutoAcceptSharesPermissionID,
+				Name:        AutoAcceptSharesPermissionName,
+				DisplayName: AutoAcceptSharesPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileAutoAcceptShares,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -692,6 +746,21 @@ func generateBundleUserLightRole() *settingsmsg.Bundle {
 					},
 				},
 			},
+			{
+				Id:          AutoAcceptSharesPermissionID,
+				Name:        AutoAcceptSharesPermissionName,
+				DisplayName: AutoAcceptSharesPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileAutoAcceptShares,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
 		},
 	}
 }
@@ -726,6 +795,16 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
 				Value: &settingsmsg.Setting_BoolValue{BoolValue: &settingsmsg.Bool{Default: false, Label: "disable notifications"}},
+			},
+			{
+				Id:          SettingUUIDProfileAutoAcceptShares,
+				Name:        "auto-accept-shares",
+				DisplayName: "Auto accept shares",
+				Description: "Automatically accept shares",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_BoolValue{BoolValue: &settingsmsg.Bool{Default: true, Label: "auto accept shares"}},
 			},
 		},
 	}
