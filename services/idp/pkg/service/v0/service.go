@@ -189,18 +189,18 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 	}
 
 	defaults := map[string]string{
-		"OCIS_LDAP_URI":                 ldap.URI,
-		"OCIS_LDAP_BIND_DN":             ldap.BindDN,
-		"OCIS_LDAP_BIND_PASSWORD":       ldap.BindPassword,
-		"OCIS_LDAP_BASEDN":              ldap.BaseDN,
-		"OCIS_LDAP_SCOPE":               ldap.Scope,
-		"OCIS_LDAP_LOGIN_ATTRIBUTE":     ldap.LoginAttribute,
-		"OCIS_LDAP_EMAIL_ATTRIBUTE":     ldap.EmailAttribute,
-		"OCIS_LDAP_NAME_ATTRIBUTE":      ldap.NameAttribute,
-		"OCIS_LDAP_UUID_ATTRIBUTE":      ldap.UUIDAttribute,
-		"OCIS_LDAP_SUB_ATTRIBUTES":      ldap.UUIDAttribute,
-		"OCIS_LDAP_UUID_ATTRIBUTE_TYPE": ldap.UUIDAttributeType,
-		"OCIS_LDAP_FILTER":              filter,
+		"LDAP_URI":                 ldap.URI,
+		"LDAP_BINDDN":              ldap.BindDN,
+		"LDAP_BINDPW":              ldap.BindPassword,
+		"LDAP_BASEDN":              ldap.BaseDN,
+		"LDAP_SCOPE":               ldap.Scope,
+		"LDAP_LOGIN_ATTRIBUTE":     ldap.LoginAttribute,
+		"LDAP_EMAIL_ATTRIBUTE":     ldap.EmailAttribute,
+		"LDAP_NAME_ATTRIBUTE":      ldap.NameAttribute,
+		"LDAP_UUID_ATTRIBUTE":      ldap.UUIDAttribute,
+		"LDAP_SUB_ATTRIBUTES":      ldap.UUIDAttribute,
+		"LDAP_UUID_ATTRIBUTE_TYPE": ldap.UUIDAttributeType,
+		"LDAP_FILTER":              filter,
 	}
 
 	if ldap.TLSCACert != "" {
