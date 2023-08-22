@@ -12,6 +12,11 @@ debug:
   token: ""
   pprof: false
   zpages: false
+tracing:
+  enabled: false
+  type: ""
+  endpoint: ""
+  collector: ""
 infected-file-handling: delete
 events:
   endpoint: 127.0.0.1:9233

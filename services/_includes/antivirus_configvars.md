@@ -10,6 +10,10 @@
 | ANTIVIRUS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | ANTIVIRUS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | ANTIVIRUS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
+| OCIS_TRACING_ENABLED<br/>ANTIVIRUS_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>ANTIVIRUS_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
+| OCIS_TRACING_ENDPOINT<br/>ANTIVIRUS_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>ANTIVIRUS_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
 | ANTIVIRUS_INFECTED_FILE_HANDLING | string | delete | Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination.|
 | OCIS_EVENTS_ENDPOINT<br/>ANTIVIRUS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>ANTIVIRUS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
