@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/CiscoM31/godata v1.0.8
-	github.com/KimMachineGun/automemlimit v0.2.4
+	github.com/KimMachineGun/automemlimit v0.2.6
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
 	github.com/Nerzal/gocloak/v13 v13.1.0
@@ -151,9 +151,9 @@ require (
 	github.com/ceph/go-ceph v0.18.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
-	github.com/cilium/ebpf v0.7.0 // indirect
+	github.com/cilium/ebpf v0.9.1 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
-	github.com/containerd/cgroups v1.0.4 // indirect
+	github.com/containerd/cgroups/v3 v3.0.1 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
