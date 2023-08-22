@@ -42,15 +42,4 @@
 | OCIS_CACHE_TTL<br/>GATEWAY_CREATE_HOME_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).|
 | OCIS_CACHE_SIZE<br/>GATEWAY_CREATE_HOME_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_URL<br/>GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
-| GATEWAY_USERS_ENDPOINT | string | com.owncloud.api.users | The USERS API endpoint.|
-| GATEWAY_GROUPS_ENDPOINT | string | com.owncloud.api.groups | The GROUPS API endpoint.|
-| GATEWAY_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | The SETTINGS API endpoint.|
-| GATEWAY_SHARING_ENDPOINT | string | com.owncloud.api.sharing | The SHARE API endpoint.|
-| GATEWAY_AUTH_BASIC_ENDPOINT | string | com.owncloud.api.auth-basic | The AUTH BASIC API endpoint.|
-| GATEWAY_AUTH_BEARER_ENDPOINT | string |  | The AUTH BEARER API endpoint.|
-| GATEWAY_AUTH_MACHINE_ENDPOINT | string | com.owncloud.api.auth-machine | The AUTH MACHINE API endpoint.|
-| GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT | string | com.owncloud.api.storage-publiclink | The STORAGE PUBLICLINK API endpoint.|
-| GATEWAY_STORAGE_USERS_ENDPOINT | string | com.owncloud.api.storage-users | The STORAGE USERS API endpoint.|
-| GATEWAY_STORAGE_SHARES_ENDPOINT | string | com.owncloud.api.storage-shares | The STORAGE SHARES API endpoint.|
-| GATEWAY_APP_REGISTRY_ENDPOINT | string | com.owncloud.api.app-registry | The APP REGISTRY API endpoint.|
 | GATEWAY_STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|

@@ -50,17 +50,6 @@ cache:
   create_home_cache_ttl: 5m0s
   create_home_cache_size: 0
 frontend_public_url: https://localhost:9200
-users_endpoint: com.owncloud.api.users
-groups_endpoint: com.owncloud.api.groups
-permissions_endpoint: com.owncloud.api.settings
-sharing_endpoint: com.owncloud.api.sharing
-auth_basic_endpoint: com.owncloud.api.auth-basic
-auth_bearer_endpoint: ""
-auth_machine_endpoint: com.owncloud.api.auth-machine
-storage_public_link_endpoint: com.owncloud.api.storage-publiclink
-storage_users_endpoint: com.owncloud.api.storage-users
-storage_shares_endpoint: com.owncloud.api.storage-shares
-app_registry_endpoint: com.owncloud.api.app-registry
 storage_registry:
   driver: spaces
   rules: []
