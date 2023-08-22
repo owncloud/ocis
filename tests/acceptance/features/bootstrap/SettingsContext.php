@@ -58,7 +58,7 @@ class SettingsContext implements Context {
 	public function getAllExistingRoles(string $user): void {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "roles-list";
 		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), "{}")
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), "{}", $this->featureContext->getStepLineRef())
 		);
 	}
 
@@ -77,7 +77,7 @@ class SettingsContext implements Context {
 		$body = json_encode(["account_uuid" => $userId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
 		);
 	}
 
@@ -93,7 +93,7 @@ class SettingsContext implements Context {
 	public function sendRequestAssignmentsList(string $user, string $userId): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-list";
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
-		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body);
+		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef());
 	}
 
 	/**
@@ -271,7 +271,7 @@ class SettingsContext implements Context {
 	public function sendRequestGetBundlesList(string $user): void {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "bundles-list";
 		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), '{}')
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), '{}', $this->featureContext->getStepLineRef())
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -312,7 +312,7 @@ class SettingsContext implements Context {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-list";
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
 		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
 		);
 
 		Assert::assertEquals(
@@ -392,7 +392,7 @@ class SettingsContext implements Context {
 		);
 
 		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
 		);
 	}
 

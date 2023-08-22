@@ -19,7 +19,7 @@ Feature: Copy test
     When user "Alice" copies file "testfile.txt" from space "new-space" to "/new/testfile.txt" inside space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions
-      | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/ |
-      | Access-Control-Allow-Origin | /^[*]{1}$/             |
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/                       |
+      | Access-Control-Allow-Origin | /^[*]{1}$/                                   |
+      | X-Request-Id                | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
 

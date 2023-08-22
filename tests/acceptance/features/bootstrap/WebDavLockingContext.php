@@ -642,6 +642,7 @@ class WebDavLockingContext implements Context {
 			$password,
 			'GET',
 			"/apps/testing/api/v1/app/core/lock-breaker-groups",
+			$this->featureContext->getStepLineRef(),
 			(string) $ocsApiVersion
 		);
 

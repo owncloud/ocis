@@ -992,6 +992,7 @@ class GraphHelper {
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  string $spaceId
+	 * @param string $xRequestId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1000,13 +1001,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $spaceId
+		string $spaceId,
+		string $xRequestId
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
 		$header = ["restore" => true];
 		$body = '{}';
 
-		return HttpRequestHelper::sendRequest($url, '', 'PATCH', $user, $password, $header, $body);
+		return HttpRequestHelper::sendRequest($url, $xRequestId, 'PATCH', $user, $password, $header, $body);
 	}
 
 	/**
