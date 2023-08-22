@@ -102,7 +102,7 @@ Feature: upload to a public link share
     Then the HTTP status code should be "507"
 
   @smokeTest
-  Scenario:uploading to a public upload-write and no edit and no overwrite share with public API
+  Scenario: uploading to a public upload-write and no edit and no overwrite share with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER          |
       | permissions | uploadwriteonly |
