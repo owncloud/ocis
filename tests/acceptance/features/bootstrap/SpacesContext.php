@@ -272,7 +272,7 @@ class SpacesContext implements Context {
 
 		return HttpRequestHelper::get(
 			$fullUrl,
-			"",
+			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			[],
@@ -341,7 +341,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			"",
 			['oc:privatelink'],
-			"",
+			$this->featureContext->getStepLineRef(),
 			"0",
 			"files",
 			WebDavHelper::DAV_VERSION_SPACES
@@ -437,14 +437,16 @@ class SpacesContext implements Context {
 					$this->featureContext->getBaseUrl(),
 					$userAdmin,
 					$this->featureContext->getPasswordForUser($userAdmin),
-					$value["id"]
+					$value["id"],
+					$this->featureContext->getStepLineRef()
 				);
 			}
 			GraphHelper::deleteSpace(
 				$this->featureContext->getBaseUrl(),
 				$userAdmin,
 				$this->featureContext->getPasswordForUser($userAdmin),
-				$value["id"]
+				$value["id"],
+				$this->featureContext->getStepLineRef()
 			);
 		}
 	}
@@ -517,7 +519,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				"?" . $query
+				"?" . $query,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -544,7 +547,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				"?" . $query
+				"?" . $query,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -571,7 +575,9 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$space["id"]
+				$space["id"],
+				'',
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -603,7 +609,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body
+				$body,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 		$this->setSpaceCreator($spaceName, $user);
@@ -659,7 +666,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$foldersPath,
 				[],
-				'',
+				$this->featureContext->getStepLineRef(),
 				'infinity',
 				'files',
 				WebDavHelper::DAV_VERSION_SPACES
@@ -686,7 +693,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$url,
-				"",
+				$this->featureContext->getStepLineRef(),
 				"PATCH",
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
@@ -1251,7 +1258,8 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$spaceId
+			$spaceId,
+			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -1408,7 +1416,8 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
-				$spaceId
+				$spaceId,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -1505,7 +1514,8 @@ class SpacesContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body
+			$body,
+			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -1641,7 +1651,6 @@ class SpacesContext implements Context {
 	):void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
-		$headers['X-Request-Id'] = WebDavHelper::generateUUIDv4();
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
@@ -1853,7 +1862,8 @@ class SpacesContext implements Context {
 			$fullUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body
+			$body,
+			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -1911,7 +1921,8 @@ class SpacesContext implements Context {
 				$fullUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body
+				$body,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 		$response = $this->featureContext->getResponseXml(null, __METHOD__);
@@ -1972,7 +1983,7 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
 		return  HttpRequestHelper::sendRequest(
 			$fullUrl,
-			"",
+			$this->featureContext->getStepLineRef(),
 			"PUT",
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -2034,7 +2045,8 @@ class SpacesContext implements Context {
 				$fullUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body
+				$body,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 
@@ -2134,7 +2146,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
 				$fullUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -2161,7 +2173,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
 				$spaceWebDavUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -2210,7 +2222,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$space["id"]
+				$space["id"],
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -2282,7 +2295,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$space["id"]
+				$space["id"],
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -2309,7 +2323,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$space["id"]
+				$space["id"],
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -2351,7 +2366,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest($fullUrl, '', 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
+			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
 	}
 
@@ -2371,7 +2386,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByNameManager($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest($fullUrl, '', 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
+			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
 	}
 
@@ -2480,7 +2495,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				'MOVE',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -2524,7 +2539,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				'DELETE',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -2572,7 +2587,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -2867,7 +2882,8 @@ class SpacesContext implements Context {
 				$fullUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body
+				$body,
+				$this->featureContext->getStepLineRef()
 			)
 		);
 
@@ -3115,7 +3131,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$resource,
 				$properties,
-				"",
+				$this->featureContext->getStepLineRef(),
 				"0",
 				"files",
 				WebDavHelper::DAV_VERSION_SPACES
@@ -3237,7 +3253,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
-				'',
+				$this->featureContext->getStepLineRef(),
 				'',
 				'',
 			)
@@ -3328,7 +3344,7 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$url,
-				'',
+				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			)

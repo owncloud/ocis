@@ -28,7 +28,7 @@ Feature: Report test
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
       | key              | value                |
       | oc:fileid        | UUIDof:SubFolder1    |
@@ -49,7 +49,7 @@ Feature: Report test
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
       | key                | value                                            |
       | oc:fileid          | UUIDof:SubFolder1/subFOLDER2/insideTheFolder.txt |
@@ -69,5 +69,5 @@ Feature: Report test
     When user "Brian" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the search result should contain "0" entries
