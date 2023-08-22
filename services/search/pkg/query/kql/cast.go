@@ -23,12 +23,26 @@ func toNode(in interface{}) (ast.Node, error) {
 }
 
 func toNodes(in interface{}) ([]ast.Node, error) {
-	out, ok := in.([]ast.Node)
-	if !ok {
+
+	switch v := in.(type) {
+	case []interface{}:
+		var nodes []ast.Node
+
+		for _, el := range toIfaceSlice(v) {
+			node, err := toNode(el)
+			if err != nil {
+				return nil, err
+			}
+
+			nodes = append(nodes, node)
+		}
+
+		return nodes, nil
+	case []ast.Node:
+		return v, nil
+	default:
 		return nil, fmt.Errorf("can't convert '%T' to []ast.Node", in)
 	}
-
-	return out, nil
 }
 
 func toString(in interface{}) (string, error) {

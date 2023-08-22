@@ -26,34 +26,25 @@ type Ast struct {
 	Nodes []Node `json:"body"`
 }
 
-type StringProperty struct {
+type StringNode struct {
 	*Base
 	Key   string
 	Value string
 }
 
-type Word struct {
-	*Base
-	Value string
-}
-
-type Phrase struct {
-	*Base
-	Value string
-}
-
-type BooleanOperator struct {
-	*Base
-	Value string
-}
-
-type Group struct {
-	*Base
-	Nodes []Node `json:"body"`
-}
-
-type KeyGroup struct {
+type BooleanNode struct {
 	*Base
 	Key   string
-	Nodes []Node `json:"body"`
+	Value bool
+}
+
+type OperatorNode struct {
+	*Base
+	Value string
+}
+
+type GroupNode struct {
+	*Base
+	Key   string
+	Nodes []Node
 }

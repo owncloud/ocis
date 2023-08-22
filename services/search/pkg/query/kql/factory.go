@@ -1,6 +1,8 @@
 package kql
 
 import (
+	"strings"
+
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
@@ -62,7 +64,7 @@ func nodes(head, tails interface{}) ([]ast.Node, error) {
 	return append(append([]ast.Node{}, node), nodes...), nil
 }
 
-func textPropertyRestriction(k, v interface{}, text []byte, pos position) (*ast.StringProperty, error) {
+func stringNode(k, v interface{}, text []byte, pos position) (*ast.StringNode, error) {
 	b, err := base(text, pos)
 	if err != nil {
 		return nil, err
@@ -78,77 +80,14 @@ func textPropertyRestriction(k, v interface{}, text []byte, pos position) (*ast.
 		return nil, err
 	}
 
-	return &ast.StringProperty{
+	return &ast.StringNode{
 		Base:  b,
 		Key:   key,
 		Value: value,
 	}, nil
 }
 
-func phrase(v interface{}, text []byte, pos position) (*ast.Phrase, error) {
-	b, err := base(text, pos)
-	if err != nil {
-		return nil, err
-	}
-
-	value, err := toString(v)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.Phrase{
-		Base:  b,
-		Value: value,
-	}, nil
-}
-
-func word(v interface{}, text []byte, pos position) (*ast.Word, error) {
-	b, err := base(text, pos)
-	if err != nil {
-		return nil, err
-	}
-
-	value, err := toString(v)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.Word{
-		Base:  b,
-		Value: value,
-	}, nil
-}
-
-func booleanOperator(text []byte, pos position) (*ast.BooleanOperator, error) {
-	b, err := base(text, pos)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.BooleanOperator{
-		Base:  b,
-		Value: string(text),
-	}, nil
-}
-
-func group(n interface{}, text []byte, pos position) (*ast.Group, error) {
-	b, err := base(text, pos)
-	if err != nil {
-		return nil, err
-	}
-
-	nodes, err := toNodes(n)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ast.Group{
-		Base:  b,
-		Nodes: nodes,
-	}, nil
-}
-
-func propertyGroup(k, n interface{}, text []byte, pos position) (*ast.KeyGroup, error) {
+func booleanNode(k, v interface{}, text []byte, pos position) (*ast.BooleanNode, error) {
 	b, err := base(text, pos)
 	if err != nil {
 		return nil, err
@@ -159,18 +98,44 @@ func propertyGroup(k, n interface{}, text []byte, pos position) (*ast.KeyGroup, 
 		return nil, err
 	}
 
-	var nodes []ast.Node
-
-	for _, el := range toIfaceSlice(n) {
-		node, err := toNode(el)
-		if err != nil {
-			return nil, err
-		}
-
-		nodes = append(nodes, node)
+	value, err := toString(v)
+	if err != nil {
+		return nil, err
 	}
 
-	return &ast.KeyGroup{
+	return &ast.BooleanNode{
+		Base:  b,
+		Key:   key,
+		Value: strings.ToLower(value) == "true",
+	}, nil
+}
+
+func operatorNode(text []byte, pos position) (*ast.OperatorNode, error) {
+	b, err := base(text, pos)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.OperatorNode{
+		Base:  b,
+		Value: string(text),
+	}, nil
+}
+
+func groupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode, error) {
+	b, err := base(text, pos)
+	if err != nil {
+		return nil, err
+	}
+
+	key, _ := toString(k)
+
+	nodes, err := toNodes(n)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.GroupNode{
 		Base:  b,
 		Key:   key,
 		Nodes: nodes,

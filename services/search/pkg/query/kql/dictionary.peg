@@ -27,17 +27,11 @@ Element <-
 ////////////////////////////////////////////////////////
 
 Groups <-
-    Group /
-    PropertyGroup
-
-Group <-
     "(" v:Nodes ")" {
-        return group(v, c.text, c.pos)
-    }
-
-PropertyGroup <-
-    k:Char+ (ColonOperator / EqualOperator) "(" v:FreeTextKeywords+ ")" {
-        return propertyGroup(k, v, c.text, c.pos)
+        return groupNode("", v, c.text, c.pos)
+    } /
+    k:Char+ (ColonOperator / EqualOperator) "(" _ v:FreeTextKeywords+ _ ")" {
+        return groupNode(k, v, c.text, c.pos)
     }
 
 ////////////////////////////////////////////////////////
@@ -45,12 +39,19 @@ PropertyGroup <-
 ////////////////////////////////////////////////////////
 
 PropertyRestrictions <-
+    YesNoPropertyRestriction /
     TextPropertyRestriction
+
+YesNoPropertyRestriction <-
+    k:Char+ (ColonOperator / EqualOperator) v:("true" / "false"){
+        return booleanNode(k, v, c.text, c.pos)
+    }
 
 TextPropertyRestriction <-
     k:Char+ (ColonOperator / EqualOperator) v:(String / [^ ()]+){
-        return textPropertyRestriction(k, v, c.text, c.pos)
+        return stringNode(k, v, c.text, c.pos)
     }
+
 
 ////////////////////////////////////////////////////////
 // free text-keywords
@@ -62,12 +63,12 @@ FreeTextKeywords <-
 
 Phrase <-
      ColonOperator? _ v:String _ ColonOperator? {
-        return phrase(v, c.text, c.pos)
+        return stringNode("", v, c.text, c.pos)
     }
 
 Word <-
      ColonOperator? _ v:[^ :()]+ _ ColonOperator? {
-        return word(v, c.text, c.pos)
+        return stringNode("", v, c.text, c.pos)
     }
 
 ////////////////////////////////////////////////////////
@@ -76,7 +77,7 @@ Word <-
 
 BooleanOperators <-
     ("AND" / "OR" / "NOT") {
-        return booleanOperator(c.text, c.pos)
+        return operatorNode(c.text, c.pos)
     }
 
 ColonOperator <-

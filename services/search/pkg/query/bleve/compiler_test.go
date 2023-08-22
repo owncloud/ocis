@@ -10,10 +10,10 @@ import (
 
 var FullAst = &ast.Ast{
 	Nodes: []ast.Node{
-		&ast.StringProperty{Key: "tag", Value: "foo"},
-		&ast.StringProperty{Key: "tag", Value: "bar"},
-		&ast.StringProperty{Key: "name", Value: "book.pdf"},
-		&ast.StringProperty{Key: "content", Value: "ahab"},
+		&ast.StringNode{Key: "tag", Value: "foo"},
+		&ast.StringNode{Key: "tag", Value: "bar"},
+		&ast.StringNode{Key: "name", Value: "book.pdf"},
+		&ast.StringNode{Key: "content", Value: "ahab"},
 	},
 }
 

@@ -14,12 +14,10 @@ func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 		append(
 			opts,
 			cmpopts.IgnoreFields(ast.Ast{}, "Base"),
-			cmpopts.IgnoreFields(ast.Word{}, "Base"),
-			cmpopts.IgnoreFields(ast.Phrase{}, "Base"),
-			cmpopts.IgnoreFields(ast.StringProperty{}, "Base"),
-			cmpopts.IgnoreFields(ast.BooleanOperator{}, "Base"),
-			cmpopts.IgnoreFields(ast.Group{}, "Base"),
-			cmpopts.IgnoreFields(ast.KeyGroup{}, "Base"),
+			cmpopts.IgnoreFields(ast.StringNode{}, "Base"),
+			cmpopts.IgnoreFields(ast.OperatorNode{}, "Base"),
+			cmpopts.IgnoreFields(ast.GroupNode{}, "Base"),
+			cmpopts.IgnoreFields(ast.BooleanNode{}, "Base"),
 		)...,
 	)
 }

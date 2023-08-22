@@ -1,7 +1,6 @@
 package bleve
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
@@ -19,22 +18,17 @@ func Compile(w io.Writer, a *ast.Ast) error {
 
 	for _, node := range a.Nodes {
 		switch n := node.(type) {
-		case *ast.StringProperty:
-			s = append(s, textPropertyRestriction(n))
-			continue
-		case *ast.Phrase, *ast.Word:
+		case *ast.StringNode:
+			s = append(s, stringNode(n))
+		case *ast.BooleanNode:
+			// how should bleve treat an BooleanNode
+		case *ast.GroupNode:
 			// fixMe:
-			// how should bleve treat an phrase or word
-			continue
-		case *ast.Group:
-			// fixMe:
-			// how should bleve treat an group
+			// how should bleve treat an GroupNode
 			// hint, recursion
-			continue
-		case *ast.BooleanOperator:
+		case *ast.OperatorNode:
 			// fixMe:
-			// how should bleve treat an boolean operator
-			continue
+			// how should bleve treat an OperatorNode
 		}
 	}
 
@@ -43,14 +37,14 @@ func Compile(w io.Writer, a *ast.Ast) error {
 	return err
 }
 
-func textPropertyRestriction(n *ast.StringProperty) string {
+func stringNode(n *ast.StringNode) string {
 	switch n.Key {
 	case _tagKey:
-		return fmt.Sprintf("%s:%s", _tagKey, n.Value)
+		return _tagKey + ":" + n.Value
 	case _nameKey:
-		return fmt.Sprintf("%s:%s", _nameKey, n.Value)
+		return _nameKey + ":" + n.Value
 	case _contentKey:
-		return fmt.Sprintf("%s:%s", _contentKey, n.Value)
+		return _contentKey + ":" + n.Value
 	}
 
 	return ""
