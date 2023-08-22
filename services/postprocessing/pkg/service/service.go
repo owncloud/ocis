@@ -55,6 +55,8 @@ func (pps *PostprocessingService) Run() error {
 			err  error
 		)
 
+		ctx = e.GetTraceContext(ctx)
+
 		switch ev := e.Event.(type) {
 		case events.BytesReceived:
 			pp = postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
