@@ -156,7 +156,7 @@ Feature: Share a file or folder that is inside a space
     And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
-    Then as "Brian" folder "Shares/folder" should not exist
+    And as "Brian" folder "Shares/folder" should not exist
 
   @issue-5823
   Scenario: check the end of expiration date in group share
@@ -171,4 +171,4 @@ Feature: Share a file or folder that is inside a space
     And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
-    Then as "Brian" folder "Shares/folder" should not exist
+    And as "Brian" folder "Shares/folder" should not exist
