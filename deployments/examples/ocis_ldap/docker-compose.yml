@@ -60,17 +60,17 @@ services:
     command: [ "-c", "ocis init || true; ocis server" ]
     environment:
       # users/gropups from ldap
-      LDAP_URI: ldaps://ldap-server:1636
-      LDAP_INSECURE: "true"
-      LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      LDAP_GROUP_FILTER: "(objectclass=owncloud)"
-      LDAP_GROUP_OBJECTCLASS: "groupOfNames"
-      LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
-      LDAP_USER_FILTER: "(objectclass=owncloud)"
-      LDAP_USER_OBJECTCLASS: "inetOrgPerson"
-      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_LDAP_URI: ldaps://ldap-server:1636
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      OCIS_LDAP_LOGIN_ATTRIBUTES: "uid"
       OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
