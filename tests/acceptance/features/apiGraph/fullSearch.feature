@@ -158,12 +158,11 @@ Feature: full text search
     And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in folder" to "spacesFolderWithFile/spacesFileInsideFolder.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file in subfolder" to "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt"
-    And user "Alice" has created the following tags for file "spacesFile.txt" of the space "tag-space":
-      | tag1 |
-    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesFileInsideFolder.txt" of the space "tag-space":
-      | tag1 |
-    And user "Alice" has created the following tags for file "spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt" of the space "tag-space":
-      | tag1 |
+    And user "Alice" has tagged the following files of the space "tag-space":
+      | path                                                               | tagName |
+      | spacesFile.txt                                                     | tag1    |
+      | spacesFolderWithFile/spacesFileInsideFolder.txt                    | tag1    |
+      | spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt | tag1    |
     And using <dav-path-version> DAV path
     When user "Brian" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -235,7 +234,6 @@ Feature: full text search
       | old              |
       | new              |
       | spaces           |
-
 
   @skipOnStable3.0
   Scenario Outline: search files inside the folder
