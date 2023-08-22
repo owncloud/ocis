@@ -10,6 +10,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/parser"
@@ -47,6 +48,11 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 			defer cancel()
 
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+
 			{
 				bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Postprocessing.Events))
 				if err != nil {
@@ -62,7 +68,7 @@ func Server(cfg *config.Config) *cli.Command {
 					microstore.Table(cfg.Store.Table),
 				)
 
-				svc, err := service.NewPostprocessingService(bus, logger, st, cfg.Postprocessing)
+				svc, err := service.NewPostprocessingService(ctx, bus, logger, st, traceProvider, cfg.Postprocessing)
 				if err != nil {
 					return err
 				}
