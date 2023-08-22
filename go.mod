@@ -69,7 +69,7 @@ require (
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.5.1
 	github.com/rogpeppe/go-internal v1.11.0
-	github.com/rs/zerolog v1.29.1
+	github.com/rs/zerolog v1.30.0
 	github.com/shamaton/msgpack/v2 v2.1.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
@@ -284,7 +284,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/rs/cors v1.9.0 // indirect
-	github.com/rs/xid v1.4.0 // indirect
+	github.com/rs/xid v1.5.0 // indirect
 	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
