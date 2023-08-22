@@ -363,6 +363,66 @@ trait Provisioning {
 	}
 
 	/**
+	 * @Given user :user has been created with default attributes and without skeleton files
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasBeenCreatedWithDefaultAttributes(
+		string $user
+	):void {
+		$this->userHasBeenCreated(["userName" => $user]);
+	}
+
+	/**
+	 * @Given these users have been created without skeleton files and not initialized:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasBeenCreatedWithDefaultAttributesAndNotInitialized(
+		TableNode $table
+	):void {
+		$this->usersHaveBeenCreated($table, true, false);
+	}
+
+	/**
+	 * @Given these users have been created with default attributes and without skeleton files:
+	 * expects a table of users with the heading
+	 * "|username|"
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
+		$this->usersHaveBeenCreated($table);
+	}
+
+	/**
+	 * @Given the administrator has created a new user with the following attributes:
+	 * @Given the user :byUser has created a new user using the Graph API with the following settings:
+	 *
+	 * @param string $byUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theAdministratorHasCreatedANewUserWithFollowingAttributes(string $byUser, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		$this->userHasBeenCreated(
+			$rows,
+			$byUser
+		);
+	}
+
+	/**
 	 *
 	 * @param string $groupname
 	 *
@@ -813,6 +873,8 @@ trait Provisioning {
 				// can be fetched with the "onPremisesSamAccountName" i.e. userid
 				$this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
 				$userAttributes['id'] = $this->getJsonDecodedResponse()['id'];
+			} else {
+				$userAttributes['id'] = null;
 			}
 			$this->addUserToCreatedUsersList(
 				$userAttributes['userid'],

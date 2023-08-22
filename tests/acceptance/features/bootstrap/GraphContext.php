@@ -725,66 +725,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has been created with default attributes and without skeleton files
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function userHasBeenCreatedWithDefaultAttributes(
-		string $user
-	):void {
-		$this->featureContext->userHasBeenCreated(["userName" => $user]);
-	}
-
-	/**
-	 * @Given these users have been created without skeleton files and not initialized:
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function userHasBeenCreatedWithDefaultAttributesAndNotInitialized(
-		TableNode $table
-	):void {
-		$this->featureContext->usersHaveBeenCreated($table, true, false);
-	}
-
-	/**
-	 * @Given these users have been created with default attributes and without skeleton files:
-	 * expects a table of users with the heading
-	 * "|username|"
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
-		$this->featureContext->usersHaveBeenCreated($table);
-	}
-
-	/**
-	 * @Given the administrator has created a new user with the following attributes:
-	 * @Given the user :byUser has created a new user using the Graph API with the following settings:
-	 *
-	 * @param string $byUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theAdministratorHasCreatedANewUserWithFollowingAttributes(string $byUser, TableNode $table): void {
-		$rows = $table->getRowsHash();
-		$this->featureContext->userHasBeenCreated(
-			$rows,
-			$byUser
-		);
-	}
-
-	/**
 	 * @When /^the user "([^"]*)" creates a new user using GraphAPI with the following settings:$/
 	 *
 	 * @param string $user
