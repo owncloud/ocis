@@ -107,12 +107,12 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 	identifierBackend, identifierErr := ldap.NewLDAPIdentifierBackend(
 		config.Config,
 		tlsConfig,
-		os.Getenv("LDAP_URI"),
-		os.Getenv("LDAP_BINDDN"),
-		os.Getenv("LDAP_BINDPW"),
-		os.Getenv("LDAP_BASEDN"),
-		os.Getenv("LDAP_SCOPE"),
-		os.Getenv("LDAP_FILTER"),
+		os.Getenv("OCIS_LDAP_URI"),
+		os.Getenv("OCIS_LDAP_BIND_DN"),
+		os.Getenv("OCIS_LDAP_BIND_PASSWORD"),
+		os.Getenv("OCIS_LDAP_BASEDN"),
+		os.Getenv("OCIS_LDAP_SCOPE"),
+		os.Getenv("OCIS_LDAP_FILTER"),
 		subMapping,
 		attributeMapping,
 	)
