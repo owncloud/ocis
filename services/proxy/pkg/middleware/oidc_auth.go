@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -35,6 +34,7 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 		OIDCIss:                 options.OIDCIss,
 		oidcClient:              options.OIDCClient,
 		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
+		skipUserInfo:            options.SkipUserInfo,
 	}
 }
 
@@ -47,6 +47,7 @@ type OIDCAuthenticator struct {
 	DefaultTokenCacheTTL    time.Duration
 	oidcClient              oidc.OIDCClient
 	AccessTokenVerifyMethod string
+	skipUserInfo            bool
 }
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
@@ -62,36 +63,38 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
 	}
 	if len(record) > 0 {
-		if err = msgpack.Unmarshal(record[0].Value, &claims); err == nil {
+		if err = msgpack.UnmarshalAsMap(record[0].Value, &claims); err == nil {
 			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
 			return claims, nil
 		}
 		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
 	}
 
-	aClaims, _, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
+	aClaims, claims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to verify access token")
 	}
 
-	oauth2Token := &oauth2.Token{
-		AccessToken: token,
-	}
+	if !m.skipUserInfo {
+		oauth2Token := &oauth2.Token{
+			AccessToken: token,
+		}
 
-	userInfo, err := m.oidcClient.UserInfo(
-		context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
-		oauth2.StaticTokenSource(oauth2Token),
-	)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get userinfo")
-	}
-	if err := userInfo.Claims(&claims); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
+		userInfo, err := m.oidcClient.UserInfo(
+			context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
+			oauth2.StaticTokenSource(oauth2Token),
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get userinfo")
+		}
+		if err := userInfo.Claims(&claims); err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
+		}
 	}
 
 	expiration := m.extractExpiration(aClaims)
 	go func() {
-		if d, err := msgpack.Marshal(claims); err != nil {
+		if d, err := msgpack.MarshalAsMap(claims); err != nil {
 			m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
 		} else {
 			err = m.userInfoCache.Write(&store.Record{
@@ -106,7 +109,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 			if sid := aClaims.SessionID; sid != "" {
 				// reuse user cache for session id lookup
 				err = m.userInfoCache.Write(&store.Record{
-					Key:    fmt.Sprintf("%s", sid),
+					Key:    sid,
 					Value:  []byte(encodedHash),
 					Expiry: time.Until(expiration),
 				})

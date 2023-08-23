@@ -41,6 +41,7 @@ func DefaultConfig() *config.Config {
 			Issuer: "https://localhost:9200",
 
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
+			SkipUserInfo:            false,
 			UserinfoCache: &config.Cache{
 				Store:    "memory",
 				Database: "ocis",
@@ -61,10 +62,10 @@ func DefaultConfig() *config.Config {
 			OIDCRoleMapper: config.OIDCRoleMapper{
 				RoleClaim: "roles",
 				RolesMap: []config.RoleMapping{
-					config.RoleMapping{RoleName: "admin", ClaimValue: "ocisAdmin"},
-					config.RoleMapping{RoleName: "spaceadmin", ClaimValue: "ocisSpaceAdmin"},
-					config.RoleMapping{RoleName: "user", ClaimValue: "ocisUser"},
-					config.RoleMapping{RoleName: "guest", ClaimValue: "ocisGuest"},
+					{RoleName: "admin", ClaimValue: "ocisAdmin"},
+					{RoleName: "spaceadmin", ClaimValue: "ocisSpaceAdmin"},
+					{RoleName: "user", ClaimValue: "ocisUser"},
+					{RoleName: "guest", ClaimValue: "ocisGuest"},
 				},
 			},
 		},
