@@ -100,7 +100,7 @@ Feature: State of the quota
 
 
   Scenario: file cannot be overwritten if there is insufficient quota
-    When user "Alice" has created a space "Project Delta" of type "project" with quota "10"
+    Given user "Alice" has created a space "Project Delta" of type "project" with quota "10"
     And user "Alice" has uploaded a file inside space "Project Delta" with content "7 bytes" to "test.txt"
     When user "Alice" uploads a file inside space "Project Delta" with content "00011 bytes" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "507"

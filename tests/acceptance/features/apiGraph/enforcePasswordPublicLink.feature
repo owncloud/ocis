@@ -18,7 +18,7 @@ Feature: enforce password on public link
       | path        | /testfile.txt |
       | permissions | 3             |
     Then the HTTP status code should be "<http-code>"
-    Then the OCS status code should be "400"
+    And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
       | ocs-api-version | http-code |
@@ -34,7 +34,7 @@ Feature: enforce password on public link
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3 |
     Then the HTTP status code should be "<http-code>"
-    Then the OCS status code should be "400"
+    And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
       | ocs-api-version | http-code |
