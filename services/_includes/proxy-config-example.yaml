@@ -109,6 +109,7 @@ oidc:
   issuer: https://localhost:9200
   insecure: false
   access_token_verify_method: jwt
+  skip_user_info: false
   user_info_cache:
     store: memory
     addresses: []
