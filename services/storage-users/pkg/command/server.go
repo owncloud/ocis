@@ -94,7 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Fatal().Err(err).Msg("can't connect to nats")
 				}
 
-				selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()))
+				selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()), pool.WithTracerProvider(traceProvider))
 				if err != nil {
 					return err
 				}

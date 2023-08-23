@@ -35,6 +35,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
+		http.TraceProvider(options.TracerProvider),
 	)
 	if err != nil {
 		options.Logger.Error().

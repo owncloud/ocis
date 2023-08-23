@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -17,6 +18,7 @@ type Options struct {
 	Config           *config.Config
 	Middleware       []func(http.Handler) http.Handler
 	ThumbnailStorage storage.Storage
+	TraceProvider    trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -55,5 +57,16 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 func ThumbnailStorage(storage storage.Storage) Option {
 	return func(o *Options) {
 		o.ThumbnailStorage = storage
+	}
+}
+
+// TraceProvider provides a function to configure the trace provider
+func TraceProvider(traceProvider trace.TracerProvider) Option {
+	return func(o *Options) {
+		if traceProvider != nil {
+			o.TraceProvider = traceProvider
+		} else {
+			o.TraceProvider = trace.NewNoopTracerProvider()
+		}
 	}
 }
