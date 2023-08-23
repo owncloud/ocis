@@ -1,5 +1,4 @@
-// Package provides available ast nodes.
-
+// Package ast provides available ast nodes.
 package ast
 
 // Node represents abstract syntax tree node
