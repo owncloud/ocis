@@ -141,6 +141,49 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
+							&ast.OperatorNode{Value: "AND"},
+							&ast.StringNode{Value: "Jane"},
+						},
+					},
+				},
+			},
+			err: false,
+		},
+		{
+			name: "KeyGroup or key",
+			got: []string{
+				`author:("John Smith" Jane) author:"Jack" AND author:"Oggy"`,
+			},
+			want: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "author",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "John Smith"},
+							&ast.OperatorNode{Value: "AND"},
+							&ast.StringNode{Value: "Jane"},
+						},
+					},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Key: "author", Value: "Jack"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "author", Value: "Oggy"},
+				},
+			},
+			err: false,
+		},
+		{
+			name: "KeyGroup",
+			got: []string{
+				`author:("John Smith" OR Jane)"`,
+			},
+			want: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "author",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "John Smith"},
+							&ast.OperatorNode{Value: "OR"},
 							&ast.StringNode{Value: "Jane"},
 						},
 					},

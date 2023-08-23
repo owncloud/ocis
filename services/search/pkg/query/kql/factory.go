@@ -40,7 +40,7 @@ func root(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 
 	return &ast.Ast{
 		Base:  b,
-		Nodes: nodes,
+		Nodes: normalize(nodes),
 	}, nil
 }
 
@@ -139,4 +139,73 @@ func groupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode, err
 		Key:   key,
 		Nodes: nodes,
 	}, nil
+}
+
+var source = "implicitly operator"
+var operatorNodeAnd = ast.OperatorNode{Base: &ast.Base{Loc: &ast.Location{Source: &source}}, Value: BoolAND}
+var operatorNodeOr = ast.OperatorNode{Base: &ast.Base{Loc: &ast.Location{Source: &source}}, Value: BoolOR}
+
+// normalize Populate the implicit logical operators in the ast
+//
+// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference#constructing-free-text-queries-using-kql
+// If there are multiple free-text expressions without any operators in between them, the query behavior is the same as using the AND operator.
+// "John Smith" "Jane Smith"
+// This functionally is the same as using the OR Boolean operator, as follows:
+// "John Smith" AND "Jane Smith"
+//
+// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference#using-multiple-property-restrictions-within-a-kql-query
+// When you use multiple instances of the same property restriction, matches are based on the union of the property restrictions in the KQL query.
+// author:"John Smith" author:"Jane Smith"
+// This functionally is the same as using the OR Boolean operator, as follows:
+// author:"John Smith" OR author:"Jane Smith"
+//
+// When you use different property restrictions, matches are based on an intersection of the property restrictions in the KQL query, as follows:
+// author:"John Smith" filetype:docx
+// This is the same as using the AND Boolean operator, as follows:
+// author:"John Smith" AND filetype:docx
+//
+// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference#grouping-property-restrictions-within-a-kql-query
+// author:("John Smith" "Jane Smith")
+// This is the same as using the AND Boolean operator, as follows:
+// author:"John Smith" AND author:"Jane Smith"
+func normalize(nodes []ast.Node) []ast.Node {
+	res := make([]ast.Node, 0, len(nodes))
+	var currentNode ast.Node
+	var prevKey, currentKey *string
+	for _, node := range nodes {
+		switch n := node.(type) {
+		case *ast.StringNode:
+			if prevKey == nil {
+				prevKey = &n.Key
+				res = append(res, node)
+				continue
+			}
+			currentNode = n
+			currentKey = &n.Key
+		case *ast.GroupNode:
+			n.Nodes = normalize(n.Nodes)
+			if prevKey == nil {
+				prevKey = &n.Key
+				res = append(res, n)
+				continue
+			}
+			currentNode = n
+			currentKey = &n.Key
+		default:
+			prevKey = nil
+			res = append(res, node)
+		}
+		if prevKey != nil && currentKey != nil {
+			if *prevKey == *currentKey && *prevKey != "" {
+				res = append(res, &operatorNodeOr, currentNode)
+			} else {
+				res = append(res, &operatorNodeAnd, currentNode)
+			}
+			currentNode = nil
+			currentKey = nil
+			prevKey = nil
+			continue
+		}
+	}
+	return res
 }
