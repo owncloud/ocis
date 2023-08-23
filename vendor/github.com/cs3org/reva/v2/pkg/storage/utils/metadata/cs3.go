@@ -33,6 +33,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -128,24 +129,25 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 	ctx, span := tracer.Start(ctx, "SimpleUpload")
 	defer span.End()
 
-	return cs3.Upload(ctx, UploadRequest{
+	_, err := cs3.Upload(ctx, UploadRequest{
 		Path:    uploadpath,
 		Content: content,
 	})
+	return err
 }
 
 // Upload uploads a file to the metadata storage
-func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
+func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse, error) {
 	ctx, span := tracer.Start(ctx, "Upload")
 	defer span.End()
 
 	client, err := cs3.providerClient()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ctx, err = cs3.getAuthContext(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	ifuReq := &provider.InitiateFileUploadRequest{
@@ -161,6 +163,14 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 			IfMatch: req.IfMatchEtag,
 		}
 	}
+	if len(req.IfNoneMatch) > 0 {
+		if req.IfNoneMatch[0] == "*" {
+			ifuReq.Options = &provider.InitiateFileUploadRequest_IfNotExist{}
+		}
+		// else {
+		//   the http upload will carry all if-not-match etags
+		// }
+	}
 	if req.IfUnmodifiedSince != (time.Time{}) {
 		ifuReq.Options = &provider.InitiateFileUploadRequest_IfUnmodifiedSince{
 			IfUnmodifiedSince: utils.TimeToTS(req.IfUnmodifiedSince),
@@ -173,10 +183,10 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 
 	res, err := client.InitiateFileUpload(ctx, ifuReq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if res.Status.Code != rpc.Code_CODE_OK {
-		return errtypes.NewErrtypeFromStatus(res.Status)
+		return nil, errtypes.NewErrtypeFromStatus(res.Status)
 	}
 
 	var endpoint string
@@ -188,21 +198,34 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 		}
 	}
 	if endpoint == "" {
-		return errors.New("metadata storage doesn't support the simple upload protocol")
+		return nil, errors.New("metadata storage doesn't support the simple upload protocol")
 	}
 
 	httpReq, err := http.NewRequest(http.MethodPut, endpoint, bytes.NewReader(req.Content))
 	if err != nil {
-		return err
+		return nil, err
+	}
+	for _, etag := range req.IfNoneMatch {
+		httpReq.Header.Add(net.HeaderIfNoneMatch, etag)
 	}
 
 	md, _ := metadata.FromOutgoingContext(ctx)
 	httpReq.Header.Add(ctxpkg.TokenHeader, md.Get(ctxpkg.TokenHeader)[0])
 	resp, err := cs3.dataGatewayClient.Do(httpReq)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return resp.Body.Close()
+	defer resp.Body.Close()
+	if err := errtypes.NewErrtypeFromHTTPStatusCode(resp.StatusCode, httpReq.URL.Path); err != nil {
+		return nil, err
+	}
+	etag := resp.Header.Get("Etag")
+	if ocEtag := resp.Header.Get("OC-ETag"); ocEtag != "" {
+		etag = ocEtag
+	}
+	return &UploadResponse{
+		Etag: etag,
+	}, nil
 }
 
 // Stat returns the metadata for the given path
@@ -241,6 +264,17 @@ func (cs3 *CS3) Stat(ctx context.Context, path string) (*provider.ResourceInfo, 
 func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
 	ctx, span := tracer.Start(ctx, "SimpleDownload")
 	defer span.End()
+	dres, err := cs3.Download(ctx, DownloadRequest{Path: downloadpath})
+	if err != nil {
+		return nil, err
+	}
+	return dres.Content, nil
+}
+
+// Download reads a file from the metadata storage
+func (cs3 *CS3) Download(ctx context.Context, req DownloadRequest) (*DownloadResponse, error) {
+	ctx, span := tracer.Start(ctx, "Download")
+	defer span.End()
 
 	client, err := cs3.providerClient()
 	if err != nil {
@@ -254,13 +288,18 @@ func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (conten
 	dreq := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			ResourceId: cs3.SpaceRoot,
-			Path:       utils.MakeRelativePath(downloadpath),
+			Path:       utils.MakeRelativePath(req.Path),
 		},
 	}
+	// FIXME add a dedicated property on the CS3 InitiateFileDownloadRequest message
+	// well the gateway never forwards the initiate request to the storageprovider, so we have to send it in the actual GET request
+	// if len(req.IfNoneMatch) > 0 {
+	//   dreq.Opaque = utils.AppendPlainToOpaque(dreq.Opaque, "if-none-match", strings.Join(req.IfNoneMatch, ","))
+	// }
 
 	res, err := client.InitiateFileDownload(ctx, &dreq)
 	if err != nil {
-		return []byte{}, errtypes.NotFound(dreq.Ref.Path)
+		return nil, errtypes.NotFound(dreq.Ref.Path)
 	}
 
 	var endpoint string
@@ -272,35 +311,46 @@ func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (conten
 		}
 	}
 	if endpoint == "" {
-		return []byte{}, errors.New("metadata storage doesn't support the spaces download protocol")
+		return nil, errors.New("metadata storage doesn't support the spaces download protocol")
 	}
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	hreq, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
-		return []byte{}, err
+		return nil, err
+	}
+
+	for _, etag := range req.IfNoneMatch {
+		hreq.Header.Add(net.HeaderIfNoneMatch, etag)
 	}
 
 	md, _ := metadata.FromOutgoingContext(ctx)
-	req.Header.Add(ctxpkg.TokenHeader, md.Get(ctxpkg.TokenHeader)[0])
-	resp, err := cs3.dataGatewayClient.Do(req)
+	hreq.Header.Add(ctxpkg.TokenHeader, md.Get(ctxpkg.TokenHeader)[0])
+	resp, err := cs3.dataGatewayClient.Do(hreq)
 	if err != nil {
-		return []byte{}, err
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	dres := DownloadResponse{}
+
+	dres.Etag = resp.Header.Get("etag")
+	dres.Etag = resp.Header.Get("oc-etag") // takes precedence
+
+	if err := errtypes.NewErrtypeFromHTTPStatusCode(resp.StatusCode, hreq.URL.Path); err != nil {
+		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return []byte{}, errtypes.NotFound(dreq.Ref.Path)
-	}
-
-	b, err := io.ReadAll(resp.Body)
+	dres.Mtime, err = time.Parse(time.RFC1123Z, resp.Header.Get("last-modified"))
 	if err != nil {
-		return []byte{}, err
+		return nil, err
 	}
 
-	if err = resp.Body.Close(); err != nil {
-		return []byte{}, err
+	dres.Content, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	return b, nil
+	return &dres, nil
 }
 
 // Delete deletes a path

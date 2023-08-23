@@ -180,6 +180,18 @@ func MTimeToTS(v string) (ts types.Timestamp, err error) {
 	return types.Timestamp{Seconds: sec, Nanos: uint32(nsec)}, err
 }
 
+// MTimeToTime converts a string in the form "<unix>.<nanoseconds>" into a go time.Time
+func MTimeToTime(v string) (t time.Time, err error) {
+	p := strings.SplitN(v, ".", 2)
+	var sec, nsec int64
+	if sec, err = strconv.ParseInt(p[0], 10, 64); err == nil {
+		if len(p) > 1 {
+			nsec, err = strconv.ParseInt(p[1], 10, 64)
+		}
+	}
+	return time.Unix(sec, nsec), err
+}
+
 // ExtractGranteeID returns the ID, user or group, set in the GranteeId object
 func ExtractGranteeID(grantee *provider.Grantee) (*userpb.UserId, *grouppb.GroupId) {
 	switch t := grantee.Id.(type) {

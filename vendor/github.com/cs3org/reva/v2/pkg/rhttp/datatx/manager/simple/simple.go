@@ -129,7 +129,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				w.WriteHeader(http.StatusUnauthorized)
 			case errtypes.InsufficientStorage:
 				w.WriteHeader(http.StatusInsufficientStorage)
-			case errtypes.PreconditionFailed, errtypes.Aborted:
+			case errtypes.PreconditionFailed, errtypes.Aborted, errtypes.AlreadyExists:
 				w.WriteHeader(http.StatusPreconditionFailed)
 			default:
 				sublog.Error().Err(v).Msg("error uploading file")

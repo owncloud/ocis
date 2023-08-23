@@ -295,7 +295,7 @@ func refFromCS3(b []byte) (*provider.Reference, error) {
 // The optional filter function can be used to filter by attribute name, e.g. by checking a prefix
 // For the source file, a shared lock is acquired.
 // NOTE: target resource will be write locked!
-func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string) bool) (err error) {
+func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), acquireTargetLock bool) (err error) {
 	// Acquire a read log on the source node
 	// write lock existing node before reading treesize or tree time
 	lock, err := lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(src), os.O_RDONLY|os.O_CREATE, 0600)
@@ -315,14 +315,14 @@ func (lu *Lookup) CopyMetadata(ctx context.Context, src, target string, filter f
 		}
 	}()
 
-	return lu.CopyMetadataWithSourceLock(ctx, src, target, filter, lock)
+	return lu.CopyMetadataWithSourceLock(ctx, src, target, filter, lock, acquireTargetLock)
 }
 
 // CopyMetadataWithSourceLock copies all extended attributes from source to target.
 // The optional filter function can be used to filter by attribute name, e.g. by checking a prefix
 // For the source file, a matching lockedfile is required.
 // NOTE: target resource will be write locked!
-func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string) bool, lockedSource *lockedfile.File) (err error) {
+func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), lockedSource *lockedfile.File, acquireTargetLock bool) (err error) {
 	switch {
 	case lockedSource == nil:
 		return errors.New("no lock provided")
@@ -337,12 +337,16 @@ func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, ta
 
 	newAttrs := make(map[string][]byte, 0)
 	for attrName, val := range attrs {
-		if filter == nil || filter(attrName) {
-			newAttrs[attrName] = val
+		if filter != nil {
+			var ok bool
+			if val, ok = filter(attrName, val); !ok {
+				continue
+			}
 		}
+		newAttrs[attrName] = val
 	}
 
-	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, true)
+	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, acquireTargetLock)
 }
 
 // DetectBackendOnDisk returns the name of the metadata backend being used on disk

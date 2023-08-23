@@ -102,9 +102,10 @@ func (p *cs3) Write(ctx context.Context, db persistence.PublicShares) error {
 		return err
 	}
 
-	return p.s.Upload(ctx, metadata.UploadRequest{
+	_, err = p.s.Upload(ctx, metadata.UploadRequest{
 		Content:           dbAsJSON,
 		Path:              "publicshares.json",
 		IfUnmodifiedSince: p.db.mtime,
 	})
+	return err
 }

@@ -33,6 +33,7 @@ const (
 	HeaderLocation                   = "Location"
 	HeaderRange                      = "Range"
 	HeaderIfMatch                    = "If-Match"
+	HeaderIfNoneMatch                = "If-None-Match"
 	HeaderPrefer                     = "Prefer"
 	HeaderPreferenceApplied          = "Preference-Applied"
 	HeaderVary                       = "Vary"

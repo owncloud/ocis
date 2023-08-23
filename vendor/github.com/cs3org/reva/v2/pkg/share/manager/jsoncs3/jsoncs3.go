@@ -92,18 +92,21 @@ import (
   2. create /users/{userid}/created.json if it doesn't exist yet and add the space/share
   3. create /users/{userid}/received.json or /groups/{groupid}/received.json if it doesn exist yet and add the space/share
 
-  When updating shares /storages/{storageid}/{spaceid}.json is updated accordingly. The mtime is used to invalidate in-memory caches:
+  When updating shares /storages/{storageid}/{spaceid}.json is updated accordingly. The etag is used to invalidate in-memory caches:
   - TODO the upload is tried with an if-unmodified-since header
-  - TODO when if fails, the {spaceid}.json file is downloaded, the changes are reapplied and the upload is retried with the new mtime
+  - TODO when if fails, the {spaceid}.json file is downloaded, the changes are reapplied and the upload is retried with the new etag
 
   When updating received shares the mountpoint and state are updated in /users/{userid}/received.json (for both user and group shares).
 
   When reading the list of received shares the /users/{userid}/received.json file and the /groups/{groupid}/received.json files are statted.
-  - if the mtime changed we download the file to update the local cache
+  - if the etag changed we download the file to update the local cache
 
   When reading the list of created shares the /users/{userid}/created.json file is statted
-  - if the mtime changed we download the file to update the local cache
+  - if the etag changed we download the file to update the local cache
 */
+
+// TODO implement a channel based aggregation of sharing requests: every in memory cache should read as many share updates to a space that are available and update them all in one go
+// whenever a persist operation fails we check if we can read more shares from the channel
 
 // name is the Tracer name used to identify this instrumentation library.
 const tracerName = "jsoncs3"
@@ -365,7 +368,7 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 func (m *Manager) getByID(ctx context.Context, id *collaboration.ShareId) (*collaboration.Share, error) {
 	storageID, spaceID, _ := shareid.Decode(id.OpaqueId)
 
-	share, err := m.Cache.Get(ctx, storageID, spaceID, id.OpaqueId)
+	share, err := m.Cache.Get(ctx, storageID, spaceID, id.OpaqueId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -655,41 +658,98 @@ func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User,
 		return nil, err
 	}
 
-	var ss []*collaboration.Share
-	for ssid, spaceShareIDs := range list {
-		storageID, spaceID, _ := shareid.Decode(ssid)
-		spaceShares, err := m.Cache.ListSpace(ctx, storageID, spaceID)
-		if err != nil {
-			continue
-		}
-		for shareid := range spaceShareIDs.IDs {
-			s := spaceShares.Shares[shareid]
-			if s == nil {
-				continue
-			}
-			if share.IsExpired(s) {
-				if err := m.removeShare(ctx, s); err != nil {
-					log.Error().Err(err).
-						Msg("failed to unshare expired share")
-				}
-				if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
-					ShareOwner:     s.GetOwner(),
-					ItemID:         s.GetResourceId(),
-					ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
-					GranteeUserID:  s.GetGrantee().GetUserId(),
-					GranteeGroupID: s.GetGrantee().GetGroupId(),
-				}); err != nil {
-					log.Error().Err(err).
-						Msg("failed to publish share expired event")
-				}
-				continue
-			}
-			if utils.UserEqual(user.GetId(), s.GetCreator()) {
-				if share.MatchesFilters(s, filters) {
-					ss = append(ss, s)
-				}
+	numWorkers := m.MaxConcurrency
+	if numWorkers == 0 || len(list) < numWorkers {
+		numWorkers = len(list)
+	}
+
+	type w struct {
+		ssid string
+		ids  sharecache.SpaceShareIDs
+	}
+	work := make(chan w)
+	results := make(chan *collaboration.Share)
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	// Distribute work
+	g.Go(func() error {
+		defer close(work)
+		for ssid, ids := range list {
+			select {
+			case work <- w{ssid, ids}:
+			case <-ctx.Done():
+				return ctx.Err()
 			}
 		}
+		return nil
+	})
+	// Spawn workers that'll concurrently work the queue
+	for i := 0; i < numWorkers; i++ {
+		g.Go(func() error {
+			for w := range work {
+				storageID, spaceID, _ := shareid.Decode(w.ssid)
+				// fetch all shares from space with one request
+				_, err := m.Cache.ListSpace(ctx, storageID, spaceID)
+				if err != nil {
+					log.Error().Err(err).
+						Str("storageid", storageID).
+						Str("spaceid", spaceID).
+						Msg("failed to list shares in space")
+					continue
+				}
+				for shareID := range w.ids.IDs {
+					s, err := m.Cache.Get(ctx, storageID, spaceID, shareID, true)
+					if err != nil || s == nil {
+						continue
+					}
+					if share.IsExpired(s) {
+						if err := m.removeShare(ctx, s); err != nil {
+							log.Error().Err(err).
+								Msg("failed to unshare expired share")
+						}
+						if err := events.Publish(ctx, m.eventStream, events.ShareExpired{
+							ShareOwner:     s.GetOwner(),
+							ItemID:         s.GetResourceId(),
+							ExpiredAt:      time.Unix(int64(s.GetExpiration().GetSeconds()), int64(s.GetExpiration().GetNanos())),
+							GranteeUserID:  s.GetGrantee().GetUserId(),
+							GranteeGroupID: s.GetGrantee().GetGroupId(),
+						}); err != nil {
+							log.Error().Err(err).
+								Msg("failed to publish share expired event")
+						}
+						continue
+					}
+					if utils.UserEqual(user.GetId(), s.GetCreator()) {
+						if share.MatchesFilters(s, filters) {
+							select {
+							case results <- s:
+							case <-ctx.Done():
+								return ctx.Err()
+							}
+						}
+					}
+				}
+			}
+			return nil
+		})
+	}
+
+	// Wait for things to settle down, then close results chan
+	go func() {
+		_ = g.Wait() // error is checked later
+		close(results)
+	}()
+
+	ss := []*collaboration.Share{}
+	for n := range results {
+		ss = append(ss, n)
+	}
+
+	if err := g.Wait(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 
 	span.SetStatus(codes.Ok, "")
@@ -722,7 +782,6 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 			var ok bool
 			if rs, ok = ssids[ssid]; !ok {
 				rs = &receivedsharecache.Space{
-					Mtime:  spaceShareIDs.Mtime,
 					States: make(map[string]*receivedsharecache.State, len(spaceShareIDs.IDs)),
 				}
 				ssids[ssid] = rs
@@ -785,8 +844,17 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 		g.Go(func() error {
 			for w := range work {
 				storageID, spaceID, _ := shareid.Decode(w.ssid)
+				// fetch all shares from space with one request
+				_, err := m.Cache.ListSpace(ctx, storageID, spaceID)
+				if err != nil {
+					log.Error().Err(err).
+						Str("storageid", storageID).
+						Str("spaceid", spaceID).
+						Msg("failed to list shares in space")
+					continue
+				}
 				for shareID, state := range w.rspace.States {
-					s, err := m.Cache.Get(ctx, storageID, spaceID, shareID)
+					s, err := m.Cache.Get(ctx, storageID, spaceID, shareID, true)
 					if err != nil || s == nil {
 						continue
 					}

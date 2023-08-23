@@ -20,6 +20,7 @@
 package download
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -38,6 +39,25 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
 )
+
+type contextKey struct{}
+
+var etagKey = contextKey{}
+
+// ContextWithEtag returns a new `context.Context` that holds an etag.
+func ContextWithEtag(ctx context.Context, etag string) context.Context {
+	return context.WithValue(ctx, etagKey, etag)
+}
+
+// EtagFromContext returns the etag previously associated with `ctx`, or
+// `""` if no such etag could be found.
+func EtagFromContext(ctx context.Context) string {
+	val := ctx.Value(etagKey)
+	if etag, ok := val.(string); ok {
+		return etag
+	}
+	return ""
+}
 
 // GetOrHeadFile returns the requested file content
 func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceID string) {
@@ -75,9 +95,23 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 
 	// do a stat to set a Content-Length header
 
-	if md, err = fs.GetMD(ctx, ref, nil, []string{"size", "mimetype"}); err != nil {
+	if md, err = fs.GetMD(ctx, ref, nil, []string{"size", "mimetype", "etag"}); err != nil {
 		handleError(w, &sublog, err, "stat")
 		return
+	}
+
+	// check etag, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
+	for _, etag := range r.Header.Values(net.HeaderIfNoneMatch) {
+		if md.Etag == etag {
+			// When the condition fails for GET and HEAD methods, then the server must return
+			// HTTP status code 304 (Not Modified). [...] Note that the server generating a
+			// 304 response MUST generate any of the following header fields that would have
+			// been sent in a 200 (OK) response to the same request:
+			// Cache-Control, Content-Location, Date, ETag, Expires, and Vary.
+			w.Header().Set(net.HeaderETag, md.Etag)
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
 	}
 
 	// fill in storage provider id if it is missing
@@ -107,6 +141,7 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 		}
 	}
 
+	ctx = ContextWithEtag(ctx, md.Etag)
 	content, err := fs.Download(ctx, ref)
 	if err != nil {
 		handleError(w, &sublog, err, "download")

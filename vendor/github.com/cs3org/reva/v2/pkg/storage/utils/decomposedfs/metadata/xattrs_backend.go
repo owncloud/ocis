@@ -146,12 +146,14 @@ func (XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map[s
 }
 
 // Remove an extended attribute key
-func (XattrsBackend) Remove(ctx context.Context, filePath string, key string) (err error) {
-	lockedFile, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
+func (XattrsBackend) Remove(ctx context.Context, filePath string, key string, acquireLock bool) (err error) {
+	if acquireLock {
+		lockedFile, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return err
+		}
+		defer cleanupLockfile(lockedFile)
 	}
-	defer cleanupLockfile(lockedFile)
 
 	return xattr.Remove(filePath, key)
 }

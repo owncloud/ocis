@@ -23,6 +23,7 @@
 package errtypes
 
 import (
+	"net/http"
 	"strings"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -172,6 +173,19 @@ func (e InsufficientStorage) StatusCode() int {
 	return StatusInsufficientStorage
 }
 
+// NotModified is the error to use when a resource was not modified, e.g. the requested etag did not change.
+type NotModified string
+
+func (e NotModified) Error() string { return "error: not modified: " + string(e) }
+
+// NotModified implements the IsNotModified interface.
+func (e NotModified) IsNotModified() {}
+
+// StatusCode returns StatusInsufficientStorage, this implementation is needed to allow TUS to cast the correct http errors.
+func (e NotModified) StatusCode() int {
+	return http.StatusNotModified
+}
+
 // Body returns the error body. This implementation is needed to allow TUS to cast the correct http errors
 func (e InsufficientStorage) Body() []byte {
 	return []byte(e.Error())
@@ -300,5 +314,39 @@ func NewErrtypeFromStatus(status *rpc.Status) error {
 		return BadRequest(status.Message)
 	default:
 		return InternalError(status.Message)
+	}
+}
+
+// NewErrtypeFromHTTPStatusCode maps an http status to an errtype
+func NewErrtypeFromHTTPStatusCode(code int, message string) error {
+	switch code {
+	case http.StatusOK:
+		return nil
+	case http.StatusNotFound:
+		return NotFound(message)
+	case http.StatusConflict:
+		return AlreadyExists(message)
+	case http.StatusNotImplemented:
+		return NotSupported(message)
+	case http.StatusNotModified:
+		return NotModified(message)
+	case http.StatusForbidden:
+		return PermissionDenied(message)
+	case http.StatusLocked:
+		return Locked(message)
+	case http.StatusPreconditionFailed:
+		return Aborted(message)
+	case http.StatusMethodNotAllowed:
+		return PreconditionFailed(message)
+	case http.StatusInsufficientStorage:
+		return InsufficientStorage(message)
+	case http.StatusBadRequest:
+		return BadRequest(message)
+	case http.StatusPartialContent:
+		return PartialContent(message)
+	case StatusChecksumMismatch:
+		return ChecksumMismatch(message)
+	default:
+		return InternalError(message)
 	}
 }
