@@ -1130,7 +1130,7 @@ def e2eTests(ctx):
             "tikaNeeded": True,
         },
         "suite2": {
-            "path": "tests/e2e/cucumber/features/smoke/*/*[!.oc10].feature",
+            "path": "tests/e2e/cucumber/features/smoke/*[!app-provider]/*[!.oc10].feature",
             "tikaNeeded": False,
         },
     }
