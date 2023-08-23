@@ -37,7 +37,11 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	gatewaySelector, err := pool.GatewaySelector(options.Config.GatewayAddress, pool.WithRegistry(registry.GetRegistry()))
+	gatewaySelector, err := pool.GatewaySelector(
+		options.Config.GatewayAddress,
+		pool.WithRegistry(registry.GetRegistry()),
+		pool.WithTracerProvider(options.TraceProvider),
+	)
 	if err != nil {
 		return http.Service{}, err
 	}
@@ -67,6 +71,7 @@ func Server(opts ...Option) (http.Service, error) {
 				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 			),
 		),
+		svc.TraceProvider(options.TraceProvider),
 	)
 
 	{

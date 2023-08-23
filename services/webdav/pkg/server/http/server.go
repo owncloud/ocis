@@ -57,6 +57,7 @@ func Server(opts ...Option) (http.Service, error) {
 				options.Logger,
 			),
 		),
+		svc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		return http.Service{}, err

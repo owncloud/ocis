@@ -49,6 +49,7 @@ func NewService(opts ...Option) grpc.Service {
 		pool.WithTLSCACert(options.Config.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 		pool.WithRegistry(registry.GetRegistry()),
+		pool.WithTracerProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway selector")

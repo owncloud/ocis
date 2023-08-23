@@ -272,7 +272,13 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
-	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
+	gatewaySelector, err := pool.GatewaySelector(
+		cfg.Reva.Address,
+		append(
+			cfg.Reva.GetRevaOptions(),
+			pool.WithRegistry(registry.GetRegistry()),
+			pool.WithTracerProvider(traceProvider),
+		)...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 	}

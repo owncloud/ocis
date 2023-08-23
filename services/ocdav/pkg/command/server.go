@@ -83,6 +83,7 @@ func Server(cfg *config.Config) *cli.Command {
 					// ocdav.TLSConfig() // tls config for the http server
 					ocdav.MetricsEnabled(true),
 					ocdav.MetricsNamespace("ocis"),
+					ocdav.Tracing("Adding these strings is a workaround for ->", "https://github.com/cs3org/reva/issues/4131"),
 					ocdav.WithTraceProvider(tracingProvider),
 				}
 

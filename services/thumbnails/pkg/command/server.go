@@ -95,6 +95,7 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Config(cfg),
 				http.Metrics(metrics),
 				http.Namespace(cfg.HTTP.Namespace),
+				http.TraceProvider(traceProvider),
 			)
 			if err != nil {
 				logger.Info().

@@ -95,7 +95,13 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-		gatewaySelector, err = pool.GatewaySelector(options.Config.Reva.Address, append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
+		gatewaySelector, err = pool.GatewaySelector(
+			options.Config.Reva.Address,
+			append(
+				options.Config.Reva.GetRevaOptions(),
+				pool.WithRegistry(registry.GetRegistry()),
+				pool.WithTracerProvider(options.TraceProvider),
+			)...)
 		if err != nil {
 			return http.Service{}, errors.Wrap(err, "could not initialize gateway selector")
 		}

@@ -78,6 +78,7 @@ func NewService(opts ...Option) (Service, error) {
 		pool.WithTLSCACert(conf.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 		pool.WithRegistry(registry.GetRegistry()),
+		pool.WithTracerProvider(options.TraceProvider),
 	)
 	if err != nil {
 		return nil, err

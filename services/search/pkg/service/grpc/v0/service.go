@@ -53,7 +53,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	}
 
 	// initialize gateway
-	selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()))
+	selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()), pool.WithTracerProvider(options.TracerProvider))
 	if err != nil {
 		logger.Fatal().Err(err).Msg("could not get reva gateway selector")
 		return nil, teardown, err
