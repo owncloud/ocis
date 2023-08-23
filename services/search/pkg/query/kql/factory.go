@@ -44,21 +44,20 @@ func root(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 	}, nil
 }
 
-func nodes(head, tails interface{}) ([]ast.Node, error) {
+func nodes(head, t interface{}) ([]ast.Node, error) {
 	node, err := toNode(head)
 	if err != nil {
 		return nil, err
 	}
 
-	var nodes []ast.Node
+	tails := toIfaceSlice(t)
+	for i, tail := range tails {
+		tails[i] = toIfaceSlice(tail)[1]
+	}
 
-	for _, tail := range toIfaceSlice(tails) {
-		node, err := toNode(toIfaceSlice(tail)[1])
-		if err != nil {
-			return nil, err
-		}
-
-		nodes = append(nodes, node)
+	nodes, err := toNodes(tails)
+	if err != nil {
+		return nil, err
 	}
 
 	return append(append([]ast.Node{}, node), nodes...), nil

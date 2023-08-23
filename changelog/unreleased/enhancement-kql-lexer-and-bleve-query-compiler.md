@@ -12,8 +12,8 @@ Supported field queries:
 
 Supported conjunctive normal form queries:
 
-* `Boolean` operators `AND`, `OR`, `NOT`,
-* `Nesting` `(` `SUB_QUERY` `)`
+* `Boolean`: `AND`, `OR`, `NOT`,
+* `Group`: `(tag:book content:ahab*)`, `tag:(book pdf)`
 
 some examples are:
 

@@ -26,10 +26,8 @@ var FullDictionary = []string{
 	`author:Shakesp*`,
 	`title:"Advanced Search"`,
 	`title:"Advanced Sear*"`,
-	// fixMe: ref1
-	// `title:"Advan* Search"`,
-	// fixMe: ref2
-	// `title:"*anced Search"`,
+	`title:"Advan* Search"`,
+	`title:"*anced Search"`,
 	`author:"John Smith" OR author:"Jane Smith"`,
 	`author:"John Smith" AND filetype:docx`,
 	`author:("John Smith" "Jane Smith")`,
@@ -73,10 +71,8 @@ func TestParse(t *testing.T) {
 					&ast.StringNode{Key: "author", Value: "Shakesp*"},
 					&ast.StringNode{Key: "title", Value: "Advanced Search"},
 					&ast.StringNode{Key: "title", Value: "Advanced Sear*"},
-					// fixMe: ref1
-					// &ast.StringProperty{Key: "title", Value: "Advan Search"},
-					// fixMe: ref2
-					// &ast.StringProperty{Key: "title", Value: "anced Search"},
+					&ast.StringNode{Key: "title", Value: "Advan* Search"},
+					&ast.StringNode{Key: "title", Value: "*anced Search"},
 					&ast.StringNode{Key: "author", Value: "John Smith"},
 					&ast.OperatorNode{Value: "OR"},
 					&ast.StringNode{Key: "author", Value: "Jane Smith"},
@@ -90,7 +86,6 @@ func TestParse(t *testing.T) {
 							&ast.StringNode{Value: "Jane Smith"},
 						},
 					},
-					// fixMe: ref4
 					&ast.GroupNode{
 						Nodes: []ast.Node{
 							&ast.StringNode{Key: "DepartmentId", Value: "*"},

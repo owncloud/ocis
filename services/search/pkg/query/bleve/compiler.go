@@ -13,6 +13,7 @@ const (
 	_contentKey = "content"
 )
 
+// Compile transforms an ast.Ast into a bleve query
 func Compile(w io.Writer, a *ast.Ast) error {
 	var s []string
 
@@ -23,11 +24,8 @@ func Compile(w io.Writer, a *ast.Ast) error {
 		case *ast.BooleanNode:
 			// how should bleve treat an BooleanNode
 		case *ast.GroupNode:
-			// fixMe:
 			// how should bleve treat an GroupNode
-			// hint, recursion
 		case *ast.OperatorNode:
-			// fixMe:
 			// how should bleve treat an OperatorNode
 		}
 	}

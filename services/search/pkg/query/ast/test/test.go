@@ -1,3 +1,4 @@
+// Package test provides shared test primitives for ast testing.
 package test
 
 import (
@@ -7,6 +8,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
+// DiffAst returns a human-readable report of the differences between two values
+// by default it ignores every ast node Base field.
 func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 	return cmp.Diff(
 		x,
