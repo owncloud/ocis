@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 * Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
 * Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
+* Enhancement - Remove deprecated environment variables: [#7099](https://github.com/owncloud/ocis/pull/7099)
 
 ## Details
 
@@ -73,6 +74,13 @@ The following sections list the changes for unreleased.
    Names the nats connections for easier debugging
 
    https://github.com/owncloud/ocis/pull/6979
+
+* Enhancement - Remove deprecated environment variables: [#7099](https://github.com/owncloud/ocis/pull/7099)
+
+   We have removed all environment variables that have been marked as deprecated and marked for
+   removal for 4.0.0
+
+   https://github.com/owncloud/ocis/pull/7099
 # Changelog for [3.1.0] (2023-08-02)
 
 The following sections list the changes for 3.1.0.
