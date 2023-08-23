@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-23-00-45-54]
+[#deprecation-note-2023-08-23-08-25-18]
 [caption=]
 .Deprecation notes for the storage-shares service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY
 |===
 
 endif::[]
@@ -176,8 +171,7 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-`REVA_GATEWAY` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

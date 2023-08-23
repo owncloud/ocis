@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-23-00-45-54]
+[#deprecation-note-2023-08-23-08-25-18]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,21 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY
-
-| STORAGE_USERS_OCIS_ASYNC_UPLOADS changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_ASYNC_UPLOADS
-
-| STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT changing name for consistency
-| 3.0
-| 4.0.0
-| STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE
 |===
 
 endif::[]
@@ -204,8 +189,7 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-`REVA_GATEWAY` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -370,8 +354,8 @@ a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
 a|`OCIS_ASYNC_UPLOADS` +
-`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+`` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -693,8 +677,7 @@ Whether to verify the server TLS certificates.
 
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
-`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -719,7 +702,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
+The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_STAT_CACHE_STORE` +

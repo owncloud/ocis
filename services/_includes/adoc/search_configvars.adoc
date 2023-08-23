@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-23-00-45-54]
+[#deprecation-note-2023-08-23-08-25-18]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,16 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY
-
-| STORAGE_USERS_OCIS_ASYNC_UPLOADS changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_ASYNC_UPLOADS
 |===
 
 endif::[]
@@ -172,8 +162,7 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-`REVA_GATEWAY` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -220,9 +209,8 @@ a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 a|`OCIS_ASYNC_UPLOADS` +
-`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
 `SEARCH_EVENTS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-23-00-45-54]
+[#deprecation-note-2023-08-23-08-25-18]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| POSTPROCESSING_VIRUSSCAN is not longer necessary and is replaced by POSTPROCESSING_STEPS which also holds information about the order of steps
-| master
-| master
-| POSTPROCESSING_STEPS
 |===
 
 endif::[]
@@ -263,15 +258,6 @@ a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
-
-a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-08-23-00-45-54[Deprecation Note]
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-After uploading a file but before making it available for download, virus scanning the file can be enabled. Needs as prerequisite the antivirus service to be enabled and configured.
 
 a|`POSTPROCESSING_DELAY` +
 
