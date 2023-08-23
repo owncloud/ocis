@@ -12,9 +12,8 @@ Feature: Deprovisioning notification
 
   Scenario: administrator creates a deprovisioning notification about shutting down the instance
     When the administrator creates a deprovisioning notification
-    Then the HTTP status code should be "200"
-    When user "Alice" lists all notifications
-    Then the HTTP status code should be "200"
+    And user "Alice" lists all notifications
+    Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
       """
       {
@@ -153,7 +152,7 @@ Feature: Deprovisioning notification
       """
 
 
-  Scenario: administrator tries to delete the deprovisioning notification
+  Scenario: administrator deletes the deprovisioning notification
     Given the administrator has created a deprovisioning notification
     When the administrator deletes the deprovisioning notification
     Then the HTTP status code should be "200"
@@ -174,9 +173,8 @@ Feature: Deprovisioning notification
 
   Scenario Outline: administrator creates a deprovisioning notification with different date formats
     When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
-    Then the HTTP status code should be "200"
-    When user "Alice" lists all notifications
-    Then the HTTP status code should be "200"
+    And user "Alice" lists all notifications
+    Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
         """
         {
@@ -209,9 +207,8 @@ Feature: Deprovisioning notification
   Scenario Outline: administrator change a deprovisioning notification with different date formats
     Given the administrator has created a deprovisioning notification
     When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
-    Then the HTTP status code should be "200"
-    When user "Alice" lists all notifications
-    Then the HTTP status code should be "200"
+    And user "Alice" lists all notifications
+    Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
         """
         {
