@@ -57,6 +57,68 @@ func TestTokenIsAddedWithUsernameClaim(t *testing.T) {
 	assert.Contains(t, token, "eyJ")
 }
 
+func TestTokenIsAddedWithDotUsernamePathClaim(t *testing.T) {
+	sut := newMockAccountResolver(&userv1beta1.User{
+		Id:   &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Mail: "foo@example.com",
+	}, nil, "li.un", "username")
+
+	// This is how lico adds the username to the access token
+	req, rw := mockRequest(map[string]interface{}{
+		oidc.Iss: "https://idx.example.com",
+		"li": map[string]interface{}{
+			"un": "foo",
+		},
+	})
+
+	sut.ServeHTTP(rw, req)
+
+	token := req.Header.Get(revactx.TokenHeader)
+	assert.NotEmpty(t, token)
+
+	assert.Contains(t, token, "eyJ")
+}
+
+func TestTokenIsAddedWithDotEscapedUsernameClaim(t *testing.T) {
+	sut := newMockAccountResolver(&userv1beta1.User{
+		Id:   &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Mail: "foo@example.com",
+	}, nil, "li\\.un", "username")
+
+	// This tests the . escaping of the readUserIDClaim
+	req, rw := mockRequest(map[string]interface{}{
+		oidc.Iss: "https://idx.example.com",
+		"li.un":  "foo",
+	})
+
+	sut.ServeHTTP(rw, req)
+
+	token := req.Header.Get(revactx.TokenHeader)
+	assert.NotEmpty(t, token)
+
+	assert.Contains(t, token, "eyJ")
+}
+
+func TestTokenIsAddedWithDottedUsernameClaimFallback(t *testing.T) {
+	sut := newMockAccountResolver(&userv1beta1.User{
+		Id:   &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Mail: "foo@example.com",
+	}, nil, "li.un", "username")
+
+	// This tests the . escaping fallback of the readUserIDClaim
+	req, rw := mockRequest(map[string]interface{}{
+		oidc.Iss: "https://idx.example.com",
+		"li.un":  "foo",
+	})
+
+	sut.ServeHTTP(rw, req)
+
+	token := req.Header.Get(revactx.TokenHeader)
+	assert.NotEmpty(t, token)
+
+	assert.Contains(t, token, "eyJ")
+}
+
 func TestNSkipOnNoClaims(t *testing.T) {
 	sut := newMockAccountResolver(nil, backend.ErrAccountDisabled, oidc.Email, "mail")
 	req, rw := mockRequest(nil)
@@ -133,6 +195,7 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 		UserProvider(&ub),
 		UserRoleAssigner(&ra),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
+		SkipUserInfo(false),
 		UserOIDCClaim(oidcclaim),
 		UserCS3Claim(cs3claim),
 		AutoprovisionAccounts(false),

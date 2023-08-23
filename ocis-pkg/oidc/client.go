@@ -27,7 +27,7 @@ import (
 // OIDCClient used to mock the oidc client during tests
 type OIDCClient interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
-	VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, []string, error)
+	VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, jwt.MapClaims, error)
 	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
 }
 
@@ -271,27 +271,26 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	}, nil
 }
 
-func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, []string, error) {
-	var mapClaims []string
+func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, jwt.MapClaims, error) {
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-		return RegClaimsWithSID{}, mapClaims, err
+		return RegClaimsWithSID{}, jwt.MapClaims{}, err
 	}
 	switch c.accessTokenVerifyMethod {
 	case config.AccessTokenVerificationJWT:
 		return c.verifyAccessTokenJWT(token)
 	case config.AccessTokenVerificationNone:
 		c.Logger.Debug().Msg("Access Token verification disabled")
-		return RegClaimsWithSID{}, mapClaims, nil
+		return RegClaimsWithSID{}, jwt.MapClaims{}, nil
 	default:
 		c.Logger.Error().Str("access_token_verify_method", c.accessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
-		return RegClaimsWithSID{}, mapClaims, errors.New("unknown Access Token Verification method")
+		return RegClaimsWithSID{}, jwt.MapClaims{}, errors.New("unknown Access Token Verification method")
 	}
 }
 
 // verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
-func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, []string, error) {
+func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.MapClaims, error) {
 	var claims RegClaimsWithSID
-	var mapClaims []string
+	mapClaims := jwt.MapClaims{}
 	jwks := c.getKeyfunc()
 	if jwks == nil {
 		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
@@ -301,7 +300,7 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, []str
 	if err != nil {
 		return claims, mapClaims, err
 	}
-	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
+	_, _, err = new(jwt.Parser).ParseUnverified(token, mapClaims)
 	// TODO: decode mapClaims to sth readable
 	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
 	if err != nil {
