@@ -42,7 +42,7 @@
                 // set some hardcoded secrets
                 "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
                 "OCIS_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
-                "STORAGE_TRANSFER_SECRET": "some-ocis-transfer-secret",
+                "OCIS_TRANSFER_SECRET": "some-ocis-transfer-secret",
                 // idm ldap
                 "IDM_SVC_PASSWORD": "some-ldap-idm-password",
                 "GRAPH_LDAP_BIND_PASSWORD": "some-ldap-idm-password",
