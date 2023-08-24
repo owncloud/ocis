@@ -27,7 +27,7 @@ type Config struct {
 	RoleQuotas            map[string]uint64  `yaml:"role_quotas"`
 	Policies              []Policy           `yaml:"policies"`
 	OIDC                  OIDC               `yaml:"oidc"`
-	TokenManager          *TokenManager      `mask:"struct" yaml:"token_manager"`
+	ServiceAccount        ServiceAccount     `yaml:"service_account"`
 	RoleAssignment        RoleAssignment     `yaml:"role_assignment"`
 	PolicySelector        *PolicySelector    `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL       `yaml:"pre_signed_url"`
@@ -160,11 +160,6 @@ type StaticSelectorConf struct {
 	Policy string `yaml:"policy"`
 }
 
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `mask:"password" yaml:"jwt_secret" env:"OCIS_JWT_SECRET;PROXY_JWT_SECRET" desc:"The secret to mint and validate JWT tokens."`
-}
-
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string `yaml:"allowed_http_methods"`
@@ -191,4 +186,10 @@ type RegexRuleConf struct {
 	Property string `yaml:"property"`
 	Match    string `yaml:"match"`
 	Policy   string `yaml:"policy"`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }

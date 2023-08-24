@@ -20,7 +20,6 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -32,7 +31,6 @@ import (
 	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/logging"
@@ -282,14 +280,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 	}
-	tokenManager, err := jwt.New(map[string]interface{}{
-		"secret": cfg.TokenManager.JWTSecret,
-	})
 	if err != nil {
 		logger.Fatal().Err(err).
 			Msg("Failed to create token manager")
 	}
-	autoProvsionCreator := autoprovision.NewCreator(autoprovision.WithTokenManager(tokenManager))
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":
@@ -298,7 +292,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			backend.WithRevaGatewaySelector(gatewaySelector),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
-			backend.WithAutoProvisonCreator(autoProvsionCreator),
+			backend.WithServiceAccount(cfg.ServiceAccount),
 		)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
@@ -317,7 +311,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
 			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
-			userroles.WithAutoProvisonCreator(autoProvsionCreator),
+			userroles.WithRevaGatewaySelector(gatewaySelector),
+			userroles.WithServiceAccount(cfg.ServiceAccount),
 		)
 	default:
 		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)

@@ -12,7 +12,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
 	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
@@ -194,7 +193,6 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 		Logger(log.NewLogger()),
 		UserProvider(&ub),
 		UserRoleAssigner(&ra),
-		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
 		SkipUserInfo(false),
 		UserOIDCClaim(oidcclaim),
 		UserCS3Claim(cs3claim),

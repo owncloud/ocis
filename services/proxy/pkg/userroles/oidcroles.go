@@ -7,7 +7,6 @@ import (
 	"time"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -127,19 +126,18 @@ func (ra oidcRoleAssigner) ApplyUserRole(ctx context.Context, user *cs3.User) (*
 }
 
 func (ra oidcRoleAssigner) prepareAdminContext() (context.Context, error) {
-	newctx := context.Background()
-	autoProvisionUser, err := ra.autoProvsionCreator.GetAutoProvisionAdmin()
+	gatewayClient, err := ra.gatewaySelector.Next()
 	if err != nil {
+		ra.logger.Error().Err(err).Msg("could not select next gateway client")
 		return nil, err
 	}
-	token, err := ra.autoProvsionCreator.GetAutoProvisionAdminToken(newctx)
+	newctx, err := utils.GetServiceUserContext(ra.serviceAccount.ServiceAccountID, gatewayClient, ra.serviceAccount.ServiceAccountSecret)
 	if err != nil {
-		ra.logger.Error().Err(err).Msg("Error generating token for provisioning role assignments.")
+		ra.logger.Error().Err(err).Msg("Error preparing request context for provisioning role assignments.")
 		return nil, err
 	}
-	newctx = revactx.ContextSetToken(newctx, token)
-	newctx = metadata.Set(newctx, middleware.AccountID, autoProvisionUser.Id.OpaqueId)
-	newctx = metadata.Set(newctx, middleware.RoleIDs, string(autoProvisionUser.Opaque.Map["roles"].Value))
+
+	newctx = metadata.Set(newctx, middleware.AccountID, ra.serviceAccount.ServiceAccountID)
 	return newctx, nil
 }
 
