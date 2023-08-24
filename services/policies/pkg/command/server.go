@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svcProtogen "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config"
@@ -50,13 +51,23 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 			defer cancel()
 
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+
 			e, err := opa.NewOPA(cfg.Engine.Timeout, logger, cfg.Engine)
 			if err != nil {
 				return err
 			}
 
 			{
-				grpcClient, err := grpc.NewClient(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
+				grpcClient, err := grpc.NewClient(
+					append(
+						grpc.GetClientOptions(cfg.GRPCClientTLS),
+						grpc.WithTraceProvider(traceProvider),
+					)...,
+				)
 				if err != nil {
 					return err
 				}
@@ -74,6 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Address(cfg.GRPC.Addr),
 					grpc.Namespace(cfg.GRPC.Namespace),
 					grpc.Version(version.GetString()),
+					grpc.TraceProvider(traceProvider),
 				)
 				if err != nil {
 					return err
@@ -103,7 +115,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				eventSvc, err := svcEvent.New(bus, logger, e, cfg.Postprocessing.Query)
+				eventSvc, err := svcEvent.New(ctx, bus, logger, traceProvider, e, cfg.Postprocessing.Query)
 				if err != nil {
 					return err
 				}
