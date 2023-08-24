@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"go-micro.dev/v4/selector"
 )
 
@@ -31,11 +31,11 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	logger              log.Logger
-	gatewaySelector     pool.Selectable[gateway.GatewayAPIClient]
-	machineAuthAPIKey   string
-	oidcISS             string
-	autoProvsionCreator autoprovision.Creator
+	logger            log.Logger
+	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
+	machineAuthAPIKey string
+	oidcISS           string
+	serviceAccount    config.ServiceAccount
 }
 
 // WithLogger sets the logger option
@@ -66,10 +66,10 @@ func WithOIDCissuer(oidcISS string) Option {
 	}
 }
 
-// WithAutoProvisonCreator configures the autoprovision creator to use
-func WithAutoProvisonCreator(c autoprovision.Creator) Option {
+// WithServiceAccount configures the service account creator to use
+func WithServiceAccount(c config.ServiceAccount) Option {
 	return func(o *Options) {
-		o.autoProvsionCreator = c
+		o.serviceAccount = c
 	}
 }
 
@@ -145,13 +145,25 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 // user. If the user already exist this is not considered an error and the
 // function will just return the existing user.
 func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
-	newctx := context.Background()
-	token, err := c.autoProvsionCreator.GetAutoProvisionAdminToken(newctx)
+	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
-		c.logger.Error().Err(err).Msg("Error generating token for autoprovisioning user.")
+		c.logger.Error().Err(err).Msg("could not select next gateway client")
 		return nil, err
 	}
-	lgClient, err := c.setupLibregraphClient(ctx, token)
+	newctx := context.Background()
+	authRes, err := gatewayClient.Authenticate(newctx, &gateway.AuthenticateRequest{
+		Type:         "serviceaccounts",
+		ClientId:     c.serviceAccount.ServiceAccountID,
+		ClientSecret: c.serviceAccount.ServiceAccountSecret,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		return nil, fmt.Errorf("error authenticating service user: %s", authRes.Status.Message)
+	}
+
+	lgClient, err := c.setupLibregraphClient(newctx, authRes.Token)
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Error setting up libregraph client.")
 		return nil, err
