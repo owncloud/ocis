@@ -1220,13 +1220,13 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string|null $user
 	 * @param string|null $verb
 	 * @param string|null $url
-	 * @param TableNode|string|null $body
+	 * @param string|null $body
 	 * @param string|null $password
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, $body = null, ?string $password = null): ResponseInterface {
+	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, string $body = null, ?string $password = null): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . $url;
 
 		if ($password === null) {
@@ -1249,14 +1249,6 @@ class FeatureContext extends BehatVariablesContext {
 			$cookies = $this->cookieJar;
 		}
 
-		$bodyRows = null;
-		if ($body instanceof TableNode) {
-			$bodyRows = $body->getRowsHash();
-		}
-		if (\is_string($body)) {
-			$bodyRows = $body;
-		}
-
 		if (isset($this->requestToken)) {
 			$headers['requesttoken'] = $this->requestToken;
 		}
@@ -1268,7 +1260,7 @@ class FeatureContext extends BehatVariablesContext {
 			$user,
 			$password,
 			$headers,
-			$bodyRows,
+			$body,
 			$config,
 			$cookies
 		);
