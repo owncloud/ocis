@@ -24,7 +24,7 @@ func (ul *UserlogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetEvents is the GET handler for events
 func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request) {
-	ctx, span := tracer.Start(r.Context(), "HandleGetEvents")
+	ctx, span := ul.tracer.Start(r.Context(), "HandleGetEvents")
 	defer span.End()
 	u, ok := revactx.ContextGetUser(ctx)
 	if !ok {

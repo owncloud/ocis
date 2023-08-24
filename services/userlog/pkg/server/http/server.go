@@ -19,8 +19,7 @@ import (
 )
 
 // Service is the service interface
-type Service interface {
-}
+type Service interface{}
 
 // Server initializes the http service and server.
 func Server(opts ...Option) (http.Service, error) {
@@ -90,6 +89,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.ValueClient(options.ValueClient),
 		svc.RoleClient(options.RoleClient),
 		svc.RegisteredEvents(options.RegisteredEvents),
+		svc.TraceProvider(options.TracerProvider),
 	)
 	if err != nil {
 		return http.Service{}, err
