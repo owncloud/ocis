@@ -50,6 +50,12 @@ func Validate(cfg *config.Config) error {
 			config.AccessTokenVerificationJWT, config.AccessTokenVerificationNone,
 		)
 	}
+	if cfg.OIDC.AccessTokenVerifyMethod == "none" && cfg.OIDC.SkipUserInfo {
+		return fmt.Errorf(
+			"Incompatible value '%t' for 'skip_user_info' in service %s. Must be false when 'access_token_verify_method' is 'none'.",
+			cfg.OIDC.SkipUserInfo, cfg.Service.Name,
+		)
+	}
 
 	return nil
 }

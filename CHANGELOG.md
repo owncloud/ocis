@@ -1,83 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [4.0.0] (2023-08-21)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 4.0.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v3.1.0...master
-
-## Summary
-
-* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
-* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
-* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
-* Enhancement - Bump reva to latest edge: [#6979](https://github.com/owncloud/ocis/pull/6979)
-* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
-* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
-* Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
-* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
-
-## Details
-
-* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
-
-   We fixed issue when using a custom LDAP attribute for group members. The graph service did not
-   honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER environment variable
-
-   https://github.com/owncloud/ocis/issues/7032
-
-* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
-
-   We fixed the issue when search using the current folder option shows the file/folders outside
-   the folder if search keyword is same as current folder
-
-   https://github.com/owncloud/ocis/issues/6935
-   https://github.com/owncloud/ocis/pull/6947
-
-* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
-
-   We added a command for rebuilding the jsoncs3 share manager indexes.
-
-   https://github.com/owncloud/ocis/pull/6986
-   https://github.com/owncloud/ocis/pull/6971
-
-* Enhancement - Bump reva to latest edge: [#6979](https://github.com/owncloud/ocis/pull/6979)
-
-   Bumps reva to latest edge
-
-   https://github.com/owncloud/ocis/pull/6979
-
-* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
-
-   Bump sonarcloud to `5.0` to avoid java errors
-
-   https://github.com/owncloud/ocis/pull/6961
-
-* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
-
-   The extension mimetype mappings known from rego can now be extended. To do this, ocis must be
-   informed where the mimetype file (apache mime.types file format) is located.
-
-   `export POLICIES_ENGINE_MIMES=OCIS_CONFIG_DIR/mime.types`
-
-   https://github.com/owncloud/ocis/pull/6869
-
-* Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
-
-   The global notifications POST and DELETE endpoints (used only for deprovision notifications
-   at the moment) can now be called by adding a static secret to the header. Admins can still call
-   this endpoint without knowing the secret
-
-   https://github.com/owncloud/ocis/pull/6946
-
-* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
-
-   Names the nats connections for easier debugging
-
-   https://github.com/owncloud/ocis/pull/6979
-# Changelog for [3.1.0] (2023-08-02)
-
-The following sections list the changes for 3.1.0.
-
-[3.1.0]: https://github.com/owncloud/ocis/compare/v3.0.0...v3.1.0
+[4.0.0]: https://github.com/owncloud/ocis/compare/v3.0.0...v4.0.0
 
 ## Summary
 
@@ -90,16 +15,19 @@ The following sections list the changes for 3.1.0.
 * Bugfix - Fix CORS issues: [#6912](https://github.com/owncloud/ocis/pull/6912)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Bugfix - Fix error message on 400 response for thumbnail requests: [#2064](https://github.com/owncloud/ocis/issues/2064)
+* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 * Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
 * Bugfix - Fix the default document language for OnlyOffice: [#6878](https://github.com/owncloud/ocis/pull/6878)
 * Bugfix - Fix the routing capability: [#9367](https://github.com/owncloud/web/issues/9367)
+* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
 * Bugfix - Fix search shares: [#6741](https://github.com/owncloud/ocis/pull/6741)
 * Bugfix - Restart Postprocessing: [#6726](https://github.com/owncloud/ocis/pull/6726)
 * Change - YAML configuration files are restricted to yaml-1.2: [#6510](https://github.com/owncloud/ocis/issues/6510)
 * Enhancement - Add 'ocis decomposedfs check-treesize' command: [#6556](https://github.com/owncloud/ocis/pull/6556)
 * Enhancement - Add IDs to graph resource logging: [#6593](https://github.com/owncloud/ocis/pull/6593)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
+* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - Add X-Request-Id to all responses: [#6715](https://github.com/owncloud/ocis/pull/6715)
 * Enhancement - Add SSE Endpoint: [#5998](https://github.com/owncloud/ocis/pull/5998)
@@ -108,7 +36,8 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Bump Hugo: [#6787](https://github.com/owncloud/ocis/pull/6787)
-* Enhancement - Bump reva to latest edge: [#6829](https://github.com/owncloud/ocis/pull/6829)
+* Enhancement - Bump reva to 2.16.0: [#6829](https://github.com/owncloud/ocis/pull/6829)
+* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
 * Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 * Enhancement - Configure max grpc message size: [#6849](https://github.com/owncloud/ocis/pull/6849)
@@ -122,17 +51,22 @@ The following sections list the changes for 3.1.0.
 * Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 * Enhancement - Add WEB_OPTION_TOKEN_STORAGE_LOCAL env variable: [#6760](https://github.com/owncloud/ocis/pull/6760)
 * Enhancement - Evaluate policy resource information on single file shares: [#6888](https://github.com/owncloud/ocis/pull/6888)
+* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
+* Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 * Enhancement - Move graph to service tracerprovider: [#6695](https://github.com/owncloud/ocis/pull/6695)
 * Enhancement - Move proxy to service tracerprovider: [#6591](https://github.com/owncloud/ocis/pull/6591)
+* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
+* Enhancement - Remove deprecated environment variables: [#7099](https://github.com/owncloud/ocis/pull/7099)
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
 * Enhancement - Update web to v7.1.0-rc.5: [#6944](https://github.com/owncloud/ocis/pull/6944)
+* Enhancement - Update web to v7.1.0: [#7107](https://github.com/owncloud/ocis/pull/7107)
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
@@ -200,6 +134,13 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/issues/2064
    https://github.com/owncloud/ocis/pull/6911
 
+* Bugfix - Graph service did not honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER setting: [#7032](https://github.com/owncloud/ocis/issues/7032)
+
+   We fixed issue when using a custom LDAP attribute for group members. The graph service did not
+   honor the OCIS_LDAP_GROUP_SCHEMA_MEMBER environment variable
+
+   https://github.com/owncloud/ocis/issues/7032
+
 * Bugfix - Fix nats registry: [#6881](https://github.com/owncloud/ocis/pull/6881)
 
    Using `nats` as service registry did work, but when a service would restart and gets a new ip it
@@ -229,6 +170,14 @@ The following sections list the changes for 3.1.0.
    Fix the routing capability
 
    https://github.com/owncloud/web/issues/9367
+
+* Bugfix - Fix the search: [#6947](https://github.com/owncloud/ocis/pull/6947)
+
+   We fixed the issue when search using the current folder option shows the file/folders outside
+   the folder if search keyword is same as current folder
+
+   https://github.com/owncloud/ocis/issues/6935
+   https://github.com/owncloud/ocis/pull/6947
 
 * Bugfix - Fix search shares: [#6741](https://github.com/owncloud/ocis/pull/6741)
 
@@ -276,6 +225,13 @@ The following sections list the changes for 3.1.0.
    for project spaces.
 
    https://github.com/owncloud/ocis/pull/6528
+
+* Enhancement - Add command for rebuilding the jsoncs3 share manager indexes: [#6986](https://github.com/owncloud/ocis/pull/6986)
+
+   We added a command for rebuilding the jsoncs3 share manager indexes.
+
+   https://github.com/owncloud/ocis/pull/6986
+   https://github.com/owncloud/ocis/pull/6971
 
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 
@@ -331,7 +287,7 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/pull/6787
 
-* Enhancement - Bump reva to latest edge: [#6829](https://github.com/owncloud/ocis/pull/6829)
+* Enhancement - Bump reva to 2.16.0: [#6829](https://github.com/owncloud/ocis/pull/6829)
 
   *   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
   *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
@@ -341,6 +297,22 @@ The following sections list the changes for 3.1.0.
   *   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
   *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): fix the default document language for OnlyOffice
   *   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+  *   Bugfix [cs3org/reva#4051](https://github.com/cs3org/reva/pull/4051): Set treesize when creating a storage space
+  *   Bugfix [cs3org/reva#4093](https://github.com/cs3org/reva/pull/4093): Fix the error handling
+  *   Bugfix [cs3org/reva#4111](https://github.com/cs3org/reva/pull/4111): Return already exists error when child already exists
+  *   Bugfix [cs3org/reva#4086](https://github.com/cs3org/reva/pull/4086): Fix ocs status code for not enough permission response
+  *   Bugfix [cs3org/reva#4101](https://github.com/cs3org/reva/pull/4101): Make the jsoncs3 share manager indexes more robust
+  *   Bugfix [cs3org/reva#4099](https://github.com/cs3org/reva/pull/4099): Fix logging upload errors
+  *   Bugfix [cs3org/reva#4078](https://github.com/cs3org/reva/pull/4078): Fix the default document language for OnlyOffice
+  *   Bugfix [cs3org/reva#4082](https://github.com/cs3org/reva/pull/4082): Fix propfind permissions
+  *   Bugfix [cs3org/reva#4100](https://github.com/cs3org/reva/pull/4100): S3ng include md5 checksum on put
+  *   Bugfix [cs3org/reva#4096](https://github.com/cs3org/reva/pull/4096): Fix the user shares list
+  *   Bugfix [cs3org/reva#4076](https://github.com/cs3org/reva/pull/4076): Fix WebDAV permissions for space managers
+  *   Bugfix [cs3org/reva#4117](https://github.com/cs3org/reva/pull/4117): Fix jsoncs3 atomic persistence
+  *   Bugfix [cs3org/reva#4081](https://github.com/cs3org/reva/pull/4081): Propagate sizeDiff
+  *   Bugfix [cs3org/reva#4091](https://github.com/cs3org/reva/pull/4091): Register WebDAV HTTP methods with chi
+  *   Bugfix [cs3org/reva#4107](https://github.com/cs3org/reva/pull/4107): Return lock when requested
+  *   Bugfix [cs3org/reva#4075](https://github.com/cs3org/reva/pull/4075): Revert 4065 - bypass proxy on upload
   *   Enhancement [cs3org/reva#4070](https://github.com/cs3org/reva/pull/4070): Selectable Propagators
   *   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
   *   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
@@ -348,10 +320,22 @@ The following sections list the changes for 3.1.0.
   *   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
   *   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
   *   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+  *   Enhancement [cs3org/reva#4089](https://github.com/cs3org/reva/pull/4089): Async propagation (experimental)
+  *   Enhancement [cs3org/reva#4074](https://github.com/cs3org/reva/pull/4074): Allow configuring the max size of grpc messages
+  *   Enhancement [cs3org/reva#4083](https://github.com/cs3org/reva/pull/4083): Allow for rolling back migrations
+  *   Enhancement [cs3org/reva#4014](https://github.com/cs3org/reva/pull/4014): En-/Disable DEPTH:inifinity in PROPFIND
+  *   Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Allow to specify a shutdown timeout
+  *   Enhancement [cs3org/reva#4103](https://github.com/cs3org/reva/pull/4103): Add .oform mimetype
+  *   Enhancement [cs3org/reva#4098](https://github.com/cs3org/reva/pull/4098): Allow naming nats connections
+  *   Enhancement [cs3org/reva#4085](https://github.com/cs3org/reva/pull/4085): Add registry refresh
+  *   Enhancement [cs3org/reva#4097](https://github.com/cs3org/reva/pull/4097): Remove app ticker logs
+  *   Enhancement [cs3org/reva#4090](https://github.com/cs3org/reva/pull/4090): Add Capability for sse
+  *   Enhancement [cs3org/reva#4110](https://github.com/cs3org/reva/pull/4110): Tracing events propgation
 
    Https://github.com/owncloud/ocis/pull/6899
    https://github.com/owncloud/ocis/pull/6919
    https://github.com/owncloud/ocis/pull/6928
+   https://github.com/owncloud/ocis/pull/6979
 
    Update reva to v2.15.0
 
@@ -417,6 +401,12 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/pull/6572
    https://github.com/owncloud/ocis/pull/6590
    https://github.com/owncloud/ocis/pull/6812
+
+* Enhancement - Bump sonarcloud: [#6961](https://github.com/owncloud/ocis/pull/6961)
+
+   Bump sonarcloud to `5.0` to avoid java errors
+
+   https://github.com/owncloud/ocis/pull/6961
 
 * Enhancement - Clarify license text in the dev docs: [#6755](https://github.com/owncloud/ocis/pull/6755)
 
@@ -518,6 +508,15 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/pull/6888
 
+* Enhancement - Extendable policy mimetype extension mapping: [#6869](https://github.com/owncloud/ocis/pull/6869)
+
+   The extension mimetype mappings known from rego can now be extended. To do this, ocis must be
+   informed where the mimetype file (apache mime.types file format) is located.
+
+   `export POLICIES_ENGINE_MIMES=OCIS_CONFIG_DIR/mime.types`
+
+   https://github.com/owncloud/ocis/pull/6869
+
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
    Defaults for the envvar OCIS_LDAP_DISABLE_USER_MECHANISM were not used consistently,
@@ -547,6 +546,14 @@ The following sections list the changes for 3.1.0.
    https://github.com/owncloud/ocis/issues/6436
    https://github.com/owncloud/ocis/pull/6437
 
+* Enhancement - Add static secret to gn endpoints: [#6946](https://github.com/owncloud/ocis/pull/6946)
+
+   The global notifications POST and DELETE endpoints (used only for deprovision notifications
+   at the moment) can now be called by adding a static secret to the header. Admins can still call
+   this endpoint without knowing the secret
+
+   https://github.com/owncloud/ocis/pull/6946
+
 * Enhancement - Improve the notification logs: [#6862](https://github.com/owncloud/ocis/pull/6862)
 
    Improve the notification logs when the user has no email address
@@ -567,6 +574,19 @@ The following sections list the changes for 3.1.0.
    instead of using a package global tracer provider.
 
    https://github.com/owncloud/ocis/pull/6591
+
+* Enhancement - Nats named connections: [#6979](https://github.com/owncloud/ocis/pull/6979)
+
+   Names the nats connections for easier debugging
+
+   https://github.com/owncloud/ocis/pull/6979
+
+* Enhancement - Remove deprecated environment variables: [#7099](https://github.com/owncloud/ocis/pull/7099)
+
+   We have removed all environment variables that have been marked as deprecated and marked for
+   removal for 4.0.0
+
+   https://github.com/owncloud/ocis/pull/7099
 
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 
@@ -704,6 +724,105 @@ The following sections list the changes for 3.1.0.
 
    https://github.com/owncloud/ocis/pull/6944
    https://github.com/owncloud/web/releases/tag/v7.1.0-rc.5
+
+* Enhancement - Update web to v7.1.0: [#7107](https://github.com/owncloud/ocis/pull/7107)
+
+   Tags: web
+
+   We updated ownCloud Web to v7.1.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   ## Summary * Bugfix [owncloud/web#9078](https://github.com/owncloud/web/pull/9078):
+   Favorites list update on removal * Bugfix
+   [owncloud/web#9213](https://github.com/owncloud/web/pull/9213): Space creation does
+   not block reoccurring event * Bugfix
+   [owncloud/web#9247](https://github.com/owncloud/web/issues/9247): Uploading to
+   folders that contain special characters * Bugfix
+   [owncloud/web#9259](https://github.com/owncloud/web/issues/9259): Relative user
+   quota display limited to two decimals * Bugfix
+   [owncloud/web#9261](https://github.com/owncloud/web/issues/9261): Remember
+   location after token invalidation * Bugfix
+   [owncloud/web#9299](https://github.com/owncloud/web/pull/9299): Authenticated
+   public links breaking uploads * Bugfix
+   [owncloud/web#9315](https://github.com/owncloud/web/issues/9315): Switch columns
+   displayed on small screens in "Shared with me" view * Bugfix
+   [owncloud/web#9351](https://github.com/owncloud/web/pull/9351): Media controls
+   overflow on mobile screens * Bugfix
+   [owncloud/web#9389](https://github.com/owncloud/web/pull/9389): Space editors see
+   empty trashbin and delete actions in space trashbin * Bugfix
+   [owncloud/web#9461](https://github.com/owncloud/web/issues/9461): Merging folders *
+   Enhancement [owncloud/web#7967](https://github.com/owncloud/web/pull/7967): Add
+   hasPriority property for editors per extension * Enhancement
+   [owncloud/web#8422](https://github.com/owncloud/web/issues/8422): Improve
+   extension app topbar * Enhancement
+   [owncloud/web#8445](https://github.com/owncloud/web/issues/8445): Open
+   individually shared file in dedicated view * Enhancement
+   [owncloud/web#8599](https://github.com/owncloud/web/issues/8599): Shrink table
+   columns * Enhancement
+   [owncloud/web#8921](https://github.com/owncloud/web/pull/8921): Add whitespace
+   context-menu * Enhancement
+   [owncloud/web#8983](https://github.com/owncloud/web/pull/8983): Deny share access *
+   Enhancement [owncloud/web#8984](https://github.com/owncloud/web/pull/8984): Long
+   breadcrumb strategy * Enhancement
+   [owncloud/web#9044](https://github.com/owncloud/web/pull/9044): Search tag filter *
+   Enhancement [owncloud/web#9046](https://github.com/owncloud/web/pull/9046): Single
+   file link open with default app * Enhancement
+   [owncloud/web#9052](https://github.com/owncloud/web/pull/9052): Drag & drop on parent
+   folder * Enhancement
+   [owncloud/web#9055](https://github.com/owncloud/web/pull/9055): Respect archiver
+   limits * Enhancement
+   [owncloud/web#9056](https://github.com/owncloud/web/issues/9056): Enable download
+   (archive) on spaces * Enhancement
+   [owncloud/web#9059](https://github.com/owncloud/web/pull/9059): Search full-text
+   filter * Enhancement
+   [owncloud/web#9077](https://github.com/owncloud/web/pull/9077): Advanced search
+   button * Enhancement
+   [owncloud/web#9077](https://github.com/owncloud/web/pull/9077): Search breadcrumb *
+   Enhancement [owncloud/web#9088](https://github.com/owncloud/web/pull/9088): Use app
+   icons for files * Enhancement
+   [owncloud/web#9140](https://github.com/owncloud/web/pull/9140): Upload file on paste
+   * Enhancement [owncloud/web#9151](https://github.com/owncloud/web/issues/9151):
+   Cloud import * Enhancement
+   [owncloud/web#9174](https://github.com/owncloud/web/issues/9174): Privacy
+   statement in account menu * Enhancement
+   [owncloud/web#9178](https://github.com/owncloud/web/pull/9178): Add login button to
+   top bar * Enhancement
+   [owncloud/web#9195](https://github.com/owncloud/web/pull/9195): Project spaces list
+   viewmode * Enhancement
+   [owncloud/web#9199](https://github.com/owncloud/web/pull/9199): Add pagination
+   options to admin settings * Enhancement
+   [owncloud/web#9200](https://github.com/owncloud/web/pull/9200): Add batch actions to
+   search result list * Enhancement
+   [owncloud/web#9216](https://github.com/owncloud/web/issues/9216): Restyle possible
+   sharees * Enhancement
+   [owncloud/web#9226](https://github.com/owncloud/web/pull/9226): Streamline URL
+   query names * Enhancement
+   [owncloud/web#9263](https://github.com/owncloud/web/pull/9263): Access denied page
+   update message * Enhancement
+   [owncloud/web#9280](https://github.com/owncloud/web/issues/9280): Hover tooltips in
+   topbar * Enhancement
+   [owncloud/web#9294](https://github.com/owncloud/web/pull/9294): Search list add
+   highlighted file content * Enhancement
+   [owncloud/web#9299](https://github.com/owncloud/web/pull/9299): Resolve pulic links
+   to their actual location * Enhancement
+   [owncloud/web#9304](https://github.com/owncloud/web/pull/9304): Add search location
+   filter * Enhancement
+   [owncloud/web#9344](https://github.com/owncloud/web/pull/9344): Ambiguation for URL
+   view mode params * Enhancement
+   [owncloud/web#9346](https://github.com/owncloud/web/pull/9346): Batch actions
+   redesign * Enhancement
+   [owncloud/web#9348](https://github.com/owncloud/web/pull/9348): Tag comma
+   separation on client side * Enhancement
+   [owncloud/web#9377](https://github.com/owncloud/web/issues/9377): User
+   notification for blocked pop-ups and redirects * Enhancement
+   [owncloud/web#9386](https://github.com/owncloud/web/pull/9386): Allow local storage
+   for auth token * Enhancement
+   [owncloud/web#9394](https://github.com/owncloud/web/pull/9394): Button styling *
+   Enhancement [owncloud/web#9436](https://github.com/owncloud/web/pull/9436): Add
+   error log to upload dialog
+
+   https://github.com/owncloud/ocis/pull/7107
+   https://github.com/owncloud/web/releases/tag/v7.1.0
 
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
@@ -4868,7 +4987,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -5036,11 +5155,28 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -5209,23 +5345,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.

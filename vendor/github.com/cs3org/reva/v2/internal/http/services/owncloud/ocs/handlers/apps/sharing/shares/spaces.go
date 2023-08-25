@@ -39,6 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 )
 
@@ -126,45 +127,70 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 		}
 	}
 
-	if role.Name != conversions.RoleManager {
-		ref := provider.Reference{ResourceId: info.GetId()}
-		p, err := h.findProvider(ctx, &ref)
-		if err != nil {
-			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider", err)
-			return
-		}
-
-		providerClient, err := h.getStorageProviderClient(p)
-		if err != nil {
-			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
-			return
-		}
-
-		lgRes, err := providerClient.ListGrants(ctx, &provider.ListGrantsRequest{Ref: &ref})
-		if err != nil || lgRes.Status.Code != rpc.Code_CODE_OK {
-			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error listing space grants", err)
-			return
-		}
-
-		if !isSpaceManagerRemaining(lgRes.Grants, grantee) {
-			response.WriteOCSError(w, r, http.StatusForbidden, "the space must have at least one manager", nil)
-			return
-		}
+	ref := provider.Reference{ResourceId: info.GetId()}
+	p, err := h.findProvider(ctx, &ref)
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider", err)
+		return
 	}
 
-	createShareRes, err := client.CreateShare(ctx, &collaborationv1beta1.CreateShareRequest{
-		ResourceInfo: info,
-		Grant: &collaborationv1beta1.ShareGrant{
-			Permissions: &collaborationv1beta1.SharePermissions{
-				Permissions: permissions,
-			},
-			Grantee:    &grantee,
-			Expiration: expirationTs,
-		},
-	})
-	if err != nil || createShareRes.Status.Code != rpc.Code_CODE_OK {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not add space member", err)
+	providerClient, err := h.getStorageProviderClient(p)
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
 		return
+	}
+
+	lgRes, err := providerClient.ListGrants(ctx, &provider.ListGrantsRequest{Ref: &ref})
+	if err != nil || lgRes.Status.Code != rpc.Code_CODE_OK {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error listing space grants", err)
+		return
+	}
+
+	if !isSpaceManagerRemaining(lgRes.Grants, grantee) {
+		response.WriteOCSError(w, r, http.StatusForbidden, "the space must have at least one manager", nil)
+		return
+	}
+
+	// we have to send the update request to the gateway to give it a chance to invalidate its cache
+	// TODO the gateway no longer should cache stuff because invalidation is to expensive. The decomposedfs already has a better cache.
+	if granteeExists(lgRes.Grants, grantee) {
+		updateShareReq := &collaborationv1beta1.UpdateShareRequest{
+			// TODO: change CS3 APIs
+			Opaque: &types.Opaque{
+				Map: map[string]*types.OpaqueEntry{
+					"spacegrant": {},
+				},
+			},
+			Share: &collaborationv1beta1.Share{
+				ResourceId: ref.GetResourceId(),
+				Permissions: &collaborationv1beta1.SharePermissions{
+					Permissions: permissions,
+				},
+				Grantee:    &grantee,
+				Expiration: expirationTs,
+			},
+		}
+		updateShareReq.Opaque = utils.AppendPlainToOpaque(updateShareReq.Opaque, "spacetype", info.GetSpace().GetSpaceType())
+		updateShareRes, err := client.UpdateShare(ctx, updateShareReq)
+		if err != nil || updateShareRes.Status.Code != rpc.Code_CODE_OK {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not update space member grant", err)
+			return
+		}
+	} else {
+		createShareRes, err := client.CreateShare(ctx, &collaborationv1beta1.CreateShareRequest{
+			ResourceInfo: info,
+			Grant: &collaborationv1beta1.ShareGrant{
+				Permissions: &collaborationv1beta1.SharePermissions{
+					Permissions: permissions,
+				},
+				Grantee:    &grantee,
+				Expiration: expirationTs,
+			},
+		})
+		if err != nil || createShareRes.Status.Code != rpc.Code_CODE_OK {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not add space member grant", err)
+			return
+		}
 	}
 
 	response.WriteOCSSuccess(w, r, nil)
@@ -319,6 +345,15 @@ func isSpaceManagerRemaining(grants []*provider.Grant, grantee provider.Grantee)
 		// If it is not set than the current grant is not for a manager and
 		// we can just continue with the next one.
 		if g.Permissions.RemoveGrant && !isEqualGrantee(*g.Grantee, grantee) {
+			return true
+		}
+	}
+	return false
+}
+
+func granteeExists(grants []*provider.Grant, grantee provider.Grantee) bool {
+	for _, g := range grants {
+		if isEqualGrantee(*g.Grantee, grantee) {
 			return true
 		}
 	}

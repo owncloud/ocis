@@ -66,6 +66,8 @@ const (
 	// that node.
 	PropagationAttr string = OcisPrefix + "propagation"
 
+	// we need mtime to keep mtime in sync with the metadata
+	MTimeAttr string = OcisPrefix + "mtime"
 	// the tree modification time of the tree below this node,
 	// propagated when synctime_accounting is true and
 	// user.ocis.propagation=1 is set

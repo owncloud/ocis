@@ -36,6 +36,7 @@ func Server(opts ...Option) (grpc.Service, func(), error) {
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
 		svc.JWTSecret(options.JWTSecret),
+		svc.TracerProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Error().

@@ -46,7 +46,7 @@ type Backend interface {
 	List(ctx context.Context, path string) (attribs []string, err error)
 	Set(ctx context.Context, path, key string, val []byte) error
 	SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) error
-	Remove(ctx context.Context, path, key string) error
+	Remove(ctx context.Context, path, key string, acquireLock bool) error
 
 	Purge(path string) error
 	Rename(oldPath, newPath string) error
@@ -95,7 +95,7 @@ func (NullBackend) SetMultiple(ctx context.Context, path string, attribs map[str
 }
 
 // Remove removes an extended attribute key
-func (NullBackend) Remove(ctx context.Context, path string, key string) error {
+func (NullBackend) Remove(ctx context.Context, path string, key string, acquireLock bool) error {
 	return errUnconfiguredError
 }
 

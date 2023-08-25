@@ -18,7 +18,7 @@ type Config struct {
 
 	// JWTSecret used to verify reva access token
 
-	TransferSecret string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_TRANSFER_SECRET"`
+	TransferSecret string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests."`
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *shared.Reva  `yaml:"reva"`
@@ -120,7 +120,7 @@ type DataGateway struct {
 type OCS struct {
 	Prefix                               string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL path prefix for the OCS service. Note that the string must not start with '/'."`
 	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
-	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE;FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"FRONTEND_OCS_HOME_NAMESPACE changing name for consistency" deprecationReplacement:"FRONTEND_OCS_PERSONAL_NAMESPACE"`
+	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE" desc:"Homespace namespace identifier."`
 	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
 	StatCacheType                        string             `yaml:"stat_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	StatCacheNodes                       []string           `yaml:"stat_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_STAT_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`

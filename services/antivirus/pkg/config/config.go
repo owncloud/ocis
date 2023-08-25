@@ -13,6 +13,8 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
+	Tracing *Tracing `yaml:"tracing"`
+
 	InfectedFileHandling string `yaml:"infected-file-handling" env:"ANTIVIRUS_INFECTED_FILE_HANDLING" desc:"Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination."`
 	Events               Events
 	Scanner              Scanner

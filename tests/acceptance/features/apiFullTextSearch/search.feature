@@ -46,6 +46,10 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+
+    @skipOnStable3.0
+    Examples:
+      | dav-path-version |
       | spaces           |
 
 
@@ -121,6 +125,10 @@ Feature: full text search
       | dav-path-version |
       | old              |
       | new              |
+
+    @skipOnStable3.0
+    Examples:
+      | dav-path-version |
       | spaces           |
 
 

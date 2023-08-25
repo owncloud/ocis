@@ -806,12 +806,14 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		}
 	}
 
+	sublog := appctx.GetLogger(ctx).With().Str("space", n.SpaceRoot.ID).Logger()
+
 	var err error
 	// TODO apply more filters
 	var sname string
 	if sname, err = n.SpaceRoot.XattrString(ctx, prefixes.SpaceNameAttr); err != nil {
 		// FIXME: Is that a severe problem?
-		appctx.GetLogger(ctx).Debug().Err(err).Msg("space does not have a name attribute")
+		sublog.Debug().Err(err).Msg("space does not have a name attribute")
 	}
 
 	/*
@@ -846,15 +848,28 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 			// This way we don't have to have a cron job checking the grants in regular intervals.
 			// The tradeof obviously is that this code is here.
 			if isGrantExpired(g) {
-				err := fs.RemoveGrant(ctx, &provider.Reference{
-					ResourceId: &provider.ResourceId{
-						SpaceId:  n.SpaceRoot.SpaceID,
-						OpaqueId: n.ID},
-				}, g)
-				appctx.GetLogger(ctx).Error().Err(err).
-					Str("space", n.SpaceRoot.ID).
-					Str("grantee", id).
-					Msg("failed to remove expired space grant")
+				if err := n.DeleteGrant(ctx, g, true); err != nil {
+					sublog.Error().Err(err).Str("grantee", id).
+						Msg("failed to delete expired space grant")
+				}
+				if n.IsSpaceRoot(ctx) {
+					// invalidate space grant
+					switch {
+					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
+						// remove from user index
+						if err := fs.userSpaceIndex.Remove(g.Grantee.GetUserId().GetOpaqueId(), n.SpaceID); err != nil {
+							sublog.Error().Err(err).Str("grantee", id).
+								Msg("failed to delete expired user space index")
+						}
+					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
+						// remove from group index
+						if err := fs.groupSpaceIndex.Remove(g.Grantee.GetGroupId().GetOpaqueId(), n.SpaceID); err != nil {
+							sublog.Error().Err(err).Str("grantee", id).
+								Msg("failed to delete expired group space index")
+						}
+					}
+				}
+
 				continue
 			}
 			grantExpiration[id] = g.Expiration
@@ -949,7 +964,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		}
 	}
 
-	etag, err := node.CalculateEtag(n.ID, tmtime)
+	etag, err := node.CalculateEtag(n, tmtime)
 	if err != nil {
 		return nil, err
 	}

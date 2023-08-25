@@ -25,23 +25,23 @@ type Config struct {
 	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant" env:"GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT" desc:"Commit shares to storage grants. This grants access to shared resources for the share receiver directly on the storage."`
 	ShareFolder                string `yaml:"share_folder_name" env:"GATEWAY_SHARE_FOLDER_NAME" desc:"Name of the share folder in users' home space."`
 	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login" env:"GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN" desc:"Disable creation of the home space on login."`
-	TransferSecret             string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"The storage transfer secret." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_TRANSFER_SECRET"`
+	TransferSecret             string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET" desc:"The storage transfer secret."`
 	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES" desc:"Expiry for the gateway tokens."`
 	Cache                      Cache  `yaml:"cache"`
 
 	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend."`
 
-	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT" desc:"The USERS API endpoint."`
-	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT" desc:"The GROUPS API endpoint."`
-	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"GATEWAY_PERMISSIONS_ENDPOINT" desc:"The SETTINGS API endpoint."`
-	SharingEndpoint           string `yaml:"sharing_endpoint" env:"GATEWAY_SHARING_ENDPOINT" desc:"The SHARE API endpoint."`
-	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint" env:"GATEWAY_AUTH_BASIC_ENDPOINT" desc:"The AUTH BASIC API endpoint."`
-	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint" env:"GATEWAY_AUTH_BEARER_ENDPOINT" desc:"The AUTH BEARER API endpoint."`
-	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint" env:"GATEWAY_AUTH_MACHINE_ENDPOINT" desc:"The AUTH MACHINE API endpoint."`
-	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint" env:"GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT" desc:"The STORAGE PUBLICLINK API endpoint."`
-	StorageUsersEndpoint      string `yaml:"storage_users_endpoint" env:"GATEWAY_STORAGE_USERS_ENDPOINT" desc:"The STORAGE USERS API endpoint."`
-	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT" desc:"The STORAGE SHARES API endpoint."`
-	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The APP REGISTRY API endpoint."`
+	UsersEndpoint             string `yaml:"-"`
+	GroupsEndpoint            string `yaml:"-"`
+	PermissionsEndpoint       string `yaml:"-"`
+	SharingEndpoint           string `yaml:"-"`
+	AuthBasicEndpoint         string `yaml:"-"`
+	AuthBearerEndpoint        string `yaml:"-"`
+	AuthMachineEndpoint       string `yaml:"-"`
+	StoragePublicLinkEndpoint string `yaml:"-"`
+	StorageUsersEndpoint      string `yaml:"-"`
+	StorageSharesEndpoint     string `yaml:"-"`
+	AppRegistryEndpoint       string `yaml:"-"`
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 

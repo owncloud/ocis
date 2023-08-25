@@ -120,8 +120,8 @@ func (b MessagePackBackend) SetMultiple(ctx context.Context, path string, attrib
 }
 
 // Remove an extended attribute key
-func (b MessagePackBackend) Remove(ctx context.Context, path, key string) error {
-	return b.saveAttributes(ctx, path, nil, []string{key}, true)
+func (b MessagePackBackend) Remove(ctx context.Context, path, key string, acquireLock bool) error {
+	return b.saveAttributes(ctx, path, nil, []string{key}, acquireLock)
 }
 
 // AllWithLockedSource reads all extended attributes from the given reader (if possible).

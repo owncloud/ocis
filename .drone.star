@@ -914,7 +914,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                  [
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v10.0.1",
+                         "image": "cs3org/wopiserver:v10.1.0",
                          "detach": True,
                          "commands": [
                              "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
@@ -1130,7 +1130,7 @@ def e2eTests(ctx):
             "tikaNeeded": True,
         },
         "suite2": {
-            "path": "tests/e2e/cucumber/features/smoke/*/*[!.oc10].feature",
+            "path": "tests/e2e/cucumber/features/smoke/*[!app-provider]/*[!.oc10].feature",
             "tikaNeeded": False,
         },
     }
@@ -1952,7 +1952,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
             "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
             "PROXY_ENABLE_BASIC_AUTH": True,
-            "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+            "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
             "IDM_CREATE_DEMO_USERS": True,
@@ -1991,7 +1991,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
             "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
             "PROXY_ENABLE_BASIC_AUTH": True,
-            "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+            "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
             "IDM_CREATE_DEMO_USERS": True,

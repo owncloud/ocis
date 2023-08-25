@@ -25,6 +25,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
+		grpc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating store service")

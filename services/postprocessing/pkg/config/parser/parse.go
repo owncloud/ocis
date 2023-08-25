@@ -37,13 +37,6 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates the config
 func Validate(cfg *config.Config) error {
-	if cfg.Postprocessing.Virusscan {
-		if !contains(cfg.Postprocessing.Steps, events.PPStepAntivirus) {
-			cfg.Postprocessing.Steps = append(cfg.Postprocessing.Steps, string(events.PPStepAntivirus))
-			fmt.Printf("ATTENTION: POSTPROCESSING_VIRUSSCAN is deprecated. Use `POSTPROCESSING_STEPS=%v` in the future\n", strings.Join(cfg.Postprocessing.Steps, ","))
-		}
-	}
-
 	if cfg.Postprocessing.Delayprocessing != 0 {
 		if !contains(cfg.Postprocessing.Steps, events.PPStepDelay) {
 			if len(cfg.Postprocessing.Steps) > 0 {

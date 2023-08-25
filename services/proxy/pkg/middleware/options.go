@@ -75,6 +75,8 @@ type Options struct {
 	RoleQuotas map[string]uint64
 	// TraceProvider sets the tracing provider.
 	TraceProvider trace.TracerProvider
+	// SkipUserInfo prevents the oidc middleware from querying the userinfo endpoint and read any claims directly from the access token instead
+	SkipUserInfo bool
 }
 
 // newOptions initializes the available default options.
@@ -246,5 +248,12 @@ func RoleQuotas(roleQuotas map[string]uint64) Option {
 func TraceProvider(tp trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TraceProvider = tp
+	}
+}
+
+// SkipUserInfo sets the skipUserInfo flag.
+func SkipUserInfo(val bool) Option {
+	return func(o *Options) {
+		o.SkipUserInfo = val
 	}
 }

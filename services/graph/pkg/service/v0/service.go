@@ -320,7 +320,11 @@ func setIdentityBackends(options Options, svc *Graph) error {
 		case "cs3":
 			gatewaySelector, err := pool.GatewaySelector(
 				options.Config.Reva.Address,
-				append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...,
+				append(
+					options.Config.Reva.GetRevaOptions(),
+					pool.WithRegistry(registry.GetRegistry()),
+					pool.WithTracerProvider(options.TraceProvider),
+				)...,
 			)
 			if err != nil {
 				return err

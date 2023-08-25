@@ -52,6 +52,13 @@ func (s *svc) RemoveShare(ctx context.Context, req *collaboration.RemoveShareReq
 	return s.removeShare(ctx, req)
 }
 
+func (s *svc) UpdateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+	if !s.c.UseCommonSpaceRootShareLogic && refIsSpaceRoot(req.GetShare().GetResourceId()) {
+		return s.updateSpaceShare(ctx, req)
+	}
+	return s.updateShare(ctx, req)
+}
+
 // TODO(labkode): we need to validate share state vs storage grant and storage ref
 // If there are any inconsistencies, the share needs to be flag as invalid and a background process
 // or active fix needs to be performed.
@@ -98,7 +105,7 @@ func (s *svc) ListShares(ctx context.Context, req *collaboration.ListSharesReque
 	return res, nil
 }
 
-func (s *svc) UpdateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
 	c, err := pool.GetUserShareProviderClient(s.c.UserShareProviderEndpoint)
 	if err != nil {
 		appctx.GetLogger(ctx).
@@ -114,9 +121,14 @@ func (s *svc) UpdateShare(ctx context.Context, req *collaboration.UpdateShareReq
 	}
 
 	if s.c.CommitShareToStorageGrant {
-		updateGrantStatus, err := s.updateGrant(ctx, res.GetShare().GetResourceId(),
-			res.GetShare().GetGrantee(),
-			res.GetShare().GetPermissions().GetPermissions())
+		creator := ctxpkg.ContextMustGetUser(ctx)
+		grant := &provider.Grant{
+			Grantee:     req.GetShare().GetGrantee(),
+			Permissions: req.GetShare().GetPermissions().GetPermissions(),
+			Expiration:  req.GetShare().GetExpiration(),
+			Creator:     creator.GetId(),
+		}
+		updateGrantStatus, err := s.updateGrant(ctx, res.GetShare().GetResourceId(), grant, nil)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "gateway: error calling updateGrant")
@@ -131,6 +143,51 @@ func (s *svc) UpdateShare(ctx context.Context, req *collaboration.UpdateShareReq
 	}
 
 	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), res.Share.ResourceId)
+	return res, nil
+}
+
+func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+	// If the share is a denial we call  denyGrant instead.
+	var st *rpc.Status
+	var err error
+	// TODO: change CS3 APIs
+	opaque := &typesv1beta1.Opaque{
+		Map: map[string]*typesv1beta1.OpaqueEntry{
+			"spacegrant": {},
+		},
+	}
+	utils.AppendPlainToOpaque(opaque, "spacetype", utils.ReadPlainFromOpaque(req.Opaque, "spacetype"))
+
+	creator := ctxpkg.ContextMustGetUser(ctx)
+	grant := &provider.Grant{
+		Grantee:     req.GetShare().GetGrantee(),
+		Permissions: req.GetShare().GetPermissions().GetPermissions(),
+		Expiration:  req.GetShare().GetExpiration(),
+		Creator:     creator.GetId(),
+	}
+	if grants.PermissionsEqual(req.Share.GetPermissions().GetPermissions(), &provider.ResourcePermissions{}) {
+		st, err = s.denyGrant(ctx, req.GetShare().GetResourceId(), req.GetShare().GetGrantee(), opaque)
+		if err != nil {
+			return nil, errors.Wrap(err, "gateway: error denying grant in storage")
+		}
+	} else {
+		st, err = s.updateGrant(ctx, req.GetShare().GetResourceId(), grant, opaque)
+		if err != nil {
+			return nil, errors.Wrap(err, "gateway: error adding grant to storage")
+		}
+	}
+
+	res := &collaboration.UpdateShareResponse{
+		Status: st,
+		Share:  req.Share,
+	}
+
+	if st.Code != rpc.Code_CODE_OK {
+		return res, nil
+	}
+
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.GetShare().GetResourceId())
+	s.providerCache.RemoveListStorageProviders(req.GetShare().GetResourceId())
 	return res, nil
 }
 
@@ -333,19 +390,15 @@ func (s *svc) addGrant(ctx context.Context, id *provider.ResourceId, g *provider
 	return grantRes.Status, nil
 }
 
-func (s *svc) updateGrant(ctx context.Context, id *provider.ResourceId, g *provider.Grantee, p *provider.ResourcePermissions) (*rpc.Status, error) {
+func (s *svc) updateGrant(ctx context.Context, id *provider.ResourceId, grant *provider.Grant, opaque *typesv1beta1.Opaque) (*rpc.Status, error) {
 	ref := &provider.Reference{
 		ResourceId: id,
 	}
 
-	creator := ctxpkg.ContextMustGetUser(ctx)
 	grantReq := &provider.UpdateGrantRequest{
-		Ref: ref,
-		Grant: &provider.Grant{
-			Grantee:     g,
-			Permissions: p,
-			Creator:     creator.GetId(),
-		},
+		Opaque: opaque,
+		Ref:    ref,
+		Grant:  grant,
 	}
 
 	c, _, err := s.find(ctx, ref)

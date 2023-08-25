@@ -36,8 +36,28 @@ type UploadRequest struct {
 	Content []byte
 
 	IfMatchEtag       string
+	IfNoneMatch       []string
 	IfUnmodifiedSince time.Time
 	MTime             time.Time
+}
+
+// UploadResponse represents a upload response
+type UploadResponse struct {
+	Etag string
+}
+
+// DownloadRequest represents a download request and its options
+type DownloadRequest struct {
+	Path        string
+	IfNoneMatch []string
+}
+
+// DownloadResponse represents a download response and its options
+type DownloadResponse struct {
+	Content []byte
+
+	Etag  string
+	Mtime time.Time
 }
 
 // Storage is the interface to maintain metadata in a storage
@@ -45,7 +65,8 @@ type Storage interface {
 	Backend() string
 
 	Init(ctx context.Context, name string) (err error)
-	Upload(ctx context.Context, req UploadRequest) error
+	Upload(ctx context.Context, req UploadRequest) (*UploadResponse, error)
+	Download(ctx context.Context, req DownloadRequest) (*DownloadResponse, error)
 	SimpleUpload(ctx context.Context, uploadpath string, content []byte) error
 	SimpleDownload(ctx context.Context, path string) ([]byte, error)
 	Delete(ctx context.Context, path string) error

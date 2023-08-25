@@ -9,12 +9,12 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/ocdav/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,7 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg, logger)
+			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -83,13 +83,8 @@ func Server(cfg *config.Config) *cli.Command {
 					// ocdav.TLSConfig() // tls config for the http server
 					ocdav.MetricsEnabled(true),
 					ocdav.MetricsNamespace("ocis"),
-				}
-
-				if cfg.Tracing.Enabled {
-					opts = append(opts,
-						ocdav.Tracing(cfg.Tracing.Endpoint, cfg.Tracing.Collector),
-						ocdav.WithTracingExporter(cfg.Tracing.Type),
-					)
+					ocdav.Tracing("Adding these strings is a workaround for ->", "https://github.com/cs3org/reva/issues/4131"),
+					ocdav.WithTraceProvider(tracingProvider),
 				}
 
 				s, err := ocdav.Service(opts...)

@@ -94,11 +94,11 @@ func (n *Node) SetXattrString(ctx context.Context, key, val string) (err error) 
 }
 
 // RemoveXattr removes an extended attribute from the write-through cache/node
-func (n *Node) RemoveXattr(ctx context.Context, key string) error {
+func (n *Node) RemoveXattr(ctx context.Context, key string, acquireLock bool) error {
 	if n.xattrsCache != nil {
 		delete(n.xattrsCache, key)
 	}
-	return n.lu.MetadataBackend().Remove(ctx, n.InternalPath(), key)
+	return n.lu.MetadataBackend().Remove(ctx, n.InternalPath(), key, acquireLock)
 }
 
 // XattrsWithReader returns the extended attributes of the node. If the attributes have already

@@ -19,8 +19,9 @@ This configuration is an _example_ for using Samba4 AD as well as a Windows Serv
 ```text
 OCIS_LDAP_URI=ldaps://xxxxxxxxx
 OCIS_LDAP_INSECURE="true"
-OCIS_LDAP_BIND_DN="cn=administrator,cn=users,xxxxxxxxxx"                    
-OCIS_LDAP_BIND_PASSWORD=xxxxxxx        
+OCIS_LDAP_BIND_DN="cn=administrator,cn=users,xxxxxxxxxx"
+OCIS_LDAP_BIND_PASSWORD=xxxxxxx
+OCIS_LDAP_DISABLE_USER_MECHANISM="none"
 OCIS_LDAP_GROUP_BASE_DN="dc=owncloud,dc=test"
 OCIS_LDAP_GROUP_OBJECTCLASS="group"
 OCIS_LDAP_GROUP_SCHEMA_ID="objectGUID"
@@ -31,7 +32,6 @@ OCIS_LDAP_USER_OBJECTCLASS="user"
 OCIS_LDAP_USER_SCHEMA_ID="objectGUID"
 OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING="true"
 OCIS_LDAP_USER_SCHEMA_USERNAME="sAMAccountName"
-OCIS_LDAP_USER_ENABLED_ATTRIBUTE=""
 OCIS_LDAP_LOGIN_ATTRIBUTES="sAMAccountName"
 IDP_LDAP_LOGIN_ATTRIBUTE="sAMAccountName"
 IDP_LDAP_UUID_ATTRIBUTE="objectGUID"

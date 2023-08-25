@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"sync"
@@ -32,7 +33,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
@@ -54,15 +54,13 @@ type Cache struct {
 
 // Spaces holds the received shares of one user per space
 type Spaces struct {
-	Mtime  time.Time
 	Spaces map[string]*Space
 
-	nextSync time.Time
+	etag string
 }
 
 // Space holds the received shares of one user in one space
 type Space struct {
-	Mtime  time.Time
 	States map[string]*State
 }
 
@@ -92,7 +90,10 @@ func (c *Cache) lockUser(userID string) func() {
 
 // Add adds a new entry to the cache
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userID)
+	span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
 	defer unlock()
 
 	if c.ReceivedSpaces[userID] == nil {
@@ -102,22 +103,14 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 		}
 	}
 
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
 
 	persistFunc := func() error {
-		if c.ReceivedSpaces[userID] == nil {
-			c.ReceivedSpaces[userID] = &Spaces{
-				Spaces: map[string]*Space{},
-			}
-		}
-		if c.ReceivedSpaces[userID].Spaces[spaceID] == nil {
-			c.ReceivedSpaces[userID].Spaces[spaceID] = &Space{}
-		}
+		c.initializeIfNeeded(userID, spaceID)
 
 		receivedSpace := c.ReceivedSpaces[userID].Spaces[spaceID]
-		receivedSpace.Mtime = time.Now()
 		if receivedSpace.States == nil {
 			receivedSpace.States = map[string]*State{}
 		}
@@ -128,22 +121,51 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 
 		return c.persist(ctx, userID)
 	}
-	err := persistFunc()
-	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
+
+	log := appctx.GetLogger(ctx).With().
+		Str("hostname", os.Getenv("HOSTNAME")).
+		Str("userID", userID).
+		Str("spaceID", spaceID).Logger()
+
+	var err error
+	for retries := 100; retries > 0; retries-- {
+		err = persistFunc()
+		switch err.(type) {
+		case nil:
+			span.SetStatus(codes.Ok, "")
+			return nil
+		case errtypes.Aborted:
+			log.Debug().Msg("aborted when persisting added received share: etag changed. retrying...")
+			// this is the expected status code from the server when the if-match etag check fails
+			// continue with sync below
+		case errtypes.PreconditionFailed:
+			log.Debug().Msg("precondition failed when persisting added received share: etag changed. retrying...")
+			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
+			// continue with sync below
+		default:
+			span.SetStatus(codes.Error, fmt.Sprintf("persisting added received share failed. giving up: %s", err.Error()))
+			log.Error().Err(err).Msg("persisting added received share failed")
+			return err
+		}
 		if err := c.syncWithLock(ctx, userID); err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("persisting added received share failed. giving up.")
 			return err
 		}
-
-		err = persistFunc()
 	}
 	return err
 }
 
 // Get returns one entry from the cache
 func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*State, error) {
-	err := c.Sync(ctx, userID)
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
+	unlock := c.lockUser(userID)
+	span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+	defer unlock()
+
+	err := c.syncWithLock(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +177,10 @@ func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*Stat
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, userID string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userID)
+	span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
 	defer unlock()
 
 	return c.syncWithLock(ctx, userID)
@@ -168,52 +193,40 @@ func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 
 	log := appctx.GetLogger(ctx).With().Str("userID", userID).Logger()
 
-	var mtime time.Time
-	if c.ReceivedSpaces[userID] != nil {
-		if time.Now().Before(c.ReceivedSpaces[userID].nextSync) {
-			span.AddEvent("skip sync")
-			span.SetStatus(codes.Ok, "")
-			return nil
-		}
-		c.ReceivedSpaces[userID].nextSync = time.Now().Add(c.ttl)
-
-		mtime = c.ReceivedSpaces[userID].Mtime
-	} else {
-		mtime = time.Time{} // Set zero time so that data from storage always takes precedence
-	}
+	c.initializeIfNeeded(userID, "")
 
 	jsonPath := userJSONPath(userID)
-	info, err := c.storage.Stat(ctx, jsonPath) // TODO we only need the mtime ... use fieldmask to make the request cheaper
-	if err != nil {
-		if _, ok := err.(errtypes.NotFound); ok {
-			span.AddEvent("no file")
-			span.SetStatus(codes.Ok, "")
-			return nil // Nothing to sync against
-		}
-		span.SetStatus(codes.Error, fmt.Sprintf("Failed to stat the received share: %s", err.Error()))
-		log.Error().Err(err).Msg("Failed to stat the received share")
+	span.AddEvent("updating cache")
+	//  - update cached list of created shares for the user in memory if changed
+	dlres, err := c.storage.Download(ctx, metadata.DownloadRequest{
+		Path:        jsonPath,
+		IfNoneMatch: []string{c.ReceivedSpaces[userID].etag},
+	})
+	switch err.(type) {
+	case nil:
+		span.AddEvent("updating local cache")
+	case errtypes.NotFound:
+		span.SetStatus(codes.Ok, "")
+		return nil
+	case errtypes.NotModified:
+		span.SetStatus(codes.Ok, "")
+		return nil
+	default:
+		span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the received share: %s", err.Error()))
+		log.Error().Err(err).Msg("Failed to download the received share")
 		return err
 	}
-	// check mtime of /users/{userid}/created.json
-	if utils.TSToTime(info.Mtime).After(mtime) {
-		span.AddEvent("updating cache")
-		//  - update cached list of created shares for the user in memory if changed
-		createdBlob, err := c.storage.SimpleDownload(ctx, jsonPath)
-		if err != nil {
-			span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the received share: %s", err.Error()))
-			log.Error().Err(err).Msg("Failed to download the received share")
-			return err
-		}
-		newSpaces := &Spaces{}
-		err = json.Unmarshal(createdBlob, newSpaces)
-		if err != nil {
-			span.SetStatus(codes.Error, fmt.Sprintf("Failed to unmarshal the received share: %s", err.Error()))
-			log.Error().Err(err).Msg("Failed to unmarshal the received share")
-			return err
-		}
-		newSpaces.Mtime = utils.TSToTime(info.Mtime)
-		c.ReceivedSpaces[userID] = newSpaces
+
+	newSpaces := &Spaces{}
+	err = json.Unmarshal(dlres.Content, newSpaces)
+	if err != nil {
+		span.SetStatus(codes.Error, fmt.Sprintf("Failed to unmarshal the received share: %s", err.Error()))
+		log.Error().Err(err).Msg("Failed to unmarshal the received share")
+		return err
 	}
+	newSpaces.etag = dlres.Etag
+
+	c.ReceivedSpaces[userID] = newSpaces
 	span.SetStatus(codes.Ok, "")
 	return nil
 }
@@ -229,31 +242,32 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		return nil
 	}
 
-	oldMtime := c.ReceivedSpaces[userID].Mtime
-	c.ReceivedSpaces[userID].Mtime = time.Now()
-
 	createdBytes, err := json.Marshal(c.ReceivedSpaces[userID])
 	if err != nil {
-		c.ReceivedSpaces[userID].Mtime = oldMtime
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := userJSONPath(userID)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
-		c.ReceivedSpaces[userID].Mtime = oldMtime
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
-	if err = c.storage.Upload(ctx, metadata.UploadRequest{
-		Path:              jsonPath,
-		Content:           createdBytes,
-		IfUnmodifiedSince: oldMtime,
-		MTime:             c.ReceivedSpaces[userID].Mtime,
-	}); err != nil {
-		c.ReceivedSpaces[userID].Mtime = oldMtime
+	ur := metadata.UploadRequest{
+		Path:        jsonPath,
+		Content:     createdBytes,
+		IfMatchEtag: c.ReceivedSpaces[userID].etag,
+	}
+	// when there is no etag in memory make sure the file has not been created on the server, see https://www.rfc-editor.org/rfc/rfc9110#field.if-match
+	// > If the field value is "*", the condition is false if the origin server has a current representation for the target resource.
+	if c.ReceivedSpaces[userID].etag == "" {
+		ur.IfNoneMatch = []string{"*"}
+	}
+
+	_, err = c.storage.Upload(ctx, ur)
+	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		return err
@@ -264,4 +278,15 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 
 func userJSONPath(userID string) string {
 	return filepath.Join("/users", userID, "received.json")
+}
+
+func (c *Cache) initializeIfNeeded(userID, spaceID string) {
+	if c.ReceivedSpaces[userID] == nil {
+		c.ReceivedSpaces[userID] = &Spaces{
+			Spaces: map[string]*Space{},
+		}
+	}
+	if spaceID != "" && c.ReceivedSpaces[userID].Spaces[spaceID] == nil {
+		c.ReceivedSpaces[userID].Spaces[spaceID] = &Space{}
+	}
 }
