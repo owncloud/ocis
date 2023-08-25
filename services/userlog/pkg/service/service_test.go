@@ -30,6 +30,7 @@ import (
 	"go-micro.dev/v4/client"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -88,9 +89,9 @@ var _ = Describe("UserlogService", func() {
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.SpaceDisabled{},
 			}),
+			service.TraceProvider(trace.NewNoopTracerProvider()),
 		)
 		Expect(err).ToNot(HaveOccurred())
-
 	})
 
 	It("it stores, returns and deletes a couple of events", func() {
