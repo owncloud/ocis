@@ -189,8 +189,16 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 				return nil, errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
 			}
 		}
-		if ifMatch, ok := metadata["if-match"]; ok {
-			info.MetaData["if-match"] = ifMatch
+
+		// only check preconditions if they are not empty // TODO or is this a bad request?
+		if metadata["if-match"] != "" {
+			info.MetaData["if-match"] = metadata["if-match"]
+		}
+		if metadata["if-none-match"] != "" {
+			info.MetaData["if-none-match"] = metadata["if-none-match"]
+		}
+		if metadata["if-unmodified-since"] != "" {
+			info.MetaData["if-unmodified-since"] = metadata["if-unmodified-since"]
 		}
 	}
 

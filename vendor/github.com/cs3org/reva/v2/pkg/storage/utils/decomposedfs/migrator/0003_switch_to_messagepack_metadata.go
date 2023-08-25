@@ -97,7 +97,7 @@ func (m Migration0003) Migrate(migrator *Migrator) (Result, error) {
 			}
 
 			for k := range attribs {
-				err = xattrs.Remove(context.Background(), path, k)
+				err = xattrs.Remove(context.Background(), path, k, false)
 				if err != nil {
 					migrator.log.Debug().Err(err).Str("path", path).Msg("error removing xattr")
 				}

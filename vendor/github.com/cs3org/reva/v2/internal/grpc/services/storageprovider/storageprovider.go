@@ -324,7 +324,13 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		return nil, err
 	}
 	switch sRes.Status.Code {
-	case rpc.Code_CODE_OK, rpc.Code_CODE_NOT_FOUND:
+	case rpc.Code_CODE_OK:
+		if req.GetIfNotExist() {
+			return &provider.InitiateFileUploadResponse{
+				Status: status.NewAlreadyExists(ctx, errors.New("already exists"), "already exists"),
+			}, nil
+		}
+	case rpc.Code_CODE_NOT_FOUND:
 		// Just continue with a normal upload
 	default:
 		return &provider.InitiateFileUploadResponse{
@@ -342,10 +348,14 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		}
 		metadata["if-match"] = ifMatch
 	}
-	if !validateIfUnmodifiedSince(req.GetIfUnmodifiedSince(), sRes.GetInfo()) {
-		return &provider.InitiateFileUploadResponse{
-			Status: status.NewFailedPrecondition(ctx, errors.New("resource has been modified"), "resource has been modified"),
-		}, nil
+	ifUnmodifiedSince := req.GetIfUnmodifiedSince()
+	if ifUnmodifiedSince != nil {
+		metadata["if-unmodified-since"] = utils.TSToTime(ifUnmodifiedSince).Format(time.RFC3339Nano)
+		if !validateIfUnmodifiedSince(ifUnmodifiedSince, sRes.GetInfo()) {
+			return &provider.InitiateFileUploadResponse{
+				Status: status.NewFailedPrecondition(ctx, errors.New("resource has been modified"), "resource has been modified"),
+			}, nil
+		}
 	}
 
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
@@ -1078,6 +1088,19 @@ func (s *service) UpdateGrant(ctx context.Context, req *provider.UpdateGrantRequ
 		if e, ok := req.Opaque.Map["lockid"]; ok && e.Decoder == "plain" {
 			ctx = ctxpkg.ContextSetLockID(ctx, string(e.Value))
 		}
+	}
+
+	// TODO: update CS3 APIs
+	// FIXME these should be part of the AddGrantRequest object
+	// https://github.com/owncloud/ocis/issues/4312
+	if utils.ExistsInOpaque(req.Opaque, "spacegrant") {
+		ctx = context.WithValue(
+			ctx,
+			utils.SpaceGrant,
+			struct{ SpaceType string }{
+				SpaceType: utils.ReadPlainFromOpaque(req.Opaque, "spacetype"),
+			},
+		)
 	}
 
 	// check grantee type is valid

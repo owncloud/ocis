@@ -168,6 +168,9 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 		info.Storage["NodeId"] = uuid.New().String()
 		info.Storage["NodeExists"] = "false"
 	}
+	if info.MetaData["if-none-match"] == "*" && info.Storage["NodeExists"] == "true" {
+		return nil, errtypes.Aborted(fmt.Sprintf("parent %s already has a child %s", n.ID, n.Name))
+	}
 	// Create binary file in the upload folder with no content
 	log.Debug().Interface("info", info).Msg("Decomposedfs: built storage info")
 	file, err := os.OpenFile(binPath, os.O_CREATE|os.O_WRONLY, defaultFilePerm)
@@ -276,10 +279,19 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 	switch upload.Info.Storage["NodeExists"] {
 	case "false":
 		f, err = initNewNode(upload, n, uint64(fsize))
+		if f != nil {
+			appctx.GetLogger(upload.Ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from initNewNode")
+		}
 	default:
 		f, err = updateExistingNode(upload, n, spaceID, uint64(fsize))
+		if f != nil {
+			appctx.GetLogger(upload.Ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from updateExistingNode")
+		}
 	}
 	defer func() {
+		if f == nil {
+			return
+		}
 		if err := f.Close(); err != nil {
 			appctx.GetLogger(upload.Ctx).Error().Err(err).Str("nodeid", n.ID).Str("parentid", n.ParentID).Msg("could not close lock")
 		}
@@ -288,7 +300,17 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 		return nil, err
 	}
 
+	mtime := time.Now()
+	if upload.Info.MetaData["mtime"] != "" {
+		// overwrite mtime if requested
+		mtime, err = utils.MTimeToTime(upload.Info.MetaData["mtime"])
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// overwrite technical information
+	initAttrs.SetString(prefixes.MTimeAttr, mtime.UTC().Format(time.RFC3339Nano))
 	initAttrs.SetInt64(prefixes.TypeAttr, int64(provider.ResourceType_RESOURCE_TYPE_FILE))
 	initAttrs.SetString(prefixes.ParentidAttr, n.ParentID)
 	initAttrs.SetString(prefixes.NameAttr, n.Name)
@@ -302,19 +324,8 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 		return nil, errors.Wrap(err, "Decomposedfs: could not write metadata")
 	}
 
-	// overwrite mtime if requested
-	if upload.Info.MetaData["mtime"] != "" {
-		if err := n.SetMtimeString(upload.Info.MetaData["mtime"]); err != nil {
-			return nil, err
-		}
-	}
-
 	// add etag to metadata
-	tmtime, err := n.GetMTime()
-	if err != nil {
-		return nil, err
-	}
-	upload.Info.MetaData["etag"], _ = node.CalculateEtag(n.ID, tmtime)
+	upload.Info.MetaData["etag"], _ = node.CalculateEtag(n, mtime)
 
 	// update nodeid for later
 	upload.Info.Storage["NodeId"] = n.ID
@@ -338,7 +349,7 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 	}
 
 	// we also need to touch the actual node file here it stores the mtime of the resource
-	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE, 0600)
+	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
 		return f, err
 	}
@@ -351,12 +362,18 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 	// link child name to parent if it is new
 	childNameLink := filepath.Join(n.ParentPath(), n.Name)
 	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
+	log := appctx.GetLogger(upload.Ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
+	log.Info().Msg("initNewNode: creating symlink")
+
 	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
+		log.Info().Err(err).Msg("initNewNode: symlink failed")
 		if errors.Is(err, iofs.ErrExist) {
-			return nil, errtypes.AlreadyExists(n.Name)
+			log.Info().Err(err).Msg("initNewNode: symlink already exists")
+			return f, errtypes.AlreadyExists(n.Name)
 		}
 		return f, errors.Wrap(err, "Decomposedfs: could not symlink child entry")
 	}
+	log.Info().Msg("initNewNode: symlink created")
 
 	// on a new file the sizeDiff is the fileSize
 	upload.SizeDiff = int64(fsize)
@@ -365,40 +382,69 @@ func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, 
 }
 
 func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint64) (*lockedfile.File, error) {
-	old, _ := node.ReadNode(upload.Ctx, upload.lu, spaceID, n.ID, false, nil, false)
-	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, true, uint64(old.Blobsize), fsize); err != nil {
+	targetPath := n.InternalPath()
+
+	// write lock existing node before reading any metadata
+	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(targetPath), os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
 		return nil, err
 	}
 
-	tmtime, err := old.GetTMTime(upload.Ctx)
+	old, _ := node.ReadNode(upload.Ctx, upload.lu, spaceID, n.ID, false, nil, false)
+	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, true, uint64(old.Blobsize), fsize); err != nil {
+		return f, err
+	}
+
+	oldNodeMtime, err := old.GetMTime(upload.Ctx)
 	if err != nil {
-		return nil, err
+		return f, err
+	}
+	oldNodeEtag, err := node.CalculateEtag(old, oldNodeMtime)
+	if err != nil {
+		return f, err
 	}
 
 	// When the if-match header was set we need to check if the
 	// etag still matches before finishing the upload.
 	if ifMatch, ok := upload.Info.MetaData["if-match"]; ok {
-		targetEtag, err := node.CalculateEtag(n.ID, tmtime)
-		switch {
-		case err != nil:
-			return nil, errtypes.InternalError(err.Error())
-		case ifMatch != targetEtag:
-			return nil, errtypes.Aborted("etag mismatch")
+		if ifMatch != oldNodeEtag {
+			return f, errtypes.Aborted("etag mismatch")
 		}
 	}
 
-	upload.versionsPath = upload.lu.InternalPath(spaceID, n.ID+node.RevisionIDDelimiter+tmtime.UTC().Format(time.RFC3339Nano))
+	// When the if-none-match header was set we need to check if any of the
+	// etags matches before finishing the upload.
+	if ifNoneMatch, ok := upload.Info.MetaData["if-none-match"]; ok {
+		if ifNoneMatch == "*" {
+			return f, errtypes.Aborted("etag mismatch, resource exists")
+		}
+		for _, ifNoneMatchTag := range strings.Split(ifNoneMatch, ",") {
+			if ifNoneMatchTag == oldNodeEtag {
+				return f, errtypes.Aborted("etag mismatch")
+			}
+		}
+	}
+
+	// When the if-unmodified-since header was set we need to check if the
+	// etag still matches before finishing the upload.
+	if ifUnmodifiedSince, ok := upload.Info.MetaData["if-unmodified-since"]; ok {
+		if err != nil {
+			return f, errtypes.InternalError(fmt.Sprintf("failed to read mtime of node: %s", err))
+		}
+		ifUnmodifiedSince, err := time.Parse(time.RFC3339Nano, ifUnmodifiedSince)
+		if err != nil {
+			return f, errtypes.InternalError(fmt.Sprintf("failed to parse if-unmodified-since time: %s", err))
+		}
+
+		if oldNodeMtime.After(ifUnmodifiedSince) {
+			return f, errtypes.Aborted("if-unmodified-since mismatch")
+		}
+	}
+
+	upload.versionsPath = upload.lu.InternalPath(spaceID, n.ID+node.RevisionIDDelimiter+oldNodeMtime.UTC().Format(time.RFC3339Nano))
 	upload.SizeDiff = int64(fsize) - old.Blobsize
 	upload.Info.MetaData["versionsPath"] = upload.versionsPath
 	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.SizeDiff))
-
-	targetPath := n.InternalPath()
-
-	// write lock existing node before reading treesize or tree time
-	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(targetPath), os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, err
-	}
 
 	// create version node
 	if _, err := os.Create(upload.versionsPath); err != nil {
@@ -406,24 +452,19 @@ func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint
 	}
 
 	// copy blob metadata to version node
-	if err := upload.lu.CopyMetadataWithSourceLock(upload.Ctx, targetPath, upload.versionsPath, func(attributeName string) bool {
-		return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
+	if err := upload.lu.CopyMetadataWithSourceLock(upload.Ctx, targetPath, upload.versionsPath, func(attributeName string, value []byte) (newValue []byte, copy bool) {
+		return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 			attributeName == prefixes.TypeAttr ||
 			attributeName == prefixes.BlobIDAttr ||
-			attributeName == prefixes.BlobsizeAttr
-	}, f); err != nil {
+			attributeName == prefixes.BlobsizeAttr ||
+			attributeName == prefixes.MTimeAttr
+	}, f, true); err != nil {
 		return f, err
 	}
 
 	// keep mtime from previous version
-	if err := os.Chtimes(upload.versionsPath, tmtime, tmtime); err != nil {
+	if err := os.Chtimes(upload.versionsPath, oldNodeMtime, oldNodeMtime); err != nil {
 		return f, errtypes.InternalError(fmt.Sprintf("failed to change mtime of version node: %s", err))
-	}
-
-	// update mtime of current version
-	mtime := time.Now()
-	if err := os.Chtimes(n.InternalPath(), mtime, mtime); err != nil {
-		return nil, err
 	}
 
 	return f, nil

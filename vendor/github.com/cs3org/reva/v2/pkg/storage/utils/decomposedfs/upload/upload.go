@@ -401,12 +401,13 @@ func (upload *Upload) cleanup(cleanNode, cleanBin, cleanInfo bool) {
 			upload.Node = nil
 		default:
 
-			if err := upload.lu.CopyMetadata(upload.Ctx, p, upload.Node.InternalPath(), func(attributeName string) bool {
-				return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
+			if err := upload.lu.CopyMetadata(upload.Ctx, p, upload.Node.InternalPath(), func(attributeName string, value []byte) (newValue []byte, copy bool) {
+				return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 					attributeName == prefixes.TypeAttr ||
 					attributeName == prefixes.BlobIDAttr ||
-					attributeName == prefixes.BlobsizeAttr
-			}); err != nil {
+					attributeName == prefixes.BlobsizeAttr ||
+					attributeName == prefixes.MTimeAttr
+			}, true); err != nil {
 				upload.log.Info().Str("versionpath", p).Str("nodepath", upload.Node.InternalPath()).Err(err).Msg("renaming version node failed")
 			}
 

@@ -511,16 +511,21 @@ func (n *Node) LockFilePath() string {
 }
 
 // CalculateEtag returns a hash of fileid + tmtime (or mtime)
-func CalculateEtag(nodeID string, tmTime time.Time) (string, error) {
-	return calculateEtag(nodeID, tmTime)
+func CalculateEtag(n *Node, tmTime time.Time) (string, error) {
+	return calculateEtag(n, tmTime)
 }
 
 // calculateEtag returns a hash of fileid + tmtime (or mtime)
-func calculateEtag(nodeID string, tmTime time.Time) (string, error) {
+func calculateEtag(n *Node, tmTime time.Time) (string, error) {
 	h := md5.New()
-	if _, err := io.WriteString(h, nodeID); err != nil {
+	if _, err := io.WriteString(h, n.ID); err != nil {
 		return "", err
 	}
+	/* TODO we could strengthen the etag by adding the blobid, but then all etags would change. we would need a legacy etag check as well
+	if _, err := io.WriteString(h, n.BlobID); err != nil {
+		return "", err
+	}
+	*/
 	if tb, err := tmTime.UTC().MarshalBinary(); err == nil {
 		if _, err := h.Write(tb); err != nil {
 			return "", err
@@ -532,19 +537,20 @@ func calculateEtag(nodeID string, tmTime time.Time) (string, error) {
 }
 
 // SetMtimeString sets the mtime and atime of a node to the unixtime parsed from the given string
-func (n *Node) SetMtimeString(mtime string) error {
-	mt, err := parseMTime(mtime)
+func (n *Node) SetMtimeString(ctx context.Context, mtime string) error {
+	mt, err := utils.MTimeToTime(mtime)
 	if err != nil {
 		return err
 	}
-	return n.SetMtime(mt)
+	return n.SetMtime(ctx, &mt)
 }
 
-// SetMtime sets the mtime and atime of a node
-func (n *Node) SetMtime(mtime time.Time) error {
-	nodePath := n.InternalPath()
-	// updating mtime also updates atime
-	return os.Chtimes(nodePath, mtime, mtime)
+// SetMTime writes the UTC mtime to the extended attributes or removes the attribute if nil is passed
+func (n *Node) SetMtime(ctx context.Context, t *time.Time) (err error) {
+	if t == nil {
+		return n.RemoveXattr(ctx, prefixes.MTimeAttr, true)
+	}
+	return n.SetXattrString(ctx, prefixes.MTimeAttr, t.UTC().Format(time.RFC3339Nano))
 }
 
 // SetEtag sets the temporary etag of a node if it differs from the current etag
@@ -555,7 +561,7 @@ func (n *Node) SetEtag(ctx context.Context, val string) (err error) {
 		return
 	}
 	var etag string
-	if etag, err = calculateEtag(n.ID, tmTime); err != nil {
+	if etag, err = calculateEtag(n, tmTime); err != nil {
 		return
 	}
 
@@ -666,7 +672,7 @@ func (n *Node) AsResourceInfo(ctx context.Context, rp *provider.ResourcePermissi
 	// use temporary etag if it is set
 	if b, err := n.XattrString(ctx, prefixes.TmpEtagAttr); err == nil && b != "" {
 		ri.Etag = fmt.Sprintf(`"%x"`, b)
-	} else if ri.Etag, err = calculateEtag(n.ID, tmTime); err != nil {
+	} else if ri.Etag, err = calculateEtag(n, tmTime); err != nil {
 		sublog.Debug().Err(err).Msg("could not calculate etag")
 	}
 
@@ -883,22 +889,26 @@ func (n *Node) GetTMTime(ctx context.Context) (time.Time, error) {
 	}
 
 	// no tmtime, use mtime
-	return n.GetMTime()
+	return n.GetMTime(ctx)
 }
 
-// GetMTime reads the mtime from disk
-func (n *Node) GetMTime() (time.Time, error) {
-	fi, err := os.Lstat(n.InternalPath())
+// GetMTime reads the mtime from the extended attributes, falling back to disk
+func (n *Node) GetMTime(ctx context.Context) (time.Time, error) {
+	b, err := n.XattrString(ctx, prefixes.MTimeAttr)
 	if err != nil {
-		return time.Time{}, err
+		fi, err := os.Lstat(n.InternalPath())
+		if err != nil {
+			return time.Time{}, err
+		}
+		return fi.ModTime(), nil
 	}
-	return fi.ModTime(), nil
+	return time.Parse(time.RFC3339Nano, b)
 }
 
 // SetTMTime writes the UTC tmtime to the extended attributes or removes the attribute if nil is passed
 func (n *Node) SetTMTime(ctx context.Context, t *time.Time) (err error) {
 	if t == nil {
-		return n.RemoveXattr(ctx, prefixes.TreeMTimeAttr)
+		return n.RemoveXattr(ctx, prefixes.TreeMTimeAttr, true)
 	}
 	return n.SetXattrString(ctx, prefixes.TreeMTimeAttr, t.UTC().Format(time.RFC3339Nano))
 }
@@ -915,7 +925,7 @@ func (n *Node) GetDTime(ctx context.Context) (tmTime time.Time, err error) {
 // SetDTime writes the UTC dtime to the extended attributes or removes the attribute if nil is passed
 func (n *Node) SetDTime(ctx context.Context, t *time.Time) (err error) {
 	if t == nil {
-		return n.RemoveXattr(ctx, prefixes.DTimeAttr)
+		return n.RemoveXattr(ctx, prefixes.DTimeAttr, true)
 	}
 	return n.SetXattrString(ctx, prefixes.DTimeAttr, t.UTC().Format(time.RFC3339Nano))
 }
@@ -962,7 +972,14 @@ func (n *Node) SetChecksum(ctx context.Context, csType string, h hash.Hash) (err
 
 // UnsetTempEtag removes the temporary etag attribute
 func (n *Node) UnsetTempEtag(ctx context.Context) (err error) {
-	return n.RemoveXattr(ctx, prefixes.TmpEtagAttr)
+	return n.RemoveXattr(ctx, prefixes.TmpEtagAttr, true)
+}
+
+func isGrantExpired(g *provider.Grant) bool {
+	if g.Expiration == nil {
+		return false
+	}
+	return time.Now().After(time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)))
 }
 
 // ReadUserPermissions will assemble the permissions for the current user on the given node without parent nodes
@@ -1014,6 +1031,10 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 			}
 		default:
 			// no need to check attribute
+			continue
+		}
+
+		if isGrantExpired(g) {
 			continue
 		}
 
@@ -1111,6 +1132,23 @@ func (n *Node) ReadGrant(ctx context.Context, grantee string) (g *provider.Grant
 	return e.Grant(), nil
 }
 
+// ReadGrant reads a CS3 grant
+func (n *Node) DeleteGrant(ctx context.Context, g *provider.Grant, acquireLock bool) (err error) {
+
+	var attr string
+	if g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP {
+		attr = prefixes.GrantGroupAcePrefix + g.Grantee.GetGroupId().OpaqueId
+	} else {
+		attr = prefixes.GrantUserAcePrefix + g.Grantee.GetUserId().OpaqueId
+	}
+
+	if err = n.RemoveXattr(ctx, attr, acquireLock); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ListGrants lists all grants of the current node.
 func (n *Node) ListGrants(ctx context.Context) ([]*provider.Grant, error) {
 	grantees, err := n.ListGrantees(ctx)
@@ -1159,17 +1197,6 @@ func (n *Node) getGranteeTypes(ctx context.Context) []provider.GranteeType {
 	return types
 }
 
-func parseMTime(v string) (t time.Time, err error) {
-	p := strings.SplitN(v, ".", 2)
-	var sec, nsec int64
-	if sec, err = strconv.ParseInt(p[0], 10, 64); err == nil {
-		if len(p) > 1 {
-			nsec, err = strconv.ParseInt(p[1], 10, 64)
-		}
-	}
-	return time.Unix(sec, nsec), err
-}
-
 // FindStorageSpaceRoot calls n.Parent() and climbs the tree
 // until it finds the space root node and adds it to the node
 func (n *Node) FindStorageSpaceRoot(ctx context.Context) error {
@@ -1198,7 +1225,7 @@ func (n *Node) UnmarkProcessing(ctx context.Context, uploadID string) error {
 		// file started another postprocessing later - do not remove
 		return nil
 	}
-	return n.RemoveXattr(ctx, prefixes.StatusPrefix)
+	return n.RemoveXattr(ctx, prefixes.StatusPrefix, true)
 }
 
 // IsProcessing returns true if the node is currently being processed

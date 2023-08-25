@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -82,45 +83,94 @@ func (disk *Disk) Stat(ctx context.Context, path string) (*provider.ResourceInfo
 
 // SimpleUpload stores a file on disk
 func (disk *Disk) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
-	return disk.Upload(ctx, UploadRequest{
+	_, err := disk.Upload(ctx, UploadRequest{
 		Path:    uploadpath,
 		Content: content,
 	})
+	return err
 }
 
 // Upload stores a file on disk
-func (disk *Disk) Upload(_ context.Context, req UploadRequest) error {
+func (disk *Disk) Upload(_ context.Context, req UploadRequest) (*UploadResponse, error) {
 	p := disk.targetPath(req.Path)
 	if req.IfMatchEtag != "" {
 		info, err := os.Stat(p)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			return err
+			return nil, err
 		} else if err == nil {
 			etag, err := calcEtag(info.ModTime(), info.Size())
 			if err != nil {
-				return err
+				return nil, err
 			}
 			if etag != req.IfMatchEtag {
-				return errtypes.PreconditionFailed("etag mismatch")
+				return nil, errtypes.PreconditionFailed("etag mismatch")
 			}
 		}
 	}
 	if req.IfUnmodifiedSince != (time.Time{}) {
 		info, err := os.Stat(p)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			return err
+			return nil, err
 		} else if err == nil {
 			if info.ModTime().After(req.IfUnmodifiedSince) {
-				return errtypes.PreconditionFailed(fmt.Sprintf("resource has been modified, mtime: %s > since %s", info.ModTime(), req.IfUnmodifiedSince))
+				return nil, errtypes.PreconditionFailed(fmt.Sprintf("resource has been modified, mtime: %s > since %s", info.ModTime(), req.IfUnmodifiedSince))
 			}
 		}
 	}
-	return os.WriteFile(p, req.Content, 0644)
+	err := os.WriteFile(p, req.Content, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := os.Stat(disk.targetPath(req.Path))
+	if err != nil {
+		return nil, err
+	}
+	res := &UploadResponse{}
+	res.Etag, err = calcEtag(info.ModTime(), info.Size())
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// Download reads a file from disk
+func (disk *Disk) Download(_ context.Context, req DownloadRequest) (*DownloadResponse, error) {
+	var err error
+
+	f, err := os.Open(disk.targetPath(req.Path))
+	if err != nil {
+		var pathError *fs.PathError
+		if errors.As(err, &pathError) {
+			return nil, errtypes.NotFound("path not found: " + disk.targetPath(req.Path))
+		}
+		return nil, err
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	res := DownloadResponse{}
+	res.Mtime = info.ModTime()
+	res.Etag, err = calcEtag(info.ModTime(), info.Size())
+	if err != nil {
+		return nil, err
+	}
+
+	res.Content, err = io.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
 // SimpleDownload reads a file from disk
-func (disk *Disk) SimpleDownload(_ context.Context, downloadpath string) ([]byte, error) {
-	return os.ReadFile(disk.targetPath(downloadpath))
+func (disk *Disk) SimpleDownload(ctx context.Context, downloadpath string) ([]byte, error) {
+	res, err := disk.Download(ctx, DownloadRequest{Path: downloadpath})
+	return res.Content, err
 }
 
 // Delete deletes a path
