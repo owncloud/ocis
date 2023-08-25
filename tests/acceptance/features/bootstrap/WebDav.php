@@ -455,9 +455,9 @@ trait WebDav {
 	 * @param string|null $width
 	 * @param string|null $height
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):void {
+	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$doDavRequestAsUser = $this->getActualUsername($doDavRequestAsUser);
 		$urlParameter = [
@@ -466,7 +466,7 @@ trait WebDav {
 			'forceIcon' => '0',
 			'preview' => '1'
 		];
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			"GET",
 			$path,
@@ -4637,13 +4637,14 @@ trait WebDav {
 	 * @return void
 	 */
 	public function downloadPreviewOfFiles(string $user, string $path, string $width, string $height):void {
-		$this->downloadPreviews(
+		$response = $this->downloadPreviews(
 			$user,
 			$path,
 			null,
 			$width,
 			$height
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -4658,13 +4659,14 @@ trait WebDav {
 	 * @return void
 	 */
 	public function downloadPreviewOfOtherUser(string $user1, string $path, string $doDavRequestAsUser, string $width, string $height):void {
-		$this->downloadPreviews(
+		$response = $this->downloadPreviews(
 			$user1,
 			$path,
 			$doDavRequestAsUser,
 			$width,
 			$height
 		);
+		$this->setResponse($response);
 	}
 
 	/**
