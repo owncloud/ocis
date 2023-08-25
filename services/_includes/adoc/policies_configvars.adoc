@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-25-06-41-58]
+[#deprecation-note-2023-08-25-18-04-00]
 [caption=]
 .Deprecation notes for the policies service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -234,5 +234,45 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Defaults to deny if the variable was not found.
+
+a|`OCIS_TRACING_ENABLED` +
+`POLICIES_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`POLICIES_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`POLICIES_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`POLICIES_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 |===
 
