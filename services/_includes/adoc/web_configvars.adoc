@@ -13,16 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| WEB_UI_CONFIG name changing to make the usecase clear
-| 3.0
-| 4.0.0
-| WEB_UI_CONFIG_FILE
-
-| WEB_UI_PATH will be superceded by WEB_UI_CONFIG_FILE
-| 3.0
-| 4.0.0
-| WEB_UI_CONFIG_FILE
 |===
 
 endif::[]

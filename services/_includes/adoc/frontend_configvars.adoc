@@ -13,21 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| STORAGE_TRANSFER_SECRET changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_TRANSFER_SECRET
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 3.1
-| OCIS_REVA_GATEWAY
-
-| FRONTEND_OCS_HOME_NAMESPACE changing name for consistency
-| 3.0
-| 4.0.0
-| FRONTEND_OCS_PERSONAL_NAMESPACE
 |===
 
 endif::[]

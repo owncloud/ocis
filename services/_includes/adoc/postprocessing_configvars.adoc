@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| POSTPROCESSING_VIRUSSCAN is not longer necessary and is replaced by POSTPROCESSING_STEPS which also holds information about the order of steps
-| master
-| master
-| POSTPROCESSING_STEPS
 |===
 
 endif::[]

@@ -13,21 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY
-
-| REVA_GATEWAY_TLS_MODE changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY_TLS_MODE
-
-| REVA_GATEWAY_TLS_CACERT changing name for consistency
-| 3.0
-| 4.0.0
-| OCIS_REVA_GATEWAY_TLS_CACERT
 |===
 
 endif::[]

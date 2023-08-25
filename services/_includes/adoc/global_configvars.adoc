@@ -11,8 +11,6 @@
 | Default Value
 | Description
 
-
-
 a| `IDM_CREATE_DEMO_USERS`
 
 a| [subs=attributes+]

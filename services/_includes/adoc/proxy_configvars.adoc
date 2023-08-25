@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| REVA_GATEWAY changing name for consistency
-| 3.0
-| 3.1
-| OCIS_REVA_GATEWAY
 |===
 
 endif::[]

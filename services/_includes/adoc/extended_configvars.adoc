@@ -26,7 +26,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-++Go micro registry type to use. Supported types are: 'nats', 'kubernetes', 'etcd', 'consul' and 'memory'. Will be selected automatically. Only change on supervision of ownCloud Support. ++
+++Go micro registry type to use. Supported types are: 'nats', 'kubernetes', 'etcd', 'consul', 'memory' and 'mdns'. Will be selected automatically. Only change on supervision of ownCloud Support. ++
 
 a| `MICRO_REGISTRY_ADDRESS` +
 a| [subs=-attributes]
