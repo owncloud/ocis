@@ -33,7 +33,7 @@ type TokenManager struct {
 
 // Reva defines all available REVA client configuration.
 type Reva struct {
-	Address string        `yaml:"address" env:"OCIS_REVA_GATEWAY;REVA_GATEWAY" desc:"The CS3 gateway endpoint." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"REVA_GATEWAY changing name for consistency" deprecationReplacement:"OCIS_REVA_GATEWAY"`
+	Address string        `yaml:"address" env:"OCIS_REVA_GATEWAY;REVA_GATEWAY" desc:"The CS3 gateway endpoint." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"REVA_GATEWAY changing name for consistency" deprecationReplacement:"OCIS_REVA_GATEWAY"`
 	TLS     GRPCClientTLS `yaml:"tls"`
 }
 
