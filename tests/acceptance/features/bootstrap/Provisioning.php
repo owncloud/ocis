@@ -405,7 +405,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given the administrator has created a new user with the following attributes:
 	 * @Given the user :byUser has created a new user using the Graph API with the following settings:
 	 *
 	 * @param string $byUser
@@ -2529,8 +2528,13 @@ trait Provisioning {
 	 * @return void
 	 */
 	public function initializeUser(string $user, string $password):void {
-		$url = $this->getBaseUrl()
-			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+		$url = $this->getBaseUrl() . "/graph/v1.0/users/$user";
+
+		if (OcisHelper::isTestingOnReva()) {
+			$url = $this->getBaseUrl()
+				. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+		}
+
 		HttpRequestHelper::get(
 			$url,
 			$this->getStepLineRef(),
@@ -5317,7 +5321,7 @@ trait Provisioning {
 	 * @return string skeleton folder before the change
 	 * @throws Exception
 	 */
-	public function setSkeletonDir(string $skeletonDir): string {
+	private function setSkeletonDir(string $skeletonDir): string {
 		$originalSkeletonPath = \getenv("SKELETON_DIR");
 		if ($skeletonDir !== '') {
 			\putenv("SKELETON_DIR=" . $skeletonDir);
