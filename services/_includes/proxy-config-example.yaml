@@ -23,7 +23,7 @@ http:
   tls_key: ~/.ocis/proxy/server.key
   tls: true
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -65,14 +65,9 @@ policies:
   - type: query
     endpoint: /remote.php/?preview=1
     service: com.owncloud.web.webdav
-  - method: REPORT
-    endpoint: /remote.php/dav/
-    service: com.owncloud.web.webdav
-  - method: REPORT
-    endpoint: /remote.php/webdav
-    service: com.owncloud.web.webdav
-  - method: REPORT
-    endpoint: /dav/spaces
+  - type: regex
+    method: REPORT
+    endpoint: (/remote.php)?/(web)?dav
     service: com.owncloud.web.webdav
   - type: query
     endpoint: /dav/?preview=1
@@ -114,6 +109,7 @@ oidc:
   issuer: https://localhost:9200
   insecure: false
   access_token_verify_method: jwt
+  skip_user_info: false
   user_info_cache:
     store: memory
     addresses: []

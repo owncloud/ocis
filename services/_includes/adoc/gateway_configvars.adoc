@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-24-00-44-23]
+[#deprecation-note-2023-08-28-10-29-32]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -44,7 +44,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
 `GATEWAY_TRACING_ENDPOINT` +
@@ -74,7 +74,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `GATEWAY_LOG_PRETTY` +
@@ -171,12 +171,11 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-`REVA_GATEWAY` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
 
@@ -235,8 +234,7 @@ a| [subs=-attributes]
 Disable creation of the home space on login.
 
 a|`OCIS_TRANSFER_SECRET` +
-`STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -409,105 +407,6 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The public facing URL of the oCIS frontend.
-
-a|`GATEWAY_USERS_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9144 ++
-a| [subs=-attributes]
-The USERS API endpoint.
-
-a|`GATEWAY_GROUPS_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9160 ++
-a| [subs=-attributes]
-The GROUPS API endpoint.
-
-a|`GATEWAY_PERMISSIONS_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9191 ++
-a| [subs=-attributes]
-The SETTINGS API endpoint.
-
-a|`GATEWAY_SHARING_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9150 ++
-a| [subs=-attributes]
-The SHARE API endpoint.
-
-a|`GATEWAY_AUTH_BASIC_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9146 ++
-a| [subs=-attributes]
-The AUTH BASIC API endpoint.
-
-a|`GATEWAY_AUTH_BEARER_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The AUTH BEARER API endpoint.
-
-a|`GATEWAY_AUTH_MACHINE_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9166 ++
-a| [subs=-attributes]
-The AUTH MACHINE API endpoint.
-
-a|`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9178 ++
-a| [subs=-attributes]
-The STORAGE PUBLICLINK API endpoint.
-
-a|`GATEWAY_STORAGE_USERS_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9157 ++
-a| [subs=-attributes]
-The STORAGE USERS API endpoint.
-
-a|`GATEWAY_STORAGE_SHARES_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9154 ++
-a| [subs=-attributes]
-The STORAGE SHARES API endpoint.
-
-a|`GATEWAY_APP_REGISTRY_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++localhost:9242 ++
-a| [subs=-attributes]
-The APP REGISTRY API endpoint.
 
 a|`GATEWAY_STORAGE_USERS_MOUNT_ID` +
 

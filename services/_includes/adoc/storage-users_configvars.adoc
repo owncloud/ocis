@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-24-00-44-23]
+[#deprecation-note-2023-08-28-10-29-32]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -44,7 +44,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
 `STORAGE_USERS_TRACING_ENDPOINT` +
@@ -74,7 +74,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `STORAGE_USERS_LOG_PRETTY` +
@@ -189,12 +189,11 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-`REVA_GATEWAY` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
 
@@ -225,6 +224,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
 
+a|`STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++30 ++
+a| [subs=-attributes]
+The number of seconds to wait for the 'storage-users' service to shutdown cleanly before exiting with an error that gets logged. Note: This setting is only applicable when running the 'storage-users' service as a standalone service. See the text description for more details.
+
 a|`STORAGE_USERS_DRIVER` +
 
 a| [subs=-attributes]
@@ -243,6 +251,25 @@ a| [subs=-attributes]
 ++messagepack ++
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+
+a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
+`STORAGE_USERS_OCIS_PROPAGATOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sync ++
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+
+a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
@@ -268,7 +295,7 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9191 ++
+++com.owncloud.api.settings ++
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
@@ -327,8 +354,8 @@ a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
 a|`OCIS_ASYNC_UPLOADS` +
-`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+`` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -355,6 +382,25 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
 
+a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
+`STORAGE_USERS_S3NG_PROPAGATOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sync ++
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+
+a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
+
 a|`STORAGE_USERS_S3NG_ROOT` +
 
 a| [subs=-attributes]
@@ -379,7 +425,7 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9191 ++
+++com.owncloud.api.settings ++
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
@@ -568,7 +614,7 @@ a|`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9144 ++
+++com.owncloud.api.users ++
 a| [subs=-attributes]
 Endpoint of the users provider.
 
@@ -631,8 +677,7 @@ Whether to verify the server TLS certificates.
 
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
-`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -657,7 +702,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
+The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_STAT_CACHE_STORE` +
@@ -850,7 +895,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion.
+ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a|`STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` +
 

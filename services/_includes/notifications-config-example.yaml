@@ -30,12 +30,14 @@ notifications:
   events:
     endpoint: 127.0.0.1:9233
     cluster: ocis-cluster
-    group: notifications
     tls_insecure: false
     tls_root_ca_certificate: ""
     enable_tls: false
   machine_auth_api_key: ""
   email_template_path: ""
   translation_path: ""
-  reva_gateway: 127.0.0.1:9142
+  reva_gateway: com.owncloud.api.gateway
   grpc_client_tls: null
+grpc_client_tls:
+  mode: ""
+  cacert: ""

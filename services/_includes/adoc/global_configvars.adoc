@@ -1,5 +1,12 @@
 // collected through docs/helpers/adoc-generator.go.tmpl
 
+Note that some global environment variables have been deprecated and replaced by a new one starting with `OCIS_` for naming consistency:
+
+* All envvars starting with `LDAP_`
+* All envvars starting with `IDM_` except `IDM_CREATE_DEMO_USERS`
+* The following envvars: `REVA_GATEWAY`, `STORAGE_TRANSFER_SECRET`, `STORAGE_USERS_OCIS_ASYNC_UPLOADS`, `USERLOG_MACHINE_AUTH_API_KEY`.
+* Note that `WEB_UI_CONFIG_FILE` is not a global envar and will dropped from the list in a later release.
+
 [.landscape]
 [caption=]
 .Environment variables with global scope available in multiple services
@@ -10,6 +17,8 @@
 | Type
 | Default Value
 | Description
+
+
 
 a| `IDM_CREATE_DEMO_USERS`
 
@@ -24,85 +33,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
-
-a| `IDM_TRACING_COLLECTOR`
-
-a| [subs=attributes+]
-* xref:{s-path}/idm.adoc[idm] +
-* xref:{s-path}/notifications.adoc[notifications] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
-a| `IDM_TRACING_ENABLED`
-
-a| [subs=attributes+]
-* xref:{s-path}/idm.adoc[idm] +
-* xref:{s-path}/notifications.adoc[notifications] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Activates tracing.
-
-a| `IDM_TRACING_ENDPOINT`
-
-a| [subs=attributes+]
-* xref:{s-path}/idm.adoc[idm] +
-* xref:{s-path}/notifications.adoc[notifications] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-The endpoint of the tracing agent.
-
-a| `IDM_TRACING_TYPE`
-
-a| [subs=attributes+]
-* xref:{s-path}/idm.adoc[idm] +
-* xref:{s-path}/notifications.adoc[notifications] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
-a| `LDAP_BIND_DN`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
-
-a| [subs=-attributes]
-LDAP DN to use for simple bind authentication with the target LDAP server.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_PASSWORD`
 
@@ -121,448 +52,6 @@ a| [subs=-attributes]
 
 a| [subs=-attributes]
 Password to use for authenticating the 'bind_dn'.
-
-a| `LDAP_CACERT`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++~/.ocis/idm/ldap.crt ++
-
-a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
-
-a| `LDAP_DISABLED_USERS_GROUP_DN`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++cn=DisabledUsersGroup,ou=groups,o=libregraph-idm ++
-
-a| [subs=-attributes]
-The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.
-
-a| `LDAP_DISABLE_USER_MECHANISM`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++none ++
-
-a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
-
-a| `LDAP_GROUP_BASE_DN`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ou=groups,o=libregraph-idm ++
-
-a| [subs=-attributes]
-Search base DN for looking up LDAP groups.
-
-a| `LDAP_GROUP_FILTER`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-LDAP filter to add to the default filters for group searches.
-
-a| `LDAP_GROUP_OBJECTCLASS`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++groupOfNames ++
-
-a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames').
-
-a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++cn ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
-
-a| `LDAP_GROUP_SCHEMA_GROUPNAME`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++cn ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for the name of groups.
-
-a| `LDAP_GROUP_SCHEMA_ID`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ownclouduuid ++
-
-a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
-
-a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
-
-a| `LDAP_GROUP_SCHEMA_MAIL`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++mail ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for the email address of groups (can be empty).
-
-a| `LDAP_GROUP_SCHEMA_MEMBER`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++member ++
-
-a| [subs=-attributes]
-LDAP Attribute that is used for group members.
-
-a| `LDAP_GROUP_SCOPE`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++sub ++
-
-a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
-
-a| `LDAP_INSECURE`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
-
-a| `LDAP_URI`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ldaps://localhost:9235 ++
-
-a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
-
-a| `LDAP_USER_BASE_DN`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ou=users,o=libregraph-idm ++
-
-a| [subs=-attributes]
-Search base DN for looking up LDAP users.
-
-a| `LDAP_USER_ENABLED_ATTRIBUTE`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ownCloudUserEnabled ++
-
-a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
-
-a| `LDAP_USER_FILTER`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
-
-a| `LDAP_USER_OBJECTCLASS`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++inetOrgPerson ++
-
-a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
-
-a| `LDAP_USER_SCHEMA_DISPLAYNAME`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++displayname ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for the displayname of users.
-
-a| `LDAP_USER_SCHEMA_ID`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ownclouduuid ++
-
-a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
-
-a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
-
-a| `LDAP_USER_SCHEMA_MAIL`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++mail ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
-
-a| `LDAP_USER_SCHEMA_USERNAME`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++uid ++
-
-a| [subs=-attributes]
-LDAP Attribute to use for username of users.
-
-a| `LDAP_USER_SCHEMA_USER_TYPE`
-
-a| [subs=attributes+]
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ownCloudUserType ++
-
-a| [subs=-attributes]
-LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.
-
-a| `LDAP_USER_SCOPE`
-
-a| [subs=attributes+]
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/users.adoc[users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++sub ++
-
-a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_ADMIN_USER_ID`
 
@@ -640,7 +129,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -709,10 +198,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++10m0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
-Default time to live for entries in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10m' (10 minutes).
+Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -755,10 +244,10 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
 
 a| [subs=-attributes]
-A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
 
 a| `OCIS_CORS_ALLOW_METHODS`
 
@@ -821,6 +310,36 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 
+a| `OCIS_DECOMPOSEDFS_PROPAGATOR`
+
+a| [subs=attributes+]
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sync ++
+
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+
+a| `OCIS_DISABLE_PREVIEWS`
+
+a| [subs=attributes+]
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+
 a| `OCIS_EDITION`
 
 a| [subs=attributes+]
@@ -858,7 +377,7 @@ a| [subs=-attributes]
 ++ocis-cluster ++
 
 a| [subs=-attributes]
-The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
 a| `OCIS_EVENTS_ENABLE_TLS`
 
@@ -907,7 +426,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 
 a| [subs=-attributes]
-The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
 
 a| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 
@@ -931,7 +450,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -946,6 +465,7 @@ a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -979,6 +499,7 @@ a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -1097,7 +618,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether the NATS server should skip the client certificate verification during the TLS handshake.
+Whether to verify the server TLS certificates.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1116,6 +637,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
@@ -1288,7 +810,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++none ++
+++attribute ++
 
 a| [subs=-attributes]
 An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
@@ -1342,7 +864,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames').
+The object class to use for groups in the default group search filter like 'groupOfNames'.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -1392,7 +914,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1431,6 +953,7 @@ a| `OCIS_LDAP_GROUP_SCHEMA_MEMBER`
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/users.adoc[users] +
 
@@ -1458,7 +981,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
 a| `OCIS_LDAP_INSECURE`
 
@@ -1580,7 +1103,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+The object class to use for users in the default user search filter like 'inetOrgPerson'.
 
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -1614,7 +1137,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1631,7 +1154,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
@@ -1700,7 +1223,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 
 a| `OCIS_LOG_COLOR`
 
@@ -1847,7 +1370,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a| `OCIS_LOG_PRETTY`
 
@@ -1940,7 +1463,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -2038,10 +1561,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
@@ -2056,7 +1579,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -2071,7 +1594,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -2132,12 +1655,14 @@ IDP of the oCIS STORAGE-SYSTEM system user.
 a| `OCIS_TRACING_COLLECTOR`
 
 a| [subs=attributes+]
+* xref:{s-path}/antivirus.adoc[antivirus] +
 * xref:{s-path}/app-provider.adoc[app-provider] +
 * xref:{s-path}/app-registry.adoc[app-registry] +
 * xref:{s-path}/audit.adoc[audit] +
 * xref:{s-path}/auth-basic.adoc[auth-basic] +
 * xref:{s-path}/auth-bearer.adoc[auth-bearer] +
 * xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
@@ -2178,12 +1703,14 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a| `OCIS_TRACING_ENABLED`
 
 a| [subs=attributes+]
+* xref:{s-path}/antivirus.adoc[antivirus] +
 * xref:{s-path}/app-provider.adoc[app-provider] +
 * xref:{s-path}/app-registry.adoc[app-registry] +
 * xref:{s-path}/audit.adoc[audit] +
 * xref:{s-path}/auth-basic.adoc[auth-basic] +
 * xref:{s-path}/auth-bearer.adoc[auth-bearer] +
 * xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
@@ -2224,12 +1751,14 @@ Activates tracing.
 a| `OCIS_TRACING_ENDPOINT`
 
 a| [subs=attributes+]
+* xref:{s-path}/antivirus.adoc[antivirus] +
 * xref:{s-path}/app-provider.adoc[app-provider] +
 * xref:{s-path}/app-registry.adoc[app-registry] +
 * xref:{s-path}/audit.adoc[audit] +
 * xref:{s-path}/auth-basic.adoc[auth-basic] +
 * xref:{s-path}/auth-bearer.adoc[auth-bearer] +
 * xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
@@ -2270,12 +1799,14 @@ The endpoint of the tracing agent.
 a| `OCIS_TRACING_TYPE`
 
 a| [subs=attributes+]
+* xref:{s-path}/antivirus.adoc[antivirus] +
 * xref:{s-path}/app-provider.adoc[app-provider] +
 * xref:{s-path}/app-registry.adoc[app-registry] +
 * xref:{s-path}/audit.adoc[audit] +
 * xref:{s-path}/auth-basic.adoc[auth-basic] +
 * xref:{s-path}/auth-bearer.adoc[auth-bearer] +
 * xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
@@ -2311,7 +1842,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a| `OCIS_TRANSFER_SECRET`
 
@@ -2357,74 +1888,22 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
-a| `REVA_GATEWAY`
+a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
-* xref:{s-path}/app-provider.adoc[app-provider] +
-* xref:{s-path}/app-registry.adoc[app-registry] +
-* xref:{s-path}/auth-basic.adoc[auth-basic] +
-* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
-* xref:{s-path}/auth-machine.adoc[auth-machine] +
-* xref:{s-path}/frontend.adoc[frontend] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/groups.adoc[groups] +
-* xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/notifications.adoc[notifications] +
-* xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/policies.adoc[policies] +
-* xref:{s-path}/proxy.adoc[proxy] +
-* xref:{s-path}/search.adoc[search] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
-* xref:{s-path}/storage-shares.adoc[storage-shares] +
-* xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/thumbnails.adoc[thumbnails] +
-* xref:{s-path}/userlog.adoc[userlog] +
-* xref:{s-path}/users.adoc[users] +
-* xref:{s-path}/webdav.adoc[webdav] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++127.0.0.1:9142 ++
-
-a| [subs=-attributes]
-CS3 gateway used to look up user metadata
-
-a| `STORAGE_TRANSFER_SECRET`
-
-a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
-* xref:{s-path}/gateway.adoc[gateway] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
-
-a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
-
-a| [subs=attributes+]
-* xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++bool ++
+++Duration ++
 
 a| [subs=-attributes]
-++false ++
+++0s ++
 
 a| [subs=-attributes]
-Enable asynchronous file uploads.
+The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
 
 a| `STORAGE_USERS_PERMISSION_ENDPOINT`
 
@@ -2436,7 +1915,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++127.0.0.1:9191 ++
+++com.owncloud.api.settings ++
 
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.

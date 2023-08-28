@@ -56,7 +56,7 @@ api:
   graph_username_match: default
   graph_assign_default_user_role: true
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -104,6 +104,7 @@ identity:
     group_filter: ""
     group_objectclass: groupOfNames
     group_name_attribute: cn
+    group_member_attribute: member
     group_id_attribute: owncloudUUID
     group_id_is_octet_string: false
     education_resources_enabled: false
@@ -115,6 +116,7 @@ identity:
       school_name_attribute: ""
       school_number_attribute: ""
       school_id_attribute: ""
+      school_termination_min_grace_days: 0
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

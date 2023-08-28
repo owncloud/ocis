@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2023-08-24T00:44:26.532564545Z
+date: 2023-08-28T10:29:37.953731011Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
@@ -28,6 +28,8 @@ The `postprocessing` service handles the coordination of asynchronous postproces
   * [Custom Postprocessing Steps](#custom-postprocessing-steps)
     * [Prerequisites](#prerequisites)
     * [Workflow](#workflow)
+* [CLI Commands](#cli-commands)
+  * [Resume Postprocessing](#resume-postprocessing)
 * [Example Yaml Config](#example-yaml-config)
 
 ## General Prerequisites
@@ -88,6 +90,22 @@ When setting a custom postprocessing step (eg. `"customstep"`) the postprocessin
 Once the custom service has finished its work, it should sent an event of type `PostprocessingFinished` via the configured events system. This event needs to contain a `FinishedStep` field set to `"customstep"`. It also must contain the outcome of the step, which can be one of "delete" (abort postprocessing, delete the file), "abort" (abort postprocessing, keep the file) and "continue" (continue postprocessing, this is the success case).
 
 See the [cs3 org](https://github.com/cs3org/reva/blob/edge/pkg/events/postprocessing.go) for up-to-date information of reserved step names and event definitions.
+
+## CLI Commands
+
+### Resume Postprocessing
+
+If postprocessing fails in one step due to an unforseen error, current uploads will not be retried automatically. A system admin can instead run a CLI command to retry the failed upload which is a two step process:
+
+-   First find the upload ID of the failed upload.
+```bash
+ocis storage-users uploads list
+```
+
+-   Then use the restart command to resume postprocessing of the ID selected.
+```bash
+ocis postprocessing restart -u <uploadID>
+```
 ## Example Yaml Config
 {{< include file="services/_includes/postprocessing-config-example.yaml"  language="yaml" >}}
 

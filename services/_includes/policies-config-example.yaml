@@ -18,7 +18,7 @@ events:
   tls_root_ca_certificate: ""
   enable_tls: false
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -32,5 +32,6 @@ log:
 engine:
   timeout: 10s
   policies: []
+  mimes: ""
 postprocessing:
   query: ""

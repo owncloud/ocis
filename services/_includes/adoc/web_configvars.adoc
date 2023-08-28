@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-24-00-44-23]
+[#deprecation-note-2023-08-28-10-29-32]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -44,7 +44,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
 `WEB_TRACING_ENDPOINT` +
@@ -74,7 +74,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
 `WEB_LOG_PRETTY` +
@@ -224,7 +224,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] ++
 a| [subs=-attributes]
-A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
 
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `WEB_CORS_ALLOW_CREDENTIALS` +
@@ -246,8 +246,7 @@ a| [subs=-attributes]
 Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
 
 a|`WEB_UI_CONFIG_FILE` +
-`WEB_UI_CONFIG` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -256,8 +255,7 @@ a| [subs=-attributes]
 Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.
 
 a|`WEB_UI_CONFIG_FILE` +
-`WEB_UI_PATH` +
-xref:deprecation-note-2023-08-24-00-44-23[Deprecation Note]
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -301,7 +299,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++https://localhost:9200/.well-known/openid-configuration ++
 a| [subs=-attributes]
-URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".
+URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + '/.well-known/openid-configuration'.
 
 a|`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
@@ -322,7 +320,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++web ++
 a| [subs=-attributes]
-OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).
+The OIDC client ID which ownCloud Web uses. This client needs to be set up in your IDP. Note that this setting has no effect when using the builtin IDP.
 
 a|`WEB_OIDC_RESPONSE_TYPE` +
 
@@ -331,7 +329,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++code ++
 a| [subs=-attributes]
-OIDC response type to use for authentication.
+The OIDC response type to use for authentication.
 
 a|`WEB_OIDC_SCOPE` +
 
@@ -341,6 +339,15 @@ a| [subs=-attributes]
 ++openid profile email ++
 a| [subs=-attributes]
 OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.
+
+a|`WEB_OIDC_POST_LOGOUT_REDIRECT_URI` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page.
 
 a|`WEB_OPTION_HOME_FOLDER` +
 
@@ -360,14 +367,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Configures whether apps and extensions should generally open in a new tab. Defaults to false.
 
-a|`WEB_OPTION_DISABLE_PREVIEWS` +
+a|`OCIS_DISABLE_PREVIEWS` +
+`WEB_OPTION_DISABLE_PREVIEWS` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different file listing views. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 
 a|`WEB_OPTION_PREVIEW_FILE_MIMETYPES` +
 
@@ -459,6 +467,42 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.
 
+a|`WEB_OPTION_IMPRINT_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies the target URL for the imprint link valid for the ocis instance in the account menu.
+
+a|`WEB_OPTION_PRIVACY_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies the target URL for the privacy link valid for the ocis instance in the account menu.
+
+a|`WEB_OPTION_ACCESS_DENIED_HELP_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.
+
+a|`WEB_OPTION_TOKEN_STORAGE_LOCAL` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.
+
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +
 
@@ -474,7 +518,7 @@ a|`WEB_GATEWAY_GRPC_ADDR` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 The bind address of the GRPC service.
 |===

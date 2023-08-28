@@ -23,7 +23,7 @@ grpc:
 token_manager:
   jwt_secret: ""
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -37,6 +37,7 @@ drivers:
     app_internal_url: ""
     app_name: ""
     app_url: ""
+    app_disable_chat: false
     insecure: false
     wopi_server_iop_secret: ""
     wopi_server_external_url: ""

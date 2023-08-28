@@ -26,7 +26,7 @@ http:
 token_manager:
   jwt_secret: ""
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""

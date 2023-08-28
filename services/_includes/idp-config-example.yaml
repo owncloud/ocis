@@ -23,7 +23,7 @@ http:
   tls_key: ~/.ocis/idp/server.key
   tls: false
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""

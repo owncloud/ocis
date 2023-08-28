@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-08-24T00:44:26.534165712Z
+date: 2023-08-28T10:29:37.954727362Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -22,6 +22,10 @@ The `userlog` service is a mediator between the `eventhistory` service and clien
 * [Storing](#storing)
 * [Configuring](#configuring)
 * [Retrieving](#retrieving)
+* [Subscribing](#subscribing)
+* [Posting](#posting)
+  * [Authentication](#authentication)
+  * [Deprovisioning](#deprovisioning)
 * [Deleting](#deleting)
 * [Translations](#translations)
   * [Translation Rules](#translation-rules)
@@ -55,9 +59,27 @@ For the time being, the configuration which user related events are of interest 
 
 The `userlog` service provides an API to retrieve configured events. For now, this API is mostly following the [oc10 notification GET API](https://doc.owncloud.com/server/next/developer_manual/core/apis/ocs-notification-endpoint-v1.html#get-user-notifications).
 
+## Subscribing
+
+Additionally to the oc10 API, the `userlog` service also provides an `/sse` (Server-Sent Events) endpoint to be informed by the server when an event happens. See [What is Server-Sent Events](https://medium.com/yemeksepeti-teknoloji/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73) for a simple introduction and examples of server sent events. The `sse` endpoint will respect language changes of the user without needing to reconnect. Note that SSE has a limitation of six open connections per browser which can be reached if one has opened various tabs of the Web UI pointing to the same Infinite Scale instance.
+
+## Posting
+
+The userlog service is able to store global messages that will be displayed in the Web UI to all users. If a user deletes the message in the Web UI, it reappears on reload. Global messages use the endpoint `/ocs/v2.php/apps/notifications/api/v1/notifications/global` and are activated by sending a `POST` request. Note that sending another `POST` request of the same type overwrites the previous one. For the time being, only the type `deprovision` is supported.
+
+### Authentication
+
+`POST` and `DELETE` endpoints provide notifications to all users. Therefore only certain users can configure them. Two authentication methods for this endpoint are provided. Users with the `admin` role can always access these endpoints. Additionally, a static secret via the `USERLOG_GLOBAL_NOTIFICATIONS_SECRET` can be defined to enable access for users knowing this secret, which has to be sent with the header containing the request.
+
+### Deprovisioning
+
+Deprovision messages announce a deprovision text including a deprovision date of the instance to all users. With this message, users get informed that the instance will be shut down and deprovisioned and no further access to their data is possible past the given date. This implies that users must download their data before the given date. The text shown to users refers to this information. Note that the task to deprovision the instance does not depend on the message. The text of the message can be translated according to the translation settings, see section [Translations](#translations). The endpoint only expects a `deprovision_date` parameter in the `POST` request body as the final text is assembled automatically. The string hast to be in `RFC3339` format, however, this format can be changed by using `deprovision_date_format`. See the [go time formating](https://pkg.go.dev/time#pkg-constants) for more details.
+
 ## Deleting
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
+
+Sending a `DELETE` request to the `ocs/v2.php/apps/notifications/api/v1/notifications/global` endpoint to remove a global message is a restricted action, see the [Authentication](#authentication) section for more details.)
 
 ## Translations
 

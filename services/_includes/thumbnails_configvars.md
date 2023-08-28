@@ -3,10 +3,10 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | OCIS_TRACING_ENABLED<br/>THUMBNAILS_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>THUMBNAILS_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_TYPE<br/>THUMBNAILS_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>THUMBNAILS_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
 | OCIS_TRACING_COLLECTOR<br/>THUMBNAILS_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
-| OCIS_LOG_LEVEL<br/>THUMBNAILS_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_LEVEL<br/>THUMBNAILS_LOG_LEVEL | string |  | The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.|
 | OCIS_LOG_PRETTY<br/>THUMBNAILS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>THUMBNAILS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>THUMBNAILS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
@@ -24,7 +24,7 @@
 | THUMBNAILS_FILESYSTEMSTORAGE_ROOT | string | ~/.ocis/thumbnails | The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails.|
 | OCIS_INSECURE<br/>THUMBNAILS_WEBDAVSOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the webdav source.|
 | OCIS_INSECURE<br/>THUMBNAILS_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
-| OCIS_REVA_GATEWAY<br/>REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
 | THUMBNAILS_TXT_FONTMAP_FILE | string |  | The path to a font file for txt thumbnails.|
 | THUMBNAILS_TRANSFER_TOKEN | string |  | The secret to sign JWT to download the actual thumbnail file.|
 | THUMBNAILS_DATA_ENDPOINT | string | http://127.0.0.1:9186/thumbnails/data | The HTTP endpoint where the actual thumbnail file can be downloaded.|

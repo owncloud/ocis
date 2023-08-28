@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2023-08-24T00:44:26.533701352Z
+date: 2023-08-28T10:29:37.954500228Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -19,6 +19,7 @@ Purpose and description to be added
 ## Table of Contents
 
 * [Deprecated Metadata Backend](#deprecated-metadata-backend)
+* [Graceful Shutdown](#graceful-shutdown)
 * [CLI Commands](#cli-commands)
   * [Manage Unfinished Uploads](#manage-unfinished-uploads)
     * [Command Examples](#command-examples)
@@ -29,6 +30,18 @@ Purpose and description to be added
 ## Deprecated Metadata Backend
 
 Starting with ocis version 3.0.0, the default backend for metadata switched to messagepack. If the setting `STORAGE_USERS_OCIS_METADATA_BACKEND` has not been defined manually, the backend will be migrated to `messagepack` automatically. Though still possible to manually configure `xattrs`, this setting should not be used anymore as it will be removed in a later version.
+
+## Graceful Shutdown
+
+Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
+
+IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network. 
+
+When hard-stopping Infinite Scale, for example with the `kill <pid>` command (SIGKILL), it is possible and likely that not all data from the decomposedfs (metadata) has been written to the storage which may result in an inconsistent decomposedfs. When gracefully shutting down Infinite Scale, using a command like SIGTERM, the process will no longer accept any write requests from _other_ services and will try to write the internal open  requests which can take an undefined duration based on many factors. To mitigate that situation, the following things have been implemented:
+
+*   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences, you must increase the default value.
+
+*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details. 
 
 ## CLI Commands
 

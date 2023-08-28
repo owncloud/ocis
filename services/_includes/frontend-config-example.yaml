@@ -60,12 +60,13 @@ http:
     - Upload-Checksum
     - Upload-Offset
     - X-HTTP-Method-Override
+    - Cache-Control
     allow_credentials: true
 transfer_secret: ""
 token_manager:
   jwt_secret: ""
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -83,6 +84,7 @@ enable_federated_sharing_incoming: false
 enable_federated_sharing_outgoing: false
 search_min_length: 3
 edition: Community
+disable_sse: false
 public_url: https://localhost:9200
 app_handler:
   insecure: false
