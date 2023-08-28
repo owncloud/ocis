@@ -114,7 +114,7 @@ HTTP status code: 200
       "app_providers": [
         {
           "name": "OnlyOffice",
-          "icon": "https://www.pikpng.com/pngl/m/343-3435764_onlyoffice-desktop-editors-onlyoffice-logo-clipart.png"
+          "icon": "https://some-website.test/onlyoffice-pdf-icon.png"
         }
       ],
       "name": "PDF",
@@ -126,11 +126,11 @@ HTTP status code: 200
       "app_providers": [
         {
           "name": "Collabora",
-          "icon": "https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png"
+          "icon": "https://some-website.test/collabora-odt-icon.png"
         },
         {
           "name": "OnlyOffice",
-          "icon": "https://www.pikpng.com/pngl/m/343-3435764_onlyoffice-desktop-editors-onlyoffice-logo-clipart.png"
+          "icon": "https://some-website.test/onlyoffice-odt-icon.png"
         }
       ],
       "name": "OpenDocument",
@@ -145,7 +145,7 @@ HTTP status code: 200
       "app_providers": [
         {
           "name": "CodiMD",
-          "icon": "https://avatars.githubusercontent.com/u/67865462?v=4"
+          "icon": "https://some-website.test/codimd-md-icon.png"
         }
       ],
       "name": "Markdown file",
@@ -158,11 +158,11 @@ HTTP status code: 200
       "app_providers": [
         {
           "name": "Collabora",
-          "icon": "https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png"
+          "icon": "https://some-website.test/collabora-word-icon.png"
         },
         {
           "name": "OnlyOffice",
-          "icon": "https://www.pikpng.com/pngl/m/343-3435764_onlyoffice-desktop-editors-onlyoffice-logo-clipart.png"
+          "icon": "https://some-website.test/onlyoffice-word-icon.png"
         }
       ]
     },
@@ -171,7 +171,7 @@ HTTP status code: 200
       "app_providers": [
         {
           "name": "Collabora",
-          "icon": "https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png"
+          "icon": "https://some-website.test/collabora-powerpoint-icon.png"
         }
       ]
     }
