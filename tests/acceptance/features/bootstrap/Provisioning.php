@@ -2776,11 +2776,19 @@ trait Provisioning {
 			: "/ocs/v2.php/cloud";
 		$fullUrl = $this->getBaseUrl() . $path . "/users/$user";
 
+		if (OcisHelper::isTestingOnReva()) {
+			$requestingUser = $this->getActualUsername($user);
+			$requestingPassword = $this->getPasswordForUser($user);
+		} else {
+			$requestingUser = $this->getAdminUsername();
+			$requestingPassword = $this->getAdminPassword();
+		}
+
 		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$requestingUser,
+			$requestingPassword
 		);
 		if ($response->getStatusCode() >= 400) {
 			return false;
