@@ -1,3 +1,44 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.0...master
+
+## Summary
+
+* Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
+
+## Details
+
+* Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
+
+   Introduce support for
+   [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference)
+   search syntax.
+
+   The functionality consists of a kql lexer and a bleve query compiler
+
+   Supported field queries:
+
+  * `Tag` search `tag:golden tag:"silver"`
+  * `Filename` search `name:file.txt name:"file.docx"`
+  * `Content` search `content:ahab content:"captain aha*"`
+
+   Supported conjunctive normal form queries:
+
+  * `Boolean`: `AND`, `OR`, `NOT`,
+  * `Group`: `(tag:book content:ahab*)`, `tag:(book pdf)`
+
+   Some examples are:
+
+   Query: `(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`
+
+  * Resources with `name: moby di*` `OR` `tag: bestseller`.
+  * `AND` with `tag:book`.
+  * `NOT` with `tag:read`.
+
+   https://github.com/owncloud/ocis/issues/7042
+   https://github.com/owncloud/ocis/pull/7043
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
@@ -4987,7 +5028,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -5155,28 +5196,11 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -5345,6 +5369,23 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
