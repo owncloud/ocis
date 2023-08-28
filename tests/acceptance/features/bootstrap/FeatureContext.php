@@ -1156,7 +1156,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
-		$this->sendingToWithDirectUrl($user, $verb, $url, null);
+		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null));
 	}
 
 	/**
@@ -1174,6 +1174,20 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @When user :user sends HTTP method :method to URL :davPath with content :content
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $davPath
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function userSendsHttpMethodToUrlWithContent(string $user, string $method, string $davPath, string $content): void {
+		$this->setResponse($this->sendingToWithDirectUrl($user, $method, $davPath, $content));
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends HTTP method "([^"]*)" to URL "([^"]*)" with password "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1184,7 +1198,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function userSendsHTTPMethodToUrlWithPassword(string $user, string $verb, string $url, string $password): void {
-		$this->sendingToWithDirectUrl($user, $verb, $url, null, $password);
+		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null, $password));
 	}
 
 	/**
@@ -1206,13 +1220,13 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string|null $user
 	 * @param string|null $verb
 	 * @param string|null $url
-	 * @param TableNode|null $body
+	 * @param string|null $body
 	 * @param string|null $password
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, ?TableNode $body, ?string $password = null): void {
+	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, string $body = null, ?string $password = null): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . $url;
 
 		if ($password === null) {
@@ -1235,23 +1249,18 @@ class FeatureContext extends BehatVariablesContext {
 			$cookies = $this->cookieJar;
 		}
 
-		$bodyRows = null;
-		if ($body instanceof TableNode) {
-			$bodyRows = $body->getRowsHash();
-		}
-
 		if (isset($this->requestToken)) {
 			$headers['requesttoken'] = $this->requestToken;
 		}
 
-		$this->response = HttpRequestHelper::sendRequest(
+		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$verb,
 			$user,
 			$password,
 			$headers,
-			$bodyRows,
+			$body,
 			$config,
 			$cookies
 		);
