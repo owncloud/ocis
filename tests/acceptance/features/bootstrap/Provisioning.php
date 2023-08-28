@@ -2676,14 +2676,12 @@ trait Provisioning {
 		$user = \trim($user);
 
 		if ($this->isTestingWithLdap()) {
-			$settings = [];
 			$setting["userid"] = $user;
 			$setting["displayName"] = $displayName;
 			$setting["password"] = $password;
 			$setting["email"] = $email;
-			$settings[] = $setting;
 			try {
-				$this->createLdapUser($settings);
+				$this->createLdapUser($setting);
 			} catch (LdapException $exception) {
 				throw new Exception(
 					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception"
