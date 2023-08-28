@@ -209,8 +209,8 @@ devDependencies:
     specifier: 3.0.0
     version: 3.0.0
   postcss-normalize:
-    specifier: 8.0.1
-    version: 8.0.1
+    specifier: 10.0.1
+    version: 10.0.1(browserslist@4.21.1)(postcss@8.4.14)
   postcss-preset-env:
     specifier: 6.7.0
     version: 6.7.0
@@ -8966,14 +8966,15 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: true
 
-  /postcss-browser-comments@3.0.0(browserslist@4.21.1):
-    resolution: {integrity: sha512-qfVjLfq7HFd2e0HW4s1dvU8X080OZdG46fFbIBFjW7US7YPDcWfRvdElvwMJr2LI6hMmD+7LnH2HcmXTs+uOig==}
-    engines: {node: '>=8.0.0'}
+  /postcss-browser-comments@4.0.0(browserslist@4.21.1)(postcss@8.4.14):
+    resolution: {integrity: sha512-X9X9/WN3KIvY9+hNERUqX9gncsgBA25XaeR+jshHz2j8+sYyHktHw1JdKuMjeLpGktXidqDhA7b/qm1mrBDmgg==}
+    engines: {node: '>=8'}
     peerDependencies:
-      browserslist: ^4
+      browserslist: '>=4'
+      postcss: '>=8'
     dependencies:
       browserslist: 4.21.1
-      postcss: 7.0.39
+      postcss: 8.4.14
     dev: true
 
   /postcss-calc@7.0.5:
@@ -9390,14 +9391,17 @@ packages:
       postcss-value-parser: 3.3.1
     dev: true
 
-  /postcss-normalize@8.0.1:
-    resolution: {integrity: sha512-rt9JMS/m9FHIRroDDBGSMsyW1c0fkvOJPy62ggxSHUldJO7B195TqFMqIf+lY5ezpDcYOV4j86aUp3/XbxzCCQ==}
-    engines: {node: '>=8.0.0'}
+  /postcss-normalize@10.0.1(browserslist@4.21.1)(postcss@8.4.14):
+    resolution: {integrity: sha512-+5w18/rDev5mqERcG3W5GZNMJa1eoYYNGo8gB7tEwaos0ajk3ZXAI4mHGcNT47NE+ZnZD1pEpUOFLvltIwmeJA==}
+    engines: {node: '>= 12'}
+    peerDependencies:
+      browserslist: '>= 4'
+      postcss: '>= 8'
     dependencies:
       '@csstools/normalize.css': 10.1.0
       browserslist: 4.21.1
-      postcss: 7.0.39
-      postcss-browser-comments: 3.0.0(browserslist@4.21.1)
+      postcss: 8.4.14
+      postcss-browser-comments: 4.0.0(browserslist@4.21.1)(postcss@8.4.14)
       sanitize.css: 10.0.0
     dev: true
 

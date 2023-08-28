@@ -140,7 +140,7 @@
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
-    "postcss-normalize": "8.0.1",
+    "postcss-normalize": "10.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
     "react-dev-utils": "^11.0.3",
