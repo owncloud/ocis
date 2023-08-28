@@ -38,6 +38,18 @@ func TestNormalizeNodes(t *testing.T) {
 			},
 		},
 		{
+			name: "no key implicit AND",
+			givenNodes: []ast.Node{
+				&ast.StringNode{Value: "John Smith"},
+				&ast.StringNode{Value: "Jane Smith"},
+			},
+			expectedNodes: []ast.Node{
+				&ast.StringNode{Value: "John Smith"},
+				&ast.OperatorNode{Value: "AND"},
+				&ast.StringNode{Value: "Jane Smith"},
+			},
+		},
+		{
 			name: "same key explicit AND",
 			givenNodes: []ast.Node{
 				&ast.StringNode{Key: "author", Value: "John Smith"},

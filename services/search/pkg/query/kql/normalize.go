@@ -13,7 +13,7 @@ var operatorNodeOr = ast.OperatorNode{Base: &ast.Base{Loc: &ast.Location{Source:
 // https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference#constructing-free-text-queries-using-kql
 // If there are multiple free-text expressions without any operators in between them, the query behavior is the same as using the AND operator.
 // "John Smith" "Jane Smith"
-// This functionally is the same as using the OR Boolean operator, as follows:
+// This functionally is the same as using the AND Boolean operator, as follows:
 // "John Smith" AND "Jane Smith"
 //
 // https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference#using-multiple-property-restrictions-within-a-kql-query
