@@ -116,7 +116,7 @@
     "cldr": "^7.1.1",
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
-    "dotenv-expand": "5.1.0",
+    "dotenv-expand": "10.0.0",
     "eslint": "^7.11.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-loader": "^4.0.2",
