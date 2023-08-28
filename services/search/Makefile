@@ -24,11 +24,12 @@ docs-generate: config-docs-generate
 include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
-ci-go-generate:  $(MOCKERY) # CI runs ci-node-generate automatically before this target
+ci-go-generate: $(PIGEON) $(MOCKERY) # CI runs ci-node-generate automatically before this target
 	$(MOCKERY) --dir pkg/engine --output pkg/engine/mocks --case underscore --name Engine
 	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Extractor
 	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Retriever
 	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name Searcher
+	$(PIGEON) -o pkg/query/kql/dictionary_gen.go pkg/query/kql/dictionary.peg
 
 .PHONY: ci-node-generate
 ci-node-generate:

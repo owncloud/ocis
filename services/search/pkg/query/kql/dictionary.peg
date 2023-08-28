@@ -1,0 +1,108 @@
+{
+    package kql
+}
+
+////////////////////////////////////////////////////////
+// ast
+////////////////////////////////////////////////////////
+
+AST <-
+    _ nodes:Nodes _ {
+        return buildAST(nodes, c.text, c.pos)
+    }
+
+Nodes <-
+    n:(
+        _
+        (
+            GroupNode /
+            PropertyRestrictionNodes /
+            BooleanOperatorNode /
+            FreeTextKeywordNodes
+        )
+        _
+    )+ {
+      return buildNodes(n)
+    }
+
+////////////////////////////////////////////////////////
+// nesting
+////////////////////////////////////////////////////////
+
+GroupNode <-
+    k:(Char+)? (ColonOperator / EqualOperator)? "(" v:Nodes ")" {
+        return buildGroupNode(k, v, c.text, c.pos)
+    }
+
+////////////////////////////////////////////////////////
+// property restrictions
+////////////////////////////////////////////////////////
+
+PropertyRestrictionNodes <-
+    YesNoPropertyRestrictionNode /
+    TextPropertyRestrictionNode
+
+YesNoPropertyRestrictionNode <-
+    k:Char+ (ColonOperator / EqualOperator) v:("true" / "false"){
+        return buildBooleanNode(k, v, c.text, c.pos)
+    }
+
+TextPropertyRestrictionNode <-
+    k:Char+ (ColonOperator / EqualOperator) v:(String / [^ ()]+){
+        return buildStringNode(k, v, c.text, c.pos)
+    }
+
+
+////////////////////////////////////////////////////////
+// free text-keywords
+////////////////////////////////////////////////////////
+
+FreeTextKeywordNodes <-
+    PhraseNode /
+    WordNode
+
+PhraseNode <-
+     ColonOperator? _ v:String _ ColonOperator? {
+        return buildStringNode("", v, c.text, c.pos)
+    }
+
+WordNode <-
+     ColonOperator? _ v:[^ :()]+ _ ColonOperator? {
+        return buildStringNode("", v, c.text, c.pos)
+    }
+
+////////////////////////////////////////////////////////
+// operators
+////////////////////////////////////////////////////////
+
+BooleanOperatorNode <-
+    ("AND" / "OR" / "NOT") {
+        return buildOperatorNode(c.text, c.pos)
+    }
+
+ColonOperator <-
+    ":" {
+        return c.text, nil
+    }
+
+EqualOperator <-
+    "=" {
+        return c.text, nil
+    }
+
+////////////////////////////////////////////////////////
+// misc
+////////////////////////////////////////////////////////
+
+Char <-
+    [A-Za-z] {
+        return c.text, nil
+    }
+
+String <-
+    '"' v:[^"]* '"' {
+        return v, nil
+    }
+
+_ <-
+    [ \t]*
