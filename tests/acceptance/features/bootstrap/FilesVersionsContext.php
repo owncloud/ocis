@@ -134,17 +134,14 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When user :user restores version index :versionIndex of file :path using the WebDAV API
-	 * @Given user :user has restored version index :versionIndex of file :path
-	 *
 	 * @param string $user
 	 * @param int $versionIndex
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+	public function restoreVersionIndexOfFile(string $user, int $versionIndex, string $path):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
@@ -155,7 +152,7 @@ class FilesVersionsContext implements Context {
 			WebDavHelper::getDavPath($user, 2) . \trim($path, "/");
 		$fullUrl = $this->featureContext->getBaseUrlWithoutPath() .
 			$xmlPart[$versionIndex];
-		$response = HttpRequestHelper::sendRequest(
+		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
 			'COPY',
@@ -163,6 +160,40 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			['Destination' => $destinationUrl]
 		);
+	}
+
+	/**
+	 * @Given user :user has restored version index :versionIndex of file :path
+	 *
+	 * @param string $user
+	 * @param int $versionIndex
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
+		$actualStatusCode = $response->getStatusCode();
+		Assert::assertEquals(
+			'204',
+			$actualStatusCode,
+			"HTTP status code was $actualStatusCode Restoring version index of file was not successful"
+		);
+	}
+
+	/**
+	 * @When user :user restores version index :versionIndex of file :path using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param int $versionIndex
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
 		$this->featureContext->setResponse($response, $user);
 	}
 
