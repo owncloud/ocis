@@ -1,6 +1,6 @@
-Feature: full text search
+Feature: content search
   As a user
-  I want to do full text search
+  I want to do search resources by content
   So that I can find the files with the content I am looking for
 
   Background:
