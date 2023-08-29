@@ -6,9 +6,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 
 ## Details
+
+* Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/7138
 
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 
