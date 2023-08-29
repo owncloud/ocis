@@ -94,34 +94,6 @@ Credentials:
 - Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
 - Keycloak account management: [keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/](https://keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/)
 
-# Parallel deployment of oC10 and oCIS
-
-Credentials:
-
-- oC10 / oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
-- Keycloak:
-  - username: admin
-  - password: admin
-- LDAP management:
-  - username: cn=admin,dc=owncloud,dc=com
-  - password: admin
-
-## Latest
-
-- oC10 / oCIS: [cloud.oc10-ocis-parallel.latest.owncloud.works](https://cloud.oc10-ocis-parallel.latest.owncloud.works)
-- LDAP management: [ldap.oc10-ocis-parallel.latest.owncloud.works](https://ldap.oc10-ocis-parallel.latest.owncloud.works)
-- Keycloak: [keycloak.oc10-ocis-parallel.latest.owncloud.works](https://keycloak.oc10-ocis-parallel.latest.owncloud.works)
-
-# oCIS with Hello extension
-
-Credentials:
-
-- oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
-
-## Latest
-
-- oCIS: [ocis.ocis-hello.latest.owncloud.works](https://ocis.ocis-hello.latest.owncloud.works)
-
 # oCIS with S3 storage backend (MinIO)
 
 Credentials:
