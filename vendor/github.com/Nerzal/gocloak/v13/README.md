@@ -80,7 +80,7 @@ go get github.com/Nerzal/gocloak/v13
   panic("Inspection failed:"+ err.Error())
  }
 
- if !rptResult.Active {
+ if !*rptResult.Active {
   panic("Token is not active")
  }
 
@@ -280,8 +280,8 @@ type GoCloak interface {
  ClearUserCache(ctx context.Context, token, realm string) error
  ClearKeysCache(ctx context.Context, token, realm string) error
 
- GetClientUserSessions(ctx context.Context, token, realm, idOfClient string) ([]*UserSessionRepresentation, error)
- GetClientOfflineSessions(ctx context.Context, token, realm, idOfClient string) ([]*UserSessionRepresentation, error)
+GetClientUserSessions(ctx context.Context, token, realm, idOfClient string, params ...GetClientUserSessionsParams) ([]*UserSessionRepresentation, error)
+GetClientOfflineSessions(ctx context.Context, token, realm, idOfClient string, params ...GetClientUserSessionsParams) ([]*UserSessionRepresentation, error)
  GetUserSessions(ctx context.Context, token, realm, userID string) ([]*UserSessionRepresentation, error)
  GetUserOfflineSessionsForClient(ctx context.Context, token, realm, userID, idOfClient string) ([]*UserSessionRepresentation, error)
 
@@ -474,6 +474,18 @@ yields
 ```
 
 Note that empty parameters are not included, because of the use of ```omitempty``` in the type definitions.
+
+## Examples
+
+* [Add client role to user](./examples/ADD_CLIENT_ROLE_TO_USER.md)
+
+* [Create User Federation & Sync](./examples/USER_FEDERATION.md)
+
+* [Create User Federation & Sync with group ldap mapper](./examples/USER_FEDERATION_GROUP_LDAP_MAPPER.md)
+
+* [Create User Federation & Sync with role ldap mapper](./examples/USER_FEDERATION_ROLE_LDAP_MAPPER.md)
+
+* [Create User Federation & Sync with user attribute ldap mapper](./examples/USER_FEDERATION_USER_ATTRIBUTE_LDAP_MAPPER.md)
 
 ## License
 

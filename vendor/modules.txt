@@ -32,7 +32,7 @@ github.com/MicahParks/keyfunc
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/Nerzal/gocloak/v13 v13.1.0
+# github.com/Nerzal/gocloak/v13 v13.8.0
 ## explicit; go 1.18
 github.com/Nerzal/gocloak/v13
 github.com/Nerzal/gocloak/v13/pkg/jwx
