@@ -18,22 +18,24 @@ import (
 
 // Email represents an email message.
 type Email struct {
-	from                  string
-	sender                string
-	replyTo               string
-	returnPath            string
-	recipients            []string
-	headers               textproto.MIMEHeader
-	parts                 []part
-	attachments           []*File
-	inlines               []*File
-	Charset               string
-	Encoding              encoding
-	Error                 error
-	SMTPServer            *smtpClient
-	DkimMsg               string
-	AllowDuplicateAddress bool
-	AddBccToHeader        bool
+	from                      string
+	sender                    string
+	replyTo                   string
+	returnPath                string
+	recipients                []string
+	headers                   textproto.MIMEHeader
+	parts                     []part
+	attachments               []*File
+	inlines                   []*File
+	Charset                   string
+	Encoding                  encoding
+	Error                     error
+	SMTPServer                *smtpClient
+	DkimMsg                   string
+	AllowDuplicateAddress     bool
+	AddBccToHeader            bool
+	preserveOriginalRecipient bool
+	dsn                       []DSN
 }
 
 /*
@@ -59,10 +61,13 @@ type SMTPServer struct {
 
 // SMTPClient represents a SMTP Client for send email
 type SMTPClient struct {
-	mu          sync.Mutex
-	Client      *smtpClient
-	KeepAlive   bool
-	SendTimeout time.Duration
+	mu                        sync.Mutex
+	Client                    *smtpClient
+	SendTimeout               time.Duration
+	KeepAlive                 bool
+	hasDSNExt                 bool
+	preserveOriginalRecipient bool
+	dsn                       []DSN
 }
 
 // part represents the different content parts of an email body.
@@ -122,9 +127,11 @@ const (
 	TextHTML
 	// TextCalendar sets body type to text/calendar in message body
 	TextCalendar
+	// TextAMP sets body type to text/x-amp-html in message body
+	TextAMP
 )
 
-var contentTypes = [...]string{"text/plain", "text/html", "text/calendar"}
+var contentTypes = [...]string{"text/plain", "text/html", "text/calendar", "text/x-amp-html"}
 
 func (contentType ContentType) string() string {
 	return contentTypes[contentType]
@@ -156,6 +163,34 @@ func (at AuthType) String() string {
 	default:
 		return ""
 	}
+}
+
+/*
+	DSN notifications
+
+- 'NEVER' under no circumstances a DSN must be returned to the sender. If you use NEVER all other notifications will be ignored.
+
+- 'SUCCESS' will notify you when your mail has arrived at its destination.
+
+- 'FAILURE' will arrive if an error occurred during delivery.
+
+- 'DELAY' will notify you if there is an unusual delay in delivery, but the actual delivery's outcome (success or failure) is not yet decided.
+
+see https://tools.ietf.org/html/rfc3461 See section 4.1 for more information about NOTIFY
+*/
+type DSN int
+
+const (
+	NEVER DSN = iota
+	FAILURE
+	DELAY
+	SUCCESS
+)
+
+var dsnTypes = [...]string{"NEVER", "FAILURE", "DELAY", "SUCCESS"}
+
+func (dsn DSN) String() string {
+	return dsnTypes[dsn]
 }
 
 // NewMSG creates a new email. It uses UTF-8 by default. All charsets: http://webcheatsheet.com/HTML/character_sets_list.php
@@ -384,18 +419,18 @@ func addAddress(addressList []string, address string, allowDuplicateAddress bool
 	return append(addressList, address), nil
 }
 
-type priority int
+type Priority int
 
 const (
-	// PriorityLow sets the email priority to Low
-	PriorityLow priority = iota
-	// PriorityHigh sets the email priority to High
+	// PriorityLow sets the email Priority to Low
+	PriorityLow Priority = iota
+	// PriorityHigh sets the email Priority to High
 	PriorityHigh
 )
 
-// SetPriority sets the email message priority. Use with
+// SetPriority sets the email message Priority. Use with
 // either "High" or "Low".
-func (email *Email) SetPriority(priority priority) *Email {
+func (email *Email) SetPriority(priority Priority) *Email {
 	if email.Error != nil {
 		return email
 	}
@@ -613,6 +648,20 @@ func (email *Email) AddAlternativeData(contentType ContentType, body []byte) *Em
 	return email
 }
 
+// SetDSN sets the delivery status notification list, only is set when SMTP server supports DSN extension
+//
+// To preserve the original recipient of an email message, for example, if it is forwarded to another address, set preserveOriginalRecipient to true
+func (email *Email) SetDSN(dsn []DSN, preserveOriginalRecipient bool) *Email {
+	if email.Error != nil {
+		return email
+	}
+
+	email.dsn = dsn
+	email.preserveOriginalRecipient = preserveOriginalRecipient
+
+	return email
+}
+
 // GetFrom returns the sender of the email, if any
 func (email *Email) GetFrom() string {
 	from := email.returnPath
@@ -709,6 +758,9 @@ func (email *Email) SendEnvelopeFrom(from string, client *SMTPClient) error {
 	} else {
 		msg = email.GetMessage()
 	}
+
+	client.dsn = email.dsn
+	client.preserveOriginalRecipient = email.preserveOriginalRecipient
 
 	return send(from, email.recipients, msg, client)
 }
@@ -864,10 +916,13 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 		}
 	}
 
+	_, hasDSN := c.ext["DSN"]
+
 	return &SMTPClient{
 		Client:      c,
 		KeepAlive:   server.KeepAlive,
 		SendTimeout: server.SendTimeout,
+		hasDSNExt:   hasDSN,
 	}, server.validateAuth(c)
 }
 
@@ -965,9 +1020,31 @@ func sendMailProcess(from string, to []string, msg string, c *SMTPClient) error 
 		return err
 	}
 
+	var dsn string
+	var dsnSet bool
+
+	if c.hasDSNExt && len(c.dsn) > 0 {
+		dsn = " NOTIFY="
+		if hasNeverDSN(c.dsn) {
+			dsn += NEVER.String()
+		} else {
+			dsn += strings.Join(dsnToString(c.dsn), ",")
+		}
+
+		if c.preserveOriginalRecipient {
+			dsn += " ORCPT=rfc822;"
+		}
+
+		dsnSet = true
+	}
+
 	// Set the recipients
 	for _, address := range to {
-		if err := c.Client.rcpt(address); err != nil {
+		if dsnSet && c.preserveOriginalRecipient {
+			dsn += address
+		}
+
+		if err := c.Client.rcpt(address, dsn); err != nil {
 			return err
 		}
 	}
@@ -1000,4 +1077,21 @@ func checkKeepAlive(client *SMTPClient) {
 		client.Quit()
 		client.Close()
 	}
+}
+
+func hasNeverDSN(dsnList []DSN) bool {
+	for i := range dsnList {
+		if dsnList[i] == NEVER {
+			return true
+		}
+	}
+	return false
+}
+
+func dsnToString(dsnList []DSN) []string {
+	dsnString := make([]string, len(dsnList))
+	for i := range dsnList {
+		dsnString[i] = dsnList[i].String()
+	}
+	return dsnString
 }

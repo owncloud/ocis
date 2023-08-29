@@ -244,11 +244,11 @@ func (c *smtpClient) mail(from string, extArgs ...map[string]string) error {
 // rcpt issues a RCPT command to the server using the provided email address.
 // A call to Rcpt must be preceded by a call to Mail and may be followed by
 // a Data call or another Rcpt call.
-func (c *smtpClient) rcpt(to string) error {
+func (c *smtpClient) rcpt(to, dsn string) error {
 	if err := validateLine(to); err != nil {
 		return err
 	}
-	_, _, err := c.cmd(25, "RCPT TO:<%s>", to)
+	_, _, err := c.cmd(25, "RCPT TO:<%s>%s", to, dsn)
 	return err
 }
 
