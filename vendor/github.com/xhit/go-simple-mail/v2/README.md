@@ -78,6 +78,8 @@ Go Simple Mail supports:
 - Support add a List-Unsubscribe header (since v2.11.0)
 - Support to add a DKIM signarure (since v2.11.0)
 - Support to send using custom connection, ideal for proxy (since v2.15.0)
+- Support Delivery Status Notification (DSN) (since v2.16.0)
+- Support text/x-amp-html content type body (since v2.16.0)
 
 ## Documentation
 
@@ -202,6 +204,9 @@ func main() {
 
 	// add inline
 	email.Attach(&mail.File{FilePath: "/path/to/image.png", Name:"Gopher.png", Inline: true})
+
+	// also you can set Delivery Status Notification (DSN) (only is set when server supports DSN)
+	email.SetDSN([]mail.DSN{mail.SUCCESS, mail.FAILURE}, false)
 
 	// you can add dkim signature to the email. 
 	// to add dkim, you need a private key already created one.
