@@ -52,10 +52,6 @@ func DefaultConfig() *config.Config {
 				AllowCredentials: true,
 			},
 		},
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 

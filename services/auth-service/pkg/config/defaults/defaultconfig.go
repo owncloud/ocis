@@ -32,10 +32,6 @@ func DefaultConfig() *config.Config {
 			Name: "auth-service",
 		},
 		Reva: shared.DefaultRevaConfig(),
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 

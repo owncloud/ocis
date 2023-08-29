@@ -108,10 +108,6 @@ func DefaultConfig() *config.Config {
 				PersonalDeleteBefore: 30 * 24 * time.Hour,
 			},
 		},
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 

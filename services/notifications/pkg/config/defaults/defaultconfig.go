@@ -44,10 +44,6 @@ func DefaultConfig() *config.Config {
 			},
 			RevaGateway: shared.DefaultRevaConfig().Address,
 		},
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 

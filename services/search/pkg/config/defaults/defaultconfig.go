@@ -54,10 +54,6 @@ func DefaultConfig() *config.Config {
 			EnableTLS:        false,
 		},
 		ContentExtractionSizeLimit: 20 * 1024 * 1024, // Limit content extraction to <20MB files by default
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 

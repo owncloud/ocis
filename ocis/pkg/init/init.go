@@ -55,10 +55,11 @@ type GraphApplication struct {
 }
 
 type GraphService struct {
-	Application GraphApplication
-	Events      Events
-	Spaces      InsecureService
-	Identity    LdapBasedService
+	Application    GraphApplication
+	Events         Events
+	Spaces         InsecureService
+	Identity       LdapBasedService
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
 type ServiceUserPasswordsSettings struct {
@@ -101,7 +102,8 @@ type ThumbnailService struct {
 }
 
 type Search struct {
-	Events Events
+	Events         Events
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
 type Audit struct {
@@ -113,8 +115,9 @@ type Sharing struct {
 }
 
 type StorageUsers struct {
-	Events  Events
-	MountID string `yaml:"mount_id"`
+	Events         Events
+	MountID        string         `yaml:"mount_id"`
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
 type Gateway struct {
@@ -126,7 +129,16 @@ type StorageRegistry struct {
 }
 
 type Notifications struct {
-	Notifications struct{ Events Events } // The notifications config has a field called notifications
+	Notifications  struct{ Events Events } // The notifications config has a field called notifications
+	ServiceAccount ServiceAccount          `yaml:"service_account"`
+}
+
+type Userlog struct {
+	ServiceAccount ServiceAccount `yaml:"service_account"`
+}
+
+type AuthService struct {
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
 type Nats struct {
@@ -134,6 +146,12 @@ type Nats struct {
 	Nats struct {
 		TLSSkipVerifyClientCert bool `yaml:"tls_skip_verify_client_cert"`
 	}
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id"`
+	ServiceAccountSecret string `yaml:"service_account_secret"`
 }
 
 // TODO: use the oCIS config struct instead of this custom struct
@@ -173,6 +191,8 @@ type OcisConfig struct {
 	Notifications     Notifications
 	Nats              Nats
 	Gateway           Gateway
+	Userlog           Userlog
+	AuthService       AuthService `yaml:"auth_service"`
 }
 
 func checkConfigPath(configPath string) error {
@@ -225,6 +245,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	adminUserID := uuid.Must(uuid.NewV4()).String()
 	graphApplicationID := uuid.Must(uuid.NewV4()).String()
 	storageUsersMountID := uuid.Must(uuid.NewV4()).String()
+	serviceAccountID := uuid.Must(uuid.NewV4()).String()
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -265,6 +286,15 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	thumbnailsTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for thumbnailsTransferSecret: %s", err)
+	}
+	serviceAccountSecret, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random password for thumbnailsTransferSecret: %s", err)
+	}
+
+	serviceAccount := ServiceAccount{
+		ServiceAccountID:     serviceAccountID,
+		ServiceAccountSecret: serviceAccountSecret,
 	}
 
 	cfg := OcisConfig{
@@ -319,6 +349,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 					BindPassword: idmServicePassword,
 				},
 			},
+			ServiceAccount: serviceAccount,
 		},
 		Thumbnails: ThumbnailService{
 			Thumbnail: ThumbnailSettings{
@@ -331,7 +362,20 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			},
 		},
 		StorageUsers: StorageUsers{
-			MountID: storageUsersMountID,
+			MountID:        storageUsersMountID,
+			ServiceAccount: serviceAccount,
+		},
+		Userlog: Userlog{
+			ServiceAccount: serviceAccount,
+		},
+		AuthService: AuthService{
+			ServiceAccount: serviceAccount,
+		},
+		Search: Search{
+			ServiceAccount: serviceAccount,
+		},
+		Notifications: Notifications{
+			ServiceAccount: serviceAccount,
 		},
 	}
 

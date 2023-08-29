@@ -105,10 +105,6 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		ServiceAccount: config.ServiceAccount{
-			ServiceAccountID:     "service-user-id",
-			ServiceAccountSecret: "secret-string",
-		},
 	}
 }
 
