@@ -75,8 +75,8 @@ dependencies:
     specifier: ^17.0.2
     version: 17.0.2(react@17.0.2)
   react-i18next:
-    specifier: ^11.15.6
-    version: 11.17.4(i18next@22.0.4)(react-dom@17.0.2)(react@17.0.2)
+    specifier: ^12.3.1
+    version: 12.3.1(i18next@22.0.4)(react-dom@17.0.2)(react@17.0.2)
   react-redux:
     specifier: ^8.0.5
     version: 8.0.5(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)(redux@3.7.2)
@@ -1620,7 +1620,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.0
-    dev: false
 
   /@babel/template@7.18.6:
     resolution: {integrity: sha512-JoDWzPe+wgBsTTgdnIma3iHNFC7YVJoPssVBDjiHfNlyt4YcunDtcDOUmfVDfCK5MfdsaIoX9PkijPhjH3nYUw==}
@@ -2060,7 +2059,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       '@emotion/hash': 0.8.0
       '@material-ui/types': 5.1.0(@types/react@17.0.47)
       '@material-ui/utils': 4.11.3(react-dom@17.0.2)(react@17.0.2)
@@ -2092,7 +2091,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       '@material-ui/utils': 4.11.3(react-dom@17.0.2)(react@17.0.2)
       '@types/react': 17.0.47
       csstype: 2.6.20
@@ -2119,7 +2118,7 @@ packages:
       react: ^16.8.0 || ^17.0.0
       react-dom: ^16.8.0 || ^17.0.0
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       prop-types: 15.8.1
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
@@ -2211,7 +2210,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       '@babel/code-frame': 7.22.10
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       '@types/aria-query': 4.2.2
       aria-query: 4.2.2
       chalk: 4.1.2
@@ -3014,7 +3013,7 @@ packages:
     resolution: {integrity: sha512-o/HelwhuKpTj/frsOsbNLNgnNGVIFsVP/SW2BSF14gVl7kAfMOJ6/8wUAUvG1R1NHKrfG+2sHZTu0yauT1qBrA==}
     engines: {node: '>=6.0'}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       '@babel/runtime-corejs3': 7.18.6
 
   /aria-query@5.0.0:
@@ -3292,7 +3291,7 @@ packages:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
     engines: {node: '>=10', npm: '>=6'}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       cosmiconfig: 7.1.0
       resolve: 1.22.1
     dev: true
@@ -4469,7 +4468,7 @@ packages:
   /css-vendor@2.0.8:
     resolution: {integrity: sha512-x9Aq0XTInxrkuFeHKbYC7zWY8ai7qJ04Kxd9MnvbC1uO5DagxoHQjm4JvG+vCdXOoFtCjbL2XSZfxmoYa9uQVQ==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       is-in-browser: 1.1.3
     dev: false
 
@@ -4865,7 +4864,7 @@ packages:
   /dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       csstype: 3.1.0
     dev: false
 
@@ -6406,7 +6405,7 @@ packages:
   /history@4.10.1:
     resolution: {integrity: sha512-36nwAD620w12kuzPAsyINPWJqlNbij+hpK1k9XRloDtym8mxzGYl2c17LnV6IAGB2Dmg4tEa7G7DlawS0+qjew==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       loose-envify: 1.4.0
       resolve-pathname: 3.0.0
       tiny-invariant: 1.2.0
@@ -6460,6 +6459,7 @@ packages:
 
   /html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
+    dev: true
 
   /html-minifier-terser@5.1.1:
     resolution: {integrity: sha512-ZPr5MNObqnV/T9akshPKbVgyOqLmy+Bxo7juKCfTfnjNniTAMdy4hz21YQqoofMBJD2kdREaqPPdThoR78Tgxg==}
@@ -6614,7 +6614,7 @@ packages:
   /i18next@21.8.11:
     resolution: {integrity: sha512-+s8N6kQShwNK+Ua/+VsS/Sji24NUJJLBk9QIucygj1f97f4hPNDWmLP9fQCI4d5+XLfXJ3JctX4g+zJla967Vw==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
     dev: true
 
   /i18next@22.0.4:
@@ -7872,7 +7872,7 @@ packages:
   /jss-plugin-camel-case@10.9.0:
     resolution: {integrity: sha512-UH6uPpnDk413/r/2Olmw4+y54yEF2lRIV8XIZyuYpgPYTITLlPOsq6XB9qeqv+75SQSg3KLocq5jUBXW8qWWww==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       hyphenate-style-name: 1.0.4
       jss: 10.9.0
     dev: false
@@ -7880,21 +7880,21 @@ packages:
   /jss-plugin-default-unit@10.9.0:
     resolution: {integrity: sha512-7Ju4Q9wJ/MZPsxfu4T84mzdn7pLHWeqoGd/D8O3eDNNJ93Xc8PxnLmV8s8ZPNRYkLdxZqKtm1nPQ0BM4JRlq2w==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       jss: 10.9.0
     dev: false
 
   /jss-plugin-global@10.9.0:
     resolution: {integrity: sha512-4G8PHNJ0x6nwAFsEzcuVDiBlyMsj2y3VjmFAx/uHk/R/gzJV+yRHICjT4MKGGu1cJq2hfowFWCyrr/Gg37FbgQ==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       jss: 10.9.0
     dev: false
 
   /jss-plugin-nested@10.9.0:
     resolution: {integrity: sha512-2UJnDrfCZpMYcpPYR16oZB7VAC6b/1QLsRiAutOt7wJaaqwCBvNsosLEu/fUyKNQNGdvg2PPJFDO5AX7dwxtoA==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       jss: 10.9.0
       tiny-warning: 1.0.3
     dev: false
@@ -7902,14 +7902,14 @@ packages:
   /jss-plugin-props-sort@10.9.0:
     resolution: {integrity: sha512-7A76HI8bzwqrsMOJTWKx/uD5v+U8piLnp5bvru7g/3ZEQOu1+PjHvv7bFdNO3DwNPC9oM0a//KwIJsIcDCjDzw==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       jss: 10.9.0
     dev: false
 
   /jss-plugin-rule-value-function@10.9.0:
     resolution: {integrity: sha512-IHJv6YrEf8pRzkY207cPmdbBstBaE+z8pazhPShfz0tZSDtRdQua5jjg6NMz3IbTasVx9FdnmptxPqSWL5tyJg==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       jss: 10.9.0
       tiny-warning: 1.0.3
     dev: false
@@ -7917,7 +7917,7 @@ packages:
   /jss-plugin-vendor-prefixer@10.9.0:
     resolution: {integrity: sha512-MbvsaXP7iiVdYVSEoi+blrW+AYnTDvHTW6I6zqi7JcwXdc6I9Kbm234nEblayhF38EftoenbM+5218pidmC5gA==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       css-vendor: 2.0.8
       jss: 10.9.0
     dev: false
@@ -7925,7 +7925,7 @@ packages:
   /jss@10.9.0:
     resolution: {integrity: sha512-YpzpreB6kUunQBbrlArlsMpXYyndt9JATbt95tajx0t4MTJJcCJdd4hdNpHmOIDiUJrF/oX5wtVFrS3uofWfGw==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       csstype: 3.1.0
       is-in-browser: 1.1.3
       tiny-warning: 1.0.3
@@ -8385,7 +8385,7 @@ packages:
       prop-types: ^15.0.0
       react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       prop-types: 15.8.1
       react: 17.0.2
       tiny-warning: 1.0.3
@@ -10204,8 +10204,8 @@ packages:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
     dev: true
 
-  /react-i18next@11.17.4(i18next@22.0.4)(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-LswEIl8KNDTP4Wk3c22XDstbR++Vc4BZyNwvGFGaYbYDjdDLkHDLwrgd7DN28f8jufFHaYhQvCG5YWLxFhRt/g==}
+  /react-i18next@12.3.1(i18next@22.0.4)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-5v8E2XjZDFzK7K87eSwC7AJcAkcLt5xYZ4+yTPDAW1i7C93oOY1dnr4BaQM7un4Hm+GmghuiPvevWwlca5PwDA==}
     peerDependencies:
       i18next: '>= 19.0.0'
       react: '>= 16.8.0'
@@ -10217,8 +10217,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@babel/runtime': 7.18.6
-      html-escaper: 2.0.2
+      '@babel/runtime': 7.22.11
       html-parse-stringify: 3.0.1
       i18next: 22.0.4
       react: 17.0.2
@@ -10304,7 +10303,7 @@ packages:
     peerDependencies:
       react: '>=15'
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -10341,7 +10340,7 @@ packages:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -10494,7 +10493,7 @@ packages:
   /redux@4.2.0:
     resolution: {integrity: sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
     dev: false
 
   /regenerate-unicode-properties@10.0.1:
@@ -10517,12 +10516,11 @@ packages:
 
   /regenerator-runtime@0.14.0:
     resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
-    dev: false
 
   /regenerator-transform@0.15.0:
     resolution: {integrity: sha512-LsrGtPmbYg19bcPHwdtmXwbW+TqNvtY4riE3P83foeHRroMbH6/2ddFBfab3t7kbzc7v7p4wbkIecHImqt0QNg==}
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
     dev: true
 
   /regex-not@1.0.2:
@@ -12520,7 +12518,7 @@ packages:
     dependencies:
       '@babel/core': 7.18.6
       '@babel/preset-env': 7.18.6(@babel/core@7.18.6)
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.22.11
       '@hapi/joi': 15.1.1
       '@rollup/plugin-node-resolve': 7.1.3(rollup@1.32.1)
       '@rollup/plugin-replace': 2.4.2(rollup@1.32.1)
