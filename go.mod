@@ -7,7 +7,7 @@ require (
 	github.com/KimMachineGun/automemlimit v0.2.6
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
-	github.com/Nerzal/gocloak/v13 v13.1.0
+	github.com/Nerzal/gocloak/v13 v13.8.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.9
 	github.com/coreos/go-oidc v2.2.1+incompatible
