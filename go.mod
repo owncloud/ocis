@@ -55,7 +55,7 @@ require (
 	github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.9.19
+	github.com/nats-io/nats-server/v2 v2.9.21
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
@@ -238,7 +238,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.16.5 // indirect
+	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
 	github.com/libregraph/oidc-go v1.0.0 // indirect
 	github.com/longsleep/go-metrics v1.0.0 // indirect
@@ -266,7 +266,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/nats-io/jwt/v2 v2.4.1 // indirect
-	github.com/nats-io/nats.go v1.27.0 // indirect
+	github.com/nats-io/nats.go v1.28.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect

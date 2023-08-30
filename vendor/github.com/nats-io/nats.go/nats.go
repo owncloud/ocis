@@ -47,7 +47,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.27.0"
+	Version                   = "1.28.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -5471,7 +5471,7 @@ func (nc *Conn) StatusChanged(statuses ...Status) chan Status {
 	if len(statuses) == 0 {
 		statuses = []Status{CONNECTED, RECONNECTING, DISCONNECTED, CLOSED}
 	}
-	ch := make(chan Status)
+	ch := make(chan Status, 10)
 	for _, s := range statuses {
 		nc.registerStatusChangeListener(s, ch)
 	}

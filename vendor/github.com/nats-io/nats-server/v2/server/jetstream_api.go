@@ -1,4 +1,4 @@
-// Copyright 2020-2022 The NATS Authors
+// Copyright 2020-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -2656,7 +2656,7 @@ func (s *Server) jsLeaderAccountPurgeRequest(sub *subscription, c *client, _ *Ac
 }
 
 // Request to have the meta leader stepdown.
-// These will only be received the meta leaders, so less checking needed.
+// These will only be received by the meta leader, so less checking needed.
 func (s *Server) jsLeaderStepDownRequest(sub *subscription, c *client, _ *Account, subject, reply string, rmsg []byte) {
 	if c == nil || !s.JetStreamEnabled() {
 		return
@@ -3360,7 +3360,7 @@ func (s *Server) processStreamRestore(ci *ClientInfo, acc *Account, cfg *StreamC
 		// TODO(dlc) - We could check apriori and cancel initial request if we know it won't fit.
 		total += len(msg)
 		if js.wouldExceedLimits(FileStorage, total) {
-			s.resourcesExeededError()
+			s.resourcesExceededError()
 			resultCh <- result{NewJSInsufficientResourcesError(), reply}
 			return
 		}
@@ -3766,11 +3766,11 @@ func (s *Server) jsConsumerCreateRequest(sub *subscription, c *client, a *Accoun
 		} else {
 			streamName = streamNameFromSubject(subject)
 			consumerName = consumerNameFromSubject(subject)
-		}
-		// New has optional filtered subject as part of main subject..
-		if n > 7 {
-			tokens := strings.Split(subject, tsep)
-			filteredSubject = strings.Join(tokens[6:], tsep)
+			// New has optional filtered subject as part of main subject..
+			if n > 6 {
+				tokens := strings.Split(subject, tsep)
+				filteredSubject = strings.Join(tokens[6:], tsep)
+			}
 		}
 	}
 

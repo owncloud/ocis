@@ -759,6 +759,7 @@ func (js *jetStream) setupMetaGroup() error {
 		s.Errorf("Error creating filestore: %v", err)
 		return err
 	}
+
 	// Register our server.
 	fs.registerServer(s)
 
@@ -2290,9 +2291,13 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 
 		case isLeader = <-lch:
 			if isLeader {
-				if sendSnapshot && mset != nil && n != nil {
-					n.SendSnapshot(mset.stateSnapshot())
-					sendSnapshot = false
+				if mset != nil && n != nil {
+					// Send a snapshot if being asked or if we are tracking
+					// a failed state so that followers sync.
+					if clfs := mset.clearCLFS(); clfs > 0 || sendSnapshot {
+						n.SendSnapshot(mset.stateSnapshot())
+						sendSnapshot = false
+					}
 				}
 				if isRestore {
 					acc, _ := s.LookupAccount(sa.Client.serviceAccount())
@@ -2713,15 +2718,14 @@ func (js *jetStream) applyStreamEntries(mset *stream, ce *CommittedEntry, isReco
 
 				// Grab last sequence and CLFS.
 				last, clfs := mset.lastSeqAndCLFS()
-
 				// We can skip if we know this is less than what we already have.
 				if lseq-clfs < last {
 					s.Debugf("Apply stream entries for '%s > %s' skipping message with sequence %d with last of %d",
 						mset.account(), mset.name(), lseq+1-clfs, last)
-					// Check for any preAcks in case we are interest based.
+
 					mset.mu.Lock()
-					seq := lseq + 1 - mset.clfs
-					mset.clearAllPreAcks(seq)
+					// Check for any preAcks in case we are interest based.
+					mset.clearAllPreAcks(lseq + 1 - mset.clfs)
 					mset.mu.Unlock()
 					continue
 				}
@@ -2807,12 +2811,15 @@ func (js *jetStream) applyStreamEntries(mset *stream, ce *CommittedEntry, isReco
 					}
 					panic(err.Error())
 				}
-				// Ignore if we are recovering and we have already processed.
-				if isRecovering && (sp.Request == nil || sp.Request.Sequence == 0) {
+				// If no explicit request, fill in with leader stamped last sequence to protect ourselves on replay during server start.
+				if sp.Request == nil || sp.Request.Sequence == 0 {
+					purgeSeq := sp.LastSeq + 1
 					if sp.Request == nil {
-						sp.Request = &JSApiStreamPurgeRequest{Sequence: sp.LastSeq}
-					} else {
-						sp.Request.Sequence = sp.LastSeq
+						sp.Request = &JSApiStreamPurgeRequest{Sequence: purgeSeq}
+					} else if sp.Request.Keep == 0 {
+						sp.Request.Sequence = purgeSeq
+					} else if isRecovering {
+						continue
 					}
 				}
 
@@ -6523,7 +6530,7 @@ LOOP:
 		})
 	}
 
-	resp.Total = len(resp.Consumers)
+	resp.Total = ocnt
 	resp.Limit = JSApiListLimit
 	resp.Offset = offset
 	resp.Missing = missingNames
@@ -7222,7 +7229,7 @@ func (mset *stream) processClusteredInboundMsg(subject, reply string, hdr, msg [
 
 	// Check here pre-emptively if we have exceeded this server limits.
 	if js.limitsExceeded(stype) {
-		s.resourcesExeededError()
+		s.resourcesExceededError()
 		if canRespond {
 			b, _ := json.Marshal(&JSPubAckResponse{PubAck: &PubAck{Stream: name}, Error: NewJSInsufficientResourcesError()})
 			outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, nil, b, nil, 0))
@@ -7768,7 +7775,7 @@ RETRY:
 				} else if err == NewJSInsufficientResourcesError() {
 					notifyLeaderStopCatchup(mrec, err)
 					if mset.js.limitsExceeded(mset.cfg.Storage) {
-						s.resourcesExeededError()
+						s.resourcesExceededError()
 					} else {
 						s.Warnf("Catchup for stream '%s > %s' errored, account resources exceeded: %v", mset.account(), mset.name(), err)
 					}
