@@ -205,6 +205,11 @@ func (g *grpcClient) stream(ctx context.Context, node *registry.Node, req client
 	header["x-content-type"] = req.ContentType()
 
 	md := gmetadata.New(header)
+
+	// WebSocket connection adds the `Connection: Upgrade` header.
+	// But as per the HTTP/2 spec, the `Connection` header makes the request malformed
+	delete(md, "connection")
+
 	ctx = gmetadata.NewOutgoingContext(ctx, md)
 
 	cf, err := g.newGRPCCodec(req.ContentType())
