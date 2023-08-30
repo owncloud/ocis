@@ -38,5 +38,5 @@
 | USERLOG_STORE_TABLE | string | events | The database table the store should use.|
 | OCIS_PERSISTENT_STORE_TTL<br/>USERLOG_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
 | OCIS_PERSISTENT_STORE_SIZE<br/>USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
-| OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE | bool | false | Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.|
+| OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE | bool | false | Disables server-sent events (sse). When disabled, clients will no longer be able to connect to the sse endpoint.|
 | USERLOG_GLOBAL_NOTIFICATIONS_SECRET | string |  | The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.|
