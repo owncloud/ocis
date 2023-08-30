@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-30-07-36-57]
+[#deprecation-note-2023-08-30-07-39-20]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -381,7 +381,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Disables server-sent events (sse). When disabled, clients will no longer be able to connect to the sse endpoint.
+Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.
 
 a|`USERLOG_GLOBAL_NOTIFICATIONS_SECRET` +
 
