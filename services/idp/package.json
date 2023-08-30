@@ -131,7 +131,7 @@
     "eslint-webpack-plugin": "^2.5.2",
     "file-loader": "6.1.1",
     "html-webpack-plugin": "4.5.0",
-    "i18next-conv": "^12.1.0",
+    "i18next-conv": "^14.0.0",
     "i18next-parser": "^8.7.0",
     "jest": "26.6.0",
     "license-checker-rseidelsohn": "^3.1.0",
