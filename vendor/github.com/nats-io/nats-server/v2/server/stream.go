@@ -838,6 +838,14 @@ func (mset *stream) lastSeqAndCLFS() (uint64, uint64) {
 	return mset.lseq, mset.clfs
 }
 
+func (mset *stream) clearCLFS() uint64 {
+	mset.mu.Lock()
+	defer mset.mu.Unlock()
+	clfs := mset.clfs
+	mset.clfs, mset.clseq = 0, 0
+	return clfs
+}
+
 func (mset *stream) lastSeq() uint64 {
 	mset.mu.RLock()
 	lseq := mset.lseq
@@ -2093,7 +2101,7 @@ func (mset *stream) processInboundMirrorMsg(m *inMsg) bool {
 	var err error
 	if node != nil {
 		if js.limitsExceeded(stype) {
-			s.resourcesExeededError()
+			s.resourcesExceededError()
 			err = ApiErrors[JSInsufficientResourcesErr]
 		} else {
 			err = node.Propose(encodeStreamMsg(m.subj, _EMPTY_, m.hdr, m.msg, sseq-1, ts))
@@ -3364,9 +3372,9 @@ func (mset *stream) setupStore(fsCfg *FileStoreConfig) error {
 		// Register our server.
 		fs.registerServer(s)
 	}
-	mset.mu.Unlock()
-
+	// This will fire the callback but we do not require the lock since md will be 0 here.
 	mset.store.RegisterStorageUpdates(mset.storeUpdates)
+	mset.mu.Unlock()
 
 	return nil
 }
@@ -3838,7 +3846,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		}
 		// Expected last sequence per subject.
 		// If we are clustered we have prechecked seq > 0.
-		if seq, exists := getExpectedLastSeqPerSubject(hdr); exists && (!isClustered || seq == 0) {
+		if seq, exists := getExpectedLastSeqPerSubject(hdr); exists {
 			// TODO(dlc) - We could make a new store func that does this all in one.
 			var smv StoreMsg
 			var fseq uint64
@@ -3952,7 +3960,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 
 	// Check to see if we have exceeded our limits.
 	if js.limitsExceeded(stype) {
-		s.resourcesExeededError()
+		s.resourcesExceededError()
 		mset.clfs++
 		mset.mu.Unlock()
 		if canRespond {
