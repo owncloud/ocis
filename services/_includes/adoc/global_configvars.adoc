@@ -67,7 +67,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -342,7 +342,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
 
 a| `OCIS_EDITION`
 
@@ -408,7 +408,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
 a| `OCIS_EVENTS_ENDPOINT`
 
@@ -458,7 +458,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -698,7 +698,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -773,7 +773,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=idp,ou=sysusers,o=libregraph-idm ++
+++uid=reva,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -794,7 +794,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
@@ -826,7 +826,7 @@ a| [subs=-attributes]
 ++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
@@ -877,7 +877,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames').
+The object class to use for groups in the default group search filter like 'groupOfNames'.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -924,10 +924,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -944,7 +944,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
@@ -994,7 +994,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
 a| `OCIS_LDAP_INSECURE`
 
@@ -1045,7 +1045,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-Url of the LDAP service to use as IDP.
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 
 a| `OCIS_LDAP_USER_BASE_DN`
 
@@ -1080,7 +1080,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `OCIS_LDAP_USER_FILTER`
 
@@ -1116,7 +1116,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-LDAP User ObjectClass like 'inetOrgPerson'.
+The object class to use for users in the default user search filter like 'inetOrgPerson'.
 
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -1147,10 +1147,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownCloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP User UUID attribute like 'uid'.
+LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1167,7 +1167,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
@@ -1185,7 +1185,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP User email attribute like 'mail'.
+LDAP Attribute to use for the email address of users.
 
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
@@ -1200,10 +1200,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP User name attribute like 'displayName'.
+LDAP Attribute to use for username of users.
 
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
@@ -1236,7 +1236,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 
 a| `OCIS_LOG_COLOR`
 
@@ -1459,7 +1459,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1480,7 +1480,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `OCIS_PERSISTENT_STORE`
 
