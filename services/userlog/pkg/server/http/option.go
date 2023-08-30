@@ -28,7 +28,7 @@ type Options struct {
 	Flags            []cli.Flag
 	Namespace        string
 	Store            store.Store
-	Consumer         events.Consumer
+	Stream           events.Stream
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	HistoryClient    ehsvc.EventHistoryService
 	ValueClient      settingssvc.ValueService
@@ -97,10 +97,10 @@ func Store(store store.Store) Option {
 	}
 }
 
-// Consumer provides a function to configure the consumer
-func Consumer(consumer events.Consumer) Option {
+// Stream provides a function to configure the stream
+func Stream(stream events.Stream) Option {
 	return func(o *Options) {
-		o.Consumer = consumer
+		o.Stream = stream
 	}
 }
 

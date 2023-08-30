@@ -15,6 +15,8 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
+	"github.com/thejerf/suture/v4"
+
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -42,6 +44,7 @@ import (
 	search "github.com/owncloud/ocis/v2/services/search/pkg/command"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/command"
+	sse "github.com/owncloud/ocis/v2/services/sse/pkg/command"
 	storagepublic "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storageSystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
@@ -53,7 +56,6 @@ import (
 	web "github.com/owncloud/ocis/v2/services/web/pkg/command"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/command"
 	webfinger "github.com/owncloud/ocis/v2/services/webfinger/pkg/command"
-	"github.com/thejerf/suture/v4"
 )
 
 var (
@@ -298,11 +300,16 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Sharing.Commons = cfg.Commons
 		return sharing.Execute(cfg.Sharing)
 	})
+	dreg(opts.Config.SSE.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.SSE.Context = ctx
+		cfg.SSE.Commons = cfg.Commons
+		return sse.Execute(cfg.SSE)
+	})
 
 	return s, nil
 }
 
-// Start an rpc service. By default the package scope Start will run all default services to provide with a working
+// Start a rpc service. By default, the package scope Start will run all default services to provide with a working
 // oCIS instance.
 func Start(o ...Option) error {
 	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect

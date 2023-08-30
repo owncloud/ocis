@@ -5,6 +5,7 @@ import (
 
 	stdhttp "net/http"
 
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
@@ -13,13 +14,14 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	svc "github.com/owncloud/ocis/v2/services/userlog/pkg/service"
+	svc "github.com/owncloud/ocis/v2/services/sse/pkg/service"
 	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )
 
 // Service is the service interface
-type Service interface{}
+type Service interface {
+}
 
 // Server initializes the http service and server.
 func Server(opts ...Option) (http.Service, error) {
@@ -29,12 +31,10 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("userlog"),
+		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
-		http.Flags(options.Flags...),
-		http.TraceProvider(options.TracerProvider),
 	)
 	if err != nil {
 		options.Logger.Error().
@@ -71,26 +71,19 @@ func Server(opts ...Option) (http.Service, error) {
 
 	mux.Use(
 		otelchi.Middleware(
-			"userlog",
+			"sse",
 			otelchi.WithChiRoutes(mux),
 			otelchi.WithTracerProvider(options.TracerProvider),
 			otelchi.WithPropagators(tracing.GetPropagator()),
 		),
 	)
 
-	handle, err := svc.NewUserlogService(
-		svc.Logger(options.Logger),
-		svc.Stream(options.Stream),
-		svc.Mux(mux),
-		svc.Store(options.Store),
-		svc.Config(options.Config),
-		svc.HistoryClient(options.HistoryClient),
-		svc.GatewaySelector(options.GatewaySelector),
-		svc.ValueClient(options.ValueClient),
-		svc.RoleClient(options.RoleClient),
-		svc.RegisteredEvents(options.RegisteredEvents),
-		svc.TraceProvider(options.TracerProvider),
-	)
+	ch, err := events.Consume(options.Consumer, "sse", options.RegisteredEvents...)
+	if err != nil {
+		return http.Service{}, err
+	}
+
+	handle, err := svc.NewSSE(options.Config, options.Logger, ch, mux)
 	if err != nil {
 		return http.Service{}, err
 	}

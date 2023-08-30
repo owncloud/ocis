@@ -26,7 +26,6 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
-	"github.com/r3labs/sse/v2"
 	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
@@ -42,10 +41,10 @@ type UserlogService struct {
 	historyClient    ehsvc.EventHistoryService
 	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	valueClient      settingssvc.ValueService
-	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
 	tp               trace.TracerProvider
 	tracer           trace.Tracer
+	publisher        events.Publisher
 }
 
 // NewUserlogService returns an EventHistory service
@@ -55,11 +54,11 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		opt(o)
 	}
 
-	if o.Consumer == nil || o.Store == nil {
-		return nil, fmt.Errorf("need non nil consumer (%v) and store (%v) to work properly", o.Consumer, o.Store)
+	if o.Stream == nil || o.Store == nil {
+		return nil, fmt.Errorf("need non nil stream (%v) and store (%v) to work properly", o.Stream, o.Store)
 	}
 
-	ch, err := events.Consume(o.Consumer, "userlog", o.RegisteredEvents...)
+	ch, err := events.Consume(o.Stream, "userlog", o.RegisteredEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,10 +74,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		registeredEvents: make(map[string]events.Unmarshaller),
 		tp:               o.TraceProvider,
 		tracer:           o.TraceProvider.Tracer("github.com/owncloud/ocis/services/userlog/pkg/service"),
-	}
-
-	if !ul.cfg.DisableSSE {
-		ul.sse = sse.New()
+		publisher:        o.Stream,
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -97,10 +93,6 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		r.Delete("/", ul.HandleDeleteEvents)
 		r.Post("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandlePostGlobalEvent))
 		r.Delete("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandleDeleteGlobalEvent))
-
-		if !ul.cfg.DisableSSE {
-			r.Get("/sse", ul.HandleSSE)
-		}
 	})
 
 	go ul.MemorizeEvents(ch)
@@ -348,8 +340,11 @@ func (ul *UserlogService) sendSSE(userid string, event events.Event) error {
 		return err
 	}
 
-	ul.sse.Publish(userid, &sse.Event{Data: b})
-	return nil
+	return events.Publish(context.Background(), ul.publisher, events.SendSSE{
+		UserID:  userid,
+		Type:    "userlog-notification",
+		Message: b,
+	})
 }
 
 func (ul *UserlogService) removeExpiredEvents(userid string, all []string, received []*ehmsg.Event) error {

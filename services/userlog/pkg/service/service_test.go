@@ -79,7 +79,7 @@ var _ = Describe("UserlogService", func() {
 
 		ul, err = service.NewUserlogService(
 			service.Config(cfg),
-			service.Consumer(bus),
+			service.Stream(bus),
 			service.Store(sto),
 			service.Logger(log.NewLogger()),
 			service.Mux(chi.NewMux()),
@@ -96,9 +96,9 @@ var _ = Describe("UserlogService", func() {
 
 	It("it stores, returns and deletes a couple of events", func() {
 		ids := make(map[string]struct{})
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
+		ids[bus.publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
+		ids[bus.publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
+		ids[bus.publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
 		// ids[bus.Publish(events.SpaceMembershipExpired{SpaceOwner: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
 		// ids[bus.Publish(events.ShareCreated{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
 
@@ -156,7 +156,11 @@ func (tb testBus) Consume(_ string, _ ...microevents.ConsumeOption) (<-chan micr
 	return ch, nil
 }
 
-func (tb testBus) Publish(e interface{}) string {
+func (tb testBus) Publish(_ string, _ interface{}, _ ...microevents.PublishOption) error {
+	return nil
+}
+
+func (tb testBus) publish(e interface{}) string {
 	ev := events.Event{
 		ID:    uuid.New().String(),
 		Type:  reflect.TypeOf(e).String(),
