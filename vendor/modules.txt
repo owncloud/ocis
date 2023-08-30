@@ -1065,11 +1065,11 @@ github.com/google/uuid
 # github.com/gookit/color v1.5.3
 ## explicit; go 1.18
 github.com/gookit/color
-# github.com/gookit/config/v2 v2.2.2
+# github.com/gookit/config/v2 v2.2.3
 ## explicit; go 1.18
 github.com/gookit/config/v2
 github.com/gookit/config/v2/yaml
-# github.com/gookit/goutil v0.6.9
+# github.com/gookit/goutil v0.6.10
 ## explicit; go 1.18
 github.com/gookit/goutil
 github.com/gookit/goutil/arrutil

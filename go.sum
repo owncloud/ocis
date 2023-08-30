@@ -1242,10 +1242,10 @@ github.com/googleapis/go-type-adapters v1.0.0/go.mod h1:zHW75FOG2aur7gAO2B+MLby+
 github.com/googleapis/google-cloud-go-testing v0.0.0-20200911160855-bcd43fbb19e8/go.mod h1:dvDLG8qkwmyD9a/MJJN3XJcT3xFxOKAvTZGvuZmac9g=
 github.com/gookit/color v1.5.3 h1:twfIhZs4QLCtimkP7MOxlF3A0U/5cDPseRT9M/+2SCE=
 github.com/gookit/color v1.5.3/go.mod h1:NUzwzeehUfl7GIb36pqId+UGmRfQcU/WiiyTTeNjHtE=
-github.com/gookit/config/v2 v2.2.2 h1:/iVW3H/5oPdNulrjSI370kf14Hs6D4Gc5E15u0AYxX8=
-github.com/gookit/config/v2 v2.2.2/go.mod h1:9wXrsGnOc9nLTr4mU+tuaR0ORzFyZdf3q5DuqsTyodU=
-github.com/gookit/goutil v0.6.9 h1:NrbGKt3cnWoqxjZonC5bTr0FrltTCRdzGReGQwnwhUk=
-github.com/gookit/goutil v0.6.9/go.mod h1:ZYNl/t+EIMo0rCRe1mwfC7jKyF/q1FdOEOgrXzJpr5o=
+github.com/gookit/config/v2 v2.2.3 h1:GlnYPduYeY7lRgWQmGld9juy0xpFUo06BUC9Pzyjuew=
+github.com/gookit/config/v2 v2.2.3/go.mod h1:FhmMu+2wg0UhyOjVGo+DZ1+ov34q4G4aWXzh86boEsY=
+github.com/gookit/goutil v0.6.10 h1:iq7CXOf+fYLvrVAh3+ZoLgufGfK65TwbzE8NpnPGtyk=
+github.com/gookit/goutil v0.6.10/go.mod h1:qqrPoX+Pm6YmxqqccgkNLPirTFX7UYMES1SK+fokqQU=
 github.com/gookit/ini/v2 v2.2.2 h1:3B8abZJrVH1vi/7TU4STuTBxdhiAq1ORSt6NJZCahaI=
 github.com/gophercloud/gophercloud v0.15.1-0.20210202035223-633d73521055/go.mod h1:wRtmUelyIIv3CSSDI47aUwbs075O6i+LY+pXsKCBsb4=
 github.com/gophercloud/gophercloud v0.16.0/go.mod h1:wRtmUelyIIv3CSSDI47aUwbs075O6i+LY+pXsKCBsb4=
