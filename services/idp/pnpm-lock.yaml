@@ -79,7 +79,7 @@ dependencies:
     version: 12.3.1(i18next@22.0.4)(react-dom@17.0.2)(react@17.0.2)
   react-redux:
     specifier: ^8.0.5
-    version: 8.0.5(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)(redux@3.7.2)
+    version: 8.0.5(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1)
   react-router:
     specifier: ^5.2.1
     version: 5.3.3(react@17.0.2)
@@ -87,14 +87,14 @@ dependencies:
     specifier: 5.2.1
     version: 5.2.1(react@17.0.2)
   redux:
-    specifier: ^3.7.2
-    version: 3.7.2
+    specifier: ^4.2.1
+    version: 4.2.1
   redux-logger:
     specifier: ^3.0.6
     version: 3.0.6
   redux-thunk:
     specifier: ^2.4.2
-    version: 2.4.2(redux@3.7.2)
+    version: 2.4.2(redux@4.2.1)
   render-if:
     specifier: ^0.1.1
     version: 0.1.1
@@ -2964,7 +2964,7 @@ packages:
       '@types/hoist-non-react-statics': 3.3.1
       '@types/react': 18.0.14
       hoist-non-react-statics: 3.3.2
-      redux: 4.2.0
+      redux: 4.2.1
     dev: false
 
   /@types/react-transition-group@4.4.5:
@@ -2992,7 +2992,7 @@ packages:
   /@types/redux-logger@3.0.9:
     resolution: {integrity: sha512-cwYhVbYNgH01aepeMwhd0ABX6fhVB2rcQ9m80u8Fl50ZODhsZ8RhQArnLTkE7/Zrfq4Sz/taNoF7DQy9pCZSKg==}
     dependencies:
-      redux: 4.2.0
+      redux: 4.2.1
     dev: false
 
   /@types/resolve@0.0.8:
@@ -8781,10 +8781,6 @@ packages:
       p-locate: 5.0.0
     dev: true
 
-  /lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
-
   /lodash._reinterpolate@3.0.0:
     resolution: {integrity: sha512-xYHt68QRoYGjeeM/XOE1uJtvXQAgvszfBhjV4yvsQH0u2i9I6cI6c6/eG4Hh3UAOVn0y/xAXwmTzEay49Q//HA==}
     dev: true
@@ -10964,7 +10960,7 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: false
 
-  /react-redux@8.0.5(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)(redux@3.7.2):
+  /react-redux@8.0.5(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1):
     resolution: {integrity: sha512-Q2f6fCKxPFpkXt1qNRZdEDLlScsDWyrgSj0mliK59qU6W5gvBiKkdMEG2lJzhd1rCctf0hb6EtePPLZ2e0m1uw==}
     peerDependencies:
       '@types/react': ^16.8 || ^17.0 || ^18.0
@@ -10994,7 +10990,7 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
       react-is: 18.2.0
-      redux: 3.7.2
+      redux: 4.2.1
       use-sync-external-store: 1.2.0(react@17.0.2)
     dev: false
 
@@ -11199,25 +11195,16 @@ packages:
       deep-diff: 0.3.8
     dev: false
 
-  /redux-thunk@2.4.2(redux@3.7.2):
+  /redux-thunk@2.4.2(redux@4.2.1):
     resolution: {integrity: sha512-+P3TjtnP0k/FEjcBL5FZpoovtvrTNT/UXd4/sluaSyrURlSlhLSzEdfsTBW7WsKB6yPvgd7q/iZPICFjW4o57Q==}
     peerDependencies:
       redux: ^4
     dependencies:
-      redux: 3.7.2
+      redux: 4.2.1
     dev: false
 
-  /redux@3.7.2:
-    resolution: {integrity: sha512-pNqnf9q1hI5HHZRBkj3bAngGZW/JMCmexDlOxw4XagXY2o1327nHH54LoTjiPJ0gizoqPDRqWyX/00g0hD6w+A==}
-    dependencies:
-      lodash: 4.17.21
-      lodash-es: 4.17.21
-      loose-envify: 1.4.0
-      symbol-observable: 1.2.0
-    dev: false
-
-  /redux@4.2.0:
-    resolution: {integrity: sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==}
+  /redux@4.2.1:
+    resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
     dependencies:
       '@babel/runtime': 7.22.11
     dev: false
@@ -12345,11 +12332,6 @@ packages:
       unquote: 1.1.1
       util.promisify: 1.0.1
     dev: true
-
-  /symbol-observable@1.2.0:
-    resolution: {integrity: sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==}
-    engines: {node: '>=0.10.0'}
-    dev: false
 
   /symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
