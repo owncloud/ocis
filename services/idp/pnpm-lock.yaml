@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@fontsource/roboto':
-    specifier: ^4.5.1
-    version: 4.5.7
+    specifier: ^5.0.8
+    version: 5.0.8
   '@material-ui/core':
     specifier: ^4.12.3
     version: 4.12.4(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)
@@ -2237,8 +2237,8 @@ packages:
       - supports-color
     dev: true
 
-  /@fontsource/roboto@4.5.7:
-    resolution: {integrity: sha512-m57UMER23Mk6Drg9OjtHW1Y+0KPGyZfE5XJoPTOsLARLar6013kJj4X2HICt+iFLJqIgTahA/QAvSn9lwF1EEw==}
+  /@fontsource/roboto@5.0.8:
+    resolution: {integrity: sha512-XxPltXs5R31D6UZeLIV1td3wTXU3jzd3f2DLsXI8tytMGBkIsGcc9sIyiupRtA8y73HAhuSCeweOoBqf6DbWCA==}
     dev: false
 
   /@gluejs/glue@0.3.0:
