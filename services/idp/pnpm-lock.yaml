@@ -93,8 +93,8 @@ dependencies:
     specifier: ^3.0.6
     version: 3.0.6
   redux-thunk:
-    specifier: ^2.2.0
-    version: 2.4.1(redux@3.7.2)
+    specifier: ^2.4.2
+    version: 2.4.2(redux@3.7.2)
   render-if:
     specifier: ^0.1.1
     version: 0.1.1
@@ -11167,8 +11167,8 @@ packages:
       deep-diff: 0.3.8
     dev: false
 
-  /redux-thunk@2.4.1(redux@3.7.2):
-    resolution: {integrity: sha512-OOYGNY5Jy2TWvTL1KgAlVy6dcx3siPJ1wTq741EPyUKfn6W6nChdICjZwCd0p8AZBs5kWpZlbkXW2nE/zjUa+Q==}
+  /redux-thunk@2.4.2(redux@3.7.2):
+    resolution: {integrity: sha512-+P3TjtnP0k/FEjcBL5FZpoovtvrTNT/UXd4/sluaSyrURlSlhLSzEdfsTBW7WsKB6yPvgd7q/iZPICFjW4o57Q==}
     peerDependencies:
       redux: ^4
     dependencies:
