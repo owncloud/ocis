@@ -33,7 +33,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_PASSWORD`
 
@@ -129,7 +129,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -198,10 +198,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++10s ++
 
 a| [subs=-attributes]
-Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -212,6 +212,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -235,6 +236,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -244,7 +246,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id] ++
 
 a| [subs=-attributes]
 A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -258,6 +260,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -267,7 +270,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET] ++
+++[GET POST PUT PATCH DELETE OPTIONS] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -281,6 +284,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -338,7 +342,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
 
 a| `OCIS_EDITION`
 
@@ -367,6 +371,7 @@ a| [subs=attributes+]
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 
@@ -392,6 +397,7 @@ a| [subs=attributes+]
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 
@@ -416,6 +422,7 @@ a| [subs=attributes+]
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 
@@ -440,6 +447,7 @@ a| [subs=attributes+]
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 
@@ -527,6 +535,7 @@ a| [subs=attributes+]
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
@@ -549,6 +558,7 @@ a| [subs=attributes+]
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
@@ -571,6 +581,7 @@ a| [subs=attributes+]
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
@@ -605,6 +616,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
@@ -618,7 +630,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
 
 a| `OCIS_JWT_SECRET`
 
@@ -640,6 +652,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -655,7 +668,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The secret to mint and validate JWT tokens.
 
 a| `OCIS_KEYCLOAK_BASE_PATH`
 
@@ -685,7 +698,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -813,7 +826,7 @@ a| [subs=-attributes]
 ++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
@@ -1067,7 +1080,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `OCIS_LDAP_USER_FILTER`
 
@@ -1253,6 +1266,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1302,6 +1316,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1351,6 +1366,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1400,6 +1416,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1442,7 +1459,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1463,7 +1480,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -1524,7 +1541,7 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
@@ -1594,7 +1611,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1680,6 +1697,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1729,6 +1747,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1778,6 +1797,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1827,6 +1847,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
 * xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
 * xref:{s-path}/storage-shares.adoc[storage-shares] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
@@ -1892,7 +1913,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
