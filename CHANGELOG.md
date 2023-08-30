@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
+* Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
 ## Details
 
@@ -46,6 +47,18 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7042
    https://github.com/owncloud/ocis/pull/7043
+
+* Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+
+   So far, sse has only been used to exchange messages between the server and the client. In order to
+   be able to send more content to the client, we have moved the endpoint to a separate service and
+   are now also using it for other notifications like:
+
+  * notify postprocessing state changes.
+  * notify file locking and unlocking.
+  * ... @toDo
+
+   https://github.com/owncloud/ocis/pull/6992
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
