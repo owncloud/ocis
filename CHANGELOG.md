@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7138
    https://github.com/owncloud/ocis/pull/6427
+   https://github.com/owncloud/ocis/pull/7178
 
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 
