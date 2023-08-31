@@ -152,6 +152,6 @@
     "url-loader": "4.1.1",
     "webpack": "4.46.0",
     "webpack-manifest-plugin": "4.1.1",
-    "workbox-webpack-plugin": "5.1.4"
+    "workbox-webpack-plugin": "7.0.0"
   }
 }
