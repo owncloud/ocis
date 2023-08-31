@@ -200,8 +200,8 @@ devDependencies:
     specifier: 6.0.1
     version: 6.0.1(webpack@4.46.0)
   pnp-webpack-plugin:
-    specifier: 1.6.4
-    version: 1.6.4(typescript@4.7.4)
+    specifier: 1.7.0
+    version: 1.7.0(typescript@4.7.4)
   postcss-flexbugs-fixes:
     specifier: 5.0.2
     version: 5.0.2(postcss@8.4.29)
@@ -10448,8 +10448,8 @@ packages:
       find-up: 3.0.0
     dev: true
 
-  /pnp-webpack-plugin@1.6.4(typescript@4.7.4):
-    resolution: {integrity: sha512-7Wjy+9E3WwLOEL30D+m8TSTF7qJJUJLONBnwQp0518siuMxUQUbgZwssaFX+QKlZkjHZcw/IpZCt/H0srrntSg==}
+  /pnp-webpack-plugin@1.7.0(typescript@4.7.4):
+    resolution: {integrity: sha512-2Rb3vm+EXble/sMXNSu6eoBx8e79gKqhNq9F5ZWW6ERNCTE/Q0wQNne5541tE5vKjfM8hpNCYL+LGc1YTfI0dg==}
     engines: {node: '>=6'}
     dependencies:
       ts-pnp: 1.2.0(typescript@4.7.4)
