@@ -1167,7 +1167,7 @@ func findEarliestShare(receivedShares []*collaboration.ReceivedShare, shareInfo 
 		}
 
 		switch {
-		case earliestShare == nil:
+		case earliestShare == nil && hasCurrentMd:
 			earliestShare = current
 		// ignore if one of the shares has no metadata
 		case !hasEarliestMd || !hasCurrentMd:
