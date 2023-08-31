@@ -88,7 +88,7 @@
     "i18next": "^23.4.6",
     "i18next-browser-languagedetector": "^6.1.3",
     "i18next-http-backend": "^2.2.1",
-    "i18next-resources-to-backend": "^1.0.0",
+    "i18next-resources-to-backend": "^1.1.4",
     "kpop": "https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz",
     "query-string": "^7.1.1",
     "react": "^17.0.2",
