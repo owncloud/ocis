@@ -5,7 +5,15 @@ import (
 	bQuery "github.com/blevesearch/bleve/v2/search/query"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
+
+// QueryTypeHeader is the header to be used across grpc and http services
+// to forward the requested query language.
+const QueryTypeHeader = "search-query-type"
+
+// QueryTypeLegacy defines the legacy query format.
+const QueryTypeLegacy = "legacy"
 
 // Creator is combines a Builder and a Compiler which is used to Create the query.
 type Creator[T any] struct {
@@ -31,3 +39,4 @@ func (c Creator[T]) Create(qs string) (T, error) {
 
 // LegacyCreator exposes an ocis legacy bleve query creator.
 var LegacyCreator = Creator[bQuery.Query]{LegacyBuilder{}, LegacyCompiler{}}
+var DefaultCreator = Creator[bQuery.Query]{kql.Builder{}, Compiler{}}

@@ -97,16 +97,16 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 	req.Query = query
 	if len(scope) > 0 {
-		// if req.Ref != nil {
-		// 	return nil, errtypes.BadRequest("cannot scope a search that is limited to a resource")
-		// }
-		scopeRef, err := extractScope(scope)
+		scopedId, err := storagespace.ParseID(scope)
 		if err != nil {
-			return nil, err
+			s.logger.Error().Err(err).Msg("failed to parse scope")
 		}
+
 		// Stat the scope to get the resource id
 		statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
-			Ref:       scopeRef,
+			Ref: &provider.Reference{
+				ResourceId: &scopedId,
+			},
 			FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}},
 		})
 		if err != nil {

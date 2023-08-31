@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"go-micro.dev/v4/metadata"
 
 	bleveSearch "github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -22,13 +23,14 @@ var _ = Describe("Bleve", func() {
 	var (
 		eng *engine.Bleve
 		idx bleveSearch.Index
-		ctx context.Context
 
 		doSearch = func(id string, query, path string) (*searchsvc.SearchIndexResponse, error) {
 			rID, err := storagespace.ParseID(id)
 			if err != nil {
 				return nil, err
 			}
+
+			ctx := metadata.Set(context.Background(), bleve.QueryTypeHeader, bleve.QueryTypeLegacy)
 
 			return eng.Search(ctx, &searchsvc.SearchIndexRequest{
 				Query: query,
@@ -63,7 +65,7 @@ var _ = Describe("Bleve", func() {
 		idx, err = bleveSearch.NewMemOnly(mapping)
 		Expect(err).ToNot(HaveOccurred())
 
-		eng = engine.NewBleveEngine(idx, bleve.LegacyCreator)
+		eng = engine.NewBleveEngine(idx)
 		Expect(err).ToNot(HaveOccurred())
 
 		rootResource = engine.Resource{
@@ -94,7 +96,7 @@ var _ = Describe("Bleve", func() {
 
 	Describe("New", func() {
 		It("returns a new index instance", func() {
-			b := engine.NewBleveEngine(idx, bleve.LegacyCreator)
+			b := engine.NewBleveEngine(idx)
 			Expect(b).ToNot(BeNil())
 		})
 	})
