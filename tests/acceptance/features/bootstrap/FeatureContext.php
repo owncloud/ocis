@@ -1298,11 +1298,13 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param int|int[]|string|string[] $expectedStatusCode
 	 * @param string|null $message
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 */
-	public function theHTTPStatusCodeShouldBe($expectedStatusCode, ?string $message = ""): void {
-		$actualStatusCode = $this->response->getStatusCode();
+	public function theHTTPStatusCodeShouldBe($expectedStatusCode, ?string $message = "", ?ResponseInterface $response = null): void {
+		$response = $response ?? $this->response;
+		$actualStatusCode = $response->getStatusCode();
 		if (\is_array($expectedStatusCode)) {
 			if ($message === "") {
 				$message = "HTTP status code $actualStatusCode is not one of the expected values " . \implode(" or ", $expectedStatusCode);
@@ -1424,14 +1426,17 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param int|string $minStatusCode
 	 * @param int|string $maxStatusCode
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 */
 	public function theHTTPStatusCodeShouldBeBetween(
 		$minStatusCode,
-		$maxStatusCode
+		$maxStatusCode,
+		?ResponseInterface $response= null
 	): void {
-		$statusCode = $this->response->getStatusCode();
+		$response = $response ?? $this->response;
+		$statusCode = $response->getStatusCode();
 		$message = "The HTTP status code $statusCode is not between $minStatusCode and $maxStatusCode";
 		Assert::assertGreaterThanOrEqual(
 			$minStatusCode,
