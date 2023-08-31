@@ -69,7 +69,7 @@ type Manager interface {
 	GetReceivedShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.ReceivedShare, error)
 
 	// UpdateReceivedShare updates the received share with share state.
-	UpdateReceivedShare(ctx context.Context, share *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error)
+	UpdateReceivedShare(ctx context.Context, share *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userv1beta1.UserId) (*collaboration.ReceivedShare, error)
 }
 
 // ReceivedShareWithUser holds the relevant information for representing a received share of a user

@@ -343,7 +343,7 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 
 	// check if we are the owner or the grantee
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if share.IsCreatedByUser(s, user) || share.IsGrantedToUser(s, user) {
+	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE || share.IsCreatedByUser(s, user) || share.IsGrantedToUser(s, user) {
 		return s, nil
 	}
 
@@ -617,7 +617,7 @@ func (m *Manager) GetReceivedShare(ctx context.Context, ref *collaboration.Share
 }
 
 // UpdateReceivedShare updates the received share with share state.
-func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
+func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userpb.UserId) (*collaboration.ReceivedShare, error) {
 	if err := m.initialize(); err != nil {
 		return nil, err
 	}
@@ -643,7 +643,12 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration
 		}
 	}
 
-	err = m.persistReceivedShare(ctx, user.Id, rs)
+	uid := user.GetId()
+	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
+		uid = forUser
+	}
+
+	err = m.persistReceivedShare(ctx, uid, rs)
 	if err != nil {
 		return nil, err
 	}
