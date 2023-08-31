@@ -215,8 +215,8 @@ devDependencies:
     specifier: 9.1.2
     version: 9.1.2(postcss@8.4.29)
   postcss-safe-parser:
-    specifier: 5.0.2
-    version: 5.0.2
+    specifier: 6.0.0
+    version: 6.0.0(postcss@8.4.29)
   react-dev-utils:
     specifier: ^11.0.3
     version: 11.0.4(eslint@7.32.0)(typescript@4.7.4)(webpack@4.46.0)
@@ -11129,11 +11129,13 @@ packages:
       postcss: 8.4.29
     dev: true
 
-  /postcss-safe-parser@5.0.2:
-    resolution: {integrity: sha512-jDUfCPJbKOABhwpUKcqCVbbXiloe/QXMcbJ6Iipf3sDIihEzTqRCeMBfRaOHxhBuTYqtASrI1KJWxzztZU4qUQ==}
-    engines: {node: '>=10.0'}
+  /postcss-safe-parser@6.0.0(postcss@8.4.29):
+    resolution: {integrity: sha512-FARHN8pwH+WiS2OPCxJI8FuRJpTVnn6ZNFiqAM2aeW2LwTHWWmWgIyKC6cUo0L8aeKiF/14MNvnpls6R2PBeMQ==}
+    engines: {node: '>=12.0'}
+    peerDependencies:
+      postcss: ^8.3.3
     dependencies:
-      postcss: 8.4.14
+      postcss: 8.4.29
     dev: true
 
   /postcss-selector-not@7.0.1(postcss@8.4.29):
@@ -11193,15 +11195,6 @@ packages:
     dependencies:
       picocolors: 0.2.1
       source-map: 0.6.1
-    dev: true
-
-  /postcss@8.4.14:
-    resolution: {integrity: sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==}
-    engines: {node: ^10 || ^12 || >=14}
-    dependencies:
-      nanoid: 3.3.6
-      picocolors: 1.0.0
-      source-map-js: 1.0.2
     dev: true
 
   /postcss@8.4.28:
