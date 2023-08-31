@@ -425,7 +425,5 @@ Feature: List and create spaces
     And the json responded should not contain a space with name "Project Venus"
     Examples:
       | role        |
-      | Admin       |
-      | Space Admin |
       | User        |
       | User Light  |

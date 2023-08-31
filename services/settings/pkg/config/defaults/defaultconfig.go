@@ -64,8 +64,9 @@ func DefaultConfig() *config.Config {
 				TTL:            time.Minute * 10,
 			},
 		},
-		BundlesPath: "",
-		Bundles:     nil,
+		BundlesPath:           "",
+		Bundles:               nil,
+		ServiceAccountIDAdmin: "service-user-id",
 	}
 }
 

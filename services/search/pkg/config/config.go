@@ -29,7 +29,13 @@ type Config struct {
 	Extractor                  Extractor             `yaml:"extractor"`
 	ContentExtractionSizeLimit uint64                `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction."`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
+	ServiceAccount ServiceAccount `yaml:"service_account"`
 
 	Context context.Context `yaml:"-"`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;SEARCH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;SEARCH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }

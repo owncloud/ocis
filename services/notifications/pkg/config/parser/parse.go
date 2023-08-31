@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 
@@ -34,9 +33,5 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
-	if cfg.Notifications.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
-	}
-
 	return nil
 }

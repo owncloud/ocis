@@ -159,10 +159,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}
 
-	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	}
-
 	if cfg.Identity.LDAP.GroupCreateBaseDN == "" {
 		cfg.Identity.LDAP.GroupCreateBaseDN = cfg.Identity.LDAP.GroupBaseDN
 	}

@@ -55,6 +55,7 @@ func DefaultConfig() *config.Config {
 		AppRegistryEndpoint:       "com.owncloud.api.app-registry",
 		AuthBasicEndpoint:         "com.owncloud.api.auth-basic",
 		AuthMachineEndpoint:       "com.owncloud.api.auth-machine",
+		AuthServiceEndpoint:       "com.owncloud.api.auth-service",
 		GroupsEndpoint:            "com.owncloud.api.groups",
 		PermissionsEndpoint:       "com.owncloud.api.settings",
 		SharingEndpoint:           "com.owncloud.api.sharing",

@@ -22,6 +22,7 @@ import (
 	"context"
 	"strings"
 
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -84,6 +85,21 @@ func OwnerPermissions() provider.ResourcePermissions {
 	}
 }
 
+// ServiceAccountPermissions defines the permissions for nodes when requested by a service account
+func ServiceAccountPermissions() provider.ResourcePermissions {
+	// TODO: Different permissions for different service accounts
+	return provider.ResourcePermissions{
+		Stat:                 true,
+		ListContainer:        true,
+		GetPath:              true, // for search index
+		InitiateFileUpload:   true, // for personal data export
+		InitiateFileDownload: true, // for full-text-search
+		RemoveGrant:          true, // for share expiry
+		ListRecycle:          true, // for purge-trash-bin command
+		PurgeRecycle:         true, // for purge-trash-bin command
+	}
+}
+
 // Permissions implements permission checks
 type Permissions struct {
 	lu PathLookup
@@ -111,6 +127,10 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
 		return NoPermissions(), nil
+	}
+
+	if u.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
+		return ServiceAccountPermissions(), nil
 	}
 
 	// are we reading a revision?

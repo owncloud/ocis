@@ -57,7 +57,9 @@ type Service struct {
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	engine          engine.Engine
 	extractor       content.Extractor
-	secret          string
+
+	serviceAccountID     string
+	serviceAccountSecret string
 }
 
 var errSkipSpace error
@@ -67,9 +69,11 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 	var s = &Service{
 		gatewaySelector: gatewaySelector,
 		engine:          eng,
-		secret:          cfg.MachineAuthAPIKey,
 		logger:          logger,
 		extractor:       extractor,
+
+		serviceAccountID:     cfg.ServiceAccount.ServiceAccountID,
+		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
 	}
 
 	return s
@@ -291,21 +295,12 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			return nil, err
 		}
 
-		var ownerCtx context.Context
-		if space.Owner.Id.Type == user.UserType_USER_TYPE_SPACE_OWNER {
-			// We can't impersonate SPACE_OWNER users and have to fall back to using the user auth instead,
-			// which will not resolve the absolute path of the share in the space but only the part the user
-			// is allowed to see.
-			// In the future this problem can be solved using service accounts.
-			ownerCtx = ctx
-		} else {
-			ownerCtx, err = getAuthContext(&user.User{Id: space.Owner.Id}, s.gatewaySelector, s.secret, s.logger)
-			if err != nil {
-				return nil, err
-			}
+		serviceCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+		if err != nil {
+			return nil, err
 		}
 
-		gpRes, err := gatewayClient.GetPath(ownerCtx, &provider.GetPathRequest{
+		gpRes, err := gatewayClient.GetPath(serviceCtx, &provider.GetPathRequest{
 			ResourceId: space.Root,
 		})
 		if err != nil {
@@ -380,7 +375,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId) error {
-	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gatewaySelector, s.secret, s.logger)
+	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
 	}
@@ -510,7 +505,7 @@ func (s *Service) MoveItem(ref *provider.Reference, uID *user.UserId) {
 }
 
 func (s *Service) resInfo(uID *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
-	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gatewaySelector, s.secret, s.logger)
+	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return nil, nil, ""
 	}

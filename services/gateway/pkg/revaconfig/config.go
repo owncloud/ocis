@@ -80,9 +80,10 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
-								"basic":        cfg.AuthBasicEndpoint,
-								"machine":      cfg.AuthMachineEndpoint,
-								"publicshares": cfg.StoragePublicLinkEndpoint,
+								"basic":           cfg.AuthBasicEndpoint,
+								"machine":         cfg.AuthMachineEndpoint,
+								"publicshares":    cfg.StoragePublicLinkEndpoint,
+								"serviceaccounts": cfg.AuthServiceEndpoint,
 							},
 						},
 					},

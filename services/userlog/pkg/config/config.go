@@ -32,6 +32,8 @@ type Config struct {
 
 	GlobalNotificationsSecret string `yaml:"global_notifications_secret" env:"USERLOG_GLOBAL_NOTIFICATIONS_SECRET" desc:"The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints."`
 
+	ServiceAccount ServiceAccount `yaml:"service_account"`
+
 	Context context.Context `yaml:"-"`
 }
 
@@ -74,4 +76,10 @@ type HTTP struct {
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;USERLOG_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;USERLOG_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;USERLOG_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }

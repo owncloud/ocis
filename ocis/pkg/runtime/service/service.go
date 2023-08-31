@@ -26,6 +26,7 @@ import (
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
+	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
@@ -134,6 +135,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.AuthMachine.Context = ctx
 		cfg.AuthMachine.Commons = cfg.Commons
 		return authmachine.Execute(cfg.AuthMachine)
+	})
+	reg(opts.Config.AuthService.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AuthService.Context = ctx
+		cfg.AuthService.Commons = cfg.Commons
+		return authservice.Execute(cfg.AuthService)
 	})
 	reg(opts.Config.EventHistory.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.EventHistory.Context = ctx
