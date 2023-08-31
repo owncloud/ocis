@@ -19,14 +19,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	"golang.org/x/sync/errgroup"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 //go:generate mockery --name=Searcher
@@ -327,9 +328,6 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		}
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
-		if req.Ref == nil && utils.MakeRelativePath(searchPathPrefix) == utils.MakeRelativePath(rootName) {
-			searchPathPrefix = "."
-		}
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 	case _spaceTypePersonal, _spaceTypeProject:
 		permissions = space.GetRootInfo().GetPermissionSet()
