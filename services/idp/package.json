@@ -84,7 +84,7 @@
     "@types/react-redux": "^7.1.19",
     "@types/redux-logger": "^3.0.9",
     "axios": "^1.5.0",
-    "classnames": "^2.2.6",
+    "classnames": "^2.3.2",
     "i18next": "^23.4.6",
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.1",
