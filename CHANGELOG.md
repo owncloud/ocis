@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
 
@@ -17,6 +18,7 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/7138
+   https://github.com/owncloud/ocis/pull/6427
 
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 
@@ -59,6 +61,12 @@ The following sections list the changes for unreleased.
   * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
+
+* Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
+
+   Introduces service accounts to avoid impersonating users in async processes
+
+   https://github.com/owncloud/ocis/pull/6427
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
