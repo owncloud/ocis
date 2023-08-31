@@ -914,7 +914,7 @@ github.com/go-micro/plugins/v4/registry/nats
 # github.com/go-micro/plugins/v4/server/grpc v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/grpc
-# github.com/go-micro/plugins/v4/server/http v1.2.1
+# github.com/go-micro/plugins/v4/server/http v1.2.2
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.1.0
