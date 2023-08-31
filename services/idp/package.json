@@ -137,7 +137,7 @@
     "license-checker-rseidelsohn": "^3.1.0",
     "mini-css-extract-plugin": "1.6.2",
     "optimize-css-assets-webpack-plugin": "6.0.1",
-    "pnp-webpack-plugin": "1.6.4",
+    "pnp-webpack-plugin": "1.7.0",
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-loader": "4.3.0",
     "postcss-normalize": "10.0.1",
