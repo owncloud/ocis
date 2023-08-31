@@ -1,6 +1,6 @@
 ---
 title: Auth-Bearer
-date: 2023-08-31T09:23:29.883510335Z
+date: 2023-08-31T11:17:46.661416063Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-bearer
@@ -18,11 +18,20 @@ The oCIS Auth Bearer service communicates with the configured OpenID Connect ide
 
 ## Table of Contents
 
-* [Built in OpenID Connect identity provider](#built-in-openid-connect-identity-provider)
+* [The `auth` Service Family](#the-`auth`-service-family)
+* [Built in OpenID Connect Identity Provider](#built-in-openid-connect-identity-provider)
 * [Scalability](#scalability)
 * [Example Yaml Config](#example-yaml-config)
 
-## Built in OpenID Connect identity provider
+## The `auth` Service Family
+
+ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+  -   `auth-basic` handles basic authentication
+  -   `auth-bearer` handles oidc authentication
+  -   `auth-machine` handles interservice authentication when a user is impersonated
+  -   `auth-service` handles interservice authentication when using service accounts
+
+## Built in OpenID Connect Identity Provider
 
 A default oCIS deployment will start a [built in OpenID Connect identity provider](https://github.com/owncloud/ocis/tree/master/services/idp) but can be configured to use an external one as well.
 

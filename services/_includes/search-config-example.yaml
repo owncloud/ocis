@@ -46,4 +46,6 @@ extractor:
   tika:
     tika_url: http://127.0.0.1:9998
 content_extraction_size_limit: 20971520
-machine_auth_api_key: ""
+service_account:
+  service_account_id: ""
+  service_account_secret: ""

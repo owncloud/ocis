@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-31-09-23-28]
+[#deprecation-note-2023-08-31-11-17-46]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -274,16 +274,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
-a|`OCIS_MACHINE_AUTH_API_KEY` +
-`NOTIFICATIONS_MACHINE_AUTH_API_KEY` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
-
 a|`OCIS_EMAIL_TEMPLATE_PATH` +
 `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` +
 
@@ -329,5 +319,25 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`NOTIFICATIONS_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`NOTIFICATIONS_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 |===
 

@@ -42,3 +42,4 @@
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.|
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>IDM_CREATE_DEMO_USERS | bool | false | The default role assignments the demo users should be setup.|
+| OCIS_SERVICE_ACCOUNT_ID<br/>SETTINGS_SERVICE_ACCOUNT_ID_ADMIN | string | service-user-id | The ID of the service account having the admin role. See the 'auth-service' service description for more details.|

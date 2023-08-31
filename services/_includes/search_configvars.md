@@ -33,4 +33,5 @@
 | OCIS_INSECURE<br/>SEARCH_EXTRACTOR_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
 | SEARCH_EXTRACTOR_TIKA_TIKA_URL | string | http://127.0.0.1:9998 | URL of the tika server.|
 | SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT | uint64 | 20971520 | Maximum file size in bytes that is allowed for content extraction.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+| OCIS_SERVICE_ACCOUNT_ID<br/>SEARCH_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+| OCIS_SERVICE_ACCOUNT_SECRET<br/>SEARCH_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|

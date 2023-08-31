@@ -1,6 +1,6 @@
 ---
 title: Auth-Basic
-date: 2023-08-31T09:23:29.883417061Z
+date: 2023-08-31T11:17:46.661295907Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-basic
@@ -22,11 +22,20 @@ To enable `auth-basic`, you first must set `PROXY_ENABLE_BASIC_AUTH` to `true`.
 
 ## Table of Contents
 
+* [The `auth` Service Family](#the-`auth`-service-family)
 * [Auth Managers](#auth-managers)
   * [LDAP Auth Manager](#ldap-auth-manager)
   * [Other Auth Managers](#other-auth-managers)
 * [Scalability](#scalability)
 * [Example Yaml Config](#example-yaml-config)
+
+## The `auth` Service Family
+
+ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+  -   `auth-basic` handles basic authentication
+  -   `auth-bearer` handles oidc authentication
+  -   `auth-machine` handles interservice authentication when a user is impersonated
+  -   `auth-service` handles interservice authentication when using service accounts
 
 ## Auth Managers
 

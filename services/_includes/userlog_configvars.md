@@ -40,3 +40,5 @@
 | OCIS_PERSISTENT_STORE_SIZE<br/>USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE | bool | false | Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.|
 | USERLOG_GLOBAL_NOTIFICATIONS_SECRET | string |  | The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.|
+| OCIS_SERVICE_ACCOUNT_ID<br/>USERLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+| OCIS_SERVICE_ACCOUNT_SECRET<br/>USERLOG_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|

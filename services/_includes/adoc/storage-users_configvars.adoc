@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-08-31-09-23-28]
+[#deprecation-note-2023-08-31-11-17-46]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -914,5 +914,25 @@ a| [subs=-attributes]
 ++720h0m0s ++
 a| [subs=-attributes]
 Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`STORAGE_USERS_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`STORAGE_USERS_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 |===
 

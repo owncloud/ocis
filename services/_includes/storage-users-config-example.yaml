@@ -118,3 +118,6 @@ tasks:
     user_id: ""
     personal_delete_before: 720h0m0s
     project_delete_before: 720h0m0s
+service_account:
+  service_account_id: ""
+  service_account_secret: ""

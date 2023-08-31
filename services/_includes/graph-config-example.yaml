@@ -123,7 +123,6 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
-machine_auth_api_key: ""
 keycloak:
   base_path: ""
   client_id: ""
@@ -131,3 +130,6 @@ keycloak:
   client_realm: ""
   user_realm: ""
   insecure_skip_verify: false
+service_account:
+  service_account_id: ""
+  service_account_secret: ""
