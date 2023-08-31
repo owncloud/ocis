@@ -90,7 +90,7 @@
     "i18next-http-backend": "^2.2.1",
     "i18next-resources-to-backend": "^1.1.4",
     "kpop": "https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz",
-    "query-string": "^7.1.1",
+    "query-string": "^8.1.0",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
     "react-dom": "^17.0.2",
