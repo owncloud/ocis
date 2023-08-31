@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.5.0
     version: 1.5.0
   classnames:
-    specifier: ^2.2.6
-    version: 2.3.1
+    specifier: ^2.3.2
+    version: 2.3.2
   i18next:
     specifier: ^23.4.6
     version: 23.4.6
@@ -5394,10 +5394,6 @@ packages:
       isobject: 3.0.1
       static-extend: 0.1.2
     dev: true
-
-  /classnames@2.3.1:
-    resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}
-    dev: false
 
   /classnames@2.3.2:
     resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
