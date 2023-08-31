@@ -1,7 +1,7 @@
-Feature: full text search
+Feature: tag search
   As a user
-  I want to do full text search
-  So that I can find the files with the content I am looking for
+  I want to do search resources by tag
+  So that I can find the files with the tag I am looking for
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
