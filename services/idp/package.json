@@ -130,7 +130,7 @@
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
     "file-loader": "6.1.1",
-    "html-webpack-plugin": "4.5.0",
+    "html-webpack-plugin": "4.5.2",
     "i18next-conv": "^14.0.0",
     "i18next-parser": "^8.7.0",
     "jest": "26.6.0",
