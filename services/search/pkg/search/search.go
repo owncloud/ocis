@@ -11,8 +11,8 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
@@ -138,21 +138,6 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		fmt.Fprintf(&b, "CK")
 	}
 	return b.String()
-}
-
-func extractScope(path string) (*provider.Reference, error) {
-	ref, err := storagespace.ParseReference(path)
-	if err != nil {
-		return nil, err
-	}
-	return &provider.Reference{
-		ResourceId: &provider.ResourceId{
-			StorageId: ref.ResourceId.StorageId,
-			SpaceId:   ref.ResourceId.SpaceId,
-			OpaqueId:  ref.ResourceId.OpaqueId,
-		},
-		Path: ref.GetPath(),
-	}, nil
 }
 
 // ParseScope extract a scope value from the query string and returns search, scope strings

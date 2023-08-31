@@ -22,13 +22,14 @@ var _fields = map[string]string{
 	"type":     "Type",
 	"tag":      "Tags",
 	"tags":     "Tags",
+	"content":  "Content",
 }
 
 // Compiler represents a KQL query search string to the bleve query formatter.
 type Compiler struct{}
 
 // Compile implements the query formatter which converts the KQL query search string to the bleve query.
-func (c *Compiler) Compile(givenAst *ast.Ast) (bleveQuery.Query, error) {
+func (c Compiler) Compile(givenAst *ast.Ast) (bleveQuery.Query, error) {
 	q, err := compile(givenAst)
 	if err != nil {
 		return nil, err

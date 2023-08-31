@@ -24,4 +24,6 @@ query: `(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`
 * `NOT` with `tag:read`.
 
 https://github.com/owncloud/ocis/pull/7043
+https://github.com/owncloud/ocis/pull/7196
 https://github.com/owncloud/ocis/issues/7042
+https://github.com/owncloud/ocis/issues/7179
