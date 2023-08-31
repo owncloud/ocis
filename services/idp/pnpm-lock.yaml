@@ -125,8 +125,8 @@ devDependencies:
     specifier: ^10.0.0
     version: 10.0.1
   case-sensitive-paths-webpack-plugin:
-    specifier: 2.3.0
-    version: 2.3.0
+    specifier: 2.4.0
+    version: 2.4.0
   cldr:
     specifier: ^7.1.1
     version: 7.2.0
@@ -5517,8 +5517,8 @@ packages:
       rsvp: 4.8.5
     dev: true
 
-  /case-sensitive-paths-webpack-plugin@2.3.0:
-    resolution: {integrity: sha512-/4YgnZS8y1UXXmC02xD5rRrBEu6T5ub+mQHLNRj0fzTRbgdBYhsNo2V5EqwgqrExjxsjtF/OpAKAMkKsxbD5XQ==}
+  /case-sensitive-paths-webpack-plugin@2.4.0:
+    resolution: {integrity: sha512-roIFONhcxog0JSSWbvVAh3OocukmSgpqOH6YpMkCvav/ySIV3JKg4Dc8vYtQjYi/UxpNE36r/9v+VqTQqgkYmw==}
     engines: {node: '>=4'}
     dev: true
 
