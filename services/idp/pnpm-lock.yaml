@@ -99,8 +99,8 @@ dependencies:
     specifier: ^0.1.1
     version: 0.1.1
   web-vitals:
-    specifier: ^1.0.1
-    version: 1.1.2
+    specifier: ^3.4.0
+    version: 3.4.0
 
 devDependencies:
   '@babel/core':
@@ -13197,8 +13197,8 @@ packages:
       - supports-color
     dev: true
 
-  /web-vitals@1.1.2:
-    resolution: {integrity: sha512-PFMKIY+bRSXlMxVAQ+m2aw9c/ioUYfDgrYot0YUa+/xa0sakubWhSDyxAKwzymvXVdF4CZI71g06W+mqhzu6ig==}
+  /web-vitals@3.4.0:
+    resolution: {integrity: sha512-n9fZ5/bG1oeDkyxLWyep0eahrNcPDF6bFqoyispt7xkW0xhDzpUBTgyDKqWDi1twT0MgH4HvvqzpUyh0ZxZV4A==}
     dev: false
 
   /webidl-conversions@3.0.1:
