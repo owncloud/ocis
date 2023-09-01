@@ -24,6 +24,7 @@ use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\Context;
 use TestHelpers\SetupHelper;
+use \Psr\Http\Message\ResponseInterface;
 
 /**
  * Authentication functions
