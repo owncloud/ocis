@@ -359,6 +359,8 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		s.logger.Debug().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 	}
 
+	var matches []*searchmsg.Match
+
 	for _, match := range res.Matches {
 		if mountpointPrefix != "" {
 			match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
@@ -372,7 +374,16 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		isMountpoint := isShared && match.GetEntity().GetRef().GetPath() == "."
 		isDir := match.GetEntity().GetMimeType() == "httpd/unix-directory"
 		match.Entity.Permissions = convertToWebDAVPermissions(isShared, isMountpoint, isDir, permissions)
+
+		if req.Ref != nil && searchPathPrefix == "/"+match.Entity.Name {
+			continue
+		}
+
+		matches = append(matches, match)
 	}
+
+	res.Matches = matches
+
 	return res, nil
 }
 
