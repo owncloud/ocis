@@ -29,6 +29,7 @@ use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\Context;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * AppConfiguration trait
@@ -110,7 +111,8 @@ class AppConfigurationContext implements Context {
 	 */
 	public function userRetrievesCapabilities(string $username): void {
 		$user = $this->featureContext->getActualUsername($username);
-		$this->userGetsCapabilities($user, true);
+		$response = $this->userGetsCapabilities($user, true);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -118,24 +120,22 @@ class AppConfigurationContext implements Context {
 	 * @param string $username
 	 * @param boolean $formatJson // if true then formats the response in json
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userGetsCapabilities(string $username, ?bool $formatJson = false):void {
+	public function userGetsCapabilities(string $username, ?bool $formatJson = false):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($username);
 		$password = $this->featureContext->getPasswordForUser($user);
-		$this->featureContext->setResponse(
-			OcsApiHelper::sendRequest(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$password,
-				'GET',
-				'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
-				$this->featureContext->getStepLineRef(),
-				[],
-				$this->featureContext->getOcsApiVersion()
-			)
+		return OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$password,
+			'GET',
+			'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
+			$this->featureContext->getStepLineRef(),
+			[],
+			$this->featureContext->getOcsApiVersion()
 		);
 	}
 
@@ -148,8 +148,8 @@ class AppConfigurationContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsCapabilitiesCheckResponse(string $username):void {
-		$this->userGetsCapabilities($username);
-		$statusCode = $this->featureContext->getResponse()->getStatusCode();
+		$response = $this->userGetsCapabilities($username);
+		$statusCode = $response->getStatusCode();
 		if ($statusCode !== 200) {
 			throw new \Exception(
 				__METHOD__
@@ -164,7 +164,8 @@ class AppConfigurationContext implements Context {
 	 * @return void
 	 */
 	public function theUserGetsCapabilities():void {
-		$this->userGetsCapabilities($this->featureContext->getCurrentUser());
+		$response = $this->userGetsCapabilities($this->featureContext->getCurrentUser());
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -205,7 +206,8 @@ class AppConfigurationContext implements Context {
 	 */
 	public function theAdministratorGetsCapabilities():void {
 		$user = $this->getAdminUsernameForCapabilitiesCheck();
-		$this->userGetsCapabilities($user, true);
+		$response = $this->userGetsCapabilities($user, true);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

@@ -98,7 +98,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWith(string $url, string $method):void {
-		$this->sendRequest($url, $method);
+		$response = $this->sendRequest($url, $method);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -114,7 +115,8 @@ class AuthContext implements Context {
 	public function userRequestsURLWithNoAuth(string $user, string $url, string $method):void {
 		$userRenamed = $this->featureContext->getActualUsername($user);
 		$url = $this->featureContext->substituteInLineCodes($url, $userRenamed);
-		$this->sendRequest($url, $method);
+		$response = $this->sendRequest($url, $method);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -126,8 +128,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userHasRequestedURLWith(string $url, string $method):void {
-		$this->sendRequest($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->sendRequest($url, $method);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $response);
 	}
 
 	/**
@@ -174,7 +176,7 @@ class AuthContext implements Context {
 				$row['endpoint'],
 				$ofUser
 			);
-			$this->sendRequest($row['endpoint'], $method, null, false, $body);
+			$this->featureContext->setResponse($this->sendRequest($row['endpoint'], $method, null, false, $body));
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -212,7 +214,7 @@ class AuthContext implements Context {
 		$this->featureContext->emptyLastOCSStatusCodesArray();
 		$this->featureContext->emptyLastHTTPStatusCodesArray();
 		foreach ($table->getHash() as $row) {
-			$this->sendRequest($row['endpoint'], $method);
+			$this->featureContext->setResponse($this->sendRequest($row['endpoint'], $method));
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -578,7 +580,7 @@ class AuthContext implements Context {
 	 * @param string|null $body
 	 * @param array|null $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function sendRequest(
 		string $url,
@@ -587,7 +589,7 @@ class AuthContext implements Context {
 		bool $useCookies = false,
 		?string $body = null,
 		?array $headers = []
-	):void {
+	):ResponseInterface {
 		// reset responseXml
 		$this->featureContext->setResponseXml([]);
 
@@ -605,18 +607,16 @@ class AuthContext implements Context {
 		if (isset($this->requestToken)) {
 			$headers['requesttoken'] = $this->featureContext->getRequestToken();
 		}
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$this->featureContext->getStepLineRef(),
-				$method,
-				null,
-				null,
-				$headers,
-				$body,
-				null,
-				$cookies
-			)
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$method,
+			null,
+			null,
+			$headers,
+			$body,
+			null,
+			$cookies
 		);
 	}
 
@@ -781,7 +781,7 @@ class AuthContext implements Context {
 		} else {
 			$authString = $userRenamed . ":" . $this->featureContext->getActualPassword($password);
 		}
-		$this->sendRequest(
+		$response = $this->sendRequest(
 			$url,
 			$method,
 			'basic ' . \base64_encode($authString),
@@ -789,6 +789,7 @@ class AuthContext implements Context {
 			$body,
 			$header
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -817,7 +818,7 @@ class AuthContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$this->sendRequest(
+		$response = $this->sendRequest(
 			$url,
 			$method,
 			'basic ' . \base64_encode($authString),
@@ -825,6 +826,7 @@ class AuthContext implements Context {
 			null,
 			$headers
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -884,11 +886,12 @@ class AuthContext implements Context {
 	 */
 	public function userRequestsURLWithUsingBasicTokenAuth(string $user, string $url, string $method):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$this->sendRequest(
+		$response = $this->sendRequest(
 			$url,
 			$method,
 			'basic ' . \base64_encode("$user:" . $this->clientToken)
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -914,7 +917,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithUsingAClientToken(string $url, string $method):void {
-		$this->sendRequest($url, $method, 'token ' . $this->clientToken);
+		$response = $this->sendRequest($url, $method, 'token ' . $this->clientToken);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -939,7 +943,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithUsingAppPassword(string $url, string $method):void {
-		$this->sendRequest($url, $method, 'token ' . $this->appToken);
+		$response = $this->sendRequest($url, $method, 'token ' . $this->appToken);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -952,7 +957,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function theUserRequestsWithUsingAppPasswordNamed(string $url, string $method, string $tokenName):void {
-		$this->sendRequest($url, $method, 'token ' . $this->appTokens[$tokenName]['token']);
+		$response = $this->sendRequest($url, $method, 'token ' . $this->appTokens[$tokenName]['token']);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -977,7 +983,8 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithBrowserSession(string $url, string $method):void {
-		$this->sendRequest($url, $method, null, true);
+		$response = $this->sendRequest($url, $method, null, true);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
