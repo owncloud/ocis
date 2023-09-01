@@ -170,17 +170,12 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	totalMatches := res.Total
 	for _, hit := range res.Hits {
-		if sir.Ref != nil && !strings.HasPrefix(getFieldValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
-			totalMatches--
-			continue
-		}
-
 		if sir.Ref != nil {
 			hitPath := strings.TrimSuffix(getFieldValue[string](hit.Fields, "Path"), "/")
 			requestedPath := utils.MakeRelativePath(sir.Ref.Path)
-			isPathRoot := hitPath == requestedPath
+			isRoot := hitPath == requestedPath
 
-			if !isPathRoot && requestedPath != "." && !strings.HasPrefix(hitPath, requestedPath+"/") {
+			if !isRoot && requestedPath != "." && !strings.HasPrefix(hitPath, requestedPath+"/") {
 				totalMatches--
 				continue
 			}
