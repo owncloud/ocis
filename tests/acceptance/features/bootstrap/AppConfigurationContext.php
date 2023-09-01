@@ -149,13 +149,7 @@ class AppConfigurationContext implements Context {
 	 */
 	public function userGetsCapabilitiesCheckResponse(string $username):void {
 		$response = $this->userGetsCapabilities($username);
-		$statusCode = $response->getStatusCode();
-		if ($statusCode !== 200) {
-			throw new \Exception(
-				__METHOD__
-				. " user $username returned unexpected status $statusCode"
-			);
-		}
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
