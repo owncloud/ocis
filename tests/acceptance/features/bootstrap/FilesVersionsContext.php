@@ -174,12 +174,7 @@ class FilesVersionsContext implements Context {
 	 */
 	public function userRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
 		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
-		$actualStatusCode = $response->getStatusCode();
-		Assert::assertEquals(
-			'204',
-			$actualStatusCode,
-			"HTTP status code was $actualStatusCode Restoring version index of file was not successful"
-		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
