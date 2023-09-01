@@ -3170,6 +3170,10 @@ class SpacesContext implements Context {
 		$xmlRes = $this->featureContext->getResponseXml();
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
+			Assert::assertNotEmpty(
+				$xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem"),
+				'The xml response "' . $xmlRes->asXML() . '" did not contain "<' . $findItem . '>" element'
+			);
 			$responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
 			$value = str_replace('UUIDof:', '', $row['value']);
 			switch ($findItem) {
