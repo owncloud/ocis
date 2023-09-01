@@ -24,6 +24,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -164,10 +165,17 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	totalMatches := res.Total
 	for _, hit := range res.Hits {
+		if sir.Ref != nil && !strings.HasPrefix(getFieldValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
+			totalMatches--
+			continue
+		}
+
 		if sir.Ref != nil {
-			path := strings.TrimSuffix(getFieldValue[string](hit.Fields, "Path"), "/")
-			relRefPath := utils.MakeRelativePath(sir.Ref.Path)
-			if relRefPath != "." && !strings.HasPrefix(path, relRefPath+"/") {
+			hitPath := strings.TrimSuffix(getFieldValue[string](hit.Fields, "Path"), "/")
+			sirPath := utils.MakeRelativePath(sir.Ref.Path)
+			isMountPoint := hitPath == sirPath
+
+			if !isMountPoint && sirPath != "." && !strings.HasPrefix(hitPath, sirPath+"/") {
 				totalMatches--
 				continue
 			}
