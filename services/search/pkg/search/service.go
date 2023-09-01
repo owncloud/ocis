@@ -19,14 +19,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	"golang.org/x/sync/errgroup"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 //go:generate mockery --name=Searcher
@@ -332,9 +333,6 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		}
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
-		if req.Ref == nil && utils.MakeRelativePath(searchPathPrefix) == utils.MakeRelativePath(rootName) {
-			searchPathPrefix = "."
-		}
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 	case _spaceTypePersonal, _spaceTypeProject:
 		permissions = space.GetRootInfo().GetPermissionSet()
@@ -361,6 +359,8 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		s.logger.Debug().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 	}
 
+	var matches []*searchmsg.Match
+
 	for _, match := range res.Matches {
 		if mountpointPrefix != "" {
 			match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
@@ -374,7 +374,16 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		isMountpoint := isShared && match.GetEntity().GetRef().GetPath() == "."
 		isDir := match.GetEntity().GetMimeType() == "httpd/unix-directory"
 		match.Entity.Permissions = convertToWebDAVPermissions(isShared, isMountpoint, isDir, permissions)
+
+		if req.Ref != nil && searchPathPrefix == "/"+match.Entity.Name {
+			continue
+		}
+
+		matches = append(matches, match)
 	}
+
+	res.Matches = matches
+
 	return res, nil
 }
 

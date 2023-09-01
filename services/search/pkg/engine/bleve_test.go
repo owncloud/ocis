@@ -340,7 +340,7 @@ var _ = Describe("Bleve", func() {
 			It("search *doc* in a subfolder", func() {
 				res, err := doSearch(rootResource.ID, "Name:*doc*", "./doc")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(res.TotalMatches).To(Equal(int32(1)))
+				Expect(res.TotalMatches).To(Equal(int32(2)))
 			})
 			It("search *file* in a root", func() {
 				res, err := doSearch(rootResource.ID, "Name:*file*", "")
