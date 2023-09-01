@@ -21,7 +21,10 @@ type ProviderMetadata struct {
 	//grant_types_supported
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported,omitempty"`
 	Issuer                           string   `json:"issuer,omitempty"`
-	JwksURI                          string   `json:"jwks_uri,omitempty"`
+	// AccessTokenIssuer is only used by AD FS and needs to be used when validating the iss of its access tokens
+	// See https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oidce/586de7dd-3385-47c7-93a2-935d9e90441c
+	AccessTokenIssuer string `json:"access_token_issuer,omitempty"`
+	JwksURI           string `json:"jwks_uri,omitempty"`
 	//registration_endpoint
 	//request_object_signing_alg_values_supported
 	//request_parameter_supported
