@@ -53,7 +53,7 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 	for i := offset; i < len(nodes); i++ {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
-			q := bleveQuery.NewQueryStringQuery(getField(n.Key) + ":" + n.Value)
+			q := bleveQuery.NewQueryStringQuery(getField(n.Key) + ":" + strings.ReplaceAll(n.Value, " ", `\ `))
 			if prev == nil {
 				prev = q
 			} else {
