@@ -71,8 +71,8 @@ class SearchContext implements Context {
 			"		<oc:search>\n";
 		if ($scope !== null) {
 			$scope = \trim($scope, "/");
-            $resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
-            $pattern .= " scope:$resourceID";
+			$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
+			$pattern .= " scope:$resourceID";
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
