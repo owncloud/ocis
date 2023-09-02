@@ -242,6 +242,33 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "unicode",
+			givenQuery: []string{
+				`	😂 "*😀 😁*" name:😂💁👌🎍😍 name:😂💁👌 😍`,
+			},
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Value: "😂",
+					},
+					&ast.StringNode{
+						Value: "*😀 😁*",
+					},
+					&ast.StringNode{
+						Key:   "name",
+						Value: "😂💁👌🎍😍",
+					},
+					&ast.StringNode{
+						Key:   "name",
+						Value: "😂💁👌",
+					},
+					&ast.StringNode{
+						Value: "😍",
+					},
+				},
+			},
+		},
 	}
 
 	assert := tAssert.New(t)
