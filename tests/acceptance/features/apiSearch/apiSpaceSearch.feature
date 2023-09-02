@@ -20,7 +20,7 @@ Feature: Search
 
 
   Scenario: user can find data from the project space
-    When user "Alice" searches for "fol" using the WebDAV API
+    When user "Alice" searches for "*fol*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Alice" should contain these entries:
@@ -31,7 +31,7 @@ Feature: Search
 
 
   Scenario: user can only find data that they searched for from the project space
-    When user "Alice" searches for "SUB" using the WebDAV API
+    When user "Alice" searches for "*SUB*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "2" entries
     And the search result of user "Alice" should contain these entries:
@@ -48,7 +48,7 @@ Feature: Search
       | shareWith | Brian      |
       | role      | viewer     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
-    When user "Brian" searches for "folder" using the WebDAV API
+    When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Brian" should contain these entries:
@@ -60,7 +60,7 @@ Feature: Search
 
   Scenario: user can find hidden file
     Given user "Alice" has created a folder ".space" in space "find data"
-    When user "Alice" searches for ".sp" using the WebDAV API
+    When user "Alice" searches for "*.sp*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain these entries:
@@ -72,7 +72,7 @@ Feature: Search
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    When user "Brian" searches for "folder" using the WebDAV API
+    When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
     And the search result of user "Brian" should not contain these entries:
@@ -87,7 +87,7 @@ Feature: Search
       | shareWith | Brian      |
       | role      | viewer     |
     And user "Brian" has declined share "/folderMain" offered by user "Alice"
-    When user "Brian" searches for "folder" using the WebDAV API
+    When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
     And the search result of user "Brian" should not contain these entries:
@@ -98,20 +98,20 @@ Feature: Search
 
   Scenario: user cannot find deleted folder
     Given user "Alice" has removed the folder "folderMain" from space "find data"
-    When user "Alice" searches for "folderMain" using the WebDAV API
+    When user "Alice" searches for "*folderMain*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
 
 
   Scenario: user can find project space by name
-    When user "Alice" searches for "find data" using the WebDAV API
+    When user "Alice" searches for "*find data*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
 
 
   Scenario: user can search inside folder in space
-    When user "Alice" searches for "folder" inside folder "/folderMain" in space "find data" using the WebDAV API
+    When user "Alice" searches for "*folder*" inside folder "/folderMain" in space "find data" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "3" entries
     And the search result of user "Alice" should contain only these entries:
@@ -128,7 +128,7 @@ Feature: Search
       | shareWith | Brian      |
       | role      | viewer     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
-    When user "Brian" searches for "folder" inside folder "/folderMain" in space "Shares" using the WebDAV API
+    When user "Brian" searches for "*folder*" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
       | /SubFolder1                                |

@@ -71,8 +71,8 @@ class SearchContext implements Context {
 			"		<oc:search>\n";
 		if ($scope !== null && $spaceName !== null) {
 			$scope = \trim($scope, "/");
-			$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $spaceName);
-			$pattern .= " scope:$spaceId/$scope";
+            $resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $scope);
+			$pattern .= " scope:$resourceID";
 		} elseif ($scope !== null) {
 			$scope = \trim($scope, "/");
 			if ($this->featureContext->getDavPathVersion() === 3) {
