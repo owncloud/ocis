@@ -97,7 +97,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 	req.Query = query
 	if len(scope) > 0 {
-		scopedId, err := storagespace.ParseID(scope)
+		scopedID, err := storagespace.ParseID(scope)
 		if err != nil {
 			s.logger.Error().Err(err).Msg("failed to parse scope")
 		}
@@ -105,7 +105,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		// Stat the scope to get the resource id
 		statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
 			Ref: &provider.Reference{
-				ResourceId: &scopedId,
+				ResourceId: &scopedID,
 			},
 			FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}},
 		})
