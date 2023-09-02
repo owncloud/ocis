@@ -36,7 +36,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John Smith`),
+				query.NewQueryStringQuery(`Name:John\ Smith`),
 			}),
 			wantErr: false,
 		},
@@ -50,7 +50,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John Smith`),
+				query.NewQueryStringQuery(`Name:John\ Smith`),
 				query.NewQueryStringQuery(`Name:Jane`),
 			}),
 			wantErr: false,
@@ -82,7 +82,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewDisjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:moby di*`),
+				query.NewQueryStringQuery(`Name:moby\ di*`),
 				query.NewConjunctionQuery([]query.Query{
 					query.NewQueryStringQuery(`Tags:bestseller`),
 					query.NewQueryStringQuery(`Tags:book`),
@@ -125,7 +125,7 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewDisjunctionQuery([]query.Query{
-					query.NewQueryStringQuery(`Name:moby di*`),
+					query.NewQueryStringQuery(`Name:moby\ di*`),
 					query.NewQueryStringQuery(`Tags:bestseller`),
 				}),
 				query.NewQueryStringQuery(`Tags:book`),
@@ -150,7 +150,7 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewDisjunctionQuery([]query.Query{
-					query.NewQueryStringQuery(`Name:moby di*`),
+					query.NewQueryStringQuery(`Name:moby\ di*`),
 					query.NewQueryStringQuery(`Tags:bestseller`),
 				}),
 				query.NewQueryStringQuery(`Tags:book`),
@@ -173,7 +173,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John Smith`),
+				query.NewQueryStringQuery(`author:John\ Smith`),
 				query.NewQueryStringQuery(`author:Jane`),
 			}),
 			wantErr: false,
@@ -195,7 +195,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John Smith`),
+				query.NewQueryStringQuery(`author:John\ Smith`),
 				query.NewQueryStringQuery(`author:Jane`),
 				query.NewQueryStringQuery(`Tags:bestseller`),
 			}),
