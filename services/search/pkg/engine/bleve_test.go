@@ -65,7 +65,7 @@ var _ = Describe("Bleve", func() {
 		idx, err = bleveSearch.NewMemOnly(mapping)
 		Expect(err).ToNot(HaveOccurred())
 
-		eng = engine.NewBleveEngine(idx)
+		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
 		Expect(err).ToNot(HaveOccurred())
 
 		rootResource = engine.Resource{
@@ -96,7 +96,7 @@ var _ = Describe("Bleve", func() {
 
 	Describe("New", func() {
 		It("returns a new index instance", func() {
-			b := engine.NewBleveEngine(idx)
+			b := engine.NewBleveEngine(idx, bleve.DefaultCreator)
 			Expect(b).ToNot(BeNil())
 		})
 	})
@@ -136,7 +136,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rootResource.ID, `Name:foo\ o*`, 1)
+				assertDocCount(rootResource.ID, `name:"foo o*"`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {
@@ -411,14 +411,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Upsert(childResource.ID, childResource)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Document.Name, 1)
-			assertDocCount(rootResource.ID, childResource.Document.Name, 1)
+			assertDocCount(rootResource.ID, `"`+parentResource.Document.Name+`"`, 1)
+			assertDocCount(rootResource.ID, `"`+childResource.Document.Name+`"`, 1)
 
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Document.Name, 0)
-			assertDocCount(rootResource.ID, childResource.Document.Name, 0)
+			assertDocCount(rootResource.ID, `"`+parentResource.Document.Name+`"`, 0)
+			assertDocCount(rootResource.ID, `"`+childResource.Document.Name+`"`, 0)
 		})
 	})
 
@@ -433,14 +433,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Name, 0)
-			assertDocCount(rootResource.ID, childResource.Name, 0)
+			assertDocCount(rootResource.ID, `"`+parentResource.Name+`"`, 0)
+			assertDocCount(rootResource.ID, `"`+childResource.Name+`"`, 0)
 
 			err = eng.Restore(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Name, 1)
-			assertDocCount(rootResource.ID, childResource.Name, 1)
+			assertDocCount(rootResource.ID, `"`+parentResource.Name+`"`, 1)
+			assertDocCount(rootResource.ID, `"`+childResource.Name+`"`, 1)
 		})
 	})
 

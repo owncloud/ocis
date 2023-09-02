@@ -19,7 +19,6 @@ import (
 	"github.com/go-chi/render"
 	"github.com/riandyrn/otelchi"
 	merrors "go-micro.dev/v4/errors"
-	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -28,7 +27,6 @@ import (
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
@@ -117,12 +115,8 @@ func NewService(opts ...Option) (Service, error) {
 				r.Get("/dav/files/{id}", svc.Thumbnail)
 				r.Get("/dav/files/{id}/*", svc.Thumbnail)
 
-				legacySearchHandler := func(w http.ResponseWriter, r *http.Request) {
-					ctx := metadata.Set(r.Context(), bleve.QueryTypeHeader, bleve.QueryTypeLegacy)
-					svc.Search(w, r.WithContext(ctx))
-				}
-				r.MethodFunc("REPORT", "/remote.php/dav/files*", legacySearchHandler)
-				r.MethodFunc("REPORT", "/dav/files*", legacySearchHandler)
+				r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
+				r.MethodFunc("REPORT", "/dav/files*", svc.Search)
 			})
 
 			r.Group(func(r chi.Router) {

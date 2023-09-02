@@ -25,6 +25,7 @@ import (
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 )
 
@@ -48,7 +49,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			_ = idx.Close()
 		}
 
-		eng = engine.NewBleveEngine(idx)
+		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
 	default:
 		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
 	}
