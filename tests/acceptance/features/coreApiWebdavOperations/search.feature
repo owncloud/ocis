@@ -24,7 +24,7 @@ Feature: Search
   @smokeTest
   Scenario Outline: search for entry by pattern
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" using the WebDAV API
+    When user "Alice" searches for "*upload*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
       | /upload.txt                   |
@@ -51,7 +51,7 @@ Feature: Search
   Scenario Outline: search for entries by only some letters from the middle of the entry name
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
-    When user "Alice" searches for "ol" using the WebDAV API
+    When user "Alice" searches for "*ol*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Alice" should contain these entries:
@@ -72,7 +72,7 @@ Feature: Search
 
   Scenario Outline: search for files by extension
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "png" using the WebDAV API
+    When user "Alice" searches for "*png*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
       | /a-image.png               |
@@ -110,7 +110,7 @@ Feature: Search
 
   Scenario Outline: limit returned search entries
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" and limits the results to "3" items using the WebDAV API
+    When user "Alice" searches for "*upload*" and limits the results to "3" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain any "3" of these entries:
       | /just-a-folder/upload.txt     |
@@ -134,7 +134,7 @@ Feature: Search
 
   Scenario Outline: limit returned search entries to only 1 entry
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" and limits the results to "1" items using the WebDAV API
+    When user "Alice" searches for "*upload*" and limits the results to "1" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain any "1" of these entries:
       | /just-a-folder/upload.txt     |
@@ -158,7 +158,7 @@ Feature: Search
 
   Scenario Outline: limit returned search entries to more entries than there are
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" and limits the results to "100" items using the WebDAV API
+    When user "Alice" searches for "*upload*" and limits the results to "100" items using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "8" entries
     And the search result of user "Alice" should contain these entries:
@@ -183,7 +183,7 @@ Feature: Search
   @issue-4712
   Scenario Outline: report extra properties in search entries for a file
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" using the WebDAV API requesting these properties:
+    When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
       | a:getlastmodified     |
@@ -216,7 +216,7 @@ Feature: Search
   @issue-4712
   Scenario Outline: report extra properties in search entries for a folder
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "upload" using the WebDAV API requesting these properties:
+    When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
       | a:getlastmodified     |
@@ -248,7 +248,7 @@ Feature: Search
 
   Scenario Outline: search for entry with emoji by pattern
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "😀 😁" using the WebDAV API
+    When user "Alice" searches for '"*😀 😁*"' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain these entries:
       | /upload😀 😁                 |
