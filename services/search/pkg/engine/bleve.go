@@ -19,7 +19,6 @@ import (
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -29,12 +28,12 @@ import (
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
-	bleveQuery "github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
-	index bleve.Index
+	index        bleve.Index
+	queryCreator searchQuery.Creator[query.Query]
 }
 
 // NewBleveIndex returns a new bleve index
@@ -59,9 +58,10 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 }
 
 // NewBleveEngine creates a new Bleve instance
-func NewBleveEngine(index bleve.Index) *Bleve {
+func NewBleveEngine(index bleve.Index, queryCreator searchQuery.Creator[query.Query]) *Bleve {
 	return &Bleve{
-		index: index,
+		index:        index,
+		queryCreator: queryCreator,
 	}
 }
 
@@ -119,17 +119,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
-	queryType, _ := metadata.Get(ctx, bleveQuery.QueryTypeHeader)
-
-	var queryCreator searchQuery.Creator[query.Query]
-	switch queryType {
-	case bleveQuery.QueryTypeLegacy:
-		queryCreator = bleveQuery.LegacyCreator
-	default:
-		queryCreator = bleveQuery.DefaultCreator
-	}
-
-	createdQuery, err := queryCreator.Create(sir.Query)
+	createdQuery, err := b.queryCreator.Create(sir.Query)
 	if err != nil {
 		return nil, err
 	}

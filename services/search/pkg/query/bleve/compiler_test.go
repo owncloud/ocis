@@ -36,7 +36,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John\ Smith`),
+				query.NewQueryStringQuery(`Name:john\ smith`),
 			}),
 			wantErr: false,
 		},
@@ -50,8 +50,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John\ Smith`),
-				query.NewQueryStringQuery(`Name:Jane`),
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Name:jane`),
 			}),
 			wantErr: false,
 		},
@@ -173,8 +173,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John\ Smith`),
-				query.NewQueryStringQuery(`author:Jane`),
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
 			}),
 			wantErr: false,
 		},
@@ -195,9 +195,27 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John\ Smith`),
-				query.NewQueryStringQuery(`author:Jane`),
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
 				query.NewQueryStringQuery(`Tags:bestseller`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `StringNode value lowercase`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "Hidden", Value: "T"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "hidden", Value: "T"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Hidden:T`),
+				query.NewQueryStringQuery(`Hidden:T`),
 			}),
 			wantErr: false,
 		},

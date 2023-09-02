@@ -23,6 +23,7 @@ var _fields = map[string]string{
 	"tag":      "Tags",
 	"tags":     "Tags",
 	"content":  "Content",
+	"hidden":   "Hidden",
 }
 
 // Compiler represents a KQL query search string to the bleve query formatter.
@@ -53,7 +54,14 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 	for i := offset; i < len(nodes); i++ {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
-			q := bleveQuery.NewQueryStringQuery(getField(n.Key) + ":" + strings.ReplaceAll(n.Value, " ", `\ `))
+			k := getField(n.Key)
+			v := strings.ReplaceAll(n.Value, " ", `\ `)
+
+			if k != "Hidden" {
+				v = strings.ToLower(v)
+			}
+
+			q := bleveQuery.NewQueryStringQuery(k + ":" + v)
 			if prev == nil {
 				prev = q
 			} else {
