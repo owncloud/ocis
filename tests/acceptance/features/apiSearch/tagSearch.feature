@@ -243,7 +243,7 @@ Feature: tag search
     And user "Alice" has uploaded file with content "hello world inside folder" to "/Folder/file2.txt"
     And user "Alice" has created folder "/Folder/SubFolder"
     And user "Alice" has uploaded file with content "hello world inside sub-folder" to "/Folder/SubFolder/file3.txt"
-    When user "Alice" searches for "file" inside folder "/Folder" using the WebDAV API
+    When user "Alice" searches for "*file*" inside folder "/Folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
       | file2.txt |

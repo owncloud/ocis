@@ -69,18 +69,10 @@ class SearchContext implements Context {
 			= "<?xml version='1.0' encoding='utf-8' ?>\n" .
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .
 			"		<oc:search>\n";
-		if ($scope !== null && $spaceName !== null) {
+		if ($scope !== null) {
 			$scope = \trim($scope, "/");
-			$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $scope);
-			$pattern .= " scope:$resourceID";
-		} elseif ($scope !== null) {
-			$scope = \trim($scope, "/");
-			if ($this->featureContext->getDavPathVersion() === 3) {
-				$rootPath = $this->featureContext->getPersonalSpaceIdForUser($user);
-			} else {
-				$rootPath = $this->featureContext->getUserIdByUserName($user);
-			}
-			$pattern .= " scope:$rootPath/$scope";
+            $resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
+            $pattern .= " scope:$resourceID";
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
