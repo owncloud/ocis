@@ -52,9 +52,13 @@ func toString(in interface{}) (string, error) {
 	case []interface{}:
 		var str string
 
-		for _, i := range v {
-			j := i.([]uint8)
-			str += string(j[0])
+		for i := range v {
+			sv, err := toString(v[i])
+			if err != nil {
+				return "", err
+			}
+
+			str += sv
 		}
 
 		return str, nil
