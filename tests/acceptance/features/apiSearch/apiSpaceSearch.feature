@@ -104,7 +104,7 @@ Feature: Search
 
 
   Scenario: user can find project space by name
-    When user "Alice" searches for "*find data*" using the WebDAV API
+    When user "Alice" searches for '"*find data*"' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
