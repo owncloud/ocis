@@ -150,9 +150,9 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
-        "apiFullTextSearch": {
+        "apiSearch": {
             "suites": [
-                "apiFullTextSearch",
+                "apiSearch",
             ],
             "skip": False,
             "tikaNeeded": True,

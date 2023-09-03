@@ -41,7 +41,6 @@ default:
         - NotificationContext:
         - OCSContext:
         - PublicWebDavContext:
-        - SearchContext:
         - TagContext:
         - TUSContext:
         - SpacesTUSContext:
@@ -62,7 +61,6 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
-        - SearchContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - TUSContext:
@@ -115,11 +113,9 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
-        - SearchContext:
         - TUSContext:
         - SpacesTUSContext:
         - OcisConfigContext:
-        - TagContext:
         - TrashbinContext:
 
     apiCors:
@@ -195,9 +191,9 @@ default:
         - PublicWebDavContext:
         - ArchiverContext:
 
-    apiFullTextSearch:
+    apiSearch:
       paths:
-        - '%paths.base%/../features/apiFullTextSearch'
+        - '%paths.base%/../features/apiSearch'
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -210,6 +206,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - TrashbinContext:
+        - TagContext:
 
     apiReshare:
       paths:
