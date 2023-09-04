@@ -22,11 +22,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"golang.org/x/exp/slices"
+
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	"golang.org/x/exp/slices"
 )
 
 // GetMe implements the Service interface.
@@ -739,7 +740,7 @@ var usernameRegexes = map[string]*regexp.Regexp{
 	// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
 	// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
 	// names should not start with numbers
-	usernameMatchDefault: regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$"),
+	usernameMatchDefault: regexp.MustCompile("^[a-zA-Z_][À-úa-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$"),
 
 	// In some cases users will be provisioned from an existing system, which may or may not have strange usernames. Because of this we want to "trust" the
 	// upstream system and allow weird usernames, so relying on the used identity provider to complain if a username is violating its restrictions.
