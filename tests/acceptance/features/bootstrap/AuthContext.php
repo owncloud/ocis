@@ -130,7 +130,7 @@ class AuthContext implements Context {
 	 */
 	public function userHasRequestedURLWith(string $url, string $method):void {
 		$response = $this->sendRequest($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
