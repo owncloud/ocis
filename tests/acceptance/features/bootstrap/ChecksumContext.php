@@ -23,6 +23,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
 use TestHelpers\WebDavHelper;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -31,6 +32,32 @@ require_once 'bootstrap.php';
  */
 class ChecksumContext implements Context {
 	private FeatureContext $featureContext;
+
+	/**
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $checksum
+	 *
+	 * @return ResponseInterface
+	 */
+	public function uploadFileToWithChecksumUsingTheAPI(
+		string $user,
+		string  $source,
+		string  $destination,
+		string  $checksum
+	):ResponseInterface {
+		$file = \file_get_contents(
+			$this->featureContext->acceptanceTestsDirLocation() . $source
+		);
+		return $this->featureContext->makeDavRequest(
+			$user,
+			'PUT',
+			$destination,
+			['OC-Checksum' => $checksum],
+			$file
+		);
+	}
 
 	/**
 	 * @When user :user uploads file :source to :destination with checksum :checksum using the WebDAV API
@@ -48,17 +75,7 @@ class ChecksumContext implements Context {
 		string  $destination,
 		string  $checksum
 	):void {
-		$file = \file_get_contents(
-			$this->featureContext->acceptanceTestsDirLocation() . $source
-		);
-		$response = $this->featureContext->makeDavRequest(
-			$user,
-			'PUT',
-			$destination,
-			['OC-Checksum' => $checksum],
-			$file
-		);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum));
 	}
 
 	/**
@@ -78,13 +95,36 @@ class ChecksumContext implements Context {
 		string $checksum
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$this->userUploadsFileToWithChecksumUsingTheAPI(
+		$response = $this->uploadFileToWithChecksumUsingTheAPI(
 			$user,
 			$source,
 			$destination,
 			$checksum
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBe([201,204], '', $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $content
+	 * @param string $checksum
+	 * @param string $destination
+	 *
+	 * @return ResponseInterface
+	 */
+	public function uploadFileWithContentAndChecksumToUsingTheAPI(
+		string $user,
+		string $content,
+		string $checksum,
+		string $destination
+	):ResponseInterface {
+		return $this->featureContext->makeDavRequest(
+			$user,
+			'PUT',
+			$destination,
+			['OC-Checksum' => $checksum],
+			$content
+		);
 	}
 
 	/**
@@ -103,14 +143,7 @@ class ChecksumContext implements Context {
 		string $checksum,
 		string $destination
 	):void {
-		$response = $this->featureContext->makeDavRequest(
-			$user,
-			'PUT',
-			$destination,
-			['OC-Checksum' => $checksum],
-			$content
-		);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination));
 	}
 
 	/**
@@ -130,13 +163,8 @@ class ChecksumContext implements Context {
 		string $destination
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$this->userUploadsFileWithContentAndChecksumToUsingTheAPI(
-			$user,
-			$content,
-			$checksum,
-			$destination
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, '', $response);
 	}
 
 	/**
@@ -375,6 +403,36 @@ class ChecksumContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param int $num
+	 * @param int $total
+	 * @param string $data
+	 * @param string $destination
+	 * @param string $expectedChecksum
+	 *
+	 * @return ResponseInterface
+	 */
+	public function uploadChunkFileOfWithToWithChecksum(
+		string $user,
+		int $num,
+		int $total,
+		string $data,
+		string $destination,
+		string $expectedChecksum
+	):ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$num -= 1;
+		$file = "$destination-chunking-42-$total-$num";
+		return $this->featureContext->makeDavRequest(
+			$user,
+			'PUT',
+			$file,
+			['OC-Checksum' => $expectedChecksum, 'OC-Chunked' => '1'],
+			$data
+		);
+	}
+
+	/**
 	 * @When user :user uploads chunk file :num of :total with :data to :destination with checksum :expectedChecksum using the WebDAV API
 	 *
 	 * @param string $user
@@ -394,16 +452,7 @@ class ChecksumContext implements Context {
 		string $destination,
 		string $expectedChecksum
 	):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$num -= 1;
-		$file = "$destination-chunking-42-$total-$num";
-		$response = $this->featureContext->makeDavRequest(
-			$user,
-			'PUT',
-			$file,
-			['OC-Checksum' => $expectedChecksum, 'OC-Chunked' => '1'],
-			$data
-		);
+		$response = $this->uploadChunkFileOfWithToWithChecksum($user, $num, $total, $data, $destination, $expectedChecksum);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -427,15 +476,12 @@ class ChecksumContext implements Context {
 		string $destination,
 		string $expectedChecksum
 	):void {
-		$this->userUploadsChunkFileOfWithToWithChecksum(
-			$user,
-			$num,
-			$total,
-			$data,
-			$destination,
-			$expectedChecksum
+		$response = $this->uploadChunkFileOfWithToWithChecksum($user, $num, $total, $data, $destination, $expectedChecksum);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			[201, 206],
+			'',
+			$response
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 206);
 	}
 
 	/**
