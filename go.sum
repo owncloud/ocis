@@ -643,8 +643,8 @@ github.com/CiscoM31/godata v1.0.8 h1:ZhPjm1dSwZWMUvb33P4bcVm048iiQ1wbncoCc9bLChQ
 github.com/CiscoM31/godata v1.0.8/go.mod h1:ZMiT6JuD3Rm83HEtiTx4JEChsd25YCrxchKGag/sdTc=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
-github.com/KimMachineGun/automemlimit v0.2.6 h1:tQFriVTcIteUkV5EgU9iz03eDY36T8JU5RAjP2r6Kt0=
-github.com/KimMachineGun/automemlimit v0.2.6/go.mod h1:pJhTW/nWJMj6SnWSU2TEKSlCaM+1N5Mej+IfS/5/Ol0=
+github.com/KimMachineGun/automemlimit v0.3.0 h1:khgwM5ESVN85cE6Bq2ozMAAWDfrOEwQ51D/YlmThE04=
+github.com/KimMachineGun/automemlimit v0.3.0/go.mod h1:pJhTW/nWJMj6SnWSU2TEKSlCaM+1N5Mej+IfS/5/Ol0=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
