@@ -39,15 +39,14 @@ class FavoritesContext implements Context {
 	 * @param string$user
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userFavoritesElement(string $user, string $path):void {
-		$response = $this->changeFavStateOfAnElement(
+	public function userFavoritesElement(string $user, string $path):ResponseInterface {
+		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
 			1
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -59,7 +58,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userFavoritesElementUsingWebDavApi(string $user, string $path):void {
-		$this->userFavoritesElement($user, $path);
+		$response = $this->userFavoritesElement($user, $path);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -71,8 +71,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasFavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$this->userFavoritesElement($user, $path);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->userFavoritesElement($user, $path);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $response);
 	}
 
 	/**
@@ -83,10 +83,11 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserFavoritesElement(string $path):void {
-		$this->userFavoritesElement(
+		$response = $this->userFavoritesElement(
 			$this->featureContext->getCurrentUser(),
 			$path
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -97,13 +98,14 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasFavoritedElement(string $path):void {
-		$this->userFavoritesElement(
+		$response = $this->userFavoritesElement(
 			$this->featureContext->getCurrentUser(),
 			$path
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			207,
-			"Expected response status code to be 207 (Multi-status), but not found! "
+			"Expected response status code to be 207 (Multi-status), but not found! ",
+			$response
 		);
 	}
 
@@ -111,15 +113,14 @@ class FavoritesContext implements Context {
 	 * @param string $user
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userUnfavoritesElement(string $user, string $path):void {
-		$response = $this->changeFavStateOfAnElement(
+	public function userUnfavoritesElement(string $user, string $path):ResponseInterface {
+		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
 			0
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -131,7 +132,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userUnfavoritesElementUsingWebDavApi(string $user, string $path):void {
-		$this->userUnfavoritesElement($user, $path);
+		$response = $this->userUnfavoritesElement($user, $path);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -143,8 +145,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasUnfavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$this->userUnfavoritesElement($user, $path);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->userUnfavoritesElement($user, $path);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -212,10 +214,10 @@ class FavoritesContext implements Context {
 	/**
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function theUserUnfavoritesElement(string $path):void {
-		$this->userUnfavoritesElement(
+	public function theUserUnfavoritesElement(string $path):ResponseInterface {
+		return $this->userUnfavoritesElement(
 			$this->featureContext->getCurrentUser(),
 			$path
 		);
@@ -229,7 +231,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserUnfavoritesElementUsingWebDavApi(string $path):void {
-		$this->theUserUnfavoritesElement($path);
+		$response = $this->theUserUnfavoritesElement($path);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -240,8 +243,8 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasUnfavoritedElementUsingWebDavApi(string $path):void {
-		$this->theUserUnfavoritesElement($path);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->theUserUnfavoritesElement($path);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
