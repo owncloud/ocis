@@ -58,8 +58,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userFavoritesElementUsingWebDavApi(string $user, string $path):void {
-		$response = $this->userFavoritesElement($user, $path);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->userFavoritesElement($user, $path));
 	}
 
 	/**
@@ -71,8 +70,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasFavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$response = $this->userFavoritesElement($user, $path);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $this->userFavoritesElement($user, $path));
 	}
 
 	/**
@@ -132,8 +130,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userUnfavoritesElementUsingWebDavApi(string $user, string $path):void {
-		$response = $this->userUnfavoritesElement($user, $path);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->userUnfavoritesElement($user, $path));
 	}
 
 	/**
@@ -145,8 +142,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasUnfavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$response = $this->userUnfavoritesElement($user, $path);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->userUnfavoritesElement($user, $path));
 	}
 
 	/**
@@ -231,8 +227,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserUnfavoritesElementUsingWebDavApi(string $path):void {
-		$response = $this->theUserUnfavoritesElement($path);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->theUserUnfavoritesElement($path));
 	}
 
 	/**
@@ -243,8 +238,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasUnfavoritedElementUsingWebDavApi(string $path):void {
-		$response = $this->theUserUnfavoritesElement($path);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->theUserUnfavoritesElement($path));
 	}
 
 	/**

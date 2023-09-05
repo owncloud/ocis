@@ -75,8 +75,7 @@ class ChecksumContext implements Context {
 		string  $destination,
 		string  $checksum
 	):void {
-		$response = $this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum));
 	}
 
 	/**
@@ -144,8 +143,7 @@ class ChecksumContext implements Context {
 		string $checksum,
 		string $destination
 	):void {
-		$response = $this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination));
 	}
 
 	/**
@@ -425,14 +423,13 @@ class ChecksumContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$num -= 1;
 		$file = "$destination-chunking-42-$total-$num";
-		$response = $this->featureContext->makeDavRequest(
+		return $this->featureContext->makeDavRequest(
 			$user,
 			'PUT',
 			$file,
 			['OC-Checksum' => $expectedChecksum, 'OC-Chunked' => '1'],
 			$data
 		);
-		return $response;
 	}
 
 	/**
