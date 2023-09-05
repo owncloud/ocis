@@ -33,7 +33,7 @@ func buildAST(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 		return nil, err
 	}
 
-	nodes, err := toNodes(n)
+	nodes, err := toNodes[ast.Node](n)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func buildNodes(e interface{}) ([]ast.Node, error) {
 
 	nodes := make([]ast.Node, len(maybeNodesGroups))
 	for i, maybeNodesGroup := range maybeNodesGroups {
-		node, err := toNode(toIfaceSlice(maybeNodesGroup)[1])
+		node, err := toNode[ast.Node](toIfaceSlice(maybeNodesGroup)[1])
 		if err != nil {
 			return nil, err
 		}
@@ -88,6 +88,35 @@ func buildStringNode(k, v interface{}, text []byte, pos position) (*ast.StringNo
 	}, nil
 }
 
+func buildDateTimeNode(k, o, v interface{}, text []byte, pos position) (*ast.DateTimeNode, error) {
+	b, err := base(text, pos)
+	if err != nil {
+		return nil, err
+	}
+
+	operator, err := toNode[*ast.OperatorNode](o)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := toString(k)
+	if err != nil {
+		return nil, err
+	}
+
+	value, err := toTime(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.DateTimeNode{
+		Base:     b,
+		Key:      key,
+		Operator: operator,
+		Value:    value,
+	}, nil
+}
+
 func buildBooleanNode(k, v interface{}, text []byte, pos position) (*ast.BooleanNode, error) {
 	b, err := base(text, pos)
 	if err != nil {
@@ -117,9 +146,14 @@ func buildOperatorNode(text []byte, pos position) (*ast.OperatorNode, error) {
 		return nil, err
 	}
 
+	value, err := toString(text)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ast.OperatorNode{
 		Base:  b,
-		Value: string(text),
+		Value: value,
 	}, nil
 }
 
@@ -131,7 +165,7 @@ func buildGroupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode
 
 	key, _ := toString(k)
 
-	nodes, err := toNodes(n)
+	nodes, err := toNodes[ast.Node](n)
 	if err != nil {
 		return nil, err
 	}

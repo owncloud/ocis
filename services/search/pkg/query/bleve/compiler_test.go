@@ -2,12 +2,22 @@ package bleve
 
 import (
 	"testing"
+	"time"
 
 	"github.com/blevesearch/bleve/v2/search/query"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
+
+var timeMustParse = func(t *testing.T, ts string) time.Time {
+	tp, err := time.Parse(time.RFC3339Nano, ts)
+	if err != nil {
+		t.Fatalf("time.Parse(...) error = %v", err)
+	}
+
+	return tp
+}
 
 func Test_compile(t *testing.T) {
 	tests := []struct {
@@ -198,6 +208,28 @@ func Test_compile(t *testing.T) {
 				query.NewQueryStringQuery(`author:john\ smith`),
 				query.NewQueryStringQuery(`author:jane`),
 				query.NewQueryStringQuery(`Tags:bestseller`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c mtime>=2023-09-05T12:40:59.14741+02:00`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Key:   "id",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`),
+				query.NewQueryStringQuery(`Mtime:>="2023-09-05T08:42:11.23554+02:00"`),
 			}),
 			wantErr: false,
 		},

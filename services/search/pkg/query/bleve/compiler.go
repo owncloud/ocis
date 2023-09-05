@@ -3,6 +3,7 @@ package bleve
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
@@ -62,6 +63,15 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 			}
 
 			q := bleveQuery.NewQueryStringQuery(k + ":" + v)
+			if prev == nil {
+				prev = q
+			} else {
+				next = q
+			}
+		case *ast.DateTimeNode:
+			k := getField(n.Key)
+			// fixMe: should be bleveQuery.NewDateRangeQuery or bleveQuery.NewDateRangeInclusiveQuery!?
+			q := bleveQuery.NewQueryStringQuery(k + ":" + n.Operator.Value + "\"" + n.Value.Format(time.RFC3339Nano) + "\"")
 			if prev == nil {
 				prev = q
 			} else {

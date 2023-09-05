@@ -3,6 +3,7 @@ package kql_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	tAssert "github.com/stretchr/testify/assert"
 
@@ -10,6 +11,15 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast/test"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
+
+var timeMustParse = func(t *testing.T, ts string) time.Time {
+	tp, err := time.Parse(time.RFC3339Nano, ts)
+	if err != nil {
+		t.Fatalf("time.Parse(...) error = %v", err)
+	}
+
+	return tp
+}
 
 var FullDictionary = []string{
 	`federated search`,
@@ -265,6 +275,94 @@ func TestParse(t *testing.T) {
 					},
 					&ast.StringNode{
 						Value: "😍",
+					},
+				},
+			},
+		},
+		{
+			name: "DateTimeRestrictionNode",
+			givenQuery: []string{
+				`Mtime="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime=2023-09-05T08:42:11.23554+02:00`,
+				`Mtime<"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime<2023-09-05T08:42:11.23554+02:00`,
+				`Mtime<="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime<=2023-09-05T08:42:11.23554+02:00`,
+				`Mtime>"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime>2023-09-05T08:42:11.23554+02:00`,
+				`Mtime>="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime>=2023-09-05T08:42:11.23554+02:00`,
+			},
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+		},
+		{
+			name: "id",
+			givenQuery: []string{
+				`id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
+				`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
+			},
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Key:   "id",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+					&ast.StringNode{
+						Key:   "ID",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
 					},
 				},
 			},

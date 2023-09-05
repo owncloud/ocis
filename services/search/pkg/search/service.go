@@ -418,7 +418,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId)
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
 		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "+ID:" + storagespace.FormatResourceID(*info.Id) + ` +Mtime:>="` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + `"`,
+			Query: "id:" + storagespace.FormatResourceID(*info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
 		})
 
 		if err == nil && len(searchRes.Matches) >= 1 {
