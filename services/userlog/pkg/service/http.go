@@ -8,6 +8,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
@@ -44,7 +45,21 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		Value: attribute.IntValue(len(evs)),
 	})
 
-	conv := ul.getConverter(r.Header.Get(HeaderAcceptLanguage))
+	gwc, err := ul.gatewaySelector.Next()
+	if err != nil {
+		ul.log.Error().Err(err).Msg("cant get gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	ctx, err = utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		ul.log.Error().Err(err).Msg("cant get service account")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath)
 
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {

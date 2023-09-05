@@ -35,10 +35,6 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates the config
 func Validate(cfg *config.Config) error {
-	if cfg.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
-	}
-
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
