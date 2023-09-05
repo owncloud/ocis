@@ -367,6 +367,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
 			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 		)),
+		middleware.SkipUserInfo(cfg.OIDC.SkipUserInfo),
 	))
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
