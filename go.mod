@@ -48,7 +48,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
 	github.com/jellydator/ttlcache/v2 v2.11.1
-	github.com/jellydator/ttlcache/v3 v3.0.1
+	github.com/jellydator/ttlcache/v3 v3.1.0
 	github.com/justinas/alice v1.2.0
 	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
