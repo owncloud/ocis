@@ -111,8 +111,7 @@ class AppConfigurationContext implements Context {
 	 */
 	public function userRetrievesCapabilities(string $username): void {
 		$user = $this->featureContext->getActualUsername($username);
-		$response = $this->userGetsCapabilities($user, true);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->userGetsCapabilities($user, true));
 	}
 
 	/**
@@ -148,8 +147,7 @@ class AppConfigurationContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsCapabilitiesCheckResponse(string $username):void {
-		$response = $this->userGetsCapabilities($username);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $this->userGetsCapabilities($username));
 	}
 
 	/**
@@ -158,8 +156,7 @@ class AppConfigurationContext implements Context {
 	 * @return void
 	 */
 	public function theUserGetsCapabilities():void {
-		$response = $this->userGetsCapabilities($this->featureContext->getCurrentUser());
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->userGetsCapabilities($this->featureContext->getCurrentUser()));
 	}
 
 	/**
@@ -200,8 +197,7 @@ class AppConfigurationContext implements Context {
 	 */
 	public function theAdministratorGetsCapabilities():void {
 		$user = $this->getAdminUsernameForCapabilitiesCheck();
-		$response = $this->userGetsCapabilities($user, true);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->userGetsCapabilities($user, true));
 	}
 
 	/**

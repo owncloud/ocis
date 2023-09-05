@@ -99,8 +99,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWith(string $url, string $method):void {
-		$response = $this->sendRequest($url, $method);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method));
 	}
 
 	/**
@@ -116,8 +115,7 @@ class AuthContext implements Context {
 	public function userRequestsURLWithNoAuth(string $user, string $url, string $method):void {
 		$userRenamed = $this->featureContext->getActualUsername($user);
 		$url = $this->featureContext->substituteInLineCodes($url, $userRenamed);
-		$response = $this->sendRequest($url, $method);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method));
 	}
 
 	/**
@@ -129,8 +127,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userHasRequestedURLWith(string $url, string $method):void {
-		$response = $this->sendRequest($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->sendRequest($url, $method));
 	}
 
 	/**
@@ -782,15 +779,16 @@ class AuthContext implements Context {
 		} else {
 			$authString = $userRenamed . ":" . $this->featureContext->getActualPassword($password);
 		}
-		$response = $this->sendRequest(
-			$url,
-			$method,
-			'basic ' . \base64_encode($authString),
-			false,
-			$body,
-			$header
+		$this->featureContext->setResponse(
+			$this->sendRequest(
+				$url,
+				$method,
+				'basic ' . \base64_encode($authString),
+				false,
+				$body,
+				$header
+			)
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -819,15 +817,16 @@ class AuthContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$response = $this->sendRequest(
-			$url,
-			$method,
-			'basic ' . \base64_encode($authString),
-			false,
-			null,
-			$headers
+		$this->featureContext->setResponse(
+			$this->sendRequest(
+				$url,
+				$method,
+				'basic ' . \base64_encode($authString),
+				false,
+				null,
+				$headers
+			)
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -887,12 +886,13 @@ class AuthContext implements Context {
 	 */
 	public function userRequestsURLWithUsingBasicTokenAuth(string $user, string $url, string $method):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$response = $this->sendRequest(
-			$url,
-			$method,
-			'basic ' . \base64_encode("$user:" . $this->clientToken)
+		$this->featureContext->setResponse(
+			$this->sendRequest(
+				$url,
+				$method,
+				'basic ' . \base64_encode("$user:" . $this->clientToken)
+			)
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -918,8 +918,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithUsingAClientToken(string $url, string $method):void {
-		$response = $this->sendRequest($url, $method, 'token ' . $this->clientToken);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->clientToken));
 	}
 
 	/**
@@ -944,8 +943,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithUsingAppPassword(string $url, string $method):void {
-		$response = $this->sendRequest($url, $method, 'token ' . $this->appToken);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->appToken));
 	}
 
 	/**
@@ -958,8 +956,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function theUserRequestsWithUsingAppPasswordNamed(string $url, string $method, string $tokenName):void {
-		$response = $this->sendRequest($url, $method, 'token ' . $this->appTokens[$tokenName]['token']);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->appTokens[$tokenName]['token']));
 	}
 
 	/**
@@ -984,8 +981,7 @@ class AuthContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsURLWithBrowserSession(string $url, string $method):void {
-		$response = $this->sendRequest($url, $method, null, true);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($this->sendRequest($url, $method, null, true));
 	}
 
 	/**
