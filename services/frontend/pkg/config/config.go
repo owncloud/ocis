@@ -58,6 +58,8 @@ type Config struct {
 	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile."`
 	ServiceAccount   ServiceAccount        `yaml:"service_account"`
 
+	PasswordPolicies PasswordPolicies `yaml:"password_policies"`
+
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
@@ -170,4 +172,14 @@ type Events struct {
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;FRONTEND_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
+}
+
+// PasswordPolicies configures reva password policies
+type PasswordPolicies struct {
+	MinCharacters          int    `yaml:"min_characters,omitempty" env:"FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 0 if not set."`
+	MinLowerCaseCharacters int    `yaml:"min_lower_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 0 if not set."`
+	MinUpperCaseCharacters int    `yaml:"min_upper_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 0 if not set."`
+	MinDigits              int    `yaml:"min_digits" env:"FRONTEND_PASSWORD_POLICIES_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 0 if not set."`
+	MinSpecialCharacters   int    `yaml:"min_special_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set."`
+	SpecialCharacters      string `yaml:"special_characters" env:"FRONTEND_PASSWORD_POLICIES_SPECIAL_CHARACTERS" desc:"Define the custom list of characters that will count as special characters. See the documentation for more details."`
 }
