@@ -413,7 +413,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function theAdministratorHasCreatedANewUserWithFollowingAttributes(string $byUser, TableNode $table): void {
+	public function theAdministratorHasCreatedANewUserWithFollowingSettings(string $byUser, TableNode $table): void {
 		$rows = $table->getRowsHash();
 		$this->userHasBeenCreated(
 			$rows,
