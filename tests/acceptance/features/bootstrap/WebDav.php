@@ -456,28 +456,35 @@ trait WebDav {
 	 * @param string|null $height
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):void {
-		$user = $this->getActualUsername($user);
-		$doDavRequestAsUser = $this->getActualUsername($doDavRequestAsUser);
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'forceIcon' => '0',
 			'preview' => '1'
 		];
-		$this->response = $this->makeDavRequest(
+		$url = $this->getBaseUrl() . '/remote.php';
+		$davVersion = $this->getDavPathVersion();
+		if ($davVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->getPersonalSpaceIdForUser($doDavRequestAsUser ?? $user);
+			$url .= '/dav/spaces/' . $spaceId . '/';
+		} elseif ($davVersion === WebDavHelper::DAV_VERSION_NEW) {
+			$url .= '/dav/files/' . ($doDavRequestAsUser ?? $user) . '/';
+		} else {
+			$url .= '/webdav/';
+		}
+
+		$urlParameter = \http_build_query($urlParameter, '', '&');
+		$path .= '?' . $urlParameter;
+		$fullUrl = WebDavHelper::sanitizeUrl($url . $path);
+
+		$this->response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			'',
+			'GET',
 			$user,
-			"GET",
-			$path,
-			[],
-			null,
-			"files",
-			'2',
-			false,
-			null,
-			$urlParameter,
-			$doDavRequestAsUser
+			$this->getPasswordForUser($user)
 		);
 	}
 
@@ -4630,6 +4637,7 @@ trait WebDav {
 
 	/**
 	 * @When user :user downloads the preview of :path with width :width and height :height using the WebDAV API
+	 * @When user :user tries to download the preview of nonexistent file :path with width :width and height :height using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $path
