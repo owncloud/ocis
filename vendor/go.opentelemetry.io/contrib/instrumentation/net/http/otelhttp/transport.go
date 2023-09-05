@@ -109,7 +109,7 @@ func (t *Transport) RoundTrip(r *http.Request) (*http.Response, error) {
 		ctx = httptrace.WithClientTrace(ctx, t.clientTrace(ctx))
 	}
 
-	r = r.WithContext(ctx)
+	r = r.Clone(ctx) // According to RoundTripper spec, we shouldn't modify the origin request.
 	span.SetAttributes(semconvutil.HTTPClientRequest(r)...)
 	t.propagators.Inject(ctx, propagation.HeaderCarrier(r.Header))
 
