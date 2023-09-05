@@ -22,7 +22,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSpacesShares/changingFilesShare.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/changingFilesShare.feature#L14)
 
-### [copy to overwrite (file and folder) from Personal to Shares Jail behaves differently](https://github.com/owncloud/ocis/issues/4393)
+### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
 
 - [apiSpacesShares/copySpaces.feature:528](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L528)
 - [apiSpacesShares/copySpaces.feature:542](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L542)
