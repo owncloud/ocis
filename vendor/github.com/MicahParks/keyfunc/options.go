@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // ErrInvalidHTTPStatusCode indicates that the HTTP status code is invalid.
@@ -70,6 +72,9 @@ type Options struct {
 	// This is done through a background goroutine. Without specifying a RefreshInterval a malicious client could
 	// self-sign X JWTs, send them to this service, then cause potentially high network usage proportional to X. Make
 	// sure to call the JWKS.EndBackground method to end this goroutine when it's no longer needed.
+	//
+	// It is recommended this option is not used when in MultipleJWKS. This is because KID collisions SHOULD be uncommon
+	// meaning nearly any JWT SHOULD trigger a refresh for the number of JWKS in the MultipleJWKS minus one.
 	RefreshUnknownKID bool
 
 	// RequestFactory creates HTTP requests for the remote JWKS resource located at the given url. For example, an
@@ -79,6 +84,26 @@ type Options struct {
 	// ResponseExtractor consumes a *http.Response and produces the raw JSON for the JWKS. By default, the
 	// ResponseExtractorStatusOK function is used. The default behavior changed in v1.4.0.
 	ResponseExtractor func(ctx context.Context, resp *http.Response) (json.RawMessage, error)
+}
+
+// MultipleOptions is used to configure the behavior when multiple JWKS are used by MultipleJWKS.
+type MultipleOptions struct {
+	// KeySelector is a function that selects the key to use for a given token. It will be used in the implementation
+	// for jwt.Keyfunc. If implementing this custom selector extract the key ID and algorithm from the token's header.
+	// Use the key ID to select a token and confirm the key's algorithm before returning it.
+	//
+	// This value defaults to KeySelectorFirst.
+	KeySelector func(multiJWKS *MultipleJWKS, token *jwt.Token) (key interface{}, err error)
+}
+
+// RefreshOptions are used to specify manual refresh behavior.
+type RefreshOptions struct {
+	IgnoreRateLimit bool
+}
+
+type refreshRequest struct {
+	cancel          context.CancelFunc
+	ignoreRateLimit bool
 }
 
 // ResponseExtractorStatusOK is meant to be used as the ResponseExtractor field for Options. It confirms that response

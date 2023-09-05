@@ -3,6 +3,7 @@ package keyfunc
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -10,6 +11,10 @@ import (
 )
 
 var (
+	// ErrRefreshImpossible is returned when a refresh is attempted on a JWKS that was not created from a remote
+	// resource.
+	ErrRefreshImpossible = errors.New("refresh impossible: JWKS was not created from a remote resource")
+
 	// defaultRefreshTimeout is the default duration for the context used to create the HTTP request for a refresh of
 	// the JWKS.
 	defaultRefreshTimeout = time.Minute
@@ -49,11 +54,51 @@ func Get(jwksURL string, options Options) (jwks *JWKS, err error) {
 
 	if jwks.refreshInterval != 0 || jwks.refreshUnknownKID {
 		jwks.ctx, jwks.cancel = context.WithCancel(context.Background())
-		jwks.refreshRequests = make(chan context.CancelFunc, 1)
+		jwks.refreshRequests = make(chan refreshRequest, 1)
 		go jwks.backgroundRefresh()
 	}
 
 	return jwks, nil
+}
+
+// Refresh manually refreshes the JWKS with the remote resource. It can bypass the rate limit if configured to do so.
+// This function will return an ErrRefreshImpossible if the JWKS was created from a static source like given keys or raw
+// JSON, because there is no remote resource to refresh from.
+//
+// This function will block until the refresh is finished or an error occurs.
+func (j *JWKS) Refresh(ctx context.Context, options RefreshOptions) error {
+	if j.jwksURL == "" {
+		return ErrRefreshImpossible
+	}
+
+	// Check if the background goroutine was launched.
+	if j.refreshInterval != 0 || j.refreshUnknownKID {
+		ctx, cancel := context.WithCancel(ctx)
+
+		req := refreshRequest{
+			cancel:          cancel,
+			ignoreRateLimit: options.IgnoreRateLimit,
+		}
+
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("failed to send request refresh to background goroutine: %w", j.ctx.Err())
+		case j.refreshRequests <- req:
+		}
+
+		<-ctx.Done()
+
+		if !errors.Is(ctx.Err(), context.Canceled) {
+			return fmt.Errorf("unexpected keyfunc background refresh context error: %w", ctx.Err())
+		}
+	} else {
+		err := j.refresh()
+		if err != nil {
+			return fmt.Errorf("failed to refresh JWKS: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // backgroundRefresh is meant to be a separate goroutine that will update the keys in a JWKS over a given interval of
@@ -69,6 +114,14 @@ func (j *JWKS) backgroundRefresh() {
 	// Create a channel that will never send anything unless there is a refresh interval.
 	refreshInterval := make(<-chan time.Time)
 
+	refresh := func() {
+		err := j.refresh()
+		if err != nil && j.refreshErrorHandler != nil {
+			j.refreshErrorHandler(err)
+		}
+		lastRefresh = time.Now()
+	}
+
 	// Enter an infinite loop that ends when the background ends.
 	for {
 		if j.refreshInterval != 0 {
@@ -80,16 +133,15 @@ func (j *JWKS) backgroundRefresh() {
 			select {
 			case <-j.ctx.Done():
 				return
-			case j.refreshRequests <- func() {}:
+			case j.refreshRequests <- refreshRequest{}:
 			default: // If the j.refreshRequests channel is full, don't send another request.
 			}
 
-		case cancel := <-j.refreshRequests:
+		case req := <-j.refreshRequests:
 			refreshMux.Lock()
-			if j.refreshRateLimit != 0 && lastRefresh.Add(j.refreshRateLimit).After(time.Now()) {
-				// Don't make the JWT parsing goroutine wait for the JWKS to refresh.
-				cancel()
-
+			if req.ignoreRateLimit {
+				refresh()
+			} else if j.refreshRateLimit != 0 && lastRefresh.Add(j.refreshRateLimit).After(time.Now()) {
 				// Launch a goroutine that will get a reservation for a JWKS refresh or fail to and immediately return.
 				queueOnce.Do(func() {
 					go func() {
@@ -104,25 +156,15 @@ func (j *JWKS) backgroundRefresh() {
 
 						refreshMux.Lock()
 						defer refreshMux.Unlock()
-						err := j.refresh()
-						if err != nil && j.refreshErrorHandler != nil {
-							j.refreshErrorHandler(err)
-						}
-
-						lastRefresh = time.Now()
+						refresh()
 						queueOnce = sync.Once{}
 					}()
 				})
 			} else {
-				err := j.refresh()
-				if err != nil && j.refreshErrorHandler != nil {
-					j.refreshErrorHandler(err)
-				}
-
-				lastRefresh = time.Now()
-
-				// Allow the JWT parsing goroutine to continue with the refreshed JWKS.
-				cancel()
+				refresh()
+			}
+			if req.cancel != nil {
+				req.cancel()
 			}
 			refreshMux.Unlock()
 

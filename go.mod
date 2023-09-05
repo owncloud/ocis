@@ -6,7 +6,7 @@ require (
 	github.com/CiscoM31/godata v1.0.8
 	github.com/KimMachineGun/automemlimit v0.3.0
 	github.com/Masterminds/semver v1.5.0
-	github.com/MicahParks/keyfunc v1.5.1
+	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.9
