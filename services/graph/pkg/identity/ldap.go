@@ -922,7 +922,7 @@ func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 	}
 
 	currentValues := entry.GetEqualFoldAttributeValues(attribute)
-	i.logger.Error().Interface("members", currentValues).Msg("current values")
+	i.logger.Debug().Interface("members", currentValues).Msg("current values")
 	found := false
 	for _, currentValue := range currentValues {
 		if currentValue == "" {
