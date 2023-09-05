@@ -138,7 +138,7 @@ Feature: Search
       | /folderMain |
   
   @issue-enterprise-6000
-  Scenario: user cannot find data that is not shared
+  Scenario: sharee cannot find resources that are not shared
     Given user "Alice" has created a folder "foo/sharedToBrian" in space "Alice Hansen"
     And user "Alice" has created a folder "sharedToCarol" in space "Alice Hansen"
     And user "Alice" has created a share inside of space "Alice Hansen" with settings:
