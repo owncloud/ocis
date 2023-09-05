@@ -23,6 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"mime"
 	"net/http"
 	"path"
@@ -39,6 +40,7 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/password"
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
@@ -87,6 +89,7 @@ type Handler struct {
 	deniable                              bool
 	resharing                             bool
 	publicPasswordEnforced                passwordEnforced
+	passwordValidator                     password.Validator
 
 	getClient GatewayClientGetter
 }
@@ -122,7 +125,8 @@ func getCacheWarmupManager(c *config.Config) (sharecache.Warmup, error) {
 type GatewayClientGetter func() (gateway.GatewayAPIClient, error)
 
 // Init initializes this and any contained handlers
-func (h *Handler) Init(c *config.Config) {
+func (h *Handler) Init(c *config.Config) error {
+	var err error
 	h.gatewayAddr = c.GatewaySvc
 	h.machineAuthAPIKey = c.MachineAuthAPIKey
 	h.storageRegistryAddr = c.StorageregistrySvc
@@ -138,20 +142,29 @@ func (h *Handler) Init(c *config.Config) {
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
 	h.publicPasswordEnforced = publicPwdEnforced(c)
+	h.passwordValidator, err = passwordPolicies(c)
+	if err != nil {
+		return err
+	}
 
 	h.statCache = cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize)
 	if c.CacheWarmupDriver != "" {
 		cwm, err := getCacheWarmupManager(c)
-		if err == nil {
-			go h.startCacheWarmup(cwm)
+		if err != nil {
+			return err
 		}
+		go h.startCacheWarmup(cwm)
 	}
 	h.getClient = h.getPoolClient
+	return nil
 }
 
 // InitWithGetter initializes the handler and adds the clientGetter
 func (h *Handler) InitWithGetter(c *config.Config, clientGetter GatewayClientGetter) {
-	h.Init(c)
+	err := h.Init(c)
+	if err != nil {
+		log.Fatal(err)
+	}
 	h.getClient = clientGetter
 }
 
@@ -1579,6 +1592,30 @@ func publicPwdEnforced(c *config.Config) passwordEnforced {
 	enf.EnforcedForReadWriteDelete = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.ReadWriteDelete)
 	enf.EnforcedForUploadOnly = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.UploadOnly)
 	return enf
+}
+
+func passwordPolicies(c *config.Config) (password.Validator, error) {
+	var pv password.Validator
+	var err error
+	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicies == nil {
+		pv, err = password.NewPasswordPolicies(0, 0, 0, 0, 0, "")
+		if err != nil {
+			return nil, fmt.Errorf("can't init the Password Policies %w", err)
+		}
+		return pv, nil
+	}
+	pv, err = password.NewPasswordPolicies(
+		c.Capabilities.Capabilities.PasswordPolicies.MinCharacters,
+		c.Capabilities.Capabilities.PasswordPolicies.MinLowerCaseCharacters,
+		c.Capabilities.Capabilities.PasswordPolicies.MinUpperCaseCharacters,
+		c.Capabilities.Capabilities.PasswordPolicies.MinDigits,
+		c.Capabilities.Capabilities.PasswordPolicies.MinSpecialCharacters,
+		c.Capabilities.Capabilities.PasswordPolicies.SpecialCharacters,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("can't init the Password Policies %w", err)
+	}
+	return pv, nil
 }
 
 // sufficientPermissions returns true if the `existing` permissions contain the `requested` permissions
