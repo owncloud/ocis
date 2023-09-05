@@ -96,6 +96,7 @@ type Service interface {
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
+	GetSharedByMe(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
@@ -199,6 +200,9 @@ func NewService(opts ...Option) (Graph, error) {
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
+		r.Route("/v1beta1", func(r chi.Router) {
+			r.Get("/me/drives/sharedByMe", svc.GetSharedByMe)
+		})
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/extensions/org.libregraph", func(r chi.Router) {
 				r.Get("/tags", svc.GetTags)
@@ -212,7 +216,9 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drive", svc.GetUserDrive)
-				r.Get("/drives", svc.GetDrives)
+				r.Route("/drives", func(r chi.Router) {
+					r.Get("/", svc.GetDrives)
+				})
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
