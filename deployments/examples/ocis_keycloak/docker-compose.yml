@@ -76,6 +76,7 @@ services:
       OCIS_ADMIN_USER_ID: ""
       OCIS_EXCLUDE_RUN_SERVICES: "idp"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
+      GRAPH_USERNAME_MATCH: "none"
     volumes:
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
