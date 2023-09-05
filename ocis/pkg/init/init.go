@@ -142,6 +142,10 @@ type AuthService struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
+type Clientlog struct {
+	ServiceAccount ServiceAccount `yaml:"service_account"`
+}
+
 type Nats struct {
 	// The nats config has a field called nats
 	Nats struct {
@@ -194,6 +198,7 @@ type OcisConfig struct {
 	Gateway           Gateway
 	Userlog           Userlog
 	AuthService       AuthService `yaml:"auth_service"`
+	Clientlog         Clientlog
 }
 
 func checkConfigPath(configPath string) error {
@@ -379,6 +384,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			ServiceAccount: serviceAccount,
 		},
 		Frontend: FrontendService{
+			ServiceAccount: serviceAccount,
+		},
+		Clientlog: Clientlog{
 			ServiceAccount: serviceAccount,
 		},
 	}

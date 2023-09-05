@@ -62,6 +62,7 @@ config = {
         "services/auth-bearer",
         "services/auth-machine",
         "services/auth-service",
+        "services/clientlog",
         "services/eventhistory",
         "services/frontend",
         "services/gateway",
