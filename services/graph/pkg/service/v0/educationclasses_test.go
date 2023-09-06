@@ -18,7 +18,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -85,7 +84,6 @@ var _ = Describe("EducationClass", func() {
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithIdentityEducationBackend(identityEducationBackend),
-			service.Logger(log.NewLogger(log.Level("debug"))),
 		)
 	})
 
