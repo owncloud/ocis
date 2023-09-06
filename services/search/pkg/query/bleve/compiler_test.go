@@ -229,7 +229,11 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewQueryStringQuery(`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`),
-				query.NewQueryStringQuery(`Mtime:>="2023-09-05T08:42:11.23554+02:00"`),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
 			}),
 			wantErr: false,
 		},
@@ -248,6 +252,59 @@ func Test_compile(t *testing.T) {
 				query.NewQueryStringQuery(`Name:john\ smith`),
 				query.NewQueryStringQuery(`Hidden:T`),
 				query.NewQueryStringQuery(`Hidden:T`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `ast.DateTimeNode`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{false}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{false}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{true}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
 			}),
 			wantErr: false,
 		},
