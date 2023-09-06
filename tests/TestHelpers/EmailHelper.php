@@ -133,7 +133,7 @@ class EmailHelper {
 		$endTime = $currentTime + $waitTimeSec;
 		$mailBox = self::getMailBoxFromEmail($emailAddress);
 		while ($currentTime <= $endTime) {
-			$mailboxResponse = self::getMailboxInformation($mailBox);
+			$mailboxResponse = self::getMailboxInformation($mailBox, $xRequestId);
 			if (!empty($mailboxResponse) && \sizeof($mailboxResponse) >= $emailNumber) {
 				$mailboxId = $mailboxResponse[\sizeof($mailboxResponse) - $emailNumber]->id;
 				$response = self::getBodyOfAnEmailById($mailBox, $mailboxId, $xRequestId);

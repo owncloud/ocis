@@ -139,7 +139,8 @@ class TagContext implements Context {
 			GraphHelper::getTags(
 				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}

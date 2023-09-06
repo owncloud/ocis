@@ -21,7 +21,7 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /testFile.txt |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-f0-9!\-]{36}$/ |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key                | value               |
       | oc:fileid          | UUIDof:testFile.txt |
@@ -41,7 +41,7 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-f0-9!\-]{36}$/ |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key                | value                                                       |
       | oc:fileid          | UUIDof:folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
@@ -60,7 +60,7 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-f0-9!\-]{36}$/ |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key              | value                |
       | oc:fileid        | UUIDof:folderMain    |
@@ -79,7 +79,8 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain/sub-folder |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-f0-9!\-]{36}$/ |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+    Then the HTTP status code should be "207"
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key              | value                        |
       | oc:fileid        | UUIDof:folderMain/sub-folder |
