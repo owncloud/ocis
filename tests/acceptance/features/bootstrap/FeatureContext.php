@@ -2304,9 +2304,9 @@ class FeatureContext extends BehatVariablesContext {
 
 		$response = $this->appConfigurationContext->userGetsCapabilities($this->appConfigurationContext->getAdminUsernameForCapabilitiesCheck());
 		$this->theHTTPStatusCodeShouldBe(200, '', $response);
-		$response_xml = $this->getResponseXml($response)->data->capabilities;
+		$responseXml = $this->getResponseXml($response)->data->capabilities;
 		$edition = $this->appConfigurationContext->getParameterValueFromXml(
-			$response_xml,
+			$responseXml,
 			'core',
 			'status@@@edition'
 		);
@@ -2318,7 +2318,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 
 		$product = $this->appConfigurationContext->getParameterValueFromXml(
-			$response_xml,
+			$responseXml,
 			'core',
 			'status@@@product'
 		);
@@ -2329,7 +2329,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 
 		$productName = $this->appConfigurationContext->getParameterValueFromXml(
-			$response_xml,
+			$responseXml,
 			'core',
 			'status@@@productname'
 		);
@@ -2347,7 +2347,7 @@ class FeatureContext extends BehatVariablesContext {
 		// We are on oCIS or reva or some other implementation. We cannot do "occ status".
 		// So get the expected version values by looking in the capabilities response.
 		$version = $this->appConfigurationContext->getParameterValueFromXml(
-			$response_xml,
+			$responseXml,
 			'core',
 			'status@@@version'
 		);
@@ -2359,7 +2359,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 
 		$versionString = $this->appConfigurationContext->getParameterValueFromXml(
-			$response_xml,
+			$responseXml,
 			'core',
 			'status@@@versionstring'
 		);
