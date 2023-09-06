@@ -2,12 +2,12 @@
 
 The `userlog` service is a mediator between the `eventhistory` service and clients who want to be informed about user related events. It provides an API to retrieve those.
 
-## The `...log` service ecosystem
+## The Log Service Ecosystem
 
-`...log` services (`userlog`, `clientlog`) are responsible for composing notifications for a certain audience.
-  -  `userlog` service translates and adjust messages to be human readable
-  -  `clientlog` service composes machine readable messages so clients can act without needing to query the server
-  -  `sse` service is only responsible for sending these messages. It does not care about their form or language
+Log services like the `userlog`, `clientlog` and `sse` are responsible for composing notifications for a certain audience.
+  -   The `userlog` service translates and adjusts messages to be human readable.
+  -   The `clientlog` service composes machine readable messages, so clients can act without the need to query the server.
+  -   The `sse` service is only responsible for sending these messages. It does not care about their form or language.
 
 ## Prerequisites
 
