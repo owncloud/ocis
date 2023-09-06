@@ -725,41 +725,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * creates a user with provided data
-	 * actor: the administrator
-	 *
-	 * @param string $user
-	 * @param string $password
-	 * @param string $email
-	 * @param string $displayName
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theAdminHasCreatedUser(
-		string $user,
-		string $password,
-		string $email,
-		string $displayName
-	): void {
-		$response = GraphHelper::createUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$user,
-			$password,
-			$email,
-			$displayName
-		);
-		if ($response->getStatusCode() !== 200) {
-			$this->throwHttpException($response, "Could not create user $user");
-		} else {
-			$this->featureContext->setResponse($response);
-		}
-	}
-
-	/**
 	 * @When /^the user "([^"]*)" creates a new user using GraphAPI with the following settings:$/
 	 *
 	 * @param string $user
@@ -793,28 +758,6 @@ class GraphContext implements Context {
 			);
 		}
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given /^the user "([^"]*)" has created a new user using the Graph API with the following settings:$/
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception|GuzzleException
-	 */
-	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $user, TableNode $table): void {
-		$this->theUserCreatesNewUser(
-			$user,
-			$table
-		);
-		$rows = $table->getRowsHash();
-		$response = $this->featureContext->getResponse();
-
-		if ($response->getStatusCode() !== 200) {
-			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
-		}
 	}
 
 	/**
