@@ -31,21 +31,22 @@ var _registeredEvents = []events.Unmarshaller{
 }
 
 // ListenForEvents listens for events and acts accordingly
-func ListenForEvents(cfg *config.Config, l log.Logger) {
+func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) error {
 	bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
 	if err != nil {
 		l.Error().Err(err).Msg("cannot connect to nats")
-		return
+		return err
 	}
 
 	evChannel, err := events.Consume(bus, "frontend", _registeredEvents...)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot consume from nats")
+		return err
 	}
 
 	tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
 	if err != nil {
-		return
+		return err
 	}
 
 	gatewaySelector, err := pool.GatewaySelector(
@@ -56,19 +57,19 @@ func ListenForEvents(cfg *config.Config, l log.Logger) {
 	)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot get gateway selector")
-		return
+		return err
 	}
 
 	gwc, err := gatewaySelector.Next()
 	if err != nil {
 		l.Error().Err(err).Msg("cannot get gateway client")
-		return
+		return err
 	}
 
 	traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot initialize tracing")
-		return
+		return err
 	}
 
 	grpcClient, err := grpc.NewClient(
@@ -79,17 +80,23 @@ func ListenForEvents(cfg *config.Config, l log.Logger) {
 	)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot create grpc client")
-		return
+		return err
 	}
 
 	valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
 
-	for e := range evChannel {
-		switch ev := e.Event.(type) {
-		default:
-			l.Error().Interface("event", e).Msg("unhandled event")
-		case events.ShareCreated:
-			AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gwc, valueService, cfg.ServiceAccount)
+	for {
+		select {
+		case e := <-evChannel:
+			switch ev := e.Event.(type) {
+			default:
+				l.Error().Interface("event", e).Msg("unhandled event")
+			case events.ShareCreated:
+				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gwc, valueService, cfg.ServiceAccount)
+			}
+		case <-ctx.Done():
+			l.Info().Msg("context cancelled")
+			return ctx.Err()
 		}
 	}
 }
