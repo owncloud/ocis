@@ -1,6 +1,6 @@
 # OCS Service
 
-The `ocs` service (open collaboration services) serves one purpous: it has an endpoint for signing keys.
+The `ocs` service (open collaboration services) serves one purpose: it has an endpoint for signing keys which the web frontend accesses when uploading data.
 
 ## Signing-Keys Endpoint
 
