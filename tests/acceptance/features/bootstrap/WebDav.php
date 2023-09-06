@@ -1053,14 +1053,17 @@ trait WebDav {
 	/**
 	 * @param string $expectedContent
 	 * @param string $extraErrorText
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 */
 	public function checkDownloadedContentMatches(
 		string $expectedContent,
-		string $extraErrorText = ""
+		string $extraErrorText = "",
+		?ResponseInterface $response = null
 	):void {
-		$actualContent = (string) $this->response->getBody();
+		$response = $response ?? $this->response;
+		$actualContent = (string) $response->getBody();
 		// For this test we really care about the content.
 		// A separate "Then" step can specifically check the HTTP status.
 		// But if the content is wrong (e.g. empty) then it is useful to

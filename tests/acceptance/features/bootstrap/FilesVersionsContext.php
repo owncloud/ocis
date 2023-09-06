@@ -306,16 +306,14 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the version of file :path with the index :index
-	 *
 	 * @param string $user
 	 * @param string $path
 	 * @param string $index
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function downloadVersion(string $user, string $path, string $index):void {
+	public function downloadVersion(string $user, string $path, string $index):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
@@ -331,13 +329,26 @@ class FilesVersionsContext implements Context {
 		$url = WebDavHelper::sanitizeUrl(
 			$this->featureContext->getBaseUrlWithoutPath() . $xmlPart[$index]
 		);
-		$response = HttpRequestHelper::get(
+		return HttpRequestHelper::get(
 			$url,
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
-		$this->featureContext->setResponse($response, $user);
+	}
+
+	/**
+	 * @When user :user downloads the version of file :path with the index :index
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $index
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userDownloadsVersion(string $user, string $path, string $index):void {
+		$this->featureContext->setResponse($this->downloadVersion($user, $path, $index), $user);
 	}
 
 	/**
@@ -357,9 +368,9 @@ class FilesVersionsContext implements Context {
 		string $user,
 		string $content
 	): void {
-		$this->downloadVersion($user, $path, $index);
-		$this->featureContext->theHTTPStatusCodeShouldBe("200");
-		$this->featureContext->downloadedContentShouldBe($content);
+		$response = $this->downloadVersion($user, $path, $index);
+		$this->featureContext->theHTTPStatusCodeShouldBe("200", '', $response);
+		$this->featureContext->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
