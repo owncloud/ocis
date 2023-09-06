@@ -31,9 +31,10 @@ type InsecureService struct {
 	Insecure bool
 }
 
-type InsecureProxyService struct {
+type ProxyService struct {
 	OIDC             InsecureProxyOIDC `yaml:"oidc"`
 	InsecureBackends bool              `yaml:"insecure_backends"`
+	ServiceAccount   ServiceAccount    `yaml:"service_account"`
 }
 
 type InsecureProxyOIDC struct {
@@ -181,7 +182,7 @@ type OcisConfig struct {
 	Graph             GraphService
 	Idp               LdapBasedService
 	Idm               IdmService
-	Proxy             InsecureProxyService
+	Proxy             ProxyService
 	Frontend          FrontendService
 	AuthBasic         AuthbasicService  `yaml:"auth_basic"`
 	AuthBearer        AuthbearerService `yaml:"auth_bearer"`
@@ -389,6 +390,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		Clientlog: Clientlog{
 			ServiceAccount: serviceAccount,
 		},
+		Proxy: ProxyService{
+			ServiceAccount: serviceAccount,
+		},
 	}
 
 	if insecure {
@@ -406,11 +410,12 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.StorageUsers.Events = _insecureEvents
 		cfg.Nats.Nats.TLSSkipVerifyClientCert = true
 		cfg.Ocdav = _insecureService
-		cfg.Proxy = InsecureProxyService{
+		cfg.Proxy = ProxyService{
 			InsecureBackends: true,
 			OIDC: InsecureProxyOIDC{
 				Insecure: true,
 			},
+			ServiceAccount: serviceAccount,
 		}
 
 		cfg.Thumbnails.Thumbnail.WebdavAllowInsecure = true
