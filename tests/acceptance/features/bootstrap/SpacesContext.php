@@ -2673,7 +2673,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->filesVersionsContext->downloadVersion($user, $fileName, $index);
+		$this->featureContext->setResponse($this->filesVersionsContext->downloadVersion($user, $fileName, $index));
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
