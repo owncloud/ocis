@@ -413,3 +413,25 @@ Feature: create a public link share
       | d:href       |
     Then the HTTP status code should be "207"
     And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/file.txt$/"
+
+  @issue-6929
+  Scenario Outline: create a password-protected public link on a file with the name same to the previously deleted one
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has uploaded file with content "test data 1" to "/test.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | test.txt |
+      | permissions | read     |
+    And user "Alice" has deleted file "test.txt"
+    And user "Alice" has uploaded file with content "test data 2" to "/test.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | test.txt |
+      | permissions | read     |
+    When user "Alice" updates the last public link share using the sharing API with
+      | password | testpassword |
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "200"
+    And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "testpassword"
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
