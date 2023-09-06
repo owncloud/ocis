@@ -10,11 +10,18 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
 	"go.opentelemetry.io/otel/trace"
 )
+
+// ClientNotification is the event the clientlog service is sending to the client
+type ClientNotification struct {
+	Type   string
+	ItemID string
+}
 
 // ClientlogService is the service responsible for user activities
 type ClientlogService struct {
@@ -85,7 +92,10 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		return
 	}
 
-	var users []string
+	var (
+		users []string
+		noti  ClientNotification
+	)
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
@@ -96,11 +106,10 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			return
 		}
 
+		noti.Type = "postprocessing-finished"
+		noti.ItemID = storagespace.FormatResourceID(*info.GetId())
+
 		users, err = utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
-		if err != nil {
-			cl.log.Error().Err(err).Interface("event", event).Msg("error getting space members")
-			return
-		}
 	}
 
 	if err != nil {
@@ -110,18 +119,15 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 
 	// II) instruct sse service to send the information
 	for _, id := range users {
-		if err := cl.sendSSE(id, event); err != nil {
+		if err := cl.sendSSE(id, noti); err != nil {
 			cl.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 			return
 		}
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userid string, event events.Event) error {
-	// TODO: convert event
-	ev := event
-
-	b, err := json.Marshal(ev)
+func (cl *ClientlogService) sendSSE(userid string, noti ClientNotification) error {
+	b, err := json.Marshal(noti)
 	if err != nil {
 		return err
 	}
