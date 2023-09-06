@@ -172,7 +172,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+	public function userHasRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
 		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
