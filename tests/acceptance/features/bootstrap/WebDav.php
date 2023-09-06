@@ -5355,6 +5355,7 @@ trait WebDav {
 	 * and returns found search results if found else returns false
 	 *
 	 * @param string|null $entryNameToSearch
+	 * @param bool|null $searchForHighlightString
 	 *
 	 * @return string|array|boolean
 	 *
@@ -5362,10 +5363,11 @@ trait WebDav {
 	 * array if $entryNameToSearch is not given
 	 * boolean false if $entryNameToSearch is given and is not found
 	 *
-	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function findEntryFromSearchResponse(
-		?string $entryNameToSearch = null
+		?string $entryNameToSearch = null,
+		?bool $searchForHighlightString = false
 	) {
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
 		if ($entryNameToSearch !== null) {
@@ -5387,7 +5389,12 @@ trait WebDav {
 			if ($entryNameToSearch === $resourcePath) {
 				return $resourcePath;
 			}
-			$results[] = $resourcePath;
+			if ($searchForHighlightString) {
+				$actualHighlightString =  $item->xpath("d:propstat//oc:highlights");
+				$results[$resourcePath] = (string)$actualHighlightString[0];
+			} else {
+				$results[] = $resourcePath;
+			}
 		}
 		if ($entryNameToSearch === null) {
 			return $results;

@@ -1,3 +1,4 @@
+@tikaServiceNeeded
 Feature: content search
   As a user
   I want to do search resources by content
@@ -172,3 +173,32 @@ Feature: content search
       | content:hel*                                | 2            | /technical task.txt | /task comments.txt |
       | content:hel* AND tag:test                   | 1            | /technical task.txt |                    |
       | (name:*task* AND content:hel*) NOT tag:test | 1            | /task comments.txt  |                    |
+
+
+  Scenario Outline: search across files with different format with search text highlight
+    Given using <dav-path-version> DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has uploaded file with content "this is a simple text file" to "test-text-file.txt"
+    And user "Alice" has uploaded file with content "this is a simple pdf file" to "test-pdf-file.pdf"
+    And user "Alice" has uploaded file with content "this is a simple cpp file" to "test-cpp-file.cpp"
+    And user "Alice" has uploaded file with content "this is another text file" to "testfile.txt"
+    And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testavatar.png"
+    And user "Alice" has uploaded a file inside space "project-space" with content "this is a simple markdown file" to "test-md-file.md"
+    And user "Alice" has uploaded a file inside space "project-space" with content "this is a simple odt file" to "test-odt-file.odt"
+    When user "Alice" searches for "Content:simple" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain these entries with highlight on keyword "simple"
+      | test-text-file.txt |
+      | test-pdf-file.pdf  |
+      | test-cpp-file.cpp  |
+      | test-md-file.md    |
+      | test-odt-file.odt  |
+    But the search result of user "Alice" should not contain these entries:
+      | testavatar.png |
+      | testfile.txt   |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
