@@ -260,6 +260,26 @@ func Test_compile(t *testing.T) {
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.DateTimeNode{
+						Key: "mtime",
+						// "=" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// ":" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// ":" no operator, skip
+						Value: timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
 						Key:      "mtime",
 						Operator: &ast.OperatorNode{Value: ">"},
 						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),

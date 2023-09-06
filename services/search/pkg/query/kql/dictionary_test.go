@@ -282,6 +282,8 @@ func TestParse(t *testing.T) {
 		{
 			name: "DateTimeRestrictionNode",
 			givenQuery: []string{
+				`Mtime:"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime:2023-09-05T08:42:11.23554+02:00`,
 				`Mtime="2023-09-05T08:42:11.23554+02:00"`,
 				`Mtime=2023-09-05T08:42:11.23554+02:00`,
 				`Mtime<"2023-09-05T08:42:11.23554+02:00"`,
@@ -295,6 +297,16 @@ func TestParse(t *testing.T) {
 			},
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
 					&ast.DateTimeNode{
 						Key:      "Mtime",
 						Operator: &ast.OperatorNode{Value: "="},

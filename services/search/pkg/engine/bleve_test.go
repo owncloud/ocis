@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"go-micro.dev/v4/metadata"
-
 	bleveSearch "github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -30,9 +28,7 @@ var _ = Describe("Bleve", func() {
 				return nil, err
 			}
 
-			ctx := metadata.Set(context.Background(), bleve.QueryTypeHeader, bleve.QueryTypeLegacy)
-
-			return eng.Search(ctx, &searchsvc.SearchIndexRequest{
+			return eng.Search(context.Background(), &searchsvc.SearchIndexRequest{
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{

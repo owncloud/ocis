@@ -76,6 +76,10 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 				FieldVal:       getField(n.Key),
 			}
 
+			if n.Operator == nil {
+				continue
+			}
+
 			switch n.Operator.Value {
 			case ">":
 				q.Start.Time = n.Value
@@ -89,6 +93,8 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 			case "<=":
 				q.End.Time = n.Value
 				q.InclusiveEnd = &[]bool{true}[0]
+			default:
+				continue
 			}
 
 			if prev == nil {

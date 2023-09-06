@@ -49,7 +49,7 @@ YesNoPropertyRestrictionNode <-
     }
 
 DateTimeRestrictionNode <-
-    k:Char+ o:(OperatorGreaterOrEqualNode / OperatorLessOrEqualNode / OperatorGreaterNode / OperatorLessNode / OperatorEqualNode) '"'? v:(FullDate "T" FullTime) '"'? {
+    k:Char+ o:(OperatorGreaterOrEqualNode / OperatorLessOrEqualNode / OperatorGreaterNode / OperatorLessNode / OperatorEqualNode / OperatorColonNode) '"'? v:(FullDate "T" FullTime) '"'? {
         return buildDateTimeNode(k, o, v, c.text, c.pos)
     }
 
