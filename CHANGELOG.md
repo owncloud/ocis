@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fixed cunary in the beginning: [#7247](https://github.com/owncloud/ocis/pull/7247)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
@@ -15,6 +16,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
+
+* Bugfix - Fixed cunary in the beginning: [#7247](https://github.com/owncloud/ocis/pull/7247)
+
+   Fixed case when the unary in the beginning lead to panic
+
+   https://github.com/owncloud/ocis/pull/7247
+   git
 
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
