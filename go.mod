@@ -76,7 +76,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/tus/tusd v1.12.1
+	github.com/tus/tusd v1.13.0
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.9.0
@@ -124,7 +124,7 @@ require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/aws/aws-sdk-go v1.44.294 // indirect
+	github.com/aws/aws-sdk-go v1.45.1 // indirect
 	github.com/beevik/etree v1.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
@@ -167,7 +167,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/emvi/iso-639-1 v1.0.1 // indirect
