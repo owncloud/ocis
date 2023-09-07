@@ -1,6 +1,6 @@
 ---
 title: Search
-date: 2023-09-07T08:54:35.536303561Z
+date: 2023-09-07T09:15:32.575632916Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/search
@@ -23,6 +23,7 @@ The search service is responsible for metadata and content extraction, stores th
 
 * [General Considerations](#general-considerations)
 * [Search engines](#search-engines)
+* [Query language](#query-language)
 * [Extraction Engines](#extraction-engines)
 * [Content Extraction](#content-extraction)
   * [Basic Extractor](#basic-extractor)
@@ -65,6 +66,22 @@ Note that as of now, the search service can not be scaled. Consider using a dedi
 ## Search engines
 
 By default, the search service is shipped with [bleve](https://github.com/blevesearch/bleve) as its primary search engine. The available engines can be extended by implementing the [Engine](pkg/engine/engine.go) interface and making that engine available.
+
+## Query language
+
+By default, [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference) is used as query language,
+for an overview of how the syntax works, please read the [microsoft documentation](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference).
+
+Not all parts are supported, the following list gives an overview of parts that are not implemented yet:
+
+*   Synonym operators
+*   Inclusion and exclusion operators
+*   Dynamic ranking operator
+*   ONEAR operator
+*   NEAR operator
+*   Date intervals
+
+In the following [ADR](https://github.com/owncloud/ocis/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why we chose KQL.
 
 ## Extraction Engines
 
