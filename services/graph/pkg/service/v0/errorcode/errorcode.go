@@ -18,6 +18,7 @@ type Error struct {
 	msg       string
 }
 
+// List taken from https://github.com/microsoft/microsoft-graph-docs-1/blob/main/concepts/errors.md#code-property
 const (
 	// AccessDenied defines the error if the caller doesn't have permission to perform the action.
 	AccessDenied ErrorCode = iota
@@ -47,6 +48,8 @@ const (
 	ResyncRequired
 	// ServiceNotAvailable defines the error if the service is not available. Try the request again after a delay. There may be a Retry-After header.
 	ServiceNotAvailable
+	// The sync state generation is not found. The delta token is expired and data must be synchronized again.
+	SyncStateNotFound
 	// QuotaLimitReached the user has reached their quota limit.
 	QuotaLimitReached
 	// Unauthenticated the caller is not authenticated.
@@ -70,6 +73,7 @@ var errorCodes = [...]string{
 	"resourceModified",
 	"resyncRequired",
 	"serviceNotAvailable",
+	"syncStateNotFound",
 	"quotaLimitReached",
 	"unauthenticated",
 	"preconditionFailed",
@@ -103,12 +107,18 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 	var status int
 	switch e.errorCode {
+	case AccessDenied:
+		status = http.StatusForbidden
+	case InvalidRange:
+		status = http.StatusRequestedRangeNotSatisfiable
+	case InvalidRequest:
+		status = http.StatusBadRequest
 	case ItemNotFound:
 		status = http.StatusNotFound
 	case NameAlreadyExists:
 		status = http.StatusConflict
 	case NotAllowed:
-		status = http.StatusForbidden
+		status = http.StatusMethodNotAllowed
 	default:
 		status = http.StatusInternalServerError
 	}

@@ -3,13 +3,16 @@ package svc_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -44,6 +47,12 @@ var _ = Describe("Driveitems", func() {
 		rr *httptest.ResponseRecorder
 
 		newGroup *libregraph.Group
+
+		currentUser = &userpb.User{
+			Id: &userpb.UserId{
+				OpaqueId: "user",
+			},
+		}
 	)
 
 	BeforeEach(func() {
@@ -84,31 +93,78 @@ var _ = Describe("Driveitems", func() {
 	})
 
 	Describe("GetRootDriveChildren", func() {
-		It("handles failing GetHome", func() {
-			gatewayClient.On("GetHome", mock.Anything, mock.Anything).Return(&provider.GetHomeResponse{
+		It("handles ListStorageSpaces not found ", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 				Status: status.NewNotFound(ctx, "not found"),
 			}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetRootDriveChildren(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNotFound))
 		})
 
-		It("handles failing GetHome", func() {
-			gatewayClient.On("GetHome", mock.Anything, mock.Anything).Return(&provider.GetHomeResponse{
-				Status: status.NewInternal(ctx, "not found"),
+		It("handles ListStorageSpaces error", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewInternal(ctx, "internal error"),
 			}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetRootDriveChildren(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("handles ListContainer not found", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{{Owner: currentUser, Root: &provider.ResourceId{}}},
+			}, nil)
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetRootDriveChildren(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNotFound))
+		})
+
+		It("handles ListContainer permission denied", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{{Owner: currentUser, Root: &provider.ResourceId{}}},
+			}, nil)
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+				Status: status.NewPermissionDenied(ctx, errors.New("denied"), "denied"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetRootDriveChildren(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
+		})
+
+		It("handles ListContainer error", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{{Owner: currentUser, Root: &provider.ResourceId{}}},
+			}, nil)
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+				Status: status.NewInternal(ctx, "internal"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetRootDriveChildren(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
 
 		It("succeeds", func() {
 			mtime := time.Now()
-			gatewayClient.On("GetHome", mock.Anything, mock.Anything).Return(&provider.GetHomeResponse{
-				Status: status.NewOK(ctx),
-				Path:   "/",
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{{Owner: currentUser, Root: &provider.ResourceId{}}},
 			}, nil)
 			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
 				Status: status.NewOK(ctx),
@@ -122,6 +178,7 @@ var _ = Describe("Driveitems", func() {
 				},
 			}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetRootDriveChildren(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 			data, err := io.ReadAll(rr.Body)

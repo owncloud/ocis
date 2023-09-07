@@ -252,6 +252,10 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Patch("/", svc.UpdateDrive)
 					r.Get("/", svc.GetSingleDrive)
 					r.Delete("/", svc.DeleteDrive)
+					r.Route("/items/{driveItemID}", func(r chi.Router) {
+						r.Get("/", svc.GetDriveItem)
+						r.Get("/children", svc.GetDriveItemChildren)
+					})
 				})
 			})
 			r.With(requireAdmin).Route("/education", func(r chi.Router) {
