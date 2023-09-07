@@ -73,6 +73,10 @@ type IdmService struct {
 	ServiceUserPasswords ServiceUserPasswordsSettings `yaml:"service_user_passwords"`
 }
 
+type SettingsService struct {
+	ServiceAccountIDAdmin string `yaml:"service_account_id_admin"`
+}
+
 type FrontendService struct {
 	Archiver       InsecureService
 	ServiceAccount ServiceAccount `yaml:"service_account"`
@@ -192,6 +196,7 @@ type OcisConfig struct {
 	Thumbnails        ThumbnailService
 	Search            Search
 	Audit             Audit
+	Settings          SettingsService `yaml:"settings"`
 	Sharing           Sharing
 	StorageUsers      StorageUsers `yaml:"storage_users"`
 	Notifications     Notifications
@@ -392,6 +397,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		},
 		Proxy: ProxyService{
 			ServiceAccount: serviceAccount,
+		},
+		Settings: SettingsService{
+			ServiceAccountIDAdmin: serviceAccount.ServiceAccountID,
 		},
 	}
 
