@@ -5,6 +5,7 @@ import (
 	bQuery "github.com/blevesearch/bleve/v2/search/query"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 // Creator is combines a Builder and a Compiler which is used to Create the query.
@@ -29,5 +30,5 @@ func (c Creator[T]) Create(qs string) (T, error) {
 	return t, nil
 }
 
-// LegacyCreator exposes an ocis legacy bleve query creator.
-var LegacyCreator = Creator[bQuery.Query]{LegacyBuilder{}, LegacyCompiler{}}
+// DefaultCreator exposes a kql to bleve query creator.
+var DefaultCreator = Creator[bQuery.Query]{kql.Builder{}, Compiler{}}

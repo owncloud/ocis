@@ -74,7 +74,7 @@ Feature: REPORT request to project space
   Scenario: check the response of the searched sub-folder
     Given user "Alice" has created a folder "folderMain/sub-folder" in space "findData"
     And using new DAV path
-    When user "Alice" searches for "sub" using the WebDAV API
+    When user "Alice" searches for "*sub*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
       | /folderMain/sub-folder |

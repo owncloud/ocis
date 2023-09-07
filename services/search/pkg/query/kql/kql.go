@@ -9,8 +9,8 @@ import (
 type Builder struct{}
 
 // Build creates an ast.Ast based on a kql query
-func (b Builder) Build(q string, opts ...Option) (*ast.Ast, error) {
-	f, err := Parse("", []byte(q), opts...)
+func (b Builder) Build(q string) (*ast.Ast, error) {
+	f, err := Parse("", []byte(q))
 	if err != nil {
 		return nil, err
 	}

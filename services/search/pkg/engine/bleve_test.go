@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-
 	bleveSearch "github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -22,7 +21,6 @@ var _ = Describe("Bleve", func() {
 	var (
 		eng *engine.Bleve
 		idx bleveSearch.Index
-		ctx context.Context
 
 		doSearch = func(id string, query, path string) (*searchsvc.SearchIndexResponse, error) {
 			rID, err := storagespace.ParseID(id)
@@ -30,7 +28,7 @@ var _ = Describe("Bleve", func() {
 				return nil, err
 			}
 
-			return eng.Search(ctx, &searchsvc.SearchIndexRequest{
+			return eng.Search(context.Background(), &searchsvc.SearchIndexRequest{
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
@@ -63,7 +61,7 @@ var _ = Describe("Bleve", func() {
 		idx, err = bleveSearch.NewMemOnly(mapping)
 		Expect(err).ToNot(HaveOccurred())
 
-		eng = engine.NewBleveEngine(idx, bleve.LegacyCreator)
+		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
 		Expect(err).ToNot(HaveOccurred())
 
 		rootResource = engine.Resource{
@@ -94,7 +92,7 @@ var _ = Describe("Bleve", func() {
 
 	Describe("New", func() {
 		It("returns a new index instance", func() {
-			b := engine.NewBleveEngine(idx, bleve.LegacyCreator)
+			b := engine.NewBleveEngine(idx, bleve.DefaultCreator)
 			Expect(b).ToNot(BeNil())
 		})
 	})
@@ -134,7 +132,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rootResource.ID, `Name:foo\ o*`, 1)
+				assertDocCount(rootResource.ID, `name:"foo o*"`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {
@@ -409,14 +407,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Upsert(childResource.ID, childResource)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Document.Name, 1)
-			assertDocCount(rootResource.ID, childResource.Document.Name, 1)
+			assertDocCount(rootResource.ID, `"`+parentResource.Document.Name+`"`, 1)
+			assertDocCount(rootResource.ID, `"`+childResource.Document.Name+`"`, 1)
 
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Document.Name, 0)
-			assertDocCount(rootResource.ID, childResource.Document.Name, 0)
+			assertDocCount(rootResource.ID, `"`+parentResource.Document.Name+`"`, 0)
+			assertDocCount(rootResource.ID, `"`+childResource.Document.Name+`"`, 0)
 		})
 	})
 
@@ -431,14 +429,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Name, 0)
-			assertDocCount(rootResource.ID, childResource.Name, 0)
+			assertDocCount(rootResource.ID, `"`+parentResource.Name+`"`, 0)
+			assertDocCount(rootResource.ID, `"`+childResource.Name+`"`, 0)
 
 			err = eng.Restore(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootResource.ID, parentResource.Name, 1)
-			assertDocCount(rootResource.ID, childResource.Name, 1)
+			assertDocCount(rootResource.ID, `"`+parentResource.Name+`"`, 1)
+			assertDocCount(rootResource.ID, `"`+childResource.Name+`"`, 1)
 		})
 	})
 

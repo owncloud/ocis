@@ -2,12 +2,22 @@ package bleve
 
 import (
 	"testing"
+	"time"
 
 	"github.com/blevesearch/bleve/v2/search/query"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
+
+var timeMustParse = func(t *testing.T, ts string) time.Time {
+	tp, err := time.Parse(time.RFC3339Nano, ts)
+	if err != nil {
+		t.Fatalf("time.Parse(...) error = %v", err)
+	}
+
+	return tp
+}
 
 func Test_compile(t *testing.T) {
 	tests := []struct {
@@ -36,7 +46,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John Smith`),
+				query.NewQueryStringQuery(`Name:john\ smith`),
 			}),
 			wantErr: false,
 		},
@@ -50,8 +60,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:John Smith`),
-				query.NewQueryStringQuery(`Name:Jane`),
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Name:jane`),
 			}),
 			wantErr: false,
 		},
@@ -82,7 +92,7 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewDisjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:moby di*`),
+				query.NewQueryStringQuery(`Name:moby\ di*`),
 				query.NewConjunctionQuery([]query.Query{
 					query.NewQueryStringQuery(`Tags:bestseller`),
 					query.NewQueryStringQuery(`Tags:book`),
@@ -125,7 +135,7 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewDisjunctionQuery([]query.Query{
-					query.NewQueryStringQuery(`Name:moby di*`),
+					query.NewQueryStringQuery(`Name:moby\ di*`),
 					query.NewQueryStringQuery(`Tags:bestseller`),
 				}),
 				query.NewQueryStringQuery(`Tags:book`),
@@ -150,7 +160,7 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewDisjunctionQuery([]query.Query{
-					query.NewQueryStringQuery(`Name:moby di*`),
+					query.NewQueryStringQuery(`Name:moby\ di*`),
 					query.NewQueryStringQuery(`Tags:bestseller`),
 				}),
 				query.NewQueryStringQuery(`Tags:book`),
@@ -173,8 +183,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John Smith`),
-				query.NewQueryStringQuery(`author:Jane`),
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
 			}),
 			wantErr: false,
 		},
@@ -195,9 +205,126 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`author:John Smith`),
-				query.NewQueryStringQuery(`author:Jane`),
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
 				query.NewQueryStringQuery(`Tags:bestseller`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c mtime>=2023-09-05T12:40:59.14741+02:00`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Key:   "id",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `StringNode value lowercase`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "Hidden", Value: "T"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "hidden", Value: "T"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Hidden:T`),
+				query.NewQueryStringQuery(`Hidden:T`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `ast.DateTimeNode`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// "=" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// ":" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// no operator, skip
+						Value: timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{false}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{false}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{true}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
 			}),
 			wantErr: false,
 		},

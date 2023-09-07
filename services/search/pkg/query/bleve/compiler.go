@@ -22,13 +22,15 @@ var _fields = map[string]string{
 	"type":     "Type",
 	"tag":      "Tags",
 	"tags":     "Tags",
+	"content":  "Content",
+	"hidden":   "Hidden",
 }
 
 // Compiler represents a KQL query search string to the bleve query formatter.
 type Compiler struct{}
 
 // Compile implements the query formatter which converts the KQL query search string to the bleve query.
-func (c *Compiler) Compile(givenAst *ast.Ast) (bleveQuery.Query, error) {
+func (c Compiler) Compile(givenAst *ast.Ast) (bleveQuery.Query, error) {
 	q, err := compile(givenAst)
 	if err != nil {
 		return nil, err
@@ -52,7 +54,49 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 	for i := offset; i < len(nodes); i++ {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
-			q := bleveQuery.NewQueryStringQuery(getField(n.Key) + ":" + n.Value)
+			k := getField(n.Key)
+			v := strings.ReplaceAll(n.Value, " ", `\ `)
+
+			if k != "Hidden" {
+				v = strings.ToLower(v)
+			}
+
+			q := bleveQuery.NewQueryStringQuery(k + ":" + v)
+			if prev == nil {
+				prev = q
+			} else {
+				next = q
+			}
+		case *ast.DateTimeNode:
+			q := &bleveQuery.DateRangeQuery{
+				Start:          bleveQuery.BleveQueryTime{},
+				End:            bleveQuery.BleveQueryTime{},
+				InclusiveStart: nil,
+				InclusiveEnd:   nil,
+				FieldVal:       getField(n.Key),
+			}
+
+			if n.Operator == nil {
+				continue
+			}
+
+			switch n.Operator.Value {
+			case ">":
+				q.Start.Time = n.Value
+				q.InclusiveStart = &[]bool{false}[0]
+			case ">=":
+				q.Start.Time = n.Value
+				q.InclusiveStart = &[]bool{true}[0]
+			case "<":
+				q.End.Time = n.Value
+				q.InclusiveEnd = &[]bool{false}[0]
+			case "<=":
+				q.End.Time = n.Value
+				q.InclusiveEnd = &[]bool{true}[0]
+			default:
+				continue
+			}
+
 			if prev == nil {
 				prev = q
 			} else {

@@ -49,7 +49,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			_ = idx.Close()
 		}
 
-		eng = engine.NewBleveEngine(idx, bleve.LegacyCreator)
+		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
 	default:
 		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
 	}

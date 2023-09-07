@@ -97,16 +97,16 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 	req.Query = query
 	if len(scope) > 0 {
-		// if req.Ref != nil {
-		// 	return nil, errtypes.BadRequest("cannot scope a search that is limited to a resource")
-		// }
-		scopeRef, err := extractScope(scope)
+		scopedID, err := storagespace.ParseID(scope)
 		if err != nil {
-			return nil, err
+			s.logger.Error().Err(err).Msg("failed to parse scope")
 		}
+
 		// Stat the scope to get the resource id
 		statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
-			Ref:       scopeRef,
+			Ref: &provider.Reference{
+				ResourceId: &scopedID,
+			},
 			FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}},
 		})
 		if err != nil {
@@ -418,7 +418,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId)
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
 		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "+ID:" + storagespace.FormatResourceID(*info.Id) + ` +Mtime:>="` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + `"`,
+			Query: "id:" + storagespace.FormatResourceID(*info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
 		})
 
 		if err == nil && len(searchRes.Matches) >= 1 {

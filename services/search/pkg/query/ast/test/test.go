@@ -21,6 +21,7 @@ func DiffAst(x, y interface{}, opts ...cmp.Option) string {
 			cmpopts.IgnoreFields(ast.OperatorNode{}, "Base"),
 			cmpopts.IgnoreFields(ast.GroupNode{}, "Base"),
 			cmpopts.IgnoreFields(ast.BooleanNode{}, "Base"),
+			cmpopts.IgnoreFields(ast.DateTimeNode{}, "Base"),
 		)...,
 	)
 }

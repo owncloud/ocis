@@ -2,6 +2,7 @@ package kql_test
 
 import (
 	"testing"
+	"time"
 
 	tAssert "github.com/stretchr/testify/assert"
 
@@ -9,6 +10,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast/test"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
+
+var now = time.Now()
 
 func TestNormalizeNodes(t *testing.T) {
 	tests := []struct {
@@ -85,11 +88,14 @@ func TestNormalizeNodes(t *testing.T) {
 			givenNodes: []ast.Node{
 				&ast.StringNode{Key: "author", Value: "John Smith"},
 				&ast.StringNode{Key: "filetype", Value: "docx"},
+				&ast.DateTimeNode{Key: "mtime", Operator: &ast.OperatorNode{Value: "="}, Value: now},
 			},
 			expectedNodes: []ast.Node{
 				&ast.StringNode{Key: "author", Value: "John Smith"},
 				&ast.OperatorNode{Value: "AND"},
 				&ast.StringNode{Key: "filetype", Value: "docx"},
+				&ast.OperatorNode{Value: "AND"},
+				&ast.DateTimeNode{Key: "mtime", Operator: &ast.OperatorNode{Value: "="}, Value: now},
 			},
 		},
 	}

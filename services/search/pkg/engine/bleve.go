@@ -17,7 +17,7 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
 	"github.com/blevesearch/bleve/v2/mapping"
-	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
+	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -27,13 +27,13 @@ import (
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query"
+	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
-	index bleve.Index
-	query query.Creator[bleveQuery.Query]
+	index        bleve.Index
+	queryCreator searchQuery.Creator[query.Query]
 }
 
 // NewBleveIndex returns a new bleve index
@@ -58,10 +58,10 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 }
 
 // NewBleveEngine creates a new Bleve instance
-func NewBleveEngine(index bleve.Index, qbc query.Creator[bleveQuery.Query]) *Bleve {
+func NewBleveEngine(index bleve.Index, queryCreator searchQuery.Creator[query.Query]) *Bleve {
 	return &Bleve{
-		index: index,
-		query: qbc,
+		index:        index,
+		queryCreator: queryCreator,
 	}
 }
 
@@ -118,15 +118,15 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
-func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
-	createdQuery, err := b.query.Create(sir.Query)
+func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
+	createdQuery, err := b.queryCreator.Create(sir.Query)
 	if err != nil {
 		return nil, err
 	}
 
 	q := bleve.NewConjunctionQuery(
 		// Skip documents that have been marked as deleted
-		&bleveQuery.BoolFieldQuery{
+		&query.BoolFieldQuery{
 			Bool:     false,
 			FieldVal: "Deleted",
 		},
@@ -136,7 +136,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	if sir.Ref != nil {
 		q.Conjuncts = append(
 			q.Conjuncts,
-			&bleveQuery.TermQuery{
+			&query.TermQuery{
 				FieldVal: "RootID",
 				Term: storagespace.FormatResourceID(
 					storageProvider.ResourceId{

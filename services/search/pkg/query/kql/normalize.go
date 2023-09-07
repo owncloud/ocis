@@ -46,6 +46,14 @@ func NormalizeNodes(nodes []ast.Node) ([]ast.Node, error) {
 			}
 			currentNode = n
 			currentKey = &n.Key
+		case *ast.DateTimeNode:
+			if prevKey == nil {
+				prevKey = &n.Key
+				res = append(res, node)
+				continue
+			}
+			currentNode = n
+			currentKey = &n.Key
 		case *ast.BooleanNode:
 			if prevKey == nil {
 				prevKey = &n.Key

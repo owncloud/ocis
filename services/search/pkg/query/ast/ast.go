@@ -1,6 +1,10 @@
 // Package ast provides available ast nodes.
 package ast
 
+import (
+	"time"
+)
+
 // Node represents abstract syntax tree node
 type Node interface {
 	Location() *Location
@@ -46,6 +50,14 @@ type BooleanNode struct {
 	*Base
 	Key   string
 	Value bool
+}
+
+// DateTimeNode represents a time.Time value
+type DateTimeNode struct {
+	*Base
+	Key      string
+	Operator *OperatorNode
+	Value    time.Time
 }
 
 // OperatorNode represents an operator value like
