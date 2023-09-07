@@ -6,7 +6,7 @@ ifeval::[{show-deprecation} == true]
 
 [#deprecation-note-2023-09-07-13-26-46]
 [caption=]
-.Deprecation notes for the app-registry service
+.Deprecation notes for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Deprecation Info
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 endif::[]
 
 [caption=]
-.Environment variables for the app-registry service
+.Environment variables for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -27,7 +27,7 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`APP_REGISTRY_TRACING_ENABLED` +
+`CLIENTLOG_TRACING_ENABLED` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -37,7 +37,7 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`APP_REGISTRY_TRACING_TYPE` +
+`CLIENTLOG_TRACING_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -47,7 +47,7 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`APP_REGISTRY_TRACING_ENDPOINT` +
+`CLIENTLOG_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -57,7 +57,7 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`APP_REGISTRY_TRACING_COLLECTOR` +
+`CLIENTLOG_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`APP_REGISTRY_LOG_LEVEL` +
+`USERLOG_LOG_LEVEL` +
 
 a| [subs=-attributes]
 ++string ++
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`APP_REGISTRY_LOG_PRETTY` +
+`USERLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -87,7 +87,7 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`APP_REGISTRY_LOG_COLOR` +
+`USERLOG_LOG_COLOR` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`APP_REGISTRY_LOG_FILE` +
+`USERLOG_LOG_FILE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -106,16 +106,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`APP_REGISTRY_DEBUG_ADDR` +
+a|`USERLOG_DEBUG_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9243 ++
+++127.0.0.1:9260 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`APP_REGISTRY_DEBUG_TOKEN` +
+a|`USERLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
 ++string ++
@@ -124,7 +124,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`APP_REGISTRY_DEBUG_PPROF` +
+a|`USERLOG_DEBUG_PPROF` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`APP_REGISTRY_DEBUG_ZPAGES` +
+a|`USERLOG_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -142,26 +142,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 
-a|`APP_REGISTRY_GRPC_ADDR` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++127.0.0.1:9242 ++
-a| [subs=-attributes]
-The bind address of the GRPC service.
-
-a|`APP_REGISTRY_GRPC_PROTOCOL` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++tcp ++
-a| [subs=-attributes]
-The transport protocol of the GRPC service.
-
 a|`OCIS_JWT_SECRET` +
-`APP_REGISTRY_JWT_SECRET` +
+`CLIENTLOG_JWT_SECRET` +
 
 a| [subs=-attributes]
 ++string ++
@@ -177,24 +159,76 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata
 
-a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`CLIENTLOG_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`CLIENTLOG_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`CLIENTLOG_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`CLIENTLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 
-a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`CLIENTLOG_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`CLIENTLOG_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`CLIENTLOG_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 |===
 

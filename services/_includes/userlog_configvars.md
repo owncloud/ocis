@@ -24,7 +24,6 @@
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | OCIS_JWT_SECRET<br/>USERLOG_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>USERLOG_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
 | OCIS_TRANSLATION_PATH<br/>USERLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
 | OCIS_EVENTS_ENDPOINT<br/>USERLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|

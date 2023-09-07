@@ -40,7 +40,6 @@ http:
 grpc_client_tls: null
 token_manager:
   jwt_secret: ""
-machine_auth_api_key: ""
 reva_gateway: com.owncloud.api.gateway
 translation_path: ""
 events:

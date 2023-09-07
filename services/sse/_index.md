@@ -1,6 +1,6 @@
 ---
 title: SSE
-date: 2023-09-07T11:00:17.967150015Z
+date: 2023-09-07T13:26:46.801293972Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/sse
@@ -18,8 +18,16 @@ The `sse` service is responsible for sending sse (Server-Sent Events) to a user.
 
 ## Table of Contents
 
+* [The Log Service Ecosystem](#the-log-service-ecosystem)
 * [Subscribing](#subscribing)
 * [Example Yaml Config](#example-yaml-config)
+
+## The Log Service Ecosystem
+
+Log services like the `userlog`, `clientlog` and `sse` are responsible for composing notifications for a certain audience.
+  -   The `userlog` service translates and adjusts messages to be human readable.
+  -   The `clientlog` service composes machine readable messages, so clients can act without the need to query the server.
+  -   The `sse` service is only responsible for sending these messages. It does not care about their form or language.
 
 ## Subscribing
 
