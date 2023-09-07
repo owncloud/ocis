@@ -256,6 +256,19 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: `NOT tag:physik`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.OperatorNode{Value: "NOT"},
+					&ast.StringNode{Key: "tag", Value: "physik"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewBooleanQuery(nil, nil, []query.Query{query.NewQueryStringQuery(`Tags:physik`)}),
+			}),
+			wantErr: false,
+		},
+		{
 			name: `ast.DateTimeNode`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
