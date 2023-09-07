@@ -955,7 +955,7 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 		return nil, err
 	}
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if !share.IsGrantedToUser(s, user) {
+	if user.GetId().GetType() != userv1beta1.UserType_USER_TYPE_SERVICE && !share.IsGrantedToUser(s, user) {
 		return nil, errtypes.NotFound(ref.String())
 	}
 	if share.IsExpired(s) {
@@ -978,7 +978,7 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 }
 
 // UpdateReceivedShare updates the received share with share state.
-func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
+func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userv1beta1.UserId) (*collaboration.ReceivedShare, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "UpdateReceivedShare")
 	defer span.End()
 
@@ -1003,10 +1003,13 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 	}
 
 	// write back
+	u := ctxpkg.ContextMustGetUser(ctx)
+	uid := u.GetId().GetOpaqueId()
+	if u.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
+		uid = forUser.GetOpaqueId()
+	}
 
-	userID := ctxpkg.ContextMustGetUser(ctx)
-
-	err = m.UserReceivedStates.Add(ctx, userID.GetId().GetOpaqueId(), rs.Share.ResourceId.StorageId+shareid.IDDelimiter+rs.Share.ResourceId.SpaceId, rs)
+	err = m.UserReceivedStates.Add(ctx, uid, rs.Share.ResourceId.StorageId+shareid.IDDelimiter+rs.Share.ResourceId.SpaceId, rs)
 	if err != nil {
 		return nil, err
 	}

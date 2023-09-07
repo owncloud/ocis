@@ -542,13 +542,13 @@ func (m *mgr) getReceived(ctx context.Context, ref *collaboration.ShareReference
 		return nil, err
 	}
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if !share.IsGrantedToUser(s, user) {
+	if user.GetId().GetType() != userv1beta1.UserType_USER_TYPE_SERVICE && !share.IsGrantedToUser(s, user) {
 		return nil, errtypes.NotFound(ref.String())
 	}
 	return m.convert(user.Id, s), nil
 }
 
-func (m *mgr) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
+func (m *mgr) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userv1beta1.UserId) (*collaboration.ReceivedShare, error) {
 	rs, err := m.getReceived(ctx, &collaboration.ShareReference{Spec: &collaboration.ShareReference_Id{Id: receivedShare.Share.Id}})
 	if err != nil {
 		return nil, err
@@ -568,27 +568,31 @@ func (m *mgr) UpdateReceivedShare(ctx context.Context, receivedShare *collaborat
 		}
 	}
 
-	user := ctxpkg.ContextMustGetUser(ctx)
+	u := ctxpkg.ContextMustGetUser(ctx)
+	uid := u.GetId().String()
+	if u.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
+		uid = forUser.String()
+	}
 	// Persist state
-	if v, ok := m.model.State[user.Id.String()]; ok {
+	if v, ok := m.model.State[uid]; ok {
 		v[rs.Share.Id.String()] = rs.State
-		m.model.State[user.Id.String()] = v
+		m.model.State[uid] = v
 	} else {
 		a := map[string]collaboration.ShareState{
 			rs.Share.Id.String(): rs.State,
 		}
-		m.model.State[user.Id.String()] = a
+		m.model.State[uid] = a
 	}
 
 	// Persist mount point
-	if v, ok := m.model.MountPoint[user.Id.String()]; ok {
+	if v, ok := m.model.MountPoint[uid]; ok {
 		v[rs.Share.Id.String()] = rs.MountPoint
-		m.model.MountPoint[user.Id.String()] = v
+		m.model.MountPoint[uid] = v
 	} else {
 		a := map[string]*provider.Reference{
 			rs.Share.Id.String(): rs.MountPoint,
 		}
-		m.model.MountPoint[user.Id.String()] = a
+		m.model.MountPoint[uid] = a
 	}
 
 	if err := m.model.Save(); err != nil {

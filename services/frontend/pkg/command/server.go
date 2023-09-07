@@ -90,6 +90,13 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 
+			// add event handler
+			gr.Add(func() error {
+				return ListenForEvents(ctx, cfg, logger)
+			}, func(_ error) {
+				cancel()
+			})
+
 			return gr.Run()
 		},
 	}

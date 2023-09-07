@@ -53,6 +53,11 @@ type Config struct {
 
 	Middleware Middleware `yaml:"middleware"`
 
+	Events           Events                `yaml:"events"`
+	GRPCClientTLS    *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile."`
+	ServiceAccount   ServiceAccount        `yaml:"service_account"`
+
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
@@ -150,4 +155,19 @@ type CBOXDriver struct {
 type Checksums struct {
 	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
 	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE" desc:"The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`
+}
+
+// Events combines the configuration options for the event bus.
+type Events struct {
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;FRONTEND_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;FRONTEND_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;FRONTEND_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE;OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false."`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;FRONTEND_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;FRONTEND_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }
