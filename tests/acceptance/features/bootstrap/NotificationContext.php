@@ -432,7 +432,9 @@ class NotificationContext implements Context {
 			GraphHelper::getMySpaces(
 				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				'',
+				$this->featureContext->getStepLineRef()
 			)
 		);
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
@@ -541,7 +543,7 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'POST',
 			$this->globalNotificationEndpointPath,
-			'',
+			$this->featureContext->getStepLineRef(),
 			json_encode($payload),
 			2
 		);
@@ -608,7 +610,7 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->globalNotificationEndpointPath,
-			'',
+			$this->featureContext->getStepLineRef(),
 			json_encode($payload),
 			2
 		);

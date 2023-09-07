@@ -166,7 +166,7 @@ class ArchiverContext implements Context {
 		$queryString = $this->getArchiverQueryString($owner, $resource, $addressType);
 		return HttpRequestHelper::get(
 			$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
-			'',
+			$this->featureContext->getStepLineRef(),
 			$downloader,
 			$this->featureContext->getPasswordForUser($downloader),
 			$headers
@@ -199,7 +199,7 @@ class ArchiverContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
-				'',
+				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			)

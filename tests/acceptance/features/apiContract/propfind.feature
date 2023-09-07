@@ -18,7 +18,7 @@ Feature: Propfind test
     When user "Alice" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
@@ -36,7 +36,7 @@ Feature: Propfind test
     When user "Brian" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id                | /^[a-f0-9!\-]{36}$/    |
+      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
