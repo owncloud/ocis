@@ -9,8 +9,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
-* Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
@@ -36,36 +36,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6427
    https://github.com/owncloud/ocis/pull/7178
 
-* Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
-
-   Introduce support for
-   [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference)
-   search syntax.
-
-   The functionality consists of a kql lexer and a bleve query compiler
-
-   Supported field queries:
-
-  * `Tag` search `tag:golden tag:"silver"`
-  * `Filename` search `name:file.txt name:"file.docx"`
-  * `Content` search `content:ahab content:"captain aha*"`
-
-   Supported conjunctive normal form queries:
-
-  * `Boolean`: `AND`, `OR`, `NOT`,
-  * `Group`: `(tag:book content:ahab*)`, `tag:(book pdf)`
-
-   Some examples are:
-
-   Query: `(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`
-
-  * Resources with `name: moby di*` `OR` `tag: bestseller`.
-  * `AND` with `tag:book`.
-  * `NOT` with `tag:read`.
-
-   https://github.com/owncloud/ocis/issues/7042
-   https://github.com/owncloud/ocis/pull/7043
-
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
    So far, sse has only been used to exchange messages between the server and the client. In order to
@@ -77,6 +47,36 @@ The following sections list the changes for unreleased.
   * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
+
+* Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
+
+   We've introduced support for
+   [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference)
+   as the default oCIS search query language.
+
+   Some examples of a valid KQL query are:
+
+  * `Tag`: `tag:golden tag:"silver"`
+  * `Filename`: `name:file.txt name:"file.docx"`
+  * `Content`: `content:ahab content:"captain aha*"`
+
+   Conjunctive normal form queries:
+
+  * `Boolean`: `tag:golden AND tag:"silver`, `tag:golden OR tag:"silver`, `tag:golden NOT tag:"silver`
+  * `Group`: `(tag:book content:ahab*)`, `tag:(book pdf)`
+
+   Complex queries:
+
+  * `(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`
+
+   https://github.com/owncloud/ocis/issues/7042
+   https://github.com/owncloud/ocis/issues/7179
+   https://github.com/owncloud/ocis/issues/7114
+   https://github.com/owncloud/web/issues/9636
+   https://github.com/owncloud/web/issues/9646
+   https://github.com/owncloud/ocis/pull/7212
+   https://github.com/owncloud/ocis/pull/7043
+   https://github.com/owncloud/web/pull/9653
 
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
