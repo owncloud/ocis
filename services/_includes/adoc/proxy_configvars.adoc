@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-07-15-19-58]
+[#deprecation-note-2023-09-07-18-55-56]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -356,15 +356,25 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.
 
-a|`OCIS_JWT_SECRET` +
-`PROXY_JWT_SECRET` +
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`PROXY_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The secret to mint and validate JWT tokens.
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`PROXY_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 
 a|`PROXY_ROLE_ASSIGNMENT_DRIVER` +
 
