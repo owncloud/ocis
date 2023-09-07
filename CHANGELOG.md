@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
@@ -35,6 +36,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7138
    https://github.com/owncloud/ocis/pull/6427
    https://github.com/owncloud/ocis/pull/7178
+   https://github.com/owncloud/ocis/pull/7217
+
+* Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
+
+   Add the clientlog service which will send machine readable notifications to clients
+
+   https://github.com/owncloud/ocis/pull/7217
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
