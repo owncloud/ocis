@@ -39,7 +39,10 @@ func (c Compiler) Compile(givenAst *ast.Ast) (bleveQuery.Query, error) {
 }
 
 func compile(a *ast.Ast) (bleveQuery.Query, error) {
-	q, _ := walk(0, a.Nodes)
+	q, _, err := walk(0, a.Nodes)
+	if err != nil {
+		return nil, err
+	}
 	switch q.(type) {
 	case *bleveQuery.ConjunctionQuery, *bleveQuery.DisjunctionQuery:
 		return q, nil
@@ -47,7 +50,7 @@ func compile(a *ast.Ast) (bleveQuery.Query, error) {
 	return bleve.NewConjunctionQuery(q), nil
 }
 
-func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
+func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 	var prev, next bleveQuery.Query
 	var operator *ast.OperatorNode
 	var isGroup bool
@@ -113,7 +116,10 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 			if n.Key != "" {
 				n = normalizeGroupingProperty(n)
 			}
-			q, _ := walk(0, n.Nodes)
+			q, _, err := walk(0, n.Nodes)
+			if err != nil {
+				return nil, 0, err
+			}
 			if prev == nil {
 				prev = q
 				isGroup = true
@@ -124,10 +130,19 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 			if n.Value == kql.BoolAND || n.Value == kql.BoolOR {
 				operator = n
 			} else if n.Value == kql.BoolNOT {
-				next, offset = nextNode(i+1, nodes)
+				var err error
+				next, offset, err = nextNode(i+1, nodes)
+				if err != nil {
+					return nil, 0, err
+				}
 				q := bleve.NewBooleanQuery()
 				q.AddMustNot(next)
-				next = q
+				if prev == nil {
+					// unary in the beginning
+					prev = q
+				} else {
+					next = q
+				}
 			}
 		}
 		if prev != nil && next != nil && operator != nil {
@@ -140,13 +155,19 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
 			i = offset
 		}
 	}
-	return prev, offset
+	if prev == nil {
+		return nil, 0, fmt.Errorf("can not compile the query")
+	}
+	return prev, offset, nil
 }
 
-func nextNode(offset int, nodes []ast.Node) (bleveQuery.Query, int) {
+func nextNode(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 	if n, ok := nodes[offset].(*ast.GroupNode); ok {
-		gq, _ := walk(0, n.Nodes)
-		return gq, offset + 1
+		gq, _, err := walk(0, n.Nodes)
+		if err != nil {
+			return nil, 0, err
+		}
+		return gq, offset + 1, nil
 	}
 	if n, ok := nodes[offset].(*ast.OperatorNode); ok {
 		if n.Value == kql.BoolNOT {
