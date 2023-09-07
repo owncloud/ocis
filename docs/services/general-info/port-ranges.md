@@ -52,7 +52,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9195-9199  | FREE                                                                                   |
 | 9200-9204  | [proxy]({{< ref "../proxy/_index.md" >}})                                              |
 | 9205-9209  | [proxy]({{< ref "../proxy/_index.md" >}})                                              |
-| 9210-9214  | [userlog]{{< ref "../userlog/_index.md" >}}                                            |
+| 9210-9214  | [userlog]({{< ref "../userlog/_index.md" >}})                                          |
 | 9215-9219  | [storage-system]({{< ref "../storage-system/_index.md" >}})                            |
 | 9220-9224  | [search]({{< ref "../search/_index.md" >}})                                            |
 | 9225-9229  | [audit]({{< ref "../audit/_index.md" >}})                                              |
@@ -61,8 +61,8 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9240-9244  | [app-registry]({{< ref "../app-registry/_index.md" >}})                                |
 | 9245-9249  | FREE                                                                                   |
 | 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
-| 9255-9259  | [postprocessing]({{ ref "../postprocessing/_index.md" >}})                             |
-| 9260-9264  | FREE                                                                                   |
+| 9255-9259  | [postprocessing]({{< ref "../postprocessing/_index.md" >}})                            |
+| 9260-9264  | [clientlog]({{ ref "../clientlog/index.md" }})                                         |
 | 9265-9269  | FREE                                                                                   |
 | 9270-9274  | [eventhistory]({{< ref "../eventhistory/_index.md" >}})                                |
 | 9275-9279  | FREE                                                                                   |

@@ -16,7 +16,6 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/leonelquinteros/gotext"
@@ -52,32 +51,29 @@ type OC10Notification struct {
 
 // Converter is responsible for converting eventhistory events to OC10Notifications
 type Converter struct {
-	locale               string
-	gatewaySelector      pool.Selectable[gateway.GatewayAPIClient]
-	serviceAccountID     string
-	serviceAccountSecret string
-	serviceName          string
-	translationPath      string
+	locale                string
+	gwc                   gateway.GatewayAPIClient
+	serviceName           string
+	translationPath       string
+	serviceAccountContext context.Context
 
 	// cached within one request not to query other service too much
-	spaces                map[string]*storageprovider.StorageSpace
-	users                 map[string]*user.User
-	resources             map[string]*storageprovider.ResourceInfo
-	serviceAccountContext context.Context
+	spaces    map[string]*storageprovider.StorageSpace
+	users     map[string]*user.User
+	resources map[string]*storageprovider.ResourceInfo
 }
 
 // NewConverter returns a new Converter
-func NewConverter(loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string, name string, translationPath string, serviceAccountID string, serviceAccountSecret string) *Converter {
+func NewConverter(ctx context.Context, loc string, gwc gateway.GatewayAPIClient, name string, translationPath string) *Converter {
 	return &Converter{
-		locale:               loc,
-		gatewaySelector:      gatewaySelector,
-		serviceAccountID:     serviceAccountID,
-		serviceAccountSecret: serviceAccountSecret,
-		serviceName:          name,
-		translationPath:      translationPath,
-		spaces:               make(map[string]*storageprovider.StorageSpace),
-		users:                make(map[string]*user.User),
-		resources:            make(map[string]*storageprovider.ResourceInfo),
+		locale:                loc,
+		gwc:                   gwc,
+		serviceName:           name,
+		translationPath:       translationPath,
+		serviceAccountContext: ctx,
+		spaces:                make(map[string]*storageprovider.StorageSpace),
+		users:                 make(map[string]*user.User),
+		resources:             make(map[string]*storageprovider.ResourceInfo),
 	}
 }
 
@@ -172,12 +168,7 @@ func (c *Converter) spaceMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	ctx, err := c.authenticate()
-	if err != nil {
-		return OC10Notification{}, err
-	}
-
-	space, err := c.getSpace(ctx, spaceid)
+	space, err := c.getSpace(c.serviceAccountContext, spaceid)
 	if err != nil {
 		return OC10Notification{}, err
 	}
@@ -211,12 +202,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	ctx, err := c.authenticate()
-	if err != nil {
-		return OC10Notification{}, err
-	}
-
-	info, err := c.getResource(ctx, resourceid)
+	info, err := c.getResource(c.serviceAccountContext, resourceid)
 	if err != nil {
 		return OC10Notification{}, err
 	}
@@ -328,27 +314,11 @@ func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string
 	}, nil
 }
 
-func (c *Converter) authenticate() (context.Context, error) {
-	if c.serviceAccountContext != nil {
-		return c.serviceAccountContext, nil
-	}
-
-	gatewayClient, err := c.gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-	ctx, err := utils.GetServiceUserContext(c.serviceAccountID, gatewayClient, c.serviceAccountSecret)
-	if err == nil {
-		c.serviceAccountContext = ctx
-	}
-	return ctx, err
-}
-
 func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovider.StorageSpace, error) {
 	if space, ok := c.spaces[spaceID]; ok {
 		return space, nil
 	}
-	space, err := getSpace(ctx, spaceID, c.gatewaySelector)
+	space, err := utils.GetSpace(ctx, spaceID, c.gwc)
 	if err == nil {
 		c.spaces[spaceID] = space
 	}
@@ -359,7 +329,7 @@ func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider
 	if r, ok := c.resources[resourceID.GetOpaqueId()]; ok {
 		return r, nil
 	}
-	resource, err := getResource(ctx, resourceID, c.gatewaySelector)
+	resource, err := utils.GetResourceByID(ctx, resourceID, c.gwc)
 	if err == nil {
 		c.resources[resourceID.GetOpaqueId()] = resource
 	}
@@ -370,7 +340,7 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	if u, ok := c.users[userID.GetOpaqueId()]; ok {
 		return u, nil
 	}
-	usr, err := getUser(ctx, userID, c.gatewaySelector)
+	usr, err := utils.GetUser(userID, c.gwc)
 	if err == nil {
 		c.users[userID.GetOpaqueId()] = usr
 	}

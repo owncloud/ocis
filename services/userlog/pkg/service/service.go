@@ -9,10 +9,7 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -114,6 +111,18 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		err       error
 	)
 
+	gwc, err := ul.gatewaySelector.Next()
+	if err != nil {
+		ul.log.Error().Err(err).Msg("cannot get gateway client")
+		return
+	}
+
+	ctx, err := utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		ul.log.Error().Err(err).Msg("cannot get service account")
+		return
+	}
+
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
@@ -140,7 +149,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	// space related // TODO: how to find spaceadmins?
 	case events.SpaceDisabled:
 		executant = e.Executant
-		users, err = ul.findSpaceMembers(ul.mustAuthenticate(), e.ID.GetOpaqueId(), viewer)
+		users, err = utils.GetSpaceMembers(ctx, e.ID.GetOpaqueId(), gwc, utils.ViewerRole)
 	case events.SpaceDeleted:
 		executant = e.Executant
 		for u := range e.FinalMembers {
@@ -148,22 +157,22 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		}
 	case events.SpaceShared:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.SpaceUnshared:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.SpaceMembershipExpired:
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 
 	// share related
 	case events.ShareCreated:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareRemoved:
 		executant = e.Executant
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareExpired:
-		users, err = ul.resolveID(ul.mustAuthenticate(), e.GranteeUserID, e.GranteeGroupID)
+		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	}
 
 	if err != nil {
@@ -180,7 +189,12 @@ func (ul *UserlogService) processEvent(event events.Event) {
 
 	// III) store the eventID for each user
 	for _, id := range users {
-		if err := ul.addEventToUser(id, event); err != nil {
+		if !ul.cfg.DisableSSE {
+			if err := ul.sendSSE(ctx, id, event, gwc); err != nil {
+				ul.log.Error().Err(err).Str("userid", id).Str("eventid", event.ID).Msg("cannot create sse event")
+			}
+		}
+		if err := ul.addEventToUser(ctx, id, event); err != nil {
 			ul.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 			return
 		}
@@ -316,19 +330,14 @@ func (ul *UserlogService) DeleteGlobalEvents(ctx context.Context, evnames []stri
 	})
 }
 
-func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
-	if !ul.cfg.DisableSSE {
-		if err := ul.sendSSE(userid, event); err != nil {
-			ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
-		}
-	}
+func (ul *UserlogService) addEventToUser(ctx context.Context, userid string, event events.Event) error {
 	return ul.alterUserEventList(userid, func(ids []string) []string {
 		return append(ids, event.ID)
 	})
 }
 
-func (ul *UserlogService) sendSSE(userid string, event events.Event) error {
-	ev, err := ul.getConverter(ul.getUserLocale(userid)).ConvertEvent(event.ID, event.Event)
+func (ul *UserlogService) sendSSE(ctx context.Context, userid string, event events.Event, gwc gateway.GatewayAPIClient) error {
+	ev, err := NewConverter(ctx, ul.getUserLocale(userid), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath).ConvertEvent(event.ID, event.Event)
 	if err != nil {
 		return err
 	}
@@ -419,105 +428,6 @@ func (ul *UserlogService) alterGlobalEvents(ctx context.Context, alter func(map[
 	})
 }
 
-// we need the spaceid to inform other space members
-// we need an owner to query space members
-// we need to check the user has the required role to see the event
-func (ul *UserlogService) findSpaceMembers(ctx context.Context, spaceID string, requiredRole permissionChecker) ([]string, error) {
-	if ctx == nil {
-		return nil, errors.New("need authenticated context to find space members")
-	}
-
-	space, err := getSpace(ctx, spaceID, ul.gatewaySelector)
-	if err != nil {
-		return nil, err
-	}
-
-	var users []string
-	switch space.SpaceType {
-	case "personal":
-		users = []string{space.GetOwner().GetId().GetOpaqueId()}
-	case "project":
-		if users, err = ul.gatherSpaceMembers(ctx, space, requiredRole); err != nil {
-			return nil, err
-		}
-	default:
-		// TODO: shares? other space types?
-		return nil, fmt.Errorf("unsupported space type: %s", space.SpaceType)
-	}
-
-	return users, nil
-}
-
-func (ul *UserlogService) gatherSpaceMembers(ctx context.Context, space *storageprovider.StorageSpace, hasRequiredRole permissionChecker) ([]string, error) {
-	var permissionsMap map[string]*storageprovider.ResourcePermissions
-	if err := utils.ReadJSONFromOpaque(space.GetOpaque(), "grants", &permissionsMap); err != nil {
-		return nil, err
-	}
-
-	groupsMap := make(map[string]struct{})
-	if opaqueGroups, ok := space.Opaque.Map["groups"]; ok {
-		_ = json.Unmarshal(opaqueGroups.GetValue(), &groupsMap)
-	}
-
-	// we use a map to avoid duplicates
-	usermap := make(map[string]struct{})
-	for id, perm := range permissionsMap {
-		if !hasRequiredRole(perm) {
-			// not allowed to receive event
-			continue
-		}
-
-		if _, isGroup := groupsMap[id]; !isGroup {
-			usermap[id] = struct{}{}
-			continue
-		}
-
-		usrs, err := ul.resolveGroup(ctx, id)
-		if err != nil {
-			ul.log.Error().Err(err).Str("groupID", id).Msg("failed to resolve group")
-			continue
-		}
-
-		for _, u := range usrs {
-			usermap[u] = struct{}{}
-		}
-	}
-
-	var users []string
-	for id := range usermap {
-		users = append(users, id)
-	}
-
-	return users, nil
-}
-
-func (ul *UserlogService) resolveID(ctx context.Context, userid *user.UserId, groupid *group.GroupId) ([]string, error) {
-	if userid != nil {
-		return []string{userid.GetOpaqueId()}, nil
-	}
-
-	if ctx == nil {
-		return nil, errors.New("need ctx to resolve group id")
-	}
-
-	return ul.resolveGroup(ctx, groupid.GetOpaqueId())
-}
-
-// resolves the users of a group
-func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]string, error) {
-	grp, err := getGroup(ctx, groupID, ul.gatewaySelector)
-	if err != nil {
-		return nil, err
-	}
-
-	var userIDs []string
-	for _, m := range grp.GetMembers() {
-		userIDs = append(userIDs, m.GetOpaqueId())
-	}
-
-	return userIDs, nil
-}
-
 func (ul *UserlogService) getUserLocale(userid string) string {
 	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
 		micrometadata.Set(context.Background(), middleware.AccountID, userid),
@@ -537,122 +447,6 @@ func (ul *UserlogService) getUserLocale(userid string) string {
 	return val[0].GetStringValue()
 }
 
-func (ul *UserlogService) getConverter(locale string) *Converter {
-	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.ServiceAccount.ServiceAccountID, ul.cfg.ServiceAccount.ServiceAccountSecret)
-}
-
-func (ul *UserlogService) mustAuthenticate() context.Context {
-	ctx, err := authenticate(ul.cfg.ServiceAccount.ServiceAccountID, ul.gatewaySelector, ul.cfg.ServiceAccount.ServiceAccountSecret)
-	if err != nil {
-		ul.log.Error().Err(err).Str("accountid", ul.cfg.ServiceAccount.ServiceAccountID).Msg("failed to impersonate service account")
-		return nil
-	}
-	return ctx
-}
-
-func authenticate(serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceAccountSecret string) (context.Context, error) {
-	gatewayClient, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	return utils.GetServiceUserContext(serviceAccountID, gatewayClient, serviceAccountSecret)
-}
-
-func getSpace(ctx context.Context, spaceID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.StorageSpace, error) {
-	gatewayClient, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := gatewayClient.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
-	if err != nil {
-		return nil, err
-	}
-
-	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error while getting space: (%v) %s", res.GetStatus().GetCode(), res.GetStatus().GetMessage())
-	}
-
-	if len(res.StorageSpaces) == 0 {
-		return nil, fmt.Errorf("error getting storage space %s: no space returned", spaceID)
-	}
-
-	return res.StorageSpaces[0], nil
-}
-
-func getUser(ctx context.Context, userid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*user.User, error) {
-	gatewayClient, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	getUserResponse, err := gatewayClient.GetUser(context.Background(), &user.GetUserRequest{
-		UserId: userid,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if getUserResponse.Status.Code != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error getting user: %s", getUserResponse.Status.Message)
-	}
-
-	return getUserResponse.GetUser(), nil
-}
-
-func getGroup(ctx context.Context, groupid string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*group.Group, error) {
-	gatewayClient, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	r, err := gatewayClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
-	if err != nil {
-		return nil, err
-	}
-
-	if r.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
-	}
-
-	return r.GetGroup(), nil
-}
-
-func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.ResourceInfo, error) {
-	gatewayClient, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
-	if err != nil {
-		return nil, err
-	}
-
-	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("unexpected status code while getting space: %v", res.GetStatus().GetCode())
-	}
-
-	return res.GetInfo(), nil
-}
-
-func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesRequest {
-	return &storageprovider.ListStorageSpacesRequest{
-		Opaque: utils.AppendPlainToOpaque(nil, "unrestricted", "true"),
-		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
-			{
-				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-					Id: &storageprovider.StorageSpaceId{
-						OpaqueId: spaceID,
-					},
-				},
-			},
-		},
-	}
-}
-
 func removeExecutant(users []string, executant *user.UserId) []string {
 	var usrs []string
 	for _, u := range users {
@@ -661,18 +455,4 @@ func removeExecutant(users []string, executant *user.UserId) []string {
 		}
 	}
 	return usrs
-}
-
-type permissionChecker func(*storageprovider.ResourcePermissions) bool
-
-func viewer(perms *storageprovider.ResourcePermissions) bool {
-	return perms.Stat
-}
-
-func editor(perms *storageprovider.ResourcePermissions) bool {
-	return perms.InitiateFileUpload
-}
-
-func manager(perms *storageprovider.ResourcePermissions) bool {
-	return perms.DenyGrant
 }

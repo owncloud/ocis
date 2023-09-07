@@ -5,8 +5,8 @@ import (
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
-	"github.com/owncloud/ocis/v2/services/userlog/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
+	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config/defaults"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )

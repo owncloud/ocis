@@ -28,6 +28,8 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] Make the service startable for binary and individual startup:
   - For single binary add service to `ocis/pkg/runtime`
   - For individual startup add service to `ocis/pkg/commands`
+  - Add the service config to `ocis-pkg/config/defaultconfig.go`
+- [ ] If the service is using service accounts, add it to `ocis/pkg/init/init.go`
 - [ ] Add the service to `.drone.star` to enable CI.
 - [ ] Inform doc team in an _early stage_ to review the readme AND the environment variables created.
   - The description must reflect the behaviour AND usually has a positive code quality impact.

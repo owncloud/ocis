@@ -1,12 +1,9 @@
 package defaults
 
 import (
-	"strings"
-	"time"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
+	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
 )
 
 // FullDefaultConfig returns the full default config
@@ -21,37 +18,20 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9210",
+			Addr:   "127.0.0.1:9260",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		Service: config.Service{
-			Name: "userlog",
+			Name: "clientlog",
 		},
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		Persistence: config.Persistence{
-			Store:    "memory",
-			Database: "userlog",
-			Table:    "events",
-			TTL:      time.Hour * 336,
-		},
 		RevaGateway: shared.DefaultRevaConfig().Address,
-		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:0",
-			Root:      "/",
-			Namespace: "com.owncloud.userlog",
-			CORS: config.CORS{
-				AllowedOrigins:   []string{"*"},
-				AllowedMethods:   []string{"GET"},
-				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Ocs-Apirequest"},
-				AllowCredentials: true,
-			},
-		},
 	}
 }
 
@@ -81,10 +61,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.Commons != nil {
-		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
-	}
-
 	// provide with defaults for shared tracing, since we need a valid destination address for "envdecode".
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
 		cfg.Tracing = &config.Tracing{
@@ -101,7 +77,4 @@ func EnsureDefaults(cfg *config.Config) {
 // Sanitize sanitizes the config
 func Sanitize(cfg *config.Config) {
 	// sanitize config
-	if cfg.HTTP.Root != "/" {
-		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-	}
 }
