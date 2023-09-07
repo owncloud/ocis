@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Keyword Query Language (KQL) search syntax support: [#7043](https://github.com/owncloud/ocis/pull/7043)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
@@ -20,6 +21,12 @@ The following sections list the changes for unreleased.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
+
+   Automatically accept shares when configured by the user or admin
+
+   https://github.com/owncloud/ocis/pull/7097
 
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
