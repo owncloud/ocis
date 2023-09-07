@@ -32,12 +32,12 @@ for an overview of how the syntax works, please read the [microsoft documentatio
 
 Not all parts are supported, the following list gives an overview of parts that are not implemented yet:
 
-* Synonym operators
-* Inclusion and exclusion operators
-* Dynamic ranking operator
-* ONEAR operator
-* NEAR operator
-* Date intervals
+*   Synonym operators
+*   Inclusion and exclusion operators
+*   Dynamic ranking operator
+*   ONEAR operator
+*   NEAR operator
+*   Date intervals
 
 In the following [ADR](https://github.com/owncloud/ocis/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why we chose KQL.
 

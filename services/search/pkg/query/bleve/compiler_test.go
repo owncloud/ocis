@@ -275,7 +275,7 @@ func Test_compile(t *testing.T) {
 					&ast.OperatorNode{Value: "AND"},
 					&ast.DateTimeNode{
 						Key: "mtime",
-						// ":" no operator, skip
+						// no operator, skip
 						Value: timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
 					},
 					&ast.OperatorNode{Value: "AND"},
