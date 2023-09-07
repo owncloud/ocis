@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-07-00-06-09]
+[#deprecation-note-2023-09-07-07-08-07]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -608,5 +608,84 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`FRONTEND_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`FRONTEND_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`FRONTEND_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`FRONTEND_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`FRONTEND_AUTO_ACCEPT_SHARES` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`FRONTEND_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`FRONTEND_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 |===
 

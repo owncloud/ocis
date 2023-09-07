@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2023-09-07T00:06:12.92239084Z
+date: 2023-09-07T07:08:09.692733867Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -27,6 +27,8 @@ The frontend service translates various owncloud related HTTP APIs to CS3 reques
 * [Scalability](#scalability)
 * [Define Read-Only Attributes](#define-read-only-attributes)
 * [Caching](#caching)
+* [Event Handler](#event-handler)
+  * [Auto-Accept Shares](#auto-accept-shares)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Endpoints Overview
@@ -82,6 +84,14 @@ The `frontend` service can use a configured store via `FRONTEND_OCS_STAT_CACHE_S
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store apply.
 3.  The frontend service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `FRONTEND_OCS_STAT_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+
+## Event Handler
+
+The `frontend` service contains an eventhandler for handling `ocs` related events. As of now, it only listens to the `ShareCreated` event.
+
+### Auto-Accept Shares
+
+When setting the `FRONTEND_AUTO_ACCEPT_SHARES` to `true`, all incoming shares will be accepted automatically. Users can overwrite this setting individually in their profile.
 ## Example Yaml Config
 {{< include file="services/_includes/frontend-config-example.yaml"  language="yaml" >}}
 

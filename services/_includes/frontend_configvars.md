@@ -64,3 +64,11 @@
 | FRONTEND_READONLY_USER_ATTRIBUTES | []string | [] | Comma separated list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.memberOf' (groups), 'user.accountEnabled' (login allowed), 'drive.quota' (quota).|
 | OCIS_LDAP_SERVER_WRITE_ENABLED<br/>FRONTEND_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).|
 | FRONTEND_FULL_TEXT_SEARCH_ENABLED | bool | false | |
+| OCIS_EVENTS_ENDPOINT<br/>FRONTEND_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_EVENTS_CLUSTER<br/>FRONTEND_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| OCIS_INSECURE<br/>FRONTEND_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
+| FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_ENABLE_TLS<br/>FRONTEND_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| FRONTEND_AUTO_ACCEPT_SHARES | bool | false | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
+| OCIS_SERVICE_ACCOUNT_ID<br/>FRONTEND_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+| OCIS_SERVICE_ACCOUNT_SECRET<br/>FRONTEND_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|

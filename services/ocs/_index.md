@@ -1,6 +1,6 @@
 ---
-title: OCS
-date: 2023-09-07T00:06:12.923178461Z
+title: OCS Service
+date: 2023-09-07T07:08:09.693615782Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocs
@@ -13,12 +13,17 @@ geekdocCollapseSection: true
 ## Abstract
 
 
-The ocs service is an ...
+The `ocs` service (open collaboration services) serves one purpose: it has an endpoint for signing keys which the web frontend accesses when uploading data.
+
 
 ## Table of Contents
 
+* [Signing-Keys Endpoint](#signing-keys-endpoint)
 * [Example Yaml Config](#example-yaml-config)
 
+## Signing-Keys Endpoint
+
+The `ocs` service contains an endpoint `/cloud/user/signing-key` on which a user can GET a signing key. Note, this functionality might be deprecated or moved in the future.
 ## Example Yaml Config
 {{< include file="services/_includes/ocs-config-example.yaml"  language="yaml" >}}
 
