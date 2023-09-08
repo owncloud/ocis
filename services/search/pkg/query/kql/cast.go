@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/araddon/dateparse"
+
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
@@ -56,5 +58,5 @@ func toTime(in interface{}) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return time.Parse(time.RFC3339Nano, ts)
+	return dateparse.ParseLocal(ts)
 }

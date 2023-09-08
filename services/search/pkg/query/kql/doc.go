@@ -21,7 +21,6 @@ The following spec parts are supported and tested:
   - 3.3.5 Date Tokens
 
 References:
-  - https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference
   - https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-kql/3bbf06cd-8fc1-4277-bd92-8661ccd3c9b0
   - https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
 */

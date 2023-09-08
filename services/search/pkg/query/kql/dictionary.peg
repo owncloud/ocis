@@ -7,7 +7,10 @@
 ////////////////////////////////////////////////////////
 
 AST <-
-    _ !OperatorBooleanAndNode _ nodes:Nodes _ {
+    _ !(
+        OperatorBooleanAndNode /
+        OperatorBooleanOrNode
+    ) _ nodes:Nodes _ {
         return buildAST(nodes, c.text, c.pos)
     }
 
@@ -45,7 +48,18 @@ YesNoPropertyRestrictionNode <-
     }
 
 DateTimeRestrictionNode <-
-    k:Char+ o:(OperatorGreaterOrEqualNode / OperatorLessOrEqualNode / OperatorGreaterNode / OperatorLessNode / OperatorEqualNode / OperatorColonNode) '"'? v:(FullDate "T" FullTime) '"'? {
+    k:Char+ o:(
+        OperatorGreaterOrEqualNode /
+        OperatorLessOrEqualNode /
+        OperatorGreaterNode /
+        OperatorLessNode /
+        OperatorEqualNode /
+        OperatorColonNode
+    ) '"'? v:(
+        DateTime /
+        FullDate /
+        FullTime
+    ) '"'? {
         return buildDateTimeNode(k, o, v, c.text, c.pos)
     }
 
@@ -169,6 +183,11 @@ FullDate <-
 FullTime <-
     TimeHour ":" TimeMinute ":" TimeSecond ("." Digit+)? ("Z" / ("+" / "-") TimeHour ":" TimeMinute) {
         return c.text, nil
+    }
+
+DateTime
+  = FullDate "T" FullTime {
+      return c.text, nil
     }
 
 ////////////////////////////////////////////////////////
