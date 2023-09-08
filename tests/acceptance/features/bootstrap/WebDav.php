@@ -459,32 +459,26 @@ trait WebDav {
 	 * @throws GuzzleException
 	 */
 	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):void {
+		$user = $this->getActualUsername($user);
+		$doDavRequestAsUser = $this->getActualUsername($doDavRequestAsUser);
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
+			'forceIcon' => '0',
 			'preview' => '1'
 		];
-		$url = $this->getBaseUrl() . '/remote.php';
-		$davVersion = $this->getDavPathVersion();
-		if ($davVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$spaceId = $this->getPersonalSpaceIdForUser($doDavRequestAsUser ?? $user);
-			$url .= '/dav/spaces/' . $spaceId . '/';
-		} elseif ($davVersion === WebDavHelper::DAV_VERSION_NEW) {
-			$url .= '/dav/files/' . ($doDavRequestAsUser ?? $user) . '/';
-		} else {
-			$url .= '/webdav/';
-		}
-
-		$urlParameter = \http_build_query($urlParameter, '', '&');
-		$path .= '?' . $urlParameter;
-		$fullUrl = WebDavHelper::sanitizeUrl($url . $path);
-
-		$this->response = HttpRequestHelper::sendRequest(
-			$fullUrl,
-			'',
-			'GET',
+		$this->response = $this->makeDavRequest(
 			$user,
-			$this->getPasswordForUser($user)
+			"GET",
+			$path,
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			$urlParameter,
+			$doDavRequestAsUser
 		);
 	}
 
