@@ -213,14 +213,14 @@ var (
 
 // Calculate accurate replicas for the consumer config with the parent stream config.
 func (consCfg ConsumerConfig) replicas(strCfg *StreamConfig) int {
-	if consCfg.Replicas == 0 {
-		if !isDurableConsumer(&consCfg) && strCfg.Retention == LimitsPolicy {
+	if consCfg.Replicas == 0 || consCfg.Replicas > strCfg.Replicas {
+		if !isDurableConsumer(&consCfg) && strCfg.Retention == LimitsPolicy && consCfg.Replicas == 0 {
+			// Matches old-school ephemerals only, where the replica count is 0.
 			return 1
 		}
 		return strCfg.Replicas
-	} else {
-		return consCfg.Replicas
 	}
+	return consCfg.Replicas
 }
 
 // Consumer is a jetstream consumer.
@@ -1091,7 +1091,7 @@ func (o *consumer) setLeader(isLeader bool) {
 		if o.dthresh > 0 && (o.isPullMode() || !o.active) {
 			// Pull consumer. We run the dtmr all the time for this one.
 			stopAndClearTimer(&o.dtmr)
-			o.dtmr = time.AfterFunc(o.dthresh, func() { o.deleteNotActive() })
+			o.dtmr = time.AfterFunc(o.dthresh, o.deleteNotActive)
 		}
 
 		// If we are not in ReplayInstant mode mark us as in replay state until resolved.
@@ -1121,7 +1121,6 @@ func (o *consumer) setLeader(isLeader bool) {
 		if pullMode {
 			// Now start up Go routine to process inbound next message requests.
 			go o.processInboundNextMsgReqs(qch)
-
 		}
 
 		// If we are R>1 spin up our proposal loop.
@@ -1140,7 +1139,10 @@ func (o *consumer) setLeader(isLeader bool) {
 			close(o.qch)
 			o.qch = nil
 		}
-		// Make sure to clear out any re delivery queues
+		// Stop any inactivity timers. Should only be running on leaders.
+		stopAndClearTimer(&o.dtmr)
+
+		// Make sure to clear out any re-deliver queues
 		stopAndClearTimer(&o.ptmr)
 		o.rdq, o.rdqi = nil, nil
 		o.pending = nil
@@ -1156,9 +1158,6 @@ func (o *consumer) setLeader(isLeader bool) {
 		// Reset waiting if we are in pull mode.
 		if o.isPullMode() {
 			o.waiting = newWaitQueue(o.cfg.MaxWaiting)
-			if !o.isDurable() {
-				stopAndClearTimer(&o.dtmr)
-			}
 			o.nextMsgReqs.drain()
 		} else if o.srv.gateway.enabled {
 			stopAndClearTimer(&o.gwdtmr)
@@ -1349,7 +1348,7 @@ func (o *consumer) updateDeliveryInterest(localInterest bool) bool {
 	// If we do not have interest anymore and have a delete threshold set, then set
 	// a timer to delete us. We wait for a bit in case of server reconnect.
 	if !interest && o.dthresh > 0 {
-		o.dtmr = time.AfterFunc(o.dthresh, func() { o.deleteNotActive() })
+		o.dtmr = time.AfterFunc(o.dthresh, o.deleteNotActive)
 		return true
 	}
 	return false
@@ -1376,7 +1375,7 @@ func (o *consumer) deleteNotActive() {
 			if o.dtmr != nil {
 				o.dtmr.Reset(o.dthresh - elapsed)
 			} else {
-				o.dtmr = time.AfterFunc(o.dthresh-elapsed, func() { o.deleteNotActive() })
+				o.dtmr = time.AfterFunc(o.dthresh-elapsed, o.deleteNotActive)
 			}
 			o.mu.Unlock()
 			return
@@ -1386,7 +1385,7 @@ func (o *consumer) deleteNotActive() {
 			if o.dtmr != nil {
 				o.dtmr.Reset(o.dthresh)
 			} else {
-				o.dtmr = time.AfterFunc(o.dthresh, func() { o.deleteNotActive() })
+				o.dtmr = time.AfterFunc(o.dthresh, o.deleteNotActive)
 			}
 			o.mu.Unlock()
 			return
@@ -1640,7 +1639,7 @@ func (o *consumer) updateConfig(cfg *ConsumerConfig) error {
 		stopAndClearTimer(&o.dtmr)
 		// Restart timer only if we are the leader.
 		if o.isLeader() && o.dthresh > 0 {
-			o.dtmr = time.AfterFunc(o.dthresh, func() { o.deleteNotActive() })
+			o.dtmr = time.AfterFunc(o.dthresh, o.deleteNotActive)
 		}
 	}
 
@@ -3031,6 +3030,22 @@ func (o *consumer) incDeliveryCount(sseq uint64) uint64 {
 	return o.rdc[sseq] + 1
 }
 
+// Used if we have to adjust on failed delivery or bad lookups.
+// Those failed attempts should not increase deliver count.
+// Lock should be held.
+func (o *consumer) decDeliveryCount(sseq uint64) {
+	if o.rdc == nil {
+		return
+	}
+	if dc, ok := o.rdc[sseq]; ok {
+		if dc == 1 {
+			delete(o.rdc, sseq)
+		} else {
+			o.rdc[sseq] -= 1
+		}
+	}
+}
+
 // send a delivery exceeded advisory.
 func (o *consumer) notifyDeliveryExceeded(sseq, dc uint64) {
 	e := JSConsumerDeliveryExceededAdvisory{
@@ -3093,7 +3108,10 @@ func (o *consumer) getNextMsg() (*jsPubMsg, uint64, error) {
 					o.notifyDeliveryExceeded(seq, dc-1)
 				}
 				// Make sure to remove from pending.
-				delete(o.pending, seq)
+				if p, ok := o.pending[seq]; ok && p != nil {
+					delete(o.pending, seq)
+					o.updateDelivered(p.Sequence, seq, dc, p.Timestamp)
+				}
 				continue
 			}
 			if seq > 0 {
@@ -3102,6 +3120,8 @@ func (o *consumer) getNextMsg() (*jsPubMsg, uint64, error) {
 				if sm == nil || err != nil {
 					pmsg.returnToPool()
 					pmsg, dc = nil, 0
+					// Adjust back deliver count.
+					o.decDeliveryCount(seq)
 				}
 				return pmsg, dc, err
 			}
@@ -3203,6 +3223,7 @@ func (o *consumer) processWaiting(eos bool) (int, int, int, time.Time) {
 				interest = true
 			}
 		}
+
 		// If interest, update batch pending requests counter and update fexp timer.
 		if interest {
 			brp += wr.n
@@ -3289,7 +3310,7 @@ func (o *consumer) checkAckFloor() {
 			}
 		}
 	} else if numPending > 0 {
-		// here it shorter to walk pending.
+		// here it is shorter to walk pending.
 		// toTerm is seq, dseq, rcd for each entry.
 		toTerm := make([]uint64, 0, numPending*3)
 		o.mu.RLock()
@@ -3506,10 +3527,16 @@ func (o *consumer) loopAndGatherMsgs(qch chan struct{}) {
 			if err == ErrStoreEOF {
 				o.checkNumPendingOnEOF()
 			}
-			if err == ErrStoreMsgNotFound || err == errDeletedMsg || err == ErrStoreEOF || err == errMaxAckPending || err == errPartialCache {
+			if err == ErrStoreMsgNotFound || err == errDeletedMsg || err == ErrStoreEOF || err == errMaxAckPending {
 				goto waitForMsgs
+			} else if err == errPartialCache {
+				s.Warnf("Unexpected partial cache error looking up message for consumer '%s > %s > %s'",
+					o.mset.acc, o.mset.cfg.Name, o.cfg.Name)
+				goto waitForMsgs
+
 			} else {
-				s.Errorf("Received an error looking up message for consumer: %v", err)
+				s.Errorf("Received an error looking up message for consumer '%s > %s > %s': %v",
+					o.mset.acc, o.mset.cfg.Name, o.cfg.Name, err)
 				goto waitForMsgs
 			}
 		}
@@ -3904,20 +3931,39 @@ func (o *consumer) trackPending(sseq, dseq uint64) {
 	}
 }
 
+// Credit back a failed delivery.
+// lock should be held.
+func (o *consumer) creditWaitingRequest(reply string) {
+	for i, rp := 0, o.waiting.rp; i < o.waiting.n; i++ {
+		if wr := o.waiting.reqs[rp]; wr != nil {
+			if wr.reply == reply {
+				wr.n++
+				wr.d--
+				return
+			}
+		}
+		rp = (rp + 1) % cap(o.waiting.reqs)
+	}
+}
+
 // didNotDeliver is called when a delivery for a consumer message failed.
 // Depending on our state, we will process the failure.
-func (o *consumer) didNotDeliver(seq uint64) {
+func (o *consumer) didNotDeliver(seq uint64, subj string) {
 	o.mu.Lock()
 	mset := o.mset
 	if mset == nil {
 		o.mu.Unlock()
 		return
 	}
+	// Adjust back deliver count.
+	o.decDeliveryCount(seq)
+
 	var checkDeliveryInterest bool
 	if o.isPushMode() {
 		o.active = false
 		checkDeliveryInterest = true
 	} else if o.pending != nil {
+		o.creditWaitingRequest(subj)
 		// pull mode and we have pending.
 		if _, ok := o.pending[seq]; ok {
 			// We found this messsage on pending, we need
