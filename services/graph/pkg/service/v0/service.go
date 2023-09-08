@@ -96,10 +96,13 @@ type Service interface {
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
-	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
+
+	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
+	GetDriveItem(w http.ResponseWriter, r *http.Request)
+	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)
 
 	GetTags(w http.ResponseWriter, r *http.Request)
 	AssignTags(w http.ResponseWriter, r *http.Request)
@@ -252,6 +255,10 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Patch("/", svc.UpdateDrive)
 					r.Get("/", svc.GetSingleDrive)
 					r.Delete("/", svc.DeleteDrive)
+					r.Route("/items/{driveItemID}", func(r chi.Router) {
+						r.Get("/", svc.GetDriveItem)
+						r.Get("/children", svc.GetDriveItemChildren)
+					})
 				})
 			})
 			r.With(requireAdmin).Route("/education", func(r chi.Router) {

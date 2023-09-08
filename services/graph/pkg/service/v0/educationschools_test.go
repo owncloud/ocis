@@ -130,7 +130,7 @@ var _ = Describe("Schools", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetEducationSchools(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -268,7 +268,7 @@ var _ = Describe("Schools", func() {
 
 			svc.PostEducationSchool(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
 		})
 
 		It("creates the school", func() {

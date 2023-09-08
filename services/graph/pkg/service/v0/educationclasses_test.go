@@ -134,7 +134,7 @@ var _ = Describe("EducationClass", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/classes", nil)
 			svc.GetEducationClasses(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 

@@ -17,13 +17,11 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -157,41 +155,37 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 
 // GetSingleDrive does a lookup of a single space by spaceId
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
-	if err != nil {
-		logger.Debug().Err(err).Str("driveID", chi.URLParam(r, "driveID")).Msg("could not get drive: unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
-
-	if driveID == "" {
-		logger.Debug().Msg("could not get drive: missing drive id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
-		return
-	}
-
-	logger.Debug().Str("driveID", driveID).Msg("calling list storage spaces with id filter")
 	ctx := r.Context()
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
 
-	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesIDFilter(driveID)}
+	rid, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	log := logger.With().Str("storage", rid.StorageId).Str("space", rid.SpaceId).Str("node", rid.OpaqueId).Logger()
+
+	log.Debug().Msg("calling list storage spaces with id filter")
+
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
+		listStorageSpacesIDFilter(storagespace.FormatResourceID(rid)),
+	}
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
 	case err != nil:
-		logger.Error().Err(err).Msg("could not get drive: transport error")
+		log.Error().Err(err).Msg("could not get drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			// the client is doing a lookup for a specific space, therefore we need to return
 			// not found to the caller
-			logger.Debug().Str("driveID", driveID).Msg("could not get drive: not found")
+			log.Debug().Msg("could not get drive: not found")
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		}
-		logger.Debug().
-			Str("id", driveID).
+		log.Debug().
 			Str("grpcmessage", res.GetStatus().GetMessage()).
 			Msg("could not get drive: grpc error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
@@ -200,26 +194,26 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 
 	webDavBaseURL, err := g.getWebDavBaseURL()
 	if err != nil {
-		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drive: error parsing webdav base url")
+		log.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drive: error parsing webdav base url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
+		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 	switch num := len(spaces); {
 	case num == 0:
-		logger.Debug().Str("id", driveID).Msg("could not get drive: no drive returned from storage")
+		log.Debug().Msg("could not get drive: no drive returned from storage")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "no drive returned from storage")
 		return
 	case num == 1:
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, spaces[0])
 	default:
-		logger.Debug().Int("number", num).Msg("could not get drive: expected to find a single drive but fetched more")
+		log.Debug().Int("number", num).Msg("could not get drive: expected to find a single drive but fetched more")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get drive: expected to find a single drive but fetched more")
 		return
 	}
@@ -354,16 +348,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling update drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
-	if err != nil {
-		logger.Debug().Err(err).Str("id", chi.URLParam(r, "driveID")).Msg("could not update drive, unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
 
-	if driveID == "" {
-		logger.Debug().Msg("Could not update drive, missing drive id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
+	rid, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -374,15 +362,6 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rid, err := storagespace.ParseID(driveID)
-	if err != nil {
-		logger.Debug().Err(err).Interface("id", rid).Msg("could not update drive, invalid resource id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid resource id")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	root := &rid
-
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -390,6 +369,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	root := &rid
 	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
 		// the original storage space.
@@ -445,7 +425,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		dt := _spaceTypePersonal
 		filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter(_spaceTypeProject)}
 		res, err := g.ListStorageSpacesWithFilters(r.Context(), filters, true)
-		if err == nil && res.GetStatus().GetCode() == rpc.Code_CODE_OK {
+		if err == nil && res.GetStatus().GetCode() == cs3rpc.Code_CODE_OK {
 			for _, sp := range res.StorageSpaces {
 				id, _ := storagespace.ParseID(sp.GetId().GetOpaqueId())
 				if id.GetSpaceId() == rid.GetSpaceId() {
@@ -1032,23 +1012,9 @@ func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageS
 func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
+	rid, err := parseIDParam(r, "driveID")
 	if err != nil {
-		logger.Debug().Err(err).Str("id", chi.URLParam(r, "driveID")).Msg("could not delete drive: unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
-
-	if driveID == "" {
-		logger.Debug().Msg("could not delete drive: missing drive id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
-		return
-	}
-
-	rid, err := storagespace.ParseID(driveID)
-	if err != nil {
-		logger.Debug().Interface("id", rid).Err(err).Msg("could not delete drive: invalid resource id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid resource id")
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

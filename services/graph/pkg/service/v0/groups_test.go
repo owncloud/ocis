@@ -133,7 +133,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroups(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 

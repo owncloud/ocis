@@ -12,6 +12,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
@@ -32,10 +33,18 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := gatewayClient.GetHome(ctx, &storageprovider.GetHomeRequest{})
+	currentUser := revactx.ContextMustGetUser(r.Context())
+	// do we need to list all or only the personal drive
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
+	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().OpaqueId))
+	filters = append(filters, listStorageSpacesTypeFilter("personal"))
+
+	res, err := gatewayClient.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+		Filters: filters,
+	})
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		g.logger.Error().Err(err).Msg("error making ListStorageSpaces grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
@@ -43,29 +52,34 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
 			return
 		}
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		g.logger.Error().Err(err).Msg("error sending ListStorageSpaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
 
+	var space *storageprovider.StorageSpace
+	for _, s := range res.StorageSpaces {
+		if utils.UserIDEqual(currentUser.GetId(), s.GetOwner().GetId()) {
+			space = s
+		}
+	}
+
 	lRes, err := gatewayClient.ListContainer(ctx, &storageprovider.ListContainerRequest{
-		Ref: &storageprovider.Reference{
-			Path: res.Path,
-		},
+		Ref: &storageprovider.Reference{ResourceId: space.Root},
 	})
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		g.logger.Error().Err(err).Msg("error making ListContainer grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+	case lRes.Status.Code != cs3rpc.Code_CODE_OK:
+		if lRes.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, lRes.Status.Message)
 			return
 		}
-		if res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
+		if lRes.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
 			// TODO check if we should return 404 to not disclose existing items
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, res.Status.Message)
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, lRes.Status.Message)
 			return
 		}
 		g.logger.Error().Err(err).Msg("error sending list container grpc request")
@@ -76,6 +90,138 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	files, err := formatDriveItems(lRes.Infos)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &ListResponse{Value: files})
+}
+
+// GetDriveItem returns a driveItem
+func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling GetDriveItem")
+	ctx := r.Context()
+
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	driveItemID, err := parseIDParam(r, "driveItemID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
+		return
+	}
+	/*
+		sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+		// Parse the request with odata parser
+		odataReq, err := godata.ParseRequest(ctx, sanitizedPath, r.URL.Query())
+		if err != nil {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+	*/
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &driveItemID}})
+	switch {
+	case err != nil:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_OK:
+		// ok
+	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+		return
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+	driveItem, err := cs3ResourceToDriveItem(res.Info)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &driveItem)
+}
+
+// GetDriveItemChildren lists the children of a driveItem
+func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling GetDriveItemChildren")
+	ctx := r.Context()
+
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	driveItemID, err := parseIDParam(r, "driveItemID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
+		return
+	}
+	/*
+		sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+		// Parse the request with odata parser
+		odataReq, err := godata.ParseRequest(ctx, sanitizedPath, r.URL.Query())
+		if err != nil {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+	*/
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res, err := gatewayClient.ListContainer(ctx, &storageprovider.ListContainerRequest{
+		Ref: &storageprovider.Reference{ResourceId: &driveItemID},
+	})
+	switch {
+	case err != nil:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_OK:
+		// ok
+	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+		return
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	files, err := formatDriveItems(res.Infos)
+	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}

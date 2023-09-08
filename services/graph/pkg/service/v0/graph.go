@@ -9,8 +9,10 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -21,6 +23,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
 	"go.opentelemetry.io/otel/trace"
@@ -133,4 +136,17 @@ func (g Graph) parseMemberRef(ref string) (string, string, error) {
 	id := segments[len(segments)-1]
 	memberType := segments[len(segments)-2]
 	return memberType, id, nil
+}
+
+func parseIDParam(r *http.Request, param string) (storageprovider.ResourceId, error) {
+	driveID, err := url.PathUnescape(chi.URLParam(r, param))
+	if err != nil {
+		return storageprovider.ResourceId{}, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+
+	id, err := storagespace.ParseID(driveID)
+	if err != nil {
+		return storageprovider.ResourceId{}, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+	return id, nil
 }
