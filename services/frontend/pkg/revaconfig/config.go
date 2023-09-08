@@ -275,13 +275,12 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"max_quota":  cfg.MaxQuota,
 							},
 							"password_policies": map[string]interface{}{
-								"min_characters":            cfg.PasswordPolicies.MinCharacters,
 								"max_characters":            72,
+								"min_characters":            cfg.PasswordPolicies.MinCharacters,
 								"min_lower_case_characters": cfg.PasswordPolicies.MinLowerCaseCharacters,
 								"min_upper_case_characters": cfg.PasswordPolicies.MinUpperCaseCharacters,
 								"min_digits":                cfg.PasswordPolicies.MinDigits,
 								"min_special_characters":    cfg.PasswordPolicies.MinSpecialCharacters,
-								"special_characters":        cfg.PasswordPolicies.SpecialCharacters,
 							},
 							"notifications": map[string]interface{}{
 								"endpoints": []string{"list", "get", "delete"},

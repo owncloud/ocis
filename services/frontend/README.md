@@ -70,7 +70,7 @@ Note that the password policy currently impacts _only_ public link password vali
 
 With the password policy, mandatory criteria for the password can be defined via the environment variables listed below.
 
-Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special can be defined via a list of special characters.
+Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
 
@@ -83,7 +83,4 @@ Define the minimum number of lowercase letters.
 -   `FRONTEND_PASSWORD_POLICIES_MIN_DIGITS`
 Define the minimum number of digits.
 -   `FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS`
-Define the minimum number of characters from the special characters list below to be present.
--   `FRONTEND_PASSWORD_POLICIES_SPECIAL_CHARACTERS`
-Define the custom list of characters that will count as special characters.
-Special characters can be any UTF-8 characters like `!"#$%&'()*+,-./:;<=>?@[\]^_{|}~` or others. Avoid using the \` (backtick) although it's possible to do so. If you want to define your own list of special characters, you have to follow the environment variables escaping rules of the operating system.
+Define the minimum number of special characters.

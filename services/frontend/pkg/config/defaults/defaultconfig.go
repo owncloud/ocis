@@ -125,9 +125,6 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		PasswordPolicies: config.PasswordPolicies{
-			SpecialCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-		},
 	}
 }
 

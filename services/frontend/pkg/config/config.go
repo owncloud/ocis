@@ -176,10 +176,9 @@ type ServiceAccount struct {
 
 // PasswordPolicies configures reva password policies
 type PasswordPolicies struct {
-	MinCharacters          int    `yaml:"min_characters,omitempty" env:"FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 0 if not set."`
-	MinLowerCaseCharacters int    `yaml:"min_lower_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 0 if not set."`
-	MinUpperCaseCharacters int    `yaml:"min_upper_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 0 if not set."`
-	MinDigits              int    `yaml:"min_digits" env:"FRONTEND_PASSWORD_POLICIES_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 0 if not set."`
-	MinSpecialCharacters   int    `yaml:"min_special_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set."`
-	SpecialCharacters      string `yaml:"special_characters" env:"FRONTEND_PASSWORD_POLICIES_SPECIAL_CHARACTERS" desc:"Define the custom list of characters that will count as special characters. See the documentation for more details."`
+	MinCharacters          int `yaml:"min_characters,omitempty" env:"FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 0 if not set."`
+	MinLowerCaseCharacters int `yaml:"min_lower_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 0 if not set."`
+	MinUpperCaseCharacters int `yaml:"min_upper_case_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 0 if not set."`
+	MinDigits              int `yaml:"min_digits" env:"FRONTEND_PASSWORD_POLICIES_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 0 if not set."`
+	MinSpecialCharacters   int `yaml:"min_special_characters" env:"FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set."`
 }

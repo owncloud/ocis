@@ -8,6 +8,9 @@ import (
 	"unicode/utf8"
 )
 
+// https://owasp.org/www-community/password-special-characters
+var _defaultSpecialCharacters = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+
 // Validator describes the interface providing a password Validate method
 type Validator interface {
 	Validate(str string) error
@@ -20,32 +23,23 @@ type Policies struct {
 	minUpperCaseCharacters  int
 	minDigits               int
 	minSpecialCharacters    int
-	specialCharacters       string
 	digitsRegexp            *regexp.Regexp
 	specialCharactersRegexp *regexp.Regexp
 }
 
 // NewPasswordPolicies returns a new NewPasswordPolicies instance
-func NewPasswordPolicies(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int,
-	specialCharacters string) (Validator, error) {
+func NewPasswordPolicies(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int) Validator {
 	p := &Policies{
 		minCharacters:          minCharacters,
 		minLowerCaseCharacters: minLowerCaseCharacters,
 		minUpperCaseCharacters: minUpperCaseCharacters,
 		minDigits:              minDigits,
 		minSpecialCharacters:   minSpecialCharacters,
-		specialCharacters:      specialCharacters,
 	}
 
 	p.digitsRegexp = regexp.MustCompile("[0-9]")
-	if len(specialCharacters) > 0 {
-		var err error
-		p.specialCharactersRegexp, err = regexp.Compile(specialCharactersExp(specialCharacters))
-		if err != nil {
-			return nil, err
-		}
-	}
-	return p, nil
+	p.specialCharactersRegexp = regexp.MustCompile(specialCharactersExp(_defaultSpecialCharacters))
+	return p
 }
 
 // Validate implements a password validation regarding the policy
@@ -110,7 +104,7 @@ func (s Policies) validateDigits(str string) error {
 
 func (s Policies) validateSpecialCharacters(str string) error {
 	if s.countSpecialCharacters(str) < s.minSpecialCharacters {
-		return fmt.Errorf("at least %d special characters are required. %s", s.minSpecialCharacters, s.specialCharacters)
+		return fmt.Errorf("at least %d special characters are required. %s", s.minSpecialCharacters, _defaultSpecialCharacters)
 	}
 	return nil
 }
