@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fixed cunary in the beginning: [#7247](https://github.com/owncloud/ocis/pull/7247)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
@@ -31,6 +32,13 @@ The following sections list the changes for unreleased.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
+
+   Add the password policies OCIS-3767
+
+   https://github.com/owncloud/ocis/pull/7194
+   https://github.com/cs3org/reva/pull/4147
 
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 
