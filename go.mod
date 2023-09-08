@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.9
 	github.com/coreos/go-oidc v2.2.1+incompatible
