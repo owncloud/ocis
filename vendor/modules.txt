@@ -1333,10 +1333,10 @@ github.com/mohae/deepcopy
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
-# github.com/nats-io/jwt/v2 v2.4.1
+# github.com/nats-io/jwt/v2 v2.5.0
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.9.21
+# github.com/nats-io/nats-server/v2 v2.9.22
 ## explicit; go 1.19
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/ldap

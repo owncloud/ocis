@@ -2983,7 +2983,7 @@ func streamAndSeq(shdr string) (string, uint64) {
 	}
 	// New version which is stream index name <SPC> sequence
 	fields := strings.Fields(shdr)
-	if len(fields) != 2 {
+	if len(fields) < 2 {
 		return _EMPTY_, 0
 	}
 	return fields[0], uint64(parseAckReplyNum(fields[1]))
@@ -4455,7 +4455,7 @@ func (mset *stream) internalLoop() {
 				// Check to see if this is a delivery for a consumer and
 				// we failed to deliver the message. If so alert the consumer.
 				if pm.o != nil && pm.seq > 0 && !didDeliver {
-					pm.o.didNotDeliver(pm.seq)
+					pm.o.didNotDeliver(pm.seq, pm.dsubj)
 				}
 				pm.returnToPool()
 			}

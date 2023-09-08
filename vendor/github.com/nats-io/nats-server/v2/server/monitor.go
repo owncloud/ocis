@@ -492,7 +492,7 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 	case ByLast:
 		sort.Sort(sort.Reverse(byLast{pconns}))
 	case ByIdle:
-		sort.Sort(sort.Reverse(byIdle{pconns}))
+		sort.Sort(sort.Reverse(byIdle{pconns, c.Now}))
 	case ByUptime:
 		sort.Sort(byUptime{pconns, time.Now()})
 	case ByStop:
@@ -1120,14 +1120,17 @@ func (s *Server) HandleIPQueuesz(w http.ResponseWriter, r *http.Request) {
 
 	queues := map[string]monitorIPQueue{}
 
-	s.ipQueues.Range(func(k, v interface{}) bool {
+	s.ipQueues.Range(func(k, v any) bool {
+		var pending, inProgress int
 		name := k.(string)
-		queue := v.(interface {
+		queue, ok := v.(interface {
 			len() int
-			inProgress() uint64
+			inProgress() int64
 		})
-		pending := queue.len()
-		inProgress := int(queue.inProgress())
+		if ok {
+			pending = queue.len()
+			inProgress = int(queue.inProgress())
+		}
 		if !all && (pending == 0 && inProgress == 0) {
 			return true
 		} else if qfilter != _EMPTY_ && !strings.Contains(name, qfilter) {
@@ -2301,18 +2304,26 @@ func (s *Server) HandleAccountStatz(w http.ResponseWriter, r *http.Request) {
 	ResponseHandler(w, r, b)
 }
 
-// ResponseHandler handles responses for monitoring routes
+// ResponseHandler handles responses for monitoring routes.
 func ResponseHandler(w http.ResponseWriter, r *http.Request, data []byte) {
+	handleResponse(http.StatusOK, w, r, data)
+}
+
+// handleResponse handles responses for monitoring routes with a specific HTTP status code.
+func handleResponse(code int, w http.ResponseWriter, r *http.Request, data []byte) {
 	// Get callback from request
 	callback := r.URL.Query().Get("callback")
 	// If callback is not empty then
 	if callback != "" {
 		// Response for JSONP
 		w.Header().Set("Content-Type", "application/javascript")
+		w.WriteHeader(code)
 		fmt.Fprintf(w, "%s(%s)", callback, data)
 	} else {
 		// Otherwise JSON
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(code)
 		w.Write(data)
 	}
 }
@@ -3047,7 +3058,7 @@ type HealthStatus struct {
 	Error  string `json:"error,omitempty"`
 }
 
-// https://tools.ietf.org/id/draft-inadarei-api-health-check-05.html
+// https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check
 func (s *Server) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
 	s.httpReqStats[HealthzPath]++
@@ -3074,16 +3085,19 @@ func (s *Server) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 		JSEnabledOnly: jsEnabledOnly,
 		JSServerOnly:  jsServerOnly,
 	})
+
+	code := http.StatusOK
+
 	if hs.Error != _EMPTY_ {
 		s.Warnf("Healthcheck failed: %q", hs.Error)
-		w.WriteHeader(http.StatusServiceUnavailable)
+		code = http.StatusServiceUnavailable
 	}
 	b, err := json.Marshal(hs)
 	if err != nil {
 		s.Errorf("Error marshaling response to /healthz request: %v", err)
 	}
 
-	ResponseHandler(w, r, b)
+	handleResponse(code, w, r, b)
 }
 
 // Generate health status.
