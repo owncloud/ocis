@@ -7,13 +7,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
-func toIfaceSlice(in interface{}) []interface{} {
-	if in == nil {
-		return nil
-	}
-	return in.([]interface{})
-}
-
 func toNode[T ast.Node](in interface{}) (T, error) {
 	var t T
 	out, ok := in.(T)
@@ -25,21 +18,7 @@ func toNode[T ast.Node](in interface{}) (T, error) {
 }
 
 func toNodes[T ast.Node](in interface{}) ([]T, error) {
-
 	switch v := in.(type) {
-	case []interface{}:
-		var nodes []T
-
-		for _, el := range toIfaceSlice(v) {
-			node, err := toNode[T](el)
-			if err != nil {
-				return nil, err
-			}
-
-			nodes = append(nodes, node)
-		}
-
-		return nodes, nil
 	case []T:
 		return v, nil
 	default:

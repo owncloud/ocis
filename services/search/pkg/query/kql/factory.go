@@ -38,31 +38,35 @@ func buildAST(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 		return nil, err
 	}
 
-	normalizedNodes, err := NormalizeNodes(nodes)
+	return &ast.Ast{
+		Base:  b,
+		Nodes: nodes,
+	}, nil
+}
+
+func buildNodes(head, tail interface{}) ([]ast.Node, error) {
+	headNode, err := toNode[ast.Node](head)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ast.Ast{
-		Base:  b,
-		Nodes: normalizedNodes,
-	}, nil
-}
-
-func buildNodes(e interface{}) ([]ast.Node, error) {
-	maybeNodesGroups := toIfaceSlice(e)
-
-	nodes := make([]ast.Node, len(maybeNodesGroups))
-	for i, maybeNodesGroup := range maybeNodesGroups {
-		node, err := toNode[ast.Node](toIfaceSlice(maybeNodesGroup)[1])
-		if err != nil {
-			return nil, err
-		}
-
-		nodes[i] = node
+	if tail == nil {
+		return []ast.Node{headNode}, nil
 	}
 
-	return nodes, nil
+	tailNodes, err := toNodes[ast.Node](tail)
+	if err != nil {
+		return nil, err
+	}
+
+	allNodes := []ast.Node{headNode}
+
+	connectionNode := incorporateNode(headNode, tailNodes...)
+	if connectionNode != nil {
+		allNodes = append(allNodes, connectionNode)
+	}
+
+	return append(allNodes, tailNodes...), nil
 }
 
 func buildStringNode(k, v interface{}, text []byte, pos position) (*ast.StringNode, error) {
@@ -149,6 +153,13 @@ func buildOperatorNode(text []byte, pos position) (*ast.OperatorNode, error) {
 	value, err := toString(text)
 	if err != nil {
 		return nil, err
+	}
+
+	switch value {
+	case "+":
+		value = BoolAND
+	case "-":
+		value = BoolNOT
 	}
 
 	return &ast.OperatorNode{

@@ -20,8 +20,8 @@ func TestNewAST(t *testing.T) {
 		},
 		{
 			name:        "error",
-			givenQuery:  "AND",
-			shouldError: true,
+			givenQuery:  kql.BoolAND,
+			shouldError: false,
 		},
 	}
 
