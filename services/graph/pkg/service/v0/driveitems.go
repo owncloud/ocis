@@ -15,7 +15,6 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -45,7 +44,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	})
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		g.logger.Error().Err(err).Msg("error making ListStorageSpaces grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
@@ -53,7 +52,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
 			return
 		}
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		g.logger.Error().Err(err).Msg("error sending ListStorageSpaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
@@ -70,7 +69,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	})
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		g.logger.Error().Err(err).Msg("error making ListContainer grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case lRes.Status.Code != cs3rpc.Code_CODE_OK:
@@ -99,18 +98,23 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: files})
 }
 
+// GetDriveItem returns a driveItem
 func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msg("Calling GetRootDriveChildren")
+	g.logger.Info().Msg("Calling GetDriveItem")
 	ctx := r.Context()
 
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
+	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
-	driveItemID, err := url.PathUnescape(chi.URLParam(r, "driveItemID"))
+	driveItemID, err := parseIDParam(r, "driveItemID")
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
 		return
 	}
 	/*
@@ -123,27 +127,12 @@ func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
 		}
 	*/
 
-	did, err := storagespace.ParseID(driveID)
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
-	diid, err := storagespace.ParseID(driveItemID)
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
-	if did.StorageId != diid.StorageId || did.SpaceId != diid.SpaceId {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
-		return
-	}
-
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &diid}})
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &driveItemID}})
 	switch {
 	case err != nil:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -173,19 +162,23 @@ func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &driveItem)
 }
 
-// GetDriveItemChildren implements the Service interface.
+// GetDriveItemChildren lists the children of a driveItem
 func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetDriveItemChildren")
 	ctx := r.Context()
 
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
+	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
-	driveItemID, err := url.PathUnescape(chi.URLParam(r, "driveItemID"))
+	driveItemID, err := parseIDParam(r, "driveItemID")
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
 		return
 	}
 	/*
@@ -198,21 +191,6 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 		}
 	*/
 
-	did, err := storagespace.ParseID(driveID)
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
-	diid, err := storagespace.ParseID(driveItemID)
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
-	if did.StorageId != diid.StorageId || did.SpaceId != diid.SpaceId {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
-		return
-	}
-
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -220,7 +198,7 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := gatewayClient.ListContainer(ctx, &storageprovider.ListContainerRequest{
-		Ref: &storageprovider.Reference{ResourceId: &diid},
+		Ref: &storageprovider.Reference{ResourceId: &driveItemID},
 	})
 	switch {
 	case err != nil:
