@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
+* Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
 
 ## Details
 
@@ -15,6 +16,10 @@ The following sections list the changes for unreleased.
    Set 'GRAPH_USERNAME_MATCH' to 'none'. To accept any username that is also valid for keycloak.
 
    https://github.com/owncloud/ocis/pull/7230
+
+* Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
+
+   https://github.com/owncloud/ocis/pull/7220
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
