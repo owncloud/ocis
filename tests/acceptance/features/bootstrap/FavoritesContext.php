@@ -70,7 +70,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasFavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 209, $this->userFavoritesElement($user, $path));
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->userFavoritesElement($user, $path));
 	}
 
 	/**
@@ -142,7 +142,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function userHasUnfavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->userUnfavoritesElement($user, $path));
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->userUnfavoritesElement($user, $path));
 	}
 
 	/**
@@ -238,7 +238,7 @@ class FavoritesContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasUnfavoritedElementUsingWebDavApi(string $path):void {
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->theUserUnfavoritesElement($path));
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->theUserUnfavoritesElement($path));
 	}
 
 	/**

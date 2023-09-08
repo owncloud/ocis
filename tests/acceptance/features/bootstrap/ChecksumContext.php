@@ -101,7 +101,7 @@ class ChecksumContext implements Context {
 			$destination,
 			$checksum
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe([201,204], '', $response);
 	}
 
 	/**
@@ -164,7 +164,7 @@ class ChecksumContext implements Context {
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, '', $response);
 	}
 
 	/**
