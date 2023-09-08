@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/araddon/dateparse"
-
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
@@ -23,24 +21,8 @@ func toNodes[T ast.Node](in interface{}) ([]T, error) {
 	switch v := in.(type) {
 	case []T:
 		return v, nil
-	case T:
-		return []T{v}, nil
-	case []interface{}:
-		var ts []T
-		for _, inter := range v {
-			n, err := toNodes[T](inter)
-			if err != nil {
-				return nil, err
-			}
-
-			ts = append(ts, n...)
-		}
-		return ts, nil
-	case nil:
-		return nil, nil
 	default:
-		var t T
-		return nil, fmt.Errorf("can't convert '%T' to '%T'", in, t)
+		return nil, fmt.Errorf("can't convert '%T' to []ast.Node", in)
 	}
 }
 
@@ -74,5 +56,5 @@ func toTime(in interface{}) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return dateparse.ParseLocal(ts)
+	return time.Parse(time.RFC3339Nano, ts)
 }

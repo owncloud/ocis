@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/araddon/dateparse"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -14,7 +13,7 @@ import (
 )
 
 var mustParseTime = func(t *testing.T, ts string) time.Time {
-	tp, err := dateparse.ParseLocal(ts)
+	tp, err := time.Parse(time.RFC3339Nano, ts)
 	if err != nil {
 		t.Fatalf("time.Parse(...) error = %v", err)
 	}
@@ -62,92 +61,15 @@ func TestParse(t *testing.T) {
 		expectedError error
 	}{
 		// SPEC //////////////////////////////////////////////////////////////////////////////
-		//
 		// https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
-		// https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-kql/3bbf06cd-8fc1-4277-bd92-8661ccd3c9b0
-		// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference
 		//
-		// ++
-		// 2.1.2 AND Operator
-		// 3.1.2 AND Operator
-		{
-			name: `cat AND dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		{
-			name: `AND`,
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		{
-			name: `AND cat AND dog`,
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		// ++
-		// 2.1.6 NOT Operator
-		// 3.1.6 NOT Operator
-		{
-			name: `cat NOT dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.OperatorNode{Value: kql.BoolNOT},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		{
-			name: `NOT dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.OperatorNode{Value: kql.BoolNOT},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		// ++
-		// 2.1.8 OR Operator
-		// 3.1.8 OR Operator
-		{
-			name: `cat OR dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		{
-			name: `OR`,
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		{
-			name: `OR cat AND dog`,
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		// ++
 		// 3.1.11 Implicit Operator
 		{
 			name: `cat dog`,
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "dog"},
 				},
 			},
@@ -180,8 +102,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
-		// 2.1.12 Parentheses
 		// 3.1.12 Parentheses
 		{
 			name: `(cat OR dog) AND fox`,
@@ -197,7 +117,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 3.2.3 Implicit Operator for Property Restriction
 		{
 			name: `author:"John Smith" filetype:docx`,
@@ -259,7 +178,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 3.3.1.1.1 Implicit AND Operator
 		{
 			name: `cat +dog`,
@@ -334,7 +252,7 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "dog"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "fox"},
@@ -364,7 +282,7 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "dog"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.OperatorNode{Value: kql.BoolNOT},
@@ -423,37 +341,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
-		// 2.3.5 Date Tokens
-		// 3.3.5 Date Tokens
-		{
-			name: `Modified:2023-09-05`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.DateTimeNode{
-						Key:      "Modified",
-						Operator: &ast.OperatorNode{Value: ":"},
-						Value:    mustParseTime(t, "2023-09-05"),
-					},
-				},
-			},
-		},
-		{
-			name: `Modified:"2008-01-29"`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.DateTimeNode{
-						Key:      "Modified",
-						Operator: &ast.OperatorNode{Value: ":"},
-						Value:    mustParseTime(t, "2008-01-29"),
-					},
-				},
-			},
-		},
-		{
-			name: `Modified:today`,
-			skip: true,
-		},
 		//////////////////////////////////////////////////////////////////////////////////////
 		// everything else
 		{
@@ -462,15 +349,15 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "federated"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "federat*"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "fed*"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Key: "author", Value: "John Smith"},
@@ -480,23 +367,23 @@ func TestParse(t *testing.T) {
 					&ast.StringNode{Key: "filename", Value: "budget.xlsx"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Key: "author", Value: "Shakespear"},
@@ -525,7 +412,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.OperatorNode{Value: kql.BoolOR},
 							&ast.StringNode{Value: "Jane Smith"},
 						},
 					},
@@ -590,7 +477,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.OperatorNode{Value: kql.BoolOR},
 							&ast.StringNode{Value: "Jane"},
 						},
 					},
@@ -614,7 +501,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.OperatorNode{Value: kql.BoolOR},
 							&ast.StringNode{Value: "Jane"},
 						},
 					},
@@ -689,7 +576,7 @@ func TestParse(t *testing.T) {
 					&ast.StringNode{
 						Value: "😂",
 					},
-					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolOR},
 					&ast.StringNode{
 						Value: "*😀 😁*",
 					},
@@ -822,199 +709,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "animal:(cat dog turtle)",
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Key: "animal",
-						Nodes: []ast.Node{
-							&ast.StringNode{
-								Value: "cat",
-							},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{
-								Value: "dog",
-							},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{
-								Value: "turtle",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "(cat dog turtle)",
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Nodes: []ast.Node{
-							&ast.StringNode{
-								Value: "cat",
-							},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{
-								Value: "dog",
-							},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{
-								Value: "turtle",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "animal:(mammal:cat mammal:dog reptile:turtle)",
-			expectedError: kql.NamedGroupInvalidNodesError{
-				Node: &ast.StringNode{Key: "mammal", Value: "cat"},
-			},
-		},
-		{
-			name: "animal:(cat mammal:dog turtle)",
-			expectedError: kql.NamedGroupInvalidNodesError{
-				Node: &ast.StringNode{Key: "mammal", Value: "dog"},
-			},
-		},
-		{
-			name: "animal:(AND cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		{
-			name: "animal:(OR cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		{
-			name: "(AND cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		{
-			name: "(OR cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		{
-			name: `cat dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		{
-			name: `cat dog fox`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "dog"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "fox"},
-				},
-			},
-		},
-		{
-			name: `(cat dog) fox`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Nodes: []ast.Node{
-							&ast.StringNode{Value: "cat"},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{Value: "dog"},
-						},
-					},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "fox"},
-				},
-			},
-		},
-		{
-			name: `(mammal:cat mammal:dog) fox`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Nodes: []ast.Node{
-							&ast.StringNode{Key: "mammal", Value: "cat"},
-							&ast.OperatorNode{Value: kql.BoolOR},
-							&ast.StringNode{Key: "mammal", Value: "dog"},
-						},
-					},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "fox"},
-				},
-			},
-		},
-		{
-			name: `mammal:(cat dog) fox`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Key: "mammal",
-						Nodes: []ast.Node{
-							&ast.StringNode{Value: "cat"},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{Value: "dog"},
-						},
-					},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "fox"},
-				},
-			},
-		},
-		{
-			name: `mammal:(cat dog) mammal:fox`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Key: "mammal",
-						Nodes: []ast.Node{
-							&ast.StringNode{Value: "cat"},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.StringNode{Value: "dog"},
-						},
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.StringNode{Key: "mammal", Value: "fox"},
-				},
-			},
-		},
-		{
-			name: `title:((Advanced OR Search OR Query) -"Advanced Search Query")`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.GroupNode{
-						Key: "title",
-						Nodes: []ast.Node{
-							&ast.GroupNode{
-								Nodes: []ast.Node{
-									&ast.StringNode{Value: "Advanced"},
-									&ast.OperatorNode{Value: kql.BoolOR},
-									&ast.StringNode{Value: "Search"},
-									&ast.OperatorNode{Value: kql.BoolOR},
-									&ast.StringNode{Value: "Query"},
-								},
-							},
-							&ast.OperatorNode{Value: kql.BoolAND},
-							&ast.OperatorNode{Value: kql.BoolNOT},
-							&ast.StringNode{Value: "Advanced Search Query"},
-						},
-					},
-				},
-			},
-		},
 	}
 
 	assert := tAssert.New(t)
@@ -1033,20 +727,17 @@ func TestParse(t *testing.T) {
 				q = tt.givenQuery
 			}
 
-			parsedAST, err := kql.Builder{}.Build(q)
+			parsedAST, err := kql.Parse("", []byte(q))
 
 			if tt.expectedError != nil {
-				if tt.expectedError.Error() != "" {
-					assert.Equal(err.Error(), tt.expectedError.Error())
-				} else {
-					assert.NotNil(err)
-				}
+				assert.Equal(err, tt.expectedError)
+				assert.Nil(parsedAST)
 
 				return
 			}
 
 			if diff := test.DiffAst(tt.expectedAst, parsedAST); diff != "" {
-				t.Fatalf("AST mismatch \nquery: '%s' \n(-expected +got): %s", q, diff)
+				t.Fatalf("AST mismatch \nquery: '%s' \n(-want +got): %s", q, diff)
 			}
 		})
 	}

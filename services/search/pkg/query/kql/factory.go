@@ -38,16 +38,35 @@ func buildAST(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 		return nil, err
 	}
 
-	a := &ast.Ast{
+	return &ast.Ast{
 		Base:  b,
-		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
-	}
+		Nodes: nodes,
+	}, nil
+}
 
-	if err := validateAst(a); err != nil {
+func buildNodes(head, tail interface{}) ([]ast.Node, error) {
+	headNode, err := toNode[ast.Node](head)
+	if err != nil {
 		return nil, err
 	}
 
-	return a, nil
+	if tail == nil {
+		return []ast.Node{headNode}, nil
+	}
+
+	tailNodes, err := toNodes[ast.Node](tail)
+	if err != nil {
+		return nil, err
+	}
+
+	allNodes := []ast.Node{headNode}
+
+	connectionNode := incorporateNode(headNode, tailNodes...)
+	if connectionNode != nil {
+		allNodes = append(allNodes, connectionNode)
+	}
+
+	return append(allNodes, tailNodes...), nil
 }
 
 func buildStringNode(k, v interface{}, text []byte, pos position) (*ast.StringNode, error) {
@@ -162,15 +181,9 @@ func buildGroupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode
 		return nil, err
 	}
 
-	gn := &ast.GroupNode{
+	return &ast.GroupNode{
 		Base:  b,
 		Key:   key,
-		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
-	}
-
-	if err := validateGroupNode(gn); err != nil {
-		return nil, err
-	}
-
-	return gn, nil
+		Nodes: nodes,
+	}, nil
 }
