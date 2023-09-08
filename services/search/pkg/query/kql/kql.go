@@ -2,6 +2,7 @@
 package kql
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -24,8 +25,18 @@ type Builder struct{}
 func (b Builder) Build(q string) (*ast.Ast, error) {
 	f, err := Parse("", []byte(q))
 	if err != nil {
-		return nil, err
+		var list errList
+		errors.As(err, &list)
+
+		for _, listError := range list {
+			var parserError *parserError
+			switch {
+			case errors.As(listError, &parserError):
+				return nil, listError
+			}
+		}
 	}
+
 	return f.(*ast.Ast), nil
 }
 

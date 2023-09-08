@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////
 
 AST <-
-    _ nodes:Nodes _ {
+    _ !OperatorBooleanAndNode _ nodes:Nodes _ {
         return buildAST(nodes, c.text, c.pos)
     }
 
@@ -15,7 +15,7 @@ Nodes <-
     _ head:(
         GroupNode /
         PropertyRestrictionNodes /
-        OperatorBooleanNode /
+        OperatorBooleanNodes /
         FreeTextKeywordNodes
     ) _ tail:Nodes? {
       return buildNodes(head, tail)
@@ -76,8 +76,23 @@ WordNode <-
 // operators
 ////////////////////////////////////////////////////////
 
-OperatorBooleanNode <-
-    ("AND" / "OR" / "NOT" / "+" / "-") {
+OperatorBooleanNodes <-
+    OperatorBooleanAndNode /
+    OperatorBooleanNotNode /
+    OperatorBooleanOrNode
+
+OperatorBooleanAndNode <-
+    ("AND" / "+") {
+        return buildOperatorNode(c.text, c.pos)
+    }
+
+OperatorBooleanNotNode <-
+    ("NOT" / "-") {
+        return buildOperatorNode(c.text, c.pos)
+    }
+
+OperatorBooleanOrNode <-
+    ("OR") {
         return buildOperatorNode(c.text, c.pos)
     }
 

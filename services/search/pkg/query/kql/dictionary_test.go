@@ -1,6 +1,7 @@
 package kql_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -63,6 +64,25 @@ func TestParse(t *testing.T) {
 		// SPEC //////////////////////////////////////////////////////////////////////////////
 		// https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
 		//
+		// 2.1.2 AND Operator
+		{
+			name: `cat AND dog`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "cat"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "dog"},
+				},
+			},
+		},
+		{
+			name:          `AND`,
+			expectedError: errors.New(""),
+		},
+		{
+			name:          `AND cat AND dog`,
+			expectedError: errors.New(""),
+		},
 		// 3.1.11 Implicit Operator
 		{
 			name: `cat dog`,
@@ -727,11 +747,14 @@ func TestParse(t *testing.T) {
 				q = tt.givenQuery
 			}
 
-			parsedAST, err := kql.Parse("", []byte(q))
+			parsedAST, err := kql.Builder{}.Build(q)
 
 			if tt.expectedError != nil {
-				assert.Equal(err, tt.expectedError)
-				assert.Nil(parsedAST)
+				if tt.expectedError.Error() != "" {
+					assert.Equal(err, tt.expectedError)
+				} else {
+					assert.NotNil(err)
+				}
 
 				return
 			}

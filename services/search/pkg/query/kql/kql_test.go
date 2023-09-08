@@ -21,7 +21,7 @@ func TestNewAST(t *testing.T) {
 		{
 			name:        "error",
 			givenQuery:  kql.BoolAND,
-			shouldError: false,
+			shouldError: true,
 		},
 	}
 
