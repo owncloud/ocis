@@ -169,28 +169,4 @@ class SearchContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 	}
-
-	/**
-	 * @Then the search result by tags for user :user should contain these entries:
-	 *
-	 * @param string|null $user
-	 * @param TableNode $expectedEntries
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theSearchResultByTagsForUserShouldContainTheseEntries(
-		?string $user,
-		TableNode $expectedEntries
-	):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$this->featureContext->verifyTableNodeColumnsCount($expectedEntries, 1);
-		$expectedEntries = $expectedEntries->getRows();
-		$expectedEntriesArray = [];
-		$responseResourcesArray = $this->featureContext->findEntryFromReportResponse($user);
-		foreach ($expectedEntries as $item) {
-			$expectedEntriesArray[] = $item[0];
-		}
-		Assert::assertEqualsCanonicalizing($expectedEntriesArray, $responseResourcesArray);
-	}
 }

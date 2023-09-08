@@ -46,10 +46,6 @@ Feature: content search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -125,10 +121,6 @@ Feature: content search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -156,8 +148,27 @@ Feature: content search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
+
+
+  Scenario Outline: search resources using different search patterns (KQL feature)
+    Given using spaces DAV path
+    And user "Alice" has uploaded file with content "hello world, let start to test" to "technical task.txt"
+    And user "Alice" has uploaded file with content "it's been hell" to "task comments.txt"
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path               | tagName |
+      | technical task.txt | test    |
+    When user "Alice" searches for '<pattern>' using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "<result-count>" entries
+    And the search result of user "Alice" should contain these entries:
+      | <search-result-1> |
+      | <search-result-2> |
+    Examples:
+      | pattern                                     | result-count | search-result-1     | search-result-2    |
+      | Content:hello                               | 1            | /technical task.txt |                    |
+      | content:hello                               | 1            | /technical task.txt |                    |
+      | content:"hello"                             | 1            | /technical task.txt |                    |
+      | content:hel*                                | 2            | /technical task.txt | /task comments.txt |
+      | content:hel* AND tag:test                   | 1            | /technical task.txt |                    |
+      | (name:*task* AND content:hel*) NOT tag:test | 1            | /task comments.txt  |                    |
