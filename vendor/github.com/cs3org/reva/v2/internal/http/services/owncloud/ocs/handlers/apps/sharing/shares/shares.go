@@ -126,7 +126,6 @@ type GatewayClientGetter func() (gateway.GatewayAPIClient, error)
 
 // Init initializes this and any contained handlers
 func (h *Handler) Init(c *config.Config) error {
-	var err error
 	h.gatewayAddr = c.GatewaySvc
 	h.machineAuthAPIKey = c.MachineAuthAPIKey
 	h.storageRegistryAddr = c.StorageregistrySvc
@@ -142,10 +141,7 @@ func (h *Handler) Init(c *config.Config) error {
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
 	h.publicPasswordEnforced = publicPwdEnforced(c)
-	h.passwordValidator, err = passwordPolicies(c)
-	if err != nil {
-		return err
-	}
+	h.passwordValidator = passwordPolicies(c)
 
 	h.statCache = cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize)
 	if c.CacheWarmupDriver != "" {
@@ -1594,28 +1590,17 @@ func publicPwdEnforced(c *config.Config) passwordEnforced {
 	return enf
 }
 
-func passwordPolicies(c *config.Config) (password.Validator, error) {
-	var pv password.Validator
-	var err error
+func passwordPolicies(c *config.Config) password.Validator {
 	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicies == nil {
-		pv, err = password.NewPasswordPolicies(0, 0, 0, 0, 0, "")
-		if err != nil {
-			return nil, fmt.Errorf("can't init the Password Policies %w", err)
-		}
-		return pv, nil
+		return password.NewPasswordPolicies(0, 0, 0, 0, 0)
 	}
-	pv, err = password.NewPasswordPolicies(
+	return password.NewPasswordPolicies(
 		c.Capabilities.Capabilities.PasswordPolicies.MinCharacters,
 		c.Capabilities.Capabilities.PasswordPolicies.MinLowerCaseCharacters,
 		c.Capabilities.Capabilities.PasswordPolicies.MinUpperCaseCharacters,
 		c.Capabilities.Capabilities.PasswordPolicies.MinDigits,
 		c.Capabilities.Capabilities.PasswordPolicies.MinSpecialCharacters,
-		c.Capabilities.Capabilities.PasswordPolicies.SpecialCharacters,
 	)
-	if err != nil {
-		return nil, fmt.Errorf("can't init the Password Policies %w", err)
-	}
-	return pv, nil
 }
 
 // sufficientPermissions returns true if the `existing` permissions contain the `requested` permissions

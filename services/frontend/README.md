@@ -63,3 +63,24 @@ The `frontend` service contains an eventhandler for handling `ocs` related event
 ### Auto-Accept Shares
 
 When setting the `FRONTEND_AUTO_ACCEPT_SHARES` to `true`, all incoming shares will be accepted automatically. Users can overwrite this setting individually in their profile.
+
+## The password policy
+
+Note that the password policy currently impacts _only_ public link password validation.
+
+With the password policy, mandatory criteria for the password can be defined via the environment variables listed below.
+
+Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+
+Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
+
+-   `FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS`
+Define the minimum password length.
+-   `FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS`
+Define the minimum number of uppercase letters.
+-   `FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS`
+Define the minimum number of lowercase letters.
+-   `FRONTEND_PASSWORD_POLICIES_MIN_DIGITS`
+Define the minimum number of digits.
+-   `FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS`
+Define the minimum number of special characters.
