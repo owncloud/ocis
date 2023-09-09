@@ -517,7 +517,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolOR},
+							&ast.OperatorNode{Value: kql.BoolAND},
 							&ast.StringNode{Value: "Jane Smith"},
 						},
 					},
@@ -582,7 +582,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolOR},
+							&ast.OperatorNode{Value: kql.BoolAND},
 							&ast.StringNode{Value: "Jane"},
 						},
 					},
@@ -606,7 +606,7 @@ func TestParse(t *testing.T) {
 						Key: "author",
 						Nodes: []ast.Node{
 							&ast.StringNode{Value: "John Smith"},
-							&ast.OperatorNode{Value: kql.BoolOR},
+							&ast.OperatorNode{Value: kql.BoolAND},
 							&ast.StringNode{Value: "Jane"},
 						},
 					},
@@ -845,7 +845,7 @@ func TestParse(t *testing.T) {
 			}
 
 			if diff := test.DiffAst(tt.expectedAst, parsedAST); diff != "" {
-				t.Fatalf("AST mismatch \nquery: '%s' \n(-want +got): %s", q, diff)
+				t.Fatalf("AST mismatch \nquery: '%s' \n(-expected +got): %s", q, diff)
 			}
 		})
 	}

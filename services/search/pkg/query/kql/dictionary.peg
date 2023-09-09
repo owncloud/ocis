@@ -10,19 +10,22 @@ AST <-
     _ !(
         OperatorBooleanAndNode /
         OperatorBooleanOrNode
-    ) _ nodes:Nodes _ {
-        return buildAST(nodes, c.text, c.pos)
+    ) n:Nodes {
+        return buildAST(n, c.text, c.pos)
     }
 
+////////////////////////////////////////////////////////
+// nodes
+////////////////////////////////////////////////////////
+
 Nodes <-
-    _ head:(
-        GroupNode /
-        PropertyRestrictionNodes /
-        OperatorBooleanNodes /
-        FreeTextKeywordNodes
-    ) _ tail:Nodes? {
-      return buildNodes(head, tail)
-    }
+    (_ Node)+
+
+Node <-
+    GroupNode /
+    PropertyRestrictionNodes /
+    OperatorBooleanNodes /
+    FreeTextKeywordNodes
 
 ////////////////////////////////////////////////////////
 // nesting
@@ -210,4 +213,6 @@ Digit <-
     }
 
 _ <-
-    [ \t]*
+    [ \t]* {
+       return nil, nil
+    }
