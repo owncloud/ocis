@@ -13,13 +13,12 @@ func connectNodes(c Connector, nodes ...ast.Node) []ast.Node {
 	for i := range nodes {
 		ri := len(nodes) - 1 - i
 		head := nodes[ri]
-		pair := []ast.Node{head}
 
-		if connectionNodes := connectNode(c, pair[0], connectedNodes...); len(connectionNodes) >= 1 {
-			pair = append(pair, connectionNodes...)
+		if connectionNodes := connectNode(c, head, connectedNodes...); len(connectionNodes) > 0 {
+			connectedNodes = append(connectionNodes, connectedNodes...)
 		}
 
-		connectedNodes = append(pair, connectedNodes...)
+		connectedNodes = append([]ast.Node{head}, connectedNodes...)
 	}
 
 	return connectedNodes
@@ -83,8 +82,8 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 	//		author:"John Smith" author:"Jane Smith"
 	//		author:"John Smith" OR author:"Jane Smith"
 	//
-	// nodes inside of group nodes are handled differently,
-	// if no explicit operator give, it uses OR
+	// nodes inside of group node are handled differently,
+	// if no explicit operator given, it uses OR
 	//
 	// spec: same
 	// 		author:"John Smith" AND author:"Jane Smith"
@@ -95,12 +94,12 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 
 	// decisions based on nearest neighbor node
 	switch neighbor.(type) {
-	// nearest neighbor node type could change the default case
+	// nearest neighbor node type can change the default case
 	// docs says, if the next value node:
 	//
-	//		is a group AND has no key
+	//		is a group and has no key
 	//
-	// even if the current node has none too, which normal leads to SAME KEY OR
+	//		and the head node has no key
 	//
 	// 		it should be an AND edge
 	//
@@ -128,7 +127,7 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 				}
 			}
 
-			// if neighbor node negotiates, AND edge is needed
+			// if neighbor node negotiates, an AND edge is needed
 			//
 			// spec: same
 			// 		cat -dog
