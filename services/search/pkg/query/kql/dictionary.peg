@@ -7,10 +7,7 @@
 ////////////////////////////////////////////////////////
 
 AST <-
-    _ !(
-        OperatorBooleanAndNode /
-        OperatorBooleanOrNode
-    ) n:Nodes {
+    n:Nodes {
         return buildAST(n, c.text, c.pos)
     }
 

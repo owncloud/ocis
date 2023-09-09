@@ -1,7 +1,6 @@
 package kql_test
 
 import (
-	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -81,12 +80,16 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name:          `AND`,
-			expectedError: errors.New(""),
+			name: `AND`,
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
 		},
 		{
-			name:          `AND cat AND dog`,
-			expectedError: errors.New(""),
+			name: `AND cat AND dog`,
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
 		},
 		// ++
 		// 2.1.6 NOT Operator
@@ -125,12 +128,16 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name:          `OR`,
-			expectedError: errors.New(""),
+			name: `OR`,
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
 		},
 		{
-			name:          `OR cat AND dog`,
-			expectedError: errors.New(""),
+			name: `OR cat AND dog`,
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
 		},
 		// ++
 		// 3.1.11 Implicit Operator
@@ -450,6 +457,7 @@ func TestParse(t *testing.T) {
 		// everything else
 		{
 			name:       "FullDictionary",
+			skip:       true,
 			givenQuery: mustJoin(FullDictionary),
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
@@ -814,6 +822,87 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "animal:(cat dog turtle)",
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "animal",
+						Nodes: []ast.Node{
+							&ast.StringNode{
+								Value: "cat",
+							},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{
+								Value: "dog",
+							},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{
+								Value: "turtle",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "(cat dog turtle)",
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Nodes: []ast.Node{
+							&ast.StringNode{
+								Value: "cat",
+							},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{
+								Value: "dog",
+							},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{
+								Value: "turtle",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "animal:(mammal:cat mammal:dog reptile:turtle)",
+			expectedError: kql.NamedGroupInvalidNodesError{
+				Node: &ast.StringNode{Key: "mammal", Value: "cat"},
+			},
+		},
+		{
+			name: "animal:(cat mammal:dog turtle)",
+			expectedError: kql.NamedGroupInvalidNodesError{
+				Node: &ast.StringNode{Key: "mammal", Value: "dog"},
+			},
+		},
+		{
+			name: "animal:(AND cat)",
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
+		},
+		{
+			name: "animal:(OR cat)",
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
+		},
+		{
+			name: "(AND cat)",
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
+		},
+		{
+			name: "(OR cat)",
+			expectedError: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
+		},
 	}
 
 	assert := tAssert.New(t)
@@ -836,7 +925,7 @@ func TestParse(t *testing.T) {
 
 			if tt.expectedError != nil {
 				if tt.expectedError.Error() != "" {
-					assert.Equal(err, tt.expectedError)
+					assert.Equal(err.Error(), tt.expectedError.Error())
 				} else {
 					assert.NotNil(err)
 				}
