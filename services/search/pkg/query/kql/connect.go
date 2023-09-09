@@ -13,12 +13,13 @@ func connectNodes(c Connector, nodes ...ast.Node) []ast.Node {
 	for i := range nodes {
 		ri := len(nodes) - 1 - i
 		head := nodes[ri]
+		pair := []ast.Node{head}
 
-		if connectionNodes := connectNode(c, head, connectedNodes...); len(connectionNodes) > 0 {
-			connectedNodes = append(connectionNodes, connectedNodes...)
+		if connectionNodes := connectNode(c, pair[0], connectedNodes...); len(connectionNodes) >= 1 {
+			pair = append(pair, connectionNodes...)
 		}
 
-		connectedNodes = append([]ast.Node{head}, connectedNodes...)
+		connectedNodes = append(pair, connectedNodes...)
 	}
 
 	return connectedNodes
@@ -65,8 +66,8 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 		return nil
 	}
 
-	headKey := strings.ToLower(ast.NodeKey(head))
-	neighborKey := strings.ToLower(ast.NodeKey(neighbor))
+	headKey := strings.ToLower(c.nodeKey(head))
+	neighborKey := strings.ToLower(c.nodeKey(neighbor))
 
 	connection := &ast.OperatorNode{
 		Base:  &ast.Base{Loc: &ast.Location{Source: &[]string{"implicitly operator"}[0]}},
@@ -74,32 +75,45 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 	}
 
 	// if the current node and the neighbor node have the same key
-	// the connection is of type OR
+	// the connection is of type OR, same applies if no keys are in place
+	//
+	//		"" == ""
 	//
 	// spec: same
 	//		author:"John Smith" author:"Jane Smith"
 	//		author:"John Smith" OR author:"Jane Smith"
 	//
-	// if the nodes have NO key, the edge is a AND connection
-	//
-	// spec: same
-	//		cat dog
-	//		cat AND dog
-	// from the spec:
-	// 		To construct complex queries, you can combine multiple
-	// 		free-text expressions with KQL query operators.
-	// 		If there are multiple free-text expressions without any
-	// 		operators in between them, the query behavior is the same
-	// 		as using the AND operator.
-	//
-	// nodes inside of group node are handled differently,
-	// if no explicit operator given, it uses AND
+	// nodes inside of group nodes are handled differently,
+	// if no explicit operator give, it uses OR
 	//
 	// spec: same
 	// 		author:"John Smith" AND author:"Jane Smith"
 	// 		author:("John Smith" "Jane Smith")
-	if headKey == neighborKey && headKey != "" && neighborKey != "" {
+	if headKey == neighborKey {
 		connection.Value = c.sameKeyOPValue
+	}
+
+	// decisions based on nearest neighbor node
+	switch neighbor.(type) {
+	// nearest neighbor node type could change the default case
+	// docs says, if the next value node:
+	//
+	//		is a group AND has no key
+	//
+	// even if the current node has none too, which normal leads to SAME KEY OR
+	//
+	// 		it should be an AND edge
+	//
+	// spec: same
+	// 		cat (dog OR fox)
+	// 		cat AND (dog OR fox)
+	//
+	// note:
+	// 		sounds contradictory to me
+	case *ast.GroupNode:
+		if headKey == "" && neighborKey == "" {
+			connection.Value = BoolAND
+		}
 	}
 
 	// decisions based on nearest neighbor operators
@@ -114,7 +128,7 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 				}
 			}
 
-			// if neighbor node negotiates, an AND edge is needed
+			// if neighbor node negotiates, AND edge is needed
 			//
 			// spec: same
 			// 		cat -dog
@@ -126,4 +140,19 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 	}
 
 	return []ast.Node{connection}
+}
+
+func (c DefaultConnector) nodeKey(n ast.Node) string {
+	switch node := n.(type) {
+	case *ast.StringNode:
+		return node.Key
+	case *ast.DateTimeNode:
+		return node.Key
+	case *ast.BooleanNode:
+		return node.Key
+	case *ast.GroupNode:
+		return node.Key
+	default:
+		return ""
+	}
 }
