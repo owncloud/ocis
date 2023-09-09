@@ -66,8 +66,8 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 		return nil
 	}
 
-	headKey := strings.ToLower(c.nodeKey(head))
-	neighborKey := strings.ToLower(c.nodeKey(neighbor))
+	headKey := strings.ToLower(ast.NodeKey(head))
+	neighborKey := strings.ToLower(ast.NodeKey(neighbor))
 
 	connection := &ast.OperatorNode{
 		Base:  &ast.Base{Loc: &ast.Location{Source: &[]string{"implicitly operator"}[0]}},
@@ -140,19 +140,4 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 	}
 
 	return []ast.Node{connection}
-}
-
-func (c DefaultConnector) nodeKey(n ast.Node) string {
-	switch node := n.(type) {
-	case *ast.StringNode:
-		return node.Key
-	case *ast.DateTimeNode:
-		return node.Key
-	case *ast.BooleanNode:
-		return node.Key
-	case *ast.GroupNode:
-		return node.Key
-	default:
-		return ""
-	}
 }

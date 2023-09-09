@@ -31,6 +31,10 @@ func (b Builder) Build(q string) (*ast.Ast, error) {
 			var parserError *parserError
 			switch {
 			case errors.As(listError, &parserError):
+				if parserError.Inner != nil {
+					return nil, parserError.Inner
+				}
+
 				return nil, listError
 			}
 		}

@@ -38,9 +38,23 @@ func buildAST(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 		return nil, err
 	}
 
+	if len(nodes) == 0 {
+		return nil, nil
+	}
+
+	nodes = connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...)
+
+	switch node := nodes[0].(type) {
+	case *ast.OperatorNode:
+		switch node.Value {
+		case BoolAND, BoolOR:
+			return nil, StartsWithBinaryOperatorError{Node: node}
+		}
+	}
+
 	return &ast.Ast{
 		Base:  b,
-		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
+		Nodes: nodes,
 	}, nil
 }
 
@@ -156,9 +170,33 @@ func buildGroupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode
 		return nil, err
 	}
 
-	return &ast.GroupNode{
+	nodes = connectNodes(DefaultConnector{sameKeyOPValue: BoolAND}, nodes...)
+
+	gn := &ast.GroupNode{
 		Base:  b,
 		Key:   key,
-		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolAND}, nodes...),
-	}, nil
+		Nodes: nodes,
+	}
+
+	if len(nodes) == 0 {
+		return gn, nil
+	}
+
+	switch node := nodes[0].(type) {
+	case *ast.OperatorNode:
+		switch node.Value {
+		case BoolAND, BoolOR:
+			return nil, StartsWithBinaryOperatorError{Node: node}
+		}
+	}
+
+	if key != "" {
+		for _, node := range nodes {
+			if ast.NodeKey(node) != "" {
+				return nil, NamedGroupInvalidNodesError{Node: node}
+			}
+		}
+	}
+
+	return gn, nil
 }
