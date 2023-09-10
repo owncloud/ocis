@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/araddon/dateparse"
+	"github.com/jinzhu/now"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -14,7 +14,7 @@ import (
 )
 
 var mustParseTime = func(t *testing.T, ts string) time.Time {
-	tp, err := dateparse.ParseLocal(ts)
+	tp, err := now.Parse(ts)
 	if err != nil {
 		t.Fatalf("time.Parse(...) error = %v", err)
 	}
@@ -22,7 +22,19 @@ var mustParseTime = func(t *testing.T, ts string) time.Time {
 	return tp
 }
 
-var mustJoin = func(v []string) string {
+var setWorldClock = func(t *testing.T, ts string) func() func() {
+	return func() func() {
+		kql.PatchTimeNow(func() time.Time {
+			return mustParseTime(t, ts)
+		})
+
+		return func() {
+			kql.PatchTimeNow(time.Now)
+		}
+	}
+}
+
+var join = func(v []string) string {
 	return strings.Join(v, " ")
 }
 
@@ -60,6 +72,7 @@ func TestParse(t *testing.T) {
 		givenQuery    string
 		expectedAst   *ast.Ast
 		expectedError error
+		prepare       func() func()
 	}{
 		// SPEC //////////////////////////////////////////////////////////////////////////////
 		//
@@ -451,14 +464,29 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: `Modified:today`,
-			skip: true,
+			name:    `Modified:today`,
+			prepare: setWorldClock(t, "2023-09-10"),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Modified",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-10"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Modified",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
 		},
 		//////////////////////////////////////////////////////////////////////////////////////
 		// everything else
 		{
 			name:       "FullDictionary",
-			givenQuery: mustJoin(FullDictionary),
+			givenQuery: join(FullDictionary),
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "federated"},
@@ -566,7 +594,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "Group",
-			givenQuery: mustJoin([]string{
+			givenQuery: join([]string{
 				`(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`,
 				`author:("John Smith" Jane)`,
 				`author:("John Smith" OR Jane)`,
@@ -712,7 +740,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "DateTimeRestrictionNode",
-			givenQuery: mustJoin([]string{
+			givenQuery: join([]string{
 				`Mtime:"2023-09-05T08:42:11.23554+02:00"`,
 				`Mtime:2023-09-05T08:42:11.23554+02:00`,
 				`Mtime="2023-09-05T08:42:11.23554+02:00"`,
@@ -803,8 +831,206 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			name:    "NaturalLanguage DateTimeNode - today",
+			prepare: setWorldClock(t, "2023-09-10"),
+			givenQuery: join([]string{
+				`Mtime:today`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-10"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - yesterday",
+			prepare: setWorldClock(t, "2023-09-10"),
+			givenQuery: join([]string{
+				`Mtime:yesterday`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-09"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-09 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - yesterday - the beginning of the month",
+			prepare: setWorldClock(t, "2023-09-01"),
+			givenQuery: join([]string{
+				`Mtime:yesterday`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-31"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-08-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - this week",
+			prepare: setWorldClock(t, "2023-09-06"),
+			givenQuery: join([]string{
+				`Mtime:"this week"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-04"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - this month",
+			prepare: setWorldClock(t, "2023-09-02"),
+			givenQuery: join([]string{
+				`Mtime:"this month"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-30 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - last month",
+			prepare: setWorldClock(t, "2023-09-02"),
+			givenQuery: join([]string{
+				`Mtime:"last month"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-08-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - last month - the beginning of the year",
+			prepare: setWorldClock(t, "2023-01-01"),
+			givenQuery: join([]string{
+				`Mtime:"last month"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2022-12-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2022-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - this year",
+			prepare: setWorldClock(t, "2023-06-18"),
+			givenQuery: join([]string{
+				`Mtime:"this year"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-01-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:    "NaturalLanguage DateTimeNode - last year",
+			prepare: setWorldClock(t, "2023-01-01"),
+			givenQuery: join([]string{
+				`Mtime:"last year"`,
+			}),
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2022-01-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2022-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
 			name: "id",
-			givenQuery: mustJoin([]string{
+			givenQuery: join([]string{
 				`id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
 				`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
 			}),
@@ -1025,6 +1251,11 @@ func TestParse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.skip {
 				t.Skip()
+			}
+
+			if tt.prepare != nil {
+				prepare := tt.prepare()
+				defer prepare()
 			}
 
 			q := tt.name

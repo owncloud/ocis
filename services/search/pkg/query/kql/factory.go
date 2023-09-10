@@ -101,6 +101,39 @@ func buildDateTimeNode(k, o, v interface{}, text []byte, pos position) (*ast.Dat
 		Value:    value,
 	}, nil
 }
+func buildNaturalLanguageDateTimeNodes(k, v interface{}, text []byte, pos position) ([]ast.Node, error) {
+	b, err := base(text, pos)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := toString(k)
+	if err != nil {
+		return nil, err
+	}
+
+	from, to, err := toTimeRange(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return []ast.Node{
+		&ast.DateTimeNode{
+			Base:     b,
+			Value:    *from,
+			Key:      key,
+			Operator: &ast.OperatorNode{Value: ">="},
+		},
+		&ast.OperatorNode{Value: BoolAND},
+		&ast.DateTimeNode{
+			Base:     b,
+			Value:    *to,
+			Key:      key,
+			Operator: &ast.OperatorNode{Value: "<="},
+		},
+	}, nil
+
+}
 
 func buildBooleanNode(k, v interface{}, text []byte, pos position) (*ast.BooleanNode, error) {
 	b, err := base(text, pos)

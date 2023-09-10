@@ -28,3 +28,15 @@ func (e NamedGroupInvalidNodesError) Error() string {
 		ast.NodeValue(e.Node),
 	).Error()
 }
+
+// UnsupportedTimeRange records an error and the value that caused it.
+type UnsupportedTimeRange struct {
+	Value interface{}
+}
+
+func (e UnsupportedTimeRange) Error() string {
+	return fmt.Errorf(
+		"unable to convert '%v' to a time range",
+		e.Value,
+	).Error()
+}

@@ -3,6 +3,7 @@ package kql
 
 import (
 	"errors"
+	"time"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
@@ -42,3 +43,7 @@ func (b Builder) Build(q string) (*ast.Ast, error) {
 
 	return f.(*ast.Ast), nil
 }
+
+// timeNow mirrors time.Now by default, the only reason why this exists
+// is to monkey patch it from the tests. See PatchTimeNow
+var timeNow = time.Now

@@ -10,7 +10,6 @@ The following spec parts are supported and tested:
   - 2.1.8 OR Operator
   - 2.1.12 Parentheses
   - 2.3.5 Date Tokens
-  - Human tokens not implemented
   - 3.1.11 Implicit Operator
   - 3.1.12 Parentheses
   - 3.1.2 AND Operator
