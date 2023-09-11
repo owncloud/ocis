@@ -29,7 +29,7 @@ ci-go-generate: $(PIGEON) $(MOCKERY) # CI runs ci-node-generate automatically be
 	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Extractor
 	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Retriever
 	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name Searcher
-	$(PIGEON) -o pkg/query/kql/dictionary_gen.go pkg/query/kql/dictionary.peg
+	$(PIGEON) -optimize-grammar -optimize-parser -o pkg/query/kql/dictionary_gen.go pkg/query/kql/dictionary.peg
 
 .PHONY: ci-node-generate
 ci-node-generate:

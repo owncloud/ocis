@@ -19,7 +19,11 @@ Complex queries:
 
 https://github.com/owncloud/ocis/pull/7212
 https://github.com/owncloud/ocis/pull/7043
+https://github.com/owncloud/ocis/pull/7247
+https://github.com/owncloud/ocis/pull/7248
+https://github.com/owncloud/ocis/pull/7254
 https://github.com/owncloud/web/pull/9653
+https://github.com/owncloud/web/pull/9672
 https://github.com/owncloud/ocis/issues/7042
 https://github.com/owncloud/ocis/issues/7179
 https://github.com/owncloud/ocis/issues/7114

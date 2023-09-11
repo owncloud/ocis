@@ -4,15 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/araddon/dateparse"
+
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
-
-func toIfaceSlice(in interface{}) []interface{} {
-	if in == nil {
-		return nil
-	}
-	return in.([]interface{})
-}
 
 func toNode[T ast.Node](in interface{}) (T, error) {
 	var t T
@@ -25,25 +20,27 @@ func toNode[T ast.Node](in interface{}) (T, error) {
 }
 
 func toNodes[T ast.Node](in interface{}) ([]T, error) {
-
 	switch v := in.(type) {
+	case []T:
+		return v, nil
+	case T:
+		return []T{v}, nil
 	case []interface{}:
-		var nodes []T
-
-		for _, el := range toIfaceSlice(v) {
-			node, err := toNode[T](el)
+		var ts []T
+		for _, inter := range v {
+			n, err := toNodes[T](inter)
 			if err != nil {
 				return nil, err
 			}
 
-			nodes = append(nodes, node)
+			ts = append(ts, n...)
 		}
-
-		return nodes, nil
-	case []T:
-		return v, nil
+		return ts, nil
+	case nil:
+		return nil, nil
 	default:
-		return nil, fmt.Errorf("can't convert '%T' to []ast.Node", in)
+		var t T
+		return nil, fmt.Errorf("can't convert '%T' to '%T'", in, t)
 	}
 }
 
@@ -77,5 +74,5 @@ func toTime(in interface{}) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return time.Parse(time.RFC3339Nano, ts)
+	return dateparse.ParseLocal(ts)
 }

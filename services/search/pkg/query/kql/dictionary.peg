@@ -7,23 +7,22 @@
 ////////////////////////////////////////////////////////
 
 AST <-
-    _ nodes:Nodes _ {
-        return buildAST(nodes, c.text, c.pos)
+    n:Nodes {
+        return buildAST(n, c.text, c.pos)
     }
 
+////////////////////////////////////////////////////////
+// nodes
+////////////////////////////////////////////////////////
+
 Nodes <-
-    n:(
-        _
-        (
-            GroupNode /
-            PropertyRestrictionNodes /
-            OperatorBooleanNode /
-            FreeTextKeywordNodes
-        )
-        _
-    )+ {
-      return buildNodes(n)
-    }
+    (_ Node)+
+
+Node <-
+    GroupNode /
+    PropertyRestrictionNodes /
+    OperatorBooleanNodes /
+    FreeTextKeywordNodes
 
 ////////////////////////////////////////////////////////
 // nesting
@@ -49,7 +48,18 @@ YesNoPropertyRestrictionNode <-
     }
 
 DateTimeRestrictionNode <-
-    k:Char+ o:(OperatorGreaterOrEqualNode / OperatorLessOrEqualNode / OperatorGreaterNode / OperatorLessNode / OperatorEqualNode / OperatorColonNode) '"'? v:(FullDate "T" FullTime) '"'? {
+    k:Char+ o:(
+        OperatorGreaterOrEqualNode /
+        OperatorLessOrEqualNode /
+        OperatorGreaterNode /
+        OperatorLessNode /
+        OperatorEqualNode /
+        OperatorColonNode
+    ) '"'? v:(
+        DateTime /
+        FullDate /
+        FullTime
+    ) '"'? {
         return buildDateTimeNode(k, o, v, c.text, c.pos)
     }
 
@@ -80,8 +90,23 @@ WordNode <-
 // operators
 ////////////////////////////////////////////////////////
 
-OperatorBooleanNode <-
-    ("AND" / "OR" / "NOT") {
+OperatorBooleanNodes <-
+    OperatorBooleanAndNode /
+    OperatorBooleanNotNode /
+    OperatorBooleanOrNode
+
+OperatorBooleanAndNode <-
+    ("AND" / "+") {
+        return buildOperatorNode(c.text, c.pos)
+    }
+
+OperatorBooleanNotNode <-
+    ("NOT" / "-") {
+        return buildOperatorNode(c.text, c.pos)
+    }
+
+OperatorBooleanOrNode <-
+    ("OR") {
         return buildOperatorNode(c.text, c.pos)
     }
 
@@ -160,6 +185,11 @@ FullTime <-
         return c.text, nil
     }
 
+DateTime
+  = FullDate "T" FullTime {
+      return c.text, nil
+    }
+
 ////////////////////////////////////////////////////////
 // misc
 ////////////////////////////////////////////////////////
@@ -180,4 +210,6 @@ Digit <-
     }
 
 _ <-
-    [ \t]*
+    [ \t]* {
+       return nil, nil
+    }

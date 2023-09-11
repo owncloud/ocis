@@ -73,3 +73,35 @@ type GroupNode struct {
 	Key   string
 	Nodes []Node
 }
+
+// NodeKey tries to return the node key
+func NodeKey(n Node) string {
+	switch node := n.(type) {
+	case *StringNode:
+		return node.Key
+	case *DateTimeNode:
+		return node.Key
+	case *BooleanNode:
+		return node.Key
+	case *GroupNode:
+		return node.Key
+	default:
+		return ""
+	}
+}
+
+// NodeValue tries to return the node key
+func NodeValue(n Node) interface{} {
+	switch node := n.(type) {
+	case *StringNode:
+		return node.Value
+	case *DateTimeNode:
+		return node.Value
+	case *BooleanNode:
+		return node.Value
+	case *GroupNode:
+		return node.Nodes
+	default:
+		return ""
+	}
+}

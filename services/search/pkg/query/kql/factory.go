@@ -38,31 +38,16 @@ func buildAST(n interface{}, text []byte, pos position) (*ast.Ast, error) {
 		return nil, err
 	}
 
-	normalizedNodes, err := NormalizeNodes(nodes)
-	if err != nil {
+	a := &ast.Ast{
+		Base:  b,
+		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
+	}
+
+	if err := validateAst(a); err != nil {
 		return nil, err
 	}
 
-	return &ast.Ast{
-		Base:  b,
-		Nodes: normalizedNodes,
-	}, nil
-}
-
-func buildNodes(e interface{}) ([]ast.Node, error) {
-	maybeNodesGroups := toIfaceSlice(e)
-
-	nodes := make([]ast.Node, len(maybeNodesGroups))
-	for i, maybeNodesGroup := range maybeNodesGroups {
-		node, err := toNode[ast.Node](toIfaceSlice(maybeNodesGroup)[1])
-		if err != nil {
-			return nil, err
-		}
-
-		nodes[i] = node
-	}
-
-	return nodes, nil
+	return a, nil
 }
 
 func buildStringNode(k, v interface{}, text []byte, pos position) (*ast.StringNode, error) {
@@ -151,6 +136,13 @@ func buildOperatorNode(text []byte, pos position) (*ast.OperatorNode, error) {
 		return nil, err
 	}
 
+	switch value {
+	case "+":
+		value = BoolAND
+	case "-":
+		value = BoolNOT
+	}
+
 	return &ast.OperatorNode{
 		Base:  b,
 		Value: value,
@@ -170,9 +162,15 @@ func buildGroupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode
 		return nil, err
 	}
 
-	return &ast.GroupNode{
+	gn := &ast.GroupNode{
 		Base:  b,
 		Key:   key,
-		Nodes: nodes,
-	}, nil
+		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
+	}
+
+	if err := validateGroupNode(gn); err != nil {
+		return nil, err
+	}
+
+	return gn, nil
 }

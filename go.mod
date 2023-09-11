@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.9
 	github.com/coreos/go-oidc v2.2.1+incompatible
@@ -54,6 +55,7 @@ require (
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
 	github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/mna/pigeon v1.1.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.9.22
 	github.com/oklog/run v1.1.0
