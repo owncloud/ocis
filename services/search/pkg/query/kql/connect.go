@@ -74,45 +74,32 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 	}
 
 	// if the current node and the neighbor node have the same key
-	// the connection is of type OR, same applies if no keys are in place
-	//
-	//		"" == ""
+	// the connection is of type OR
 	//
 	// spec: same
 	//		author:"John Smith" author:"Jane Smith"
 	//		author:"John Smith" OR author:"Jane Smith"
 	//
+	// if the nodes have NO key, the edge is a AND connection
+	//
+	// spec: same
+	//		cat dog
+	//		cat AND dog
+	// from the spec:
+	// 		To construct complex queries, you can combine multiple
+	// 		free-text expressions with KQL query operators.
+	// 		If there are multiple free-text expressions without any
+	// 		operators in between them, the query behavior is the same
+	// 		as using the AND operator.
+	//
 	// nodes inside of group node are handled differently,
-	// if no explicit operator given, it uses OR
+	// if no explicit operator given, it uses AND
 	//
 	// spec: same
 	// 		author:"John Smith" AND author:"Jane Smith"
 	// 		author:("John Smith" "Jane Smith")
-	if headKey == neighborKey {
+	if headKey == neighborKey && headKey != "" && neighborKey != "" {
 		connection.Value = c.sameKeyOPValue
-	}
-
-	// decisions based on nearest neighbor node
-	switch neighbor.(type) {
-	// nearest neighbor node type can change the default case
-	// docs says, if the next value node:
-	//
-	//		is a group and has no key
-	//
-	//		and the head node has no key
-	//
-	// 		it should be an AND edge
-	//
-	// spec: same
-	// 		cat (dog OR fox)
-	// 		cat AND (dog OR fox)
-	//
-	// note:
-	// 		sounds contradictory to me
-	case *ast.GroupNode:
-		if headKey == "" && neighborKey == "" {
-			connection.Value = BoolAND
-		}
 	}
 
 	// decisions based on nearest neighbor operators

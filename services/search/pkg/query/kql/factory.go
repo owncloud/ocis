@@ -165,7 +165,7 @@ func buildGroupNode(k, n interface{}, text []byte, pos position) (*ast.GroupNode
 	gn := &ast.GroupNode{
 		Base:  b,
 		Key:   key,
-		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolAND}, nodes...),
+		Nodes: connectNodes(DefaultConnector{sameKeyOPValue: BoolOR}, nodes...),
 	}
 
 	if err := validateGroupNode(gn); err != nil {

@@ -65,6 +65,7 @@ func TestParse(t *testing.T) {
 		//
 		// https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
 		// https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-kql/3bbf06cd-8fc1-4277-bd92-8661ccd3c9b0
+		// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference
 		//
 		// ++
 		// 2.1.2 AND Operator
@@ -146,7 +147,7 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "dog"},
 				},
 			},
@@ -333,7 +334,7 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "dog"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "fox"},
@@ -363,7 +364,7 @@ func TestParse(t *testing.T) {
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "dog"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.OperatorNode{Value: kql.BoolNOT},
@@ -457,20 +458,19 @@ func TestParse(t *testing.T) {
 		// everything else
 		{
 			name:       "FullDictionary",
-			skip:       true,
 			givenQuery: mustJoin(FullDictionary),
 			expectedAst: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "federated"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "federat*"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "search"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "fed*"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Key: "author", Value: "John Smith"},
@@ -480,23 +480,23 @@ func TestParse(t *testing.T) {
 					&ast.StringNode{Key: "filename", Value: "budget.xlsx"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "John Smith"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "author"},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{Key: "author", Value: "Shakespear"},
@@ -689,7 +689,7 @@ func TestParse(t *testing.T) {
 					&ast.StringNode{
 						Value: "😂",
 					},
-					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.OperatorNode{Value: kql.BoolAND},
 					&ast.StringNode{
 						Value: "*😀 😁*",
 					},
@@ -901,6 +901,118 @@ func TestParse(t *testing.T) {
 			name: "(OR cat)",
 			expectedError: kql.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
+		},
+		{
+			name: `cat dog`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "cat"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "dog"},
+				},
+			},
+		},
+		{
+			name: `cat dog fox`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "cat"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "dog"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "fox"},
+				},
+			},
+		},
+		{
+			name: `(cat dog) fox`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "cat"},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{Value: "dog"},
+						},
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "fox"},
+				},
+			},
+		},
+		{
+			name: `(mammal:cat mammal:dog) fox`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Nodes: []ast.Node{
+							&ast.StringNode{Key: "mammal", Value: "cat"},
+							&ast.OperatorNode{Value: kql.BoolOR},
+							&ast.StringNode{Key: "mammal", Value: "dog"},
+						},
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "fox"},
+				},
+			},
+		},
+		{
+			name: `mammal:(cat dog) fox`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "mammal",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "cat"},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{Value: "dog"},
+						},
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "fox"},
+				},
+			},
+		},
+		{
+			name: `mammal:(cat dog) mammal:fox`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "mammal",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "cat"},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.StringNode{Value: "dog"},
+						},
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.StringNode{Key: "mammal", Value: "fox"},
+				},
+			},
+		},
+		{
+			name: `title:((Advanced OR Search OR Query) -"Advanced Search Query")`,
+			expectedAst: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "title",
+						Nodes: []ast.Node{
+							&ast.GroupNode{
+								Nodes: []ast.Node{
+									&ast.StringNode{Value: "Advanced"},
+									&ast.OperatorNode{Value: kql.BoolOR},
+									&ast.StringNode{Value: "Search"},
+									&ast.OperatorNode{Value: kql.BoolOR},
+									&ast.StringNode{Value: "Query"},
+								},
+							},
+							&ast.OperatorNode{Value: kql.BoolAND},
+							&ast.OperatorNode{Value: kql.BoolNOT},
+							&ast.StringNode{Value: "Advanced Search Query"},
+						},
+					},
+				},
 			},
 		},
 	}
