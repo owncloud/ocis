@@ -24,6 +24,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
+use \Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -53,6 +54,37 @@ class TagContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 */
+	public function createFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):ResponseInterface {
+		$tagNameArray = [];
+		foreach ($table->getRows() as $value) {
+			$tagNameArray[] = $value[0];
+		}
+		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
+			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		return GraphHelper::createTags(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId,
+			$tagNameArray
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" creates the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
@@ -65,24 +97,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserCreatesFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$tagNameArray = [];
-		foreach ($table->getRows() as $value) {
-			$tagNameArray[] = $value[0];
-		}
-		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
-			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
-
-		$response = GraphHelper::createTags(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$resourceId,
-			$tagNameArray
-		);
+		$response = $this->createFollowingTags($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -99,8 +114,8 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserHasCreatedFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$this->theUserCreatesFollowingTags($user, $fileOrFolder, $resource, $space, $table);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
+		$response = $this->createFollowingTags($user, $fileOrFolder, $resource, $space, $table);
+		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -175,6 +190,38 @@ class TagContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 */
+	public function removeTagsFromResourceOfTheSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):ResponseInterface {
+		$tagNameArray = [];
+		foreach ($table->getRows() as $value) {
+			$tagNameArray[] = $value[0];
+		}
+
+		if ($fileOrFolder === 'folder') {
+			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		return GraphHelper::deleteTags(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId,
+			$tagNameArray
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" removes the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
@@ -187,25 +234,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function userRemovesTagsFromResourceOfTheSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$tagNameArray = [];
-		foreach ($table->getRows() as $value) {
-			$tagNameArray[] = $value[0];
-		}
-
-		if ($fileOrFolder === 'folder') {
-			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
-
-		$response = GraphHelper::deleteTags(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$resourceId,
-			$tagNameArray
-		);
+		$response = $this->removeTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -222,7 +251,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function userHAsRemovedTheFollowingTagsForFileOfSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$this->userRemovesTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
+		$response = $this->removeTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
+		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 	}
 }
