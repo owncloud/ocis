@@ -381,7 +381,7 @@ Feature: get users
     """
 
 
-  Scenario Outline: non-admin user gets his/her own drive information
+  Scenario Outline: user gets his/her own information along with drive information
     Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     When the user "Brian" gets his drive information using Graph API
     Then the HTTP status code should be "200"
@@ -504,6 +504,7 @@ Feature: get users
     """
     Examples:
       | userRole    |
+      | Admin       |
       | Space Admin |
       | User        |
       | User Light  |
@@ -748,7 +749,6 @@ Feature: get users
     """
     And the JSON data of the response should not contain the user "Carol King" in the item 'value'
     And the JSON data of the response should not contain the user "Alice Hansen" in the item 'value'
-
 
 
   Scenario: admin user gets all users of two groups

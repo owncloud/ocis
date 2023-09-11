@@ -74,7 +74,7 @@ trait WebDav {
 	/**
 	 * response content parsed into a SimpleXMLElement
 	 */
-	private ?SimpleXMLElement $responseXmlObject;
+	private ?SimpleXMLElement $responseXmlObject = null;
 
 	private int $httpRequestTimeout = 0;
 
@@ -2391,8 +2391,6 @@ trait WebDav {
 			false,
 			'new'
 		);
-
-		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**

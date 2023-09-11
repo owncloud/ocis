@@ -71,7 +71,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L91)
 - [apiGraph/getUser.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L92)
 - [apiGraph/getUser.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L93)
-- [apiGraph/getUser.feature:606](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L606)
 - [apiGraph/getUser.feature:607](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L607)
 - [apiGraph/getUser.feature:608](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L608)
 - [apiGraph/getUser.feature:609](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L609)
@@ -83,6 +82,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:615](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L615)
 - [apiGraph/getUser.feature:616](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L616)
 - [apiGraph/getUser.feature:617](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L617)
+- [apiGraph/getUser.feature:618](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L618)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 
@@ -90,7 +90,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getGroup.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L382)
 - [apiGraph/getGroup.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L383)
 
-#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
+#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/7044)
 
 - [apiGraph/editUser.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L67)
 

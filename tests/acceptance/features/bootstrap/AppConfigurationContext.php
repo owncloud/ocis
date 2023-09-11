@@ -171,7 +171,7 @@ class AppConfigurationContext implements Context {
 
 	/**
 	 * @return string
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public function getAdminUsernameForCapabilitiesCheck():string {
 		if (\TestHelpers\OcisHelper::isTestingOnReva()) {
@@ -182,7 +182,7 @@ class AppConfigurationContext implements Context {
 			$adminUsername = "PseudoAdminForRevaTest";
 			$createdUsers = $this->featureContext->getCreatedUsers();
 			if (!\array_key_exists($adminUsername, $createdUsers)) {
-				$this->featureContext->createUser($adminUsername);
+				$this->featureContext->userHasBeenCreated(["userName" => $adminUsername]);
 			}
 		} else {
 			$adminUsername = $this->featureContext->getAdminUsername();

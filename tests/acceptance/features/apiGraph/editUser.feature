@@ -42,7 +42,7 @@ Feature: edit user
       | empty mail                |                      | 400  | brian@example.com    |
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
-   @issue-5763
+  @issue-7044
   Scenario Outline: admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
