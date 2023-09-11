@@ -3038,7 +3038,7 @@ class SpacesContext implements Context {
 	 */
 	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->favoritesContext->userFavoritesElement($user, $path);
+		$this->featureContext->setResponse($this->favoritesContext->userFavoritesElement($user, $path));
 	}
 
 	/**
