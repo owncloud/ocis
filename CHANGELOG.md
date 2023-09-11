@@ -6,7 +6,6 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Fixed cunary in the beginning: [#7247](https://github.com/owncloud/ocis/pull/7247)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
@@ -18,13 +17,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
-
-* Bugfix - Fixed cunary in the beginning: [#7247](https://github.com/owncloud/ocis/pull/7247)
-
-   Fixed case when the unary in the beginning lead to panic
-
-   https://github.com/owncloud/ocis/pull/7247
-   git
 
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
@@ -101,7 +93,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/issues/9646
    https://github.com/owncloud/ocis/pull/7212
    https://github.com/owncloud/ocis/pull/7043
+   https://github.com/owncloud/ocis/pull/7247
+   https://github.com/owncloud/ocis/pull/7248
+   https://github.com/owncloud/ocis/pull/7254
    https://github.com/owncloud/web/pull/9653
+   https://github.com/owncloud/web/pull/9672
 
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 
