@@ -456,6 +456,7 @@ trait WebDav {
 	 * @param string|null $height
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):void {
 		$user = $this->getActualUsername($user);
@@ -473,7 +474,7 @@ trait WebDav {
 			[],
 			null,
 			"files",
-			'2',
+			null,
 			false,
 			null,
 			$urlParameter,
@@ -4630,6 +4631,7 @@ trait WebDav {
 
 	/**
 	 * @When user :user downloads the preview of :path with width :width and height :height using the WebDAV API
+	 * @When user :user tries to download the preview of nonexistent file :path with width :width and height :height using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $path
