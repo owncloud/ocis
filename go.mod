@@ -47,7 +47,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/gookit/config/v2 v2.2.3
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.1.0
 	github.com/justinas/alice v1.2.0
