@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
+* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
@@ -98,6 +99,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7254
    https://github.com/owncloud/web/pull/9653
    https://github.com/owncloud/web/pull/9672
+
+* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
+
+   The variables renaming OCIS-3767
+
+   https://github.com/cs3org/reva/pull/7264
 
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 
