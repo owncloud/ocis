@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2023-09-12T06:24:32.343778614Z
+date: 2023-09-12T11:51:48.538353797Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -106,9 +106,9 @@ Note that a password can have a maximum length of **72 bytes**. Depending on the
 
 -   `FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS`
 Define the minimum password length.
--   `FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS`
+-   `FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS`
 Define the minimum number of uppercase letters.
--   `FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS`
+-   `FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS`
 Define the minimum number of lowercase letters.
 -   `FRONTEND_PASSWORD_POLICIES_MIN_DIGITS`
 Define the minimum number of digits.

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-12-06-24-28]
+[#deprecation-note-2023-09-12-11-51-45]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -697,7 +697,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum password length. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_LOWER_CASE_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -706,7 +706,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of uppercase letters. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_UPPER_CASE_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
