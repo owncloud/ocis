@@ -90,8 +90,8 @@ type CapabilitiesGraph struct {
 type CapabilitiesPasswordPolicies struct {
 	MinCharacters          int    `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
 	MaxCharacters          int    `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
-	MinLowerCaseCharacters int    `json:"min_lower_case_characters" xml:"min_lower_case_characters" mapstructure:"min_lower_case_characters"`
-	MinUpperCaseCharacters int    `json:"min_upper_case_characters" xml:"min_upper_case_characters" mapstructure:"min_upper_case_characters"`
+	MinLowerCaseCharacters int    `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
+	MinUpperCaseCharacters int    `json:"min_uppercase_characters" xml:"min_uppercase_characters" mapstructure:"min_uppercase_characters"`
 	MinDigits              int    `json:"min_digits" xml:"min_digits" mapstructure:"min_digits"`
 	MinSpecialCharacters   int    `json:"min_special_characters" xml:"min_special_characters" mapstructure:"min_special_characters"`
 	SpecialCharacters      string `json:"special_characters" xml:"special_characters" mapstructure:"special_characters"`
