@@ -52,9 +52,9 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Brian" should contain these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     And for user "Brian" the search result should contain space "mountpoint/folderMain"
 
 
@@ -115,9 +115,9 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "3" entries
     And the search result of user "Alice" should contain only these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Alice" should not contain these entries:
       | /folderMain |
 
@@ -131,8 +131,8 @@ Feature: Search
     When user "Brian" searches for "folder" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Brian" should not contain these entries:
       | /folderMain |

@@ -26,9 +26,9 @@ Feature: tag search
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | fileInRootLevel.txt     |
-      | fileInsideFolder.txt    |
-      | fileInsideSubFolder.txt |
+      | fileInRootLevel.txt                              |
+      | folderWithFile/fileInsideFolder.txt              |
+      | folderWithFile/subFolder/fileInsideSubFolder.txt |
     Examples:
       | dav-path-version |
       | old              |
@@ -54,9 +54,9 @@ Feature: tag search
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | spacesFile.txt                |
-      | spacesFileInsideFolder.txt    |
-      | spacesFileInsideSubFolder.txt |
+      | spacesFile.txt                                                     |
+      | spacesFolderWithFile/spacesFileInsideFolder.txt                    |
+      | spacesFolderWithFile/spacesSubFolder/spacesFileInsideSubFolder.txt |
     Examples:
       | dav-path-version |
       | old              |
@@ -103,8 +103,8 @@ Feature: tag search
     When user "Alice" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | spacesFolder    |
-      | spacesSubFolder |
+      | spacesFolder                 |
+      | spacesFolder/spacesSubFolder |
     Examples:
       | dav-path-version |
       | old              |
@@ -132,8 +132,8 @@ Feature: tag search
     When user "Brian" searches for "Tags:tag1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these files:
-      | file1.txt |
-      | file2.txt |
+      | uploadFolder/file1.txt |
+      | uploadFolder/file2.txt |
     Examples:
       | dav-path-version |
       | old              |
@@ -246,8 +246,8 @@ Feature: tag search
     When user "Alice" searches for "file" inside folder "/Folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
-      | file2.txt |
-      | file3.txt |
+      | /Folder/file2.txt           |
+      | /Folder/SubFolder/file3.txt |
     But the search result of user "Alice" should not contain these entries:
       | file1.txt |
     Examples:

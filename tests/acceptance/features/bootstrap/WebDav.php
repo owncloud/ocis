@@ -4875,22 +4875,33 @@ trait WebDav {
 		$elementRows = $expectedFiles->getRows();
 		$should = ($shouldOrNot !== "not");
 		foreach ($elementRows as $expectedFile) {
-			$fileFound = $this->findEntryFromPropfindResponse(
-				$expectedFile[0],
-				$user,
-				$method,
-				"files",
-				$folderpath
-			);
+			$resource = $expectedFile[0];
+			if ($resource === '') {
+				continue;
+			}
+			if ($method === "REPORT") {
+				$fileFound = $this->findEntryFromSearchResponse(
+					$resource
+				);
+			} else {
+				$fileFound = $this->findEntryFromPropfindResponse(
+					$resource,
+					$user,
+					$method,
+					"files",
+					$folderpath
+				);
+			}
+
 			if ($should) {
 				Assert::assertNotEmpty(
 					$fileFound,
-					"response does not contain the entry '$expectedFile[0]'"
+					"response does not contain the entry '$resource'"
 				);
 			} else {
 				Assert::assertFalse(
 					$fileFound,
-					"response does contain the entry '$expectedFile[0]' but should not"
+					"response does contain the entry '$resource' but should not"
 				);
 			}
 		}
@@ -5331,6 +5342,51 @@ trait WebDav {
 				return $multistatusResult;
 			}
 			$results[] = $entryName;
+		}
+		if ($entryNameToSearch === null) {
+			return $results;
+		}
+		return false;
+	}
+
+	/**
+	 * parses a REPORT response from $this->response into xml
+	 * and returns found search results if found else returns false
+	 *
+	 * @param string|null $entryNameToSearch
+	 *
+	 * @return string|array|boolean
+	 *
+	 * string if $entryNameToSearch is given and is found
+	 * array if $entryNameToSearch is not given
+	 * boolean false if $entryNameToSearch is given and is not found
+	 *
+	 * @throws GuzzleException
+	 */
+	public function findEntryFromSearchResponse(
+		?string $entryNameToSearch = null
+	) {
+		// trim any leading "/" passed by the caller, we can just match the "raw" name
+		if ($entryNameToSearch !== null) {
+			$entryNameToSearch = \trim($entryNameToSearch, "/");
+		}
+		$spacesBaseUrl = webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
+		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
+		$results = [];
+		foreach ($searchResults as $item) {
+			$href = (string)$item->xpath("d:href")[0];
+			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
+			$href = \str_replace($spacesBaseUrl, "", $href);
+			$resourcePath = \substr($href, \strpos($href, '/') + 1);
+			if (\count($shareRootXml)) {
+				$shareroot = \trim((string)$shareRootXml[0], "/");
+				$resourcePath = $shareroot . "/" . $resourcePath;
+			}
+			$resourcePath = \rawurldecode($resourcePath);
+			if ($entryNameToSearch === $resourcePath) {
+				return $resourcePath;
+			}
+			$results[] = $resourcePath;
 		}
 		if ($entryNameToSearch === null) {
 			return $results;
