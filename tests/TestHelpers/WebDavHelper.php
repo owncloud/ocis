@@ -738,10 +738,10 @@ class WebDavHelper {
 			return "remote.php/dav/";
 		}
 		if ($davPathVersionToUse === self::DAV_VERSION_SPACES) {
-			if (($spaceId === null) || (\strlen($spaceId) === 0)) {
-				throw new InvalidArgumentException(
-					__METHOD__ . " A spaceId must be passed when using DAV path version 3 (spaces)"
-				);
+			// return spaces root path if spaceid is null
+			// REPORT request uses spaces root path
+			if ($spaceId === null) {
+				return "/remote.php/dav/spaces/";
 			}
 			if ($type === "trash-bin") {
 				return "/remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
