@@ -134,17 +134,14 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When user :user restores version index :versionIndex of file :path using the WebDAV API
-	 * @Given user :user has restored version index :versionIndex of file :path
-	 *
 	 * @param string $user
 	 * @param int $versionIndex
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+	public function restoreVersionIndexOfFile(string $user, int $versionIndex, string $path):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
@@ -155,7 +152,7 @@ class FilesVersionsContext implements Context {
 			WebDavHelper::getDavPath($user, 2) . \trim($path, "/");
 		$fullUrl = $this->featureContext->getBaseUrlWithoutPath() .
 			$xmlPart[$versionIndex];
-		$response = HttpRequestHelper::sendRequest(
+		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
 			'COPY',
@@ -163,6 +160,35 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			['Destination' => $destinationUrl]
 		);
+	}
+
+	/**
+	 * @Given user :user has restored version index :versionIndex of file :path
+	 *
+	 * @param string $user
+	 * @param int $versionIndex
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
+	}
+
+	/**
+	 * @When user :user restores version index :versionIndex of file :path using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param int $versionIndex
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
 		$this->featureContext->setResponse($response, $user);
 	}
 
@@ -280,16 +306,14 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the version of file :path with the index :index
-	 *
 	 * @param string $user
 	 * @param string $path
 	 * @param string $index
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function downloadVersion(string $user, string $path, string $index):void {
+	public function downloadVersion(string $user, string $path, string $index):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
@@ -305,13 +329,26 @@ class FilesVersionsContext implements Context {
 		$url = WebDavHelper::sanitizeUrl(
 			$this->featureContext->getBaseUrlWithoutPath() . $xmlPart[$index]
 		);
-		$response = HttpRequestHelper::get(
+		return HttpRequestHelper::get(
 			$url,
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
-		$this->featureContext->setResponse($response, $user);
+	}
+
+	/**
+	 * @When user :user downloads the version of file :path with the index :index
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $index
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userDownloadsVersion(string $user, string $path, string $index):void {
+		$this->featureContext->setResponse($this->downloadVersion($user, $path, $index), $user);
 	}
 
 	/**
@@ -331,9 +368,9 @@ class FilesVersionsContext implements Context {
 		string $user,
 		string $content
 	): void {
-		$this->downloadVersion($user, $path, $index);
-		$this->featureContext->theHTTPStatusCodeShouldBe("200");
-		$this->featureContext->downloadedContentShouldBe($content);
+		$response = $this->downloadVersion($user, $path, $index);
+		$this->featureContext->theHTTPStatusCodeShouldBe("200", '', $response);
+		$this->featureContext->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
