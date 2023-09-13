@@ -83,7 +83,7 @@ func DefaultConfig() *config.Config {
 		EnableFavorites:          false,
 		EnableProjectSpaces:      true,
 		EnableShareJail:          true,
-		UploadMaxChunkSize:       1e+8,
+		UploadMaxChunkSize:       1e+7,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
 		EnableResharing:          true,
