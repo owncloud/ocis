@@ -64,9 +64,9 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Brian" should contain these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     And for user "Brian" the search result should contain space "mountpoint/folderMain"
     Examples:
       | dav-path-version |
@@ -163,9 +163,9 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "3" entries
     And the search result of user "Alice" should contain only these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Alice" should not contain these entries:
       | /folderMain |
     Examples:
@@ -185,9 +185,9 @@ Feature: Search
     When user "Brian" searches for "*folder*" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
-      | /SubFolder1                                |
-      | /SubFolder1/subFOLDER2                     |
-      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | folderMain/SubFolder1                                |
+      | folderMain/SubFolder1/subFOLDER2                     |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Brian" should not contain these entries:
       | /folderMain |
     Examples:
@@ -208,8 +208,8 @@ Feature: Search
     When user "Alice" searches for "*file*" inside folder "/Folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
-      | file2.txt |
-      | file3.txt |
+      | /Folder/file2.txt           |
+      | /Folder/SubFolder/file3.txt |
     But the search result of user "Alice" should not contain these entries:
       | file1.txt |
     Examples:
@@ -231,7 +231,7 @@ Feature: Search
     When user "Brian" searches for "shared*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain these entries:
-      | /sharedToBrian |
+      | foo/sharedToBrian |
     But the search result of user "Brian" should not contain these entries:
       | /sharedToCarol |
     Examples:
