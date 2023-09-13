@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-13-00-07-14]
+[#deprecation-note-2023-09-13-10-18-32]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -316,7 +316,7 @@ a|`FRONTEND_UPLOAD_MAX_CHUNK_SIZE` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++100000000 ++
+++10000000 ++
 a| [subs=-attributes]
 Sets the max chunk sizes in bytes for uploads via the clients.
 
