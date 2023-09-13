@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
@@ -18,6 +19,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
+
+* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
+
+   We changed the default TUS chunk size from 100MB to 10MB. You can still use the old value by
+   configuring it in your deployment.
+
+   https://github.com/owncloud/ocis/pull/7273
 
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
