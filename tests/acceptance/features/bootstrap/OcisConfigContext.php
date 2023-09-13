@@ -21,6 +21,7 @@
  */
 
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
@@ -71,6 +72,28 @@ class OcisConfigContext implements Context {
 			200,
 			$response->getStatusCode(),
 			"Failed to set config $configVariable=$configValue"
+		);
+	}
+
+	/**
+	 * @Given the following configs have been set:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theConfigHasBeenSetToValue(TableNode $table): void {
+		$envs = [];
+		foreach ($table->getHash() as $row) {
+			$envs[$row['config']] = $row['value'];
+		}
+
+		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to set config"
 		);
 	}
 
