@@ -2267,7 +2267,6 @@ def deploy(ctx, config, rebuild):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
