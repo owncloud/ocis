@@ -57,6 +57,12 @@ services:
     # it will fail on subsequent runs, because the config file already exists
     # therefore we ignore the error and then start the ocis server
     command: ["-c", "ocis init || true; ocis server"]
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "127.0.0.1", "9235" ]
+      interval: 60s
+      timeout: 15s
+      start_period: 3s
+      start_interval: 3s
     environment:
       #PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       OCIS_OIDC_ISSUER: https://${AUTHELIA_DOMAIN:-authelia.owncloud.test}
@@ -93,6 +99,9 @@ services:
     restart: always
 
   authelia:
+    depends_on:
+      ocis:
+        condition: service_healthy
     image: authelia/authelia
     container_name: authelia
     volumes:
