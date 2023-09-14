@@ -85,7 +85,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates the following tags for (folder|file)"([^"]*)" of space "([^"]*)":$/
+	 * @When /^user "([^"]*)" creates the following tags for (folder|file) "([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)
@@ -222,7 +222,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the following tags for (folder|file)"([^"]*)" of space "([^"]*)":$/
+	 * @When /^user "([^"]*)" removes the following tags for (folder|file) "([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)
