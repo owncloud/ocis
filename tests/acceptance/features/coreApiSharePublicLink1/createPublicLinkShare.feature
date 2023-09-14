@@ -414,7 +414,7 @@ Feature: create a public link share
     Then the HTTP status code should be "207"
     And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/file.txt$/"
 
-  @issue-6929
+  @issue-6929 @skipOnRevaMaster
   Scenario Outline: create a password-protected public link on a file with the name same to the previously deleted one
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "test data 1" to "/test.txt"
