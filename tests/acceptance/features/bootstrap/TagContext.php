@@ -63,7 +63,7 @@ class TagContext implements Context {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function createFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):ResponseInterface {
+	public function createTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):ResponseInterface {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
 			$tagNameArray[] = $value[0];
@@ -85,7 +85,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
+	 * @When /^user "([^"]*)" creates the following tags for (folder|file)"([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)
@@ -97,7 +97,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserCreatesFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$response = $this->createFollowingTags($user, $fileOrFolder, $resource, $space, $table);
+		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -114,7 +114,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserHasCreatedFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
-		$response = $this->createFollowingTags($user, $fileOrFolder, $resource, $space, $table);
+		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -222,7 +222,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
+	 * @When /^user "([^"]*)" removes the following tags for (folder|file)"([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)

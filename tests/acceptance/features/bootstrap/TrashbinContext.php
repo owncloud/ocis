@@ -61,11 +61,11 @@ class TrashbinContext implements Context {
 	/**
 	 * @When user :user empties the trashbin using the trashbin API
 	 *
-	 * @param string|null $user user
+	 * @param string $user user
 	 *
-	 * @return ResponseInterface
+	 * @return void
 	 */
-	public function userEmptiesTrashbin(?string $user): void {
+	public function userEmptiesTrashbin(string $user): void {
 		$this->featureContext->setResponse($this->emptyTrashbin($user));
 	}
 	/**
