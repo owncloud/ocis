@@ -52,13 +52,13 @@ class SearchContext implements Context {
 	 * @return void
 	 */
 	public function userSearchesUsingWebDavAPI(
-		string $user,
-		string $pattern,
-		?string	$limit = null,
-		?string $scope = null,
-		?string $spaceName = null,
+		string    $user,
+		string    $pattern,
+		?string   $limit = null,
+		?string   $scope = null,
+		?string   $spaceName = null,
 		TableNode $properties = null
-	):void {
+	): void {
 		// Because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously, a short wait is necessary before searching files or folders.
 		sleep(4);
 		$user = $this->featureContext->getActualUsername($user);
@@ -113,10 +113,10 @@ class SearchContext implements Context {
 	 * @throws Exception
 	 */
 	public function fileOrFolderInTheSearchResultShouldContainProperties(
-		string $path,
-		string $user,
+		string    $path,
+		string    $user,
 		TableNode $properties
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($properties, ['name', 'value']);
 		$properties = $properties->getHash();
@@ -163,10 +163,47 @@ class SearchContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
+	}
+
+	/**
+	 * @Then /^the search result should contain these (?:files|entries) with highlight on keyword "([^"]*)"/
+	 *
+	 * @param TableNode $expectedFiles
+	 * @param string $expectedContent
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function theSearchResultShouldContainEntriesWithHighlight(
+		TableNode $expectedFiles,
+		string    $expectedContent
+	): void {
+		$this->featureContext->verifyTableNodeColumnsCount($expectedFiles, 1);
+		$elementRows = $expectedFiles->getRows();
+		$foundEntries = $this->featureContext->findEntryFromSearchResponse(
+			null,
+			true
+		);
+		foreach ($elementRows as $index => $expectedFile) {
+			$filename = $expectedFile[0];
+			$content = $foundEntries[$filename];
+			// Extract the content between the <mark> tags
+			preg_match('/<mark>(.*?)<\/mark>/s', $content, $matches);
+			$actualContent = isset($matches[1]) ? $matches[1] : '';
+
+			// Remove any leading/trailing whitespace for comparison
+			$actualContent = trim($actualContent);
+			Assert::assertEquals(
+				$expectedContent,
+				$actualContent,
+				"Expected text highlight to be '$expectedContent' but found '$actualContent'"
+			);
+		}
 	}
 }
