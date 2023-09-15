@@ -276,11 +276,11 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 							},
 							"password_policy": map[string]interface{}{
 								"max_characters":           72,
-								"min_characters":           cfg.PasswordPolicies.MinCharacters,
-								"min_lowercase_characters": cfg.PasswordPolicies.MinLowerCaseCharacters,
-								"min_uppercase_characters": cfg.PasswordPolicies.MinUpperCaseCharacters,
-								"min_digits":               cfg.PasswordPolicies.MinDigits,
-								"min_special_characters":   cfg.PasswordPolicies.MinSpecialCharacters,
+								"min_characters":           cfg.PasswordPolicy.MinCharacters,
+								"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
+								"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
+								"min_digits":               cfg.PasswordPolicy.MinDigits,
+								"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
 							},
 							"notifications": map[string]interface{}{
 								"endpoints": []string{"list", "get", "delete"},
