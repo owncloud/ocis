@@ -524,7 +524,7 @@ Feature: copy file
     Then the HTTP status code should be "403"
     And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares" should be "ownCloud test text file 1"
 
-  @issue-4393
+  @issue-7208
   Scenario: copy a file over the top of an existing folder received as a user share
     Given using spaces DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
@@ -538,7 +538,7 @@ Feature: copy file
     And as "Alice" file "/textfile1.txt" should exist
     And user "Alice" should not have any received shares
 
-  @issue-4393
+  @issue-7208
   Scenario: copy a folder over the top of an existing file received as a user share
     Given using spaces DAV path
     And user "Alice" has created folder "/FOLDER"
