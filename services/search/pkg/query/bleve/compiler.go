@@ -26,6 +26,34 @@ var _fields = map[string]string{
 	"hidden":   "Hidden",
 }
 
+// The following quoted string enumerates the characters which may be escaped: "+-=&|><!(){}[]^\"~*?:\\/ "
+// based on bleve docs https://blevesearch.com/docs/Query-String-Query/
+// Wildcards * and ? are excluded
+var bleveEscaper = strings.NewReplacer(
+	`+`, `\+`,
+	`-`, `\-`,
+	`=`, `\=`,
+	`&`, `\&`,
+	`|`, `\|`,
+	`>`, `\>`,
+	`<`, `\<`,
+	`!`, `\!`,
+	`(`, `\(`,
+	`)`, `\)`,
+	`{`, `\{`,
+	`}`, `\}`,
+	`{`, `\}`,
+	`[`, `\[`,
+	`]`, `\]`,
+	`^`, `\^`,
+	`"`, `\"`,
+	`~`, `\~`,
+	`:`, `\:`,
+	`\`, `\\`,
+	`/`, `\/`,
+	` `, `\ `,
+)
+
 // Compiler represents a KQL query search string to the bleve query formatter.
 type Compiler struct{}
 
@@ -58,7 +86,10 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
 			k := getField(n.Key)
-			v := strings.ReplaceAll(n.Value, " ", `\ `)
+			v := n.Value
+			if k != "ID" && k != "Size" {
+				v = bleveEscaper.Replace(n.Value)
+			}
 
 			if k != "Hidden" {
 				v = strings.ToLower(v)
