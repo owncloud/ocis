@@ -4,15 +4,10 @@ Feature: enforce password on public link
   I want to enforce passwords on public links shared with upload, edit, or contribute permission
   So that the password is required to access the contents of the link
 
-  Background:
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | Alice    |
-    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
-
-
   Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
     Given the config "OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |
@@ -28,6 +23,8 @@ Feature: enforce password on public link
 
   Scenario Outline: update a public link to edit permission without a password
     Given the config "OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And user "Alice" has created a public link share with settings
       | path        | /testfile.txt |
@@ -45,10 +42,12 @@ Feature: enforce password on public link
 
   Scenario Outline: updates a public link to edit permission with a password
     Given the config "OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share inside of space "Alice Hansen" with settings:
-      | path        | testfile.txt |
-      | permissions | 1            |
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3            |
       | password    | testpassword |
@@ -65,8 +64,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: create a public link with a password in accordance with the password policy
-    Given using OCS API version "<ocs-api-version>"
-    And the following configs have been set:
+    Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
       | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
@@ -74,6 +72,9 @@ Feature: enforce password on public link
       | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |
       | permissions | 3             |
@@ -90,9 +91,8 @@ Feature: enforce password on public link
       | 2               | 200      |
 
 
-  Scenario Outline: try to create a public link with a password that does not comply with the password policy
-    Given using OCS API version "<ocs-api-version>"
-    And the following configs have been set:
+  Scenario Outline: try to create a public link with a password that does not comply with the password policy 
+    Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
       | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
@@ -100,6 +100,9 @@ Feature: enforce password on public link
       | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |
       | permissions | 3             |
@@ -114,8 +117,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password in accordance with the password policy
-    Given using OCS API version "<ocs-api-version>"
-    And the following configs have been set:
+    Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
       | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
@@ -123,9 +125,12 @@ Feature: enforce password on public link
       | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 1     |
       | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
-    And user "Alice" has created a public link share inside of space "Alice Hansen" with settings:
-      | path        | testfile.txt |
-      | permissions | 1            |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3             |
       | password    | 6a0Q;A3 +i^m[ |
@@ -142,8 +147,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: try to update a public link with a password that does not comply with the password policy
-    Given using OCS API version "<ocs-api-version>"
-    And the following configs have been set:
+    Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
       | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
@@ -151,9 +155,12 @@ Feature: enforce password on public link
       | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
       | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 1     |
       | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
-    And user "Alice" has created a public link share inside of space "Alice Hansen" with settings:
-      | path        | testfile.txt |
-      | permissions | 1            |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3    |
       | password    | Pws^ |
@@ -179,9 +186,11 @@ Feature: enforce password on public link
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true           |
       | <config>                                               | <config-value> |
     And using OCS API version "2"
-    And user "Alice" has created a public link share inside of space "Alice Hansen" with settings:
-      | path        | testfile.txt |
-      | permissions | 1            |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3          |
       | password    | <password> |
@@ -209,9 +218,11 @@ Feature: enforce password on public link
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true           |
       | <config>                                               | <config-value> |
     And using OCS API version "2"
-    And user "Alice" has created a public link share inside of space "Alice Hansen" with settings:
-      | path        | testfile.txt |
-      | permissions | 1            |
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3          |
       | password    | <password> |
