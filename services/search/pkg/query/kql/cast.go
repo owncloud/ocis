@@ -84,7 +84,7 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 
 	value, err := toString(in)
 	if err != nil {
-		return &from, &to, UnsupportedTimeRange{}
+		return &from, &to, UnsupportedTimeRangeError{}
 	}
 
 	c := &now.Config{
@@ -121,7 +121,7 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 	}
 
 	if from.IsZero() || to.IsZero() {
-		return nil, nil, UnsupportedTimeRange{}
+		return nil, nil, UnsupportedTimeRangeError{}
 	}
 
 	return &from, &to, nil
