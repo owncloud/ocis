@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/araddon/dateparse"
+	"github.com/jinzhu/now"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -13,66 +13,18 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
-var mustParseTime = func(t *testing.T, ts string) time.Time {
-	tp, err := dateparse.ParseLocal(ts)
-	if err != nil {
-		t.Fatalf("time.Parse(...) error = %v", err)
-	}
-
-	return tp
-}
-
-var mustJoin = func(v []string) string {
-	return strings.Join(v, " ")
-}
-
-var FullDictionary = []string{
-	`federated search`,
-	`federat* search`,
-	`search fed*`,
-	`author:"John Smith"`,
-	`filetype:docx`,
-	`filename:budget.xlsx`,
-	`author: "John Smith"`,
-	`author :"John Smith"`,
-	`author : "John Smith"`,
-	`author "John Smith"`,
-	`author "John Smith"`,
-	`author:Shakespear`,
-	`author:Paul`,
-	`author:Shakesp*`,
-	`title:"Advanced Search"`,
-	`title:"Advanced Sear*"`,
-	`title:"Advan* Search"`,
-	`title:"*anced Search"`,
-	`author:"John Smith" OR author:"Jane Smith"`,
-	`author:"John Smith" AND filetype:docx`,
-	`author:("John Smith" "Jane Smith")`,
-	`author:("John Smith" OR "Jane Smith")`,
-	`(DepartmentId:* OR RelatedHubSites:*) AND contentclass:sts_site NOT IsHubSite:false`,
-	`author:"John Smith" (filetype:docx title:"Advanced Search")`,
-}
-
-func TestParse(t *testing.T) {
-	tests := []struct {
-		name          string
-		skip          bool
-		givenQuery    string
-		expectedAst   *ast.Ast
-		expectedError error
-	}{
-		// SPEC //////////////////////////////////////////////////////////////////////////////
-		//
-		// https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
-		// https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-kql/3bbf06cd-8fc1-4277-bd92-8661ccd3c9b0
-		// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference
-		//
-		// ++
+func TestParse_Spec(t *testing.T) {
+	// SPEC //////////////////////////////////////////////////////////////////////////////
+	//
+	// https://msopenspecs.azureedge.net/files/MS-KQL/%5bMS-KQL%5d.pdf
+	// https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-kql/3bbf06cd-8fc1-4277-bd92-8661ccd3c9b0
+	// https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference
+	tests := []testCase{
 		// 2.1.2 AND Operator
 		// 3.1.2 AND Operator
 		{
 			name: `cat AND dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -82,22 +34,21 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `AND`,
-			expectedError: kql.StartsWithBinaryOperatorError{
+			error: kql.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
 		{
 			name: `AND cat AND dog`,
-			expectedError: kql.StartsWithBinaryOperatorError{
+			error: kql.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
-		// ++
 		// 2.1.6 NOT Operator
 		// 3.1.6 NOT Operator
 		{
 			name: `cat NOT dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -108,19 +59,18 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `NOT dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.OperatorNode{Value: kql.BoolNOT},
 					&ast.StringNode{Value: "dog"},
 				},
 			},
 		},
-		// ++
 		// 2.1.8 OR Operator
 		// 3.1.8 OR Operator
 		{
 			name: `cat OR dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolOR},
@@ -130,21 +80,20 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `OR`,
-			expectedError: kql.StartsWithBinaryOperatorError{
+			error: kql.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},
 		{
 			name: `OR cat AND dog`,
-			expectedError: kql.StartsWithBinaryOperatorError{
+			error: kql.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},
-		// ++
 		// 3.1.11 Implicit Operator
 		{
 			name: `cat dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -154,7 +103,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat AND (dog OR fox)`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -168,7 +117,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat (dog OR fox)`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -180,12 +129,11 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 2.1.12 Parentheses
 		// 3.1.12 Parentheses
 		{
 			name: `(cat OR dog) AND fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
 						&ast.StringNode{Value: "cat"},
@@ -197,11 +145,10 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 3.2.3 Implicit Operator for Property Restriction
 		{
 			name: `author:"John Smith" filetype:docx`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Key: "author", Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -211,7 +158,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `author:"John Smith" AND filetype:docx`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Key: "author", Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -221,7 +168,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `author:"John Smith" author:"Jane Smith"`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Key: "author", Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolOR},
@@ -231,7 +178,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `author:"John Smith" OR author:"Jane Smith"`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Key: "author", Value: "John Smith"},
 					&ast.OperatorNode{Value: kql.BoolOR},
@@ -241,7 +188,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat filetype:docx`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -251,7 +198,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat AND filetype:docx`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -259,11 +206,10 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 3.3.1.1.1 Implicit AND Operator
 		{
 			name: `cat +dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -273,7 +219,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat AND dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -283,7 +229,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat -dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -294,7 +240,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat AND NOT dog`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -305,7 +251,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat +dog -fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -318,7 +264,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat AND dog AND NOT fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -331,7 +277,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat dog +fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -343,7 +289,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `fox OR (fox AND (cat OR dog))`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "fox"},
 					&ast.OperatorNode{Value: kql.BoolOR},
@@ -361,7 +307,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat dog -fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -374,7 +320,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `(NOT fox) AND (cat OR dog)`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
 						&ast.OperatorNode{Value: kql.BoolNOT},
@@ -391,7 +337,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `cat +dog -fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -404,7 +350,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `(NOT fox) AND (dog OR (dog AND cat))`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
 						&ast.OperatorNode{Value: kql.BoolNOT},
@@ -423,12 +369,11 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		// ++
 		// 2.3.5 Date Tokens
 		// 3.3.5 Date Tokens
 		{
 			name: `Modified:2023-09-05`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.DateTimeNode{
 						Key:      "Modified",
@@ -440,7 +385,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `Modified:"2008-01-29"`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.DateTimeNode{
 						Key:      "Modified",
@@ -451,15 +396,400 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: `Modified:today`,
-			skip: true,
+			name:  `Modified:today`,
+			patch: patchNow(t, "2023-09-10"),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Modified",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-10"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Modified",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
 		},
-		//////////////////////////////////////////////////////////////////////////////////////
-		// everything else
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
+		})
+	}
+}
+
+func TestParse_DateTimeRestrictionNode(t *testing.T) {
+	tests := []testCase{
 		{
-			name:       "FullDictionary",
-			givenQuery: mustJoin(FullDictionary),
-			expectedAst: &ast.Ast{
+			name: "format",
+			query: join([]string{
+				`Mtime:"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime:2023-09-05T08:42:11.23554+02:00`,
+				`Mtime="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime=2023-09-05T08:42:11.23554+02:00`,
+				`Mtime<"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime<2023-09-05T08:42:11.23554+02:00`,
+				`Mtime<="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime<=2023-09-05T08:42:11.23554+02:00`,
+				`Mtime>"2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime>2023-09-05T08:42:11.23554+02:00`,
+				`Mtime>="2023-09-05T08:42:11.23554+02:00"`,
+				`Mtime>=2023-09-05T08:42:11.23554+02:00`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - today",
+			patch: setWorldClock(t, "2023-09-10"),
+			query: join([]string{
+				`Mtime:today`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-10"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - yesterday",
+			patch: setWorldClock(t, "2023-09-10"),
+			query: join([]string{
+				`Mtime:yesterday`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-09"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-09 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - yesterday - the beginning of the month",
+			patch: setWorldClock(t, "2023-09-01"),
+			query: join([]string{
+				`Mtime:yesterday`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-31"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-08-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - this week",
+			patch: setWorldClock(t, "2023-09-06"),
+			query: join([]string{
+				`Mtime:"this week"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-04"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-10 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - this month",
+			patch: setWorldClock(t, "2023-09-02"),
+			query: join([]string{
+				`Mtime:"this month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-30 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last month",
+			patch: setWorldClock(t, "2023-09-02"),
+			query: join([]string{
+				`Mtime:"last month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-08-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last month - the beginning of the year",
+			patch: setWorldClock(t, "2023-01-01"),
+			query: join([]string{
+				`Mtime:"last month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2022-12-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2022-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - this year",
+			patch: setWorldClock(t, "2023-06-18"),
+			query: join([]string{
+				`Mtime:"this year"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-01-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last year",
+			patch: setWorldClock(t, "2023-01-01"),
+			query: join([]string{
+				`Mtime:"last year"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2022-01-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2022-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
+		})
+	}
+}
+
+func TestParse_Errors(t *testing.T) {
+	tests := []testCase{
+		{
+			query: "animal:(mammal:cat mammal:dog reptile:turtle)",
+			error: kql.NamedGroupInvalidNodesError{
+				Node: &ast.StringNode{Key: "mammal", Value: "cat"},
+			},
+		},
+		{
+			query: "animal:(cat mammal:dog turtle)",
+			error: kql.NamedGroupInvalidNodesError{
+				Node: &ast.StringNode{Key: "mammal", Value: "dog"},
+			},
+		},
+		{
+			query: "animal:(AND cat)",
+			error: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
+		},
+		{
+			query: "animal:(OR cat)",
+			error: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
+		},
+		{
+			query: "(AND cat)",
+			error: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolAND},
+			},
+		},
+		{
+			query: "(OR cat)",
+			error: kql.StartsWithBinaryOperatorError{
+				Node: &ast.OperatorNode{Value: kql.BoolOR},
+			},
+		},
+		{
+			query: `cat dog`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "cat"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{Value: "dog"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
+		})
+	}
+}
+
+func TestParse_Stress(t *testing.T) {
+	tests := []testCase{
+		{
+			name:  "FullDictionary",
+			query: join(FullDictionary),
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "federated"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -565,13 +895,13 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "Group",
-			givenQuery: mustJoin([]string{
+			name: "complex",
+			query: join([]string{
 				`(name:"moby di*" OR tag:bestseller) AND tag:book NOT tag:read`,
 				`author:("John Smith" Jane)`,
 				`author:("John Smith" OR Jane)`,
 			}),
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Nodes: []ast.Node{
@@ -608,7 +938,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `author:("John Smith" Jane) author:"Jack" AND author:"Oggy"`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "author",
@@ -627,7 +957,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `author:("John Smith" OR Jane)`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "author",
@@ -642,7 +972,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `NOT "John Smith" NOT Jane`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.OperatorNode{Value: kql.BoolNOT},
 					&ast.StringNode{Value: "John Smith"},
@@ -654,7 +984,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `NOT author:"John Smith" NOT author:"Jane Smith" NOT tag:sifi`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.OperatorNode{Value: kql.BoolNOT},
 					&ast.StringNode{Key: "author", Value: "John Smith"},
@@ -669,7 +999,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `scope:"<uuid>/new folder/subfolder" file`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{
 						Key:   "scope",
@@ -684,7 +1014,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `	😂 "*😀 😁*" name:😂💁👌🎍😍 name:😂💁👌 😍`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{
 						Value: "😂",
@@ -711,120 +1041,8 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "DateTimeRestrictionNode",
-			givenQuery: mustJoin([]string{
-				`Mtime:"2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime:2023-09-05T08:42:11.23554+02:00`,
-				`Mtime="2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime=2023-09-05T08:42:11.23554+02:00`,
-				`Mtime<"2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime<2023-09-05T08:42:11.23554+02:00`,
-				`Mtime<="2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime<=2023-09-05T08:42:11.23554+02:00`,
-				`Mtime>"2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime>2023-09-05T08:42:11.23554+02:00`,
-				`Mtime>="2023-09-05T08:42:11.23554+02:00"`,
-				`Mtime>=2023-09-05T08:42:11.23554+02:00`,
-			}),
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ":"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ":"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "<"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "<"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "<="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: "<="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ">"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ">"},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ">="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.DateTimeNode{
-						Key:      "Mtime",
-						Operator: &ast.OperatorNode{Value: ">="},
-						Value:    mustParseTime(t, "2023-09-05T08:42:11.23554+02:00"),
-					},
-				},
-			},
-		},
-		{
-			name: "id",
-			givenQuery: mustJoin([]string{
-				`id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
-				`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
-			}),
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{
-						Key:   "id",
-						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
-					},
-					&ast.OperatorNode{Value: kql.BoolOR},
-					&ast.StringNode{
-						Key:   "ID",
-						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
-					},
-				},
-			},
-		},
-		{
 			name: "animal:(cat dog turtle)",
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "animal",
@@ -847,7 +1065,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "(cat dog turtle)",
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Nodes: []ast.Node{
@@ -868,54 +1086,8 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "animal:(mammal:cat mammal:dog reptile:turtle)",
-			expectedError: kql.NamedGroupInvalidNodesError{
-				Node: &ast.StringNode{Key: "mammal", Value: "cat"},
-			},
-		},
-		{
-			name: "animal:(cat mammal:dog turtle)",
-			expectedError: kql.NamedGroupInvalidNodesError{
-				Node: &ast.StringNode{Key: "mammal", Value: "dog"},
-			},
-		},
-		{
-			name: "animal:(AND cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		{
-			name: "animal:(OR cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		{
-			name: "(AND cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolAND},
-			},
-		},
-		{
-			name: "(OR cat)",
-			expectedError: kql.StartsWithBinaryOperatorError{
-				Node: &ast.OperatorNode{Value: kql.BoolOR},
-			},
-		},
-		{
-			name: `cat dog`,
-			expectedAst: &ast.Ast{
-				Nodes: []ast.Node{
-					&ast.StringNode{Value: "cat"},
-					&ast.OperatorNode{Value: kql.BoolAND},
-					&ast.StringNode{Value: "dog"},
-				},
-			},
-		},
-		{
 			name: `cat dog fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.StringNode{Value: "cat"},
 					&ast.OperatorNode{Value: kql.BoolAND},
@@ -927,7 +1099,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `(cat dog) fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Nodes: []ast.Node{
@@ -943,7 +1115,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `(mammal:cat mammal:dog) fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Nodes: []ast.Node{
@@ -959,7 +1131,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `mammal:(cat dog) fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "mammal",
@@ -976,7 +1148,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `mammal:(cat dog) mammal:fox`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "mammal",
@@ -993,7 +1165,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: `title:((Advanced OR Search OR Query) -"Advanced Search Query")`,
-			expectedAst: &ast.Ast{
+			ast: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{
 						Key: "title",
@@ -1015,39 +1187,56 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "ids",
+			query: join([]string{
+				`id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
+				`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Key:   "id",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+					&ast.OperatorNode{Value: kql.BoolOR},
+					&ast.StringNode{
+						Key:   "ID",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+				},
+			},
+		},
+		{
+			name: `"test:test" test:"test:test" "more:*+#!/°^§$%&&/()=?<><<more" more:"more:*+#!/°^§$%&&/()=?<><<more"`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Value: "test:test",
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{
+						Key:   "test",
+						Value: "test:test",
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{
+						Value: "more:*+#!/°^§$%&&/()=?<><<more",
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.StringNode{
+						Key:   "more",
+						Value: "more:*+#!/°^§$%&&/()=?<><<more",
+					},
+				},
+			},
+		},
 	}
 
-	assert := tAssert.New(t)
-
-	for _, tt := range tests {
-		tt := tt
-
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip()
-			}
-
-			q := tt.name
-
-			if tt.givenQuery != "" {
-				q = tt.givenQuery
-			}
-
-			parsedAST, err := kql.Builder{}.Build(q)
-
-			if tt.expectedError != nil {
-				if tt.expectedError.Error() != "" {
-					assert.Equal(err.Error(), tt.expectedError.Error())
-				} else {
-					assert.NotNil(err)
-				}
-
-				return
-			}
-
-			if diff := test.DiffAst(tt.expectedAst, parsedAST); diff != "" {
-				t.Fatalf("AST mismatch \nquery: '%s' \n(-expected +got): %s", q, diff)
-			}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
 		})
 	}
 }
@@ -1059,4 +1248,110 @@ func BenchmarkParse(b *testing.B) {
 			b.Fatal(err)
 		}
 	}
+}
+
+type testCase struct {
+	name  string
+	query string
+	ast   *ast.Ast
+	error error
+	skip  bool
+	patch func() func()
+}
+
+var mustParseTime = func(t *testing.T, ts string) time.Time {
+	tp, err := now.Parse(ts)
+	if err != nil {
+		t.Fatalf("time.Parse(...) error = %v", err)
+	}
+
+	return tp
+}
+
+var setWorldClock = func(t *testing.T, ts string) func() func() {
+	return func() func() {
+		kql.PatchTimeNow(func() time.Time {
+			return mustParseTime(t, ts)
+		})
+
+		return func() {
+			kql.PatchTimeNow(time.Now)
+		}
+	}
+}
+
+var patchNow = func(t *testing.T, ts string) func() func() {
+	return func() func() {
+		kql.PatchTimeNow(func() time.Time {
+			return mustParseTime(t, ts)
+		})
+
+		return func() {
+			kql.PatchTimeNow(time.Now)
+		}
+	}
+}
+
+var join = func(v []string) string {
+	return strings.Join(v, " ")
+}
+
+func testKQL(t *testing.T, tc testCase) {
+	if tc.skip {
+		t.Skip()
+	}
+
+	if tc.patch != nil {
+		revert := tc.patch()
+		defer revert()
+	}
+
+	query := tc.name
+	if tc.query != "" {
+		query = tc.query
+	}
+
+	astResult, err := kql.Builder{}.Build(query)
+	assert := tAssert.New(t)
+
+	if tc.error != nil {
+		if expectedError := tc.error.Error(); expectedError != "" {
+			assert.Equal(err.Error(), expectedError)
+		} else {
+			assert.NotNil(err)
+		}
+
+		return
+	}
+
+	if diff := test.DiffAst(tc.ast, astResult); diff != "" {
+		t.Fatalf("AST mismatch \nquery: '%s' \n(-expected +got): %s", query, diff)
+	}
+}
+
+var FullDictionary = []string{
+	`federated search`,
+	`federat* search`,
+	`search fed*`,
+	`author:"John Smith"`,
+	`filetype:docx`,
+	`filename:budget.xlsx`,
+	`author: "John Smith"`,
+	`author :"John Smith"`,
+	`author : "John Smith"`,
+	`author "John Smith"`,
+	`author "John Smith"`,
+	`author:Shakespear`,
+	`author:Paul`,
+	`author:Shakesp*`,
+	`title:"Advanced Search"`,
+	`title:"Advanced Sear*"`,
+	`title:"Advan* Search"`,
+	`title:"*anced Search"`,
+	`author:"John Smith" OR author:"Jane Smith"`,
+	`author:"John Smith" AND filetype:docx`,
+	`author:("John Smith" "Jane Smith")`,
+	`author:("John Smith" OR "Jane Smith")`,
+	`(DepartmentId:* OR RelatedHubSites:*) AND contentclass:sts_site NOT IsHubSite:false`,
+	`author:"John Smith" (filetype:docx title:"Advanced Search")`,
 }

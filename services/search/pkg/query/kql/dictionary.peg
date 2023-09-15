@@ -61,6 +61,12 @@ DateTimeRestrictionNode <-
         FullTime
     ) '"'? {
         return buildDateTimeNode(k, o, v, c.text, c.pos)
+    } /
+    k:Char+ (
+        OperatorEqualNode /
+        OperatorColonNode
+    ) '"'? v:NaturalLanguageDateTime '"'? {
+        return buildNaturalLanguageDateTimeNodes(k, v, c.text, c.pos)
     }
 
 TextPropertyRestrictionNode <-
@@ -185,9 +191,20 @@ FullTime <-
         return c.text, nil
     }
 
-DateTime
-  = FullDate "T" FullTime {
+DateTime  <-
+    FullDate "T" FullTime {
       return c.text, nil
+    }
+
+NaturalLanguageDateTime  <-
+    "today" /
+    "yesterday" /
+    "this week" /
+    "this month" /
+    "last month" /
+    "this year" /
+    "last year"  {
+        return c.text, nil
     }
 
 ////////////////////////////////////////////////////////

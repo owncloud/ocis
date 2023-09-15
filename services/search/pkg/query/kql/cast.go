@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/araddon/dateparse"
+	"github.com/jinzhu/now"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
@@ -21,21 +21,23 @@ func toNode[T ast.Node](in interface{}) (T, error) {
 
 func toNodes[T ast.Node](in interface{}) ([]T, error) {
 	switch v := in.(type) {
-	case []T:
-		return v, nil
 	case T:
 		return []T{v}, nil
+	case []T:
+		return v, nil
+	case []*ast.OperatorNode, []*ast.DateTimeNode:
+		return toNodes[T](v)
 	case []interface{}:
-		var ts []T
-		for _, inter := range v {
-			n, err := toNodes[T](inter)
+		var nodes []T
+		for _, el := range v {
+			node, err := toNodes[T](el)
 			if err != nil {
 				return nil, err
 			}
 
-			ts = append(ts, n...)
+			nodes = append(nodes, node...)
 		}
-		return ts, nil
+		return nodes, nil
 	case nil:
 		return nil, nil
 	default:
@@ -74,5 +76,53 @@ func toTime(in interface{}) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return dateparse.ParseLocal(ts)
+	return now.Parse(ts)
+}
+
+func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
+	var from, to time.Time
+
+	value, err := toString(in)
+	if err != nil {
+		return &from, &to, UnsupportedTimeRangeError{}
+	}
+
+	c := &now.Config{
+		WeekStartDay: time.Monday,
+	}
+
+	n := c.With(timeNow())
+
+	switch value {
+	case "today":
+		from = n.BeginningOfDay()
+		to = n.EndOfDay()
+	case "yesterday":
+		yesterday := n.With(n.AddDate(0, 0, -1))
+		from = yesterday.BeginningOfDay()
+		to = yesterday.EndOfDay()
+	case "this week":
+		from = n.BeginningOfWeek()
+		to = n.EndOfWeek()
+	case "this month":
+		from = n.BeginningOfMonth()
+		to = n.EndOfMonth()
+	case "last month":
+		lastMonth := n.With(n.AddDate(0, -1, 0))
+		from = lastMonth.BeginningOfMonth()
+		to = lastMonth.EndOfMonth()
+	case "this year":
+		from = n.BeginningOfYear()
+		to = n.EndOfYear()
+	case "last year":
+		lastYear := n.With(n.AddDate(-1, 0, 0))
+		from = lastYear.BeginningOfYear()
+		to = lastYear.EndOfYear()
+	}
+
+	if from.IsZero() || to.IsZero() {
+		return nil, nil, UnsupportedTimeRangeError{}
+	}
+
+	return &from, &to, nil
 }
