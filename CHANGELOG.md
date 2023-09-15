@@ -80,16 +80,31 @@ The following sections list the changes for unreleased.
    [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference)
    as the default oCIS search query language.
 
-   Some examples of a valid KQL query are:
+   Simple queries:
 
-  * `Tag`: `tag:golden tag:"silver"`
-  * `Filename`: `name:file.txt name:"file.docx"`
-  * `Content`: `content:ahab content:"captain aha*"`
+  * `tag:golden tag:"silver"`
+  * `name:file.txt name:"file.docx"`
+  * `content:ahab content:"captain aha*"`
+
+   Date/-range queries
+
+  * `Mtime:"2023-09-05T08:42:11.23554+02:00"`
+  * `Mtime>"2023-09-05T08:42:11.23554+02:00"`
+  * `Mtime>="2023-09-05T08:42:11.23554+02:00"`
+  * `Mtime<"2023-09-05T08:42:11.23554+02:00"`
+  * `Mtime<="2023-09-05T08:42:11.23554+02:00"`
+  * `Mtime:today` - range: start of today till end of today
+  * `Mtime:yesterday` - range: start of yesterday till end of yesterday
+  * `Mtime:"this week"` - range: start of this week till end of this week
+  * `Mtime:"this month"` - range: start of this month till end of this month
+  * `Mtime:"last month"` - range: start of last month till end of last month
+  * `Mtime:"this year"` - range: start of this year till end of this year
+  * `Mtime:"last year"` - range: start of last year till end of last year
 
    Conjunctive normal form queries:
 
-  * `Boolean`: `tag:golden AND tag:"silver`, `tag:golden OR tag:"silver`, `tag:golden NOT tag:"silver`
-  * `Group`: `(tag:book content:ahab*)`, `tag:(book pdf)`
+  * `tag:golden AND tag:"silver`, `tag:golden OR tag:"silver`, `tag:golden NOT tag:"silver`
+  * `(tag:book content:ahab*)`, `tag:(book pdf)`
 
    Complex queries:
 
@@ -105,6 +120,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7247
    https://github.com/owncloud/ocis/pull/7248
    https://github.com/owncloud/ocis/pull/7254
+   https://github.com/owncloud/ocis/pull/7262
    https://github.com/owncloud/web/pull/9653
    https://github.com/owncloud/web/pull/9672
 
