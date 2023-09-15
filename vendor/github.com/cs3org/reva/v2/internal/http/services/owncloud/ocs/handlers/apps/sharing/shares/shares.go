@@ -1591,15 +1591,15 @@ func publicPwdEnforced(c *config.Config) passwordEnforced {
 }
 
 func passwordPolicies(c *config.Config) password.Validator {
-	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicies == nil {
-		return password.NewPasswordPolicies(0, 0, 0, 0, 0)
+	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicy == nil {
+		return password.NewPasswordPolicy(0, 0, 0, 0, 0)
 	}
-	return password.NewPasswordPolicies(
-		c.Capabilities.Capabilities.PasswordPolicies.MinCharacters,
-		c.Capabilities.Capabilities.PasswordPolicies.MinLowerCaseCharacters,
-		c.Capabilities.Capabilities.PasswordPolicies.MinUpperCaseCharacters,
-		c.Capabilities.Capabilities.PasswordPolicies.MinDigits,
-		c.Capabilities.Capabilities.PasswordPolicies.MinSpecialCharacters,
+	return password.NewPasswordPolicy(
+		c.Capabilities.Capabilities.PasswordPolicy.MinCharacters,
+		c.Capabilities.Capabilities.PasswordPolicy.MinLowerCaseCharacters,
+		c.Capabilities.Capabilities.PasswordPolicy.MinUpperCaseCharacters,
+		c.Capabilities.Capabilities.PasswordPolicy.MinDigits,
+		c.Capabilities.Capabilities.PasswordPolicy.MinSpecialCharacters,
 	)
 }
 

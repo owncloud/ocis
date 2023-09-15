@@ -50,14 +50,14 @@ type CapabilitiesData struct {
 
 // Capabilities groups several capability aspects
 type Capabilities struct {
-	Core             *CapabilitiesCore             `json:"core" xml:"core"`
-	Checksums        *CapabilitiesChecksums        `json:"checksums" xml:"checksums"`
-	Files            *CapabilitiesFiles            `json:"files" xml:"files" mapstructure:"files"`
-	Dav              *CapabilitiesDav              `json:"dav" xml:"dav"`
-	FilesSharing     *CapabilitiesFilesSharing     `json:"files_sharing" xml:"files_sharing" mapstructure:"files_sharing"`
-	Spaces           *Spaces                       `json:"spaces,omitempty" xml:"spaces,omitempty" mapstructure:"spaces"`
-	Graph            *CapabilitiesGraph            `json:"graph,omitempty" xml:"graph,omitempty" mapstructure:"graph"`
-	PasswordPolicies *CapabilitiesPasswordPolicies `json:"password_policies,omitempty" xml:"password_policies,omitempty" mapstructure:"password_policies"`
+	Core           *CapabilitiesCore           `json:"core" xml:"core"`
+	Checksums      *CapabilitiesChecksums      `json:"checksums" xml:"checksums"`
+	Files          *CapabilitiesFiles          `json:"files" xml:"files" mapstructure:"files"`
+	Dav            *CapabilitiesDav            `json:"dav" xml:"dav"`
+	FilesSharing   *CapabilitiesFilesSharing   `json:"files_sharing" xml:"files_sharing" mapstructure:"files_sharing"`
+	Spaces         *Spaces                     `json:"spaces,omitempty" xml:"spaces,omitempty" mapstructure:"spaces"`
+	Graph          *CapabilitiesGraph          `json:"graph,omitempty" xml:"graph,omitempty" mapstructure:"graph"`
+	PasswordPolicy *CapabilitiesPasswordPolicy `json:"password_policy,omitempty" xml:"password_policy,omitempty" mapstructure:"password_policy"`
 
 	Notifications *CapabilitiesNotifications `json:"notifications,omitempty" xml:"notifications,omitempty"`
 }
@@ -86,15 +86,14 @@ type CapabilitiesGraph struct {
 	Users              CapabilitiesGraphUsers `json:"users" xml:"users" mapstructure:"users"`
 }
 
-// CapabilitiesPasswordPolicies hold the password policies capabilities
-type CapabilitiesPasswordPolicies struct {
-	MinCharacters          int    `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
-	MaxCharacters          int    `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
-	MinLowerCaseCharacters int    `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
-	MinUpperCaseCharacters int    `json:"min_uppercase_characters" xml:"min_uppercase_characters" mapstructure:"min_uppercase_characters"`
-	MinDigits              int    `json:"min_digits" xml:"min_digits" mapstructure:"min_digits"`
-	MinSpecialCharacters   int    `json:"min_special_characters" xml:"min_special_characters" mapstructure:"min_special_characters"`
-	SpecialCharacters      string `json:"special_characters" xml:"special_characters" mapstructure:"special_characters"`
+// CapabilitiesPasswordPolicy hold the password policy capabilities
+type CapabilitiesPasswordPolicy struct {
+	MinCharacters          int `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
+	MaxCharacters          int `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
+	MinLowerCaseCharacters int `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
+	MinUpperCaseCharacters int `json:"min_uppercase_characters" xml:"min_uppercase_characters" mapstructure:"min_uppercase_characters"`
+	MinDigits              int `json:"min_digits" xml:"min_digits" mapstructure:"min_digits"`
+	MinSpecialCharacters   int `json:"min_special_characters" xml:"min_special_characters" mapstructure:"min_special_characters"`
 }
 
 // CapabilitiesGraphUsers holds the graph user capabilities
