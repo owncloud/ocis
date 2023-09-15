@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
@@ -19,6 +20,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
+
+* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+
+   We fixed the issue when 500 on searches that contain ":". Added the characters escaping
+   according to https://blevesearch.com/docs/Query-String-Query/
+
+   https://github.com/owncloud/ocis/issues/7282
+   https://github.com/owncloud/ocis/pull/7290
 
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 
