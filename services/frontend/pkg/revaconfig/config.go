@@ -274,7 +274,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"share_jail": cfg.EnableShareJail,
 								"max_quota":  cfg.MaxQuota,
 							},
-							"password_policies": map[string]interface{}{
+							"password_policy": map[string]interface{}{
 								"max_characters":           72,
 								"min_characters":           cfg.PasswordPolicies.MinCharacters,
 								"min_lowercase_characters": cfg.PasswordPolicies.MinLowerCaseCharacters,
