@@ -341,6 +341,18 @@ func Test_compile(t *testing.T) {
 			}),
 			wantErr: false,
 		},
+		{
+			name: `John Smith`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith +-=&|><!(){}[]^\"~: "},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith\ \+\-\=\&\|\>\<\!\(\)\{\}\[\]\^\"\~\:\ `),
+			}),
+			wantErr: false,
+		},
 	}
 
 	assert := tAssert.New(t)
@@ -354,6 +366,37 @@ func Test_compile(t *testing.T) {
 				return
 			}
 			assert.Equal(tt.want, got)
+		})
+	}
+}
+
+func Test_escape(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "all escaped",
+			args: args{
+				`+-=&|><!(){}[]^"~:\/ `,
+			},
+			want: `\+\-\=\&\|\>\<\!\(\)\{\}\[\]\^\"\~\:\\\/\ `,
+		},
+		{
+			name: "no one escaped",
+			args: args{
+				`@#$%`,
+			},
+			want: `@#$%`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tAssert.Equalf(t, tt.want, bleveEscaper.Replace(tt.args.str), "bleveEscaper(%v)", tt.args.str)
 		})
 	}
 }
