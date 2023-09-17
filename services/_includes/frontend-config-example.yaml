@@ -130,7 +130,7 @@ auto_accept_shares: false
 service_account:
   service_account_id: ""
   service_account_secret: ""
-password_policies:
+password_policy:
   min_lowercase_characters: 0
   min_uppercase_characters: 0
   min_digits: 0

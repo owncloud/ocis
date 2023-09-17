@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-17-00-40-25]
+[#deprecation-note-2023-09-17-08-22-46]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -688,7 +688,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The service account secret.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -697,7 +697,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum password length. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -706,7 +706,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of uppercase letters. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -715,7 +715,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of lowercase letters. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_DIGITS` +
+a|`FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -724,7 +724,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of digits. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS` +
+a|`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++

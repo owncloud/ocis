@@ -72,8 +72,8 @@
 | FRONTEND_AUTO_ACCEPT_SHARES | bool | false | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>FRONTEND_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>FRONTEND_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS | int | 0 | Define the minimum password length. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS | int | 0 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS | int | 0 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICIES_MIN_DIGITS | int | 0 | Define the minimum number of digits. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS | int | 0 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 0 | Define the minimum password length. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 0 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 0 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 0 | Define the minimum number of digits. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 0 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
