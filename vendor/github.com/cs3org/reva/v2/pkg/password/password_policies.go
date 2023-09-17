@@ -27,8 +27,8 @@ type Policies struct {
 	specialCharactersRegexp *regexp.Regexp
 }
 
-// NewPasswordPolicies returns a new NewPasswordPolicies instance
-func NewPasswordPolicies(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int) Validator {
+// NewPasswordPolicy returns a new NewPasswordPolicy instance
+func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int) Validator {
 	p := &Policies{
 		minCharacters:          minCharacters,
 		minLowerCaseCharacters: minLowerCaseCharacters,
