@@ -9,7 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
-* Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
+* Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
@@ -43,10 +43,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7138
 
-* Enhancement - Add the password policies: [#7194](https://github.com/owncloud/ocis/pull/7194)
+* Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 
    Add the password policies OCIS-3767
 
+   https://github.com/owncloud/ocis/pull/7285
    https://github.com/owncloud/ocis/pull/7194
    https://github.com/cs3org/reva/pull/4147
 
