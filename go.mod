@@ -84,11 +84,11 @@ require (
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.7
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.43.0
-	go.opentelemetry.io/contrib/zpages v0.43.0
+	go.opentelemetry.io/contrib/zpages v0.44.0
 	go.opentelemetry.io/otel v1.18.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.17.0
-	go.opentelemetry.io/otel/sdk v1.17.0
+	go.opentelemetry.io/otel/sdk v1.18.0
 	go.opentelemetry.io/otel/trace v1.18.0
 	golang.org/x/crypto v0.13.0
 	golang.org/x/exp v0.0.0-20221026004748-78e5e7837ae6

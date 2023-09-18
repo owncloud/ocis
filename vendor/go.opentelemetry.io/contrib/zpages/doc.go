@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package zpages implements a collection of HTML pages that display
+// telemetry stats.
 package zpages // import "go.opentelemetry.io/contrib/zpages"
-
-// Version is the current release version of the zpages span processor.
-func Version() string {
-	return "0.44.0"
-	// This string is updated by the pre_release.sh script during release
-}
-
-// SemVersion is the semantic version to be supplied to tracer/meter creation.
-//
-// Deprecated: Use [Version] instead.
-func SemVersion() string {
-	return Version()
-}
