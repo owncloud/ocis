@@ -126,7 +126,8 @@ class SpacesTUSContext implements Context {
 		TableNode $headers
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
