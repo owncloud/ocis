@@ -1946,34 +1946,30 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     user = "0:0"
     environment = {
         "OCIS_URL": OCIS_URL,
-        "OCIS_CONFIG_DIR": "/root/.ocis/config",
+        "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
-        "STORAGE_USERS_DRIVER_LOCAL_ROOT": "%s/local/root" % dirs["ocis"],
-        "STORAGE_USERS_DRIVER_OCIS_ROOT": "%s/storage/users" % dirs["ocis"],
-        "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
-        "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
         "PROXY_ENABLE_BASIC_AUTH": True,
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
         "OCIS_LOG_LEVEL": "error",
-        "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
-        "IDM_CREATE_DEMO_USERS": True,
+        "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": True,
         "OCIS_EVENTS_ENABLE_TLS": False,
-        "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
     }
 
     if deploy_type == "":
         environment["FRONTEND_OCS_ENABLE_DENIALS"] = True
         environment["OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY"] = True
+
+        # fonts map for txt thumbnails (including unicode support)
         environment["THUMBNAILS_TXT_FONTMAP_FILE"] = "%s/tests/config/drone/fontsMap.json" % (dirs["base"])
 
     if deploy_type == "cs3api_validator":
-        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # cs3api-validator needs the cs3api gatway exposed
+        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  #  make gateway available to cs3api-validator
 
     if deploy_type == "wopi_validator":
-        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"
+        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
         environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
