@@ -102,6 +102,8 @@ func WaitForConnection() bool {
 			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
 			return false
 		default:
+			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
+
 			res, err := client.Do(req)
 			if err != nil || res.StatusCode != 200 {
 				// 500 milliseconds poll interval
