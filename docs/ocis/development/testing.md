@@ -376,6 +376,48 @@ BEHAT_FEATURE="tests/acceptance/features/apiNotification/emailNotification.featu
 make test-acceptance-api
 ```
 
+## Running Test Suite With Tika Service (@tikaServiceNeeded)
+
+Test suites that are tagged with `@tikaServiceNeeded` require tika service.
+
+### Setup Tika Service
+
+Run the following docker command to setup tika service
+
+```bash
+docker run -d -p 127.0.0.1:9998:9998 apache/tika
+```
+
+### Run oCIS
+
+Documentation related to the content based search and tika extractor can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/search.html#content-extraction)
+
+```bash
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+OCIS_INSECURE=true \
+SEARCH_EXTRACTOR_TYPE=tika \
+SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://localhost:9998 \
+SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true \
+ocis/bin/ocis server
+```
+
+### Run the Acceptance Test
+
+Run the acceptance test with the following command:
+
+```bash
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+BEHAT_FEATURE="tests/acceptance/features/apiSearch/contentSearch.feature" \
+make test-acceptance-api
+```
+
 ## Running Tests for Parallel Deployment
 
 ### Setup the Parallel Deployment Environment
@@ -450,7 +492,7 @@ The commands are ubuntu specific and may differ according to your system. You ca
 
 ##### Mac OS user
 Install ClamAV using [here](https://gist.github.com/mendozao/3ea393b91f23a813650baab9964425b9)
-Start ClamAV daemon 
+Start ClamAV daemon
 ```bash
 /your/location/to/brew/Cellar/clamav/1.1.0/sbin/clamd
 ```
