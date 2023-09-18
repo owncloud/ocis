@@ -67,11 +67,11 @@ Feature: enforce password on public link
     Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS    | 3     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -91,15 +91,15 @@ Feature: enforce password on public link
       | 2               | 200      |
 
 
-  Scenario Outline: try to create a public link with a password that does not comply with the password policy 
+  Scenario Outline: try to create a public link with a password that does not comply with the password policy
     Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS    | 3     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -120,11 +120,11 @@ Feature: enforce password on public link
     Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS    | 3     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 1     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -150,11 +150,11 @@ Feature: enforce password on public link
     Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS              | 13    |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS    | 3     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS    | 2     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS                  | 1     |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -201,15 +201,15 @@ Feature: enforce password on public link
     And the public should not be able to download file "/textfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
     But the public should be able to download file "/textfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
     Examples:
-      | config                                              | config-value | password                          |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS           | 5            | 12345                             |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS           | 10           | with space                        |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS | 3            | Test                              |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS | 3            | TeST                              |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS               | 1            | test1                             |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS   | 1            | test pass                         |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS   | 33           | ! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
-      | FRONTEND_PASSWORD_POLICIES_MIN_SPECIAL_CHARACTERS   | 5            | sameCharacterShouldWork!!!!!      |
+      | config                                            | config-value | password                          |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 5            | 12345                             |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 10           | with space                        |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3            | Test                              |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | TeST                              |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1            | test1                             |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1            | test pass                         |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 33           | ! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
+      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 5            | sameCharacterShouldWork!!!!!      |
 
 
   Scenario Outline: try to update a public link with a password that does not comply with the password policy (invalid cases)
@@ -230,8 +230,8 @@ Feature: enforce password on public link
     And the OCS status code should be "400"
     And the OCS status message should be "<message>"
     Examples:
-      | config                                              | config-value | password | message                                                             |
-      | FRONTEND_PASSWORD_POLICIES_MIN_CHARACTERS           | 5            | 1234     | missing required password at least 5 characters are required        |
-      | FRONTEND_PASSWORD_POLICIES_MIN_LOWERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 lowercase letters are required |
-      | FRONTEND_PASSWORD_POLICIES_MIN_UPPERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 uppercase letters are required |
-      | FRONTEND_PASSWORD_POLICIES_MIN_DIGITS               | 2            | test1    | missing required password at least 2 numbers are required           |
+      | config                                            | config-value | password | message                                                             |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 5            | 1234     | missing required password at least 5 characters are required        |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 lowercase letters are required |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 uppercase letters are required |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | test1    | missing required password at least 2 numbers are required           |
