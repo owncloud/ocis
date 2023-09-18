@@ -349,12 +349,12 @@ class SettingsContext implements Context {
 	 * @param string $user
 	 * @param string $language
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestToSwitchSystemLanguage(string $user, string $language): void {
+	public function sendRequestToSwitchSystemLanguage(string $user, string $language): ResponseInterface {
 		$profileBundlesList = $this->getBundlesList($user, "Profile");
 		Assert::assertNotEmpty($profileBundlesList, "bundles list is empty");
 
@@ -390,10 +390,7 @@ class SettingsContext implements Context {
 			],
 			JSON_THROW_ON_ERROR
 		);
-
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
-		);
+		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef());
 	}
 
 	/**
@@ -405,12 +402,13 @@ class SettingsContext implements Context {
 	 * @return void
 	 *
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
-	public function theUserHasSwitchedSysemLanguage(string $user, string $language): void {
-		$this->sendRequestToSwitchSystemLanguage($user, $language);
+	public function theUserHasSwitchedSystemLanguage(string $user, string $language): void {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
-			"Expected response status code should be 201"
+			"Expected response status code should be 201",
+			$this->sendRequestToSwitchSystemLanguage($user, $language)
 		);
 	}
 }

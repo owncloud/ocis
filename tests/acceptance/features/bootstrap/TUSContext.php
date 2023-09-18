@@ -30,6 +30,7 @@ use TusPhp\Exception\ConnectionException;
 use TusPhp\Exception\TusException;
 use TusPhp\Tus\Client;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -40,6 +41,36 @@ class TUSContext implements Context {
 	private FeatureContext $featureContext;
 
 	private ?string $resourceLocation = null;
+
+	/**
+	 * @param string $user
+	 * @param TableNode $headers
+	 * @param string $content
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function createNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = ''): ResponseInterface {
+		$this->featureContext->verifyTableNodeColumnsCount($headers, 2);
+		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getUserPassword($user);
+		$this->resourceLocation = null;
+
+		$response = $this->featureContext->makeDavRequest(
+			$user,
+			"POST",
+			null,
+			$headers->getRowsHash(),
+			$content,
+			"files",
+			null,
+			false,
+			$password
+		);
+		return $response;
+	}
 
 	/**
 	 * @When user :user creates a new TUS resource on the WebDAV API with these headers:
@@ -53,25 +84,9 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function createNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = ''): void {
-		$this->featureContext->verifyTableNodeColumnsCount($headers, 2);
-		$user = $this->featureContext->getActualUsername($user);
-		$password = $this->featureContext->getUserPassword($user);
-		$this->resourceLocation = null;
-
-		$this->featureContext->setResponse(
-			$this->featureContext->makeDavRequest(
-				$user,
-				"POST",
-				null,
-				$headers->getRowsHash(),
-				$content,
-				"files",
-				null,
-				false,
-				$password
-			)
-		);
+	public function userCreateNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = ''): void {
+		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$this->featureContext->setResponse($response);
 		$locationHeader = $this->featureContext->getResponse()->getHeader('Location');
 		if (\sizeof($locationHeader) > 0) {
 			$this->resourceLocation = $locationHeader[0];
@@ -92,8 +107,43 @@ class TUSContext implements Context {
 	public function createNewTUSResource(string $user, TableNode $headers): void {
 		$rows = $headers->getRows();
 		$rows[] = ['Tus-Resumable', '1.0.0'];
-		$this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
-		$this->featureContext->theHTTPStatusCodeShouldBe(201);
+		$response = $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+		$locationHeader = $response->getHeader('Location');
+		if (\sizeof($locationHeader) > 0) {
+			$this->resourceLocation = $locationHeader[0];
+		}
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $offset
+	 * @param string $data
+	 * @param string $checksum
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getUserPassword($user);
+		$response = HttpRequestHelper::sendRequest(
+			$this->resourceLocation,
+			$this->featureContext->getStepLineRef(),
+			'PATCH',
+			$user,
+			$password,
+			[
+				'Content-Type' => 'application/offset+octet-stream',
+				'Tus-Resumable' => '1.0.0',
+				'Upload-Checksum' => $checksum,
+				'Upload-Offset' => $offset
+			],
+			$data
+		);
+		return $response;
 	}
 
 	/**
@@ -109,25 +159,9 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): void {
-		$user = $this->featureContext->getActualUsername($user);
-		$password = $this->featureContext->getUserPassword($user);
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$this->resourceLocation,
-				$this->featureContext->getStepLineRef(),
-				'PATCH',
-				$user,
-				$password,
-				[
-					'Content-Type' => 'application/offset+octet-stream',
-					'Tus-Resumable' => '1.0.0',
-					'Upload-Checksum' => $checksum,
-					'Upload-Offset' => $offset
-				],
-				$data
-			)
-		);
+	public function userSendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): void {
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->setResponse($response);
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
@@ -359,7 +393,12 @@ class TUSContext implements Context {
 		string    $content,
 		TableNode $headers
 	): void {
-		$this->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$this->featureContext->setResponse($response);
+		$locationHeader = $this->featureContext->getResponse()->getHeader('Location');
+		if (\sizeof($locationHeader) > 0) {
+			$this->resourceLocation = $locationHeader[0];
+		}
 	}
 
 	/**
@@ -407,7 +446,8 @@ class TUSContext implements Context {
 		string $offset,
 		string $content
 	): void {
-		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -427,8 +467,8 @@ class TUSContext implements Context {
 		string $offset,
 		string $content
 	): void {
-		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204);
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
@@ -443,7 +483,8 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 */
 	public function userUploadsChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
-		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -458,8 +499,8 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 */
 	public function userHasUploadedChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
-		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204);
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
@@ -479,6 +520,7 @@ class TUSContext implements Context {
 	 */
 	public function userOverwritesFileWithChecksum(string $user, string $offset, string $data, string $checksum, TableNode $headers): void {
 		$this->createNewTUSResource($user, $headers);
-		$this->userHasUploadedChunkFileWithChecksum($user, $offset, $data, $checksum);
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->setResponse($response);
 	}
 }
