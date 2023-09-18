@@ -834,7 +834,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, []) +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
                  [
                      {
                          "name": "cs3ApiTests-%s" % (storage),
@@ -1943,83 +1943,50 @@ def notify():
     }
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+    user = "0:0"
+    environment = {
+        "OCIS_URL": OCIS_URL,
+        "OCIS_CONFIG_DIR": "/root/.ocis/config",
+        "STORAGE_USERS_DRIVER": "%s" % (storage),
+        "STORAGE_USERS_DRIVER_LOCAL_ROOT": "%s/local/root" % dirs["ocis"],
+        "STORAGE_USERS_DRIVER_OCIS_ROOT": "%s/storage/users" % dirs["ocis"],
+        "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
+        "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
+        "PROXY_ENABLE_BASIC_AUTH": True,
+        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+        "OCIS_LOG_LEVEL": "error",
+        "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
+        "IDM_CREATE_DEMO_USERS": True,
+        "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
+        "FRONTEND_SEARCH_MIN_LENGTH": "2",
+        "OCIS_ASYNC_UPLOADS": True,
+        "OCIS_EVENTS_ENABLE_TLS": False,
+        "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
+    }
+
     if deploy_type == "":
-        user = "0:0"
-        environment = {
-            "OCIS_URL": OCIS_URL,
-            "OCIS_CONFIG_DIR": "/root/.ocis/config",
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
-            "STORAGE_USERS_DRIVER": "%s" % (storage),
-            "STORAGE_USERS_DRIVER_LOCAL_ROOT": "%s/local/root" % dirs["ocis"],
-            "STORAGE_USERS_DRIVER_OCIS_ROOT": "%s/storage/users" % dirs["ocis"],
-            "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
-            "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
-            "PROXY_ENABLE_BASIC_AUTH": True,
-            "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-            "OCIS_LOG_LEVEL": "error",
-            "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
-            "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
-            "FRONTEND_SEARCH_MIN_LENGTH": "2",
-            "OCIS_ASYNC_UPLOADS": True,
-            "OCIS_EVENTS_ENABLE_TLS": False,
-            "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
-            "FRONTEND_OCS_ENABLE_DENIALS": True,
-            "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY": True,
-            # fonts map for txt thumbnails (including unicode support)
-            "THUMBNAILS_TXT_FONTMAP_FILE": "%s/tests/config/drone/fontsMap.json" % (dirs["base"]),
-        }
-        if tika_enabled:
-            environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
-            environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
-            environment["SEARCH_EXTRACTOR_TIKA_TIKA_URL"] = "http://tika:9998"
-            environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
-        wait_for_ocis = {
-            "name": "wait-for-ocis-server",
-            "image": OC_CI_ALPINE,
-            "commands": [
-                "curl -k -u admin:admin --fail --retry-connrefused --retry 7 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
-            ],
-            "depends_on": depends_on,
-        }
+        environment["FRONTEND_OCS_ENABLE_DENIALS"] = True
+        environment["OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY"] = True
+        environment["THUMBNAILS_TXT_FONTMAP_FILE"] = "%s/tests/config/drone/fontsMap.json" % (dirs["base"])
+
+    if deploy_type == "cs3api_validator":
+        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # cs3api-validator needs the cs3api gatway exposed
 
     if deploy_type == "wopi_validator":
-        user = "0:0"
-        environment = {
-            "OCIS_URL": OCIS_URL,
-            "OCIS_CONFIG_DIR": "/root/.ocis/config",
-            "STORAGE_USERS_DRIVER": "%s" % (storage),
-            "STORAGE_USERS_DRIVER_LOCAL_ROOT": "%s/local/root" % dirs["ocis"],
-            "STORAGE_USERS_DRIVER_OCIS_ROOT": "%s/storage/users" % dirs["ocis"],
-            "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
-            "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
-            "PROXY_ENABLE_BASIC_AUTH": True,
-            "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-            "OCIS_LOG_LEVEL": "error",
-            "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
-            "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
-            "FRONTEND_SEARCH_MIN_LENGTH": "2",
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # make gateway available to wopi server
-            "APP_PROVIDER_EXTERNAL_ADDR": "com.owncloud.api.app-provider",
-            "APP_PROVIDER_DRIVER": "wopi",
-            "APP_PROVIDER_WOPI_APP_NAME": "FakeOffice",
-            "APP_PROVIDER_WOPI_APP_URL": "http://fakeoffice:8080",
-            "APP_PROVIDER_WOPI_INSECURE": "true",
-            "APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL": "http://wopiserver:8880",
-            "APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL": "https://ocis-server:9200",
-            "OCIS_ASYNC_UPLOADS": True,
-            "OCIS_EVENTS_ENABLE_TLS": False,
-            "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
-        }
-        wait_for_ocis = {
-            "name": "wait-for-ocis-server",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it ocis-server:9200 -t 300",
-            ],
-            "depends_on": depends_on,
-        }
+        environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"
+        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
+        environment["APP_PROVIDER_DRIVER"] = "wopi"
+        environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
+        environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
+        environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
+        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:8880"
+        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = "https://ocis-server:9200"
+
+    if tika_enabled:
+        environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
+        environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
+        environment["SEARCH_EXTRACTOR_TIKA_TIKA_URL"] = "http://tika:9998"
+        environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
     # That will allow OCIS to use whatever its built-in default is.
@@ -2037,6 +2004,15 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "make -C %s build" % dirs["ocisWrapper"],
         "%s/bin/ociswrapper serve --bin %s --url %s" % (dirs["ocisWrapper"], ocis_bin, OCIS_URL),
     ]
+
+    wait_for_ocis = {
+        "name": "wait-for-ocis-server",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "curl -k -u admin:admin --fail --retry-connrefused --retry 7 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
+        ],
+        "depends_on": depends_on,
+    }
 
     return [
         {
