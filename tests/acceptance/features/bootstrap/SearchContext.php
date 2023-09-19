@@ -64,6 +64,19 @@ class SearchContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
+		if (str_contains($pattern, '$')) {
+			$date = explode("$", $pattern);
+			switch ($date[1]) {
+				case "today":
+					$pattern = $date[0] . date('Y-m-d', strtotime('today'));
+					break;
+				case "yesterday":
+					$pattern = $date[0] . date('Y-m-d', strtotime('yesterday'));
+					break;
+				default:
+					throw new Exception("cannot convert the date");
+			}
+		}
 		$body
 			= "<?xml version='1.0' encoding='utf-8' ?>\n" .
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .

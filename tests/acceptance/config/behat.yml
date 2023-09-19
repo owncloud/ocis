@@ -207,6 +207,8 @@ default:
         - OCSContext:
         - TrashbinContext:
         - TagContext:
+        - SpacesTUSContext:
+        - TUSContext:
 
     apiReshare:
       paths:
