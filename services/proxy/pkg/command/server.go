@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -154,6 +155,7 @@ func Server(cfg *config.Config) *cli.Command {
 						Msg("Shutting down server")
 
 					cancel()
+					os.Exit(1)
 				})
 			}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"os"
 
 	"github.com/oklog/run"
 
@@ -113,6 +114,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 				natsServer.Shutdown()
 				cancel()
+				os.Exit(1)
 			})
 
 			return gr.Run()
