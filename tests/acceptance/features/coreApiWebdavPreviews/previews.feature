@@ -141,7 +141,7 @@ Feature: previews of files downloaded through the webdav API
     And user "Alice" has uploaded file "filesForUpload/<resource>" to "/<resource>"
     And user "Alice" has shared file "/<resource>" with user "Brian"
     And user "Brian" has accepted share "/<resource>" offered by user "Alice"
-    When user "Brian" downloads the preview of "/Shares/<resource>" with width "32" and height "32" using the WebDAV API
+    When user "Brian" downloads the preview of shared resource "/Shares/<resource>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
     Examples:
@@ -150,6 +150,8 @@ Feature: previews of files downloaded through the webdav API
       | old              | example.gif |
       | new              | lorem.txt   |
       | new              | example.gif |
+      | spaces           | lorem.txt   |
+      | spaces           | example.gif |
 
 
   Scenario Outline: user tries to download previews of other users files
@@ -213,14 +215,15 @@ Feature: previews of files downloaded through the webdav API
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has shared file "/parent.txt" with user "Brian"
     And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
-    And user "Brian" has downloaded the preview of "/Shares/parent.txt" with width "32" and height "32"
+    And user "Brian" has downloaded the preview of shared resource "/Shares/parent.txt" with width "32" and height "32"
     When user "Alice" uploads file with content "this is a file to upload" to "/parent.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And as user "Brian" the preview of "/Shares/parent.txt" with width "32" and height "32" should have been changed
+    And as user "Brian" the preview of shared resource "/Shares/parent.txt" with width "32" and height "32" should have been changed
     Examples:
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: it should update the preview content if the file content is updated (content with UTF chars)
@@ -246,19 +249,20 @@ Feature: previews of files downloaded through the webdav API
     And user "Alice" has shared folder "FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And user "Alice" has downloaded the preview of "/FOLDER/lorem.txt" with width "32" and height "32"
-    And user "Brian" has downloaded the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32"
+    And user "Brian" has downloaded the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32"
     When user "Alice" uploads file "filesForUpload/lorem.txt" to "/FOLDER/lorem.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Brian" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    When user "Brian" uploads file with content "new uploaded content" to "Shares/FOLDER/lorem.txt" using the WebDAV API
+    And as user "Brian" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    When user "Brian" uploads file with content "new uploaded content" to shared resource "Shares/FOLDER/lorem.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Brian" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    And as user "Brian" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
     Examples:
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: updates to a group shared file should change the preview for both sharees and sharers
@@ -274,19 +278,20 @@ Feature: previews of files downloaded through the webdav API
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And user "Carol" has accepted share "/FOLDER" offered by user "Alice"
     And user "Alice" has downloaded the preview of "/FOLDER/lorem.txt" with width "32" and height "32"
-    And user "Brian" has downloaded the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32"
-    And user "Carol" has downloaded the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32"
+    And user "Brian" has downloaded the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32"
+    And user "Carol" has downloaded the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32"
     When user "Alice" uploads file "filesForUpload/lorem.txt" to "/FOLDER/lorem.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Brian" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Carol" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    When user "Brian" uploads file with content "new uploaded content" to "Shares/FOLDER/lorem.txt" using the WebDAV API
+    And as user "Brian" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    And as user "Carol" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    When user "Brian" uploads file with content "new uploaded content" to shared resource "Shares/FOLDER/lorem.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Brian" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-    And as user "Carol" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    And as user "Brian" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
+    And as user "Carol" the preview of shared resource "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
     Examples:
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
