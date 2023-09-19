@@ -86,7 +86,7 @@ type LDAPDriver struct {
 }
 
 type LDAPUserSchema struct {
-	ID              string `yaml:"id" env:"OCIS_LDAP_USER_SCHEMA_ID" desc:"LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID."`
+	ID              string `yaml:"id" env:"OCIS_LDAP_USER_SCHEMA_ID;USERS_LDAP_USER_SCHEMA_ID" desc:"LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID."`
 	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's." deprecationVersion:"4.0.2" removalVersion:"5.0.0" deprecationInfo:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
 	Mail            string `yaml:"mail" env:"OCIS_LDAP_USER_SCHEMA_MAIL;USERS_LDAP_USER_SCHEMA_MAIL" desc:"LDAP Attribute to use for the email address of users."`
 	DisplayName     string `yaml:"display_name" env:"OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;USERS_LDAP_USER_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of users."`
