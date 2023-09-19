@@ -69,6 +69,10 @@ class TUSContext implements Context {
 			false,
 			$password
 		);
+		$locationHeader = $response->getHeader('Location');
+		if (\sizeof($locationHeader) > 0) {
+			$this->resourceLocation = $locationHeader[0];
+		}
 		return $response;
 	}
 
@@ -87,10 +91,6 @@ class TUSContext implements Context {
 	public function userCreateNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = ''): void {
 		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
 		$this->featureContext->setResponse($response);
-		$locationHeader = $this->featureContext->getResponse()->getHeader('Location');
-		if (\sizeof($locationHeader) > 0) {
-			$this->resourceLocation = $locationHeader[0];
-		}
 	}
 
 	/**
@@ -109,10 +109,6 @@ class TUSContext implements Context {
 		$rows[] = ['Tus-Resumable', '1.0.0'];
 		$response = $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
-		$locationHeader = $response->getHeader('Location');
-		if (\sizeof($locationHeader) > 0) {
-			$this->resourceLocation = $locationHeader[0];
-		}
 	}
 
 	/**
@@ -395,10 +391,6 @@ class TUSContext implements Context {
 	): void {
 		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
 		$this->featureContext->setResponse($response);
-		$locationHeader = $this->featureContext->getResponse()->getHeader('Location');
-		if (\sizeof($locationHeader) > 0) {
-			$this->resourceLocation = $locationHeader[0];
-		}
 	}
 
 	/**
