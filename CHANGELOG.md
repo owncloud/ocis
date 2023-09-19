@@ -3312,7 +3312,7 @@ The following sections list the changes for 2.0.0.
    permissions prop was empty
 
    https://github.com/owncloud/web/issues/7557
-   https://github.com/owncloud/ocis/pull/4484
+   https://github.com/owncloud/ocis/pull/4485
 
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 
