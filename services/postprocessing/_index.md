@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2023-09-19T07:27:44.079108792Z
+date: 2023-09-19T09:29:01.287650966Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
@@ -38,7 +38,7 @@ To use the postprocessing service, an event system needs to be configured for al
 
 ## Postprocessing Functionality
 
-The storageprovider service (`storage-users`) can be configured to initiate asynchronous postprocessing by setting the `STORAGE_USERS_OCIS_ASYNC_UPLOADS` environment variable to `true`. If this is the case, postprocessing will get initiated *after* uploading a file and all bytes have been received.
+The storageprovider service (`storage-users`) can be configured to initiate asynchronous postprocessing by setting the `OCIS_ASYNC_UPLOADS` environment variable to `true`. If this is the case, postprocessing will get initiated *after* uploading a file and all bytes have been received.
 
 The `postprocessing` service will then coordinate configured postprocessing steps like scanning the file for viruses. During postprocessing, the file will be in a `processing state` where only a limited set of actions are available. Note that this processing state excludes file accessibility by users.
 
