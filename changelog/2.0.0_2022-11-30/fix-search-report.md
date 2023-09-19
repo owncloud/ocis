@@ -9,4 +9,4 @@ There were multiple issues with REPORT search responses from webdav. Also we wan
 *   the permissions prop was empty
 
 https://github.com/owncloud/web/issues/7557
-https://github.com/owncloud/ocis/pull/4484
+https://github.com/owncloud/ocis/pull/4485
