@@ -42,6 +42,26 @@ The gRPC API can be used by any other internal service. It can also be used for 
 
 The proxy service already includes a middleware which uses the internal [gRPC API](#grpc-api) to evaluate the policies. Since the proxy is in heavy use and every HTTP request is processed here, only simple and quick decisions should be evaluated. More complex queries such as file content evaluation are _strongly_ discouraged.
 
+When the evaluation in the proxy results in a "denied" outcome, the response will return a `403 Permission Denied` with the following response body
+
+```json
+{
+    "error":
+    {
+        "code": "deniedByPolicy",
+        "message": "Operation denied due to security policies",
+        "innererror":
+        {
+            "date": "2023-09-19T13:22:20Z",
+            "filename": "File",
+            "method": "POST",
+            "path": "/dav/spaces/some-space-id/Folder/",
+            "request-id": "9CFCE925-F9D9-4F26-AB3B-2C1C40A9CD0C"
+        }
+    }
+}
+```
+
 ### Event Service (Postprocessing)
 
 This layer is event-based and part of the postprocessing service. Since processing at this point is asynchronous, the operations can also take longer and be more expensive, like evaluating the contents of a file.
