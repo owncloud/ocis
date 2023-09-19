@@ -2195,9 +2195,7 @@ def example_deploys(ctx):
         "ocis_keycloak/latest.yml",
         "ocis_traefik/latest.yml",
         "ocis_wopi/latest.yml",
-        "ocis_hello/latest.yml",
         "ocis_s3/latest.yml",
-        "oc10_ocis_parallel/latest.yml",
     ]
     nightly_deploy = [
         "ocis_ldap/released.yml",
