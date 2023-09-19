@@ -40,7 +40,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function asyncUploadHasbeenEnabledWithDelayedPostProcessing(string $delayTime): void {
 		$envs = [
-			"STORAGE_USERS_OCIS_ASYNC_UPLOADS" => true,
+			"OCIS_ASYNC_UPLOADS" => true,
 			"OCIS_EVENTS_ENABLE_TLS" => false,
 			"POSTPROCESSING_DELAY" => $delayTime . "s",
 		];
