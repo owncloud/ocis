@@ -81,6 +81,17 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 {{< /hint >}}
 
 {{< hint info >}}
+To run the tests that require tika service (tests tagged with `@tikaServiceNeeded`), you need to provide `START_TIKA=true` while running the tests.
+
+```bash
+START_TIKA=true \
+BEHAT_FEATURE='tests/acceptance/features/apiSearch/contentSearch.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+```
+
+{{< /hint >}}
+
+{{< hint info >}}
 To run the tests that require an antivirus service (tests tagged with `@antivirus`), you need to provide the following environment variables while running the tests.
 
 ```bash
