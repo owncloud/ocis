@@ -153,7 +153,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		if err := h.passwordValidator.Validate(password); err != nil {
 			return nil, &ocsError{
 				Code:    response.MetaBadRequest.StatusCode,
-				Message: "password validation failed",
+				Message: err.Error(),
 				Error:   fmt.Errorf("password validation failed: %w", err),
 			}
 		}
@@ -479,7 +479,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		// skip validation if the clear password scenario
 		if len(newPassword[0]) > 0 {
 			if err := h.passwordValidator.Validate(newPassword[0]); err != nil {
-				response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, fmt.Errorf("missing required password %w", err).Error(), err)
+				response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, err.Error(), err)
 				return
 			}
 		}

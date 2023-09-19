@@ -88,12 +88,13 @@ type CapabilitiesGraph struct {
 
 // CapabilitiesPasswordPolicy hold the password policy capabilities
 type CapabilitiesPasswordPolicy struct {
-	MinCharacters          int `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
-	MaxCharacters          int `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
-	MinLowerCaseCharacters int `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
-	MinUpperCaseCharacters int `json:"min_uppercase_characters" xml:"min_uppercase_characters" mapstructure:"min_uppercase_characters"`
-	MinDigits              int `json:"min_digits" xml:"min_digits" mapstructure:"min_digits"`
-	MinSpecialCharacters   int `json:"min_special_characters" xml:"min_special_characters" mapstructure:"min_special_characters"`
+	MinCharacters          int                 `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
+	MaxCharacters          int                 `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
+	MinLowerCaseCharacters int                 `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
+	MinUpperCaseCharacters int                 `json:"min_uppercase_characters" xml:"min_uppercase_characters" mapstructure:"min_uppercase_characters"`
+	MinDigits              int                 `json:"min_digits" xml:"min_digits" mapstructure:"min_digits"`
+	MinSpecialCharacters   int                 `json:"min_special_characters" xml:"min_special_characters" mapstructure:"min_special_characters"`
+	BannedPasswordsList    map[string]struct{} `json:"-" xml:"-" mapstructure:"banned_passwords_list"`
 }
 
 // CapabilitiesGraphUsers holds the graph user capabilities

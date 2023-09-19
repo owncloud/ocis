@@ -1,23 +1,38 @@
 package revaconfig
 
 import (
+	"bufio"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"time"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error) {
+func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]interface{}, error) {
 	webURL, err := url.Parse(cfg.PublicURL)
 	if err != nil {
 		return nil, err
 	}
 	webURL.Path = path.Join(webURL.Path, "external")
 	webOpenInAppURL := webURL.String()
+
+	var bannedPasswordsList interface{}
+	if cfg.PasswordPolicy.BannedPasswordsList != "" {
+		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
+		if err != nil {
+			logger.Err(err).
+				Str("server", cfg.Service.Name).
+				Msgf("Failed to load the banned passwords from a file %s, skipped.", cfg.PasswordPolicy.BannedPasswordsList)
+		}
+	}
 
 	archivers := []map[string]interface{}{
 		{
@@ -281,6 +296,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
 								"min_digits":               cfg.PasswordPolicy.MinDigits,
 								"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
+								"banned_passwords_list":    bannedPasswordsList,
 							},
 							"notifications": map[string]interface{}{
 								"endpoints": []string{"list", "get", "delete"},
@@ -300,4 +316,35 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 			},
 		},
 	}, nil
+}
+
+func readMultilineFile(path string) (interface{}, error) {
+	if !fileExists(path) {
+		path = filepath.Join(defaults.BaseConfigPath(), path)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	data := make(map[string]struct{})
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != "" {
+			data[line] = struct{}{}
+		}
+	}
+	return data, err
+}
+
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	if info.IsDir() {
+		return false
+	}
+	return true
 }
