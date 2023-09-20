@@ -1,5 +1,10 @@
 ---
 title: "22. Sharing and Space Management API"
+date: 2023-09-08T02:29:00+01:00
+weight: 22
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0022-sharing-and-space-management-api.md
 ---
 
 * Status: accepted
