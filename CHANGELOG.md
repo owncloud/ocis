@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
+* Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
@@ -71,6 +72,12 @@ The following sections list the changes for unreleased.
    Add the clientlog service which will send machine readable notifications to clients
 
    https://github.com/owncloud/ocis/pull/7217
+
+* Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
+
+   Introduce a config to set the web login URL via `WEB_OPTION_LOGIN_URL`.
+
+   https://github.com/owncloud/ocis/pull/7317
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
