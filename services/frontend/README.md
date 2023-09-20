@@ -86,5 +86,5 @@ Define the minimum number of lowercase letters.
 Define the minimum number of digits.
 -   `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
 Define the minimum number of special characters.
--  `FRONTEND_BANNED_PASSWORDS_LIST`
+-   `FRONTEND_BANNED_PASSWORDS_LIST`
 Define the path to the banned passwords list file.
