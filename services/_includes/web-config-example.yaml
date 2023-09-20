@@ -126,6 +126,7 @@ web:
       editor: null
       contextHelpersReadMore: true
       logoutUrl: ""
+      loginUrl: ""
       openLinksWithDefaultApp: true
       imprintUrl: ""
       privacyUrl: ""

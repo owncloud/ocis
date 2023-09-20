@@ -48,6 +48,7 @@
 | WEB_OPTION_ROUTING_ID_BASED | bool | true | Enable or disable fileIds being added to the URL. Defaults to 'true', because otherwise spaces with name clashes cannot be resolved correctly. Note: Only disable this if you can guarantee on the server side, that spaces of the same namespace cannot have name clashes.|
 | WEB_OPTION_CONTEXTHELPERS_READ_MORE | bool | true | Specifies whether the 'Read more' link should be displayed or not.|
 | WEB_OPTION_LOGOUT_URL | string |  | Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.|
+| WEB_OPTION_LOGIN_URL | string |  | Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: 'https://www.myidp.com/login'.|
 | WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP | bool | true | Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.|
 | WEB_OPTION_IMPRINT_URL | string |  | Specifies the target URL for the imprint link valid for the ocis instance in the account menu.|
 | WEB_OPTION_PRIVACY_URL | string |  | Specifies the target URL for the privacy link valid for the ocis instance in the account menu.|

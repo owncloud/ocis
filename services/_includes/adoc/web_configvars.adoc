@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-20-08-05-36]
+[#deprecation-note-2023-09-20-08-45-52]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -457,6 +457,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.
+
+a|`WEB_OPTION_LOGIN_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: '\https://www.myidp.com/login'.
 
 a|`WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` +
 
