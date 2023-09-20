@@ -42,7 +42,7 @@ The gRPC API can be used by any other internal service. It can also be used for 
 
 The proxy service already includes a middleware which uses the internal [gRPC API](#grpc-api) to evaluate the policies. Since the proxy is in heavy use and every HTTP request is processed here, only simple and quick decisions should be evaluated. More complex queries such as file content evaluation are _strongly_ discouraged.
 
-When the evaluation in the proxy results in a "denied" outcome, the response will return a `403 Permission Denied` with the following response body
+If the evaluation in the proxy results in a "denied" outcome, the response will return a `403 Permission Denied` with the following response body
 
 ```json
 {
