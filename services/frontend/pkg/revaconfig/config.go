@@ -24,7 +24,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 	webURL.Path = path.Join(webURL.Path, "external")
 	webOpenInAppURL := webURL.String()
 
-	var bannedPasswordsList interface{}
+	var bannedPasswordsList map[string]struct{}
 	if cfg.PasswordPolicy.BannedPasswordsList != "" {
 		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
 		if err != nil {
@@ -318,7 +318,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 	}, nil
 }
 
-func readMultilineFile(path string) (interface{}, error) {
+func readMultilineFile(path string) (map[string]struct{}, error) {
 	if !fileExists(path) {
 		path = filepath.Join(defaults.BaseConfigPath(), path)
 	}
@@ -340,11 +340,8 @@ func readMultilineFile(path string) (interface{}, error) {
 
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
+	if err != nil {
 		return false
 	}
-	if info.IsDir() {
-		return false
-	}
-	return true
+	return !info.IsDir()
 }

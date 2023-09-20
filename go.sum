@@ -764,8 +764,8 @@ gioui.org v0.0.0-20210308172011-57750fc8a0a6/go.mod h1:RSH6KIUZ0p2xy5zHDxgAM4zum
 git.sr.ht/~sbinet/gg v0.3.1/go.mod h1:KGYtlADtqsqANL9ueOFkWymvzUvLMQllU5Ixo+8v3pc=
 github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1 h1:dOIG9lXUo5CAZbjlegvZpeTqfAlH+zn+0uXbtlZjCPY=
 github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/2403905/reva/v2 v2.0.0-20230919184122-ba02476f8281 h1:WvQmlfkRmZsCoqxMWupyAC0uU8PipHCj0Cet7OIY/yU=
-github.com/2403905/reva/v2 v2.0.0-20230919184122-ba02476f8281/go.mod h1:RvhuweTFqzezjUFU0SIdTXakrEx9vJlMvQ7znPXSP1g=
+github.com/2403905/reva/v2 v2.0.0-20230920162959-54564e32d69c h1:Sovi2hfiA1xsD/1y619rVgK1/ojCE5jCtQKPAte6TRg=
+github.com/2403905/reva/v2 v2.0.0-20230920162959-54564e32d69c/go.mod h1:RvhuweTFqzezjUFU0SIdTXakrEx9vJlMvQ7znPXSP1g=
 github.com/Azure/azure-pipeline-go v0.2.3/go.mod h1:x841ezTBIMG6O3lAcl8ATHnsOPVl2bqk7S3ta6S6u4k=
 github.com/Azure/azure-sdk-for-go v32.4.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-storage-blob-go v0.14.0/go.mod h1:SMqIBi+SuiQH32bvyjngEewEeXoPfKMgWlBDaYf6fck=

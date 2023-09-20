@@ -29,11 +29,7 @@ type Policies struct {
 }
 
 // NewPasswordPolicy returns a new NewPasswordPolicy instance
-func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int,
-	bannedPasswordsList map[string]struct{}) Validator {
-	if len(bannedPasswordsList) == 0 {
-		bannedPasswordsList = nil
-	}
+func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int, bannedPasswordsList map[string]struct{}) Validator {
 	p := &Policies{
 		minCharacters:          minCharacters,
 		minLowerCaseCharacters: minLowerCaseCharacters,
@@ -85,11 +81,11 @@ func (s Policies) Validate(str string) error {
 }
 
 func (s Policies) validateBannedList(str string) error {
-	if s.bannedPasswordsList == nil {
+	if len(s.bannedPasswordsList) == 0 {
 		return nil
 	}
 	if _, ok := s.bannedPasswordsList[str]; ok {
-		return fmt.Errorf("weak password is not allowed")
+		return fmt.Errorf("unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety")
 	}
 	return nil
 }
@@ -124,7 +120,7 @@ func (s Policies) validateDigits(str string) error {
 
 func (s Policies) validateSpecialCharacters(str string) error {
 	if s.countSpecialCharacters(str) < s.minSpecialCharacters {
-		return fmt.Errorf("at least %d special characters are required. %s", s.minSpecialCharacters, _defaultSpecialCharacters)
+		return fmt.Errorf("at least %d special characters are required %s", s.minSpecialCharacters, _defaultSpecialCharacters)
 	}
 	return nil
 }

@@ -109,7 +109,14 @@ Feature: enforce password on public link
       | password    | Pas1          |
     Then the HTTP status code should be "<http-code>"
     And the OCS status code should be "400"
-    And the OCS status message should be "password validation failed"
+    And the OCS status message should be:
+    """
+    at least 13 characters are required
+    at least 3 lowercase letters are required
+    at least 2 uppercase letters are required
+    at least 2 numbers are required
+    at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+    """
     Examples:
       | ocs-api-version | http-code |
       | 1               | 200       |
@@ -168,11 +175,11 @@ Feature: enforce password on public link
     And the OCS status code should be "400"
     And the OCS status message should be:
       """
-      missing required password at least 13 characters are required
+      at least 13 characters are required
       at least 3 lowercase letters are required
       at least 2 uppercase letters are required
       at least 1 numbers are required
-      at least 2 special characters are required.  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+      at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
       """
     Examples:
       | ocs-api-version | http-code |
@@ -231,7 +238,7 @@ Feature: enforce password on public link
     And the OCS status message should be "<message>"
     Examples:
       | config                                            | config-value | password | message                                                             |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 5            | 1234     | missing required password at least 5 characters are required        |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 lowercase letters are required |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | TesT     | missing required password at least 3 uppercase letters are required |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | test1    | missing required password at least 2 numbers are required           |
+      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 5            | 1234     | at least 5 characters are required        |
+      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3            | TesT     | at least 3 lowercase letters are required |
+      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | TesT     | at least 3 uppercase letters are required |
+      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | test1    | at least 2 numbers are required           |
