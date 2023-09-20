@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-09-20-14-29-45]
+[#deprecation-note-2023-09-20-17-00-46]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| LDAP_BIND_PASSWORD changing name for consistency
+| 4.0.2
+| 5.0.0
+| OCIS_LDAP_BIND_PASSWORD
 |===
 
 endif::[]
@@ -480,9 +485,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
 
-a|`LDAP_BIND_PASSWORD` +
+a|`OCIS_LDAP_BIND_PASSWORD` +
+`LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-
+xref:deprecation-note-2023-09-20-17-00-46[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
