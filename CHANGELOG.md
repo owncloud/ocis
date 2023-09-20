@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
@@ -16,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
@@ -29,6 +31,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7282
    https://github.com/owncloud/ocis/pull/7290
+
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+
+   We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently removed from
+   the users service with the 4.0.0 release.
+
+   https://github.com/owncloud/ocis/issues/7312
+   https://github.com/owncloud/ocis-charts/issues/397
 
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 
@@ -140,6 +150,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7262
    https://github.com/owncloud/web/pull/9653
    https://github.com/owncloud/web/pull/9672
+
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+
+   The enviroment variable `OCIS_LDAP_BIND_PASSWORD` was added to be more consistent with all
+   other global LDAP variables.
+
+   `LDAP_BIND_PASSWORD` is deprecated now and scheduled for removal with the 5.0.0 release.
+
+   We also deprecated `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` for removal with 5.0.0. The
+   replacement for it is `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`.
+
+   https://github.com/owncloud/ocis/issues/7176
 
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 
