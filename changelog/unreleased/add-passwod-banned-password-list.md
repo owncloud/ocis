@@ -1,4 +1,4 @@
-Enhancement: Add the Banned-Passwords List
+Enhancement: Add the Banned Passwords List
 
 Added an option to enable a password check against a banned passwords list OCIS-3809
 
