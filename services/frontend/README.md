@@ -74,7 +74,7 @@ Generally, a password can contain any UTF-8 characters, however some characters 
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
 
-The validation against the Banned-Passwords List can be configured via a new-line-separated words text file. If a user tries to set a password listed in the banned Banned-Password List, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the Banned-Password-List file. If the file doesn't exist in a location ocis tries to load a file from the `OCIS_CONFIG_DIR/FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`An option will be enabled when the file has been loaded successfully.
+The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OCIS_CONFIG_DIR/FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
 
 -   `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
