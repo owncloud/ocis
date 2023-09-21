@@ -38,14 +38,10 @@ Feature: date search
       | Mtime:today        | /today.txt      |                 | /yesterday.txt  | /lastWeek.txt   |
       | Mtime:yesterday    | /yesterday.txt  |                 | /today.txt      |                 |
       | Mtime:"this week"  | /today.txt      |                 | /lastWeek.txt   | /lastMont.txt   |
-      # # not implemented
-      # | Mtime:"last week"  | /lastWeek.txt   |                 | /today.txt      |                 |
       | Mtime:"this month" | /today.txt      |                 | /lastMont.txt   |                 |
       | Mtime:"last month" | /lastMonth.txt  |                 | /today.txt      |                 |
       | Mtime:"this year"  | /today.txt      |                 | /lastYear.txt   |                 |
       | Mtime:"last year"  | /lastYear.txt   |                 | /today.txt      |                 |
-      # #  500 error. can not compile the query
-      # | Mtime:$today       | /today.txt      |                 | /yesterday.txt  | /lastWeek.txt   |
       | Mtime>=$today      | /today.txt      |                 | /yesterday.txt  |                 |
       | Mtime>$yesterday   | /today.txt      |                 |                 |                 |
       | Mtime>=$yesterday  | /today.txt      | /yesterday.txt  |                 |                 |
