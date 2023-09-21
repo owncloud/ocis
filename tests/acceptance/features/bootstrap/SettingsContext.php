@@ -390,7 +390,13 @@ class SettingsContext implements Context {
 			],
 			JSON_THROW_ON_ERROR
 		);
-		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef());
+		return $this->spacesContext->sendPostRequestToUrl(
+			$fullUrl,
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$this->featureContext->getStepLineRef()
+		);
 	}
 
 	/**
@@ -405,10 +411,11 @@ class SettingsContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theUserHasSwitchedSystemLanguage(string $user, string $language): void {
+		$response = $this->sendRequestToSwitchSystemLanguage($user, $language);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$this->sendRequestToSwitchSystemLanguage($user, $language)
+			$response
 		);
 	}
 }

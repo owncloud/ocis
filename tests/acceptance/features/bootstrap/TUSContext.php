@@ -104,7 +104,7 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function createNewTUSResource(string $user, TableNode $headers): void {
+	public function userHasCreatedNewTUSResourceWithHeaders(string $user, TableNode $headers): void {
 		$rows = $headers->getRows();
 		$rows[] = ['Tus-Resumable', '1.0.0'];
 		$response = $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
@@ -125,7 +125,7 @@ class TUSContext implements Context {
 	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
-		$response = HttpRequestHelper::sendRequest(
+		return HttpRequestHelper::sendRequest(
 			$this->resourceLocation,
 			$this->featureContext->getStepLineRef(),
 			'PATCH',
@@ -139,24 +139,22 @@ class TUSContext implements Context {
 			],
 			$data
 		);
-		return $response;
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends a chunk to the last created TUS Location with offset "([^"]*)" and data "([^"]*)" using the WebDAV API$/
+	 * @When user :user sends a chunk to the last created TUS Location with offset :offset and data :data using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $offset
 	 * @param string $data
-	 * @param string $checksum
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userSendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): void {
-		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+	public function userSendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data): void {
+		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data);
 		$this->featureContext->setResponse($response);
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
@@ -511,7 +509,7 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 */
 	public function userOverwritesFileWithChecksum(string $user, string $offset, string $data, string $checksum, TableNode $headers): void {
-		$this->createNewTUSResource($user, $headers);
+		$this->userHasCreatedNewTUSResourceWithHeaders($user, $headers);
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
 	}
