@@ -7,5 +7,9 @@ func Println(message string) {
 }
 
 func Panic(err error) {
-	log.Panic("[ociswrapper] ", err.Error())
+	log.Panic("[ociswrapper]", err.Error())
+}
+
+func Fatalln(err error) {
+	log.Fatalln("[ociswrapper]", err.Error())
 }

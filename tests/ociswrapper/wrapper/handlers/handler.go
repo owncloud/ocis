@@ -31,7 +31,7 @@ func sendResponse(res http.ResponseWriter, ocisStatus bool) {
 	} else {
 		res.WriteHeader(http.StatusInternalServerError)
 		resBody["status"] = "ERROR"
-		resBody["message"] = "oCIS server error"
+		resBody["message"] = "Unable to start oCIS server"
 	}
 	res.Header().Set("Content-Type", "application/json")
 
