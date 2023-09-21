@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -90,7 +91,9 @@ func Start(envMap map[string]any) {
 func Stop() {
 	err := cmd.Process.Kill()
 	if err != nil {
-		log.Fatalln(err)
+		if !strings.HasSuffix(err.Error(), "process already finished") {
+			log.Fatalln(err)
+		}
 	}
 	cmd.Wait()
 }
