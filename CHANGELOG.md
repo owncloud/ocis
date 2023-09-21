@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
@@ -53,6 +54,13 @@ The following sections list the changes for unreleased.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
+
+   Added an option to enable a password check against a banned passwords list OCIS-3809
+
+   https://github.com/cs3org/reva/pull/4197
+   https://github.com/owncloud/ocis/pull/7314
 
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 
