@@ -124,7 +124,11 @@ func WaitForConnection() bool {
 			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
 
 			res, err := client.Do(req)
-			if err != nil || res.StatusCode != 200 {
+			if err != nil || res.StatusCode >= 400 {
+				if res != nil {
+					log.Println(fmt.Sprintf("oCIS server up but request failed: %v", res.StatusCode))
+					return true
+				}
 				// 500 milliseconds poll interval
 				time.Sleep(500 * time.Millisecond)
 				continue
