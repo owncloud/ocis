@@ -118,6 +118,25 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteAllNotifications(string $user):ResponseInterface {
+		$this->userListAllNotifications($user);
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+			foreach ($responseBody as $value) {
+				// set notificationId
+				$this->notificationIds[] = $value->notification_id;
+			}
+		}
+		return $this->userDeletesNotification($user);
+	}
+
+	/**
 	 * @When user :user deletes all notifications
 	 *
 	 * @param string $user
@@ -127,15 +146,8 @@ class NotificationContext implements Context {
 	 * @throws JsonException
 	 */
 	public function userDeletesAllNotifications(string $user):void {
-		$this->userListAllNotifications($user);
-		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
-			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
-			foreach ($responseBody as $value) {
-				// set notificationId
-				$this->notificationIds[] = $value->notification_id;
-			}
-		}
-		$this->featureContext->setResponse($this->userDeletesNotification($user));
+		$response = $this->deleteAllNotifications($user);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -148,8 +160,8 @@ class NotificationContext implements Context {
 	 * @throws JsonException
 	 */
 	public function userHasDeletedAllNotifications(string $user):void {
-		$this->userDeletesAllNotifications($user);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
+		$response = $this->deleteAllNotifications($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -174,7 +186,7 @@ class NotificationContext implements Context {
 	 *
 	 * @param string $user
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
@@ -524,7 +536,7 @@ class NotificationContext implements Context {
 	 * @param string|null $deprovision_date
 	 * @param string|null $deprovision_date_format
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 *
@@ -589,8 +601,8 @@ class NotificationContext implements Context {
 	 * @return void
 	 */
 	public function userHasCreatedDeprovisioningNotification():void {
-		$this->userCreatesDeprovisioningNotification();
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
+		$response = $this->userCreatesDeprovisioningNotification();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
