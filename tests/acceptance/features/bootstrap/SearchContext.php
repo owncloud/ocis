@@ -135,8 +135,7 @@ class SearchContext implements Context {
 		$properties = $properties->getHash();
 		$fileResult = $this->featureContext->findEntryFromPropfindResponse(
 			$path,
-			$user,
-			"REPORT",
+			$user
 		);
 		Assert::assertNotFalse(
 			$fileResult,
