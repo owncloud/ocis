@@ -83,13 +83,16 @@ func WaitForConnection() bool {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	// 5 seconds timeout
-	timeoutValue := 5 * time.Second
+	// 30 seconds timeout
+	timeoutValue := 30 * time.Second
 
 	client := http.Client{
 		Timeout:   timeoutValue,
 		Transport: transport,
 	}
+
+	req, _ := http.NewRequest("GET", config.Get("url")+"/graph/v1.0/users/"+config.Get("adminUsername"), nil)
+	req.SetBasicAuth(config.Get("adminUsername"), config.Get("adminPassword"))
 
 	timeout := time.After(timeoutValue)
 
@@ -99,13 +102,17 @@ func WaitForConnection() bool {
 			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
 			return false
 		default:
-			_, err := client.Get(config.Get("url"))
-			if err == nil {
-				log.Println("oCIS server is ready to accept requests")
-				return true
+			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
+
+			res, err := client.Do(req)
+			if err != nil || res.StatusCode != 200 {
+				// 500 milliseconds poll interval
+				time.Sleep(500 * time.Millisecond)
+				continue
 			}
-			// 500 milliseconds poll interval
-			time.Sleep(500 * time.Millisecond)
+
+			log.Println("oCIS server is ready to accept requests")
+			return true
 		}
 	}
 }
