@@ -2,6 +2,7 @@ package revaconfig
 
 import (
 	"bufio"
+	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -28,9 +29,9 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 	if cfg.PasswordPolicy.BannedPasswordsList != "" {
 		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
 		if err != nil {
-			logger.Err(err).
-				Str("server", cfg.Service.Name).
-				Msgf("Failed to load the banned passwords from a file %s, skipped.", cfg.PasswordPolicy.BannedPasswordsList)
+			err = fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
+			logger.Err(err).Send()
+			return nil, err
 		}
 	}
 
