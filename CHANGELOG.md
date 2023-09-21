@@ -8,6 +8,8 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
 * Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 
 ## Details
 
@@ -20,6 +22,26 @@ The following sections list the changes for unreleased.
 * Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
 
    https://github.com/owncloud/ocis/pull/7220
+
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+
+   We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently removed from
+   the users service with the 4.0.0 release.
+
+   https://github.com/owncloud/ocis/issues/7312
+   https://github.com/owncloud/ocis-charts/issues/397
+
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+
+   The enviroment variable `OCIS_LDAP_BIND_PASSWORD` was added to be more consistent with all
+   other global LDAP variables.
+
+   `LDAP_BIND_PASSWORD` is deprecated now and scheduled for removal with the 5.0.0 release.
+
+   We also deprecated `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` for removal with 5.0.0. The
+   replacement for it is `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`.
+
+   https://github.com/owncloud/ocis/issues/7176
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
