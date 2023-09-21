@@ -72,10 +72,6 @@ func Start(envMap map[string]any) {
 
 				// retry to start oCIS server
 				retryCount++
-				retryCount++
-
-				retryCount++
-
 				maxRetry, _ := strconv.Atoi(config.Get("retry"))
 				if retryCount <= maxRetry {
 					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
