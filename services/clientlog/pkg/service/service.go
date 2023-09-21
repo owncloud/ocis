@@ -17,12 +17,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// ClientNotification is the event the clientlog service is sending to the client
-type ClientNotification struct {
-	Type   string
-	ItemID string
-}
-
 // ClientlogService is the service responsible for user activities
 type ClientlogService struct {
 	log              log.Logger
@@ -94,7 +88,8 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 
 	var (
 		users []string
-		noti  ClientNotification
+		typ   string
+		data  interface{}
 	)
 	switch e := event.Event.(type) {
 	default:
@@ -106,8 +101,10 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			return
 		}
 
-		noti.Type = "postprocessing-finished"
-		noti.ItemID = storagespace.FormatResourceID(*info.GetId())
+		typ = "postprocessing-finished"
+		data = FileReadyEvent{
+			ItemID: storagespace.FormatResourceID(*info.GetId()),
+		}
 
 		users, err = utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
 	}
@@ -119,22 +116,22 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 
 	// II) instruct sse service to send the information
 	for _, id := range users {
-		if err := cl.sendSSE(id, noti); err != nil {
+		if err := cl.sendSSE(id, typ, data); err != nil {
 			cl.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 			return
 		}
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userid string, noti ClientNotification) error {
-	b, err := json.Marshal(noti)
+func (cl *ClientlogService) sendSSE(userid string, typ string, data interface{}) error {
+	b, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
 	return events.Publish(context.Background(), cl.publisher, events.SendSSE{
 		UserID:  userid,
-		Type:    "clientlog-notification",
+		Type:    typ,
 		Message: b,
 	})
 }
