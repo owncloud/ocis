@@ -266,12 +266,10 @@ Feature: tag search
       | tag:(mathe klass10)                       | 2            | /exercises         | /answers           |
       | tag:klass10  AND tag:chemi                | 1            | /answers           |                    |
       | tag:chemi OR tag:physik                   | 2            | /exercises         | /answers           |
-      # why we need use quotes? it'll be fixed in future. Actual: search result gives all user content
-      #| (tag:klass10) NOT tag:physik              | 2      | /answers           | verification work |
+      | (tag:klass10) NOT tag:physik              | 2            | /answers           | verification work  |
       | (tag:(mathe klass10)) NOT tag:chemi       | 1            | /exercises         |                    |
       | (tag:mathe OR tag:klass10) NOT tag:physik | 2            | /answers           | /verification work |
       | tag:mathe NOT name:exercises              | 1            | /answers           |                    |
       | tag:mathe AND NOT name:exercises          | 1            | /answers           |                    |
       # The third finding is the personal space itself
       | NOT tag:mathe                             | 3            | /verification work | /withoutTagFolder  |
-

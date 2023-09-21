@@ -195,6 +195,25 @@ class SpacesTUSContext implements Context {
 		string $mtime,
 		string $spaceName
 	): void {
+		switch ($mtime) {
+			case "today":
+				$mtime = date('Y-m-d', strtotime('today'));
+				break;
+			case "yesterday":
+				$mtime = date('Y-m-d', strtotime('yesterday'));
+				break;
+			case "lastWeek":
+				$mtime = date('Y-m-d', strtotime('-7 days'));
+				break;
+			case "lastMonth":
+				$mtime = date('Y-m' . '-01', strtotime('-1 month'));
+				break;
+			case "lastYear":
+				$mtime = date('Y-m' . '-01', strtotime('-1 year'));
+				break;
+			default:
+				$mtime;
+		}
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$this->tusContext->userUploadsFileWithContentToWithMtimeUsingTUS($user, $source, $destination, $mtime);
 	}
