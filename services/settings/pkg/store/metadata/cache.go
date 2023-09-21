@@ -152,13 +152,13 @@ func (c *CachedMDC) Init(ctx context.Context, id string) error {
 }
 
 func (c *CachedMDC) removePrefix(cache microstore.Store, prefix string) error {
-	c.logger.Error().Str("prefix", prefix).Msg("removePrefix")
+	c.logger.Debug().Str("prefix", prefix).Msg("removePrefix")
 	keys, err := cache.List(microstore.ListPrefix(prefix))
 	if err != nil {
 		c.logger.Error().Err(err).Msg("failed to list cache entries")
 	}
 	for _, k := range keys {
-		c.logger.Error().Str("key", k).Msg("removePrefix")
+		c.logger.Debug().Str("key", k).Msg("removePrefix")
 		if err := cache.Delete(k); err != nil {
 			c.logger.Error().Err(err).Msg("failed to remove prefix from cache")
 			return err
