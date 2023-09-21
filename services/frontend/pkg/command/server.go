@@ -42,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			rCfg, err := revaconfig.FrontendConfigFromStruct(cfg)
+			rCfg, err := revaconfig.FrontendConfigFromStruct(cfg, logger)
 			if err != nil {
 				return err
 			}

@@ -23,18 +23,20 @@ type Policies struct {
 	minUpperCaseCharacters  int
 	minDigits               int
 	minSpecialCharacters    int
+	bannedPasswordsList     map[string]struct{}
 	digitsRegexp            *regexp.Regexp
 	specialCharactersRegexp *regexp.Regexp
 }
 
 // NewPasswordPolicy returns a new NewPasswordPolicy instance
-func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int) Validator {
+func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int, bannedPasswordsList map[string]struct{}) Validator {
 	p := &Policies{
 		minCharacters:          minCharacters,
 		minLowerCaseCharacters: minLowerCaseCharacters,
 		minUpperCaseCharacters: minUpperCaseCharacters,
 		minDigits:              minDigits,
 		minSpecialCharacters:   minSpecialCharacters,
+		bannedPasswordsList:    bannedPasswordsList,
 	}
 
 	p.digitsRegexp = regexp.MustCompile("[0-9]")
@@ -48,7 +50,11 @@ func (s Policies) Validate(str string) error {
 	if !utf8.ValidString(str) {
 		return fmt.Errorf("the password contains invalid characters")
 	}
-	err := s.validateCharacters(str)
+	err := s.validateBannedList(str)
+	if err != nil {
+		return err
+	}
+	err = s.validateCharacters(str)
 	if err != nil {
 		allErr = errors.Join(allErr, err)
 	}
@@ -70,6 +76,16 @@ func (s Policies) Validate(str string) error {
 	}
 	if allErr != nil {
 		return allErr
+	}
+	return nil
+}
+
+func (s Policies) validateBannedList(str string) error {
+	if len(s.bannedPasswordsList) == 0 {
+		return nil
+	}
+	if _, ok := s.bannedPasswordsList[str]; ok {
+		return fmt.Errorf("unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety")
 	}
 	return nil
 }
@@ -104,7 +120,7 @@ func (s Policies) validateDigits(str string) error {
 
 func (s Policies) validateSpecialCharacters(str string) error {
 	if s.countSpecialCharacters(str) < s.minSpecialCharacters {
-		return fmt.Errorf("at least %d special characters are required. %s", s.minSpecialCharacters, _defaultSpecialCharacters)
+		return fmt.Errorf("at least %d special characters are required %s", s.minSpecialCharacters, _defaultSpecialCharacters)
 	}
 	return nil
 }
