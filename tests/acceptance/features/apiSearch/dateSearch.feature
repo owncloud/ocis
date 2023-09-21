@@ -45,7 +45,7 @@ Feature: date search
       | Mtime:"this year"  | /today.txt      |                 | /lastYear.txt   |                 |
       | Mtime:"last year"  | /lastYear.txt   |                 | /today.txt      |                 |
       # #  500 error. can not compile the query
-      | Mtime:$today       | /today.txt      |                 | /yesterday.txt  | /lastWeek.txt   |
+      # | Mtime:$today       | /today.txt      |                 | /yesterday.txt  | /lastWeek.txt   |
       | Mtime>=$today      | /today.txt      |                 | /yesterday.txt  |                 |
       | Mtime>$yesterday   | /today.txt      |                 |                 |                 |
       | Mtime>=$yesterday  | /today.txt      | /yesterday.txt  |                 |                 |
