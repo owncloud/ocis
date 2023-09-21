@@ -135,3 +135,4 @@ password_policy:
   min_uppercase_characters: 0
   min_digits: 0
   min_special_characters: 0
+  banned_passwords_list: ""

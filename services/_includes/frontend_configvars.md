@@ -77,3 +77,4 @@
 | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 0 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
 | FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 0 | Define the minimum number of digits. Defaults to 0 if not set.|
 | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 0 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|
