@@ -39,9 +39,9 @@ Feature: content search
     When user "Brian" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these files:
-      | keywordAtStart.txt  |
-      | keywordAtMiddle.txt |
-      | keywordAtLast.txt   |
+      | uploadFolder/keywordAtStart.txt  |
+      | uploadFolder/keywordAtMiddle.txt |
+      | uploadFolder/keywordAtLast.txt   |
     Examples:
       | dav-path-version |
       | old              |
@@ -63,8 +63,8 @@ Feature: content search
     When user "Alice" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | keywordAtStart.txt  |
-      | keywordAtMiddle.txt |
+      | uploadFolder/keywordAtStart.txt |
+      | keywordAtMiddle.txt             |
     Examples:
       | dav-path-version |
       | old              |
@@ -118,9 +118,9 @@ Feature: content search
     When user "Alice" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
-      | keywordAtStart.txt  |
-      | keywordAtMiddle.txt |
-      | keywordAtLast.txt   |
+      | keywordAtStart.txt                                     |
+      | spacesFolderWithFile/keywordAtMiddle.txt               |
+      | spacesFolderWithFile/spacesSubFolder/keywordAtLast.txt |
     Examples:
       | dav-path-version |
       | old              |
