@@ -87,9 +87,9 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 
 	var (
-		users []string
-		typ   string
-		data  interface{}
+		users  []string
+		evType string
+		data   interface{}
 	)
 	switch e := event.Event.(type) {
 	default:
@@ -101,7 +101,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			return
 		}
 
-		typ = "postprocessing-finished"
+		evType = "postprocessing-finished"
 		data = FileReadyEvent{
 			ItemID: storagespace.FormatResourceID(*info.GetId()),
 		}
@@ -116,14 +116,14 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 
 	// II) instruct sse service to send the information
 	for _, id := range users {
-		if err := cl.sendSSE(id, typ, data); err != nil {
+		if err := cl.sendSSE(id, evType, data); err != nil {
 			cl.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 			return
 		}
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userid string, typ string, data interface{}) error {
+func (cl *ClientlogService) sendSSE(userid string, evType string, data interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -131,7 +131,7 @@ func (cl *ClientlogService) sendSSE(userid string, typ string, data interface{})
 
 	return events.Publish(context.Background(), cl.publisher, events.SendSSE{
 		UserID:  userid,
-		Type:    typ,
+		Type:    evType,
 		Message: b,
 	})
 }
