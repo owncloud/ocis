@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
@@ -116,6 +117,12 @@ The following sections list the changes for unreleased.
   * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
+
+* Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
+
+   Improve format of sse notifications
+
+   https://github.com/owncloud/ocis/pull/7325
 
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 
