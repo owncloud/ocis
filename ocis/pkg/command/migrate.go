@@ -162,14 +162,20 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 						switch share.Grantee.Type {
 						case provider.GranteeType_GRANTEE_TYPE_USER:
 							userid := share.Grantee.GetUserId().GetOpaqueId()
-							rs := &collaboration.ReceivedShare{
-								Share: share,
-								State: collaboration.ShareState_SHARE_STATE_PENDING,
-							}
-							err := mgr.UserReceivedStates.Add(ctx, userid, spaceId, rs)
+							existingState, err := mgr.UserReceivedStates.Get(ctx, userid, spaceId, share.Id.OpaqueId)
 							if err != nil {
-								fmt.Printf(" adding share '%s' to the user cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
+								fmt.Printf(" retrieving current state of received share '%s' from the user cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
 								errorsOccured = true
+							} else if existingState == nil {
+								rs := &collaboration.ReceivedShare{
+									Share: share,
+									State: collaboration.ShareState_SHARE_STATE_PENDING,
+								}
+								err := mgr.UserReceivedStates.Add(ctx, userid, spaceId, rs)
+								if err != nil {
+									fmt.Printf(" adding share '%s' to the user cache failed! (%s)\n", share.Id.OpaqueId, err.Error())
+									errorsOccured = true
+								}
 							}
 						case provider.GranteeType_GRANTEE_TYPE_GROUP:
 							groupid := share.Grantee.GetGroupId().GetOpaqueId()
