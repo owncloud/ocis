@@ -95,6 +95,7 @@ func Server(cfg *config.Config) *cli.Command {
 						Err(err).
 						Msg("Shutting down server")
 					cancel()
+					os.Exit(1)
 				})
 			}
 
