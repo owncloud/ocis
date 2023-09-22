@@ -76,6 +76,20 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
+	 * @Given the config :configVariable has been set path to :path
+	 *
+	 * @param string $configVariable
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
+		$path = \dirname(__FILE__) . "/../../" . $path;
+		$this->theConfigHasBeenSetTo($configVariable, $path);
+	}
+
+	/**
 	 * @Given the following configs have been set:
 	 *
 	 * @param TableNode $table
