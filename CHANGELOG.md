@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
@@ -32,6 +33,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7282
    https://github.com/owncloud/ocis/pull/7290
+
+* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
+
+   We fixed a problem with the "ocis migrate rebuild-jsoncs3-indexes" command which reset the
+   state of received shares to "pending".
+
+   https://github.com/owncloud/ocis/issues/7319
 
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 
