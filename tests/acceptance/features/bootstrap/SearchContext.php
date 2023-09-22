@@ -133,35 +133,27 @@ class SearchContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($properties, ['name', 'value']);
 		$properties = $properties->getHash();
-		$fileResult = $this->featureContext->findEntryFromPropfindResponse(
-			$path,
-			$user
+		$fileResult = $this->featureContext->findEntryFromSearchResponse(
+			$path
 		);
 		Assert::assertNotFalse(
 			$fileResult,
 			"could not find file/folder '$path'"
 		);
-		$fileProperties = $fileResult['value'][1]['value'][0]['value'];
 		foreach ($properties as $property) {
-			$foundProperty = false;
 			$property['value'] = $this->featureContext->substituteInLineCodes(
 				$property['value'],
 				$user
 			);
-			foreach ($fileProperties as $fileProperty) {
-				if ($fileProperty['name'] === $property['name']) {
-					Assert::assertMatchesRegularExpression(
-						"/" . $property['value'] . "/",
-						$fileProperty['value']
-					);
-					$foundProperty = true;
-					break;
-				}
+			$fileResultProperty = $fileResult->xpath("d:propstat//" . $property['name']);
+			if ($fileResultProperty) {
+				Assert::assertMatchesRegularExpression(
+					"/" . $property['value'] . "/",
+					\trim((string)$fileResultProperty[0])
+				);
+				continue;
 			}
-			Assert::assertTrue(
-				$foundProperty,
-				"could not find property '" . $property['name'] . "'"
-			);
+			throw new Error("Could not find property '" . $property['name'] . "'");
 		}
 	}
 

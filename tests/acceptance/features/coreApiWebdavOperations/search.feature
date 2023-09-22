@@ -186,23 +186,23 @@ Feature: Search
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
-      | a:getlastmodified     |
-      | a:getetag             |
-      | a:getcontenttype      |
+      | d:getlastmodified     |
+      | d:getetag             |
+      | d:getcontenttype      |
       | oc:size               |
       | oc:owner-id           |
       | oc:owner-display-name |
     Then the HTTP status code should be "207"
     And file "/upload.txt" in the search result of user "Alice" should contain these properties:
-      | name                                       | value                                                                                             |
-      | {http://owncloud.org/ns}fileid             | \d*                                                                                               |
-      | {http://owncloud.org/ns}permissions        | ^(RDNVW\|RMDNVW)$                                                                                 |
-      | {DAV:}getlastmodified                      | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
-      | {DAV:}getetag                              | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
-      | {DAV:}getcontenttype                       | text\/plain                                                                                       |
-      | {http://owncloud.org/ns}size               | 15                                                                                                |
-      | {http://owncloud.org/ns}owner-id           | %username%                                                                                        |
-      | {http://owncloud.org/ns}owner-display-name | %displayname%                                                                                     |
+      | name                  | value                                                                                             |
+      | oc:fileid             | \d*                                                                                               |
+      | oc:permissions        | ^(RDNVW\|RMDNVW)$                                                                                 |
+      | d:getlastmodified     | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
+      | d:getetag             | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
+      | d:getcontenttype      | text\/plain                                                                                       |
+      | oc:size               | 15                                                                                                |
+      | oc:owner-id           | %username%                                                                                        |
+      | oc:owner-display-name | %displayname%                                                                                     |
     Examples:
       | dav-path-version |
       | old              |
@@ -219,22 +219,22 @@ Feature: Search
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
       | oc:fileid             |
       | oc:permissions        |
-      | a:getlastmodified     |
-      | a:getetag             |
-      | a:getcontenttype      |
+      | d:getlastmodified     |
+      | d:getetag             |
+      | d:getcontenttype      |
       | oc:size               |
       | oc:owner-id           |
       | oc:owner-display-name |
     Then the HTTP status code should be "207"
     And folder "/upload folder" in the search result of user "Alice" should contain these properties:
-      | name                                       | value                                                                                             |
-      | {http://owncloud.org/ns}fileid             | \d*                                                                                               |
-      | {http://owncloud.org/ns}permissions        | ^(RDNVCK\|RMDNVCK)$                                                                               |
-      | {DAV:}getlastmodified                      | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
-      | {DAV:}getetag                              | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
-      | {http://owncloud.org/ns}size               | 0                                                                                                 |
-      | {http://owncloud.org/ns}owner-id           | %username%                                                                                        |
-      | {http://owncloud.org/ns}owner-display-name | %displayname%                                                                                     |
+      | name                  | value                                                                                             |
+      | oc:fileid             | \d*                                                                                               |
+      | oc:permissions        | ^(RDNVCK\|RMDNVCK)$                                                                               |
+      | d:getlastmodified     | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
+      | d:getetag             | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
+      | oc:size               | 0                                                                                                 |
+      | oc:owner-id           | %username%                                                                                        |
+      | oc:owner-display-name | %displayname%                                                                                     |
     Examples:
       | dav-path-version |
       | old              |

@@ -4866,6 +4866,9 @@ trait WebDav {
 				$fileFound = $this->findEntryFromSearchResponse(
 					$resource
 				);
+				if (\is_object($fileFound)) {
+					$fileFound = $fileFound->xpath("d:propstat//oc:name");
+				}
 			} else {
 				$fileFound = $this->findEntryFromPropfindResponse(
 					$resource,
@@ -4874,7 +4877,6 @@ trait WebDav {
 					$folderpath
 				);
 			}
-
 			if ($should) {
 				Assert::assertNotEmpty(
 					$fileFound,
@@ -5353,12 +5355,25 @@ trait WebDav {
 			}
 			$resourcePath = \rawurldecode($resourcePath);
 			if ($entryNameToSearch === $resourcePath) {
-				return $resourcePath;
+				// If searching for single entry,
+				// we return an SimpleXmlElement of found item
+				return $item;
 			}
 			if ($searchForHighlightString) {
+				// If searching for highlighted string,
+				// we return an array of entries with highlighted content as value
+				// Example:
+				//      [
+				//          "<entryName1>" => "<highlighted-content>"
+				//          "<entryName2>" => "<highlighted-content>"
+				//      ]
 				$actualHighlightString =  $item->xpath("d:propstat//oc:highlights");
 				$results[$resourcePath] = (string)$actualHighlightString[0];
 			} else {
+				// If list all the entries i.e. $entryNameToSearch=null,
+				// we return an array of entries in the response
+				// Example:
+				//      ["<entry1>", "<entry2>"]
 				$results[] = $resourcePath;
 			}
 		}
