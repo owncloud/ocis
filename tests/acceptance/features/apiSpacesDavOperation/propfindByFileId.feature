@@ -1,6 +1,6 @@
-Feature: Propfind by file/folder using file id
+Feature: propfind a file using file id
   As a user
-  I want to check the PROPFIND response of file/folder using their file id
+  I want to check the PROPFIND response of file using their file id
   So that I can make sure that the response contains all the relevant values
 
   Background:
@@ -8,7 +8,7 @@ Feature: Propfind by file/folder using file id
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: send a PROPFIND requests to a file with its FILEID in dav-path url inside root of personal space
+  Scenario Outline: send a PROPFIND request to a file inside root of personal space
     Given user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
@@ -23,7 +23,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file with its FILEID in dav-path url inside a folder of personal space
+  Scenario Outline: send a PROPFIND requests to a file inside a folder of personal space
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "folder/textfile.txt"
     And we save it into "FILEID"
@@ -39,7 +39,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sends a PROPFIND request a file in personal space with its FILEID in dav-path url of another user
+  Scenario Outline: sends a PROPFIND request to a file in personal space owned by other user
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
@@ -51,7 +51,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file with its FILEID in dav-path url inside project space
+  Scenario Outline: send a PROPFIND requests to a file of inside project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
@@ -68,7 +68,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file with its FILEID in dav-path url inside a folder of project space
+  Scenario Outline: send a PROPFIND requests to a file inside a folder of project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder" in space "new-space"
@@ -86,7 +86,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sends a PROPFIND request a file in project space with its FILEID in dav-path url of another user
+  Scenario Outline: sends a PROPFIND request to a file inside project space owned by other user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
@@ -100,7 +100,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file with its FILEID in dav-path of a shared file
+  Scenario Outline: send a PROPFIND requests to a shared file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
@@ -118,7 +118,7 @@ Feature: Propfind by file/folder using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sharee send a PROPFIND requests to a file with its FILEID in dav-path inside of a shared folder
+  Scenario Outline: sharee send a PROPFIND requests to a file inside of a shared folder
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
