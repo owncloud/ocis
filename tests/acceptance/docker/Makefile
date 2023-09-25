@@ -30,6 +30,17 @@ OCIS_IMAGE_TAG ?= dev
 WITH_WRAPPER ?= true
 OCIS_WRAPPER := ../../ociswrapper/bin/ociswrapper
 
+ifdef START_TIKA
+	ifeq ($(START_TIKA),true)
+		COMPOSE_FILE := $(COMPOSE_FILE):src/tika.yml
+		SEARCH_EXTRACTOR_TYPE := tika
+	else
+		SEARCH_EXTRACTOR_TYPE := basic
+	endif
+else
+	SEARCH_EXTRACTOR_TYPE := basic
+endif
+
 # static
 DIVIDE_INTO_NUM_PARTS := 10
 PARTS = 1 2 3 4 5 6 7 8 9 10
@@ -191,6 +202,11 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container ../../../vendo
     		COMPOSE_FILE=src/antivirus.yml \
     		docker-compose run start_antivirus; \
     fi; \
+    if [ "${START_TIKA}" == "true" ]; then \
+			COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+			COMPOSE_FILE=src/tika.yml \
+			docker-compose run tika-service; \
+    fi; \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
@@ -199,6 +215,7 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container ../../../vendo
 	OCIS_ASYNC_UPLOADS=$(OCIS_ASYNC_UPLOADS) \
 	OCIS_ADD_RUN_SERVICES=$(OCIS_ADD_RUN_SERVICES) \
 	POSTPROCESSING_STEPS=$(POSTPROCESSING_STEPS) \
+	SEARCH_EXTRACTOR_TYPE=$(SEARCH_EXTRACTOR_TYPE) \
 	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
