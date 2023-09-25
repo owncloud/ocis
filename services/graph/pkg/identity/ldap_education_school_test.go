@@ -2,6 +2,7 @@ package identity
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -67,45 +69,135 @@ var (
 )
 
 func TestCreateEducationSchool(t *testing.T) {
-	lm := &mocks.Client{}
-
-	ldapSchoolAddRequestMatcher := func(ar *ldap.AddRequest) bool {
-		if ar.DN != "ou=Test School," {
-			return false
-		}
-		for _, attr := range ar.Attributes {
-			if attr.Type == "ocEducationSchoolTerminationTimestamp" {
+	tests := []struct {
+		name          string
+		schoolNumber  string
+		schoolName    string
+		expectedError error
+	}{
+		{
+			name:          "Create a Education School succeeds",
+			schoolNumber:  "0123",
+			schoolName:    "Test School",
+			expectedError: nil,
+		}, {
+			name:          "Create a Education School with a duplicated Schoolnumber fails with an error",
+			schoolNumber:  "0666",
+			schoolName:    "Test School",
+			expectedError: errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present"),
+		}, {
+			name:          "Create a Education School with a duplicated Name fails with an error",
+			schoolNumber:  "0123",
+			schoolName:    "Existing Test School",
+			expectedError: errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present"),
+		}, {
+			name:          "Create a Education School fails, when there is a backend error",
+			schoolNumber:  "1111",
+			schoolName:    "Test School",
+			expectedError: errorcode.New(errorcode.GeneralException, "error looking up school by number"),
+		},
+	}
+	for _, tt := range tests {
+		lm := &mocks.Client{}
+		ldapSchoolGoodAddRequestMatcher := func(ar *ldap.AddRequest) bool {
+			if ar.DN != "ou=Test School," {
 				return false
 			}
+			for _, attr := range ar.Attributes {
+				if attr.Type == "ocEducationSchoolTerminationTimestamp" {
+					return false
+				}
+			}
+			return true
 		}
-		return true
+		lm.On("Add", mock.MatchedBy(ldapSchoolGoodAddRequestMatcher)).Return(nil)
+
+		ldapExistingSchoolAddRequestMatcher := func(ar *ldap.AddRequest) bool {
+			if ar.DN == "ou=Existing Test School," {
+				return true
+			}
+			return false
+		}
+		lm.On("Add", mock.MatchedBy(ldapExistingSchoolAddRequestMatcher)).Return(ldap.NewError(ldap.LDAPResultEntryAlreadyExists, errors.New("")))
+
+		schoolNumberSearchRequest := &ldap.SearchRequest{
+			BaseDN:     "",
+			Scope:      2,
+			SizeLimit:  1,
+			Filter:     "(&(objectClass=ocEducationSchool)(ocEducationSchoolNumber=0123))",
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
+			Controls:   []ldap.Control(nil),
+		}
+		lm.On("Search", schoolNumberSearchRequest).
+			Return(
+				&ldap.SearchResult{
+					Entries: []*ldap.Entry{},
+				},
+				nil)
+		existingSchoolNumberSearchRequest := &ldap.SearchRequest{
+			BaseDN:     "",
+			Scope:      2,
+			SizeLimit:  1,
+			Filter:     "(&(objectClass=ocEducationSchool)(ocEducationSchoolNumber=0666))",
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
+			Controls:   []ldap.Control(nil),
+		}
+		lm.On("Search", existingSchoolNumberSearchRequest).
+			Return(
+				&ldap.SearchResult{
+					Entries: []*ldap.Entry{schoolEntry},
+				},
+				nil)
+		schoolNumberSearchRequestError := &ldap.SearchRequest{
+			BaseDN:     "",
+			Scope:      2,
+			SizeLimit:  1,
+			Filter:     "(&(objectClass=ocEducationSchool)(ocEducationSchoolNumber=1111))",
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
+			Controls:   []ldap.Control(nil),
+		}
+		lm.On("Search", schoolNumberSearchRequestError).
+			Return(
+				&ldap.SearchResult{
+					Entries: []*ldap.Entry{},
+				},
+				ldap.NewError(ldap.LDAPResultOther, errors.New("some error")))
+		schoolLookupAfterCreate := &ldap.SearchRequest{
+			BaseDN:     "ou=Test School,",
+			Scope:      0,
+			SizeLimit:  1,
+			Filter:     "(objectClass=ocEducationSchool)",
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
+			Controls:   []ldap.Control(nil),
+		}
+		lm.On("Search", schoolLookupAfterCreate).
+			Return(
+				&ldap.SearchResult{
+					Entries: []*ldap.Entry{schoolEntry},
+				},
+				nil)
+		b, err := getMockedBackend(lm, eduConfig, &logger)
+		assert.Nil(t, err)
+		assert.NotEqual(t, "", b.educationConfig.schoolObjectClass)
+
+		school := libregraph.NewEducationSchool()
+		school.SetDisplayName(tt.schoolName)
+		school.SetSchoolNumber(tt.schoolNumber)
+		school.SetId("abcd-defg")
+		res_school, err := b.CreateEducationSchool(context.Background(), *school)
+		if tt.expectedError == nil {
+			assert.Nil(t, err)
+			lm.AssertNumberOfCalls(t, "Add", 1)
+			assert.NotNil(t, res_school)
+			assert.Equal(t, res_school.GetDisplayName(), school.GetDisplayName())
+			assert.Equal(t, res_school.GetId(), school.GetId())
+			assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
+			assert.False(t, res_school.HasTerminationDate())
+		} else {
+			assert.Equal(t, err, tt.expectedError)
+			assert.Nil(t, res_school)
+		}
 	}
-
-	lm.On("Add", mock.MatchedBy(ldapSchoolAddRequestMatcher)).Return(nil)
-
-	lm.On("Search", mock.Anything).
-		Return(
-			&ldap.SearchResult{
-				Entries: []*ldap.Entry{schoolEntry},
-			},
-			nil)
-
-	b, err := getMockedBackend(lm, eduConfig, &logger)
-	assert.Nil(t, err)
-	assert.NotEqual(t, "", b.educationConfig.schoolObjectClass)
-	school := libregraph.NewEducationSchool()
-	school.SetDisplayName("Test School")
-	school.SetSchoolNumber("0123")
-	school.SetId("abcd-defg")
-	res_school, err := b.CreateEducationSchool(context.Background(), *school)
-	lm.AssertNumberOfCalls(t, "Add", 1)
-	lm.AssertNumberOfCalls(t, "Search", 1)
-	assert.Nil(t, err)
-	assert.NotNil(t, res_school)
-	assert.Equal(t, res_school.GetDisplayName(), school.GetDisplayName())
-	assert.Equal(t, res_school.GetId(), school.GetId())
-	assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
-	assert.False(t, res_school.HasTerminationDate())
 }
 
 func TestUpdateEducationSchoolTerminationDate(t *testing.T) {

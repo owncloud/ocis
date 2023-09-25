@@ -116,7 +116,19 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		return nil, ErrReadOnly
 	}
 
-	// Here we should verify that the school number is not already used
+	// Check that the school number is not already used
+	_, err := i.getSchoolByNumber(school.GetSchoolNumber())
+	switch err {
+	case nil:
+		msg := "A school with that number is already present"
+		logger.Warn().Str("schoolNumber", school.GetSchoolNumber()).Msg(msg)
+		return nil, errorcode.New(errorcode.NameAlreadyExists, msg)
+	case ErrNotFound:
+		break
+	default:
+		logger.Error().Err(err).Str("schoolNumber", school.GetSchoolNumber()).Msg("error looking up school by number")
+		return nil, errorcode.New(errorcode.GeneralException, "error looking up school by number")
+	}
 
 	attributeTypeAndValue := ldap.AttributeTypeAndValue{
 		Type:  i.educationConfig.schoolAttributeMap.displayName,
@@ -141,7 +153,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		logger.Debug().Err(err).Msg("error adding school")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+				err = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
 			}
 		}
 		return nil, err
