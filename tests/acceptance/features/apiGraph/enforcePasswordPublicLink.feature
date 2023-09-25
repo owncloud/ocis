@@ -244,8 +244,8 @@ Feature: enforce password on public link
       | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | test1    | at least 2 numbers are required           |
 
 
-  Scenario Outline: update a public link with a password that is listed in the banned Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set path to "filesForUpload/bannedPassword/banned-password-list.txt"
+  Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -268,8 +268,8 @@ Feature: enforce password on public link
       | p@ssword | 200       | 200      | OK                                                                                                    |
 
 
-  Scenario Outline: create  a public link with a password that is listed in the banned Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set path to "filesForUpload/bannedPassword/banned-password-list.txt"
+  Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"

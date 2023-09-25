@@ -25,6 +25,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
+use TestHelpers\UploadHelper;
 
 /**
  * steps needed to re-configure oCIS server
@@ -76,7 +77,7 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given the config :configVariable has been set path to :path
+	 * @Given the config :configVariable has been set to path :path
 	 *
 	 * @param string $configVariable
 	 * @param string $path
@@ -85,7 +86,8 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
-		$path = \dirname(__FILE__) . "/../../" . $path;
+		$path = UploadHelper::getUploadFilesDir($path);
+	
 		$this->theConfigHasBeenSetTo($configVariable, $path);
 	}
 
