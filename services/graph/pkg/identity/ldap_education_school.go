@@ -633,17 +633,12 @@ func (i *LDAP) RemoveClassFromEducationSchool(ctx context.Context, schoolNumberO
 }
 
 func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
-	attrs := []string{
-		i.educationConfig.schoolAttributeMap.displayName,
-		i.educationConfig.schoolAttributeMap.id,
-		i.educationConfig.schoolAttributeMap.schoolNumber,
-	}
 	filter := fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
 
 	if i.educationConfig.schoolFilter != "" {
 		filter = fmt.Sprintf("(&%s(%s))", filter, i.educationConfig.schoolFilter)
 	}
-	return i.getEntryByDN(dn, attrs, filter)
+	return i.getEntryByDN(dn, i.getEducationSchoolAttrTypes(), filter)
 }
 
 func (i *LDAP) getSchoolByNumberOrID(numberOrID string) (*ldap.Entry, error) {
