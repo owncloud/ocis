@@ -3460,19 +3460,18 @@ trait Sharing {
 					__METHOD__ . ' invalid "state" given'
 				);
 		}
-
 		$url = $this->getSharesEndpointPath("?format=json&shared_with_me=true&state=$stateCode");
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"GET",
 			$url
 		);
-		if ($this->response->getStatusCode() !== 200) {
+		if ($response->getStatusCode() !== 200) {
 			throw new Exception(
 				__METHOD__ . " could not retrieve information about shares"
 			);
 		}
-		$result = $this->response->getBody()->getContents();
+		$result = $response->getBody()->getContents();
 		$usersShares = \json_decode($result, true);
 		if (!\is_array($usersShares)) {
 			throw new Exception(
