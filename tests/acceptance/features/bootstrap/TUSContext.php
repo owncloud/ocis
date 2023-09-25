@@ -156,7 +156,6 @@ class TUSContext implements Context {
 	public function userSendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data): void {
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data);
 		$this->featureContext->setResponse($response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -438,7 +437,6 @@ class TUSContext implements Context {
 	): void {
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
 		$this->featureContext->setResponse($response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -460,7 +458,6 @@ class TUSContext implements Context {
 	): void {
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -477,7 +474,6 @@ class TUSContext implements Context {
 	public function userUploadsChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -494,7 +490,6 @@ class TUSContext implements Context {
 	public function userHasUploadedChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -516,6 +511,5 @@ class TUSContext implements Context {
 		$this->userHasCreatedNewTUSResourceWithHeaders($user, $headers);
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 }
