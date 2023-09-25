@@ -3391,6 +3391,7 @@ class FeatureContext extends BehatVariablesContext {
 		if (\count(WebDavHelper::$spacesIdRef) > 0) {
 			WebDavHelper::$spacesIdRef = [];
 		}
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
