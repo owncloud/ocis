@@ -30,6 +30,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/huandu/xstrings"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
@@ -153,7 +154,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		if err := h.passwordValidator.Validate(password); err != nil {
 			return nil, &ocsError{
 				Code:    response.MetaBadRequest.StatusCode,
-				Message: err.Error(),
+				Message: xstrings.FirstRuneToUpper(err.Error()),
 				Error:   fmt.Errorf("password validation failed: %w", err),
 			}
 		}
@@ -479,7 +480,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		// skip validation if the clear password scenario
 		if len(newPassword[0]) > 0 {
 			if err := h.passwordValidator.Validate(newPassword[0]); err != nil {
-				response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, err.Error(), err)
+				response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, xstrings.FirstRuneToUpper(err.Error()), err)
 				return
 			}
 		}

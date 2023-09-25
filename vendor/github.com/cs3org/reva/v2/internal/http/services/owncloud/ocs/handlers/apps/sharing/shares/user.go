@@ -244,7 +244,6 @@ func (h *Handler) listUserShares(r *http.Request, filters []*collaboration.Filte
 
 			h.addFileInfo(ctx, data, info)
 			h.mapUserIds(ctx, client, data)
-
 			// Filter out a share if ShareWith is not found because the user or group already deleted
 			if data.ShareWith == "" {
 				continue

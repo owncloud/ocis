@@ -734,7 +734,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 
 	share.Permissions = &collaboration.SharePermissions{Permissions: role.CS3ResourcePermissions()}
 
-	var fieldMaskPaths = []string{"permissions"}
+	var fieldMaskPaths = []string{"permissions", "hide"}
 
 	expireDate := r.PostFormValue("expireDate")
 	var expirationTs *types.Timestamp
@@ -863,6 +863,8 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 	// which pending state to list
 	stateFilter := getStateFilter(r.FormValue("state"))
 
+	showHidden, _ := strconv.ParseBool(r.URL.Query().Get("show_hidden"))
+
 	ctx := r.Context()
 	p := r.URL.Query().Get("path")
 	shareRef := r.URL.Query().Get("share_ref")
@@ -950,6 +952,9 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 
 	// TODO(refs) filter out "invalid" shares
 	for _, rs := range lrsRes.GetShares() {
+		if rs.Share.Hide && !showHidden {
+			continue
+		}
 		if stateFilter != ocsStateUnknown && rs.GetState() != stateFilter {
 			continue
 		}
