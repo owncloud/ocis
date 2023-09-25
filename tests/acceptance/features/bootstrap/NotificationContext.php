@@ -100,7 +100,7 @@ class NotificationContext implements Context {
 	public function listAllNotifications(string $user):ResponseInterface {
 		$this->setUserRecipient($user);
 		$headers = ["accept-language" => $this->settingsContext->getSettingLanguageValue($user)];
-		$response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -111,7 +111,6 @@ class NotificationContext implements Context {
 			2,
 			$headers
 		);
-		return $response;
 	}
 
 	/**
