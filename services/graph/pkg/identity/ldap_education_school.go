@@ -253,13 +253,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 	}
 
 	if err := i.conn.Modify(mr); err != nil {
-		var lerr *ldap.Error
 		logger.Debug().Err(err).Msg("error updating school number")
-		if errors.As(err, &lerr) {
-			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
-			}
-		}
 		return err
 	}
 
