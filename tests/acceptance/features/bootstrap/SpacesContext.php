@@ -1791,9 +1791,10 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" copies a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
+	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
 	 *
 	 * @param string $user
+	 * @param string $actionType
 	 * @param string $sourceFile
 	 * @param string $destinationFile
 	 * @param string $toSpaceName
@@ -1802,13 +1803,22 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @return void
 	 */
-	public function userCopiesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
+	public function userCopiesOrMovesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
 		// split the source when there are sub-folders
 		$sourceFile = explode("/", $sourceFile);
-		$fileDestination = $this->escapePath(\ltrim($destinationFile, "/")) . '/' . $this->escapePath(\ltrim(end($sourceFile), "/"));
+		$fileDestination = '';
+		if ($actionType === 'copies' || $actionType === 'moves') {
+			$fileDestination = $this->escapePath(\ltrim($destinationFile, "/")) . '/' . $this->escapePath(\ltrim(end($sourceFile), "/"));
+		} elseif ($actionType === 'renames') {
+			$fileDestination = $destinationFile;
+		}
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
 		$fullUrl = $this->featureContext->getBaseUrl() . $url;
-		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
+		if ($actionType === 'copies') {
+			$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
+		} elseif ($actionType === 'moves' || $actionType === 'renames') {
+			$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
+		}
 	}
 
 	/**
