@@ -14,32 +14,32 @@ Feature: propfind a file using file id
     When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
-      | key            | value               |
-      | oc:name        | textfile.txt        |
-      | oc:permissions | RDNVWZP             |
+      | key            | value        |
+      | oc:name        | textfile.txt |
+      | oc:permissions | RDNVWZP      |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file inside a folder of personal space
+  Scenario Outline: send a PROPFIND request to a file inside a folder of personal space
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "folder/textfile.txt"
     And we save it into "FILEID"
     When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
-      | key            | value               |
-      | oc:name        | textfile.txt        |
-      | oc:permissions | RDNVWZP             |
+      | key            | value        |
+      | oc:name        | textfile.txt |
+      | oc:permissions | RDNVWZP      |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sends a PROPFIND request to a file in personal space owned by other user
+  Scenario Outline: send a PROPFIND request to a file in personal space owned by another user
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
@@ -51,7 +51,7 @@ Feature: propfind a file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file of inside project space
+  Scenario Outline: send a PROPFIND request to a file of inside project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
@@ -61,14 +61,14 @@ Feature: propfind a file using file id
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value        |
       | oc:name        | textfile.txt |
-      | oc:permissions | RDNVWZP     |
+      | oc:permissions | RDNVWZP      |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a file inside a folder of project space
+  Scenario Outline: send a PROPFIND request to a file inside a folder of project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder" in space "new-space"
@@ -79,14 +79,14 @@ Feature: propfind a file using file id
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value        |
       | oc:name        | textfile.txt |
-      | oc:permissions | RDNVWZP     |
+      | oc:permissions | RDNVWZP      |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sends a PROPFIND request to a file inside project space owned by other user
+  Scenario Outline: send a PROPFIND request to a file inside project space owned by another user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
@@ -100,7 +100,7 @@ Feature: propfind a file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: send a PROPFIND requests to a shared file
+  Scenario Outline: send a PROPFIND request to a shared file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
@@ -118,7 +118,7 @@ Feature: propfind a file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: sharee send a PROPFIND requests to a file inside of a shared folder
+  Scenario Outline: sharee sends a PROPFIND request to a file inside of a shared folder
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
