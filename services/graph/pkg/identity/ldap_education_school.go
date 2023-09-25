@@ -233,7 +233,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 	mr := ldap.NewModifyRequest(dn, nil)
 	if updatedSchoolNumber, ok := updatedSchool.GetSchoolNumberOk(); ok {
 		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
-			_, err := i.getSchoolByNumberOrID(*updatedSchoolNumber)
+			_, err := i.getSchoolByNumber(*updatedSchoolNumber)
 			if err == nil {
 				return errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
 			}
@@ -643,6 +643,16 @@ func (i *LDAP) getSchoolByNumberOrID(numberOrID string) (*ldap.Entry, error) {
 		numberOrID,
 		i.educationConfig.schoolAttributeMap.schoolNumber,
 		numberOrID,
+	)
+	return i.getSchoolByFilter(filter)
+}
+
+func (i *LDAP) getSchoolByNumber(schoolNumber string) (*ldap.Entry, error) {
+	schoolNumber = ldap.EscapeFilter(schoolNumber)
+	filter := fmt.Sprintf(
+		"(%s=%s)",
+		i.educationConfig.schoolAttributeMap.schoolNumber,
+		schoolNumber,
 	)
 	return i.getSchoolByFilter(filter)
 }
