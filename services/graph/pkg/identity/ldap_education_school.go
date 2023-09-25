@@ -216,7 +216,7 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 		logger.Debug().Err(err).Msg("error updating school name")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+				err = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
 			}
 		}
 		return err
@@ -235,9 +235,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
 			_, err := i.getSchoolByNumberOrID(*updatedSchoolNumber)
 			if err == nil {
-				errmsg := fmt.Sprintf("school number '%s' already exists", *updatedSchoolNumber)
-				err = fmt.Errorf(errmsg)
-				return err
+				return errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
 			}
 			mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{*updatedSchoolNumber})
 		}
