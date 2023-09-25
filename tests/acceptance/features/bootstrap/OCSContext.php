@@ -46,7 +46,8 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserSendsToOcsApiEndpoint(string $verb, string $url):void {
-		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
+		$response = $this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -58,8 +59,8 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasSentToOcsApiEndpoint(string $verb, string $url):void {
-		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -74,13 +75,14 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function userSendsToOcsApiEndpoint(string $user, string $verb, string $url, ?string $password = null):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$verb,
 			$url,
 			null,
 			$password
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -94,14 +96,14 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function userHasSentToOcsApiEndpoint(string $user, string $verb, string $url, ?string $password = null):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$verb,
 			$url,
 			null,
 			$password
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -112,7 +114,7 @@ class OCSContext implements Context {
 	 * @param string|null $password
 	 * @param array|null $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function userSendsHTTPMethodToOcsApiEndpointWithBody(
 		string $user,
@@ -121,7 +123,7 @@ class OCSContext implements Context {
 		?TableNode $body = null,
 		?string $password = null,
 		?array $headers = null
-	):void {
+	):ResponseInterface {
 		/**
 		 * array of the data to be sent in the body.
 		 * contains $body data converted to an array
@@ -140,7 +142,7 @@ class OCSContext implements Context {
 			$user = null;
 			$password = null;
 		}
-		$response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
@@ -151,7 +153,6 @@ class OCSContext implements Context {
 			$this->featureContext->getOcsApiVersion(),
 			$headers
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -159,15 +160,15 @@ class OCSContext implements Context {
 	 * @param string $url
 	 * @param TableNode|null $body
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function adminSendsHttpMethodToOcsApiEndpointWithBody(
 		string $verb,
 		string $url,
 		?TableNode $body
-	):void {
+	):ResponseInterface {
 		$admin = $this->featureContext->getAdminUsername();
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$admin,
 			$verb,
 			$url,
@@ -180,10 +181,10 @@ class OCSContext implements Context {
 	 * @param string $url
 	 * @param TableNode|null $body
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function theUserSendsToOcsApiEndpointWithBody(string $verb, string $url, ?TableNode $body = null):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+	public function theUserSendsToOcsApiEndpointWithBody(string $verb, string $url, ?TableNode $body = null):ResponseInterface {
+		return $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$this->featureContext->getCurrentUser(),
 			$verb,
 			$url,
@@ -209,13 +210,14 @@ class OCSContext implements Context {
 		?TableNode $body = null,
 		?string $password = null
 	):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$verb,
 			$url,
 			$body,
 			$password
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -236,14 +238,14 @@ class OCSContext implements Context {
 		?TableNode $body = null,
 		?string $password = null
 	):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$verb,
 			$url,
 			$body,
 			$password
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -399,11 +401,12 @@ class OCSContext implements Context {
 		string $url,
 		?TableNode $body
 	):void {
-		$this->adminSendsHttpMethodToOcsApiEndpointWithBody(
+		$response = $this->adminSendsHttpMethodToOcsApiEndpointWithBody(
 			$verb,
 			$url,
 			$body
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -420,12 +423,12 @@ class OCSContext implements Context {
 		string $url,
 		?TableNode $body
 	):void {
-		$this->adminSendsHttpMethodToOcsApiEndpointWithBody(
+		$response = $this->adminSendsHttpMethodToOcsApiEndpointWithBody(
 			$verb,
 			$url,
 			$body
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -438,11 +441,12 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserSendsHTTPMethodToOcsApiEndpointWithBody(string $verb, string $url, TableNode $body):void {
-		$this->theUserSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->theUserSendsToOcsApiEndpointWithBody(
 			$verb,
 			$url,
 			$body
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -455,12 +459,12 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasSentHTTPMethodToOcsApiEndpointWithBody(string $verb, string $url, TableNode $body):void {
-		$this->theUserSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->theUserSendsToOcsApiEndpointWithBody(
 			$verb,
 			$url,
 			$body
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -480,13 +484,14 @@ class OCSContext implements Context {
 		TableNode $body
 	):void {
 		$admin = $this->featureContext->getAdminUsername();
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$admin,
 			$verb,
 			$url,
 			$body,
 			$password
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -507,13 +512,14 @@ class OCSContext implements Context {
 		string $password,
 		TableNode $body
 	):void {
-		$this->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$verb,
 			$url,
 			$body,
 			$password
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

@@ -29,6 +29,7 @@ use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\WebDavHelper;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -61,7 +62,7 @@ class WebDavLockingContext implements Context {
 		TableNode $properties,
 		bool $public = false,
 		bool $expectToSucceed = true
-	) {
+	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if ($public === true) {
@@ -99,10 +100,7 @@ class WebDavLockingContext implements Context {
 			$this->featureContext->getDavPathVersion(),
 			$type
 		);
-
-		$this->featureContext->setResponse($response);
-		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
-		$this->featureContext->setResponseXmlObject($responseXml);
+		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
 		if (isset($xmlPart[0])) {
 			$this->tokenOfLastLock[$user][$file] = (string) $xmlPart[0];
@@ -111,6 +109,7 @@ class WebDavLockingContext implements Context {
 				Assert::fail("could not find lock token after trying to lock '$file'");
 			}
 		}
+		return $response;
 	}
 
 	/**
@@ -123,7 +122,8 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function lockFileUsingWebDavAPI(string $user, string $file, TableNode $properties) {
-		$this->lockFile($user, $file, $properties, false, false);
+		$response = $this->lockFile($user, $file, $properties, false, false);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -136,7 +136,8 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userHasLockedFile(string $user, string $file, TableNode $properties) {
-		$this->lockFile($user, $file, $properties);
+		$response = $this->lockFile($user, $file, $properties);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
@@ -147,12 +148,13 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function publicHasLockedLastSharedFile(TableNode $properties) {
-		$this->lockFile(
+		$response = $this->lockFile(
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			"/",
 			$properties,
 			true
 		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
@@ -163,13 +165,14 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function publicLocksLastSharedFile(TableNode $properties) {
-		$this->lockFile(
+		$response = $this->lockFile(
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			"/",
 			$properties,
 			true,
 			false
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -184,12 +187,13 @@ class WebDavLockingContext implements Context {
 		string    $file,
 		TableNode $properties
 	) {
-		$this->lockFile(
+		$response = $this->lockFile(
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			$file,
 			$properties,
 			true
 		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
@@ -206,13 +210,14 @@ class WebDavLockingContext implements Context {
 		string $publicWebDAVAPIVersion,
 		TableNode $properties
 	) {
-		$this->lockFile(
+		$response = $this->lockFile(
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			$file,
 			$properties,
 			true,
 			false
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -224,12 +229,13 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function unlockLastLockUsingWebDavAPI(string $user, string $file) {
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$file,
 			$user,
 			$file
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -246,12 +252,13 @@ class WebDavLockingContext implements Context {
 		string $itemToUnlock,
 		string $itemToUseLockOf
 	) {
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$user,
 			$itemToUseLockOf
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -269,12 +276,13 @@ class WebDavLockingContext implements Context {
 		string $itemToUseLockOf
 	) {
 		$lockOwner = $this->featureContext->getLastCreatedPublicShareToken();
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -339,28 +347,26 @@ class WebDavLockingContext implements Context {
 	) {
 		$lockCount = $this->countLockOfResources($user, $itemToUnlock);
 
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf,
 			$public
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 
 		$this->numberOfLockShouldBeReported($lockCount - 1, $itemToUnlock, $user);
 	}
 
 	/**
-	 * @When user :user unlocks file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf of user :lockOwner using the WebDAV API
-	 *
 	 * @param string $user
 	 * @param string $itemToUnlock
 	 * @param string $lockOwner
 	 * @param string $itemToUseLockOf
 	 * @param boolean $public
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 		string $user,
@@ -368,7 +374,7 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $itemToUseLockOf,
 		bool $public = false
-	) {
+	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		if ($public === true) {
@@ -388,21 +394,43 @@ class WebDavLockingContext implements Context {
 		$headers = [
 			"Lock-Token" => $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf]
 		];
-		$this->featureContext->setResponse(
-			WebDavHelper::makeDavRequest(
-				$baseUrl,
-				$user,
-				$password,
-				"UNLOCK",
-				$itemToUnlock,
-				$headers,
-				$this->featureContext->getStepLineRef(),
-				null,
-				$this->featureContext->getDavPathVersion(),
-				$type
-			)
+		return WebDavHelper::makeDavRequest(
+			$baseUrl,
+			$user,
+			$password,
+			"UNLOCK",
+			$itemToUnlock,
+			$headers,
+			$this->featureContext->getStepLineRef(),
+			null,
+			$this->featureContext->getDavPathVersion(),
+			$type
 		);
-		$this->featureContext->pushToLastStatusCodesArrays();
+	}
+
+	/**
+	 * @When user :user unlocks file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf of user :lockOwner using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $itemToUnlock
+	 * @param string $lockOwner
+	 * @param string $itemToUseLockOf
+	 *
+	 * @return void
+	 */
+	public function userUnlocksItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		string $user,
+		string $itemToUnlock,
+		string $lockOwner,
+		string $itemToUseLockOf
+	) {
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+			$user,
+			$itemToUnlock,
+			$lockOwner,
+			$itemToUseLockOf
+		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -420,13 +448,14 @@ class WebDavLockingContext implements Context {
 		string $itemToUseLockOf
 	) {
 		$user = $this->featureContext->getLastCreatedPublicShareToken();
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf,
 			true
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -438,13 +467,14 @@ class WebDavLockingContext implements Context {
 	 */
 	public function unlockItemAsPublicUsingWebDavAPI(string $itemToUnlock) {
 		$user = $this->featureContext->getLastCreatedPublicShareToken();
-		$this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$user,
 			$itemToUnlock,
 			true
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -463,12 +493,48 @@ class WebDavLockingContext implements Context {
 		string $fileDestination,
 		string $itemToUseLockOf
 	) {
-		$this->moveItemSendingLockTokenOfUser(
+		$response = $this->moveItemSendingLockTokenOfUser(
 			$user,
 			$fileSource,
 			$fileDestination,
 			$itemToUseLockOf,
 			$user
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 * @param string $itemToUseLockOf
+	 * @param string $lockOwner
+	 *
+	 * @return ResponseInterface
+	 */
+	public function moveItemSendingLockTokenOfUser(
+		string $user,
+		string $fileSource,
+		string $fileDestination,
+		string $itemToUseLockOf,
+		string $lockOwner
+	):ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
+		$destination = $this->featureContext->destinationHeaderValue(
+			$user,
+			$fileDestination
+		);
+		$token = $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf];
+		$headers = [
+			"Destination" => $destination,
+			"If" => "(<$token>)"
+		];
+		return $this->featureContext->makeDavRequest(
+			$user,
+			"MOVE",
+			$fileSource,
+			$headers
 		);
 	}
 
@@ -483,34 +549,21 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function moveItemSendingLockTokenOfUser(
+	public function userMovesItemSendingLockTokenOfUser(
 		string $user,
 		string $fileSource,
 		string $fileDestination,
 		string $itemToUseLockOf,
 		string $lockOwner
 	) {
-		$user = $this->featureContext->getActualUsername($user);
-		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
-		$destination = $this->featureContext->destinationHeaderValue(
+		$response = $this->moveItemSendingLockTokenOfUser(
 			$user,
-			$fileDestination
+			$fileSource,
+			$fileDestination,
+			$itemToUseLockOf,
+			$lockOwner
 		);
-		$token = $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf];
-		$headers = [
-			"Destination" => $destination,
-			"If" => "(<$token>)"
-		];
-		try {
-			$response = $this->featureContext->makeDavRequest(
-				$user,
-				"MOVE",
-				$fileSource,
-				$headers
-			);
-			$this->featureContext->setResponse($response);
-		} catch (ConnectException $e) {
-		}
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
