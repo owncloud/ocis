@@ -6,12 +6,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
 * Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 
 ## Details
+
+* Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
+
+   We fixed a problem where the states of received shares were reset to PENDING in the "ocis migrate
+   rebuild-jsoncs3-indexes" command
+
+   https://github.com/owncloud/ocis/issues/7319
 
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
 
