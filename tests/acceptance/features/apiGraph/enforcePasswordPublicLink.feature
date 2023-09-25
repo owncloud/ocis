@@ -110,13 +110,13 @@ Feature: enforce password on public link
     Then the HTTP status code should be "<http-code>"
     And the OCS status code should be "400"
     And the OCS status message should be:
-    """
-    at least 13 characters are required
-    at least 3 lowercase letters are required
-    at least 2 uppercase letters are required
-    at least 2 numbers are required
-    at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-    """
+      """
+      at least 13 characters are required
+      at least 3 lowercase letters are required
+      at least 2 uppercase letters are required
+      at least 2 numbers are required
+      at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+      """
     Examples:
       | ocs-api-version | http-code |
       | 1               | 200       |
@@ -237,8 +237,54 @@ Feature: enforce password on public link
     And the OCS status code should be "400"
     And the OCS status message should be "<message>"
     Examples:
-      | config                                            | config-value | password | message                                                             |
+      | config                                            | config-value | password | message                                   |
       | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 5            | 1234     | at least 5 characters are required        |
       | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3            | TesT     | at least 3 lowercase letters are required |
       | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | TesT     | at least 3 uppercase letters are required |
       | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | test1    | at least 2 numbers are required           |
+
+
+  Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
+    And using OCS API version "2"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | 3          |
+      | password    | <password> |
+    Then the HTTP status code should be "<http-code>"
+    And the OCS status code should be "<ocs-code>"
+    And the OCS status message should be "<message>"
+    Examples:
+      | password | http-code | ocs-code | message                                                                                               |
+      | 123      | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | ownCloud | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | 1234     | 200       | 200      | OK                                                                                                    |
+      | OwnCloud | 200       | 200      | OK                                                                                                    |
+      | p@ssword | 200       | 200      | OK                                                                                                    |
+
+
+  Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
+    And using OCS API version "2"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    When user "Alice" creates a public link share using the sharing API with settings
+      | path        | /testfile.txt |
+      | permissions | 3             |
+      | password    | <password>    |
+    Then the HTTP status code should be "<http-code>"
+    And the OCS status code should be "<ocs-code>"
+    And the OCS status message should be "<message>"
+    Examples:
+      | password | http-code | ocs-code | message                                                                                               |
+      | 123      | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | ownCloud | 400       | 400      | unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | 1234     | 200       | 200      | OK                                                                                                    |
+      | OwnCloud | 200       | 200      | OK                                                                                                    |
+      | p@ssword | 200       | 200      | OK                                                                                                    |
