@@ -1846,7 +1846,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function theUserDeletesLastShareUsingTheSharingAPI():void {
-		$this->deleteLastShareUsingSharingApiByCurrentUser();
+		$this->setResponse($this->deleteLastShareUsingSharingApiByCurrentUser());
 	}
 
 	/**
@@ -1855,8 +1855,8 @@ trait Sharing {
 	 * @return void
 	 */
 	public function theUserHasDeletedLastShareUsingTheSharingAPI():void {
-		$this->deleteLastShareUsingSharingApiByCurrentUser();
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->deleteLastShareUsingSharingApiByCurrentUser();
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -1864,9 +1864,9 @@ trait Sharing {
 	 * @param string|null $sharer the specific user whose share will be deleted (if specified)
 	 * @param bool $deleteLastPublicLink
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function deleteLastShareUsingSharingApi(string $user, string $sharer = null, bool $deleteLastPublicLink = false):void {
+	public function deleteLastShareUsingSharingApi(string $user, string $sharer = null, bool $deleteLastPublicLink = false):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		if ($deleteLastPublicLink) {
 			$shareId = (string) $this->getLastCreatedPublicShare()->id;
@@ -1878,7 +1878,7 @@ trait Sharing {
 			}
 		}
 		$url = $this->getSharesEndpointPath("/$shareId");
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"DELETE",
 			$url
@@ -1886,10 +1886,10 @@ trait Sharing {
 	}
 
 	/**
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function deleteLastShareUsingSharingApiByCurrentUser():void {
-		$this->deleteLastShareUsingSharingApi($this->currentUser);
+	public function deleteLastShareUsingSharingApiByCurrentUser():ResponseInterface {
+		return $this->deleteLastShareUsingSharingApi($this->currentUser);
 	}
 
 	/**
@@ -1901,7 +1901,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userDeletesLastShareUsingTheSharingApi(string $user):void {
-		$this->deleteLastShareUsingSharingApi($user);
+		$this->setResponse($this->deleteLastShareUsingSharingApi($user));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1914,7 +1914,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userDeletesLastPublicLinkShareUsingTheSharingApi(string $user):void {
-		$this->deleteLastShareUsingSharingApi($user, null, true);
+		$this->setResponse($this->deleteLastShareUsingSharingApi($user, null, true));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1928,7 +1928,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userDeletesLastShareOfUserUsingTheSharingApi(string $user, string $sharer):void {
-		$this->deleteLastShareUsingSharingApi($user, $sharer);
+		$this->setResponse($this->deleteLastShareUsingSharingApi($user, $sharer));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1940,8 +1940,8 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userHasDeletedLastShareUsingTheSharingApi(string $user):void {
-		$this->deleteLastShareUsingSharingApi($user);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->deleteLastShareUsingSharingApi($user);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -1967,7 +1967,7 @@ trait Sharing {
 	public function userGetsInfoOfLastShareUsingTheSharingApi(string $user, ?string $language = null):void {
 		$shareId = $this->getLastCreatedUserGroupShareId();
 		$language = TranslationHelper::getLanguage($language);
-		$this->getShareData($user, $shareId, $language);
+		$this->setResponse($this->getShareData($user, $shareId, $language));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -2000,7 +2000,7 @@ trait Sharing {
 			);
 		}
 		$language = TranslationHelper::getLanguage($language);
-		$this->getShareData($user, $shareId, $language);
+		$this->setResponse($this->getShareData($user, $shareId, $language));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -2073,16 +2073,16 @@ trait Sharing {
 	 * @param string $share_id
 	 * @param string|null $language
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function getShareData(string $user, string $share_id, ?string $language = null):void {
+	public function getShareData(string $user, string $share_id, ?string $language = null):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$url = $this->getSharesEndpointPath("/$share_id");
 		$headers = [];
 		if ($language !== null) {
 			$headers['Accept-Language'] = $language;
 		}
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"GET",
 			$url,
@@ -2102,11 +2102,12 @@ trait Sharing {
 	public function userGetsAllTheSharesSharedWithHimUsingTheSharingApi(string $user):void {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/v1/shares?shared_with_me=true";
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -2120,8 +2121,8 @@ trait Sharing {
 	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, TableNode $table):void {
 		$user = $this->getActualUsername($user);
 		$shareId = (string) $this->getLastCreatedPublicShare()->id;
-		$this->getShareData($user, $shareId);
-		$this->checkFields($user, $table);
+		$response = $this->getShareData($user, $shareId);
+		$this->checkFields($user, $table, $response);
 	}
 
 	/**
@@ -2148,13 +2149,14 @@ trait Sharing {
 		} else {
 			$rawShareTypes = SharingHelper::SHARE_TYPES[$shareType];
 		}
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$this->getSharesEndpointPath(
 				"?shared_with_me=true" . $pendingClause . "&share_types=" . $rawShareTypes
 			)
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -2169,11 +2171,12 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/"
 			. "v$this->sharingApiVersion/shares?shared_with_me=true&path=$path";
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -2295,19 +2298,21 @@ trait Sharing {
 	):void {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
-		$this->getShareData($user, $this->getLastCreatedUserGroupShareId());
+		$response = $this->getShareData($user, $this->getLastCreatedUserGroupShareId());
 		$this->theHTTPStatusCodeShouldBe(
 			200,
-			"Error getting info of last share for user $user"
+			"Error getting info of last share for user $user",
+			$response
 		);
 		$this->ocsContext->assertOCSResponseIndicatesSuccess(
 			__METHOD__ .
 			' Error getting info of last share for user $user\n' .
 			$this->ocsContext->getOCSResponseStatusMessage(
-				$this->getResponse()
-			) . '"'
+				$response
+			) . '"',
+			$response
 		);
-		$this->checkFields($user, $body);
+		$this->checkFields($user, $body, $response);
 	}
 
 	/**
@@ -2543,11 +2548,14 @@ trait Sharing {
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkFields(string $user, ?TableNode $body):void {
+	public function checkFields(string $user, ?TableNode $body, ?ResponseInterface $response = null):void {
+		$response = $response ?? $this->getResponse();
+		$data = $this->getResponseXml($response, __METHOD__)->data[0];
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 		$userRelatedFieldNames = [
@@ -2568,8 +2576,8 @@ trait Sharing {
 			$value = $this->getActualUsername($value);
 			$value = $this->replaceValuesFromTable($field, $value);
 			Assert::assertTrue(
-				$this->isFieldInResponse($field, $value),
-				"$field doesn't have value '$value'"
+				$this->isFieldInResponse($field, $value, true, $data),
+				"$field doesn't have value '$value'",
 			);
 		}
 	}
@@ -3022,17 +3030,17 @@ trait Sharing {
 	 * @param string $name
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function deletePublicLinkShareUsingTheSharingApi(
 		string $user,
 		string $name,
 		string $path
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$share_id = $this->getPublicShareIDByName($user, $path, $name);
 		$url = $this->getSharesEndpointPath("/$share_id");
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"DELETE",
 			$url
@@ -3053,11 +3061,12 @@ trait Sharing {
 		string $name,
 		string $path
 	):void {
-		$this->deletePublicLinkShareUsingTheSharingApi(
+		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
 			$path
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3074,12 +3083,12 @@ trait Sharing {
 		string $name,
 		string $path
 	):void {
-		$this->deletePublicLinkShareUsingTheSharingApi(
+		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
 			$path
 		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -3137,11 +3146,12 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$httpRequestMethod,
 			$url
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -3195,11 +3205,12 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$httpRequestMethod,
 			$url
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3387,11 +3398,12 @@ trait Sharing {
 			__METHOD__ . " could not find share, offered by $sharer to $sharee"
 		);
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$sharer,
 			'DELETE',
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3460,19 +3472,18 @@ trait Sharing {
 					__METHOD__ . ' invalid "state" given'
 				);
 		}
-
 		$url = $this->getSharesEndpointPath("?format=json&shared_with_me=true&state=$stateCode");
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"GET",
 			$url
 		);
-		if ($this->response->getStatusCode() !== 200) {
+		if ($response->getStatusCode() !== 200) {
 			throw new Exception(
 				__METHOD__ . " could not retrieve information about shares"
 			);
 		}
-		$result = $this->response->getBody()->getContents();
+		$result = $response->getBody()->getContents();
 		$usersShares = \json_decode($result, true);
 		if (!\is_array($usersShares)) {
 			throw new Exception(
