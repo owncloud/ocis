@@ -15,9 +15,11 @@
 package s2
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"math"
+	"reflect"
 
 	"github.com/golang/geo/r1"
 	"github.com/golang/geo/r3"
@@ -66,6 +68,9 @@ type Loop struct {
 
 	// index is the spatial index for this Loop.
 	index *ShapeIndex
+
+	// A buffer pool to be used while decoding the polygon
+	BufPool *GeoBufferPool
 }
 
 // LoopFromPoints constructs a loop from the given points.
@@ -1258,6 +1263,15 @@ func (l Loop) encode(e *encoder) {
 	l.bound.encode(e)
 }
 
+func init() {
+	var f64 float64
+	sizeOfFloat64 = int(reflect.TypeOf(f64).Size())
+	sizeOfVertex = 3 * sizeOfFloat64
+}
+
+var sizeOfFloat64 int
+var sizeOfVertex int
+
 // Decode decodes a loop.
 func (l *Loop) Decode(r io.Reader) error {
 	*l = Loop{}
@@ -1287,11 +1301,37 @@ func (l *Loop) decode(d *decoder) {
 		return
 	}
 	l.vertices = make([]Point, nvertices)
-	for i := range l.vertices {
-		l.vertices[i].X = d.readFloat64()
-		l.vertices[i].Y = d.readFloat64()
-		l.vertices[i].Z = d.readFloat64()
+
+	// Each vertex requires 24 bytes of storage
+	numBytesNeeded := int(nvertices) * sizeOfVertex
+
+	i := 0
+
+	for numBytesNeeded > 0 {
+		arr := l.BufPool.Get(numBytesNeeded)
+		numBytesRead := d.readFloat64Array(numBytesNeeded, arr)
+
+		if numBytesRead == 0 {
+			break
+		}
+
+		numBytesNeeded -= numBytesRead
+
+		// Parsing one vertex at a time into the vertex array of the loop
+		// by going through the buffer in steps of sizeOfVertex and converting
+		// floatSize worth of bytes into the float values
+		for j := 0; j < int(numBytesRead/sizeOfVertex); j++ {
+			l.vertices[i+j].X = math.Float64frombits(
+				binary.LittleEndian.Uint64(arr[sizeOfFloat64*(j*3) : sizeOfFloat64*(j*3+1)]))
+			l.vertices[i+j].Y = math.Float64frombits(
+				binary.LittleEndian.Uint64(arr[sizeOfFloat64*(j*3+1) : sizeOfFloat64*(j*3+2)]))
+			l.vertices[i+j].Z = math.Float64frombits(
+				binary.LittleEndian.Uint64(arr[sizeOfFloat64*(j*3+2) : sizeOfFloat64*(j*3+3)]))
+		}
+
+		i += int(numBytesRead/sizeOfVertex)
 	}
+
 	l.index = NewShapeIndex()
 	l.originInside = d.readBool()
 	l.depth = int(d.readUint32())

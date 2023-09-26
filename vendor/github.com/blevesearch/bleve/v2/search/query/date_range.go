@@ -16,7 +16,6 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -27,13 +26,14 @@ import (
 	"github.com/blevesearch/bleve/v2/registry"
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/searcher"
+	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 )
 
-// QueryDateTimeParser controls the default query date time parser
+// QueryDateTimeParser controls the default query date time parser.
 var QueryDateTimeParser = optional.Name
 
-// QueryDateTimeFormat controls the format when Marshaling to JSON
+// QueryDateTimeFormat controls the format when Marshaling to JSON.
 var QueryDateTimeFormat = time.RFC3339
 
 var cache = registry.NewCache()
@@ -55,7 +55,7 @@ func queryTimeFromString(t string) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, err
 	}
-	rv, err := dateTimeParser.ParseDateTime(t)
+	rv, _, err := dateTimeParser.ParseDateTime(t)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -69,7 +69,7 @@ func (t *BleveQueryTime) MarshalJSON() ([]byte, error) {
 
 func (t *BleveQueryTime) UnmarshalJSON(data []byte) error {
 	var timeString string
-	err := json.Unmarshal(data, &timeString)
+	err := util.UnmarshalJSON(data, &timeString)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (t *BleveQueryTime) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	t.Time, err = dateTimeParser.ParseDateTime(timeString)
+	t.Time, _, err = dateTimeParser.ParseDateTime(timeString)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ type DateRangeQuery struct {
 // NewDateRangeQuery creates a new Query for ranges
 // of date values.
 // Date strings are parsed using the DateTimeParser configured in the
-//  top-level config.QueryDateTimeParser
+// top-level config.QueryDateTimeParser
 // Either, but not both endpoints can be nil.
 func NewDateRangeQuery(start, end time.Time) *DateRangeQuery {
 	return NewDateRangeInclusiveQuery(start, end, nil, nil)
@@ -105,7 +105,7 @@ func NewDateRangeQuery(start, end time.Time) *DateRangeQuery {
 // NewDateRangeInclusiveQuery creates a new Query for ranges
 // of date values.
 // Date strings are parsed using the DateTimeParser configured in the
-//  top-level config.QueryDateTimeParser
+// top-level config.QueryDateTimeParser
 // Either, but not both endpoints can be nil.
 // startInclusive and endInclusive control inclusion of the endpoints.
 func NewDateRangeInclusiveQuery(start, end time.Time, startInclusive, endInclusive *bool) *DateRangeQuery {

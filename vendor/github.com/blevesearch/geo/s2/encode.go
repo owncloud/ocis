@@ -222,3 +222,17 @@ func (d *decoder) readUvarint() (x uint64) {
 	x, d.err = binary.ReadUvarint(d.r)
 	return
 }
+
+func (d *decoder) readFloat64Array(size int, buf []byte) int {
+	if d.err != nil || buf == nil {
+		return 0
+	}
+
+	if size >= len(buf) {
+		_, d.err = io.ReadFull(d.r, buf)
+		return len(buf)
+	}
+
+	_, d.err = io.ReadFull(d.r, buf[0:size])
+	return size
+}

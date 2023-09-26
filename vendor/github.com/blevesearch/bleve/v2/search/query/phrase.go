@@ -16,19 +16,20 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/searcher"
+	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 )
 
 type PhraseQuery struct {
-	Terms    []string `json:"terms"`
-	Field    string   `json:"field,omitempty"`
-	BoostVal *Boost   `json:"boost,omitempty"`
+	Terms     []string `json:"terms"`
+	Field     string   `json:"field,omitempty"`
+	BoostVal  *Boost   `json:"boost,omitempty"`
+	Fuzziness int      `json:"fuzziness"`
 }
 
 // NewPhraseQuery creates a new Query for finding
@@ -49,12 +50,16 @@ func (q *PhraseQuery) SetBoost(b float64) {
 	q.BoostVal = &boost
 }
 
+func (q *PhraseQuery) SetFuzziness(f int) {
+	q.Fuzziness = f
+}
+
 func (q *PhraseQuery) Boost() float64 {
 	return q.BoostVal.Value()
 }
 
 func (q *PhraseQuery) Searcher(ctx context.Context, i index.IndexReader, m mapping.IndexMapping, options search.SearcherOptions) (search.Searcher, error) {
-	return searcher.NewPhraseSearcher(ctx, i, q.Terms, q.Field, options)
+	return searcher.NewPhraseSearcher(ctx, i, q.Terms, q.Fuzziness, q.Field, q.BoostVal.Value(), options)
 }
 
 func (q *PhraseQuery) Validate() error {
@@ -67,12 +72,13 @@ func (q *PhraseQuery) Validate() error {
 func (q *PhraseQuery) UnmarshalJSON(data []byte) error {
 	type _phraseQuery PhraseQuery
 	tmp := _phraseQuery{}
-	err := json.Unmarshal(data, &tmp)
+	err := util.UnmarshalJSON(data, &tmp)
 	if err != nil {
 		return err
 	}
 	q.Terms = tmp.Terms
 	q.Field = tmp.Field
 	q.BoostVal = tmp.BoostVal
+	q.Fuzziness = tmp.Fuzziness
 	return nil
 }
