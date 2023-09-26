@@ -191,8 +191,8 @@ devDependencies:
     specifier: 29.7.0
     version: 29.7.0(@types/node@20.5.9)
   license-checker-rseidelsohn:
-    specifier: ^4.2.6
-    version: 4.2.6
+    specifier: ^4.2.8
+    version: 4.2.8
   mini-css-extract-plugin:
     specifier: 1.6.2
     version: 1.6.2(webpack@4.47.0)
@@ -8152,8 +8152,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /license-checker-rseidelsohn@4.2.6:
-    resolution: {integrity: sha512-cV69Exm7y7stSVoYpFaQ1rEdmTtA7y1bMgTeeB1fqE0TZRkW1zpn8uIsIKeHK5rMvJYQzEuExNmLOTDXJMplgg==}
+  /license-checker-rseidelsohn@4.2.8:
+    resolution: {integrity: sha512-WVnHC3iJff79mAp+IfAgiBwHXF2Oey/7/XugjTHRcTcufZMSpwky9a+1wyOOOe+0Z3Qo5XK1pVRfLAoOHLOGqA==}
     engines: {node: '>=18', npm: '>=8'}
     hasBin: true
     dependencies:
