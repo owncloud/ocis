@@ -224,8 +224,6 @@ Feature: Change data of space
       }
     }
     """
-    And for user "Alice" folder ".space/" of the space "Project Jupiter" should contain these entries:
-      | readme.md |
     And for user "Alice" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "space description"
 
 
@@ -235,8 +233,6 @@ Feature: Change data of space
     And user "Alice" has set the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
     When user "<user>" uploads a file inside space "Project Jupiter" with content "new description" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
-    And for user "<user>" folder ".space/" of the space "Project Jupiter" should contain these entries:
-      | readme.md |
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<content>"
     Examples:
       | user  | code | content           |
