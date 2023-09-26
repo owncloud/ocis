@@ -2966,7 +2966,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->addUserToGroup($user, $group, "api");
+		$this->addUserToGroup($user, $group);
 	}
 
 	/**
@@ -3107,33 +3107,9 @@ trait Provisioning {
 			$method = "ldap";
 		} elseif ($method === null && OcisHelper::isTestingWithGraphApi()) {
 			$method = "graph";
-		} elseif ($method === null) {
-			$method = "api";
 		}
 		$method = \trim(\strtolower($method));
 		switch ($method) {
-			case "api":
-				$result = UserHelper::addUserToGroup(
-					$this->getBaseUrl(),
-					$user,
-					$group,
-					$this->getAdminUsername(),
-					$this->getAdminPassword(),
-					$this->getStepLineRef(),
-					$this->ocsApiVersion
-				);
-				if ($checkResult && ($result->getStatusCode() !== 200)) {
-					throw new Exception(
-						"could not add user to group. "
-						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				$this->response = $result;
-				if (!$checkResult) {
-					// for when step only
-					$this->pushToLastStatusCodesArrays();
-				}
-				break;
 			case "ldap":
 				try {
 					$this->addUserToLdapGroup(
@@ -3157,19 +3133,6 @@ trait Provisioning {
 					"Invalid method to add a user to a group"
 				);
 		}
-	}
-
-	/**
-	 * @Given the administrator has been added to group :group
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasBeenAddedToGroup(string $group):void {
-		$admin = $this->getAdminUsername();
-		$this->addUserToGroup($admin, $group, null, true);
 	}
 
 	/**

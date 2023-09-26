@@ -772,7 +772,7 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id") ?: WebDavHelper::generateUUIDv4();
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
@@ -847,19 +847,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException | Exception
 	 */
 	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
-		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = WebDavHelper::generateUUIDv4();
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$this->featureContext->setResponse(
-			GraphHelper::addUserToGroup(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials['username'],
-				$credentials['password'],
-				$userId,
-				$groupId
-			)
-		);
+		$this->featureContext->setResponse($this->addUserToGroup('', $user, $byUser));
 	}
 
 	/**
