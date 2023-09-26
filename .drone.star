@@ -138,6 +138,7 @@ config = {
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
             },
         },
         "apiAntivirus": {
