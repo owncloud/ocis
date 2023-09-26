@@ -243,3 +243,7 @@ func (oc *OperatorClaims) Claims() *ClaimsData {
 func (oc *OperatorClaims) updateVersion() {
 	oc.GenericFields.Version = libVersion
 }
+
+func (oc *OperatorClaims) GetTags() TagList {
+	return oc.Operator.Tags
+}

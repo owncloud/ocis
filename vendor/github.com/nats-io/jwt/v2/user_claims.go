@@ -151,3 +151,7 @@ func (u *UserClaims) updateVersion() {
 func (u *UserClaims) IsBearerToken() bool {
 	return u.BearerToken
 }
+
+func (u *UserClaims) GetTags() TagList {
+	return u.User.Tags
+}

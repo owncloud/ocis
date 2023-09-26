@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/nats-io/nkeys"
 )
@@ -124,10 +125,14 @@ func (sk *SigningKeys) MarshalJSON() ([]byte, error) {
 	if sk == nil {
 		return nil, nil
 	}
+
+	keys := sk.Keys()
+	sort.Strings(keys)
+
 	var a []interface{}
-	for k, v := range *sk {
-		if v != nil {
-			a = append(a, v)
+	for _, k := range keys {
+		if (*sk)[k] != nil {
+			a = append(a, (*sk)[k])
 		} else {
 			a = append(a, k)
 		}

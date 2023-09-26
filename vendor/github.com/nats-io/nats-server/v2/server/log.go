@@ -72,6 +72,16 @@ func (s *Server) ConfigureLogger() {
 				l.SetSizeLimit(opts.LogSizeLimit)
 			}
 		}
+		if opts.LogMaxFiles > 0 {
+			if l, ok := log.(*srvlog.Logger); ok {
+				al := int(opts.LogMaxFiles)
+				if int64(al) != opts.LogMaxFiles {
+					// set to default (no max) on overflow
+					al = 0
+				}
+				l.SetMaxNumFiles(al)
+			}
+		}
 	} else if opts.RemoteSyslog != "" {
 		log = srvlog.NewRemoteSysLogger(opts.RemoteSyslog, opts.Debug, opts.Trace)
 	} else if syslog {
@@ -215,6 +225,14 @@ func (s *Server) RateLimitWarnf(format string, v ...interface{}) {
 		return
 	}
 	s.Warnf("%s", statement)
+}
+
+func (s *Server) RateLimitDebugf(format string, v ...interface{}) {
+	statement := fmt.Sprintf(format, v...)
+	if _, loaded := s.rateLimitLogging.LoadOrStore(statement, time.Now()); loaded {
+		return
+	}
+	s.Debugf("%s", statement)
 }
 
 // Fatalf logs a fatal error
