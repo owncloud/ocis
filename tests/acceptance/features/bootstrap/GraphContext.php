@@ -346,17 +346,15 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): void {
+	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-
-		$this->featureContext->setResponse(
-			GraphHelper::deleteUser(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials["username"],
-				$credentials["password"],
-				$user
-			)
+		return(GraphHelper::deleteUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$user
+		)
 		);
 	}
 
@@ -442,8 +440,8 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theUserHasDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
-		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
+		$response = $this->adminDeletesUserUsingTheGraphApi($user, $byUser);
+		$this->featureContext->theHttpStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**

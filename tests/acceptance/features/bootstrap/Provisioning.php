@@ -1425,7 +1425,15 @@ trait Provisioning {
 	 */
 	public function theAdministratorHasDeletedUserUsingTheProvisioningApi(?string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+		$response =  $this->deleteTheUserUsingTheProvisioningApi($user);
+		if ($this->theUserShouldExist($user)
+			&& (!\in_array($response->getStatusCode(), [200, 204]))
+		) {
+			\error_log(
+				"INFORMATION: could not delete user '$user' "
+				. $response->getStatusCode() . " " . $response->getBody()
+			);
+		}
 		WebDavHelper::removeSpaceIdReferenceForUser($user);
 		$this->userShouldNotExist($user);
 	}
@@ -1440,51 +1448,9 @@ trait Provisioning {
 	 */
 	public function theAdminDeletesUserUsingTheProvisioningApi(string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+		$this->setResponse($this->deleteTheUserUsingTheProvisioningApi($user));
+		$this->pushToLastHttpStatusCodesArray();
 		$this->rememberThatUserIsNotExpectedToExist($user);
-	}
-
-	/**
-	 * @When the administrator deletes the following users using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorDeletesTheFollowingUsersUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["username"]);
-		$usernames = $table->getHash();
-		foreach ($usernames as $username) {
-			$this->theAdminDeletesUserUsingTheProvisioningApi($username["username"]);
-		}
-	}
-
-	/**
-	 * @When user :user deletes user :otherUser using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $otherUser
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userDeletesUserUsingTheProvisioningApi(
-		string $user,
-		string $otherUser
-	):void {
-		$actualUser = $this->getActualUsername($user);
-		$actualPassword = $this->getUserPassword($actualUser);
-		$actualOtherUser = $this->getActualUsername($otherUser);
-
-		$this->response = UserHelper::deleteUser(
-			$this->getBaseUrl(),
-			$actualOtherUser,
-			$actualUser,
-			$actualPassword,
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
 	}
 
 	/**
@@ -2337,22 +2303,6 @@ trait Provisioning {
 			}
 		}
 		$this->userShouldNotExist($user);
-	}
-
-	/**
-	 * @Given the following users have been deleted
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theFollowingUsersHaveBeenDeleted(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["username"]);
-		$usernames = $table->getHash();
-		foreach ($usernames as $username) {
-			$this->userHasBeenDeleted($username["username"]);
-		}
 	}
 
 	/**
@@ -3538,15 +3488,13 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteTheUserUsingTheProvisioningApi(string $user):void {
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
+	public function deleteTheUserUsingTheProvisioningApi(string $user):ResponseInterface {
 		// Always try to delete the user
 		if (OcisHelper::isTestingWithGraphApi()) {
 			// users can be deleted using the username in the GraphApi too
-			$this->graphContext->adminDeletesUserUsingTheGraphApi($user);
+			$response = $this->graphContext->adminDeletesUserUsingTheGraphApi($user);
 		} else {
-			$this->response = UserHelper::deleteUser(
+			$response = UserHelper::deleteUser(
 				$this->getBaseUrl(),
 				$user,
 				$this->getAdminUsername(),
@@ -3555,22 +3503,7 @@ trait Provisioning {
 				$this->ocsApiVersion
 			);
 		}
-		$this->pushToLastStatusCodesArrays();
-
-		// Only log a message if the test really expected the user to have been
-		// successfully created (i.e. the delete is expected to work) and
-		// there was a problem deleting the user. Because in this case there
-		// might be an effect on later tests.
-		if ($this->theUserShouldExist($user)
-			&& (!\in_array($this->response->getStatusCode(), [200, 204]))
-		) {
-			\error_log(
-				"INFORMATION: could not delete user '$user' "
-				. $this->response->getStatusCode() . " " . $this->response->getBody()
-			);
-		}
-
-		$this->rememberThatUserIsNotExpectedToExist($user);
+		return $response;
 	}
 
 	/**
