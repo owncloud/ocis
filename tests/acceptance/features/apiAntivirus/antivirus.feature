@@ -229,8 +229,8 @@ Feature: antivirus
     And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
       | message                                                                        |
       | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And for user "Alice" the space "new-space" should not contain these entries:
-      | /uploadFolder/<newfilename> |
+    And for user "Alice" folder "uploadFolder" of the space "new-space" should not contain these entries:
+      | <newfilename> |
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
