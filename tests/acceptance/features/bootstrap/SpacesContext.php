@@ -1753,15 +1753,19 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $fileDestination
 	 * @param string $spaceName
+	 * @param string|null $endPath
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName):string {
+	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName, string $endPath = null):string {
 		$space = $this->getSpaceByName($user, $spaceName);
-
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
-
+		if ($endPath && str_contains($endPath, 'remote.php')) {
+			// this is check for when we want to test with the endpoint having `remote.php` in  space webdav
+			// by default spaces webdav is '/dav/spaces'
+			return $this->featureContext->getBaseUrl() . '/remote.php/dav/spaces/' . $space['id'] . '/' . $fileDestination;
+		}
 		return $space["root"]["webDavUrl"] . '/' . $fileDestination;
 	}
 
@@ -1784,6 +1788,27 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$headers,
 		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" copies a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $sourceFile
+	 * @param string $destinationFile
+	 * @param string $toSpaceName
+	 * @param string $url
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function userCopiesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
+		// split the source when there are sub-folders
+		$sourceFile = explode("/", $sourceFile);
+		$fileDestination = $this->escapePath(\ltrim($destinationFile, "/")) . '/' . $this->escapePath(\ltrim(end($sourceFile), "/"));
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
+		$fullUrl = $this->featureContext->getBaseUrl() . $url;
+		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
 	/**
