@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d
-	github.com/cs3org/reva/v2 v2.16.1-0.20230921092447-6caa589a0ae8
+	github.com/cs3org/reva/v2 v2.16.1-0.20230925154539-22d6a27d8da0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -337,4 +337,5 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+// the replacement build is based on https://github.com/dragonchaser/cs3apis/tree/master
+replace github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147
