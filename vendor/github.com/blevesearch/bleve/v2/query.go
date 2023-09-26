@@ -48,7 +48,9 @@ func NewConjunctionQuery(conjuncts ...query.Query) *query.ConjunctionQuery {
 // NewDateRangeQuery creates a new Query for ranges
 // of date values.
 // Date strings are parsed using the DateTimeParser configured in the
-//  top-level config.QueryDateTimeParser
+//
+//	top-level config.QueryDateTimeParser
+//
 // Either, but not both endpoints can be nil.
 func NewDateRangeQuery(start, end time.Time) *query.DateRangeQuery {
 	return query.NewDateRangeQuery(start, end)
@@ -57,11 +59,47 @@ func NewDateRangeQuery(start, end time.Time) *query.DateRangeQuery {
 // NewDateRangeInclusiveQuery creates a new Query for ranges
 // of date values.
 // Date strings are parsed using the DateTimeParser configured in the
-//  top-level config.QueryDateTimeParser
+//
+//	top-level config.QueryDateTimeParser
+//
 // Either, but not both endpoints can be nil.
 // startInclusive and endInclusive control inclusion of the endpoints.
 func NewDateRangeInclusiveQuery(start, end time.Time, startInclusive, endInclusive *bool) *query.DateRangeQuery {
 	return query.NewDateRangeInclusiveQuery(start, end, startInclusive, endInclusive)
+}
+
+// NewDateRangeStringQuery creates a new Query for ranges
+// of date values.
+// Date strings are parsed using the DateTimeParser set using
+//
+//	the DateRangeStringQuery.SetDateTimeParser() method.
+//
+// If no DateTimeParser is set, then the
+//
+//	top-level config.QueryDateTimeParser
+//
+// is used.
+func NewDateRangeStringQuery(start, end string) *query.DateRangeStringQuery {
+	return query.NewDateRangeStringQuery(start, end)
+}
+
+// NewDateRangeStringQuery creates a new Query for ranges
+// of date values.
+// Date strings are parsed using the DateTimeParser set using
+//
+//	the DateRangeStringQuery.SetDateTimeParser() method.
+//
+// this DateTimeParser is a custom date time parser defined in the index mapping,
+// using AddCustomDateTimeParser() method.
+// If no DateTimeParser is set, then the
+//
+//	top-level config.QueryDateTimeParser
+//
+// is used.
+// Either, but not both endpoints can be nil.
+// startInclusive and endInclusive control inclusion of the endpoints.
+func NewDateRangeInclusiveStringQuery(start, end string, startInclusive, endInclusive *bool) *query.DateRangeStringQuery {
+	return query.NewDateRangeStringInclusiveQuery(start, end, startInclusive, endInclusive)
 }
 
 // NewDisjunctionQuery creates a new compound Query.

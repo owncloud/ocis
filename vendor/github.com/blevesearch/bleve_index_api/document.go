@@ -67,7 +67,7 @@ type NumericField interface {
 }
 
 type DateTimeField interface {
-	DateTime() (time.Time, error)
+	DateTime() (time.Time, string, error)
 }
 
 type BooleanField interface {
