@@ -2150,13 +2150,14 @@ trait Sharing {
 		} else {
 			$rawShareTypes = SharingHelper::SHARE_TYPES[$shareType];
 		}
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$this->getSharesEndpointPath(
 				"?shared_with_me=true" . $pendingClause . "&share_types=" . $rawShareTypes
 			)
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -2171,11 +2172,12 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/"
 			. "v$this->sharingApiVersion/shares?shared_with_me=true&path=$path";
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3029,17 +3031,17 @@ trait Sharing {
 	 * @param string $name
 	 * @param string $path
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function deletePublicLinkShareUsingTheSharingApi(
 		string $user,
 		string $name,
 		string $path
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$share_id = $this->getPublicShareIDByName($user, $path, $name);
 		$url = $this->getSharesEndpointPath("/$share_id");
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"DELETE",
 			$url
@@ -3060,11 +3062,12 @@ trait Sharing {
 		string $name,
 		string $path
 	):void {
-		$this->deletePublicLinkShareUsingTheSharingApi(
+		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
 			$path
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3081,12 +3084,12 @@ trait Sharing {
 		string $name,
 		string $path
 	):void {
-		$this->deletePublicLinkShareUsingTheSharingApi(
+		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
 			$path
 		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -3144,11 +3147,12 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$httpRequestMethod,
 			$url
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -3202,11 +3206,12 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			$httpRequestMethod,
 			$url
 		);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3394,11 +3399,12 @@ trait Sharing {
 			__METHOD__ . " could not find share, offered by $sharer to $sharee"
 		);
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$sharer,
 			'DELETE',
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
 		);
+		$this->setResponse($response);
 	}
 
 	/**

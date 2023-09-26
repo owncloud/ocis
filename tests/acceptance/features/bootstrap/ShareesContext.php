@@ -72,11 +72,12 @@ class ShareesContext implements Context {
 			$url .= '?' . \implode('&', $parameters);
 		}
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
