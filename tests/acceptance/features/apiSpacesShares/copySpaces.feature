@@ -21,8 +21,8 @@ Feature: copy file
       | role      | <role> |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Brian" the space "Project" should contain these entries:
-      | /newfolder/insideSpace.txt |
+    And for user "Brian" folder "newfolder" of the space "Project" should contain these files:
+      | insideSpace.txt |
     And for user "Alice" the content of the file "/newfolder/insideSpace.txt" of the space "Project" should be "some content"
     Examples:
       | role    |
@@ -40,8 +40,8 @@ Feature: copy file
       | role      | viewer |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Brian" the space "Project" should not contain these entries:
-      | /newfolder/insideSpace.txt |
+    And for user "Brian" folder "newfolder" of the space "Project" should contain these files:
+      | insideSpace.txt |
 
 
   Scenario Outline: user copies a file from a project space with a different role to a project space with the manager role
@@ -142,8 +142,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare/project.txt |
+    And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
+      | project.txt |
     Examples:
       | role    |
       | manager |
@@ -201,8 +201,8 @@ Feature: copy file
     And user "Alice" has uploaded file with content "personal content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare/personal.txt |
+    And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
+      | personal.txt |
 
 
   Scenario Outline: user copies a file from share space with different role to personal space
@@ -277,8 +277,8 @@ Feature: copy file
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare2" of the space "Shares" should contain these files:
       | /testshare1.txt |
-    And for user "Brian" the space "Personal" should contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Brian" folder "testshare2" of the space "Personal" should contain these files:
+      | /testshare1.txt |
     And for user "Alice" the content of the file "/testshare2/testshare1.txt" of the space "Shares" should be "testshare1 content"
     And for user "Brian" the content of the file "/testshare1/testshare1.txt" of the space "Personal" should be "testshare1 content"
     Examples:
@@ -297,10 +297,10 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare2/testshare1.txt |
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Alice" folder "testshare2" of the space "Shares" should not contain these files:
+      | testshare1.txt |
+    And for user "Brian" folder "testshare2" of the space "Personal" should not contain these files:
+      | testshare1.txt |
     Examples:
       | permissions |
       | 31          |
@@ -318,8 +318,10 @@ Feature: copy file
       | role      | <role> |
     When user "Brian" copies folder "/folder2" to "/folder1/folder2" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Brian" the space "Project" <shouldOrNot> contain these entries:
-      | folder1/folder2/demo.txt |
+    And for user "Brian" folder "folder1" of the space "Project" should contain these entries:
+      | folder2 |
+    And for user "Brian" folder "folder1/folder2" of the space "Project" should contain these files:
+      | demo.txt |
     Examples:
       | role    | shouldOrNot | status-code |
       | manager | should      | 201         |
@@ -341,8 +343,8 @@ Feature: copy file
       | role      | <from_role> |
     When user "Alice" copies folder "/folder1" from space "Project1" to "/folder1" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" the space "Project2" <shouldOrNot> contain these entries:
-      | /folder1/demo.txt |
+    And for user "Alice" folder "folder1" of the space "Project2" <shouldOrNot> contain these files:
+      | demo.txt |
     Examples:
       | from_role | to_role | status-code | shouldOrNot |
       | manager   | manager | 201         | should      |
@@ -364,8 +366,8 @@ Feature: copy file
       | role      | <role> |
     When user "Alice" copies file "/folder1" from space "Project" to "/folder1" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | /folder1/demo.txt |
+    And for user "Alice" folder "folder1" of the space "Personal" should contain these files:
+      | demo.txt |
     Examples:
       | role    |
       | manager |
@@ -386,8 +388,10 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these files:
-      | /folder1/demo.txt |
+    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these entries:
+      | folder1 |
+    And for user "Alice" folder "testshare/folder1" of the space "Shares" <shouldOrNot> contain these files:
+      | demo.txt |
     Examples:
       | role    | shouldOrNot | permissions | status-code |
       | manager | should      | 31          | 201         |
@@ -408,8 +412,8 @@ Feature: copy file
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" the space "Project" <shouldOrNot> contain these entries:
-      | /folder1/demo.txt |
+    And for user "Alice" folder "folder1" of the space "Project" <shouldOrNot> contain these files:
+      | demo.txt |
     Examples:
       | role    | shouldOrNot | status-code |
       | manager | should      | 201         |
@@ -426,7 +430,9 @@ Feature: copy file
     When user "Alice" copies folder "/folder1" from space "Personal" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
     And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these files:
-      | folder1/demo.txt |
+      | folder1 |
+    And for user "Alice" folder "testshare/folder1" of the space "Shares" <shouldOrNot> contain these files:
+      | demo.txt |
     Examples:
       | permissions | shouldOrNot | status-code |
       | 31          | should      | 201         |
@@ -463,8 +469,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project" should contain these entries:
-      | /folder1/testshare.txt |
+    And for user "Alice" folder "folder1" of the space "Project" should contain these files:
+      | testshare.txt |
     Examples:
       | role    | permissions |
       | manager | 31          |
@@ -486,8 +492,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Project" should not contain these entries:
-      | /folder1/testshare.txt |
+    And for user "Alice" folder "folder1" of the space "Project" should not contain these files:
+      | testshare.txt |
     Examples:
       | permissions |
       | 31          |
@@ -567,10 +573,10 @@ Feature: copy file
     When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these entries:
-      | /second-level-folder/third-level-folder/sample-folder-c/ |
-    And for user "Brian" folder "BRIAN-FOLDER" of the space "Personal" should contain these files:
-      | /second-level-folder/third-level-folder/sample-folder-c/ |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-folder" of the space "Shares" should contain these entries:
+      | sample-folder-c |
+    And for user "Brian" folder "BRIAN-FOLDER/second-level-folder/third-level-folder" of the space "Personal" should contain these entries:
+      | sample-folder-c |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -587,8 +593,8 @@ Feature: copy file
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
     When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
-      | /second-level-folder/third-level-folder |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder" of the space "Shares" should not contain these entries:
+      | third-level-folder |
     And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
       | /second-level-folder |
@@ -632,10 +638,10 @@ Feature: copy file
     And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these entries:
-      | /second-level-folder/third-level-file.txt/third-level-folder |
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these entries:
-      | /second-level-folder/second-level-folder/ |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-file.txt" of the space "Shares" should contain these entries:
+      | third-level-folder |
+    But for user "Alice" folder "BRIAN-FOLDER/second-level-folder" of the space "Shares" should not contain these entries:
+      | second-level-folder |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -656,8 +662,8 @@ Feature: copy file
     When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
-      | /second-level-folder/third-level-folder/sample-folder-c/ |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-folder" of the space "Shares" should contain these entries:
+      | sample-folder-c |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -677,8 +683,8 @@ Feature: copy file
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
     When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these entries:
-      | /second-level-folder/third-level-folder |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder" of the space "Shares" should not contain these entries:
+      | third-level-folder |
     And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Personal" should be "sample file-c"
     And the response when user "Alice" gets the info of the last share should include
@@ -724,9 +730,10 @@ Feature: copy file
     And user "Alice" has created folder "/FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
-      | /second-level-folder/third-level-file.txt/                    |
-      | /second-level-folder/third-level-file.txt/third-level-folder/ |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder" of the space "Shares" should contain these files:
+      | third-level-file.txt |
+    And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-file.txt" of the space "Shares" should contain these files:
+      | third-level-folder |
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /second-level-folder/second-level-folder |
@@ -742,9 +749,9 @@ Feature: copy file
     And user "Alice" has uploaded a file inside space "Project" with content "new content" to "/insideSpace.txt"
     When user "Alice" copies file "/insideSpace.txt" to "/newfolder/insideSpace (1).txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/insideSpace.txt     |
-      | newfolder/insideSpace (1).txt |
+    And for user "Alice" folder "newfolder" of the space "Project" should contain these entries:
+      | insideSpace.txt     |
+      | insideSpace (1).txt |
     And for user "Alice" the content of the file "/newfolder/insideSpace (1).txt" of the space "Project" should be "new content"
 
   @issue-4797
@@ -780,13 +787,13 @@ Feature: copy file
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/personal.txt     |
-      | newfolder/personal (1).txt |
+    And for user "Alice" folder "newfolder" of the space "Project" should contain these entries:
+      | personal.txt     |
+      | personal (1).txt |
     And for user "Alice" the content of the file "/newfolder/personal (1).txt" of the space "Project" should be "new content"
-    And for user "Brian" the space "Shares" should contain these entries:
-      | newfolder/personal.txt     |
-      | newfolder/personal (1).txt |
+    And for user "Brian" folder "newfolder" of the space "Shares" should contain these entries:
+      | personal.txt     |
+      | personal (1).txt |
 
 
   Scenario: copying a file from Personal to Shares with an option "replace"
@@ -803,8 +810,8 @@ Feature: copy file
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares" while copying using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/personal.txt |
+    And for user "Alice" folder "newfolder" of the space "Project" should contain these entries:
+      | personal.txt     |
     And for user "Alice" the content of the file "/newfolder/personal.txt" of the space "Project" should be "new content"
     When user "Alice" downloads version of the file "/newfolder/personal.txt" with the index "1" of the space "Project" using the WebDAV API
     Then the HTTP status code should be "200"
