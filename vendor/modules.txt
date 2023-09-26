@@ -333,7 +333,7 @@ github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
 github.com/crewjam/saml/xmlenc
-# github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+# github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147
 ## explicit; go 1.13
 github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1
@@ -356,7 +356,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.16.1-0.20230921092447-6caa589a0ae8
+# github.com/cs3org/reva/v2 v2.16.1-0.20230925154539-22d6a27d8da0
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -2232,4 +2232,4 @@ stash.kopano.io/kgol/oidc-go
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
-# github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+# github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147

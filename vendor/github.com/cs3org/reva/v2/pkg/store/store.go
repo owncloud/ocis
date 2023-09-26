@@ -119,9 +119,11 @@ func Create(opts ...microstore.Option) microstore.Store {
 		// TODO nats needs a DefaultTTL option as it does not support per Write TTL ...
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid
+		natsOptions := nats.GetDefaultOptions()
+		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
 		return natsjs.NewStore(
 			append(opts,
-				natsjs.NatsOptions(nats.Options{Name: "TODO"}),
+				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options
 				natsjs.DefaultTTL(ttl))...,
 		) // TODO test with ocis nats
 	case TypeMemory, "mem", "": // allow existing short form and use as default
