@@ -111,11 +111,11 @@ Feature: enforce password on public link
     And the OCS status code should be "400"
     And the OCS status message should be:
       """
-      at least 13 characters are required
-      at least 3 lowercase letters are required
-      at least 2 uppercase letters are required
-      at least 2 numbers are required
-      at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+      At least 13 characters are required
+      At least 3 lowercase letters are required
+      At least 2 uppercase letters are required
+      At least 2 numbers are required
+      At least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
       """
     Examples:
       | ocs-api-version | http-code |
@@ -175,11 +175,11 @@ Feature: enforce password on public link
     And the OCS status code should be "400"
     And the OCS status message should be:
       """
-      at least 13 characters are required
-      at least 3 lowercase letters are required
-      at least 2 uppercase letters are required
-      at least 1 numbers are required
-      at least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+      At least 13 characters are required
+      At least 3 lowercase letters are required
+      At least 2 uppercase letters are required
+      At least 1 numbers are required
+      At least 2 special characters are required  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
       """
     Examples:
       | ocs-api-version | http-code |
