@@ -169,7 +169,7 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Value
 	}
 
 	res, err := gatewayClient.GetGroupByClaim(ctx, &cs3group.GetGroupByClaimRequest{
-		Claim: "groupid", // FIXME add consts to reva
+		Claim: "group_id", // FIXME add consts to reva
 		Value: groupID,
 	})
 
