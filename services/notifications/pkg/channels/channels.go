@@ -69,6 +69,8 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 		server.Authentication = mail.AuthCRAMMD5
 	case "none":
 		server.Authentication = mail.AuthNone
+	case "auto", "":
+		server.Authentication = mail.AuthAuto
 	default:
 		return nil, errors.New("unknown mail authentication method")
 	}

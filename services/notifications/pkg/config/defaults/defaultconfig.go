@@ -31,11 +31,7 @@ func DefaultConfig() *config.Config {
 		WebUIURL: "https://localhost:9200",
 		Notifications: config.Notifications{
 			SMTP: config.SMTP{
-				Host:           "",
-				Port:           1025,
-				Sender:         "ownCloud <noreply@example.com>",
-				Authentication: "none",
-				Encryption:     "none",
+				Encryption: "none",
 			},
 			Events: config.Events{
 				Endpoint:  "127.0.0.1:9233",
