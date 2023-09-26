@@ -15,7 +15,7 @@ package server
 
 import (
 	"bytes"
-	"crypto/rand"
+	crand "crypto/rand"
 	"crypto/sha1"
 	"crypto/tls"
 	"encoding/base64"
@@ -545,7 +545,7 @@ func wsFillFrameHeader(fh []byte, useMasking, first, final, compressed bool, fra
 	var key []byte
 	if useMasking {
 		var keyBuf [4]byte
-		if _, err := io.ReadFull(rand.Reader, keyBuf[:4]); err != nil {
+		if _, err := io.ReadFull(crand.Reader, keyBuf[:4]); err != nil {
 			kv := mrand.Int31()
 			binary.LittleEndian.PutUint32(keyBuf[:4], uint32(kv))
 		}
@@ -958,7 +958,7 @@ func wsAcceptKey(key string) string {
 
 func wsMakeChallengeKey() (string, error) {
 	p := make([]byte, 16)
-	if _, err := io.ReadFull(rand.Reader, p); err != nil {
+	if _, err := io.ReadFull(crand.Reader, p); err != nil {
 		return _EMPTY_, err
 	}
 	return base64.StdEncoding.EncodeToString(p), nil
@@ -1234,12 +1234,14 @@ func (s *Server) createWSClient(conn net.Conn, ws *websocket) *client {
 		return nil
 	}
 	s.clients[c.cid] = c
-
-	// Websocket clients do TLS in the websocket http server.
-	// So no TLS here...
 	s.mu.Unlock()
 
 	c.mu.Lock()
+	// Websocket clients do TLS in the websocket http server.
+	// So no TLS initiation here...
+	if _, ok := conn.(*tls.Conn); ok {
+		c.flags.set(handshakeComplete)
+	}
 
 	if c.isClosed() {
 		c.mu.Unlock()

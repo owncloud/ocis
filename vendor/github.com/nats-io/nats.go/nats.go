@@ -47,7 +47,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.28.0"
+	Version                   = "1.29.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -61,6 +61,7 @@ const (
 	DefaultReconnectBufSize   = 8 * 1024 * 1024 // 8MB
 	RequestChanLen            = 8
 	DefaultDrainTimeout       = 30 * time.Second
+	DefaultFlusherTimeout     = time.Minute
 	LangString                = "go"
 )
 
@@ -154,6 +155,7 @@ func GetDefaultOptions() Options {
 		SubChanLen:         DefaultMaxChanLen,
 		ReconnectBufSize:   DefaultReconnectBufSize,
 		DrainTimeout:       DefaultDrainTimeout,
+		FlusherTimeout:     DefaultFlusherTimeout,
 	}
 }
 
@@ -356,6 +358,7 @@ type Options struct {
 
 	// FlusherTimeout is the maximum time to wait for write operations
 	// to the underlying connection to complete (including the flusher loop).
+	// Defaults to 1m.
 	FlusherTimeout time.Duration
 
 	// PingInterval is the period at which the client will be sending ping
@@ -613,7 +616,7 @@ type Subscription struct {
 	pHead *Msg
 	pTail *Msg
 	pCond *sync.Cond
-	pDone func()
+	pDone func(subject string)
 
 	// Pending stats, async subscriptions, high-speed etc.
 	pMsgs       int
@@ -946,6 +949,7 @@ func ReconnectWait(t time.Duration) Option {
 }
 
 // MaxReconnects is an Option to set the maximum number of reconnect attempts.
+// If negative, it will never stop trying to reconnect.
 // Defaults to 60.
 func MaxReconnects(max int) Option {
 	return func(o *Options) error {
@@ -2500,6 +2504,9 @@ func (nc *Conn) sendConnect() error {
 	// Construct the CONNECT protocol string
 	cProto, err := nc.connectProto()
 	if err != nil {
+		if !nc.initc && nc.Opts.AsyncErrorCB != nil {
+			nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+		}
 		return err
 	}
 
@@ -3025,7 +3032,7 @@ func (nc *Conn) waitForMsgs(s *Subscription) {
 	s.mu.Unlock()
 
 	if done != nil {
-		done()
+		done(s.Subject)
 	}
 }
 
@@ -4448,6 +4455,14 @@ func (s *Subscription) AutoUnsubscribe(max int) error {
 		return ErrBadSubscription
 	}
 	return conn.unsubscribe(s, max, false)
+}
+
+// SetClosedHandler will set the closed handler for when a subscription
+// is closed (either unsubscribed or drained).
+func (s *Subscription) SetClosedHandler(handler func(subject string)) {
+	s.mu.Lock()
+	s.pDone = handler
+	s.mu.Unlock()
 }
 
 // unsubscribe performs the low level unsubscribe to the server.

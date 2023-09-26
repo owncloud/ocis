@@ -357,6 +357,9 @@ func (a *AccountClaims) ExpectedPrefixes() []nkeys.PrefixByte {
 func (a *AccountClaims) Claims() *ClaimsData {
 	return &a.ClaimsData
 }
+func (a *AccountClaims) GetTags() TagList {
+	return a.Account.Tags
+}
 
 // DidSign checks the claims against the account's public key and its signing keys
 func (a *AccountClaims) DidSign(c Claims) bool {
