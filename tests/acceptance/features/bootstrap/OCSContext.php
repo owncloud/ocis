@@ -787,14 +787,16 @@ class OCSContext implements Context {
 	 *
 	 * @param string $statusCode
 	 * @param string $message
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theOCSStatusCodeShouldBe(string $statusCode, string $message = ""):void {
+	public function theOCSStatusCodeShouldBe(string $statusCode, string $message = "", ?ResponseInterface $response = null):void {
 		$statusCodes = explode(",", $statusCode);
+		$response = $response ?? $this->featureContext->getResponse();
 		$responseStatusCode = $this->getOCSResponseStatusCode(
-			$this->featureContext->getResponse()
+			$response
 		);
 		if (\is_array($statusCodes)) {
 			if ($message === "") {
@@ -1000,16 +1002,18 @@ class OCSContext implements Context {
 	 * this function is aware of the currently used OCS version
 	 *
 	 * @param string|null $message
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertOCSResponseIndicatesSuccess(?string $message = ""):void {
-		$this->featureContext->theHTTPStatusCodeShouldBe('200', $message);
+	public function assertOCSResponseIndicatesSuccess(?string $message = "", ?ResponseInterface $response = null):void {
+		$response = $response ?? $this->featureContext->getResponse();
+		$this->featureContext->theHTTPStatusCodeShouldBe('200', $message, $response);
 		if ($this->featureContext->getOcsApiVersion() === 1) {
-			$this->theOCSStatusCodeShouldBe('100', $message);
+			$this->theOCSStatusCodeShouldBe('100', $message, $response);
 		} else {
-			$this->theOCSStatusCodeShouldBe('200', $message);
+			$this->theOCSStatusCodeShouldBe('200', $message, $response);
 		}
 	}
 
