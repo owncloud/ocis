@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -94,42 +93,22 @@ func (p Web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p Web) getPayload() (payload []byte, err error) {
-	if p.config.Web.Path == "" {
-		// render dynamically using config
+	// render dynamically using config
 
-		// build theme url
-		if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
-			p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
-		} else {
-			p.config.Web.Config.Theme = p.config.Web.ThemePath
-		}
-
-		// make apps render as empty array if it is empty
-		// TODO remove once https://github.com/golang/go/issues/27589 is fixed
-		if len(p.config.Web.Config.Apps) == 0 {
-			p.config.Web.Config.Apps = make([]string, 0)
-		}
-
-		return json.Marshal(p.config.Web.Config)
+	// build theme url
+	if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
+		p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
+	} else {
+		p.config.Web.Config.Theme = p.config.Web.ThemePath
 	}
 
-	// try loading from file
-	if _, err = os.Stat(p.config.Web.Path); os.IsNotExist(err) {
-		p.logger.Fatal().
-			Err(err).
-			Str("config", p.config.Web.Path).
-			Msg("web config doesn't exist")
+	// make apps render as empty array if it is empty
+	// TODO remove once https://github.com/golang/go/issues/27589 is fixed
+	if len(p.config.Web.Config.Apps) == 0 {
+		p.config.Web.Config.Apps = make([]string, 0)
 	}
 
-	payload, err = os.ReadFile(p.config.Web.Path)
-
-	if err != nil {
-		p.logger.Fatal().
-			Err(err).
-			Str("config", p.config.Web.Path).
-			Msg("failed to read custom config")
-	}
-	return
+	return json.Marshal(p.config.Web.Config)
 }
 
 // Config implements the Service interface.
