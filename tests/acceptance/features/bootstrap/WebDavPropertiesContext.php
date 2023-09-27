@@ -27,6 +27,7 @@ use PHPUnit\Framework\Assert;
 use TestHelpers\Asserts\WebDav as WebDavTest;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -55,13 +56,13 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $path
 	):void {
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				'0'
-			)
+		$response = $this->featureContext->listFolder(
+			$user,
+			$path,
+			'0'
 		);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -79,12 +80,41 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $depth
 	):void {
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				$depth
-			)
+		$response = $this->featureContext->listFolder(
+			$user,
+			$path,
+			$depth
+		);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $path
+	 * @param TableNode|null $propertiesTable
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 */
+	public function getPropertiesOfFolder(
+		string $user,
+		string $path,
+		TableNode $propertiesTable
+	):ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$properties = null;
+		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
+		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
+		foreach ($propertiesTable->getColumnsHash() as $row) {
+			$properties[] = $row["propertyName"];
+		}
+		$depth = "1";
+		return   $this->featureContext->listFolder(
+			$user,
+			$path,
+			$depth,
+			$properties
 		);
 	}
 
@@ -103,22 +133,9 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		TableNode $propertiesTable
 	):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$properties = null;
-		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
-		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-		foreach ($propertiesTable->getColumnsHash() as $row) {
-			$properties[] = $row["propertyName"];
-		}
-		$depth = "1";
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				$depth,
-				$properties
-			)
-		);
+		$response = $this->getPropertiesOfFolder($user, $path, $propertiesTable);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 
@@ -203,11 +220,13 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserGetsPropertiesOfFolder(string $path, TableNode $propertiesTable) {
-		$this->userGetsPropertiesOfFolder(
+		$response = $this->getPropertiesOfFolder(
 			$this->featureContext->getCurrentUser(),
 			$path,
 			$propertiesTable
 		);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -229,18 +248,16 @@ class WebDavPropertiesContext implements Context {
 		$username = $this->featureContext->getActualUsername($username);
 		$this->featureContext->verifyTableNodeColumns($propertiesTable, ['propertyName', 'propertyValue']);
 		$properties = $propertiesTable->getColumnsHash();
-		$this->featureContext->setResponse(
-			WebDavHelper::proppatchWithMultipleProps(
-				$this->featureContext->getBaseUrl(),
-				$username,
-				$this->featureContext->getPasswordForUser($username),
-				$path,
-				$properties,
-				$this->featureContext->getStepLineRef(),
-				$this->featureContext->getDavPathVersion()
-			)
+		$response = WebDavHelper::proppatchWithMultipleProps(
+			$this->featureContext->getBaseUrl(),
+			$username,
+			$this->featureContext->getPasswordForUser($username),
+			$path,
+			$properties,
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getDavPathVersion()
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -280,6 +297,29 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
+	 * @param string $path
+	 * @param TableNode $propertiesTable
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 */
+	public function publicGetThePropertiesOfFolder(string $path, TableNode $propertiesTable):ResponseInterface {
+		$user = $this->featureContext->getLastCreatedPublicShareToken();
+		$properties = null;
+		foreach ($propertiesTable->getRows() as $row) {
+			$properties[] = $row[0];
+		}
+		return
+			$this->featureContext->listFolder(
+				$user,
+				$path,
+				'0',
+				$properties,
+				$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
+			);
+	}
+
+	/**
 	 * @When /^the public gets the following properties of (?:file|folder|entry) "([^"]*)" in the last created public link using the WebDAV API$/
 	 *
 	 * @param string $path
@@ -289,20 +329,9 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function publicGetsThePropertiesOfFolder(string $path, TableNode $propertiesTable):void {
-		$user = $this->featureContext->getLastCreatedPublicShareToken();
-		$properties = null;
-		foreach ($propertiesTable->getRows() as $row) {
-			$properties[] = $row[0];
-		}
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				'0',
-				$properties,
-				$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
-			)
-		);
+		$response = $this->publicGetThePropertiesOfFolder($path, $propertiesTable);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -312,7 +341,7 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $path path on which to set properties to
 	 * @param string $propertyValue property value
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
 	public function setPropertyWithNamespaceOfResource(
@@ -321,9 +350,9 @@ class WebDavPropertiesContext implements Context {
 		string $namespace,
 		string $path,
 		string $propertyValue
-	):void {
+	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
-		$response =  WebDavHelper::proppatch(
+		return WebDavHelper::proppatch(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getUserPassword($user),
@@ -334,7 +363,6 @@ class WebDavPropertiesContext implements Context {
 			$namespace,
 			$this->featureContext->getDavPathVersion()
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -356,13 +384,14 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $propertyValue
 	):void {
-		$this->setPropertyWithNamespaceOfResource(
+		$response = $this->setPropertyWithNamespaceOfResource(
 			$user,
 			$propertyName,
 			$namespace,
 			$path,
 			$propertyValue
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -384,14 +413,14 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $propertyValue
 	):void {
-		$this->setPropertyWithNamespaceOfResource(
+		$response = $this->setPropertyWithNamespaceOfResource(
 			$user,
 			$propertyName,
 			$namespace,
 			$path,
 			$propertyValue
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -782,13 +811,13 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function publicGetsThePropertiesOfFolderAndAssertValueOfItemInResponseRegExp(string $xpath, string $path, string $pattern):void {
 		$propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
-		$this->publicGetsThePropertiesOfFolder($path, $propertiesTable);
-
-		$this->featureContext->theHTTPStatusCodeShouldBe('200');
+		$response = $this->publicGetThePropertiesOfFolder($path, $propertiesTable);
+		$this->featureContext->theHTTPStatusCodeShouldBe('207', "", $response);
 		$this->assertValueOfItemInResponseToUserRegExp(
 			$xpath,
 			null,
-			$pattern
+			$pattern,
+			$xmlObject = HttpRequestHelper::getResponseXml($response)
 		);
 	}
 
@@ -863,12 +892,13 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $xpath
 	 * @param string|null $user
 	 * @param string $pattern
+	 * @param SimpleXMLElement|null $responseXml
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseToUserRegExp(string $xpath, ?string $user, string $pattern):void {
-		$resXml = $this->featureContext->getResponseXmlObject();
+	public function assertValueOfItemInResponseToUserRegExp(string $xpath, ?string $user, string $pattern, ?SimpleXMLElement $responseXml = null):void {
+		$resXml = $responseXml ?? $this->featureContext->getResponseXmlObject();
 		if ($resXml === null) {
 			$resXml = HttpRequestHelper::getResponseXml(
 				$this->featureContext->getResponse(),
@@ -916,17 +946,17 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function userGetsPropertiesOfFolderAndAssertValueOfItemInResponseToUserRegExp(string $user, string $xpath, string $path, string $pattern):void {
 		$propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
-		$this->userGetsPropertiesOfFolder(
+		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
 			$propertiesTable
 		);
-
-		$this->featureContext->theHTTPStatusCodeShouldBe('200');
+		$this->featureContext->theHTTPStatusCodeShouldBe('207', '', $response);
 		$this->assertValueOfItemInResponseToUserRegExp(
 			$xpath,
 			$user,
-			$pattern
+			$pattern,
+			HttpRequestHelper::getResponseXml($response)
 		);
 	}
 
@@ -1087,13 +1117,13 @@ class WebDavPropertiesContext implements Context {
 		}
 		$user = $this->featureContext->getActualUsername($user);
 		$propertiesTable = new TableNode([['propertyName'],['getetag']]);
-		$this->userGetsPropertiesOfFolder(
+		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
 			$propertiesTable
 		);
 		$this->storedETAG[$user][$storePath]
-			= $this->featureContext->getEtagFromResponseXmlObject();
+			= $this->featureContext->getEtagFromResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -1231,12 +1261,12 @@ class WebDavPropertiesContext implements Context {
 	public function getCurrentEtagOfElement(string $path, string $user):string {
 		$user = $this->featureContext->getActualUsername($user);
 		$propertiesTable = new TableNode([['propertyName'],['getetag']]);
-		$this->userGetsPropertiesOfFolder(
+		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
 			$propertiesTable
 		);
-		return $this->featureContext->getEtagFromResponseXmlObject();
+		return $this->featureContext->getEtagFromResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
