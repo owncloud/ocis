@@ -511,6 +511,8 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 				toUpdate.Permissions = updated.Permissions
 			case "expiration":
 				toUpdate.Expiration = updated.Expiration
+			case "hide":
+				toUpdate.Hide = updated.Hide
 			default:
 				return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
 			}
@@ -878,6 +880,7 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 
 					if share.IsGrantedToUser(s, user) {
 						if share.MatchesFiltersWithState(s, state.State, filters) {
+							s.Hide = state.Hide
 							rs := &collaboration.ReceivedShare{
 								Share:      s,
 								State:      state.State,
@@ -933,6 +936,7 @@ func (m *Manager) convert(ctx context.Context, userID string, s *collaboration.S
 	if err == nil && state != nil {
 		rs.State = state.State
 		rs.MountPoint = state.MountPoint
+		rs.Share.Hide = state.Hide
 	}
 	return rs
 }
@@ -997,6 +1001,8 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 			rs.State = receivedShare.State
 		case "mount_point":
 			rs.MountPoint = receivedShare.MountPoint
+		case "hide":
+			rs.Share.Hide = receivedShare.Share.Hide
 		default:
 			return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
 		}
