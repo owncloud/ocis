@@ -72,9 +72,7 @@ func TestGetEducationClasses(t *testing.T) {
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetEducationClasses(context.Background())
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
@@ -156,7 +154,7 @@ func TestGetEducationClass(t *testing.T) {
 
 		if tt.expectedItemNotFound {
 			assert.NotNil(t, err)
-			assert.Equal(t, "itemNotFound", err.Error())
+			assert.Equal(t, "itemNotFound: not found", err.Error())
 		} else {
 			assert.Nil(t, err)
 			assert.Equal(t, "Math", class.GetDisplayName())
@@ -228,7 +226,7 @@ func TestDeleteEducationClass(t *testing.T) {
 		if tt.expectedItemNotFound {
 			lm.AssertNumberOfCalls(t, "Del", 0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "itemNotFound", err.Error())
+			assert.Equal(t, "itemNotFound: not found", err.Error())
 		} else {
 			assert.Nil(t, err)
 		}
@@ -301,7 +299,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 		if tt.expectedItemNotFound {
 			lm.AssertNumberOfCalls(t, "Search", 1)
 			assert.NotNil(t, err)
-			assert.Equal(t, "itemNotFound", err.Error())
+			assert.Equal(t, "itemNotFound: not found", err.Error())
 		} else {
 			lm.AssertNumberOfCalls(t, "Search", 2)
 			assert.Nil(t, err)

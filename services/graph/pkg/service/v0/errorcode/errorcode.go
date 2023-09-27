@@ -130,7 +130,11 @@ func (e ErrorCode) String() string {
 }
 
 func (e Error) Error() string {
-	return errorCodes[e.errorCode]
+	errString := errorCodes[e.errorCode]
+	if e.msg != "" {
+		errString += ": " + e.msg
+	}
+	return errString
 }
 
 // RenderError render the Graph Error based on a code or default one
