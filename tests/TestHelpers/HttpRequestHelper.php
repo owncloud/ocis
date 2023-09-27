@@ -155,6 +155,7 @@ class HttpRequestHelper {
 			}
 		}
 
+		self::logResponse($response);
 		return $response;
 	}
 
@@ -428,9 +429,70 @@ class HttpRequestHelper {
 			$headers,
 			$body
 		);
+		self::logRequest($request);
 		return $request;
 	}
 
+	/**
+	 * @param RequestInterface $request
+	 *
+	 * @return void
+	 */
+	public function logRequest(RequestInterface $request): void {
+		$method = $request->getMethod();
+		$path = $request->getUri()->getPath();
+		$version = "HTTP/" . $request->getProtocolVersion();
+		$body = $request->getBody();
+		$headers = "";
+
+		foreach ($request->getHeaders() as $key => $value) {
+			$headers = $key . ": " . $value[0] . "\n";
+		}
+
+		$logPath = __DIR__ . '/../acceptance/logs';
+		$logFile = "$logPath/scenario.log";
+		$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
+		$log = "--------------------------------------------------\n==> REQUEST\n";
+		$log .= "$method $path $version\n$headers\n";
+
+		if ($body->getSize() > 0) {
+			$log .= "==> REQ BODY\n" . $body . "\n\n";
+		}
+		\fwrite($file, $log);
+		\fclose($file);
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return void
+	 */
+	public function logResponse(ResponseInterface $response): void {
+		$version = "HTTP/" . $response->getProtocolVersion();
+		$statusCode = $response->getStatusCode();
+		$statusMessage = $response->getReasonPhrase();
+		$body = $response->getBody();
+		$headers = "";
+
+		foreach ($response->getHeaders() as $key => $value) {
+			$headers = $key . ": " . $value[0] . "\n";
+		}
+
+		$logPath = __DIR__ . '/../acceptance/logs';
+		$logFile = "$logPath/scenario.log";
+		$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
+		$log = "<== RESPONSE\n";
+		$log .= "$version $statusCode $statusMessage\n$headers\n\n";
+
+		if ($body->getSize() > 0) {
+			$log .= "<== RES BODY\n" . $body . "\n\n";
+		}
+		// rewind the body stream so that later code can read from the start.
+		$response->getBody()->rewind();
+		// $log .= "--------------------------------------------------\n";
+		\fwrite($file, $log);
+		\fclose($file);
+	}
 	/**
 	 * same as HttpRequestHelper::sendRequest() but with "GET" as method
 	 *

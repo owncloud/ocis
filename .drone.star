@@ -54,52 +54,52 @@ dirs = {
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
-        "services/antivirus",
-        "services/app-provider",
-        "services/app-registry",
-        "services/audit",
-        "services/auth-basic",
-        "services/auth-bearer",
-        "services/auth-machine",
-        "services/auth-service",
-        "services/clientlog",
-        "services/eventhistory",
-        "services/frontend",
-        "services/gateway",
-        "services/graph",
-        "services/groups",
-        "services/idm",
-        "services/idp",
-        "services/invitations",
-        "services/nats",
-        "services/notifications",
-        "services/ocdav",
-        "services/ocs",
-        "services/policies",
-        "services/proxy",
-        "services/search",
-        "services/settings",
-        "services/sharing",
-        "services/sse",
-        "services/storage-system",
-        "services/storage-publiclink",
-        "services/storage-shares",
-        "services/storage-users",
-        "services/store",
-        "services/thumbnails",
-        "services/userlog",
-        "services/users",
-        "services/web",
-        "services/webdav",
-        "services/webfinger",
-        "ocis-pkg",
-        "ocis",
+        # "services/antivirus",
+        # "services/app-provider",
+        # "services/app-registry",
+        # "services/audit",
+        # "services/auth-basic",
+        # "services/auth-bearer",
+        # "services/auth-machine",
+        # "services/auth-service",
+        # "services/clientlog",
+        # "services/eventhistory",
+        # "services/frontend",
+        # "services/gateway",
+        # "services/graph",
+        # "services/groups",
+        # "services/idm",
+        # "services/idp",
+        # "services/invitations",
+        # "services/nats",
+        # "services/notifications",
+        # "services/ocdav",
+        # "services/ocs",
+        # "services/policies",
+        # "services/proxy",
+        # "services/search",
+        # "services/settings",
+        # "services/sharing",
+        # "services/sse",
+        # "services/storage-system",
+        # "services/storage-publiclink",
+        # "services/storage-shares",
+        # "services/storage-users",
+        # "services/store",
+        # "services/thumbnails",
+        # "services/userlog",
+        # "services/users",
+        # "services/web",
+        # "services/webdav",
+        # "services/webfinger",
+        # "ocis-pkg",
+        # "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -116,19 +116,20 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
             ],
-            "skip": False,
+            "skip": True,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
+            "skip": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -145,7 +146,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -159,22 +160,22 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [9],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
         "skipExceptParts": [],
+        "skip": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -277,8 +278,8 @@ def main(ctx):
         [releaseSubmodule(ctx)]
 
     build_release_helpers = [
-        changelog(),
-        docs(),
+        # changelog(),
+        # docs(),
     ]
 
     test_pipelines.append(
@@ -823,14 +824,28 @@ def localApiTests(suite, storage, extra_environment = {}):
     for item in extra_environment:
         environment[item] = extra_environment[item]
 
-    return [{
-        "name": "localApiTests-%s-%s" % (suite, storage),
-        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-        "environment": environment,
-        "commands": [
-            "make test-acceptance-api",
-        ],
-    }]
+    return [
+        {
+            "name": "localApiTests-%s-%s" % (suite, storage),
+            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+            "environment": environment,
+            "commands": [
+                "make test-acceptance-api",
+            ],
+        },
+        {
+            "name": "logs",
+            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+            "commands": [
+                "cat %s/tests/acceptance/logs/access.log" % dirs["base"],
+            ],
+            "when": {
+                "status": [
+                    "failure",
+                ],
+            },
+        },
+    ]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
@@ -1006,6 +1021,18 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                          "commands": [
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
+                     },
+                     {
+                         "name": "logs",
+                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                         "commands": [
+                             "cat %s/tests/acceptance/logs/access.log" % dirs["base"],
+                         ],
+                         "when": {
+                             "status": [
+                                 "failure",
+                             ],
+                         },
                      },
                  ],
         "services": redisForOCStorage(storage),

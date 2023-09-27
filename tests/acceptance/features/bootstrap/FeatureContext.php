@@ -27,9 +27,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use Helmich\JsonAssert\JsonAssertions;
 use rdx\behatvars\BehatVariablesContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
+use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
@@ -570,6 +572,87 @@ class FeatureContext extends BehatVariablesContext {
 			$this->publicLinkSharePassword = $publicLinkSharePasswordFromEnvironment;
 		}
 		$this->originalAdminPassword = $this->adminPassword;
+	}
+
+	/**
+	 * Create a request-response log file
+	 *
+	 * @BeforeSuite
+	 *
+	 * @param BeforeSuiteScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function setupLogFile(BeforeSuiteScope $scope): void {
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/access.log";
+		if (!\file_exists($logPath)) {
+			\mkdir($logPath, 0777, true);
+		}
+		$file = \fopen($logFile, 'w') or die('Cannot open file:  ' . $logFile);
+		\fwrite($file, '# Access Logs' . "\n\n");
+		\fclose($file);
+	}
+
+	/**
+	 *
+	 * @BeforeScenario
+	 *
+	 * @param BeforeScenarioScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function logScenario(BeforeScenarioScope $scope): void {
+		$suite = $scope->getFeature()->getFile();
+		$suite = \explode('/', $suite);
+		$suite = \array_slice($suite, -2);
+		$suite = \implode('/', $suite);
+		$scenarioLine = $scope->getScenario()->getLine();
+		$suite = $suite . ':' . $scenarioLine;
+
+		if ($scope->getScenario()->getNodeType() === "Example") {
+			$keyword = "Scenario Outline";
+			$title = $scope->getScenario()->getOutlineTitle();
+		} else {
+			$title = $scope->getScenario()->getTitle();
+			$keyword = $scope->getScenario()->getNodeType();
+		}
+	
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/scenario.log";
+		// Delete previous scenario.log file
+		if (\file_exists($logFile)) {
+			\unlink($logFile);
+		}
+		$file = \fopen($logFile, 'w') or die('Cannot open file:  ' . $logFile);
+
+		$log = "## $suite" . "\n\n### $keyword: $title\n\n";
+		\fwrite($file, $log);
+		\fclose($file);
+	}
+
+	/**
+	 *
+	 * @BeforeStep
+	 *
+	 * @param BeforeStepScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function logStepRequests(BeforeStepScope $scope): void {
+		$step = $scope->getStep()->getType();
+		$step = $step . " " . $scope->getStep()->getText();
+
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/scenario.log";
+		$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
+
+		$log = "#### $step\n";
+		\fwrite($file, $log);
+		\fclose($file);
 	}
 
 	/**
@@ -3577,5 +3660,112 @@ class FeatureContext extends BehatVariablesContext {
 		} else {
 			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+	}
+
+	/**
+	 *
+	 * @AfterSuite
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function clearScnarioLogSuite(): void {
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/scenario.log";
+		var_dump("Suite -------------------------------");
+		$accessLogs = \file_get_contents("$logPath/access.log");
+		var_dump($accessLogs);
+		if (\file_exists($logFile)) {
+			\unlink($logFile);
+		}
+	}
+
+	/**
+	 *
+	 * @AfterFeature
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function clearScnarioLog(): void {
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/scenario.log";
+		var_dump("Feature -------------------------------");
+		$accessLogs = \file_get_contents("$logPath/access.log");
+		var_dump($accessLogs);
+		if (\file_exists($logFile)) {
+			\unlink($logFile);
+		}
+	}
+
+	/**
+	 * wrap up logs
+	 *
+	 * @AfterScenario
+	 *
+	 * @param AfterScenarioScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function checkScenario(AfterScenarioScope $scope): void {
+		$logPath = __DIR__ . '/../../logs';
+		$logFile = "$logPath/access.log";
+		$scenarioLog = "$logPath/scenario.log";
+
+		if ($scope->getTestResult()->getResultCode() !== 0 && !self::isExpectedToFail(self::getScenarioLine($scope))) {
+			$accessLogs = \file_get_contents($scenarioLog);
+
+			$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
+			\fwrite($file, $accessLogs);
+			\fclose($file);
+		}
+
+		var_dump("Scenario -------------------------------");
+		$accessLogs = \file_get_contents("$logPath/access.log");
+		var_dump($accessLogs);
+		if (\file_exists($scenarioLog)) {
+			\unlink($scenarioLog);
+		}
+	}
+
+	/**
+	 * @param AfterScenarioScope $scope
+	 *
+	 * @return string
+	 */
+	public static function getScenarioLine(AfterScenarioScope $scope): string {
+		$suite = $scope->getFeature()->getFile();
+		$suite = \explode('/', $suite);
+		$suite = \array_slice($suite, -2);
+		$suite = \implode('/', $suite);
+		$scenarioLine = $scope->getScenario()->getLine();
+		return $suite . ':' . $scenarioLine;
+	}
+
+	/**
+	 * @param string $scenarioLine
+	 *
+	 * @return bool
+	 */
+	public static function isExpectedToFail(string $scenarioLine): bool {
+		$expectedFailFile = __DIR__ . '/../../expected-failures-localAPI-on-OCIS-storage.md';
+		if (\strpos($scenarioLine, "coreApi") === 0) {
+			$expectedFailFile = __DIR__ . '/../../expected-failures-API-on-OCIS-storage.md';
+		}
+
+		var_dump($scenarioLine);
+		var_dump($expectedFailFile);
+		$reader = \fopen($expectedFailFile, 'r');
+		if ($reader) {
+			while (($line = \fgets($reader)) !== false) {
+				if (\strpos($line, $scenarioLine) !== false) {
+					\fclose($reader);
+					return true;
+				}
+			}
+			\fclose($reader);
+		}
+		return false;
 	}
 }
