@@ -310,7 +310,7 @@ func TestUpdateEducationSchoolOperation(t *testing.T) {
 			SchoolNumber: &tt.schoolNumber,
 		}
 
-		operation := b.UpdateEducationSchoolOperation(schoolUpdate, currentSchool)
+		operation := b.updateEducationSchoolOperation(schoolUpdate, currentSchool)
 		assert.Equal(t, tt.expectedOperation, operation)
 	}
 }
