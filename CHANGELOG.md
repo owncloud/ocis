@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
 * Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
@@ -20,6 +21,13 @@ The following sections list the changes for unreleased.
    rebuild-jsoncs3-indexes" command
 
    https://github.com/owncloud/ocis/issues/7319
+
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+
+   We fixed an issue that allowed to create two schools with the same school number
+
+   https://github.com/owncloud/enterprise/issues/6051
+   https://github.com/owncloud/ocis/pull/7351
 
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
 
