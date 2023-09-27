@@ -171,7 +171,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 }
 
 // UpdateEducationSchoolOperation contains the logic for which update operation to apply to a school
-func (i *LDAP) UpdateEducationSchoolOperation(
+func (i *LDAP) updateEducationSchoolOperation(
 	schoolUpdate libregraph.EducationSchool,
 	currentSchool libregraph.EducationSchool,
 ) schoolUpdateOperation {
@@ -289,7 +289,7 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 	}
 
 	currentSchool := i.createSchoolModelFromLDAP(e)
-	switch i.UpdateEducationSchoolOperation(school, *currentSchool) {
+	switch i.updateEducationSchoolOperation(school, *currentSchool) {
 	case tooManyValues:
 		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
 	case schoolUnchanged:
