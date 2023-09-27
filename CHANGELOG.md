@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
@@ -44,6 +45,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7282
    https://github.com/owncloud/ocis/pull/7290
+
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+
+   We fixed an issue that allowed to create two schools with the same school number
+
+   https://github.com/owncloud/enterprise/issues/6051
+   https://github.com/owncloud/ocis/pull/7351
 
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 
