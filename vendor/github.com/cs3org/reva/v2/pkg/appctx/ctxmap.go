@@ -41,20 +41,24 @@ func GetKeyValuesFromCtx(ctx context.Context) map[interface{}]interface{} {
 }
 
 func getKeyValue(ctx interface{}, m map[interface{}]interface{}) {
-	ctxVals := reflect.ValueOf(ctx).Elem()
-	ctxType := reflect.TypeOf(ctx).Elem()
+	// This is a dirty hack to run with go 1.21.x
+	reflectCtxValues := reflect.ValueOf(ctx)
+	if reflectCtxValues.Kind() != reflect.Struct {
+		ctxVals := reflectCtxValues.Elem()
+		ctxType := reflect.TypeOf(ctx).Elem()
 
-	if ctxType.Kind() == reflect.Struct {
-		for i := 0; i < ctxVals.NumField(); i++ {
-			currField, currIf := extractField(ctxVals, ctxType, i)
-			switch currField {
-			case "Context":
-				getKeyValue(currIf, m)
-			case "key":
-				nextField, nextIf := extractField(ctxVals, ctxType, i+1)
-				if nextField == "val" {
-					m[currIf] = nextIf
-					i++
+		if ctxType.Kind() == reflect.Struct {
+			for i := 0; i < ctxVals.NumField(); i++ {
+				currField, currIf := extractField(ctxVals, ctxType, i)
+				switch currField {
+				case "Context":
+					getKeyValue(currIf, m)
+				case "key":
+					nextField, nextIf := extractField(ctxVals, ctxType, i+1)
+					if nextField == "val" {
+						m[currIf] = nextIf
+						i++
+					}
 				}
 			}
 		}
