@@ -205,14 +205,10 @@ func TestGetUser(t *testing.T) {
 	}
 
 	_, err = b.GetUser(context.Background(), "fred", odataReqDefault)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	_, err = b.GetUser(context.Background(), "fred", odataReqExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock an empty Search Result
 	lm = &mocks.Client{}
@@ -221,14 +217,10 @@ func TestGetUser(t *testing.T) {
 			&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetUser(context.Background(), "fred", odataReqDefault)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	_, err = b.GetUser(context.Background(), "fred", odataReqExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock a valid Search Result
 	lm = &mocks.Client{}
@@ -265,9 +257,7 @@ func TestGetUser(t *testing.T) {
 
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetUser(context.Background(), "invalid", nil)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 }
 
 func TestGetUsers(t *testing.T) {
@@ -283,9 +273,7 @@ func TestGetUsers(t *testing.T) {
 
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetUsers(context.Background(), odataReqDefault)
-	if err == nil || err.Error() != "generalException" {
-		t.Errorf("Expected 'generalException' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "generalException:")
 
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)

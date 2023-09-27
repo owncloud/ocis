@@ -148,7 +148,7 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	if school, err = g.identityEducationBackend.UpdateEducationSchool(r.Context(), schoolID, *school); err != nil {
 		logger.Debug().Err(err).Interface("school", school).Msg("could not update school: backend error")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

@@ -49,7 +49,11 @@ const (
 
 const ldapDateFormat = "20060102150405Z0700"
 
-var errNotSet = errors.New("Attribute not set")
+var (
+	errNotSet             = errors.New("Attribute not set")
+	errSchoolNameExists   = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
+	errSchoolNumberExists = errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
+)
 
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
@@ -120,9 +124,8 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 	_, err := i.getSchoolByNumber(school.GetSchoolNumber())
 	switch err {
 	case nil:
-		msg := "A school with that number is already present"
-		logger.Warn().Str("schoolNumber", school.GetSchoolNumber()).Msg(msg)
-		return nil, errorcode.New(errorcode.NameAlreadyExists, msg)
+		logger.Debug().Err(errSchoolNumberExists).Str("schoolNumber", school.GetSchoolNumber()).Msg("duplicate school number")
+		return nil, errSchoolNumberExists
 	case ErrNotFound:
 		break
 	default:
@@ -153,7 +156,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		logger.Debug().Err(err).Msg("error adding school")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
+				err = errSchoolNameExists
 			}
 		}
 		return nil, err
@@ -228,7 +231,7 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 		logger.Debug().Err(err).Msg("error updating school name")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
+				err = errSchoolNameExists
 			}
 		}
 		return err
@@ -247,7 +250,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
 			_, err := i.getSchoolByNumber(*updatedSchoolNumber)
 			if err == nil {
-				return errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
+				return errSchoolNumberExists
 			}
 			mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{*updatedSchoolNumber})
 		}
