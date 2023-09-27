@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
@@ -26,6 +27,15 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 
 ## Details
+
+* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
+
+   When requesting `config.json` file from the server, web service would reload the file if a path
+   is set. This will remove config entries set via Envvar. Since we want to have the possiblity to
+   set configuration from both sources we removed the reading from file. The file will still be
+   loaded on service startup.
+
+   https://github.com/owncloud/ocis/pull/7369
 
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 
