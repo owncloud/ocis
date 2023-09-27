@@ -49,7 +49,11 @@ const (
 
 const ldapDateFormat = "20060102150405Z0700"
 
-var errNotSet = errors.New("Attribute not set")
+var (
+	errNotSet             = errors.New("Attribute not set")
+	errSchoolNameExists   = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
+	errSchoolNumberExists = errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
+)
 
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
@@ -116,7 +120,18 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		return nil, ErrReadOnly
 	}
 
-	// Here we should verify that the school number is not already used
+	// Check that the school number is not already used
+	_, err := i.getSchoolByNumber(school.GetSchoolNumber())
+	switch err {
+	case nil:
+		logger.Debug().Err(errSchoolNumberExists).Str("schoolNumber", school.GetSchoolNumber()).Msg("duplicate school number")
+		return nil, errSchoolNumberExists
+	case ErrNotFound:
+		break
+	default:
+		logger.Error().Err(err).Str("schoolNumber", school.GetSchoolNumber()).Msg("error looking up school by number")
+		return nil, errorcode.New(errorcode.GeneralException, "error looking up school by number")
+	}
 
 	attributeTypeAndValue := ldap.AttributeTypeAndValue{
 		Type:  i.educationConfig.schoolAttributeMap.displayName,
@@ -141,7 +156,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		logger.Debug().Err(err).Msg("error adding school")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+				err = errSchoolNameExists
 			}
 		}
 		return nil, err
@@ -156,7 +171,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 }
 
 // UpdateEducationSchoolOperation contains the logic for which update operation to apply to a school
-func (i *LDAP) UpdateEducationSchoolOperation(
+func (i *LDAP) updateEducationSchoolOperation(
 	schoolUpdate libregraph.EducationSchool,
 	currentSchool libregraph.EducationSchool,
 ) schoolUpdateOperation {
@@ -216,7 +231,7 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 		logger.Debug().Err(err).Msg("error updating school name")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+				err = errSchoolNameExists
 			}
 		}
 		return err
@@ -233,11 +248,9 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 	mr := ldap.NewModifyRequest(dn, nil)
 	if updatedSchoolNumber, ok := updatedSchool.GetSchoolNumberOk(); ok {
 		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
-			_, err := i.getSchoolByNumberOrID(*updatedSchoolNumber)
+			_, err := i.getSchoolByNumber(*updatedSchoolNumber)
 			if err == nil {
-				errmsg := fmt.Sprintf("school number '%s' already exists", *updatedSchoolNumber)
-				err = fmt.Errorf(errmsg)
-				return err
+				return errSchoolNumberExists
 			}
 			mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{*updatedSchoolNumber})
 		}
@@ -255,13 +268,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 	}
 
 	if err := i.conn.Modify(mr); err != nil {
-		var lerr *ldap.Error
 		logger.Debug().Err(err).Msg("error updating school number")
-		if errors.As(err, &lerr) {
-			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
-			}
-		}
 		return err
 	}
 
@@ -282,7 +289,7 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 	}
 
 	currentSchool := i.createSchoolModelFromLDAP(e)
-	switch i.UpdateEducationSchoolOperation(school, *currentSchool) {
+	switch i.updateEducationSchoolOperation(school, *currentSchool) {
 	case tooManyValues:
 		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
 	case schoolUnchanged:
@@ -635,17 +642,12 @@ func (i *LDAP) RemoveClassFromEducationSchool(ctx context.Context, schoolNumberO
 }
 
 func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
-	attrs := []string{
-		i.educationConfig.schoolAttributeMap.displayName,
-		i.educationConfig.schoolAttributeMap.id,
-		i.educationConfig.schoolAttributeMap.schoolNumber,
-	}
 	filter := fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
 
 	if i.educationConfig.schoolFilter != "" {
 		filter = fmt.Sprintf("(&%s(%s))", filter, i.educationConfig.schoolFilter)
 	}
-	return i.getEntryByDN(dn, attrs, filter)
+	return i.getEntryByDN(dn, i.getEducationSchoolAttrTypes(), filter)
 }
 
 func (i *LDAP) getSchoolByNumberOrID(numberOrID string) (*ldap.Entry, error) {
@@ -656,6 +658,16 @@ func (i *LDAP) getSchoolByNumberOrID(numberOrID string) (*ldap.Entry, error) {
 		numberOrID,
 		i.educationConfig.schoolAttributeMap.schoolNumber,
 		numberOrID,
+	)
+	return i.getSchoolByFilter(filter)
+}
+
+func (i *LDAP) getSchoolByNumber(schoolNumber string) (*ldap.Entry, error) {
+	schoolNumber = ldap.EscapeFilter(schoolNumber)
+	filter := fmt.Sprintf(
+		"(%s=%s)",
+		i.educationConfig.schoolAttributeMap.schoolNumber,
+		schoolNumber,
 	)
 	return i.getSchoolByFilter(filter)
 }
