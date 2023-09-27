@@ -377,7 +377,7 @@ func TestDeleteEducationSchool(t *testing.T) {
 		if tt.expectedItemNotFound {
 			lm.AssertNumberOfCalls(t, "Del", 0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "itemNotFound", err.Error())
+			assert.Equal(t, "itemNotFound: not found", err.Error())
 		} else {
 			assert.Nil(t, err)
 		}
@@ -441,7 +441,7 @@ func TestGetEducationSchool(t *testing.T) {
 
 		if tt.expectedItemNotFound {
 			assert.NotNil(t, err)
-			assert.Equal(t, "itemNotFound", err.Error())
+			assert.Equal(t, "itemNotFound: not found", err.Error())
 		} else {
 			assert.Nil(t, err)
 			assert.Equal(t, "Test School", school.GetDisplayName())
@@ -594,7 +594,7 @@ func TestRemoveMemberFromEducationSchool(t *testing.T) {
 	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "does-not-exist")
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
-	assert.Equal(t, "itemNotFound", err.Error())
+	assert.Equal(t, "itemNotFound: not found", err.Error())
 	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "abcd-defg")
 	lm.AssertNumberOfCalls(t, "Search", 4)
 	lm.AssertNumberOfCalls(t, "Modify", 1)
@@ -705,7 +705,7 @@ func TestRemoveClassFromEducationSchool(t *testing.T) {
 	err = b.RemoveClassFromEducationSchool(context.Background(), "abcd-defg", "does-not-exist")
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
-	assert.Equal(t, "itemNotFound", err.Error())
+	assert.Equal(t, "itemNotFound: not found", err.Error())
 	err = b.RemoveClassFromEducationSchool(context.Background(), "abcd-defg", "abcd-defg")
 	lm.AssertNumberOfCalls(t, "Search", 4)
 	lm.AssertNumberOfCalls(t, "Modify", 1)

@@ -59,34 +59,22 @@ func TestGetGroup(t *testing.T) {
 
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetGroup(context.Background(), "group", nil)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	_, err = b.GetGroup(context.Background(), "group", queryParamExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	_, err = b.GetGroup(context.Background(), "group", queryParamSelect)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock an empty Search Result
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetGroup(context.Background(), "group", nil)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	_, err = b.GetGroup(context.Background(), "group", queryParamExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	_, err = b.GetGroup(context.Background(), "group", queryParamSelect)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock an invalid Search Result
 	lm = &mocks.Client{}
@@ -95,17 +83,11 @@ func TestGetGroup(t *testing.T) {
 	}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err := b.GetGroup(context.Background(), "group", nil)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock a valid	Search Result
 	lm = &mocks.Client{}
@@ -240,9 +222,7 @@ func TestGetGroups(t *testing.T) {
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetGroups(context.Background(), url.Values{})
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
+	assert.ErrorContains(t, err, "itemNotFound:")
 
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)

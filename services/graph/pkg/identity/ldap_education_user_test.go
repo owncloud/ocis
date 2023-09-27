@@ -139,7 +139,7 @@ func TestDeleteEducationUser(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	lm.AssertNumberOfCalls(t, "Del", 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, "itemNotFound", err.Error())
+	assert.Equal(t, "itemNotFound: not found", err.Error())
 }
 
 func TestGetEducationUser(t *testing.T) {
@@ -157,7 +157,7 @@ func TestGetEducationUser(t *testing.T) {
 	_, err = b.GetEducationUser(context.Background(), "xxxx-xxxx")
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
-	assert.Equal(t, "itemNotFound", err.Error())
+	assert.Equal(t, "itemNotFound: not found", err.Error())
 }
 
 func TestGetEducationUsers(t *testing.T) {
