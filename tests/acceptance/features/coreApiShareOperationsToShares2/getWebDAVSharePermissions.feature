@@ -75,7 +75,7 @@ Feature: sharing
     And user "Brian" has accepted share "/tmp.txt" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | update,read |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "3"
     Examples:
       | dav-path-version |
@@ -112,7 +112,7 @@ Feature: sharing
     And user "Brian" has accepted share "/tmp.txt" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | share,read |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "17"
     Examples:
       | dav-path-version |

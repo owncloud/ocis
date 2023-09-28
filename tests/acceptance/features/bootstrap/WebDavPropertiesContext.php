@@ -1108,10 +1108,10 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $path
 	 * @param string|null $storePath
 	 *
-	 * @return void
+	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	public function storeEtagOfElement(string $user, string $path, ?string $storePath = ""):void {
+	public function storeEtagOfElement(string $user, string $path, ?string $storePath = ""):SimpleXMLElement {
 		if ($storePath === "") {
 			$storePath = $path;
 		}
@@ -1122,8 +1122,10 @@ class WebDavPropertiesContext implements Context {
 			$path,
 			$propertiesTable
 		);
+		$xmlObject = HttpRequestHelper::getResponseXml($response);
 		$this->storedETAG[$user][$storePath]
-			= $this->featureContext->getEtagFromResponseXmlObject(HttpRequestHelper::getResponseXml($response));
+			= $this->featureContext->getEtagFromResponseXmlObject($xmlObject);
+		return $xmlObject;
 	}
 
 	/**
