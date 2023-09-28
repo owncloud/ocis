@@ -104,13 +104,13 @@ cannot share a folder with create permission
 
 #### [OCS error message for attempting to access share via share id as an unauthorized user is not informative](https://github.com/owncloud/ocis/issues/1233)
 
+- [coreApiShareOperationsToShares1/gettingShares.feature:143](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L143)
 - [coreApiShareOperationsToShares1/gettingShares.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L144)
-- [coreApiShareOperationsToShares1/gettingShares.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L145)
 
 #### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 
+- [coreApiShareOperationsToShares1/gettingShares.feature:177](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L177)
 - [coreApiShareOperationsToShares1/gettingShares.feature:178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L178)
-- [coreApiShareOperationsToShares1/gettingShares.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L179)
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 

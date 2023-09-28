@@ -1,4 +1,3 @@
-@skipOnReva
 Feature: sharing
   As a user
   I want to get all the shares
@@ -144,7 +143,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
-  @issue-1289 @skipOnGraph
+  @issue-1289
   Scenario: share a folder to a group, and remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -155,7 +154,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
     And user "Alice" has shared folder "/PARENT" with group "group0"
     When the administrator removes user "Carol" from group "group0" using the provisioning API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "204"
     And user "Brian" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
