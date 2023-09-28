@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Bump reva to 2.16.1: [#7350](https://github.com/owncloud/ocis/pull/7350)
 * Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
@@ -14,6 +15,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 
 ## Details
+
+* Bugfix - Bump reva to 2.16.1: [#7350](https://github.com/owncloud/ocis/pull/7350)
+
+  *   Bugfix [cs3org/reva#4194](https://github.com/cs3org/reva/pull/4194): Make appctx package compatible with go v1.21
+  *   Bugfix [cs3org/reva#4214](https://github.com/cs3org/reva/pull/4214): Always pass adjusted default nats options
+
+   https://github.com/owncloud/ocis/pull/7350
 
 * Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
 
