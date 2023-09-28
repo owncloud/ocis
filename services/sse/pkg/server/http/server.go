@@ -8,6 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -78,7 +79,7 @@ func Server(opts ...Option) (http.Service, error) {
 		),
 	)
 
-	ch, err := events.Consume(options.Consumer, "sse", options.RegisteredEvents...)
+	ch, err := events.Consume(options.Consumer, "sse-"+uuid.New().String(), options.RegisteredEvents...)
 	if err != nil {
 		return http.Service{}, err
 	}

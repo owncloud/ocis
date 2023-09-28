@@ -72,6 +72,9 @@ func Server(cfg *config.Config) *cli.Command {
 					http.RegisteredEvents(_registeredEvents),
 					http.TracerProvider(tracerProvider),
 				)
+				if err != nil {
+					return err
+				}
 
 				gr.Add(server.Run, func(_ error) {
 					cancel()
