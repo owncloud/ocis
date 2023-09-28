@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
+* Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 
 ## Details
 
@@ -225,6 +226,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/5550
    https://github.com/owncloud/ocis/pull/6427
+
+* Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
+
+   When running multiple sse instances some events would not be reported to the user. This is
+   fixed.
+
+   https://github.com/owncloud/ocis/pull/7382
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
