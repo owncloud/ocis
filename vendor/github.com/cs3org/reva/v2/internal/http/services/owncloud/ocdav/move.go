@@ -141,12 +141,6 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 }
 
 func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Request, src, dst *provider.Reference, log zerolog.Logger) {
-	// do not allow overwriting spaces
-	if err := s.validateDestination(dst); err != nil {
-		log.Error().Err(err)
-		w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
-		return
-	}
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {
@@ -200,6 +194,11 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		errors.HandleErrorStatus(&log, w, srcStatRes.Status)
 		return
 	}
+	if err := validateSrc(srcStatRes.GetInfo()); err != nil {
+		log.Err(err).Send()
+		w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
+		return
+	}
 
 	// check dst exists
 	dstStatReq := &provider.StatRequest{Ref: dst}
@@ -218,6 +217,11 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.9.4
 
+		if err := validateDst(srcStatRes.GetInfo(), dstStatRes.GetInfo()); err != nil {
+			log.Err(err).Send()
+			w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
+			return
+		}
 		if !overwrite {
 			log.Warn().Bool("overwrite", overwrite).Msg("dst already exists")
 			w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
@@ -310,12 +314,4 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*info.Id))
 	w.Header().Set(net.HeaderOCETag, info.Etag)
 	w.WriteHeader(successCode)
-}
-
-func (s *svc) validateDestination(dstStatRes *provider.Reference) error {
-	// do not allow overwriting spaces
-	if dstStatRes.GetPath() == "." && dstStatRes.GetResourceId().GetOpaqueId() == dstStatRes.GetResourceId().GetSpaceId() {
-		return fmt.Errorf("overwriting is not allowed")
-	}
-	return nil
 }

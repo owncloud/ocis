@@ -339,3 +339,5 @@ require (
 
 // the replacement build is based on https://github.com/dragonchaser/cs3apis/tree/master
 replace github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147
+
+replace github.com/cs3org/reva/v2 => github.com/2403905/reva/v2 v2.0.0-20230928044430-e1d16ef58d24

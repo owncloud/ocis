@@ -608,6 +608,11 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		errors.HandleErrorStatus(log, w, srcStatRes.Status)
 		return nil
 	}
+	if err := validateSrc(srcStatRes.GetInfo()); err != nil {
+		log.Err(err).Send()
+		w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
+		return nil
+	}
 
 	dstStatReq := &provider.StatRequest{Ref: dstRef}
 	dstStatRes, err := client.Stat(ctx, dstStatReq)
@@ -624,7 +629,11 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	successCode := http.StatusCreated // 201 if new resource was created, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.8.5
-
+		if err := validateDst(srcStatRes.GetInfo(), dstStatRes.GetInfo()); err != nil {
+			log.Err(err).Send()
+			w.WriteHeader(http.StatusPreconditionFailed) // 412, see https://tools.ietf.org/html/rfc4918#section-9.9.4
+			return nil
+		}
 		if !overwrite {
 			log.Warn().Bool("overwrite", overwrite).Msg("dst already exists")
 			w.WriteHeader(http.StatusPreconditionFailed)

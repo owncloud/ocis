@@ -20,6 +20,7 @@ package ocdav
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -412,4 +413,27 @@ func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[g
 	cp := path.Join(childPathRes.Path, child.Path) + "/"
 	pp := path.Join(parentPathRes.Path, parent.Path) + "/"
 	return strings.HasPrefix(cp, pp), nil
+}
+
+func validateSrc(srcInf *provider.ResourceInfo) error {
+	if isSpaceRoot(srcInf) {
+		return fmt.Errorf("overwriting is not allowed")
+	}
+	return nil
+}
+
+func validateDst(srcInf, dstInf *provider.ResourceInfo) error {
+	if isSpaceRoot(dstInf) {
+		return fmt.Errorf("overwriting is not allowed")
+	}
+	if srcInf.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER && dstInf.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		return fmt.Errorf("overwriting a folder by file is not allowed")
+	}
+	return nil
+}
+
+func isSpaceRoot(info *provider.ResourceInfo) bool {
+	f := info.GetId()
+	s := info.GetSpace().GetRoot()
+	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
 }
