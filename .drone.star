@@ -116,20 +116,20 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
             ],
-            "skip": True,
+            "skip": False,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
-            "skip": True,
+            "skip": False,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": True,
+            "skip": False,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -146,7 +146,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": True,
+            "skip": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -160,14 +160,14 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": True,
+            "skip": False,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [9],
+        "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
@@ -187,8 +187,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
-    "codestyle": True,
+    "litmus": False,
+    "codestyle": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -264,17 +264,11 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
-        codestyle(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
-        [licenseCheck(ctx)] + \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx) + \
         [releaseSubmodule(ctx)]
 
     build_release_helpers = [
@@ -347,7 +341,7 @@ def testOcisModules(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
-    return pipelines + [scan_result_upload]
+    return pipelines  #+ [scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []

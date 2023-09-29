@@ -19,7 +19,7 @@ Feature: sizing of previews of files downloaded through the webdav API
     Examples:
       | request_width | request_height | return_width | return_height |
       | 1             | 1              | 16           | 16            |
-      | 32            | 32             | 32           | 33            |
+      | 32            | 32             | 32           | 32            |
       | 1024          | 1024           | 640          | 480           |
       | 1             | 1024           | 16           | 16            |
       | 1024          | 1              | 640          | 480           |
