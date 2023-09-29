@@ -318,15 +318,13 @@ Feature: copy file
       | role      | <role> |
     When user "Brian" copies folder "/folder2" to "/folder1/folder2" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Brian" folder "folder1" of the space "Project" <shouldOrNot> contain these entries:
-      | folder2 |
-    And for user "Brian" folder "folder1/folder2" of the space "Project" <shouldOrNot> contain these files:
-      | demo.txt |
+    And for user "Brian" folder "<parent-folder>" of the space "Project" <shouldOrNot> contain these files:
+      | <entry> |
     Examples:
-      | role    | shouldOrNot | status-code |
-      | manager | should      | 201         |
-      | editor  | should      | 201         |
-      | viewer  | should not  | 403         |
+      | role    | shouldOrNot | status-code | parent-folder   | entry    |
+      | manager | should      | 201         | folder1/folder2 | demo.txt |
+      | editor  | should      | 201         | folder1/folder2 | demo.txt |
+      | viewer  | should not  | 403         | folder1         | folder2  |
 
 
   Scenario Outline: user copies a folder from a project space with different role to a project space with different role
