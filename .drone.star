@@ -414,6 +414,14 @@ def cacheGoBin():
                 "make bingo-update",
             ],
             "volumes": [stepVolumeGo],
+            "environment": {
+                "HTTP_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+                "HTTPS_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+            },
         },
         {
             "name": "archive-go-bin",
