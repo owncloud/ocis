@@ -275,8 +275,6 @@ Feature: move (rename) file
       | /ONE |
     And for user "Brian" folder "folderA" of the space "Shares" should not contain these entries:
       | /ONE |
-    And for user "Brian" folder "folderA/ONE" of the space "Shares" should not contain these entries:
-      | TWO |
     And user "Brian" folder "/folderB/ONE" of the space "Shares" should have the previously stored id
 
 

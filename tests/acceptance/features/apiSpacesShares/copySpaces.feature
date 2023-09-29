@@ -40,7 +40,7 @@ Feature: copy file
       | role      | viewer |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Brian" folder "newfolder" of the space "Project" should contain these files:
+    And for user "Brian" folder "newfolder" of the space "Project" should not contain these files:
       | insideSpace.txt |
 
 
@@ -318,9 +318,9 @@ Feature: copy file
       | role      | <role> |
     When user "Brian" copies folder "/folder2" to "/folder1/folder2" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Brian" folder "folder1" of the space "Project" should contain these entries:
+    And for user "Brian" folder "folder1" of the space "Project" <shouldOrNot> contain these entries:
       | folder2 |
-    And for user "Brian" folder "folder1/folder2" of the space "Project" should contain these files:
+    And for user "Brian" folder "folder1/folder2" of the space "Project" <shouldOrNot> contain these files:
       | demo.txt |
     Examples:
       | role    | shouldOrNot | status-code |
@@ -343,17 +343,17 @@ Feature: copy file
       | role      | <from_role> |
     When user "Alice" copies folder "/folder1" from space "Project1" to "/folder1" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "folder1" of the space "Project2" <shouldOrNot> contain these files:
-      | demo.txt |
+    And for user "Alice" folder "<parent-folder>" of the space "Project2" <shouldOrNot> contain these files:
+      | <entry> |
     Examples:
-      | from_role | to_role | status-code | shouldOrNot |
-      | manager   | manager | 201         | should      |
-      | manager   | editor  | 201         | should      |
-      | editor    | manager | 201         | should      |
-      | editor    | editor  | 201         | should      |
-      | manager   | viewer  | 403         | should not  |
-      | editor    | viewer  | 403         | should not  |
-      | viewer    | viewer  | 403         | should not  |
+      | from_role | to_role | status-code | shouldOrNot | parent-folder | entry    |
+      | manager   | manager | 201         | should      | folder1       | demo.txt |
+      | manager   | editor  | 201         | should      | folder1       | demo.txt |
+      | editor    | manager | 201         | should      | folder1       | demo.txt |
+      | editor    | editor  | 201         | should      | folder1       | demo.txt |
+      | manager   | viewer  | 403         | should not  | /             | folder1  |
+      | editor    | viewer  | 403         | should not  | /             | folder1  |
+      | viewer    | viewer  | 403         | should not  | /             | folder1  |
 
 
   Scenario Outline: user copies a folder from project space with different role to personal space
@@ -388,18 +388,16 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these entries:
-      | folder1 |
-    And for user "Alice" folder "testshare/folder1" of the space "Shares" <shouldOrNot> contain these files:
-      | demo.txt |
+    And for user "Alice" folder "<parent-folder>" of the space "Shares" <shouldOrNot> contain these files:
+      | <entry> |
     Examples:
-      | role    | shouldOrNot | permissions | status-code |
-      | manager | should      | 31          | 201         |
-      | editor  | should      | 31          | 201         |
-      | viewer  | should      | 31          | 201         |
-      | manager | should not  | 17          | 403         |
-      | editor  | should not  | 17          | 403         |
-      | viewer  | should not  | 17          | 403         |
+      | role    | shouldOrNot | permissions | status-code | parent-folder     | entry    |
+      | manager | should      | 31          | 201         | testshare/folder1 | demo.txt |
+      | editor  | should      | 31          | 201         | testshare/folder1 | demo.txt |
+      | viewer  | should      | 31          | 201         | testshare/folder1 | demo.txt |
+      | manager | should not  | 17          | 403         | testshare         | folder1  |
+      | editor  | should not  | 17          | 403         | testshare         | folder1  |
+      | viewer  | should not  | 17          | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from personal space to project space with different role
@@ -412,13 +410,13 @@ Feature: copy file
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "folder1" of the space "Project" <shouldOrNot> contain these files:
-      | demo.txt |
+    And for user "Alice" folder "<parent-folder>" of the space "Project" <shouldOrNot> contain these files:
+      | <entry> |
     Examples:
-      | role    | shouldOrNot | status-code |
-      | manager | should      | 201         |
-      | editor  | should      | 201         |
-      | viewer  | should not  | 403         |
+      | role    | shouldOrNot | status-code | parent-folder | entry    |
+      | manager | should      | 201         | folder1       | demo.txt |
+      | editor  | should      | 201         | folder1       | demo.txt |
+      | viewer  | should not  | 403         | /             | folder1  |
 
 
   Scenario Outline: user copies a folder from personal space to share space with different permissions
@@ -429,14 +427,12 @@ Feature: copy file
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these files:
-      | folder1 |
-    And for user "Alice" folder "testshare/folder1" of the space "Shares" <shouldOrNot> contain these files:
-      | demo.txt |
+    And for user "Alice" folder "<parent-folder>" of the space "Shares" <shouldOrNot> contain these files:
+      | <entry> |
     Examples:
-      | permissions | shouldOrNot | status-code |
-      | 31          | should      | 201         |
-      | 17          | should not  | 403         |
+      | permissions | shouldOrNot | status-code | parent-folder     | entry    |
+      | 31          | should      | 201         | testshare/folder1 | demo.txt |
+      | 17          | should not  | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from share space with different role to personal space
@@ -492,8 +488,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" folder "folder1" of the space "Project" should not contain these files:
-      | testshare.txt |
+    And for user "Alice" folder "/" of the space "Project" should not contain these files:
+      | folder1 |
     Examples:
       | permissions |
       | 31          |

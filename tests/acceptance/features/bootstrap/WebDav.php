@@ -4871,6 +4871,9 @@ trait WebDav {
 		?string $method = 'REPORT',
 		?string $folderpath = ''
 	):void {
+		if ($folderpath === "/") {
+			$folderpath = "";
+		}
 		$this->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
 		$should = ($shouldOrNot !== "not");
