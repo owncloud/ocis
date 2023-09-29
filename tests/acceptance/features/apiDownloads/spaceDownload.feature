@@ -11,7 +11,7 @@ Feature: Download space
       | Brian    |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project-space" with content "some data" to "file1.txt"
     And user "Alice" has created a folder ".space" in space "Project-space"
     And user "Alice" has uploaded a file inside space "Project-space" with content "space description" to ".space/readme.md"

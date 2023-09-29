@@ -115,8 +115,8 @@ Feature: Resharing
 
   Scenario Outline: resharing with group with different permissions
     Given group "security department" has been created
-    And the administrator has added a user "Ember" to the group "security department" using GraphApi
-    And the administrator has added a user "Fred" to the group "security department" using GraphApi
+    And the administrator has added a user "Ember" to the group "security department" using the Graph API
+    And the administrator has added a user "Fred" to the group "security department" using the Graph API
     When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<permissions>" using the sharing API
     Then the OCS status code should be "100"
     When user "Ember" accepts share "/folder" offered by user "Brian" using the sharing API
