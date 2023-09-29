@@ -809,7 +809,6 @@ def localApiTests(suite, storage, extra_environment = {}):
         "TEST_SERVER_URL": "https://ocis-server:9200",
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-        "TEST_OCIS": "true",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITE": suite,
@@ -994,7 +993,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-                             "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": filterTags,
@@ -1103,7 +1101,6 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
                          "environment": {
                              "SERVER_HOST": "https://ocis-server:9200",
                              "BACKEND_HOST": "https://ocis-server:9200",
-                             "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "%s" % dirs["ocisRevaDataRoot"],
                              "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
                              "TEST_TAGS": finalFilterTags,
