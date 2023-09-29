@@ -603,20 +603,16 @@ trait WebDav {
 			$user,
 			$fileDestination
 		);
-		$this->response = $this->makeDavRequest(
+		$response = $this->makeDavRequest(
 			$user,
 			"MOVE",
 			$fileSource,
 			$headers
 		);
-		$expectedStatusCode = 201;
-		$actualStatusCode = $this->response->getStatusCode();
-		Assert::assertEquals(
-			$expectedStatusCode,
-			$actualStatusCode,
-			__METHOD__ . " Failed moving resource '$fileSource' to '$fileDestination'."
-			. " Expected status code was '$expectedStatusCode' but got '$actualStatusCode'"
-		);
+        $actualStatusCode = $response->getStatusCode();
+        $this->theHTTPStatusCodeShouldBe(201, " Failed moving resource '$fileSource' to '$fileDestination'."
+            . " Expected status code was 201 but got '$actualStatusCode' ", $response);
+
 	}
 
 	/**
@@ -837,6 +833,31 @@ trait WebDav {
 		$this->usingServer($previousServer);
 	}
 
+    /**
+     * @param string $user
+     * @param string $fileSource
+     * @param string $fileDestination
+     *
+     * @return ResponseInterface
+     */
+    public function userCopyFileUsingTheAPI(
+        string $user,
+        string $fileSource,
+        string $fileDestination
+    ):ResponseInterface {
+        $user = $this->getActualUsername($user);
+        $headers['Destination'] = $this->destinationHeaderValue(
+            $user,
+            $fileDestination
+        );
+        return $this->makeDavRequest(
+            $user,
+            "COPY",
+            $fileSource,
+            $headers
+        );
+    }
+
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
@@ -851,19 +872,10 @@ trait WebDav {
 		string $fileSource,
 		string $fileDestination
 	):void {
-		$user = $this->getActualUsername($user);
-		$headers['Destination'] = $this->destinationHeaderValue(
-			$user,
-			$fileDestination
-		);
-		$this->response = $this->makeDavRequest(
-			$user,
-			"COPY",
-			$fileSource,
-			$headers
-		);
+		$response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
+		$this->setResponse($response);
 		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($this->response)
+			HttpRequestHelper::parseResponseAsXml($response)
 		);
 		$this->pushToLastHttpStatusCodesArray(
 			(string) $this->getResponse()->getStatusCode()
@@ -884,12 +896,12 @@ trait WebDav {
 		string $fileSource,
 		string $fileDestination
 	):void {
-		$this->userCopiesFileUsingTheAPI($user, $fileSource, $fileDestination);
+        $response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination' for user '$user'",
+            $response
 		);
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -913,10 +925,11 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasCopiedFileUsingTheAPI(string $fileSource, string $fileDestination):void {
-		$this->theUserCopiesFileUsingTheAPI($fileSource, $fileDestination);
+		$response = $this->userCopyFileUsingTheAPI($this->getCurrentUser(), $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination'"
+			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination'",
+            $response
 		);
 	}
 
@@ -2070,6 +2083,41 @@ trait WebDav {
 		}
 	}
 
+    /**
+     * @param string $user
+     * @param string $source
+     * @param string $destination
+     * @param bool|null $isGivenStep
+     *
+     * @return ResponseInterface
+     */
+    public function userUploadAFileTo(
+        string $user,
+        string $source,
+        string $destination,
+        ?bool $isGivenStep = false
+    ):ResponseInterface {
+        $user = $this->getActualUsername($user);
+        $file = \fopen($this->acceptanceTestsDirLocation() . $source, 'r');
+        $this->pauseUploadDelete();
+        $response = $this->makeDavRequest(
+            $user,
+            "PUT",
+            $destination,
+            [],
+            $file,
+            "files",
+            null,
+            false,
+            null,
+            [],
+            null,
+            $isGivenStep
+        );
+        $this->lastUploadDeleteTime = \time();
+        return $response;
+    }
+
 	/**
 	 * @When user :user uploads file :source to :destination using the WebDAV API
 	 *
@@ -2086,26 +2134,10 @@ trait WebDav {
 		string $destination,
 		?bool $isGivenStep = false
 	):void {
-		$user = $this->getActualUsername($user);
-		$file = \fopen($this->acceptanceTestsDirLocation() . $source, 'r');
-		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest(
-			$user,
-			"PUT",
-			$destination,
-			[],
-			$file,
-			"files",
-			null,
-			false,
-			null,
-			[],
-			null,
-			$isGivenStep
-		);
-		$this->lastUploadDeleteTime = \time();
+        $response = $this->userUploadAFileTo($user, $source, $destination);
+        $this->setResponse($response);
 		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($this->response)
+			HttpRequestHelper::parseResponseAsXml($response)
 		);
 		$this->pushToLastHttpStatusCodesArray(
 			(string) $this->getResponse()->getStatusCode()
@@ -2122,12 +2154,12 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userHasUploadedAFileTo(string $user, string $source, string $destination):void {
-		$this->userUploadsAFileTo($user, $source, $destination, true);
+		$response = $this->userUploadAFileTo($user, $source, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'",
+            $response
 		);
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -2651,10 +2683,11 @@ trait WebDav {
 	 */
 	public function userShouldBeAbleToUploadFileTo(string $user, string $source, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$this->userUploadsAFileTo($user, $source, $destination);
+		$response = $this->userUploadAFileTo($user, $source, $destination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$destination'"
+			"HTTP status code was not 201 or 204 while trying to upload file '$destination'",
+            $response
 		);
 		$this->asFileOrFolderShouldExist($user, "file", $destination);
 	}
@@ -2678,7 +2711,7 @@ trait WebDav {
 		$usernames = $table->getHash();
 		foreach ($usernames as $username) {
 			$actualUser = $this->getActualUsername($username["username"]);
-			$this->userUploadsAFileTo($actualUser, $source, $destination);
+			$this->userUploadAFileTo($actualUser, $source, $destination);
 			$this->asFileOrFolderShouldExist($actualUser, "file", $destination);
 		}
 	}
