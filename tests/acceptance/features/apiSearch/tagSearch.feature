@@ -39,7 +39,7 @@ Feature: tag search
   Scenario Outline: search project space files by tag
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "tag-space" with the default quota using the Graph API
     And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "tag-space"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file" to "spacesFile.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"
@@ -92,7 +92,7 @@ Feature: tag search
   Scenario Outline: search project space folders by tag
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "tag-space" with the default quota using the Graph API
     And user "Alice" has created a folder "spacesFolder/spacesSubFolder" in space "tag-space"
     And user "Alice" has created a folder "unTagSpacesFolder/unTagSpacesSubFolder" in space "tag-space"
     And user "Alice" has tagged the following folders of the space "tag-space":
@@ -148,7 +148,7 @@ Feature: tag search
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "tag-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "tag-space" with the default quota using the Graph API
     And user "Alice" has shared a space "tag-space" with settings:
       | shareWith | Brian  |
       | role      | viewer |

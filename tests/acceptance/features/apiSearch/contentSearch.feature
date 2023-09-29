@@ -161,7 +161,7 @@ Feature: content search
   Scenario Outline: search project space files by content
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "hello world from nepal" to "keywordAtStart.txt"
     And user "Alice" has uploaded a file inside space "project-space" with content "saying hello to the world" to "spacesFolderWithFile/keywordAtMiddle.txt"
@@ -185,7 +185,7 @@ Feature: content search
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has shared a space "project-space" with settings:
       | shareWith | Brian  |
       | role      | viewer |
@@ -234,7 +234,7 @@ Feature: content search
   Scenario Outline: search across files with different format with search text highlight
     Given using <dav-path-version> DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded file with content "this is a simple text file" to "test-text-file.txt"
     And user "Alice" has uploaded file with content "this is a simple pdf file" to "test-pdf-file.pdf"
     And user "Alice" has uploaded file with content "this is a simple cpp file" to "test-cpp-file.cpp"
