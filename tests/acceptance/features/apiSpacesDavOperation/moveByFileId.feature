@@ -7,15 +7,16 @@ Feature: moving/renaming file using file id
     Given using spaces DAV path
     And user "Alice" has been created with default attributes and without skeleton files
 
+
   Scenario Outline: move a file into a folder inside personal space
     Given user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     When user "Alice" moves a file "/textfile.txt" into "/folder" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/textfile.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | textfile.txt |
+    But for user "Alice" the space "Personal" should not contain these entries:
       | textfile.txt |
     Examples:
       | dav-path                          |
@@ -30,9 +31,9 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     When user "Alice" moves a file "/textfile.txt" into "/folder/sub-folder" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/sub-folder/textfile.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
+    And for user "Alice" folder "folder/sub-folder/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    But for user "Alice" the space "Personal" should not contain these entries:
       | textfile.txt |
     Examples:
       | dav-path                          |
@@ -48,8 +49,8 @@ Feature: moving/renaming file using file id
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | textfile.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
-      | folder/textfile.txt |
+    But for user "Alice" folder "folder" of the space "Personal" should not contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -65,8 +66,8 @@ Feature: moving/renaming file using file id
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | textfile.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
-      | folder/sub-folder/textfile.txt |
+    But for user "Alice" folder "folder/sub-folder" of the space "Personal" should not contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -80,7 +81,7 @@ Feature: moving/renaming file using file id
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | renamed.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
+    But for user "Alice" the space "Personal" should not contain these entries:
       | textfile.txt |
     Examples:
       | dav-path                          |
@@ -94,9 +95,9 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     When user "Alice" renames a file "textfile.txt" into "/folder/renamed.txt" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/renamed.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | renamed.txt |
+    But for user "Alice" the space "Personal" should not contain these entries:
       | textfile.txt |
     Examples:
       | dav-path                          |
@@ -111,9 +112,9 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     When user "Alice" renames a file "textfile.txt" into "/folder/sub-folder/renamed.txt" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/sub-folder/renamed.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
+    And for user "Alice" folder "folder/sub-folder" of the space "Personal" should contain these files:
+      | renamed.txt |
+    But for user "Alice" the space "Personal" should not contain these entries:
       | textfile.txt |
     Examples:
       | dav-path                          |
@@ -129,8 +130,8 @@ Feature: moving/renaming file using file id
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | renamed.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
-      | folder/textfile.txt |
+    But for user "Alice" folder "folder" of the space "Personal" should not contain these files:
+      | renamed.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -146,8 +147,8 @@ Feature: moving/renaming file using file id
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | renamed.txt |
-    And for user "Alice" the space "Personal" should not contain these entries:
-      | folder/sub-folder/textfile.txt |
+    But for user "Alice" folder "folder/sub-folder" of the space "Personal" should not contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
