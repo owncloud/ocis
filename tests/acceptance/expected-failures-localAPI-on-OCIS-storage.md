@@ -143,11 +143,5 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraph/addUserToGroup.feature:420](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L420)
 
-#### [Disable DEPTH:infinity in PROPFIND is only applicable to dav/spaces path](https://github.com/owncloud/ocis/issues/7359)
-
-- [apiDepthInfinity/propfind.feature:117](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiDepthInfinity/propfind.feature#L117)
-- [apiDepthInfinity/propfind.feature:137](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiDepthInfinity/propfind.feature#L137)
-- [apiDepthInfinity/propfind.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiDepthInfinity/propfind.feature#L138)
-
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

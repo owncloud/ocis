@@ -114,7 +114,6 @@ config = {
                 "apiDownloads",
                 "apiReshare",
                 "apiSpacesDavOperation",
-                "apiDepthInfinity",
             ],
             "skip": False,
         },
