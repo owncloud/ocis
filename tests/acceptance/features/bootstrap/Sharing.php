@@ -2122,7 +2122,6 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$shareId = (string) $this->getLastCreatedPublicShare()->id;
 		$response = $this->getShareData($user, $shareId);
-		var_dump($response->getBody()->getContents());
 		$this->checkFields($user, $table, $response);
 	}
 
