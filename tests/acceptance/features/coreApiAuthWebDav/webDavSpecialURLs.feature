@@ -13,6 +13,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send DELETE requests to webDav endpoints with 2 slashes
+    # TODO: check if it has definition
     When user "Alice" requests these endpoints with "DELETE" using password "%regular%" about user "Alice"
       | endpoint                                            |
       | //remote.php/webdav/textfile0.txt                   |
@@ -55,7 +56,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send LOCK requests to webDav endpoints with 2 slashes
-    When the user "Alice" requests these endpoints with "LOCK" to get property "d:shared" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "LOCK" to get property "d:shared" about user "Alice"
       | endpoint                                            |
       | //remote.php/webdav/textfile0.txt                   |
       | //remote.php//dav/files/%username%/textfile1.txt    |
@@ -66,7 +67,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send LOCK requests to webDav endpoints with 2 slashes using the spaces WebDAV API
-    When the user "Alice" requests these endpoints with "LOCK" to get property "d:shared" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "LOCK" to get property "d:shared" about user "Alice"
       | endpoint                                             |
       | //remote.php/dav/spaces/%spaceid%/textfile0.txt      |
       | //remote.php//dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -121,6 +122,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send POST requests to webDav endpoints with 2 slashes
+    # TODO: check if it has definition
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "%regular%" about user "Alice"
       | endpoint                                            |
       | //remote.php/webdav/textfile0.txt                   |
@@ -142,7 +144,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send PROPFIND requests to webDav endpoints with 2 slashes
-    When the user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" about user "Alice"
       | endpoint                                            |
       | //remote.php/webdav/textfile0.txt                   |
       | //remote.php//dav/files/%username%/textfile1.txt    |
@@ -153,7 +155,7 @@ Feature: make webdav request with special urls
 
   @skipOnRevaMaster
   Scenario: send PROPFIND requests to webDav endpoints with 2 slashes using the spaces WebDAV API
-    When the user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" about user "Alice"
       | endpoint                                            |
       | //remote.php//dav/spaces/%spaceid%/textfile1.txt    |
       | /remote.php//dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -163,7 +165,7 @@ Feature: make webdav request with special urls
 
 
   Scenario: send PROPPATCH requests to webDav endpoints with 2 slashes
-    When the user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" about user "Alice"
       | endpoint                                            |
       | //remote.php/webdav/textfile0.txt                   |
       | //remote.php//dav/files/%username%/textfile1.txt    |
@@ -174,7 +176,7 @@ Feature: make webdav request with special urls
 
   @skipOnRevaMaster
   Scenario: send PROPPATCH requests to webDav endpoints with 2 slashes using the spaces WebDAV API
-    When the user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" with password "%regular%" about user "Alice"
+    When the user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" about user "Alice"
       | endpoint                                            |
       | //remote.php//dav/spaces/%spaceid%/textfile1.txt    |
       | /remote.php//dav/spaces/%spaceid%/PARENT/parent.txt |

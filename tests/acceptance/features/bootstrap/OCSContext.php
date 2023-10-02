@@ -589,14 +589,14 @@ class OCSContext implements Context {
 					$ofUser
 				);
 			}
-			$this->featureContext->authContext->userRequestsURLWithUsingBasicAuth(
+			$response = $this->featureContext->authContext->requestUrlWithBasicAuth(
 				$user,
 				$row['endpoint'],
 				$method,
-				$password,
 				$body,
 				$header
 			);
+			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -715,14 +715,14 @@ class OCSContext implements Context {
 				$row['endpoint'],
 				$ofUser
 			);
-			$this->featureContext->authContext->userRequestsURLWithUsingBasicAuth(
+			$response = $this->featureContext->authContext->requestUrlWithBasicAuth(
 				$user,
 				$row['endpoint'],
 				$method,
-				$this->featureContext->getPasswordForUser($user),
 				$body,
 				$header
 			);
+			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -750,13 +750,13 @@ class OCSContext implements Context {
 				$row['endpoint'],
 				$userRenamed
 			);
-			$this->featureContext->authContext->userRequestsURLWithUsingBasicAuth(
+			$response = $this->featureContext->authContext->requestUrlWithBasicAuth(
 				$asUser,
 				$row['endpoint'],
 				$method,
-				$this->featureContext->getPasswordForUser($user),
 				$body
 			);
+			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
