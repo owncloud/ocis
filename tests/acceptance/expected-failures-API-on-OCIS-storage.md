@@ -595,6 +595,11 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiFavorites/favorites.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L150)
 - [coreApiFavorites/favorites.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L227)
 
+#### [Disable DEPTH:infinity in PROPFIND is only applicable to dav/spaces path](https://github.com/owncloud/ocis/issues/7359)
+
+- [coreApiWebdavOperations/propfind.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/propfind.feature#L40)
+- [coreApiWebdavOperations/propfind.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/propfind.feature#L41)
+
 #### [OCS status code zero](https://github.com/owncloud/ocis/issues/3621)
 
 - [coreApiShareManagementToShares/moveReceivedShare.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/moveReceivedShare.feature#L13)
