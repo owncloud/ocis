@@ -24,7 +24,10 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
+use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use TestHelpers\OcsApiHelper;
 
 require_once 'bootstrap.php';
 
@@ -33,6 +36,125 @@ require_once 'bootstrap.php';
  */
 class CapabilitiesContext implements Context {
 	private FeatureContext $featureContext;
+
+	/**
+	 * This will run before EVERY scenario.
+	 * It will set the properties for this object.
+	 *
+	 * @BeforeScenario
+	 *
+	 * @param BeforeScenarioScope $scope
+	 *
+	 * @return void
+	 */
+	public function before(BeforeScenarioScope $scope):void {
+		// Get the environment
+		$environment = $scope->getEnvironment();
+		// Get all the contexts you need in this context
+		$this->featureContext = $environment->getContext('FeatureContext');
+	}
+
+	/**
+	 *
+	 * @param string $username
+	 * @param boolean $formatJson // if true then formats the response in json
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userGetsCapabilities(string $username, ?bool $formatJson = false): ResponseInterface {
+		$user = $this->featureContext->getActualUsername($username);
+		$password = $this->featureContext->getPasswordForUser($user);
+		return OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$password,
+			'GET',
+			'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
+			$this->featureContext->getStepLineRef(),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+	}
+
+	/**
+	 * @return string
+	 * @throws Exception|GuzzleException
+	 */
+	public function getAdminUsernameForCapabilitiesCheck(): string {
+		if (\TestHelpers\OcisHelper::isTestingOnReva()) {
+			// When testing on reva we don't have a user called "admin" to use
+			// to access the capabilities. So create an ordinary user on-the-fly
+			// with a default password. That user should be able to get a
+			// capabilities response that the test can process.
+			$adminUsername = "PseudoAdminForRevaTest";
+			$createdUsers = $this->featureContext->getCreatedUsers();
+			if (!\array_key_exists($adminUsername, $createdUsers)) {
+				$this->featureContext->userHasBeenCreated(["userName" => $adminUsername]);
+			}
+		} else {
+			$adminUsername = $this->featureContext->getAdminUsername();
+		}
+		return $adminUsername;
+	}
+
+	/**
+	 * @param SimpleXMLElement $xml of the capabilities
+	 * @param string $capabilitiesApp the "app" name in the capabilities response
+	 * @param string $capabilitiesPath the path to the element
+	 *
+	 * @return string
+	 */
+	public function getParameterValueFromXml(
+		SimpleXMLElement $xml,
+		string $capabilitiesApp,
+		string $capabilitiesPath
+	): string {
+		$path_to_element = \explode('@@@', $capabilitiesPath);
+		$answeredValue = $xml->{$capabilitiesApp};
+		foreach ($path_to_element as $element) {
+			$nameIndexParts = \explode('[', $element);
+			if (isset($nameIndexParts[1])) {
+				// This part of the path should be something like "some_element[1]"
+				// Separately extract the name and the index
+				$name = $nameIndexParts[0];
+				$index = (int) \explode(']', $nameIndexParts[1])[0];
+				// and use those to construct the reference into the next XML level
+				$answeredValue = $answeredValue->{$name}[$index];
+			} else {
+				if ($element !== "") {
+					$answeredValue = $answeredValue->{$element};
+				}
+			}
+		}
+
+		return (string) $answeredValue;
+	}
+
+	/**
+	 * @When user :username retrieves the capabilities using the capabilities API
+	 *
+	 * @param string $username
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userRetrievesCapabilities(string $username): void {
+		$user = $this->featureContext->getActualUsername($username);
+		$this->featureContext->setResponse($this->userGetsCapabilities($user, true));
+	}
+
+	/**
+	 * @When the administrator retrieves the capabilities using the capabilities API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsCapabilities(): void {
+		$user = $this->getAdminUsernameForCapabilitiesCheck();
+		$this->featureContext->setResponse($this->userGetsCapabilities($user, true));
+	}
 
 	/**
 	 * @Then the major-minor-micro version data in the response should match the version string
@@ -77,48 +199,129 @@ class CapabilitiesContext implements Context {
 	}
 
 	/**
-	 * @Then the :pathToElement capability of files sharing app should be :value
+	 * @Then the status.php response should include
 	 *
-	 * @param string $pathToElement
-	 * @param string $value
+	 * @param PyStringNode $jsonExpected
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theCapabilityOfFilesSharingAppShouldBe(
-		string $pathToElement,
-		string $value
-	):void {
-		$this->featureContext->appConfigurationContext->userGetsCapabilitiesCheckResponse(
-			$this->featureContext->getCurrentUser()
-		);
-		$capabilitiesXML = $this->featureContext->appConfigurationContext->getCapabilitiesXml(__METHOD__);
-		$actualValue = $this->featureContext->appConfigurationContext->getParameterValueFromXml(
-			$capabilitiesXML,
-			"files_sharing",
-			$pathToElement
-		);
-		Assert::assertEquals(
-			$value === "EMPTY" ? '' : $value,
-			$actualValue,
-			"Expected $pathToElement capability of files sharing app to be $value, but got $actualValue"
-		);
-	}
+	public function statusPhpRespondedShouldMatch(PyStringNode $jsonExpected): void {
+		$jsonExpectedDecoded = \json_decode($jsonExpected->getRaw(), true);
+		$jsonRespondedDecoded = $this->featureContext->getJsonDecodedResponse();
 
-	/**
-	 * This will run before EVERY scenario.
-	 * It will set the properties for this object.
-	 *
-	 * @BeforeScenario
-	 *
-	 * @param BeforeScenarioScope $scope
-	 *
-	 * @return void
-	 */
-	public function before(BeforeScenarioScope $scope):void {
-		// Get the environment
-		$environment = $scope->getEnvironment();
-		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
+		$response = $this->userGetsCapabilities($this->getAdminUsernameForCapabilitiesCheck());
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$responseXml = $this->featureContext->getResponseXml($response)->data->capabilities;
+		$edition = $this->getParameterValueFromXml(
+			$responseXml,
+			'core',
+			'status@@@edition'
+		);
+
+		if (!\strlen($edition)) {
+			Assert::fail(
+				"Cannot get edition from core capabilities"
+			);
+		}
+
+		$product = $this->getParameterValueFromXml(
+			$responseXml,
+			'core',
+			'status@@@product'
+		);
+		if (!\strlen($product)) {
+			Assert::fail(
+				"Cannot get product from core capabilities"
+			);
+		}
+
+		$productName = $this->getParameterValueFromXml(
+			$responseXml,
+			'core',
+			'status@@@productname'
+		);
+
+		if (!\strlen($productName)) {
+			Assert::fail(
+				"Cannot get productname from core capabilities"
+			);
+		}
+
+		$jsonExpectedDecoded['edition'] = $edition;
+		$jsonExpectedDecoded['product'] = $product;
+		$jsonExpectedDecoded['productname'] = $productName;
+
+		// We are on oCIS or reva or some other implementation. We cannot do "occ status".
+		// So get the expected version values by looking in the capabilities response.
+		$version = $this->getParameterValueFromXml(
+			$responseXml,
+			'core',
+			'status@@@version'
+		);
+
+		if (!\strlen($version)) {
+			Assert::fail(
+				"Cannot get version from core capabilities"
+			);
+		}
+
+		$versionString = $this->getParameterValueFromXml(
+			$responseXml,
+			'core',
+			'status@@@versionstring'
+		);
+
+		if (!\strlen($versionString)) {
+			Assert::fail(
+				"Cannot get versionstring from core capabilities"
+			);
+		}
+
+		$jsonExpectedDecoded['version'] = $version;
+		$jsonExpectedDecoded['versionstring'] = $versionString;
+		$errorMessage = "";
+		$errorFound = false;
+		foreach ($jsonExpectedDecoded as $key => $expectedValue) {
+			if (\array_key_exists($key, $jsonRespondedDecoded)) {
+				$actualValue = $jsonRespondedDecoded[$key];
+				if ($actualValue !== $expectedValue) {
+					$errorMessage .= "$key expected value was $expectedValue but actual value was $actualValue\n";
+					$errorFound = true;
+				}
+			} else {
+				$errorMessage .= "$key was not found in the status response\n";
+				$errorFound = true;
+			}
+		}
+		Assert::assertFalse($errorFound, $errorMessage);
+		// We have checked that the status.php response has data that matches up with
+		// data found in the capabilities response and/or the "occ status" command output.
+		// But the output might be reported wrongly in all of these in the same way.
+		// So check that the values also seem "reasonable".
+		$version = $jsonExpectedDecoded['version'];
+		$versionString = $jsonExpectedDecoded['versionstring'];
+		Assert::assertMatchesRegularExpression(
+			"/^\d+\.\d+\.\d+\.\d+$/",
+			$version,
+			"version should be in a form like 10.9.8.1 but is $version"
+		);
+		if (\preg_match("/^(\d+\.\d+\.\d+)\.\d+(-[0-9A-Za-z-]+)?(\+[0-9A-Za-z-]+)?$/", $version, $matches)) {
+			// We should have matched something like 10.9.8 - the first 3 numbers in the version.
+			// Ignore pre-releases and meta information
+			Assert::assertArrayHasKey(
+				1,
+				$matches,
+				"version $version could not match the pattern Major.Minor.Patch"
+			);
+			$majorMinorPatchVersion = $matches[1];
+		} else {
+			Assert::fail("version '$version' does not start in a form like 10.9.8");
+		}
+		Assert::assertStringStartsWith(
+			$majorMinorPatchVersion,
+			$versionString,
+			"versionstring should start with $majorMinorPatchVersion but is $versionString"
+		);
 	}
 }
