@@ -18,7 +18,6 @@ default:
             adminPassword: admin
             regularUserPassword: 123456
             ocPath: apps/testing/api/v1/occ
-        - AppConfigurationContext:
         - ChecksumContext:
         - FilesVersionsContext:
         - TrashbinContext:
@@ -57,7 +56,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
-        - AppConfigurationContext:
 
     coreApiFavorites:
       paths:
@@ -67,7 +65,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - FavoritesContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiShareCreateSpecialToShares1:
       paths:
@@ -77,7 +74,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiShareCreateSpecialToShares2:
       paths:
@@ -87,7 +83,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiSharees:
       paths:
@@ -96,7 +91,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - ShareesContext:
-        - AppConfigurationContext:
 
     coreApiShareManagementToShares:
       paths:
@@ -107,7 +101,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
         - FilesVersionsContext:
 
     coreApiShareManagementBasicToShares:
@@ -150,7 +143,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiSharePublicLink2:
       paths:
@@ -161,7 +153,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiSharePublicLink3:
       paths:
@@ -172,7 +163,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiShareReshareToShares1:
       paths:
@@ -193,7 +183,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiShareReshareToShares3:
       paths:
@@ -204,7 +193,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiShareUpdateToShares:
       paths:
@@ -215,7 +203,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiTrashbin:
       paths:
@@ -224,7 +211,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
-        - AppConfigurationContext:
         - WebDavPropertiesContext:
 
     coreApiTrashbinRestore:
@@ -234,7 +220,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
-        - AppConfigurationContext:
         - WebDavPropertiesContext:
 
     coreApiVersions:
@@ -246,7 +231,6 @@ default:
         - ChecksumContext:
         - FilesVersionsContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
         - TrashbinContext:
 
     coreApiWebdavDelete:
@@ -332,7 +316,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiWebdavProperties2:
       paths:
@@ -341,7 +324,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiWebdavUpload1:
       paths:
@@ -381,7 +363,6 @@ default:
         - PublicWebDavContext:
         - FilesVersionsContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
     coreApiWebdavEtagPropagation2:
       paths:
@@ -393,7 +374,6 @@ default:
         - PublicWebDavContext:
         - FilesVersionsContext:
         - WebDavPropertiesContext:
-        - AppConfigurationContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
