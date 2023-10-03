@@ -249,10 +249,10 @@ trait Sharing {
 	 *       |                    |    6 = federated (cloud share).                     |
 	 *       |                    |    Pass either the number or the keyword.           |
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function createShareWithSettings(string $user, ?TableNode $body):void {
+	public function createShareWithSettings(string $user, ?TableNode $body): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeRows(
 			$body,
@@ -290,7 +290,7 @@ trait Sharing {
 		$needToParse = \array_key_exists('expireDate', $bodyRows);
 		$expireDate = $bodyRows['expireDate'] ?? $bodyRows['expireDateAsString'] ?? null;
 		$bodyRows['expireDate'] = $needToParse ? \date('Y-m-d', \strtotime($expireDate)) : $expireDate;
-		$this->createShare(
+		return $this->createShare(
 			$user,
 			$bodyRows['path'],
 			$bodyRows['shareType'],
@@ -314,10 +314,11 @@ trait Sharing {
 	 */
 	public function userCreatesAShareWithSettings(string $user, ?TableNode $body):void {
 		$user = $this->getActualUsername($user);
-		$this->createShareWithSettings(
+		$response = $this->createShareWithSettings(
 			$user,
 			$body
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -331,14 +332,12 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userHasCreatedAShareWithSettings(string $user, ?TableNode $body) {
-		$this->createShareWithSettings(
+		$response = $this->createShareWithSettings(
 			$user,
 			$body
 		);
-		$this->theHTTPStatusCodeShouldBe(
-			200,
-			"Failed HTTP status code for last share for user $user" . ", Reason: " . $this->getResponse()->getReasonPhrase()
-		);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -350,7 +349,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function theUserCreatesAShareWithSettings(?TableNode $body):void {
-		$this->createShareWithSettings($this->currentUser, $body);
+		$response = $this->createShareWithSettings($this->currentUser, $body);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -367,7 +367,8 @@ trait Sharing {
 		// A public link share is shareType 3
 		$rows[] = ['shareType', 'public_link'];
 		$newBody = new TableNode($rows);
-		$this->createShareWithSettings($user, $newBody);
+		$response = $this->createShareWithSettings($user, $newBody);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -408,9 +409,9 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function theUserHasCreatedAShareWithSettings(?TableNode $body):void {
-		$this->createShareWithSettings($this->currentUser, $body);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200");
-		$this->theHTTPStatusCodeShouldBe(200);
+		$response = $this->createShareWithSettings($this->currentUser, $body);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -436,7 +437,7 @@ trait Sharing {
 	 * @param string|null $linkName
 	 * @param string|null $expireDate
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function createAPublicShare(
 		string $user,
@@ -446,9 +447,8 @@ trait Sharing {
 		$permissions = null,
 		?string $linkName = null,
 		?string $expireDate = null
-	):void {
-		$user = $this->getActualUsername($user);
-		$this->createShare(
+	): ResponseInterface {
+		return $this->createShare(
 			$user,
 			$path,
 			'public_link',
@@ -470,7 +470,8 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userCreatesAPublicLinkShareOf(string $user, string $path):void {
-		$this->createAPublicShare($user, $path);
+		$response = $this->createAPublicShare($user, $path);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -482,55 +483,9 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userHasCreatedAPublicLinkShareOf(string $user, string $path):void {
-		$this->createAPublicShare($user, $path);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function createPublicLinkShareOfResourceAsCurrentUser(string $path):void {
-		$this->createAPublicShare($this->currentUser, $path);
-	}
-
-	/**
-	 * @When /^the user creates a public link share of (?:file|folder) "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfIsCreated(string $path):void {
-		$this->createPublicLinkShareOfResourceAsCurrentUser($path);
-	}
-
-	/**
-	 * @Given /^the user has created a public link share of (?:file|folder) "([^"]*)"$/
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfHasCreated(string $path):void {
-		$this->createPublicLinkShareOfResourceAsCurrentUser($path);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function createPublicLinkShareOfResourceWithPermission(
-		string $user,
-		string $path,
-		$permissions
-	):void {
-		$this->createAPublicShare($user, $path, true, null, $permissions);
+		$response = $this->createAPublicShare($user, $path);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -547,11 +502,8 @@ trait Sharing {
 		string $path,
 		$permissions
 	):void {
-		$this->createPublicLinkShareOfResourceWithPermission(
-			$user,
-			$path,
-			$permissions
-		);
+		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -568,53 +520,9 @@ trait Sharing {
 		string $path,
 		$permissions
 	):void {
-		$this->createPublicLinkShareOfResourceWithPermission(
-			$user,
-			$path,
-			$permissions
-		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function createPublicLinkShareWithPermissionByCurrentUser(string $path, $permissions):void {
-		$this->createAPublicShare(
-			$this->currentUser,
-			$path,
-			true,
-			null,
-			$permissions
-		);
-	}
-
-	/**
-	 * @When /^the user creates a public link share of (?:file|folder) "([^"]*)" using the sharing API with (read|update|create|delete|change|uploadwriteonly|share|all) permission(?:s|)$/
-	 *
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfIsCreatedWithPermission(string $path, $permissions):void {
-		$this->createPublicLinkShareWithPermissionByCurrentUser($path, $permissions);
-	}
-
-	/**
-	 * @Given /^the user has created a public link share of (?:file|folder) "([^"]*)" with (read|update|create|delete|change|uploadwriteonly|share|all) permission(?:s|)$/
-	 *
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfHasCreatedWithPermission(string $path, $permissions):void {
-		$this->createPublicLinkShareWithPermissionByCurrentUser($path, $permissions);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -705,43 +613,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^the user creates a public link share of (?:file|folder) "([^"]*)" using the sharing API with expiry "([^"]*)$"/
-	 *
-	 * @param string $path
-	 * @param string $expiryDate in a valid date format, e.g. "+30 days"
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfIsCreatedWithExpiry(
-		string $path,
-		string $expiryDate
-	):void {
-		$this->createPublicLinkShareOfResourceWithExpiryByCurrentUser(
-			$path,
-			$expiryDate
-		);
-	}
-
-	/**
-	 * @Given /^the user has created a public link share of (?:file|folder) "([^"]*)" with expiry "([^"]*)$/
-	 *
-	 * @param string $path
-	 * @param string $expiryDate in a valid date format, e.g. "+30 days"
-	 *
-	 * @return void
-	 */
-	public function aPublicLinkShareOfHasCreatedWithExpiry(
-		string $path,
-		string $expiryDate
-	):void {
-		$this->createPublicLinkShareOfResourceWithExpiryByCurrentUser(
-			$path,
-			$expiryDate
-		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
 	 * @Then /^user "([^"]*)" should not be able to create a public link share of (file|folder) "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $sharer
@@ -752,11 +623,6 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $entry, string $filepath):void {
-		$this->asFileOrFolderShouldExist(
-			$this->getActualUsername($sharer),
-			$entry,
-			$filepath
-		);
 		$this->createAPublicShare($sharer, $filepath);
 		Assert::assertEquals(
 			404,
@@ -969,7 +835,7 @@ trait Sharing {
 	 * @param string|null $expireDate
 	 * @param string $sharingApp
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws JsonException
 	 * @throws Exception
 	 */
@@ -984,13 +850,13 @@ trait Sharing {
 		?string $linkName = null,
 		?string $expireDate = null,
 		string $sharingApp = 'files_sharing'
-	):void {
+	): ResponseInterface {
 		$userActual = $this->getActualUsername($user);
 		if (\is_string($permissions) && !\is_numeric($permissions)) {
 			$permissions = $this->splitPermissionsString($permissions);
 		}
 		$this->waitToCreateShare();
-		$this->response = SharingHelper::createShare(
+		$response = SharingHelper::createShare(
 			$this->getBaseUrl(),
 			$userActual,
 			$this->getPasswordForUser($user),
@@ -1007,33 +873,22 @@ trait Sharing {
 			$this->sharingApiVersion,
 			$sharingApp
 		);
-		$httpStatusCode = $this->response->getStatusCode();
-		// In case of HTTP status code 204 "no content", or a failure code like 4xx
-		// in the HTTP or OCS status there is no useful content in response payload body.
-		// Clear the test-runner's memory of "last share data" to avoid later steps
-		// accidentally using some previous share data.
-		if (($httpStatusCode === 204)
-			|| !$this->theHTTPStatusCodeWasSuccess()
-			|| (($httpStatusCode === 200) && ($this->ocsContext->getOCSResponseStatusCode($this->response) > 299))
-		) {
-			if ($shareType === 'public_link') {
-				$this->emptyCreatedPublicShares();
-			} else {
-				$this->emptyCreatedUserGroupShares();
-			}
-		} else {
-			$response = $this->getResponseXml(null, __METHOD__);
-			if (isset($response->data)) {
-				$shareData = $response->data;
+
+		// save the created share data
+		if ($response->getStatusCode() === 200) {
+			$xmlResponse = $this->getResponseXml($response);
+			if (isset($xmlResponse->data)) {
+				$shareData = $xmlResponse->data;
 				if ($shareType === 'public_link') {
 					$this->addToCreatedPublicShares($shareData);
 				} else {
-					$sharer = (string) $response->data->uid_owner;
+					$sharer = (string) $xmlResponse->data->uid_owner;
 					$this->addToCreatedUserGroupshares($sharer, $shareData);
 				}
 			}
 		}
 		$this->localLastShareTime = \microtime(true);
+		return $response;
 	}
 
 	/**
@@ -1310,89 +1165,54 @@ trait Sharing {
 
 	/**
 	 *
-	 * @param string $user1
+	 * @param string $sharer
 	 * @param string $filepath
-	 * @param string $user2
+	 * @param string $sharee
 	 * @param string|int|string[]|int[] $permissions
-	 * @param bool|null $getShareData If true then only create the share if it is not
-	 *                                already existing, and at the end request the
-	 *                                share information and leave that in $this->response
-	 *                                Typically used in a "Given" step which verifies
-	 *                                that the share did get created successfully.
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function shareFileWithUserUsingTheSharingApi(
-		string $user1,
+	public function createAUserShare(
+		string $sharer,
 		string $filepath,
-		string $user2,
-		$permissions = null,
-		?bool $getShareData = false
-	):void {
-		$user1Actual = $this->getActualUsername($user1);
-		$user2Actual = $this->getActualUsername($user2);
-
-		$path = $this->getSharesEndpointPath("?path=" . \urlencode($filepath));
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user1Actual,
-			$this->getPasswordForUser($user1),
-			"GET",
-			$path,
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
+		string $sharee,
+		$permissions = null
+	): ResponseInterface {
+		return $this->createShare(
+			$sharer,
+			$filepath,
+			'0',
+			$this->getActualUsername($sharee),
+			null,
+			null,
+			$permissions
 		);
-		if ($getShareData && $this->isUserOrGroupInSharedData($user2Actual, "user", $permissions)) {
-			return;
-		} else {
-			$this->createShare(
-				$user1,
-				$filepath,
-				'0',
-				$user2Actual,
-				null,
-				null,
-				$permissions
-			);
-		}
-		if ($getShareData) {
-			$this->response = OcsApiHelper::sendRequest(
-				$this->getBaseUrl(),
-				$user1Actual,
-				$this->getPasswordForUser($user1),
-				"GET",
-				$path,
-				$this->getStepLineRef(),
-				[],
-				$this->ocsApiVersion
-			);
-		}
 	}
 
 	/**
 	 * @When /^user "([^"]*)" shares (?:file|folder|entry) "([^"]*)" with user "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
 	 * @When /^user "([^"]*)" shares (?:file|folder|entry) "([^"]*)" with user "([^"]*)" with permissions "([^"]*)" using the sharing API$/
 	 *
-	 * @param string $user1
+	 * @param string $sharer
 	 * @param string $filepath
-	 * @param string $user2
+	 * @param string $sharee
 	 * @param string|int|string[]|int[] $permissions
 	 *
 	 * @return void
 	 */
 	public function userSharesFileWithUserUsingTheSharingApi(
-		string $user1,
+		string $sharer,
 		string $filepath,
-		string $user2,
+		string $sharee,
 		$permissions = null
 	):void {
-		$this->shareFileWithUserUsingTheSharingApi(
-			$user1,
+		$response = $this->createAUserShare(
+			$sharer,
 			$filepath,
-			$user2,
+			$this->getActualUsername($sharee),
 			$permissions
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1431,37 +1251,28 @@ trait Sharing {
 	 * @Given /^user "([^"]*)" has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)"(?: with permissions (\d+))?$/
 	 * @Given /^user "([^"]*)" has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)" with permissions "([^"]*)"$/
 	 *
-	 * @param string $user1
+	 * @param string $sharer
 	 * @param string $filepath
-	 * @param string $user2
+	 * @param string $sharee
 	 * @param string|int|string[]|int[] $permissions
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function userHasSharedFileWithUserUsingTheSharingApi(
-		string $user1,
+		string $sharer,
 		string $filepath,
-		string $user2,
+		string $sharee,
 		$permissions = null
 	):void {
-		$user1 = $this->getActualUsername($user1);
-		$user2 = $this->getActualUsername($user2);
-		$this->shareFileWithUserUsingTheSharingApi(
-			$user1,
+		$response = $this->createAUserShare(
+			$sharer,
 			$filepath,
-			$user2,
-			$permissions,
-			true
+			$this->getActualUsername($sharee),
+			$permissions
 		);
-		$this->ocsContext->assertOCSResponseIndicatesSuccess(
-			'The ocs share response does not indicate success.',
-		);
-		// this is expected to fail if a file is shared with create and delete permissions, which is not possible
-		Assert::assertTrue(
-			$this->isUserOrGroupInSharedData($user2, "user", $permissions),
-			__METHOD__ . " User $user1 failed to share $filepath with user $user2"
-		);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -1588,58 +1399,24 @@ trait Sharing {
 	 * @param string $filepath
 	 * @param string $group
 	 * @param string|int|string[]|int[] $permissions
-	 * @param bool $getShareData If true then only create the share if it is not
-	 *                           already existing, and at the end request the
-	 *                           share information and leave that in $this->response
-	 *                           Typically used in a "Given" step which verifies
-	 *                           that the share did get created successfully.
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function shareFileWithGroupUsingTheSharingApi(
+	public function createAGroupShare(
 		string $user,
 		string $filepath,
 		string$group,
-		$permissions = null,
-		bool $getShareData = false
-	):void {
-		$userActual = $this->getActualUsername($user);
-		$path = $this->getSharesEndpointPath("?path=$filepath");
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$userActual,
-			$this->getPasswordForUser($user),
-			"GET",
-			$path,
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
+		$permissions = null
+	): ResponseInterface {
+		return $this->createShare(
+			$user,
+			$filepath,
+			'1',
+			$group,
+			null,
+			null,
+			$permissions
 		);
-		if ($getShareData && $this->isUserOrGroupInSharedData($group, "group", $permissions)) {
-			return;
-		} else {
-			$this->createShare(
-				$user,
-				$filepath,
-				'1',
-				$group,
-				null,
-				null,
-				$permissions
-			);
-		}
-		if ($getShareData) {
-			$this->response = OcsApiHelper::sendRequest(
-				$this->getBaseUrl(),
-				$userActual,
-				$this->getPasswordForUser($user),
-				"GET",
-				$path,
-				$this->getStepLineRef(),
-				[],
-				$this->ocsApiVersion
-			);
-		}
 	}
 
 	/**
@@ -1659,12 +1436,13 @@ trait Sharing {
 		string $group,
 		$permissions = null
 	) {
-		$this->shareFileWithGroupUsingTheSharingApi(
+		$response = $this->createAGroupShare(
 			$user,
 			$filepath,
 			$group,
 			$permissions
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1716,19 +1494,14 @@ trait Sharing {
 		string $group,
 		$permissions = null
 	) {
-		$this->shareFileWithGroupUsingTheSharingApi(
+		$response = $this->createAGroupShare(
 			$user,
 			$filepath,
 			$group,
-			$permissions,
-			true
+			$permissions
 		);
-
-		Assert::assertTrue(
-			$this->isUserOrGroupInSharedData($group, "group", $permissions),
-			__METHOD__
-			. " Could not assert that user '$user' has shared '$filepath' with group '$group' with permissions '$permissions'"
-		);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -1780,12 +1553,7 @@ trait Sharing {
 		$permissions = null
 	):void {
 		$sharee = $this->getActualUsername($sharee);
-		$this->asFileOrFolderShouldExist(
-			$this->getActualUsername($sharer),
-			$entry,
-			$filepath
-		);
-		$this->createShare(
+		$response = $this->createShare(
 			$sharer,
 			$filepath,
 			$userOrGroupShareType,
@@ -1794,7 +1562,7 @@ trait Sharing {
 			null,
 			$permissions
 		);
-		$statusCode = $this->ocsContext->getOCSResponseStatusCode($this->response);
+		$statusCode = $this->ocsContext->getOCSResponseStatusCode($response);
 		Assert::assertTrue(
 			($statusCode == 404) || ($statusCode == 403),
 			"Sharing should have failed with status code 403 or 404 but got status code $statusCode"
@@ -1824,8 +1592,7 @@ trait Sharing {
 		$permissions = null
 	):void {
 		$sharee = $this->getActualUsername($sharee);
-		$this->asFileOrFolderShouldExist($sharer, $entry, $filepath);
-		$this->createShare(
+		$response = $this->createShare(
 			$sharer,
 			$filepath,
 			$userOrGroupShareType,
@@ -1835,9 +1602,11 @@ trait Sharing {
 			$permissions
 		);
 
-		//v1.php returns 100 as success code
-		//v2.php returns 200 in the same case
-		$this->ocsContext->theOCSStatusCodeShouldBe("100, 200");
+		$statusCode = $this->ocsContext->getOCSResponseStatusCode($response);
+		Assert::assertTrue(
+			($statusCode == 100) || ($statusCode == 200),
+			"Sharing should be successful but got ocs status code $statusCode"
+		);
 	}
 
 	/**
@@ -2995,7 +2764,6 @@ trait Sharing {
 	 */
 	public function checkPublicSharesAreEmpty(string $user, string $entry, string $path):void {
 		$user = $this->getActualUsername($user);
-		$this->asFileOrFolderShouldExist($user, $entry, $path);
 		$response = $this->getShares($user, $path);
 		//It shouldn't have public shares
 		Assert::assertEquals(
