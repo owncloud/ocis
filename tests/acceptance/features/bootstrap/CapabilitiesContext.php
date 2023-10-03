@@ -24,6 +24,8 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
+use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use TestHelpers\OcsApiHelper;
 
@@ -206,11 +208,11 @@ class CapabilitiesContext implements Context {
 	 */
 	public function statusPhpRespondedShouldMatch(PyStringNode $jsonExpected): void {
 		$jsonExpectedDecoded = \json_decode($jsonExpected->getRaw(), true);
-		$jsonRespondedDecoded = $this->getJsonDecodedResponse();
+		$jsonRespondedDecoded = $this->featureContext->getJsonDecodedResponse();
 
 		$response = $this->userGetsCapabilities($this->getAdminUsernameForCapabilitiesCheck());
-		$this->theHTTPStatusCodeShouldBe(200, '', $response);
-		$responseXml = $this->getResponseXml($response)->data->capabilities;
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$responseXml = $this->featureContext->getResponseXml($response)->data->capabilities;
 		$edition = $this->getParameterValueFromXml(
 			$responseXml,
 			'core',
