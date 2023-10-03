@@ -21,6 +21,7 @@ default:
         - ChecksumContext:
         - FilesVersionsContext:
         - TrashbinContext:
+        - CapabilitiesContext:
 
     coreApiAuth:
       paths:
