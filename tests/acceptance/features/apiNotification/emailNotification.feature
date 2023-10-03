@@ -30,8 +30,9 @@ Feature: Email notification
 
   Scenario: user gets an email notification when someone shares a file
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    When user "Alice" has shared file "lorem.txt" with user "Brian" with permissions "17"
+    When user "Alice" shares file "lorem.txt" with user "Brian" with permissions "17" using the sharing API
     Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"
       """
       Hello Brian Murphy
@@ -80,8 +81,9 @@ Feature: Email notification
     And user "Brian" has switched the system language to "es"
     And user "Carol" has switched the system language to "de"
     And user "Alice" has created folder "/HelloWorld"
-    When user "Alice" has shared folder "/HelloWorld" with group "group1"
+    When user "Alice" shares folder "HelloWorld" with group "group1" using the sharing API
     Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"
       """
       Hola Brian Murphy
@@ -108,8 +110,9 @@ Feature: Email notification
     And user "Brian" has switched the system language to "es"
     And user "Carol" has switched the system language to "de"
     And user "Alice" has uploaded file with content "hello world" to "text.txt"
-    When user "Alice" has shared file "text.txt" with group "group1"
+    When user "Alice" shares file "text.txt" with group "group1" using the sharing API
     Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"
       """
       Hola Brian Murphy
