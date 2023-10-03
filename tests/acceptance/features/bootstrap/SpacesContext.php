@@ -667,7 +667,7 @@ class SpacesContext implements Context {
 				$foldersPath,
 				[],
 				$this->featureContext->getStepLineRef(),
-				'infinity',
+				null,
 				'files',
 				WebDavHelper::DAV_VERSION_SPACES
 			)

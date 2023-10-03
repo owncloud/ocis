@@ -1983,7 +1983,6 @@ trait WebDav {
 			$responseXmlObject = $this->listFolderAndReturnResponseXml(
 				$user,
 				"/",
-				"infinity"
 			);
 			foreach ($elementsSimplified as $expectedElement) {
 				// Allow the table of expected elements to have entries that do
@@ -4872,6 +4871,9 @@ trait WebDav {
 		?string $method = 'REPORT',
 		?string $folderpath = ''
 	):void {
+		if ($folderpath === "/") {
+			$folderpath = "";
+		}
 		$this->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
 		$should = ($shouldOrNot !== "not");

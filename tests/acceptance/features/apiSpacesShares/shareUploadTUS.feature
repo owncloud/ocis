@@ -64,7 +64,7 @@ Feature: upload resources on share using TUS protocol
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/nonExistentFolder/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should not contain these entries:
-      | nonExistentFolder/file.txt |
+      | nonExistentFolder |
 
 
   Scenario: attempt to upload a file into a nonexistent folder within correctly received read only share
@@ -74,7 +74,7 @@ Feature: upload resources on share using TUS protocol
     And user "Brian" has accepted share "/toShare" offered by user "Alice"
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/nonExistentFolder/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should not contain these entries:
-      | nonExistentFolder/file.txt |
+      | nonExistentFolder |
 
 
   Scenario: uploading a file to a received share folder
