@@ -7,6 +7,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
 #### [copy personal space file to shared folder root result share in decline state](https://github.com/owncloud/ocis/issues/6999)
+
 - [coreApiWebdavProperties1/copyFile.feature:289](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L289)
 - [coreApiWebdavProperties1/copyFile.feature:290](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L290)
 
@@ -593,17 +594,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiFavorites/favorites.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L123)
 - [coreApiFavorites/favorites.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L150)
 - [coreApiFavorites/favorites.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L227)
-
-#### [Cannot disable the dav propfind depth infinity for resources](https://github.com/owncloud/ocis/issues/3720)
-
-- [coreApiWebdavOperations/listFiles.feature:354](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L354)
-- [coreApiWebdavOperations/listFiles.feature:355](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L355)
-- [coreApiWebdavOperations/listFiles.feature:360](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L360)
-- [coreApiWebdavOperations/listFiles.feature:374](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L374)
-- [coreApiWebdavOperations/listFiles.feature:379](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L379)
-- [coreApiWebdavOperations/listFiles.feature:393](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L393)
-- [coreApiWebdavOperations/listFiles.feature:394](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L394)
-- [coreApiWebdavOperations/listFiles.feature:399](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L399)
 
 #### [OCS status code zero](https://github.com/owncloud/ocis/issues/3621)
 

@@ -14,9 +14,10 @@ Feature: copying file using file id
     And we save it into "FILEID"
     When user "Alice" copies a file "/textfile.txt" into "/folder" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/textfile.txt |
-      | textfile.txt        |
+    And for user "Alice" folder "/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -30,9 +31,10 @@ Feature: copying file using file id
     And we save it into "FILEID"
     When user "Alice" copies a file "/textfile.txt" into "/folder/sub-folder" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | folder/sub-folder/textfile.txt |
-      | textfile.txt                   |
+    And for user "Alice" folder "/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "folder/sub-folder" of the space "Personal" should contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -45,9 +47,10 @@ Feature: copying file using file id
     And we save it into "FILEID"
     When user "Alice" copies a file "folder/textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | textfile.txt        |
-      | folder/textfile.txt |
+    And for user "Alice" folder "/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -61,9 +64,10 @@ Feature: copying file using file id
     And we save it into "FILEID"
     When user "Alice" copies a file "folder/sub-folder/textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Personal" should contain these entries:
-      | textfile.txt                   |
-      | folder/sub-folder/textfile.txt |
+    And for user "Alice" folder "/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "folder/sub-folder" of the space "Personal" should contain these files:
+      | textfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |

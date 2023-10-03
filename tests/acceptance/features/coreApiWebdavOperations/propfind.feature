@@ -33,7 +33,6 @@ Feature: PROPFIND
     Examples:
       | dav_path                         | depth    |
       | /remote.php/dav/spaces/%spaceid% | 0        |
-      | /remote.php/dav/spaces/%spaceid% | infinity |
 
 
   Scenario: send PROPFIND request to a public link
