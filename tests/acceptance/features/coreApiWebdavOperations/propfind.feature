@@ -23,7 +23,7 @@ Feature: PROPFIND
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth and with headers
       | header | value   |
       | depth  | <depth> |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "<http-code>"
     Examples:
       | dav-path                    | depth    | http-code | 
       | /remote.php/webdav          | 0        | 207       |
