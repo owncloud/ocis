@@ -171,7 +171,7 @@ Feature: sharing
   @skipOnGraph
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and small skeleton files
+    And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |

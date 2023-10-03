@@ -766,14 +766,23 @@ class GraphContext implements Context {
 	 * @param string $group
 	 * @param string $user
 	 * @param string|null $byUser
+	 * @param bool $createNonExistentGroup
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
+	public function addUserToGroup(string $group, string $user, ?string $byUser = null, bool $createNonExistentGroup = false): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id") ?: WebDavHelper::generateUUIDv4();
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		if ($createNonExistentGroup) {
+			$groupId = WebDavHelper::generateUUIDv4();
+		} else {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		}
+		if ($this->featureContext->userExists($user)) {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		} else {
+			$userId = WebDavHelper::generateUUIDv4();
+		}
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -824,7 +833,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator tries to add user :user to group :group using the Graph API
+	 * @When the administrator tries to add nonexistent user :user to group :group using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -847,7 +856,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException | Exception
 	 */
 	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
-		$this->featureContext->setResponse($this->addUserToGroup('', $user, $byUser));
+		$this->featureContext->setResponse($this->addUserToGroup('', $user, $byUser, true));
 	}
 
 	/**

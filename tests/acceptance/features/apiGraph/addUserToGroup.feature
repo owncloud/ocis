@@ -205,8 +205,8 @@ Feature: add users to group
 
   Scenario: admin tries to add a nonexistent user to a group
     Given group "groupA" has been created
-    When the administrator tries to add user "nonexistentuser" to group "groupA" using the provisioning API
-    Then the HTTP status code should be "405"
+    When the administrator tries to add nonexistent user "nonexistentuser" to group "groupA" using the Graph API
+    Then the HTTP status code should be "404"
 
 
   Scenario: admin tries to add user to a group without sending the group

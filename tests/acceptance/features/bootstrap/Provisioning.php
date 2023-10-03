@@ -2970,22 +2970,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @When the administrator adds the following users to the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorAddsUserToTheFollowingGroupsUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["username", "groupname"], ["comment"]);
-		$rows = $table->getHash();
-		foreach ($rows as $row) {
-			$this->adminAddsUserToGroupUsingTheProvisioningApi($row["username"], $row["groupname"]);
-		}
-	}
-
-	/**
 	 * @When user :user tries to add user :otherUser to group :group using the provisioning API
 	 *
 	 * @param string $user
@@ -3009,39 +2993,6 @@ trait Provisioning {
 			$this->ocsApiVersion
 		);
 		$this->response = $result;
-	}
-
-	/**
-	 * @When user :user tries to add himself to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToAddHimselfToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->userTriesToAddUserToGroupUsingTheProvisioningApi($user, $user, $group);
-	}
-
-	/**
-	 * @When the administrator tries to add user :user to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheProvisioningApi(
-		string $user,
-		string $group
-	):void {
-		$this->userTriesToAddUserToGroupUsingTheProvisioningApi(
-			$this->getAdminUsername(),
-			$user,
-			$group
-		);
 	}
 
 	/**
@@ -3071,19 +3022,6 @@ trait Provisioning {
 		foreach ($table as $row) {
 			$this->userHasBeenAddedToGroup($row['username'], $row['groupname']);
 		}
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been added to database backend group "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenAddedToDatabaseBackendGroup(string $user, string $group):void {
-		$this->addUserToGroup($user, $group, 'api', true);
 	}
 
 	/**
