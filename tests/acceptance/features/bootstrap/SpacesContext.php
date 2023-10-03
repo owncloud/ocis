@@ -1156,7 +1156,8 @@ class SpacesContext implements Context {
 			$ownerUser = $user;
 		}
 		$this->setSpaceIDByName($ownerUser, $spaceName);
-		$this->featureContext->userCreatesFolder($user, $folder);
+		$response = $this->featureContext->createFolder($user, $folder);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

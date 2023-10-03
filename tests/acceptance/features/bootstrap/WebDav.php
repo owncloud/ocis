@@ -447,6 +447,34 @@ trait WebDav {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 * @param bool|null $isGivenStep
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException | GuzzleException
+	 * @throws GuzzleException | JsonException
+	 */
+	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false): ResponseInterface {
+		$folder = '/' . \ltrim($folder, '/');
+		return $this->makeDavRequest(
+			$user,
+			"MKCOL",
+			$folder,
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			[],
+			null,
+			$isGivenStep
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string|null $path
 	 * @param string|null $doDavRequestAsUser
@@ -3628,32 +3656,14 @@ trait WebDav {
 	 *
 	 * @param string $user
 	 * @param string $destination
-	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 * @throws JsonException | GuzzleException
 	 * @throws GuzzleException | JsonException
 	 */
-	public function userCreatesFolder(string $user, string $destination, ?bool $isGivenStep = false):void {
-		$user = $this->getActualUsername($user);
-		$destination = '/' . \ltrim($destination, '/');
-		$this->response = $this->makeDavRequest(
-			$user,
-			"MKCOL",
-			$destination,
-			[],
-			null,
-			"files",
-			null,
-			false,
-			null,
-			[],
-			null,
-			$isGivenStep
-		);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($this->response)
-		);
+	public function userCreatesFolder(string $user, string $destination):void {
+		$response = $this->createFolder($user, $destination);
+		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
 
@@ -3668,13 +3678,12 @@ trait WebDav {
 	 * @throws GuzzleException
 	 */
 	public function userHasCreatedFolder(string $user, string $destination):void {
-		$user = $this->getActualUsername($user);
-		$this->userCreatesFolder($user, $destination, true);
+		$response = $this->createFolder($user, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'",
+			$response
 		);
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -3693,13 +3702,13 @@ trait WebDav {
 			$admin,
 			__METHOD__ . "The provided user is not admin but '" . $admin . "'"
 		);
-		$this->userCreatesFolder($admin, $destination, true);
+		$response = $this->createFolder($user, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for admin '$admin'"
+			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for admin '$admin'",
+			$response
 		);
 		$this->adminResources[] = $destination;
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -3718,32 +3727,6 @@ trait WebDav {
 		foreach ($paths as $path) {
 			$this->userHasCreatedFolder($user, $path["path"]);
 		}
-	}
-
-	/**
-	 * @When the user creates folder :destination using the WebDAV API
-	 *
-	 * @param string $destination
-	 *
-	 * @return void
-	 */
-	public function theUserCreatesFolder(string $destination):void {
-		$this->userCreatesFolder($this->getCurrentUser(), $destination);
-	}
-
-	/**
-	 * @Given the user has created folder :destination
-	 *
-	 * @param string $destination
-	 *
-	 * @return void
-	 */
-	public function theUserHasCreatedFolder(string $destination):void {
-		$this->theUserCreatesFolder($destination);
-		$this->theHTTPStatusCodeShouldBe(
-			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to create folder '$destination'"
-		);
 	}
 
 	/**
@@ -3775,12 +3758,11 @@ trait WebDav {
 	 */
 	public function userShouldNotBeAbleToCreateFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$this->userCreatesFolder($user, $destination);
-		$this->theHTTPStatusCodeShouldBeFailure();
-		$this->asFileOrFolderShouldNotExist(
-			$user,
-			"folder",
-			$destination
+		$response = $this->createFolder($user, $destination);
+		Assert::assertNotEquals(
+			201,
+			$response->getStatusCode(),
+			"User '$user' should not be able to create folder '$destination' but was successful"
 		);
 	}
 
