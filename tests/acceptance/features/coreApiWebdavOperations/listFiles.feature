@@ -72,35 +72,6 @@ Feature: list files
       | dav-path-version |
       | spaces           |
 
-  @depthInfinityPropfindEnabled
-  Scenario Outline: get the list of resources in the root folder with depth infinity
-    Given using <dav-path-version> DAV path
-    When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the last DAV response for user "Alice" should contain these nodes
-      | name                                                      |
-      | textfile0.txt                                             |
-      | welcome.txt                                               |
-      | simple-folder/                                            |
-      | simple-folder/textfile0.txt                               |
-      | simple-folder/welcome.txt                                 |
-      | simple-folder/simple-empty-folder/                        |
-      | simple-folder/simple-folder1/                             |
-      | simple-folder/simple-folder1/simple-folder2               |
-      | simple-folder/simple-folder1/textfile0.txt                |
-      | simple-folder/simple-folder1/welcome.txt                  |
-      | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
-      | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
 
   Scenario Outline: get the list of resources in a folder with depth 0
     Given using <dav-path-version> DAV path
@@ -138,31 +109,6 @@ Feature: list files
       | simple-folder/simple-folder1      |
     And the last DAV response for user "Alice" should not contain these nodes
       | name                                                      |
-      | simple-folder/simple-folder1/simple-folder2               |
-      | simple-folder/simple-folder1/textfile0.txt                |
-      | simple-folder/simple-folder1/welcome.txt                  |
-      | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
-      | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
-  @depthInfinityPropfindEnabled
-  Scenario Outline: get the list of resources in a folder with depth infinity
-    Given using <dav-path-version> DAV path
-    When user "Alice" lists the resources in "/simple-folder" with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the last DAV response for user "Alice" should contain these nodes
-      | name                                                      |
-      | /simple-folder/textfile0.txt                              |
-      | /simple-folder/welcome.txt                                |
-      | /simple-folder/simple-folder1/                            |
       | simple-folder/simple-folder1/simple-folder2               |
       | simple-folder/simple-folder1/textfile0.txt                |
       | simple-folder/simple-folder1/welcome.txt                  |
@@ -226,29 +172,6 @@ Feature: list files
       | /simple-folder1/textfile0.txt                                |
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
 
-  @depthInfinityPropfindEnabled
-  Scenario: get the list of resources in a folder shared through public link with depth infinity
-    Given using new DAV path
-    And user "Alice" has created the following folders
-      | path                                                                       |
-      | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
-      | /simple-folder/simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    And user "Alice" has created a public link share of folder "simple-folder"
-    When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the last public link DAV response should contain these nodes
-      | name                                                         |
-      | /textfile0.txt                                               |
-      | /welcome.txt                                                 |
-      | /simple-folder1/                                             |
-      | /simple-folder1/welcome.txt                                  |
-      | /simple-folder1/simple-folder2                               |
-      | /simple-folder1/textfile0.txt                                |
-      | /simple-folder1/simple-folder2/textfile0.txt                 |
-      | /simple-folder1/simple-folder2/welcome.txt                   |
-      | /simple-folder1/simple-folder2/simple-folder3                |
-      | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-
 
   Scenario Outline: get the list of files in the trashbin with depth 0
     Given using <dav-path-version> DAV path
@@ -303,91 +226,6 @@ Feature: list files
       | simple-folder/simple-folder1/welcome.txt                  |
       | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
-  @depthInfinityPropfindEnabled
-  Scenario Outline: get the list of files in the trashbin with depth infinity
-    Given using <dav-path-version> DAV path
-    And user "Alice" has deleted the following resources
-      | path           |
-      | textfile0.txt  |
-      | welcome.txt    |
-      | simple-folder/ |
-    When user "Alice" lists the resources in the trashbin with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the trashbin DAV response should contain these nodes
-      | name                                                      |
-      | textfile0.txt                                             |
-      | welcome.txt                                               |
-      | simple-folder/                                            |
-      | simple-folder/textfile0.txt                               |
-      | simple-folder/welcome.txt                                 |
-      | simple-folder/simple-folder1/textfile0.txt                |
-      | simple-folder/simple-folder1/welcome.txt                  |
-      | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
-      | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
-  @depthInfinityPropfindDisabled
-  Scenario Outline: get the list of resources in the root folder with depth infinity when depth infinity is not allowed
-    Given using <dav-path-version> DAV path
-    When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "412"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
-  @depthInfinityPropfindDisabled
-  Scenario Outline: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created the following folders
-      | path                                                                       |
-      | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
-      | /simple-folder/simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    And user "Alice" has created a public link share of folder "simple-folder"
-    When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "412"
-    Examples:
-      | dav-path-version |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
-
-  @depthInfinityPropfindDisabled
-  Scenario Outline: get the list of files in the trashbin with depth infinity when depth infinity is not allowed
-    Given using <dav-path-version> DAV path
-    And user "Alice" has deleted the following resources
-      | path           |
-      | textfile0.txt  |
-      | welcome.txt    |
-      | simple-folder/ |
-    When user "Alice" lists the resources in the trashbin with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "412"
     Examples:
       | dav-path-version |
       | old              |

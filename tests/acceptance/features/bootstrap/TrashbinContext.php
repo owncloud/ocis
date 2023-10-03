@@ -143,7 +143,7 @@ class TrashbinContext implements Context {
 	 * @return array response
 	 * @throws Exception
 	 */
-	public function listTopOfTrashbinFolder(?string $user, string $depth = "infinity"):array {
+	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"):array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		$response = WebDavHelper::listFolder(

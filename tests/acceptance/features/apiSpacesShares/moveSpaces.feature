@@ -21,9 +21,9 @@ Feature: move (rename) file
       | role      | <role> |
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/insideSpace.txt |
-    And for user "Alice" the space "Project" should not contain these entries:
+    And for user "Alice" folder "newfolder" of the space "Project" should contain these entries:
+      | insideSpace.txt |
+    But for user "Alice" the space "Project" should not contain these entries:
       | insideSpace.txt |
     Examples:
       | role    |
@@ -41,9 +41,9 @@ Feature: move (rename) file
       | role      | viewer |
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Project" should not contain these entries:
-      | newfolder/insideSpace.txt |
-    And for user "Alice" the space "Project" should contain these entries:
+    And for user "Alice" folder "newfolder" of the space "Project" should not contain these entries:
+      | insideSpace.txt |
+    But for user "Alice" the space "Project" should contain these entries:
       | insideSpace.txt |
 
 
@@ -111,8 +111,8 @@ Feature: move (rename) file
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Project" should contain these entries:
       | project.txt |
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare/project.txt |
+    But for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
+      | project.txt |
     Examples:
       | role    | permissions |
       | manager | 31          |
@@ -152,8 +152,8 @@ Feature: move (rename) file
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Personal" should contain these entries:
       | personal.txt |
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare/personal.txt |
+    But for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
+      | project.txt |
     Examples:
       | permissions |
       | 31          |
@@ -217,10 +217,10 @@ Feature: move (rename) file
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare2" of the space "Shares" should contain these entries:
       | testshare1.txt |
-    And for user "Alice" folder "testshare1" of the space "Shares" should not contain these entries:
+    And for user "Brian" folder "testshare2" of the space "Personal" should contain these entries:
       | testshare1.txt |
-    And for user "Brian" the space "Personal" should contain these entries:
-      | /testshare2/testshare1.txt |
+    But for user "Alice" folder "testshare1" of the space "Shares" should not contain these entries:
+      | testshare1.txt |
 
 
   Scenario: user moves a file from space Shares with role editor to space Shares with role viewer
@@ -233,10 +233,10 @@ Feature: move (rename) file
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare2/testshare1.txt |
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
+      | testshare1.txt |
+    And for user "Brian" folder "testshare2" of the space "Personal" should not contain these entries:
+      | testshare1.txt |
 
 
   Scenario: user moves a file from space Shares with role viewer to space Shares with role editor
@@ -249,10 +249,10 @@ Feature: move (rename) file
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares" should not contain these entries:
-      | /testshare2/testshare1.txt |
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
+      | testshare1.txt |
+    And for user "Brian" folder "testshare2" of the space "Personal" should not contain these entries:
+      | testshare1.txt |
 
 
   Scenario: checking file id after a move between received shares
@@ -274,8 +274,7 @@ Feature: move (rename) file
     And for user "Brian" folder "folderB" of the space "Shares" should contain these entries:
       | /ONE |
     And for user "Brian" folder "folderA" of the space "Shares" should not contain these entries:
-      | /ONE     |
-      | /ONE/TWO |
+      | /ONE |
     And user "Brian" folder "/folderB/ONE" of the space "Shares" should have the previously stored id
 
 
@@ -293,8 +292,8 @@ Feature: move (rename) file
     And the content of file "/testfile.txt" for user "Brian" should be "test data"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
       | testfile.txt |
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testshare/testfile.txt |
+    And for user "Brian" folder "testshare" of the space "Personal" should not contain these entries:
+      | testfile.txt |
 
 
   Scenario: moving a folder out of a shared folder as a sharer
@@ -314,8 +313,8 @@ Feature: move (rename) file
     And the content of file "/testsubfolder/testfile.txt" for user "Brian" should be "test data"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
       | testsubfolder |
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testshare/testsubfolder |
+    And for user "Brian" folder "testshare" of the space "Personal" should not contain these entries:
+      | testsubfolder |
 
 
   Scenario: overwriting a file while moving

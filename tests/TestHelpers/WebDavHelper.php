@@ -191,7 +191,7 @@ class WebDavHelper {
 		?string $path,
 		?array $properties,
 		?string $xRequestId = '',
-		?string $folderDepth = '0',
+		?string $folderDepth = '1',
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $doDavRequestAsUser = null
@@ -199,7 +199,10 @@ class WebDavHelper {
 		$body = self::getBodyForPropfind($properties);
 		$folderDepth = (string) $folderDepth;
 		if ($folderDepth !== '0' && $folderDepth !== '1' && $folderDepth !== 'infinity') {
-			throw new InvalidArgumentException('Invalid depth value ' . $folderDepth);
+			if ($folderDepth !== '') {
+				throw new InvalidArgumentException('Invalid depth value ' . $folderDepth);
+			}
+			$folderDepth = '1'; // oCIS server's default value
 		}
 		$headers['Depth'] = $folderDepth;
 		return self::makeDavRequest(
