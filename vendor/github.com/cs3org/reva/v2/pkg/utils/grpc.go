@@ -27,6 +27,14 @@ var (
 	ManagerRole SpaceRole = func(perms *storageprovider.ResourcePermissions) bool { return perms.DenyGrant }
 )
 
+var _errStatusCodeTmpl = "unexpected status code while %s: %v"
+
+// Package error checkers
+var (
+	IsErrNotFound         = func(err error) bool { return IsStatusCodeError(err, rpc.Code_CODE_NOT_FOUND) }
+	IsErrPermissionDenied = func(err error) bool { return IsStatusCodeError(err, rpc.Code_CODE_PERMISSION_DENIED) }
+)
+
 // GetServiceUserContext returns an authenticated context of the given service user
 func GetServiceUserContext(serviceUserID string, gwc gateway.GatewayAPIClient, serviceUserSecret string) (context.Context, error) {
 	ctx := context.Background()
@@ -38,8 +46,9 @@ func GetServiceUserContext(serviceUserID string, gwc gateway.GatewayAPIClient, s
 	if err != nil {
 		return nil, err
 	}
-	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error authenticating service user: %s", authRes.Status.Message)
+
+	if err := checkStatusCode("authenticating service user", authRes.GetStatus().GetCode()); err != nil {
+		return nil, err
 	}
 
 	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
@@ -51,8 +60,9 @@ func GetUser(userID *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, err
 	if err != nil {
 		return nil, err
 	}
-	if getUserResponse.Status.Code != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error getting user: %s", getUserResponse.Status.Message)
+
+	if err := checkStatusCode("getting user", getUserResponse.GetStatus().GetCode()); err != nil {
+		return nil, err
 	}
 
 	return getUserResponse.GetUser(), nil
@@ -65,12 +75,12 @@ func GetSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient)
 		return nil, err
 	}
 
-	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("error while getting space: (%v) %s", res.GetStatus().GetCode(), res.GetStatus().GetMessage())
+	if err := checkStatusCode("getting space", res.GetStatus().GetCode()); err != nil {
+		return nil, err
 	}
 
 	if len(res.StorageSpaces) == 0 {
-		return nil, fmt.Errorf("error getting storage space %s: no space returned", spaceID)
+		return nil, statusCodeError{"getting space", rpc.Code_CODE_NOT_FOUND}
 	}
 
 	return res.StorageSpaces[0], nil
@@ -83,8 +93,8 @@ func GetGroupMembers(ctx context.Context, groupID string, gwc gateway.GatewayAPI
 		return nil, err
 	}
 
-	if r.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
+	if err := checkStatusCode("getting group", r.GetStatus().GetCode()); err != nil {
+		return nil, err
 	}
 
 	users := make([]string, 0, len(r.GetGroup().GetMembers()))
@@ -147,11 +157,28 @@ func GetResource(ctx context.Context, ref *storageprovider.Reference, gwc gatewa
 		return nil, err
 	}
 
-	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("unexpected status code while getting space: %v", res.GetStatus().GetCode())
+	if err := checkStatusCode("getting resource", res.GetStatus().GetCode()); err != nil {
+		return nil, err
 	}
 
 	return res.GetInfo(), nil
+}
+
+// IsStatusCodeError returns true if `err` was caused because of status code `code`
+func IsStatusCodeError(err error, code rpc.Code) bool {
+	sce, ok := err.(statusCodeError)
+	if !ok {
+		return false
+	}
+
+	return sce.code == code
+}
+
+func checkStatusCode(reason string, code rpc.Code) error {
+	if code == rpc.Code_CODE_OK {
+		return nil
+	}
+	return statusCodeError{reason, code}
 }
 
 func gatherProjectSpaceMembers(ctx context.Context, space *storageprovider.StorageSpace, gwc gateway.GatewayAPIClient, role SpaceRole) ([]string, error) {
@@ -214,4 +241,15 @@ func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesR
 			},
 		},
 	}
+}
+
+// statusCodeError is a helper struct to return errors
+type statusCodeError struct {
+	reason string
+	code   rpc.Code
+}
+
+// Error implements error interface
+func (sce statusCodeError) Error() string {
+	return fmt.Sprintf(_errStatusCodeTmpl, sce.reason, sce.code)
 }

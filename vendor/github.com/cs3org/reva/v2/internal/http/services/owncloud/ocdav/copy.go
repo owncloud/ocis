@@ -608,6 +608,11 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		errors.HandleErrorStatus(log, w, srcStatRes.Status)
 		return nil
 	}
+	if isSpaceRoot(srcStatRes.GetInfo()) {
+		log.Error().Msg("the source is disallowed")
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
 
 	dstStatReq := &provider.StatRequest{Ref: dstRef}
 	dstStatRes, err := client.Stat(ctx, dstStatReq)
@@ -625,6 +630,11 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 
+		if isSpaceRoot(dstStatRes.GetInfo()) {
+			log.Error().Msg("overwriting is not allowed")
+			w.WriteHeader(http.StatusBadRequest)
+			return nil
+		}
 		if !overwrite {
 			log.Warn().Bool("overwrite", overwrite).Msg("dst already exists")
 			w.WriteHeader(http.StatusPreconditionFailed)
@@ -633,7 +643,6 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			errors.HandleWebdavError(log, w, b, err) // 412, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 			return nil
 		}
-
 		// delete existing tree when overwriting a directory or replacing a file with a directory
 		if dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER ||
 			(dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_FILE &&

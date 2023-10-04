@@ -413,3 +413,9 @@ func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[g
 	pp := path.Join(parentPathRes.Path, parent.Path) + "/"
 	return strings.HasPrefix(cp, pp), nil
 }
+
+func isSpaceRoot(info *provider.ResourceInfo) bool {
+	f := info.GetId()
+	s := info.GetSpace().GetRoot()
+	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
+}
