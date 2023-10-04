@@ -609,10 +609,8 @@ trait WebDav {
 			$fileSource,
 			$headers
 		);
-        $actualStatusCode = $response->getStatusCode();
-        $this->theHTTPStatusCodeShouldBe(201, " Failed moving resource '$fileSource' to '$fileDestination'."
-            . " Expected status code was 201 but got '$actualStatusCode' ", $response);
-
+		$actualStatusCode = $response->getStatusCode();
+		$this->theHTTPStatusCodeShouldBe(201, " Failed moving resource '$fileSource' to '$fileDestination'." . " Expected status code was 201 but got '$actualStatusCode' ", $response);
 	}
 
 	/**
@@ -833,30 +831,30 @@ trait WebDav {
 		$this->usingServer($previousServer);
 	}
 
-    /**
-     * @param string $user
-     * @param string $fileSource
-     * @param string $fileDestination
-     *
-     * @return ResponseInterface
-     */
-    public function userCopyFileUsingTheAPI(
-        string $user,
-        string $fileSource,
-        string $fileDestination
-    ):ResponseInterface {
-        $user = $this->getActualUsername($user);
-        $headers['Destination'] = $this->destinationHeaderValue(
-            $user,
-            $fileDestination
-        );
-        return $this->makeDavRequest(
-            $user,
-            "COPY",
-            $fileSource,
-            $headers
-        );
-    }
+	/**
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userCopyFileUsingTheAPI(
+		string $user,
+		string $fileSource,
+		string $fileDestination
+	):ResponseInterface {
+		$user = $this->getActualUsername($user);
+		$headers['Destination'] = $this->destinationHeaderValue(
+			$user,
+			$fileDestination
+		);
+		return $this->makeDavRequest(
+			$user,
+			"COPY",
+			$fileSource,
+			$headers
+		);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" using the WebDAV API$/
@@ -896,11 +894,11 @@ trait WebDav {
 		string $fileSource,
 		string $fileDestination
 	):void {
-        $response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
+		$response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination' for user '$user'",
-            $response
+			$response
 		);
 	}
 
@@ -929,7 +927,7 @@ trait WebDav {
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination'",
-            $response
+			$response
 		);
 	}
 
@@ -950,6 +948,24 @@ trait WebDav {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $range
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userDownloadFileWithRange(string $user, string $fileSource, string $range):ResponseInterface {
+		$user = $this->getActualUsername($user);
+		$headers['Range'] = $range;
+		return $this->makeDavRequest(
+			$user,
+			"GET",
+			$fileSource,
+			$headers
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" downloads file "([^"]*)" with range "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -959,14 +975,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userDownloadsFileWithRange(string $user, string $fileSource, string $range):void {
-		$user = $this->getActualUsername($user);
-		$headers['Range'] = $range;
-		$this->response = $this->makeDavRequest(
-			$user,
-			"GET",
-			$fileSource,
-			$headers
-		);
+		$this->setResponse($this->userDownloadFileWithRange($user, $fileSource, $range));
 	}
 
 	/**
@@ -985,19 +994,19 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
-		$this->downloadFileAsUserUsingPassword($user, $fileName, $password);
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
 		Assert::assertGreaterThanOrEqual(
 			400,
-			$this->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' download must fail'
 		);
 		Assert::assertLessThanOrEqual(
 			499,
-			$this->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' 4xx error expected but got status code "'
-			. $this->getResponse()->getStatusCode() . '"'
+			. $response->getStatusCode() . '"'
 		);
 	}
 
@@ -1016,19 +1025,19 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		$password = $this->getPasswordForUser($user);
-		$this->downloadFileAsUserUsingPassword($user, $fileName, $password);
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
 		Assert::assertGreaterThanOrEqual(
 			400,
-			$this->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' download must fail'
 		);
 		Assert::assertLessThanOrEqual(
 			499,
-			$this->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' 4xx error expected but got status code "'
-			. $this->getResponse()->getStatusCode() . '"'
+			. $response->getStatusCode() . '"'
 		);
 	}
 
@@ -1189,8 +1198,8 @@ trait WebDav {
 	 * @return void
 	 */
 	public function contentOfFileShouldBe(string $fileName, string $content):void {
-		$this->theUserDownloadsTheFileUsingTheAPI($fileName);
-		$this->downloadedContentShouldBe($content);
+		$response = $this->downloadFileAsUserUsingPassword($this->currentUser, $fileName);
+		$this->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**
@@ -1232,14 +1241,14 @@ trait WebDav {
 	 */
 	public function contentOfFileForUserShouldBe(string $fileName, string $user, string $content):void {
 		$user = $this->getActualUsername($user);
-		$this->downloadFileAsUserUsingPassword($user, $fileName);
-		$actualStatus = $this->response->getStatusCode();
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
+		$actualStatus = $response->getStatusCode();
 		if ($actualStatus !== 200) {
 			throw new Exception(
 				"Expected status code to be '200', but got '$actualStatus'"
 			);
 		}
-		$this->checkDownloadedContentMatches($content);
+		$this->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**
@@ -1300,8 +1309,8 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
-		$this->downloadFileAsUserUsingPassword($user, $fileName, $password);
-		$this->downloadedContentShouldBe($content);
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
+		$this->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**
@@ -1460,8 +1469,8 @@ trait WebDav {
 		string $content
 	):void {
 		$user = $this->getActualUsername($user);
-		$this->userDownloadsFileWithRange($user, $fileSource, $range);
-		$this->downloadedContentShouldBe($content);
+		$response = $this->userDownloadFileWithRange($user, $fileSource, $range);
+		$this->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**
@@ -1472,7 +1481,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserDownloadsTheFileUsingTheAPI(string $fileName):void {
-		$this->downloadFileAsUserUsingPassword($this->currentUser, $fileName);
+		$this->setResponse($this->downloadFileAsUserUsingPassword($this->currentUser, $fileName));
 	}
 
 	/**
@@ -1487,7 +1496,7 @@ trait WebDav {
 		string $user,
 		string $fileName
 	):void {
-		$this->downloadFileAsUserUsingPassword($user, $fileName);
+		$this->setResponse($this->downloadFileAsUserUsingPassword($user, $fileName));
 	}
 
 	/**
@@ -1504,7 +1513,7 @@ trait WebDav {
 		?string $password,
 		string $fileName
 	):void {
-		$this->downloadFileAsUserUsingPassword($user, $fileName, $password);
+		$this->setResponse($this->downloadFileAsUserUsingPassword($user, $fileName, $password));
 	}
 
 	/**
@@ -1513,17 +1522,17 @@ trait WebDav {
 	 * @param string|null $password
 	 * @param array|null $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function downloadFileAsUserUsingPassword(
 		string $user,
 		string $fileName,
 		?string $password = null,
 		?array $headers = []
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			'GET',
 			$fileName,
@@ -2083,40 +2092,40 @@ trait WebDav {
 		}
 	}
 
-    /**
-     * @param string $user
-     * @param string $source
-     * @param string $destination
-     * @param bool|null $isGivenStep
-     *
-     * @return ResponseInterface
-     */
-    public function userUploadAFileTo(
-        string $user,
-        string $source,
-        string $destination,
-        ?bool $isGivenStep = false
-    ):ResponseInterface {
-        $user = $this->getActualUsername($user);
-        $file = \fopen($this->acceptanceTestsDirLocation() . $source, 'r');
-        $this->pauseUploadDelete();
-        $response = $this->makeDavRequest(
-            $user,
-            "PUT",
-            $destination,
-            [],
-            $file,
-            "files",
-            null,
-            false,
-            null,
-            [],
-            null,
-            $isGivenStep
-        );
-        $this->lastUploadDeleteTime = \time();
-        return $response;
-    }
+	/**
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param bool|null $isGivenStep
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userUploadAFileTo(
+		string $user,
+		string $source,
+		string $destination,
+		?bool $isGivenStep = false
+	):ResponseInterface {
+		$user = $this->getActualUsername($user);
+		$file = \fopen($this->acceptanceTestsDirLocation() . $source, 'r');
+		$this->pauseUploadDelete();
+		$response = $this->makeDavRequest(
+			$user,
+			"PUT",
+			$destination,
+			[],
+			$file,
+			"files",
+			null,
+			false,
+			null,
+			[],
+			null,
+			$isGivenStep
+		);
+		$this->lastUploadDeleteTime = \time();
+		return $response;
+	}
 
 	/**
 	 * @When user :user uploads file :source to :destination using the WebDAV API
@@ -2134,8 +2143,8 @@ trait WebDav {
 		string $destination,
 		?bool $isGivenStep = false
 	):void {
-        $response = $this->userUploadAFileTo($user, $source, $destination);
-        $this->setResponse($response);
+		$response = $this->userUploadAFileTo($user, $source, $destination, $isGivenStep);
+		$this->setResponse($response);
 		$this->setResponseXml(
 			HttpRequestHelper::parseResponseAsXml($response)
 		);
@@ -2158,7 +2167,7 @@ trait WebDav {
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'",
-            $response
+			$response
 		);
 	}
 
@@ -2188,10 +2197,11 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasUploadedFileTo(string $source, string $destination):void {
-		$this->theUserUploadsAFileTo($source, $destination, true);
+		$response = $this->userUploadAFileTo($this->getCurrentUser(), $source, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination'"
+			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination'",
+			$response
 		);
 	}
 
@@ -2687,7 +2697,7 @@ trait WebDav {
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination'",
-            $response
+			$response
 		);
 		$this->asFileOrFolderShouldExist($user, "file", $destination);
 	}
@@ -2729,14 +2739,14 @@ trait WebDav {
 	public function theUserShouldNotBeAbleToUploadFileTo(string $user, string $source, string $destination):void {
 		$fileAlreadyExists = $this->fileOrFolderExists($user, "file", $destination);
 		if ($fileAlreadyExists) {
-			$this->downloadFileAsUserUsingPassword($user, $destination);
-			$initialContent = (string) $this->response->getBody();
+			$response = $this->downloadFileAsUserUsingPassword($user, $destination);
+			$initialContent = (string) $response->getBody();
 		}
-		$this->userUploadsAFileTo($user, $source, $destination);
-		$this->theHTTPStatusCodeShouldBe(["403", "423"]);
+		$response = $this->userUploadAFileTo($user, $source, $destination);
+		$this->theHTTPStatusCodeShouldBe(["403", "423"], "", $response);
 		if ($fileAlreadyExists) {
-			$this->downloadFileAsUserUsingPassword($user, $destination);
-			$currentContent = (string) $this->response->getBody();
+			$response = $this->downloadFileAsUserUsingPassword($user, $destination);
+			$currentContent = (string) $response->getBody();
 			Assert::assertSame(
 				$initialContent,
 				$currentContent,
@@ -3010,7 +3020,7 @@ trait WebDav {
 	 * @param string $destination
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return string[]
+	 * @return ResponseInterface
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
@@ -3019,10 +3029,10 @@ trait WebDav {
 		?string $content,
 		string $destination,
 		?bool $isGivenStep = false
-	): array {
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest(
+		$response = $this->makeDavRequest(
 			$user,
 			"PUT",
 			$destination,
@@ -3036,11 +3046,8 @@ trait WebDav {
 			null,
 			$isGivenStep
 		);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($this->response)
-		);
 		$this->lastUploadDeleteTime = \time();
-		return $this->response->getHeader('oc-fileid');
+		return $response;
 	}
 
 	/**
@@ -3049,13 +3056,16 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param string $destination
 	 *
-	 * @return string[]
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function adminUploadsAFileWithContentTo(
 		?string $content,
 		string $destination
-	):array {
-		return $this->uploadFileWithContent($this->getAdminUsername(), $content, $destination);
+	):void {
+		$response = $this->uploadFileWithContent($this->getAdminUsername(), $content, $destination);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3064,18 +3074,20 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param string $destination
 	 *
-	 * @return string[]
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function adminHasUploadedAFileWithContentTo(
 		?string $content,
 		string $destination
-	):array {
-		$fileId = $this->uploadFileWithContent($this->getAdminUsername(), $content, $destination, true);
+	):void {
+		$response = $this->uploadFileWithContent($this->getAdminUsername(), $content, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$destination'"
+			"HTTP status code was not 201 or 204 while trying to upload file '$destination'",
+			$response
 		);
-		return $fileId;
 	}
 
 	/**
@@ -3094,7 +3106,8 @@ trait WebDav {
 		?string $content,
 		string $destination
 	):void {
-		$this->uploadFileWithContent($user, $content, $destination);
+		$response = $this->uploadFileWithContent($user, $content, $destination);
+		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
 
@@ -3117,7 +3130,8 @@ trait WebDav {
 		$paths = $table->getHash();
 
 		foreach ($paths as $destination) {
-			$this->uploadFileWithContent($user, $content, $destination["path"]);
+			$response = $this->uploadFileWithContent($user, $content, $destination["path"]);
+			$this->setResponse($response);
 			$this->pushToLastStatusCodesArrays();
 		}
 	}
@@ -3303,21 +3317,22 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param string $destination
 	 *
-	 * @return string[]
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function userHasUploadedAFileWithContentTo(
 		string $user,
 		?string $content,
 		string $destination
-	):array {
+	):void {
 		$user = $this->getActualUsername($user);
-		$fileId = $this->uploadFileWithContent($user, $content, $destination, true);
+		$response = $this->uploadFileWithContent($user, $content, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
+			$response
 		);
-		$this->emptyLastHTTPStatusCodesArray();
-		return $fileId;
 	}
 
 	/**
@@ -3327,23 +3342,20 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param TableNode $table
 	 *
-	 * @return array
-	 * @throws Exception
+	 * @return void
+	 * @throws Exception|GuzzleException
 	 */
 	public function userHasUploadedFollowingFilesWithContent(
 		string $user,
 		?string $content,
 		TableNode $table
-	):array {
+	):void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$files = $table->getHash();
 
-		$fileIds = [];
 		foreach ($files as $destination) {
-			$fileId = $this->userHasUploadedAFileWithContentTo($user, $content, $destination["path"])[0];
-			$fileIds[] = $fileId;
+			$this->userHasUploadedAFileWithContentTo($user, $content, $destination["path"]);
 		}
-		return $fileIds;
 	}
 
 	/**
@@ -3363,7 +3375,8 @@ trait WebDav {
 		$files = $table->getHash();
 		$this->emptyLastHTTPStatusCodesArray();
 		foreach ($files as $fileName) {
-			$this->downloadFileAsUserUsingPassword($user, $fileName["path"]);
+			$response = $this->downloadFileAsUserUsingPassword($user, $fileName["path"]);
+			$this->setResponse($response);
 			$this->pushToLastStatusCodesArrays();
 		}
 	}
@@ -3395,32 +3408,27 @@ trait WebDav {
 			["X-OC-Mtime" => $mtime],
 			$content
 		);
-		$this->theHTTPStatusCodeShouldBe(
-			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$destination' with mtime $mtime for user '$user'"
-		);
+		$this->setResponse($response);
 	}
 
 	/**
-	 * @When user :user uploads file with checksum :checksum and content :content to :destination using the WebDAV API
-	 *
 	 * @param string $user
 	 * @param string $checksum
 	 * @param string|null $content
 	 * @param string $destination
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userUploadsAFileWithChecksumAndContentTo(
+	public function userUploadAFileWithChecksumAndContentTo(
 		string $user,
 		string $checksum,
 		?string $content,
 		string $destination,
 		?bool $isGivenStep = false
-	):void {
+	):ResponseInterface {
 		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest(
+		$response = $this->makeDavRequest(
 			$user,
 			"PUT",
 			$destination,
@@ -3435,7 +3443,27 @@ trait WebDav {
 			$isGivenStep
 		);
 		$this->lastUploadDeleteTime = \time();
-		$this->pushToLastStatusCodesArrays();
+		return $response;
+	}
+
+	/**
+	 * @When user :user uploads file with checksum :checksum and content :content to :destination using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $checksum
+	 * @param string $content
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function userUploadsAFileWithChecksumAndContentTo(
+		string $user,
+		string $checksum,
+		string $content,
+		string $destination
+	):void {
+		$response = $this->userUploadAFileWithChecksumAndContentTo($user, $checksum, $content, $destination);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3454,7 +3482,7 @@ trait WebDav {
 		?string $content,
 		string $destination
 	):void {
-		$this->userUploadsAFileWithChecksumAndContentTo(
+		$response = $this->userUploadAFileWithChecksumAndContentTo(
 			$user,
 			$checksum,
 			$content,
@@ -3463,7 +3491,8 @@ trait WebDav {
 		);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file with checksum '$checksum' to '$destination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to upload file with checksum '$checksum' to '$destination' for user '$user'",
+			$response
 		);
 	}
 
@@ -3480,7 +3509,7 @@ trait WebDav {
 	public function userShouldBeAbleToDeleteEntry(string $user, string $entry, string $source):void {
 		$user = $this->getActualUsername($user);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userDeletesFile($user, $source);
+		$this->userDeleteFile($user, $source);
 		$this->asFileOrFolderShouldNotExist($user, $entry, $source);
 	}
 
@@ -3496,7 +3525,7 @@ trait WebDav {
 	 */
 	public function theUserShouldNotBeAbleToDeleteEntry(string $user, string $entry, string $source):void {
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userDeletesFile($user, $source);
+		$this->userDeleteFile($user, $source);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
 	}
 
@@ -3513,6 +3542,20 @@ trait WebDav {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 */
+	public function userDeleteFile(string $user, string $resource):ResponseInterface {
+		$user = $this->getActualUsername($user);
+		$this->pauseUploadDelete();
+		$response = $this->makeDavRequest($user, 'DELETE', $resource, []);
+		$this->lastUploadDeleteTime = \time();
+		return $response;
+	}
+
+	/**
 	 * @When user :user deletes file/folder :resource using the WebDAV API
 	 *
 	 * @param string $user
@@ -3521,11 +3564,8 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userDeletesFile(string $user, string $resource):void {
-		$user = $this->getActualUsername($user);
-		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest($user, 'DELETE', $resource, []);
-		$this->lastUploadDeleteTime = \time();
-		$this->pushToLastHttpStatusCodesArray((string) $this->getResponse()->getStatusCode());
+		$response = $this->userDeleteFile($user, $resource);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3539,7 +3579,7 @@ trait WebDav {
 	 */
 	public function userHasDeletedResource(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
-		$this->userDeletesFile($user, $resource);
+		$response = $this->userDeleteFile($user, $resource);
 		// If the file or folder was there and got deleted then we get a 204
 		// That is good and the expected status
 		// If the file or folder was already not there then we get a 404
@@ -3549,9 +3589,9 @@ trait WebDav {
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204"],
-			"HTTP status code was not 204 while trying to delete resource '$resource' for user '$user'"
+			"HTTP status code was not 204 while trying to delete resource '$resource' for user '$user'",
+			$response
 		);
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -3600,7 +3640,8 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserDeletesFile(string $file):void {
-		$this->userDeletesFile($this->getCurrentUser(), $file);
+		$response = $this->userDeleteFile($this->getCurrentUser(), $file);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3658,7 +3699,7 @@ trait WebDav {
 	 */
 	public function userOnDeletesFile(string $user, string $server, string $file):void {
 		$previousServer = $this->usingServer($server);
-		$this->userDeletesFile($user, $file);
+		$this->setResponse($this->userDeleteFile($user, $file));
 		$this->usingServer($previousServer);
 	}
 
@@ -3685,19 +3726,46 @@ trait WebDav {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $destination
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException | GuzzleException
+	 * @throws GuzzleException | JsonException
+	 */
+	public function userCreateFolder(string $user, string $destination, ?bool $isGivenStep = false):ResponseInterface {
+		$user = $this->getActualUsername($user);
+		$destination = '/' . \ltrim($destination, '/');
+		$response = $this->makeDavRequest(
+			$user,
+			"MKCOL",
+			$destination,
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			[],
+			null,
+			$isGivenStep
+		);
+		return $response;
+	}
+
+	/**
 	 * @When user :user creates folder :destination using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $destination
 	 *
 	 * @return void
-	 * @throws JsonException | GuzzleException
-	 * @throws GuzzleException | JsonException
+	 * @throws JsonException
+	 * @throws GuzzleException
 	 */
 	public function userCreatesFolder(string $user, string $destination):void {
-		$response = $this->createFolder($user, $destination);
+		$response = $this->userCreateFolder($user, $destination);
 		$this->setResponse($response);
-		$this->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -3711,7 +3779,8 @@ trait WebDav {
 	 * @throws GuzzleException
 	 */
 	public function userHasCreatedFolder(string $user, string $destination):void {
-		$response = $this->createFolder($user, $destination, true);
+		$user = $this->getActualUsername($user);
+		$response = $this->userCreateFolder($user, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'",
@@ -3735,7 +3804,7 @@ trait WebDav {
 			$admin,
 			__METHOD__ . "The provided user is not admin but '" . $admin . "'"
 		);
-		$response = $this->createFolder($admin, $destination, true);
+		$response = $this->userCreateFolder($admin, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for admin '$admin'",
@@ -3760,6 +3829,33 @@ trait WebDav {
 		foreach ($paths as $path) {
 			$this->userHasCreatedFolder($user, $path["path"]);
 		}
+	}
+
+	/**
+	 * @When the user creates folder :destination using the WebDAV API
+	 *
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function theUserCreatesFolder(string $destination):void {
+		$this->userCreatesFolder($this->getCurrentUser(), $destination);
+	}
+
+	/**
+	 * @Given the user has created folder :destination
+	 *
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function theUserHasCreatedFolder(string $destination):void {
+		$response = $this->userCreateFolder($this->getCurrentUser(), $destination);
+		$this->theHTTPStatusCodeShouldBe(
+			["201", "204"],
+			"HTTP status code was not 201 or 204 while trying to create folder '$destination'",
+			$response
+		);
 	}
 
 	/**
@@ -3791,11 +3887,12 @@ trait WebDav {
 	 */
 	public function userShouldNotBeAbleToCreateFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->createFolder($user, $destination);
-		Assert::assertNotEquals(
-			201,
-			$response->getStatusCode(),
-			"User '$user' should not be able to create folder '$destination' but was successful"
+		$response = $this->userCreateFolder($user, $destination);
+		$this->theHTTPStatusCodeShouldBe(400, "", $response);
+		$this->asFileOrFolderShouldNotExist(
+			$user,
+			"folder",
+			$destination
 		);
 	}
 
@@ -3865,8 +3962,6 @@ trait WebDav {
 	/**
 	 * Old style chunking upload
 	 *
-	 * @When user :user uploads chunk file :num of :total with :data to :destination using the WebDAV API
-	 *
 	 * @param string $user
 	 * @param int $num
 	 * @param int $total
@@ -3874,21 +3969,21 @@ trait WebDav {
 	 * @param string $destination
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userUploadsChunkedFile(
+	public function userUploadChunkedFile(
 		string $user,
 		int $num,
 		int $total,
 		?string $data,
 		string $destination,
 		?bool $isGivenStep = false
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$num -= 1;
 		$file = "$destination-chunking-42-$total-$num";
 		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest(
+		$response = $this->makeDavRequest(
 			$user,
 			'PUT',
 			$file,
@@ -3903,6 +3998,29 @@ trait WebDav {
 			$isGivenStep
 		);
 		$this->lastUploadDeleteTime = \time();
+		return $response;
+	}
+
+	/**
+	 * @When user :user uploads chunk file :num of :total with :data to :destination using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param int $num
+	 * @param int $total
+	 * @param string $data
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function userUploadsChunkedFile(
+		string $user,
+		int $num,
+		int $total,
+		?string $data,
+		string $destination
+	):void {
+		$response = $this->userUploadChunkedFile($user, $num, $total, $data, $destination);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3926,10 +4044,11 @@ trait WebDav {
 		string $destination
 	):void {
 		$user = $this->getActualUsername($user);
-		$this->userUploadsChunkedFile($user, $num, $total, $data, $destination, true);
+		$response = $this->userUploadChunkedFile($user, $num, $total, $data, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload chunk $num of $total to file '$destination' for user '$user'"
+			"HTTP status code was not 201 or 204 while trying to upload chunk $num of $total to file '$destination' for user '$user'",
+			$response
 		);
 	}
 
@@ -4079,30 +4198,31 @@ trait WebDav {
 		if ($async === true) {
 			$headers = ['OC-LazyOps' => 'true'];
 		}
-		$this->moveNewDavChunkToFinalFile($user, $chunkingId, $file, $headers, $isGivenStep);
+		$response = $this->moveNewDavChunkToFinalFile($user, $chunkingId, $file, $headers, $isGivenStep);
 		if ($isGivenStep) {
-			$this->theHTTPStatusCodeShouldBeSuccess();
+			$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		} else {
+			$this->setResponse($response);
 		}
 		$this->lastUploadDeleteTime = \time();
 	}
 
 	/**
-	 * @When user :user creates a new chunking upload with id :id using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $id
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userCreatesANewChunkingUploadWithId(
+	public function userCreateANewChunkingUploadWithId(
 		string $user,
 		string $id,
 		?bool $isGivenStep = false
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$destination = "/uploads/$user/$id";
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			'MKCOL',
 			$destination,
@@ -4119,6 +4239,22 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user creates a new chunking upload with id :id using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $id
+	 *
+	 * @return void
+	 */
+	public function userCreatesANewChunkingUploadWithId(
+		string $user,
+		string $id
+	):void {
+		$response = $this->userCreateANewChunkingUploadWithId($user, $id);
+		$this->setResponse($response);
+	}
+
+	/**
 	 * @Given user :user has created a new chunking upload with id :id
 	 *
 	 * @param string $user
@@ -4127,31 +4263,29 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userHasCreatedANewChunkingUploadWithId(string $user, string $id):void {
-		$this->userCreatesANewChunkingUploadWithId($user, $id, true);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->userCreateANewChunkingUploadWithId($user, $id, true);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
-	 * @When user :user uploads new chunk file :num with :data to id :id using the WebDAV API
-	 *
 	 * @param string $user
 	 * @param int $num
 	 * @param string|null $data
 	 * @param string $id
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function userUploadsNewChunkFileOfWithToId(
+	public function userUploadNewChunkFileOfWithToId(
 		string $user,
 		int $num,
 		?string $data,
 		string $id,
 		?bool $isGivenStep = false
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$destination = "/uploads/$user/$id/$num";
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			'PUT',
 			$destination,
@@ -4165,6 +4299,26 @@ trait WebDav {
 			null,
 			$isGivenStep
 		);
+	}
+
+	/**
+	 * @When user :user uploads new chunk file :num with :data to id :id using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param int $num
+	 * @param string|null $data
+	 * @param string $id
+	 *
+	 * @return void
+	 */
+	public function userUploadsNewChunkFileOfWithToId(
+		string $user,
+		int $num,
+		?string $data,
+		string $id
+	):void {
+		$response = $this->userUploadNewChunkFileOfWithToId($user, $num, $data, $id);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -4179,8 +4333,29 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userHasUploadedNewChunkFileOfWithToId(string $user, int $num, ?string $data, string $id):void {
-		$this->userUploadsNewChunkFileOfWithToId($user, $num, $data, $id, true);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->userUploadNewChunkFileOfWithToId($user, $num, $data, $id, true);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $id
+	 * @param string $type "asynchronously" or empty
+	 * @param string $dest
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userMoveNewChunkFileWithIdToMychunkedfile(
+		string $user,
+		string $id,
+		string $type,
+		string $dest
+	):ResponseInterface {
+		$headers = [];
+		if ($type === "asynchronously") {
+			$headers = ['OC-LazyOps' => 'true'];
+		}
+		return $this->moveNewDavChunkToFinalFile($user, $id, $dest, $headers);
 	}
 
 	/**
@@ -4199,11 +4374,7 @@ trait WebDav {
 		string $type,
 		string $dest
 	):void {
-		$headers = [];
-		if ($type === "asynchronously") {
-			$headers = ['OC-LazyOps' => 'true'];
-		}
-		$this->moveNewDavChunkToFinalFile($user, $id, $dest, $headers);
+		$this->setResponse($this->userMoveNewChunkFileWithIdToMychunkedfile($user, $id, $type, $dest));
 	}
 
 	/**
@@ -4222,8 +4393,8 @@ trait WebDav {
 		string $type,
 		string $dest
 	):void {
-		$this->userMovesNewChunkFileWithIdToMychunkedfile($user, $id, $type, $dest);
-		$this->theHTTPStatusCodeShouldBe("201");
+		$response = $this->userMoveNewChunkFileWithIdToMychunkedfile($user, $id, $type, $dest);
+		$this->theHTTPStatusCodeShouldBe("201", "", $response);
 	}
 
 	/**
@@ -4238,7 +4409,8 @@ trait WebDav {
 		string $user,
 		string $id
 	):void {
-		$this->deleteUpload($user, $id, []);
+		$response = $this->deleteUpload($user, $id, []);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -4253,8 +4425,36 @@ trait WebDav {
 		string $user,
 		string $id
 	):void {
-		$this->userCancelsUploadWithId($user, $id);
-		$this->theHTTPStatusCodeShouldBe("201");
+		$response = $this->deleteUpload($user, $id, []);
+		$this->theHTTPStatusCodeShouldBe("201", "", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $id
+	 * @param string $type "asynchronously" or empty
+	 * @param string $dest
+	 * @param int $size
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userMoveNewChunkFileWithIdToMychunkedfileWithSize(
+		string $user,
+		string $id,
+		string $type,
+		string $dest,
+		int $size
+	):ResponseInterface {
+		$headers = ['OC-Total-Length' => $size];
+		if ($type === "asynchronously") {
+			$headers['OC-LazyOps'] = 'true';
+		}
+		return $this->moveNewDavChunkToFinalFile(
+			$user,
+			$id,
+			$dest,
+			$headers
+		);
 	}
 
 	/**
@@ -4275,16 +4475,14 @@ trait WebDav {
 		string $dest,
 		int $size
 	):void {
-		$headers = ['OC-Total-Length' => $size];
-		if ($type === "asynchronously") {
-			$headers['OC-LazyOps'] = 'true';
-		}
-		$this->moveNewDavChunkToFinalFile(
+		$response = $this->userMoveNewChunkFileWithIdToMychunkedfileWithSize(
 			$user,
 			$id,
+			$type,
 			$dest,
-			$headers
+			$size
 		);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -4306,14 +4504,42 @@ trait WebDav {
 		string $dest,
 		int $size
 	):void {
-		$this->userMovesNewChunkFileWithIdToMychunkedfileWithSize(
+		$response = $this->userMoveNewChunkFileWithIdToMychunkedfileWithSize(
 			$user,
 			$id,
 			$type,
 			$dest,
 			$size
 		);
-		$this->theHTTPStatusCodeShouldBe("201");
+		$this->theHTTPStatusCodeShouldBe("201", "", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $id
+	 * @param string $type "asynchronously" or empty
+	 * @param string $dest
+	 * @param string $checksum
+	 *
+	 * @return ResponseInterface
+	 */
+	public function userMoveNewChunkFileWithIdToMychunkedfileWithChecksum(
+		string $user,
+		string $id,
+		string $type,
+		string $dest,
+		string $checksum
+	):ResponseInterface {
+		$headers = ['OC-Checksum' => $checksum];
+		if ($type === "asynchronously") {
+			$headers['OC-LazyOps'] = 'true';
+		}
+		return $this->moveNewDavChunkToFinalFile(
+			$user,
+			$id,
+			$dest,
+			$headers
+		);
 	}
 
 	/**
@@ -4334,16 +4560,8 @@ trait WebDav {
 		string $dest,
 		string $checksum
 	):void {
-		$headers = ['OC-Checksum' => $checksum];
-		if ($type === "asynchronously") {
-			$headers['OC-LazyOps'] = 'true';
-		}
-		$this->moveNewDavChunkToFinalFile(
-			$user,
-			$id,
-			$dest,
-			$headers
-		);
+		$response = $this->userMoveNewChunkFileWithIdToMychunkedfileWithChecksum($user, $id, $type, $dest, $checksum);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -4365,14 +4583,14 @@ trait WebDav {
 		string $dest,
 		string $checksum
 	):void {
-		$this->userMovesNewChunkFileWithIdToMychunkedfileWithChecksum(
+		$response = $this->userMoveNewChunkFileWithIdToMychunkedfileWithChecksum(
 			$user,
 			$id,
 			$type,
 			$dest,
 			$checksum
 		);
-		$this->theHTTPStatusCodeShouldBe("201");
+		$this->theHTTPStatusCodeShouldBe("201", "", $response);
 	}
 
 	/**
@@ -4384,7 +4602,7 @@ trait WebDav {
 	 * @param array $headers extra headers
 	 * @param bool|null $isGivenStep
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	private function moveNewDavChunkToFinalFile(
 		string $user,
@@ -4392,7 +4610,7 @@ trait WebDav {
 		string $destination,
 		array $headers,
 		?bool $isGivenStep = false
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$source = "/uploads/$user/$id/.file";
 		$headers['Destination'] = $this->destinationHeaderValue(
@@ -4400,7 +4618,7 @@ trait WebDav {
 			$destination
 		);
 
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			'MOVE',
 			$source,
@@ -4423,11 +4641,11 @@ trait WebDav {
 	 * @param string $id upload id
 	 * @param array $headers extra headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	private function deleteUpload(string $user, string $id, array $headers) {
+	private function deleteUpload(string $user, string $id, array $headers):ResponseInterface {
 		$source = "/uploads/$user/$id";
-		$this->response = $this->makeDavRequest(
+		return $this->makeDavRequest(
 			$user,
 			'DELETE',
 			$source,
@@ -4451,12 +4669,12 @@ trait WebDav {
 	}
 
 	/**
-	 * @When an unauthenticated client connects to the DAV endpoint using the WebDAV API
+	 * an unauthenticated client connects to the DAV endpoint using the WebDAV API
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function connectingToDavEndpoint():void {
-		$this->response = $this->makeDavRequest(
+	public function connectToDavEndpoint():ResponseInterface {
+		return $this->makeDavRequest(
 			null,
 			'PROPFIND',
 			'',
@@ -4465,13 +4683,22 @@ trait WebDav {
 	}
 
 	/**
+	 * @When an unauthenticated client connects to the DAV endpoint using the WebDAV API
+	 *
+	 * @return void
+	 */
+	public function connectingToDavEndpoint():void {
+		$this->setResponse($this->connectToDavEndpoint());
+	}
+
+	/**
 	 * @Given an unauthenticated client has connected to the DAV endpoint
 	 *
 	 * @return void
 	 */
 	public function hasConnectedToDavEndpoint():void {
-		$this->connectingToDavEndpoint();
-		$this->theHTTPStatusCodeShouldBe("401");
+		$response = $this->connectToDavEndpoint();
+		$this->theHTTPStatusCodeShouldBe("401", "", $response);
 	}
 
 	/**
@@ -4760,8 +4987,14 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userDownloadsThePreviewOfWithWidthAndHeight(string $user, string $path, string $width, string $height):void {
-		$this->downloadPreviewOfFiles($user, $path, $width, $height);
-		$this->theHTTPStatusCodeShouldBe(200);
+		$response = $this->downloadPreviews(
+			$user,
+			$path,
+			null,
+			$width,
+			$height
+		);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->imageDimensionsShouldBe($width, $height);
 		// save response to user response dictionary for further comparisons
 		$this->userResponseBodyContents[$user] = $this->responseBodyContent;
@@ -4778,9 +5011,15 @@ trait WebDav {
 	 * @return void
 	 */
 	public function asUserThePreviewOfPathWithHeightAndWidthShouldHaveBeenChanged(string $user, string $path, string $width, string $height):void {
-		$this->downloadPreviewOfFiles($user, $path, $width, $height);
-		$this->theHTTPStatusCodeShouldBe(200);
-		$newResponseBodyContents = $this->response->getBody()->getContents();
+		$response = $this->downloadPreviews(
+			$user,
+			$path,
+			null,
+			$width,
+			$height
+		);
+		$this->theHTTPStatusCodeShouldBe(200, "", $response);
+		$newResponseBodyContents = $response->getBody()->getContents();
 		Assert::assertNotEquals(
 			$newResponseBodyContents,
 			// different users can download files before and after an update is made to a file
@@ -5523,7 +5762,8 @@ trait WebDav {
 	 */
 	public function userGetsTheContentOfGeneratedJsonReport(string $user, string $pathToFile): void {
 		$password = $this->getPasswordForUser($user);
-		$this->downloadFileAsUserUsingPassword($user, $pathToFile, $password);
+		$response = $this->downloadFileAsUserUsingPassword($user, $pathToFile, $password);
+		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
 }
