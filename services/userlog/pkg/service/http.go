@@ -61,6 +61,7 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 
 	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath)
 
+	var outdatedEvents []string
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
 		etype, ok := ul.registeredEvents[e.Type]
@@ -77,11 +78,25 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 
 		noti, err := conv.ConvertEvent(e.Id, einterface)
 		if err != nil {
+			if utils.IsErrNotFound(err) || utils.IsErrPermissionDenied(err) {
+				outdatedEvents = append(outdatedEvents, e.Id)
+				continue
+			}
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
 			continue
 		}
 
 		resp.OCS.Data = append(resp.OCS.Data, noti)
+	}
+
+	// delete outdated events asynchronously
+	if len(outdatedEvents) > 0 {
+		go func() {
+			err := ul.DeleteEvents(u.GetId().GetOpaqueId(), outdatedEvents)
+			if err != nil {
+				ul.log.Error().Err(err).Msg("failed to delete events")
+			}
+		}()
 	}
 
 	glevs, err := ul.GetGlobalEvents(ctx)
