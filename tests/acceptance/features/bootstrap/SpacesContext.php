@@ -1083,6 +1083,7 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
+		$folder = \trim($folder, "/");
 		$exploded = explode('/', $folder);
 		$path = '';
 		for ($i = 0; $i < \count($exploded); $i++) {
@@ -1126,6 +1127,7 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
+		$folder = \trim($folder, "/");
 		$exploded = explode('/', $folder);
 		$path = '';
 		for ($i = 0; $i < \count($exploded); $i++) {

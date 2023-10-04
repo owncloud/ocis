@@ -28,7 +28,7 @@ Feature: public link for a space
 
 
   Scenario: public tries to delete a folder in the public space
-    And user "Alice" has created a folder "/public-folder" in space "public space"
+    And user "Alice" has created a folder "public-folder" in space "public space"
     When the public deletes folder "public-folder" from the last public link share using the new public WebDAV API
     And the HTTP status code should be "403"
 
