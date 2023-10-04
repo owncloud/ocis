@@ -52,13 +52,13 @@ Feature: PROPFIND with depth:infinity
 
   Scenario Outline: get the list of resources of a folder with depth infinity
     Given using <dav-path-version> DAV path
-    When user "Alice" lists the resources in "/simple-folder" with depth "infinity" using the WebDAV API
+    When user "Alice" lists the resources in "simple-folder" with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last DAV response for user "Alice" should contain these nodes
       | name                                                      |
-      | /simple-folder/textfile0.txt                              |
-      | /simple-folder/welcome.txt                                |
-      | /simple-folder/simple-folder1/                            |
+      | simple-folder/textfile0.txt                               |
+      | simple-folder/welcome.txt                                 |
+      | simple-folder/simple-folder1/                             |
       | simple-folder/simple-folder1/simple-folder2               |
       | simple-folder/simple-folder1/textfile0.txt                |
       | simple-folder/simple-folder1/welcome.txt                  |
@@ -77,15 +77,15 @@ Feature: PROPFIND with depth:infinity
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last public link DAV response should contain these nodes
-      | name                                                         |
-      | /textfile0.txt                                               |
-      | /welcome.txt                                                 |
-      | /simple-folder1/                                             |
-      | /simple-folder1/welcome.txt                                  |
-      | /simple-folder1/simple-folder2                               |
-      | /simple-folder1/textfile0.txt                                |
-      | /simple-folder1/simple-folder2/textfile0.txt                 |
-      | /simple-folder1/simple-folder2/welcome.txt                   |
+      | name                                        |
+      | textfile0.txt                               |
+      | welcome.txt                                 |
+      | simple-folder1/                             |
+      | simple-folder1/welcome.txt                  |
+      | simple-folder1/simple-folder2               |
+      | simple-folder1/textfile0.txt                |
+      | simple-folder1/simple-folder2/textfile0.txt |
+      | simple-folder1/simple-folder2/welcome.txt   |
 
 
   Scenario Outline: get the list of files in the trashbin with depth infinity
