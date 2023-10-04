@@ -62,7 +62,6 @@ class WebDavPropertiesContext implements Context {
 			'0'
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -86,7 +85,6 @@ class WebDavPropertiesContext implements Context {
 			$depth
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -135,79 +133,7 @@ class WebDavPropertiesContext implements Context {
 	):void {
 		$response = $this->getPropertiesOfFolder($user, $path, $propertiesTable);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 		$this->featureContext->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $path
-	 * @param TableNode $propertiesTable
-	 * @param string $depth
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function getFollowingCommentPropertiesOfFileUsingWebDAVPropfindApi(
-		string $user,
-		string $path,
-		TableNode $propertiesTable,
-		string $depth = "1"
-	):void {
-		$properties = null;
-		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
-		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-		foreach ($propertiesTable->getColumnsHash() as $row) {
-			$properties[] = $row["propertyName"];
-		}
-
-		$user = $this->featureContext->getActualUsername($user);
-		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		$commentsPath = "/comments/files/$fileId/";
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$commentsPath,
-				$depth,
-				$properties,
-				"comments"
-			)
-		);
-	}
-
-	/**
-	 * @When user :user gets the following comment properties of file :path using the WebDAV PROPFIND API
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param TableNode $propertiesTable
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userGetsFollowingCommentPropertiesOfFileUsingWebDAVPropfindApi(string $user, string $path, TableNode $propertiesTable) {
-		$this->getFollowingCommentPropertiesOfFileUsingWebDAVPropfindApi(
-			$user,
-			$path,
-			$propertiesTable
-		);
-	}
-
-	/**
-	 * @When the user gets the following comment properties of file :arg1 using the WebDAV PROPFIND API
-	 *
-	 * @param string $path
-	 * @param TableNode $propertiesTable
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserGetsFollowingCommentPropertiesOfFileUsingWebDAVPropfindApi(string $path, TableNode $propertiesTable) {
-		$this->getFollowingCommentPropertiesOfFileUsingWebDAVPropfindApi(
-			$this->featureContext->getCurrentUser(),
-			$path,
-			$propertiesTable
-		);
 	}
 
 	/**
@@ -226,7 +152,6 @@ class WebDavPropertiesContext implements Context {
 			$propertiesTable
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -331,7 +256,6 @@ class WebDavPropertiesContext implements Context {
 	public function publicGetsThePropertiesOfFolder(string $path, TableNode $propertiesTable):void {
 		$response = $this->publicGetThePropertiesOfFolder($path, $propertiesTable);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
@@ -438,13 +362,7 @@ class WebDavPropertiesContext implements Context {
 		string $namespaceString,
 		string $propertyValue
 	):void {
-		$this->featureContext->setResponseXmlObject(
-			HttpRequestHelper::getResponseXml(
-				$this->featureContext->getResponse(),
-				__METHOD__
-			)
-		);
-		$responseXmlObject = $this->featureContext->getResponseXmlObject();
+		$responseXmlObject = $this->featureContext->getResponseXml();
 		//calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
@@ -487,13 +405,7 @@ class WebDavPropertiesContext implements Context {
 	):void {
 		// let's unescape quotes first
 		$propertyValue = \str_replace('\"', '"', $propertyValue);
-		$this->featureContext->setResponseXmlObject(
-			HttpRequestHelper::getResponseXml(
-				$this->featureContext->getResponse(),
-				__METHOD__
-			)
-		);
-		$responseXmlObject = $this->featureContext->getResponseXmlObject();
+		$responseXmlObject = $this->featureContext->getResponseXml();
 		//calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
@@ -555,7 +467,8 @@ class WebDavPropertiesContext implements Context {
 		string $key,
 		string $expectedValue
 	):void {
-		$this->checkSingleResponseContainsAPropertyWithValueAndAlternative(
+		$this->checkResponseContainsAPropertyWithValue(
+			$this->featureContext->getResponse(),
 			$key,
 			$expectedValue,
 			$expectedValue
@@ -577,7 +490,8 @@ class WebDavPropertiesContext implements Context {
 		string $key,
 		string $expectedValue
 	):void {
-		$this->checkSingleResponseContainsAPropertyWithValueAndAlternative(
+		$this->checkResponseContainsAPropertyWithValue(
+			$this->featureContext->getResponse(),
 			$key,
 			$expectedValue,
 			$expectedValue,
@@ -600,7 +514,8 @@ class WebDavPropertiesContext implements Context {
 		string $expectedValue,
 		string $altExpectedValue
 	):void {
-		$this->checkSingleResponseContainsAPropertyWithValueAndAlternative(
+		$this->checkResponseContainsAPropertyWithValue(
+			$this->featureContext->getResponse(),
 			$key,
 			$expectedValue,
 			$altExpectedValue
@@ -608,6 +523,7 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
+	 * @param ResponseInterface $response
 	 * @param string $key
 	 * @param string $expectedValue
 	 * @param string $altExpectedValue
@@ -616,13 +532,14 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSingleResponseContainsAPropertyWithValueAndAlternative(
+	public function checkResponseContainsAPropertyWithValue(
+		ResponseInterface $response,
 		string $key,
 		string $expectedValue,
 		string $altExpectedValue,
 		?string $user = null
 	):void {
-		$xmlPart = $this->featureContext->getResponseXmlObject()->xpath(
+		$xmlPart = $this->featureContext->getResponseXml($response)->xpath(
 			"//d:prop/$key"
 		);
 		Assert::assertTrue(
@@ -995,15 +912,14 @@ class WebDavPropertiesContext implements Context {
 		string $expectedValue,
 		string $altExpectedValue
 	):void {
-		$this->featureContext->setResponseXmlObject(
-			$this->featureContext->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				'0',
-				[$property]
-			)
+		$response = $this->featureContext->listFolder(
+			$user,
+			$path,
+			'0',
+			[$property]
 		);
-		$this->theSingleResponseShouldContainAPropertyWithValueAndAlternative(
+		$this->checkResponseContainsAPropertyWithValue(
+			$response,
 			$property,
 			$expectedValue,
 			$altExpectedValue

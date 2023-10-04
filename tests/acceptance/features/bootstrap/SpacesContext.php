@@ -3021,7 +3021,6 @@ class SpacesContext implements Context {
 		$this->setSpaceIDByName($user, $spaceName);
 		$response = $this->webDavPropertiesContext->getPropertiesOfFolder($user, $resourceName, $propertiesTable);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->setResponseXmlObject(HttpRequestHelper::getResponseXml($response));
 	}
 
 	/**
