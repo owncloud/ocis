@@ -762,26 +762,29 @@ class GraphContext implements Context {
 
 	/**
 	 * adds a user to a group
+	 * Note that the string "nonexistent" shouldn't be used for username and groupname
+	 * Only for nonexistent testcase
 	 *
 	 * @param string $group
 	 * @param string $user
 	 * @param string|null $byUser
-	 * @param bool $createNonExistentGroup
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function addUserToGroup(string $group, string $user, ?string $byUser = null, bool $createNonExistentGroup = false): ResponseInterface {
+	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		if ($createNonExistentGroup) {
+		//user shouldn't be created with "nonexistent" name but only used when for nonexistent group testcase
+		if ($group === "nonexistent") {
 			$groupId = WebDavHelper::generateUUIDv4();
 		} else {
 			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		}
-		if ($this->featureContext->userExists($user)) {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		} else {
+		//user shouldn't be created with "nonexistent" name but used when for nonexistent users testcase
+		if ($user === "nonexistent") {
 			$userId = WebDavHelper::generateUUIDv4();
+		} else {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		}
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
@@ -833,15 +836,14 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator tries to add nonexistent user :user to group :group using the Graph API
+	 * @When the administrator tries to add nonexistent user to group :group using the Graph API
 	 *
-	 * @param string $user
 	 * @param string $group
 	 *
 	 * @return void
 	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
-		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent"));
 	}
 
 	/**
@@ -856,7 +858,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException | Exception
 	 */
 	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
-		$this->featureContext->setResponse($this->addUserToGroup('', $user, $byUser, true));
+		$this->featureContext->setResponse($this->addUserToGroup("nonexistent", $user, $byUser));
 	}
 
 	/**
