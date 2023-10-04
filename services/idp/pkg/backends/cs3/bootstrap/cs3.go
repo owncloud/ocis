@@ -74,7 +74,6 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 		config.TLSClientConfig,
 		// FIXME add a map[string]interface{} property to the lico config.Config so backends can pass custom config parameters through the bootstrap process
 		os.Getenv("CS3_GATEWAY"),
-		os.Getenv("CS3_MACHINE_AUTH_API_KEY"),
 		config.Settings.Insecure,
 	)
 	if identifierErr != nil {

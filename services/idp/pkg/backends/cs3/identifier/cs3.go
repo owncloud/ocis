@@ -36,7 +36,6 @@ type CS3Backend struct {
 	logger            logrus.FieldLogger
 	tlsConfig         *tls.Config
 	gatewayURI        string
-	machineAuthAPIKey string
 	insecure          bool
 
 	sessions cmap.ConcurrentMap
@@ -49,7 +48,6 @@ func NewCS3Backend(
 	c *config.Config,
 	tlsConfig *tls.Config,
 	gatewayURI string,
-	machineAuthAPIKey string,
 	insecure bool,
 ) (*CS3Backend, error) {
 
@@ -63,7 +61,6 @@ func NewCS3Backend(
 		logger:            c.Logger,
 		tlsConfig:         tlsConfig,
 		gatewayURI:        gatewayURI,
-		machineAuthAPIKey: machineAuthAPIKey,
 		insecure:          insecure,
 
 		sessions: cmap.New(),
@@ -159,7 +156,6 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 	res, err := client.Authenticate(ctx, &cs3gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "username:" + username,
-		ClientSecret: b.machineAuthAPIKey,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend machine authenticate rpc error: %v", err)

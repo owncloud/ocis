@@ -17,7 +17,6 @@ type Config struct {
 	Events            Events                `yaml:"events"`
 	Reva              *shared.Reva          `yaml:"reva"`
 	GRPCClientTLS     *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	MachineAuthAPIKey string                `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;POLICIES_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 	Context           context.Context       `yaml:"-"`
 	Log               *Log                  `yaml:"log"`
 	Engine            Engine                `yaml:"engine"`

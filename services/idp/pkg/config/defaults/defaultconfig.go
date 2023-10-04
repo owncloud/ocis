@@ -159,9 +159,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
-	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	}
+
 }
 
 // Sanitize sanitizes the configuration

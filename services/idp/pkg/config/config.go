@@ -20,7 +20,6 @@ type Config struct {
 
 	Reva *shared.Reva `yaml:"reva"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`
