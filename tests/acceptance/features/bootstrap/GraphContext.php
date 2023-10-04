@@ -348,13 +348,12 @@ class GraphContext implements Context {
 	 */
 	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		return(GraphHelper::deleteUser(
+		return GraphHelper::deleteUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$user
-		)
 		);
 	}
 

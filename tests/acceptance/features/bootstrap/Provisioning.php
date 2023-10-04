@@ -1426,14 +1426,7 @@ trait Provisioning {
 	public function theAdministratorHasDeletedUserUsingTheProvisioningApi(?string $user):void {
 		$user = $this->getActualUsername($user);
 		$response =  $this->deleteTheUserUsingTheProvisioningApi($user);
-		if ($this->theUserShouldExist($user)
-			&& (!\in_array($response->getStatusCode(), [200, 204]))
-		) {
-			\error_log(
-				"INFORMATION: could not delete user '$user' "
-				. $response->getStatusCode() . " " . $response->getBody()
-			);
-		}
+		$this->theHttpStatusCodeShouldBe(204, "", $response);
 		WebDavHelper::removeSpaceIdReferenceForUser($user);
 		$this->userShouldNotExist($user);
 	}
@@ -1450,7 +1443,6 @@ trait Provisioning {
 		$user = $this->getActualUsername($user);
 		$this->setResponse($this->deleteTheUserUsingTheProvisioningApi($user));
 		$this->pushToLastHttpStatusCodesArray();
-		$this->rememberThatUserIsNotExpectedToExist($user);
 	}
 
 	/**
