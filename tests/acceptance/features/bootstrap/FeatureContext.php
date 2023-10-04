@@ -163,7 +163,6 @@ class FeatureContext extends BehatVariablesContext {
 	public AuthContext $authContext;
 	public GraphContext $graphContext;
 	public SpacesContext $spacesContext;
-	public AppConfigurationContext $appConfigurationContext;
 	private array $initialTrustedServer;
 
 	/**
@@ -2291,133 +2290,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Then the status.php response should include
-	 *
-	 * @param PyStringNode $jsonExpected
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function statusPhpRespondedShouldMatch(PyStringNode $jsonExpected): void {
-		$jsonExpectedDecoded = \json_decode($jsonExpected->getRaw(), true);
-		$jsonRespondedDecoded = $this->getJsonDecodedResponse();
-
-		$response = $this->appConfigurationContext->userGetsCapabilities($this->appConfigurationContext->getAdminUsernameForCapabilitiesCheck());
-		$this->theHTTPStatusCodeShouldBe(200, '', $response);
-		$responseXml = $this->getResponseXml($response)->data->capabilities;
-		$edition = $this->appConfigurationContext->getParameterValueFromXml(
-			$responseXml,
-			'core',
-			'status@@@edition'
-		);
-
-		if (!\strlen($edition)) {
-			Assert::fail(
-				"Cannot get edition from core capabilities"
-			);
-		}
-
-		$product = $this->appConfigurationContext->getParameterValueFromXml(
-			$responseXml,
-			'core',
-			'status@@@product'
-		);
-		if (!\strlen($product)) {
-			Assert::fail(
-				"Cannot get product from core capabilities"
-			);
-		}
-
-		$productName = $this->appConfigurationContext->getParameterValueFromXml(
-			$responseXml,
-			'core',
-			'status@@@productname'
-		);
-
-		if (!\strlen($productName)) {
-			Assert::fail(
-				"Cannot get productname from core capabilities"
-			);
-		}
-
-		$jsonExpectedDecoded['edition'] = $edition;
-		$jsonExpectedDecoded['product'] = $product;
-		$jsonExpectedDecoded['productname'] = $productName;
-
-		// We are on oCIS or reva or some other implementation. We cannot do "occ status".
-		// So get the expected version values by looking in the capabilities response.
-		$version = $this->appConfigurationContext->getParameterValueFromXml(
-			$responseXml,
-			'core',
-			'status@@@version'
-		);
-
-		if (!\strlen($version)) {
-			Assert::fail(
-				"Cannot get version from core capabilities"
-			);
-		}
-
-		$versionString = $this->appConfigurationContext->getParameterValueFromXml(
-			$responseXml,
-			'core',
-			'status@@@versionstring'
-		);
-
-		if (!\strlen($versionString)) {
-			Assert::fail(
-				"Cannot get versionstring from core capabilities"
-			);
-		}
-
-		$jsonExpectedDecoded['version'] = $version;
-		$jsonExpectedDecoded['versionstring'] = $versionString;
-		$errorMessage = "";
-		$errorFound = false;
-		foreach ($jsonExpectedDecoded as $key => $expectedValue) {
-			if (\array_key_exists($key, $jsonRespondedDecoded)) {
-				$actualValue = $jsonRespondedDecoded[$key];
-				if ($actualValue !== $expectedValue) {
-					$errorMessage .= "$key expected value was $expectedValue but actual value was $actualValue\n";
-					$errorFound = true;
-				}
-			} else {
-				$errorMessage .= "$key was not found in the status response\n";
-				$errorFound = true;
-			}
-		}
-		Assert::assertFalse($errorFound, $errorMessage);
-		// We have checked that the status.php response has data that matches up with
-		// data found in the capabilities response and/or the "occ status" command output.
-		// But the output might be reported wrongly in all of these in the same way.
-		// So check that the values also seem "reasonable".
-		$version = $jsonExpectedDecoded['version'];
-		$versionString = $jsonExpectedDecoded['versionstring'];
-		Assert::assertMatchesRegularExpression(
-			"/^\d+\.\d+\.\d+\.\d+$/",
-			$version,
-			"version should be in a form like 10.9.8.1 but is $version"
-		);
-		if (\preg_match("/^(\d+\.\d+\.\d+)\.\d+(-[0-9A-Za-z-]+)?(\+[0-9A-Za-z-]+)?$/", $version, $matches)) {
-			// We should have matched something like 10.9.8 - the first 3 numbers in the version.
-			// Ignore pre-releases and meta information
-			Assert::assertArrayHasKey(
-				1,
-				$matches,
-				"version $version could not match the pattern Major.Minor.Patch"
-			);
-			$majorMinorPatchVersion = $matches[1];
-		} else {
-			Assert::fail("version '$version' does not start in a form like 10.9.8");
-		}
-		Assert::assertStringStartsWith(
-			$majorMinorPatchVersion,
-			$versionString,
-			"versionstring should start with $majorMinorPatchVersion but is $versionString"
-		);
-	}
-
-	/**
 	 * send request to read a server file for core
 	 *
 	 * @param string $path
@@ -3237,13 +3109,10 @@ class FeatureContext extends BehatVariablesContext {
 		// that calls BasicStructure.php
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
-		$this->appConfigurationContext = new AppConfigurationContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
-		$this->appConfigurationContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
-		$environment->registerContext($this->appConfigurationContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();
@@ -3588,24 +3457,6 @@ class FeatureContext extends BehatVariablesContext {
 		$foundPath = \end($foundPaths)['path'];
 		// strip DAV path
 		return \substr($foundPath, \strlen($davPath) + 1);
-	}
-
-	/**
-	 * After Scenario. restore trusted servers
-	 *
-	 * @param string $server 'LOCAL'/'REMOTE'
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function restoreTrustedServers(string $server): void {
-		$currentTrustedServers = $this->getTrustedServers($server);
-		foreach (\array_diff($currentTrustedServers, $this->initialTrustedServer[$server]) as $url => $id) {
-			$this->appConfigurationContext->theAdministratorDeletesUrlFromTrustedServersUsingTheTestingApi($url);
-		}
-		foreach (\array_diff($this->initialTrustedServer[$server], $currentTrustedServers) as $url => $id) {
-			$this->appConfigurationContext->theAdministratorAddsUrlAsTrustedServerUsingTheTestingApi($url);
-		}
 	}
 
 	/**
