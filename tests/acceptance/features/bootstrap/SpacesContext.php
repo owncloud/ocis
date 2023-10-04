@@ -1856,7 +1856,7 @@ class SpacesContext implements Context {
 	 * @param string $fileContent
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return array
 	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFile(
@@ -1864,11 +1864,12 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $fileContent,
 		string $destination
-	): void {
+	): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->setSpaceIDByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
+		return $response->getHeader('oc-fileid');
 	}
 
 	/**

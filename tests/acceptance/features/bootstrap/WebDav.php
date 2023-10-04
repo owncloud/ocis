@@ -3317,7 +3317,7 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return array
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
@@ -3325,7 +3325,7 @@ trait WebDav {
 		string $user,
 		?string $content,
 		string $destination
-	):void {
+	):array {
 		$user = $this->getActualUsername($user);
 		$response = $this->uploadFileWithContent($user, $content, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
@@ -3333,6 +3333,7 @@ trait WebDav {
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
 			$response
 		);
+		return $response->getHeader('oc-fileid');
 	}
 
 	/**
