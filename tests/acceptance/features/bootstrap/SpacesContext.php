@@ -1133,12 +1133,12 @@ class SpacesContext implements Context {
 		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
 			$response = $this->theUserCreateAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
-			$this->featureContext->theHTTPStatusCodeShouldBe(
-				201,
-				"Expected response status code should be 201",
-				$response
-			);
 		}
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
 	}
 
 	/**

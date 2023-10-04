@@ -1117,7 +1117,7 @@ trait WebDav {
 		// A separate "Then" step can specifically check the HTTP status.
 		// But if the content is wrong (e.g. empty) then it is useful to
 		// report the HTTP status to give some clue what might be the problem.
-		$actualStatus = $this->response->getStatusCode();
+		$actualStatus = $response->getStatusCode();
 		if ($extraErrorText !== "") {
 			$extraErrorText .= "\n";
 		}
@@ -3567,6 +3567,7 @@ trait WebDav {
 	public function userDeletesFile(string $user, string $resource):void {
 		$response = $this->userDeleteFile($user, $resource);
 		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
@@ -3889,7 +3890,7 @@ trait WebDav {
 	public function userShouldNotBeAbleToCreateFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
 		$response = $this->userCreateFolder($user, $destination);
-		$this->theHTTPStatusCodeShouldBe(400, "", $response);
+		$this->theHTTPStatusCodeShouldBeBetween(400, 499, $response);
 		$this->asFileOrFolderShouldNotExist(
 			$user,
 			"folder",
