@@ -130,6 +130,19 @@ default:
         - GraphContext:
         - OcisConfigContext:
 
+    apiDepthInfinity:
+      paths:
+        - '%paths.base%/../features/apiDepthInfinity'
+      context: *common_ldap_suite_context
+      contexts:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - OCSContext:
+        - GraphContext:
+        - PublicWebDavContext:
+        - TrashbinContext:
+        - OcisConfigContext:
+
     apiAsyncUpload:
       paths:
         - '%paths.base%/../features/apiAsyncUpload'
