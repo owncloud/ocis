@@ -152,8 +152,8 @@ trait WebDav {
 	 *
 	 * @return string the etag or an empty string if the getetag property does not exist
 	 */
-	public function getEtagFromResponseXmlObject(?SimpleXMLElement $xmlObject = null):string {
-		$xmlObject = $xmlObject ?? $this->getResponseXmlObject();
+	public function getEtagFromResponseXmlObject(?SimpleXMLElement $xmlObject = null): string {
+		$xmlObject = $xmlObject ?? $this->getResponseXml();
 		$xmlPart = $xmlObject->xpath("//d:prop/d:getetag");
 		if (!\is_array($xmlPart) || (\count($xmlPart) === 0)) {
 			return '';
