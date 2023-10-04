@@ -3857,6 +3857,55 @@ trait Sharing {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" hiddes share "([^"]*)" of the (accepted|pending|declined) state offered by user "([^"]*)" using the sharing API$/
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $state specify 'accepted', 'pending' or 'declined' to only consider shares in that state
+	 * @param string $offeredBy
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHiddesShareOfferedBy(string $user, string $share, string $state, string $offeredBy):void {
+		$user = $this->getActualUsername($user);
+		$offeredBy = $this->getActualUsername($offeredBy);
+
+		$response = $this->getAllSharesSharedWithUser($user);
+		$shareId = null;
+		foreach ($response as $shareElement) {
+			$requiredStateCode = SharingHelper::SHARE_STATES[$state];
+			if ($shareElement['state'] === $requiredStateCode) {
+				$matchesShareState = true;
+			} else {
+				$matchesShareState = false;
+			}
+			
+			if ($matchesShareState
+				&& (string) $shareElement['uid_owner'] === $offeredBy
+				&& (string) $shareElement['path'] === $share
+			) {
+				$shareId = (string) $shareElement['id'];
+				break;
+			}
+		}
+		Assert::assertNotNull(
+			$shareId,
+			__METHOD__ . " could not find share $share of the $state state, offered by $offeredBy to $user"
+		);
+		$url = "/apps/files_sharing/api/v$this->sharingApiVersion" .
+			"/shares/pending/$shareId?format=xml&hide=true";
+
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+			$user,
+			'POST',
+			$url
+		);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
+	}
+
+	/**
 	 * @return array of common sharing capability settings for testing
 	 */
 	protected function getCommonSharingConfigs():array {
