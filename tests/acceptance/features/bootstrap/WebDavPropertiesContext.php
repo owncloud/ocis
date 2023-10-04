@@ -125,7 +125,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsPropertiesOfFolder(
+	public function userGetsFollowingPropertiesOfEntryUsingWebDavApi(
 		string $user,
 		string $path,
 		TableNode $propertiesTable
@@ -227,7 +227,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function getPropertiesOfPublicFolder(string $path, TableNode $propertiesTable): ResponseInterface {
+	public function getPropertiesOfEntryFromLastLinkShare(string $path, TableNode $propertiesTable): ResponseInterface {
 		$user = $this->featureContext->getLastCreatedPublicShareToken();
 		$properties = null;
 		foreach ($propertiesTable->getRows() as $row) {
@@ -251,8 +251,8 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function publicGetsThePropertiesOfFolder(string $path, TableNode $propertiesTable):void {
-		$response = $this->getPropertiesOfPublicFolder($path, $propertiesTable);
+	public function thePublicGetsFollowingPropertiesOfEntryFromLastLinkShare(string $path, TableNode $propertiesTable):void {
+		$response = $this->getPropertiesOfEntryFromLastLinkShare($path, $propertiesTable);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -727,7 +727,7 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function publicGetsThePropertiesOfFolderAndAssertValueOfItemInResponseRegExp(string $xpath, string $path, string $pattern):void {
 		$propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
-		$response = $this->getPropertiesOfPublicFolder($path, $propertiesTable);
+		$response = $this->getPropertiesOfEntryFromLastLinkShare($path, $propertiesTable);
 		$this->featureContext->theHTTPStatusCodeShouldBe('207', "", $response);
 		$this->assertXpathValueMatchesPattern(
 			$this->featureContext->getResponseXml($response),
@@ -847,7 +847,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseToUserRegExp(string $xpath, ?string $user, string $pattern, ?SimpleXMLElement $responseXml = null):void {
+	public function theValueOfItemInResponseToUserShouldMatch(string $xpath, ?string $user, string $pattern, ?SimpleXMLElement $responseXml = null):void {
 		$resXml = $this->featureContext->getResponseXml();
 		$this->assertXpathValueMatchesPattern($resXml, $xpath, $pattern, $user);
 	}
