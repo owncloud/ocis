@@ -360,7 +360,10 @@ class WebDavPropertiesContext implements Context {
 		string $namespaceString,
 		string $propertyValue
 	):void {
-		$responseXmlObject = $this->featureContext->getResponseXml();
+		$responseXmlObject = $this->featureContext->getResponseXml(
+			$this->featureContext->getResponse(),
+			__METHOD__
+		);
 		//calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
@@ -403,7 +406,10 @@ class WebDavPropertiesContext implements Context {
 	):void {
 		// let's unescape quotes first
 		$propertyValue = \str_replace('\"', '"', $propertyValue);
-		$responseXmlObject = $this->featureContext->getResponseXml();
+		$responseXmlObject = $this->featureContext->getResponseXml(
+			$this->featureContext->getResponse(),
+			__METHOD__
+		);
 		//calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
@@ -537,9 +543,7 @@ class WebDavPropertiesContext implements Context {
 		string $altExpectedValue,
 		?string $user = null
 	):void {
-		var_dump($response->getStatusCode());
 		$xmlPart = $this->featureContext->getResponseXml($response);
-		var_dump($xmlPart);
 		$xmlPart = $xmlPart->xpath(
 			"//d:prop/$key"
 		);
@@ -613,7 +617,10 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function assertValueOfItemInResponseAboutUserIs(string $xpath, ?string $user, string $expectedValue):void {
-		$resXml = $this->featureContext->getResponseXml();
+		$resXml = $this->featureContext->getResponseXml(
+			$this->featureContext->getResponse(),
+			__METHOD__
+		);
 		$value = $this->getXmlItemByXpath($resXml, $xpath);
 		$user = $this->featureContext->getActualUsername($user);
 		$expectedValue = $this->featureContext->substituteInLineCodes(
@@ -647,7 +654,10 @@ class WebDavPropertiesContext implements Context {
 		if (!$expectedValue2) {
 			$expectedValue2 = $expectedValue1;
 		}
-		$resXml = $this->featureContext->getResponseXml();
+		$resXml = $this->featureContext->getResponseXml(
+			$this->featureContext->getResponse(),
+			__METHOD__
+		);
 		$value = $this->getXmlItemByXpath($resXml, $xpath);
 		$user = $this->featureContext->getActualUsername($user);
 		$expectedValue1 = $this->featureContext->substituteInLineCodes(
@@ -736,7 +746,10 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function assertEntryWithHrefMatchingRegExpInResponseToUser(string $expectedHref, string $user):void {
-		$resXml = $this->featureContext->getResponseXml();
+		$resXml = $this->featureContext->getResponseXml(
+			$this->featureContext->getResponse(),
+			__METHOD__
+		);
 
 		$user = $this->featureContext->getActualUsername($user);
 		$expectedHref = $this->featureContext->substituteInLineCodes(
@@ -1102,7 +1115,7 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function thePropertiesResponseShouldContainAnEtag():void {
 		Assert::assertTrue(
-			$this->featureContext->isEtagValid(),
+			$this->featureContext->isEtagValid($this->featureContext->getEtagFromResponseXmlObject()),
 			__METHOD__
 			. " getetag not found in response"
 		);
