@@ -163,11 +163,11 @@ trait WebDav {
 
 	/**
 	 *
-	 * @param string|null $eTag if null then get eTag from response XML object
+	 * @param string $eTag
 	 *
 	 * @return boolean
 	 */
-	public function isEtagValid($eTag):bool {
+	public function isEtagValid(string $eTag): bool {
 		if (\preg_match("/^\"[a-f0-9:\.]{1,32}\"$/", $eTag)
 		) {
 			return true;

@@ -181,7 +181,7 @@ class WebDavPropertiesContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getDavPathVersion()
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
 	}
 
 	/**
@@ -342,7 +342,7 @@ class WebDavPropertiesContext implements Context {
 			$path,
 			$propertyValue
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
 	}
 
 	/**
