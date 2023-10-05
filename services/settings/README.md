@@ -71,3 +71,7 @@ Services can set or query ocis *setting values* of a user from settings bundles.
 ## Service Accounts
 
 The settings service needs to know the ID's of service accounts but it doesn't need their secrets. Currently only one service account can be configured which has the admin role. This can be set with the `SETTINGS_SERVICE_ACCOUNT_ID_ADMIN` envvar, but it will also pick up the global `OCIS_SERVICE_ACCOUNT_ID` envvar. Also see the 'auth-service' service description for additional details.
+
+## Default language
+
+The default language can be defined via SETTINGS_DEFAULT_LANGUAGE environment variable. If this variable is not defined, the English language will be used as default.
