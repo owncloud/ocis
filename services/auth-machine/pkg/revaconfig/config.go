@@ -26,6 +26,7 @@ func AuthMachineConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
+							"api_key":      cfg.MachineAuthAPIKey,
 							"gateway_addr": cfg.Reva.Address,
 						},
 					},
