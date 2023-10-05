@@ -89,13 +89,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				}
 
 				// if the request is not bound to any user agent, write all available challenges
-				if !touch &&
-					// This is a temporary hack... Before the authentication middleware rewrite all
-					// unauthenticated requests were still handled. The reva http services then did add
-					// the supported authentication headers to the response. Since we are not allowing the
-					// requests to continue so far we have to do it here. But we shouldn't do it for the graph service.
-					// That's the reason for this hard check here.
-					!strings.HasPrefix(r.URL.Path, "/graph") {
+				if !touch {
 					writeSupportedAuthenticateHeader(w, r)
 				}
 			}
