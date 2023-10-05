@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
+* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
@@ -20,6 +21,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
+* Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
@@ -67,6 +69,14 @@ The following sections list the changes for unreleased.
    state of received shares to "pending".
 
    https://github.com/owncloud/ocis/issues/7319
+
+* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+
+   The values `tls` and `ssl` for the `smtp_encryption` configuration setting are duplicates of
+   `starttls` and `ssltls`. They have been marked as deprecated. A warning will be logged when
+   they are still used. Please use `starttls` instead for `tls` and `ssltls` instead of `ssl.
+
+   https://github.com/owncloud/ocis/issues/7345
 
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 
@@ -132,6 +142,14 @@ The following sections list the changes for unreleased.
    Introduce a config to set the web login URL via `WEB_OPTION_LOGIN_URL`.
 
    https://github.com/owncloud/ocis/pull/7317
+
+* Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
+
+   This cause the notifications service to automatically pick a suitable authentication method
+   to use with the configured SMTP server. This is also the new default behavior. The previous
+   default was to not use authentication at all.
+
+   https://github.com/owncloud/ocis/issues/7356
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
