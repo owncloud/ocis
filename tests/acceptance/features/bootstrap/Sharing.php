@@ -341,19 +341,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^the user creates a share using the sharing API with settings$/
-	 *
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserCreatesAShareWithSettings(?TableNode $body):void {
-		$response = $this->createShareWithSettings($this->currentUser, $body);
-		$this->setResponse($response);
-	}
-
-	/**
 	 * @When /^user "([^"]*)" creates a public link share using the sharing API with settings$/
 	 *
 	 * @param string $user
@@ -398,20 +385,6 @@ trait Sharing {
 	 */
 	public function theUserCreatesAPublicLinkShareWithSettings(?TableNode $body):void {
 		$this->userCreatesAPublicLinkShareWithSettings($this->currentUser, $body);
-	}
-
-	/**
-	 * @Given /^the user has created a share with settings$/
-	 *
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserHasCreatedAShareWithSettings(?TableNode $body):void {
-		$response = $this->createShareWithSettings($this->currentUser, $body);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -875,7 +848,9 @@ trait Sharing {
 		);
 
 		// save the created share data
-		if ($response->getStatusCode() === 200) {
+		if (($response->getStatusCode() === 200)
+			&& \in_array($this->ocsContext->getOCSResponseStatusCode($response), ['100', '200'])
+		) {
 			$xmlResponse = $this->getResponseXml($response);
 			if (isset($xmlResponse->data)) {
 				$shareData = $xmlResponse->data;
