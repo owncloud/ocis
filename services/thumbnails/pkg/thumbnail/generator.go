@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"errors"
 	"image"
 	"image/color"
 	"image/draw"
@@ -11,26 +10,25 @@ import (
 	"github.com/disintegration/imaging"
 )
 
-var (
-	// ErrInvalidType represents the error when a type can't be encoded.
-	ErrInvalidType2 = errors.New("can't encode this type")
-)
-
+// Generator generates a web friendly file version.
 type Generator interface {
 	Generate(image.Rectangle, interface{}, Processor) (interface{}, error)
 }
 
+// SimpleGenerator is the default image generator and is used for all image types expect gif.
 type SimpleGenerator struct{}
 
+// Generate creates the image version based on the processor.
 func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
 	m, ok := img.(image.Image)
 	if !ok {
-		return nil, ErrInvalidType2
+		return nil, ErrInvalidType
 	}
 
 	return processor.Process(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
 }
 
+// GifGenerator is used to create a web friendly version of the provided gif image.
 type GifGenerator struct{}
 
 func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
@@ -38,7 +36,7 @@ func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor 
 
 	m, ok := img.(*gif.GIF)
 	if !ok {
-		return nil, ErrInvalidType2
+		return nil, ErrInvalidType
 	}
 	// Create a new RGBA image to hold the incremental frames.
 	srcX, srcY := m.Config.Width, m.Config.Height
