@@ -74,4 +74,4 @@ The settings service needs to know the ID's of service accounts but it doesn't n
 
 ## Default language
 
-The default language can be defined via SETTINGS_DEFAULT_LANGUAGE environment variable. If this variable is not defined, the English language will be used as default.
+The default language can be defined via SETTINGS_DEFAULT_LANGUAGE environment variable. If this variable is not defined, English will be used as default.
