@@ -130,7 +130,6 @@ Feature: multi-link sharing
       | permissions | read          |
       | name        | sharedlink2   |
     And user "Alice" has deleted file "/textfile0.txt"
-    And the HTTP status code should be "204"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as user "Alice" the file "/textfile0.txt" should not have any shares

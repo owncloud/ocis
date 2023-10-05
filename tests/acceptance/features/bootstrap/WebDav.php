@@ -3768,6 +3768,9 @@ trait WebDav {
 	public function userCreatesFolder(string $user, string $destination):void {
 		$response = $this->userCreateFolder($user, $destination);
 		$this->setResponse($response);
+		$this->setResponseXml(
+			HttpRequestHelper::parseResponseAsXml($response)
+		);
 	}
 
 	/**
@@ -4938,12 +4941,14 @@ trait WebDav {
 	 *
 	 * @param string $width
 	 * @param string $height
+	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 */
-	public function imageDimensionsShouldBe(string $width, string $height): void {
+	public function imageDimensionsShouldBe(string $width, string $height, ?ResponseInterface $response = null): void {
+		$response = $response ?? $this->getResponse();
 		if ($this->responseBodyContent === null) {
-			$this->responseBodyContent = $this->response->getBody()->getContents();
+			$this->responseBodyContent = $response->getBody()->getContents();
 		}
 		$size = \getimagesizefromstring($this->responseBodyContent);
 		Assert::assertNotFalse($size, "could not get size of image");
@@ -4997,7 +5002,7 @@ trait WebDav {
 			$height
 		);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->imageDimensionsShouldBe($width, $height);
+		$this->imageDimensionsShouldBe($width, $height, $response);
 		// save response to user response dictionary for further comparisons
 		$this->userResponseBodyContents[$user] = $this->responseBodyContent;
 	}
