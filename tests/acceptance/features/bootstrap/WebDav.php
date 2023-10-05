@@ -3702,7 +3702,7 @@ trait WebDav {
 			$admin,
 			__METHOD__ . "The provided user is not admin but '" . $admin . "'"
 		);
-		$response = $this->createFolder($user, $destination, true);
+		$response = $this->createFolder($admin, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for admin '$admin'",
@@ -4825,10 +4825,11 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theDavElementShouldBe(string $element, string $message):void {
+		$resXmlArray = HttpRequestHelper::parseResponseAsXml($this->getResponse());
 		WebDavAssert::assertDavResponseElementIs(
 			$element,
 			$message,
-			$this->responseXml,
+			$resXmlArray,
 			__METHOD__
 		);
 	}

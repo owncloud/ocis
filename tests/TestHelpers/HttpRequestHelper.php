@@ -657,6 +657,8 @@ class HttpRequestHelper {
 	 * @return array
 	 */
 	public static function parseResponseAsXml(ResponseInterface $response):array {
+		// rewind so that we can reparse it if it was parsed already
+		$response->getBody()->rewind();
 		$body = $response->getBody()->getContents();
 		$parsedResponse = [];
 		if ($body && \substr($body, 0, 1) === '<') {
