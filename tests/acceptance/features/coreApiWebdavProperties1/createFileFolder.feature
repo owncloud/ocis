@@ -51,7 +51,7 @@ Feature: create files and folder
     When user "Alice" gets the following properties of folder "/test_folder" using the WebDAV API
       | propertyName   |
       | d:resourcetype |
-    Then the HTTP status code should be "201"
+    Then the HTTP status code should be "207"
     And the single response should contain a property "d:resourcetype" with a child property "d:collection"
     Examples:
       | dav-path-version |
@@ -70,7 +70,7 @@ Feature: create files and folder
     When user "Alice" gets the following properties of folder "/test_folder:5" using the WebDAV API
       | propertyName   |
       | d:resourcetype |
-    Then the HTTP status code should be "201"
+    Then the HTTP status code should be "207"
     And the single response should contain a property "d:resourcetype" with a child property "d:collection"
     Examples:
       | dav-path-version |

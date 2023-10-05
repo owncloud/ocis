@@ -148,11 +148,12 @@ trait WebDav {
 	}
 
 	/**
+	 * @param SimpleXMLElement|null $xmlObject
 	 *
 	 * @return string the etag or an empty string if the getetag property does not exist
 	 */
-	public function getEtagFromResponseXmlObject():string {
-		$xmlObject = $this->getResponseXmlObject();
+	public function getEtagFromResponseXmlObject(?SimpleXMLElement $xmlObject = null): string {
+		$xmlObject = $xmlObject ?? $this->getResponseXml();
 		$xmlPart = $xmlObject->xpath("//d:prop/d:getetag");
 		if (!\is_array($xmlPart) || (\count($xmlPart) === 0)) {
 			return '';
@@ -162,14 +163,11 @@ trait WebDav {
 
 	/**
 	 *
-	 * @param string|null $eTag if null then get eTag from response XML object
+	 * @param string $eTag
 	 *
 	 * @return boolean
 	 */
-	public function isEtagValid(?string $eTag = null):bool {
-		if ($eTag === null) {
-			$eTag = $this->getEtagFromResponseXmlObject();
-		}
+	public function isEtagValid(string $eTag): bool {
 		if (\preg_match("/^\"[a-f0-9:\.]{1,32}\"$/", $eTag)
 		) {
 			return true;
@@ -1689,7 +1687,7 @@ trait WebDav {
 		$statusCode = $response->getStatusCode();
 		if ($statusCode < 401 || $statusCode > 404) {
 			try {
-				$this->responseXmlObject = HttpRequestHelper::getResponseXml(
+				$responseXml = $this->featureContext->getResponseXml(
 					$response,
 					__METHOD__
 				);
@@ -1699,10 +1697,10 @@ trait WebDav {
 				);
 			}
 			Assert::assertTrue(
-				$this->isEtagValid(),
+				$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml)),
 				"$entry '$path' should not exist. But API returned $statusCode without an etag in the body"
 			);
-			$isCollection = $this->getResponseXmlObject()->xpath("//d:prop/d:resourcetype/d:collection");
+			$isCollection = $responseXml->xpath("//d:prop/d:resourcetype/d:collection");
 			if (\count($isCollection) === 0) {
 				$actualResourceType = "file";
 			} else {
@@ -1758,7 +1756,7 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		$path = $this->substituteInLineCodes($path);
-		$this->responseXmlObject = $this->listFolderAndReturnResponseXml(
+		$responseXml = $this->listFolderAndReturnResponseXml(
 			$user,
 			$path,
 			'0',
@@ -1766,16 +1764,15 @@ trait WebDav {
 			$type
 		);
 		Assert::assertTrue(
-			$this->isEtagValid(),
+			$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml)),
 			"$entry '$path' expected to exist for user $user but not found"
 		);
-		$isCollection = $this->getResponseXmlObject()->xpath("//d:prop/d:resourcetype/d:collection");
+		$isCollection = $responseXml->xpath("//d:prop/d:resourcetype/d:collection");
 		if ($entry === "folder") {
 			Assert::assertEquals(\count($isCollection), 1, "Unexpectedly, `$path` is not a folder");
 		} elseif ($entry === "file") {
 			Assert::assertEquals(\count($isCollection), 0, "Unexpectedly, `$path` is not a file");
 		}
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
@@ -1839,12 +1836,12 @@ trait WebDav {
 		$numEntriesThatExist = 0;
 		foreach ($table->getTable() as $row) {
 			$path = $this->substituteInLineCodes($row[0]);
-			$this->responseXmlObject = $this->listFolderAndReturnResponseXml(
+			$responseXml = $this->listFolderAndReturnResponseXml(
 				$user,
 				$path,
 				'0'
 			);
-			if ($this->isEtagValid()) {
+			if ($this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml))) {
 				$numEntriesThatExist = $numEntriesThatExist + 1;
 			}
 		}
