@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
@@ -29,6 +30,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 
 ## Details
+
+* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
+
+   Userlog will now delete events when the user has no longer access to the underlying resource
+
+   https://github.com/owncloud/ocis/pull/7410
 
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 
@@ -112,6 +119,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6427
    https://github.com/owncloud/ocis/pull/7178
    https://github.com/owncloud/ocis/pull/7217
+   https://github.com/owncloud/ocis/pull/7410
 
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 
