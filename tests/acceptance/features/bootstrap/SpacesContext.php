@@ -2980,14 +2980,14 @@ class SpacesContext implements Context {
 
 		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $body;
 
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url,
 		);
 
 		$should = ($shouldOrNot !== "not");
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data), true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->data), true, 512, JSON_THROW_ON_ERROR);
 
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
