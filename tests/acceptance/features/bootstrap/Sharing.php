@@ -3452,11 +3452,12 @@ trait Sharing {
 	 *
 	 * @param string $user
 	 * @param string|null $state pending|accepted|declined|rejected|all
+	 * @param bool $hidden return hidden shares
 	 *
 	 * @return array of shares that are shared with this user
 	 * @throws Exception
 	 */
-	private function getAllSharesSharedWithUser(string $user, ?string $state = "all"): array {
+	private function getAllSharesSharedWithUser(string $user, ?string $state = "all", ?bool $hidden = false): array {
 		switch ($state) {
 			case 'pending':
 			case 'accepted':
@@ -3472,7 +3473,7 @@ trait Sharing {
 					__METHOD__ . ' invalid "state" given'
 				);
 		}
-		$url = $this->getSharesEndpointPath("?format=json&shared_with_me=true&state=$stateCode");
+		$url = $this->getSharesEndpointPath("?format=json&shared_with_me=true&state=$stateCode" . ($hidden ? '&show_hidden=true' : ''));
 		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			"GET",
@@ -3857,48 +3858,85 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" hiddes share "([^"]*)" of the (accepted|pending|declined) state offered by user "([^"]*)" using the sharing API$/
+	 * @When /^user "([^"]*)" (hiddes|displays) share "([^"]*)" offered by user "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $user
+	 * @param string $action
 	 * @param string $share
-	 * @param string $state specify 'accepted', 'pending' or 'declined' to only consider shares in that state
 	 * @param string $offeredBy
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHiddesShareOfferedBy(string $user, string $share, string $state, string $offeredBy):void {
+	public function userHiddesShareOfferedBy(string $user, string $action, string $share, string $offeredBy):void {
 		$user = $this->getActualUsername($user);
 		$offeredBy = $this->getActualUsername($offeredBy);
 
-		$response = $this->getAllSharesSharedWithUser($user);
+		$response = $this->getAllSharesSharedWithUser($user, "all", true);
 		$shareId = null;
 		foreach ($response as $shareElement) {
-			$requiredStateCode = SharingHelper::SHARE_STATES[$state];
-			if ($shareElement['state'] === $requiredStateCode) {
-				$matchesShareState = true;
-			} else {
-				$matchesShareState = false;
-			}
-			
-			if ($matchesShareState
-				&& (string) $shareElement['uid_owner'] === $offeredBy
-				&& (string) $shareElement['path'] === $share
-			) {
+			if ((string) $shareElement['uid_owner'] === $offeredBy && (string) $shareElement['path'] === $share) {
 				$shareId = (string) $shareElement['id'];
 				break;
 			}
 		}
 		Assert::assertNotNull(
 			$shareId,
-			__METHOD__ . " could not find share $share of the $state state, offered by $offeredBy to $user"
+			__METHOD__ . " could not find share $share offered by $offeredBy to $user"
 		);
 		$url = "/apps/files_sharing/api/v$this->sharingApiVersion" .
-			"/shares/pending/$shareId?format=xml&hide=true";
+			"/shares/pending/$shareId?format=xml&" . ($action === 'hiddes' ? 'hide=true' : 'hide=false');
 
 		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'POST',
+			$url
+		);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has hidden share "([^"]*)" offered by user "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $offeredBy
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasHiddenShareOfferedBy(string $user, string $share, string $offeredBy):void {
+		$this->userHiddesShareOfferedBy($user, 'hiddes', $share, $offeredBy);
+		$this->theHTTPStatusCodeShouldBe(200, "user $user couldn not hidden resource $share");
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (hiddes|displayes) shared (folder|file) "([^"]*)" using the sharing API$/
+	 *
+	 * @param string $user
+	 * @param string $action
+	 * @param string $share
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHiddesSharedResource(string $user, string $action, string $share):void {
+		$user = $this->getActualUsername($user);
+
+		$response = $this->getAllShares($user, "?format=json&reshares=true&path=$share");
+		$responseBody = \json_decode($response->getBody()->getContents(), true);
+  
+		Assert::assertArrayHasKey('data', $responseBody['ocs']);
+		$shareId = $responseBody['ocs']['data'][0]['id'];
+	
+		$url = "/apps/files_sharing/api/v$this->sharingApiVersion" .
+			"/shares/$shareId?" . ($action === 'hiddes' ? 'hide=true' : 'hide=false');
+		;
+
+		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+			$user,
+			'PUT',
 			$url
 		);
 		$this->setResponse($response);
