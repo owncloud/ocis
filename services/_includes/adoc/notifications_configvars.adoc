@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-05-09-58-05]
+[#deprecation-note-2023-10-05-10-38-06]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| The NOTIFICATIONS_SMTP_ENCRYPTION values 'ssl' and 'tls' are deprecated and will be removed in the future.
+| 5.0.0
+| 6.0.0
+| Use 'starttls' instead of 'tls' and 'ssltls' instead of 'ssl'.
 |===
 
 endif::[]
@@ -166,7 +171,7 @@ a|`NOTIFICATIONS_SMTP_PORT` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++1025 ++
+++0 ++
 a| [subs=-attributes]
 Port of the SMTP host to connect to.
 
@@ -175,9 +180,9 @@ a|`NOTIFICATIONS_SMTP_SENDER` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ownCloud <noreply@example.com> ++
+++ ++
 a| [subs=-attributes]
-Sender address of emails that will be sent.
+Sender address of emails that will be sent (e.g. 'ownCloud <noreply@example.com>'.
 
 a|`NOTIFICATIONS_SMTP_USERNAME` +
 
@@ -211,12 +216,12 @@ a|`NOTIFICATIONS_SMTP_AUTHENTICATION` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++none ++
+++ ++
 a| [subs=-attributes]
-Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none'
+Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-
+xref:deprecation-note-2023-10-05-10-38-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

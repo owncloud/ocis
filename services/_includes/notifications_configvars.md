@@ -16,12 +16,12 @@
 | NOTIFICATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCIS_URL<br/>NOTIFICATIONS_WEB_UI_URL | string | https://localhost:9200 | The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails|
 | NOTIFICATIONS_SMTP_HOST | string |  | SMTP host to connect to.|
-| NOTIFICATIONS_SMTP_PORT | int | 1025 | Port of the SMTP host to connect to.|
-| NOTIFICATIONS_SMTP_SENDER | string | ownCloud &lt;noreply@example.com&gt; | Sender address of emails that will be sent.|
+| NOTIFICATIONS_SMTP_PORT | int | 0 | Port of the SMTP host to connect to.|
+| NOTIFICATIONS_SMTP_SENDER | string |  | Sender address of emails that will be sent (e.g. 'ownCloud <noreply@example.com>'.|
 | NOTIFICATIONS_SMTP_USERNAME | string |  | Username for the SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_PASSWORD | string |  | Password for the SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_INSECURE | bool | false | Allow insecure connections to the SMTP server.|
-| NOTIFICATIONS_SMTP_AUTHENTICATION | string | none | Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none'|
+| NOTIFICATIONS_SMTP_AUTHENTICATION | string |  | Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.|
 | NOTIFICATIONS_SMTP_ENCRYPTION | string | none | Encryption method for the SMTP communication. Possible values  are 'starttls', 'ssl', 'ssltls', 'tls'  and 'none'.|
 | OCIS_EVENTS_ENDPOINT<br/>NOTIFICATIONS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>NOTIFICATIONS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
