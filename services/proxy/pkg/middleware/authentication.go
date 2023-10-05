@@ -204,7 +204,6 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 			return
 		}
 	}
-	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(l.fallback), l.r.Host))
 }
 
 func getTraceProvider(o Options) trace.TracerProvider {
