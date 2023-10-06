@@ -84,7 +84,6 @@ func DefaultConfig() *config.Config {
 		},
 		GatewayAddress: "com.owncloud.api.gateway",
 		Web: config.Web{
-			Path:        "",
 			ThemeServer: "https://localhost:9200",
 			ThemePath:   "/themes/owncloud/theme.json",
 			Config: config.WebConfig{

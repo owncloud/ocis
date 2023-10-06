@@ -9,20 +9,19 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	Commons           *shared.Commons       `yaml:"-"` // don't use this directly as configuration for a service
-	GRPC              GRPC                  `yaml:"grpc"`
-	Service           Service               `yaml:"-"`
-	Debug             Debug                 `yaml:"debug"`
-	TokenManager      *TokenManager         `yaml:"token_manager"`
-	Events            Events                `yaml:"events"`
-	Reva              *shared.Reva          `yaml:"reva"`
-	GRPCClientTLS     *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	MachineAuthAPIKey string                `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;POLICIES_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
-	Context           context.Context       `yaml:"-"`
-	Log               *Log                  `yaml:"log"`
-	Engine            Engine                `yaml:"engine"`
-	Postprocessing    Postprocessing        `yaml:"postprocessing"`
-	Tracing           *Tracing              `yaml:"tracing"`
+	Commons        *shared.Commons       `yaml:"-"` // don't use this directly as configuration for a service
+	GRPC           GRPC                  `yaml:"grpc"`
+	Service        Service               `yaml:"-"`
+	Debug          Debug                 `yaml:"debug"`
+	TokenManager   *TokenManager         `yaml:"token_manager"`
+	Events         Events                `yaml:"events"`
+	Reva           *shared.Reva          `yaml:"reva"`
+	GRPCClientTLS  *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	Context        context.Context       `yaml:"-"`
+	Log            *Log                  `yaml:"log"`
+	Engine         Engine                `yaml:"engine"`
+	Postprocessing Postprocessing        `yaml:"postprocessing"`
+	Tracing        *Tracing              `yaml:"tracing"`
 }
 
 // Service defines the available service configuration.
