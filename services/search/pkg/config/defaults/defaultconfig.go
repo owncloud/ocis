@@ -50,7 +50,7 @@ func DefaultConfig() *config.Config {
 			Endpoint:         "127.0.0.1:9233",
 			Cluster:          "ocis-cluster",
 			DebounceDuration: 1000,
-			AsyncUploads:     false,
+			AsyncUploads:     true,
 			EnableTLS:        false,
 		},
 		ContentExtractionSizeLimit: 20 * 1024 * 1024, // Limit content extraction to <20MB files by default

@@ -85,6 +85,7 @@ func DefaultConfig() *config.Config {
 				PermissionsEndpoint:        "com.owncloud.api.settings",
 				MaxAcquireLockCycles:       20,
 				LockCycleDurationFactor:    30,
+				AsyncUploads:               true,
 			},
 		},
 		Events: config.Events{
