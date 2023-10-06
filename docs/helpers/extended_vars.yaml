@@ -1,0 +1,82 @@
+variables:
+- rawname: CS3_GATEWAY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:76
+  foundincode: true
+  name: CS3_GATEWAY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: CS3_MACHINE_AUTH_API_KEY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  foundincode: true
+  name: CS3_MACHINE_AUTH_API_KEY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:31
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: string
+  default_value: Error
+  description: Set the log level for the internal go micro framework. Only change
+    on supervision of ownCloud Support.
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:35
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: registryEnv
+  path: ocis-pkg/registry/registry.go:44
+  foundincode: true
+  name: MICRO_REGISTRY
+  type: string
+  default_value: ""
+  description: 'Go micro registry type to use. Supported types are: ''nats'', ''kubernetes'',
+    ''etcd'', ''consul'', ''memory'' and ''mdns''. Will be selected automatically. Only change
+    on supervision of ownCloud Support.'
+  do_ignore: false
+- rawname: registryAddressEnv
+  path: ocis-pkg/registry/registry.go:42
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: string
+  default_value: ""
+  description: The bind address of the internal go micro framework. Only change on
+    supervision of ownCloud Support.
+  do_ignore: false
+- rawname: OCIS_BASE_DATA_PATH
+  path: ocis-pkg/config/defaults/paths.go:23
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: string
+  default_value: '''/var/lib/ocis'' or ''$HOME/.ocis/'''
+  description: The base directory location used by several services and for user data.
+    Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/'
+    for binary releases. Services can have, if available, an individual setting with
+    an own environment variable.
+  do_ignore: false
+- rawname: OCIS_CONFIG_DIR
+  path: ocis-pkg/config/defaults/paths.go:56
+  foundincode: true
+  name: OCIS_CONFIG_DIR
+  type: string
+  default_value: '''/etc/ocis'' or ''$HOME/.ocis/config'''
+  description: The default directory location for config files. Predefined to '/etc/ocis'
+    for container images (inside the container) or '$HOME/.ocis/config' for binary
+    releases.
+  do_ignore: false
+- rawname: parts[0]
+  path: ocis-pkg/config/envdecode/envdecode.go:382
+  foundincode: true
+  name: parts[0]
+  type: ""
+  default_value: ""
+  description: false positive - code that extract envvars for config structs
+  do_ignore: true
