@@ -35,6 +35,10 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	switch cfg.IDP.IdentityManager {
+	case "cs3":
+		if cfg.MachineAuthAPIKey == "" {
+			return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		}
 	case "ldap":
 		if cfg.Ldap.BindPassword == "" {
 			return shared.MissingLDAPBindPassword(cfg.Service.Name)

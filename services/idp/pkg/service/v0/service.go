@@ -57,7 +57,7 @@ func NewService(opts ...Option) Service {
 	switch options.Config.IDP.IdentityManager {
 	case "cs3":
 		cs3BackendSupport.MustRegister()
-		if err := initCS3EnvVars(options.Config.Reva.Address); err != nil {
+		if err := initCS3EnvVars(options.Config.Reva.Address, options.Config.MachineAuthAPIKey); err != nil {
 			logger.Fatal().Err(err).Msg("could not initialize cs3 backend env vars")
 		}
 	case "ldap":
@@ -152,9 +152,10 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 }
 
 // Init cs3 backend vars which are currently not accessible via idp api
-func initCS3EnvVars(cs3Addr string) error {
+func initCS3EnvVars(cs3Addr, machineAuthAPIKey string) error {
 	defaults := map[string]string{
-		"CS3_GATEWAY": cs3Addr,
+		"CS3_GATEWAY":              cs3Addr,
+		"CS3_MACHINE_AUTH_API_KEY": machineAuthAPIKey,
 	}
 
 	for k, v := range defaults {

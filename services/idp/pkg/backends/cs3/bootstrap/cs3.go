@@ -19,12 +19,13 @@ package bootstrap
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/libregraph/lico/bootstrap"
 	"github.com/libregraph/lico/identifier"
 	"github.com/libregraph/lico/identity"
 	"github.com/libregraph/lico/identity/managers"
 	cs3 "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/identifier"
-	"os"
 )
 
 // Identity managers.
@@ -73,6 +74,7 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 		config.TLSClientConfig,
 		// FIXME add a map[string]interface{} property to the lico config.Config so backends can pass custom config parameters through the bootstrap process
 		os.Getenv("CS3_GATEWAY"),
+		os.Getenv("CS3_MACHINE_AUTH_API_KEY"),
 		config.Settings.Insecure,
 	)
 	if identifierErr != nil {

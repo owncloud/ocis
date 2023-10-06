@@ -33,10 +33,11 @@ var cs3SpportedScopes = []string{
 type CS3Backend struct {
 	supportedScopes []string
 
-	logger     logrus.FieldLogger
-	tlsConfig  *tls.Config
-	gatewayURI string
-	insecure   bool
+	logger            logrus.FieldLogger
+	tlsConfig         *tls.Config
+	gatewayURI        string
+	machineAuthAPIKey string
+	insecure          bool
 
 	sessions cmap.ConcurrentMap
 
@@ -48,6 +49,7 @@ func NewCS3Backend(
 	c *config.Config,
 	tlsConfig *tls.Config,
 	gatewayURI string,
+	machineAuthAPIKey string,
 	insecure bool,
 ) (*CS3Backend, error) {
 
@@ -58,10 +60,11 @@ func NewCS3Backend(
 	b := &CS3Backend{
 		supportedScopes: supportedScopes,
 
-		logger:     c.Logger,
-		tlsConfig:  tlsConfig,
-		gatewayURI: gatewayURI,
-		insecure:   insecure,
+		logger:            c.Logger,
+		tlsConfig:         tlsConfig,
+		gatewayURI:        gatewayURI,
+		machineAuthAPIKey: machineAuthAPIKey,
+		insecure:          insecure,
 
 		sessions: cmap.New(),
 	}
@@ -154,8 +157,9 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 	client := cs3gateway.NewGatewayAPIClient(l)
 
 	res, err := client.Authenticate(ctx, &cs3gateway.AuthenticateRequest{
-		Type:     "machine",
-		ClientId: "username:" + username,
+		Type:         "machine",
+		ClientId:     "username:" + username,
+		ClientSecret: b.machineAuthAPIKey,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend machine authenticate rpc error: %v", err)
