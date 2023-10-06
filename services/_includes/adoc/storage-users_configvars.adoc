@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-06-03-42-42]
+[#deprecation-note-2023-10-06-08-26-29]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -359,7 +359,7 @@ a|`OCIS_ASYNC_UPLOADS` +
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++false ++
+++true ++
 a| [subs=-attributes]
 Enable asynchronous file uploads.
 

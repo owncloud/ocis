@@ -30,7 +30,7 @@ grpc_client_tls: null
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
-  async_uploads: false
+  async_uploads: true
   num_consumers: 0
   debounce_duration: 1000
   tls_insecure: false
