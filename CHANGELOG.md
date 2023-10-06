@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
@@ -131,6 +132,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7178
    https://github.com/owncloud/ocis/pull/7217
    https://github.com/owncloud/ocis/pull/7410
+
+* Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
+
+   Checked and changed the envvars specified in the task and also removed those that are no longer
+   used.
+
+   https://github.com/owncloud/ocis/pull/7406
 
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 
