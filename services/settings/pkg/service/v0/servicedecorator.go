@@ -11,11 +11,13 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
+var _defaultLanguage = "en"
+
 // NewDefaultLanguageService returns a default language decorator for ServiceHandler.
 func NewDefaultLanguageService(cfg *config.Config, serviceHandler settings.ServiceHandler) settings.ServiceHandler {
 	defaultLanguage := cfg.DefaultLanguage
 	if defaultLanguage == "" {
-		defaultLanguage = "en"
+		defaultLanguage = _defaultLanguage
 	}
 	return &defaultLanguageDecorator{defaultLanguage: defaultLanguage, ServiceHandler: serviceHandler}
 }

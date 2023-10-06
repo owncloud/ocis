@@ -74,4 +74,4 @@ The settings service needs to know the ID's of service accounts but it doesn't n
 
 ## Default language
 
-The default language can be defined via SETTINGS_DEFAULT_LANGUAGE environment variable. If this variable is not defined, English will be used as default. The value has ISO 639-1 format ("de", "en", etc.) and limited by the supported languages. This setting can be used to set the default language for invitation emails.
+The default language can be defined via SETTINGS_DEFAULT_LANGUAGE environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for invitation emails.
