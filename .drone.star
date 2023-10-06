@@ -1816,7 +1816,7 @@ def docs():
             {
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
-                "commands": ["make -C docs docs-generate"],
+                "commands": ["make docs-generate"],
             },
             {
                 "name": "prepare",
