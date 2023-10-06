@@ -47,7 +47,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 10, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 11},
+					{Low: 0, High: 10, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 11},
 				},
 				RuneCount: map[string]int{
 					"Latin": 11,
@@ -60,7 +60,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 12, Spaces: []int{8, 12}, TargetScript: "Latin", RuneCount: 13},
+					{Low: 0, High: 12, Spaces: []int{8, 12}, TargetScript: "Latin", RuneCount: 13},
 				},
 				RuneCount: map[string]int{
 					"Latin": 13,
@@ -73,7 +73,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 45, Spaces: []int{5, 11, 16, 21, 25, 30, 34}, TargetScript: "Latin", RuneCount: 44},
+					{Low: 0, High: 45, Spaces: []int{5, 11, 16, 21, 25, 30, 34}, TargetScript: "Latin", RuneCount: 44},
 				},
 				RuneCount: map[string]int{
 					"Latin": 44,
@@ -86,7 +86,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 14, Spaces: []int{5, 10}, TargetScript: "Latin", RuneCount: 12},
+					{Low: 0, High: 14, Spaces: []int{5, 10}, TargetScript: "Latin", RuneCount: 12},
 				},
 				RuneCount: map[string]int{
 					"Latin": 12,
@@ -99,7 +99,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 15, Spaces: []int{6}, TargetScript: "Hangul", RuneCount: 6},
+					{Low: 0, High: 15, Spaces: []int{6}, TargetScript: "Hangul", RuneCount: 6},
 				},
 				RuneCount: map[string]int{
 					"Hangul": 6,
@@ -112,7 +112,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 20, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 7},
+					{Low: 0, High: 20, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 7},
 				},
 				RuneCount: map[string]int{
 					"Hiragana": 7,
@@ -125,7 +125,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 14, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
+					{Low: 0, High: 14, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
 				},
 				RuneCount: map[string]int{
 					"Katakana": 5,
@@ -138,7 +138,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 9},
+					{Low: 0, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 9},
 				},
 				RuneCount: map[string]int{
 					"Hiragana": 9,
@@ -151,7 +151,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 35, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 12},
+					{Low: 0, High: 35, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 12},
 				},
 				RuneCount: map[string]int{
 					"Hiragana": 12,
@@ -164,7 +164,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 36, Spaces: []int{27}, TargetScript: "Hiragana", RuneCount: 13},
+					{Low: 0, High: 36, Spaces: []int{27}, TargetScript: "Hiragana", RuneCount: 13},
 				},
 				RuneCount: map[string]int{
 					"Hiragana": 13,
@@ -177,7 +177,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 45, Spaces: []int{21}, TargetScript: "Devanagari", RuneCount: 16},
+					{Low: 0, High: 45, Spaces: []int{21}, TargetScript: "Devanagari", RuneCount: 16},
 				},
 				RuneCount: map[string]int{
 					"Devanagari": 16,
@@ -190,9 +190,9 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 6},
-					ScriptRange{Low: 6, High: 12, Spaces: []int{12}, TargetScript: "Hangul", RuneCount: 3},
-					ScriptRange{Low: 13, High: 24, Spaces: []int{19}, TargetScript: "Han", RuneCount: 5}, // 🚀 and ! are "Common" script and will be merged with "Han"
+					{Low: 0, High: 5, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 6},
+					{Low: 6, High: 12, Spaces: []int{12}, TargetScript: "Hangul", RuneCount: 3},
+					{Low: 13, High: 24, Spaces: []int{19}, TargetScript: "Han", RuneCount: 5}, // 🚀 and ! are "Common" script and will be merged with "Han"
 				},
 				RuneCount: map[string]int{
 					"Latin":  6,
@@ -207,7 +207,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
 				},
 				RuneCount: map[string]int{
 					"Latin": 5,
@@ -220,7 +220,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{2}, TargetScript: "Latin", RuneCount: 4},
+					{Low: 0, High: 5, Spaces: []int{2}, TargetScript: "Latin", RuneCount: 4},
 				},
 				RuneCount: map[string]int{
 					"Latin": 4,
@@ -233,7 +233,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 28, Spaces: []int{14}, TargetScript: "_unknown", RuneCount: 15},
+					{Low: 0, High: 28, Spaces: []int{14}, TargetScript: "_unknown", RuneCount: 15},
 				},
 				RuneCount: map[string]int{
 					"_unknown": 15,
@@ -246,8 +246,8 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 6},
-					ScriptRange{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+					{Low: 0, High: 5, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 6},
+					{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
 				},
 				RuneCount: map[string]int{
 					"Latin":    6,
@@ -261,7 +261,7 @@ func TestAnalyzeString(t *testing.T) {
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 16, Spaces: []int{0, 6, 16}, TargetScript: "Latin", RuneCount: 17},
+					{Low: 0, High: 16, Spaces: []int{0, 6, 16}, TargetScript: "Latin", RuneCount: 17},
 				},
 				RuneCount: map[string]int{
 					"Latin": 17,
@@ -304,9 +304,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[0],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 6, High: 10, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					{Low: 6, High: 10, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
 				},
 				RuneCount: map[string]int{
 					"Latin":  10,
@@ -319,10 +319,10 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[1],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 7, Spaces: []int{}, TargetScript: "Latin", RuneCount: 8},
-					ScriptRange{Low: 8, High: 8, Spaces: []int{8}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
-					ScriptRange{Low: 12, High: 12, Spaces: []int{12}, TargetScript: "Common", RuneCount: 1},
+					{Low: 0, High: 7, Spaces: []int{}, TargetScript: "Latin", RuneCount: 8},
+					{Low: 8, High: 8, Spaces: []int{8}, TargetScript: "Common", RuneCount: 1},
+					{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
+					{Low: 12, High: 12, Spaces: []int{12}, TargetScript: "Common", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Latin":  11,
@@ -335,16 +335,16 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[2],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 6, High: 9, Spaces: []int{}, TargetScript: "Latin", RuneCount: 4},
-					ScriptRange{Low: 10, High: 21, Spaces: []int{11, 16, 21}, TargetScript: "Common", RuneCount: 11}, // £ takes 2 bytes
-					ScriptRange{Low: 22, High: 24, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
-					ScriptRange{Low: 25, High: 30, Spaces: []int{25, 30}, TargetScript: "Common", RuneCount: 5}, // ¥ takes 2 bytes
-					ScriptRange{Low: 31, High: 33, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
-					ScriptRange{Low: 34, High: 34, Spaces: []int{34}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 35, High: 44, Spaces: []int{}, TargetScript: "Latin", RuneCount: 10},
-					ScriptRange{Low: 45, High: 45, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
+					{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					{Low: 6, High: 9, Spaces: []int{}, TargetScript: "Latin", RuneCount: 4},
+					{Low: 10, High: 21, Spaces: []int{11, 16, 21}, TargetScript: "Common", RuneCount: 11}, // £ takes 2 bytes
+					{Low: 22, High: 24, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
+					{Low: 25, High: 30, Spaces: []int{25, 30}, TargetScript: "Common", RuneCount: 5}, // ¥ takes 2 bytes
+					{Low: 31, High: 33, Spaces: []int{}, TargetScript: "Latin", RuneCount: 3},
+					{Low: 34, High: 34, Spaces: []int{34}, TargetScript: "Common", RuneCount: 1},
+					{Low: 35, High: 44, Spaces: []int{}, TargetScript: "Latin", RuneCount: 10},
+					{Low: 45, High: 45, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Latin":  25,
@@ -357,10 +357,10 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[3],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 6, High: 9, Spaces: []int{}, TargetScript: "Latin", RuneCount: 4},
-					ScriptRange{Low: 10, High: 14, Spaces: []int{10}, TargetScript: "Common", RuneCount: 2},
+					{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					{Low: 6, High: 9, Spaces: []int{}, TargetScript: "Latin", RuneCount: 4},
+					{Low: 10, High: 14, Spaces: []int{10}, TargetScript: "Common", RuneCount: 2},
 				},
 				RuneCount: map[string]int{
 					"Latin":  9,
@@ -373,9 +373,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[4],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 2},
-					ScriptRange{Low: 6, High: 6, Spaces: []int{6}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 7, High: 15, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 3},
+					{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 2},
+					{Low: 6, High: 6, Spaces: []int{6}, TargetScript: "Common", RuneCount: 1},
+					{Low: 7, High: 15, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 3},
 				},
 				RuneCount: map[string]int{
 					"Hangul": 5,
@@ -388,9 +388,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[5],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 8, Spaces: []int{}, TargetScript: "Han", RuneCount: 3},
-					ScriptRange{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
-					ScriptRange{Low: 12, High: 20, Spaces: []int{}, TargetScript: "Han", RuneCount: 3},
+					{Low: 0, High: 8, Spaces: []int{}, TargetScript: "Han", RuneCount: 3},
+					{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
+					{Low: 12, High: 20, Spaces: []int{}, TargetScript: "Han", RuneCount: 3},
 				},
 				RuneCount: map[string]int{
 					"Hiragana": 1,
@@ -403,10 +403,10 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[6],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 1},
-					ScriptRange{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Common", RuneCount: 1}, // ー U+30FC (KATAKANA-HIRAGANA PROLONGED SOUND MARK) seems to be counted as Common
-					ScriptRange{Low: 6, High: 11, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
-					ScriptRange{Low: 12, High: 14, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
+					{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 1},
+					{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Common", RuneCount: 1}, // ー U+30FC (KATAKANA-HIRAGANA PROLONGED SOUND MARK) seems to be counted as Common
+					{Low: 6, High: 11, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
+					{Low: 12, High: 14, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Katakana": 3,
@@ -420,10 +420,10 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[7],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
-					ScriptRange{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
-					ScriptRange{Low: 6, High: 20, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
-					ScriptRange{Low: 21, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
+					{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
+					{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
+					{Low: 6, High: 20, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
+					{Low: 21, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
 				},
 				RuneCount: map[string]int{
 					"Han":      1,
@@ -437,12 +437,12 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[8],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
-					ScriptRange{Low: 6, High: 8, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
-					ScriptRange{Low: 12, High: 14, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
-					ScriptRange{Low: 15, High: 29, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
-					ScriptRange{Low: 30, High: 35, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
+					{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
+					{Low: 6, High: 8, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
+					{Low: 9, High: 11, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
+					{Low: 12, High: 14, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
+					{Low: 15, High: 29, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
+					{Low: 30, High: 35, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
 				},
 				RuneCount: map[string]int{
 					"Han":      1,
@@ -457,13 +457,13 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[9],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
-					ScriptRange{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
-					ScriptRange{Low: 6, High: 20, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
-					ScriptRange{Low: 21, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
-					ScriptRange{Low: 27, High: 27, Spaces: []int{27}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 28, High: 33, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
-					ScriptRange{Low: 34, High: 36, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
+					{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
+					{Low: 3, High: 5, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 1},
+					{Low: 6, High: 20, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 5},
+					{Low: 21, High: 26, Spaces: []int{}, TargetScript: "Hiragana", RuneCount: 2},
+					{Low: 27, High: 27, Spaces: []int{27}, TargetScript: "Common", RuneCount: 1},
+					{Low: 28, High: 33, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
+					{Low: 34, High: 36, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Han":      1,
@@ -478,9 +478,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[10],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 20, Spaces: []int{}, TargetScript: "Devanagari", RuneCount: 7},
-					ScriptRange{Low: 21, High: 21, Spaces: []int{21}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 22, High: 45, Spaces: []int{}, TargetScript: "Devanagari", RuneCount: 8},
+					{Low: 0, High: 20, Spaces: []int{}, TargetScript: "Devanagari", RuneCount: 7},
+					{Low: 21, High: 21, Spaces: []int{21}, TargetScript: "Common", RuneCount: 1},
+					{Low: 22, High: 45, Spaces: []int{}, TargetScript: "Devanagari", RuneCount: 8},
 				},
 				RuneCount: map[string]int{
 					"Devanagari": 15,
@@ -493,12 +493,12 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[11],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 6, High: 11, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 2},
-					ScriptRange{Low: 12, High: 12, Spaces: []int{12}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 13, High: 18, Spaces: []int{}, TargetScript: "Han", RuneCount: 2},
-					ScriptRange{Low: 19, High: 24, Spaces: []int{19}, TargetScript: "Common", RuneCount: 3},
+					{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					{Low: 6, High: 11, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 2},
+					{Low: 12, High: 12, Spaces: []int{12}, TargetScript: "Common", RuneCount: 1},
+					{Low: 13, High: 18, Spaces: []int{}, TargetScript: "Han", RuneCount: 2},
+					{Low: 19, High: 24, Spaces: []int{19}, TargetScript: "Common", RuneCount: 3},
 				},
 				RuneCount: map[string]int{
 					"Latin":  5,
@@ -513,11 +513,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[12],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 0, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 1, High: 1, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
-					ScriptRange{Low: 2, High: 3, Spaces: []int{}, TargetScript: "Inherited", RuneCount: 1},
-					ScriptRange{Low: 4, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
+					{Low: 0, High: 0, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
+					{Low: 1, High: 1, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
+					{Low: 2, High: 3, Spaces: []int{}, TargetScript: "Inherited", RuneCount: 1},
+					{Low: 4, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
+					{Low: 5, High: 5, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Latin":     2,
@@ -531,10 +531,10 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[13], // ä and a + ¨
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 1, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
-					ScriptRange{Low: 2, High: 2, Spaces: []int{2}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 3, High: 3, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
-					ScriptRange{Low: 4, High: 5, Spaces: []int{}, TargetScript: "Inherited", RuneCount: 1},
+					{Low: 0, High: 1, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
+					{Low: 2, High: 2, Spaces: []int{2}, TargetScript: "Common", RuneCount: 1},
+					{Low: 3, High: 3, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
+					{Low: 4, High: 5, Spaces: []int{}, TargetScript: "Inherited", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Latin":     2,
@@ -548,9 +548,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[14], // cyrillic script isn't part of our default
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 13, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
-					ScriptRange{Low: 14, High: 14, Spaces: []int{14}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 15, High: 28, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+					{Low: 0, High: 13, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+					{Low: 14, High: 14, Spaces: []int{14}, TargetScript: "Common", RuneCount: 1},
+					{Low: 15, High: 28, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
 				},
 				RuneCount: map[string]int{
 					"_unknown": 14,
@@ -563,9 +563,9 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[15], // latin + cyrillic (cyrillic script isn't part of our default)
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+					{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
 				},
 				RuneCount: map[string]int{
 					"Latin":    5,
@@ -579,11 +579,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 			input: inputs[16],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
-					ScriptRange{Low: 0, High: 0, Spaces: []int{0}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 1, High: 5, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
-					ScriptRange{Low: 6, High: 6, Spaces: []int{6}, TargetScript: "Common", RuneCount: 1},
-					ScriptRange{Low: 7, High: 15, Spaces: []int{}, TargetScript: "Latin", RuneCount: 9},
-					ScriptRange{Low: 16, High: 16, Spaces: []int{16}, TargetScript: "Common", RuneCount: 1},
+					{Low: 0, High: 0, Spaces: []int{0}, TargetScript: "Common", RuneCount: 1},
+					{Low: 1, High: 5, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					{Low: 6, High: 6, Spaces: []int{6}, TargetScript: "Common", RuneCount: 1},
+					{Low: 7, High: 15, Spaces: []int{}, TargetScript: "Latin", RuneCount: 9},
+					{Low: 16, High: 16, Spaces: []int{16}, TargetScript: "Common", RuneCount: 1},
 				},
 				RuneCount: map[string]int{
 					"Latin":  14,

@@ -154,7 +154,7 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 // Init cs3 backend vars which are currently not accessible via idp api
 func initCS3EnvVars(cs3Addr string) error {
 	defaults := map[string]string{
-		"CS3_GATEWAY":              cs3Addr,
+		"CS3_GATEWAY": cs3Addr,
 	}
 
 	for k, v := range defaults {

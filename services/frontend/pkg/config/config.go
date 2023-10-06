@@ -20,8 +20,8 @@ type Config struct {
 
 	TransferSecret string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests."`
 
-	TokenManager      *TokenManager `yaml:"token_manager"`
-	Reva              *shared.Reva  `yaml:"reva"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 

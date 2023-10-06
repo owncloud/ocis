@@ -20,7 +20,6 @@ type Config struct {
 
 	Reva *shared.Reva `yaml:"reva"`
 
-
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`
 	Clients []Client `yaml:"clients"`

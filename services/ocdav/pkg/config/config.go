@@ -31,7 +31,6 @@ type Config struct {
 	// Timeout in seconds when making requests to the gateway
 	Timeout int64 `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout in seconds for requests from the oCDAV service to the GATEWAY service."`
 
-
 	Context context.Context `yaml:"-"`
 	Status  Status          `yaml:"-"`
 

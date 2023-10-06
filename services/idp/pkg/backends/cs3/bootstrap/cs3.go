@@ -19,13 +19,12 @@ package bootstrap
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/libregraph/lico/bootstrap"
 	"github.com/libregraph/lico/identifier"
 	"github.com/libregraph/lico/identity"
 	"github.com/libregraph/lico/identity/managers"
 	cs3 "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/identifier"
+	"os"
 )
 
 // Identity managers.

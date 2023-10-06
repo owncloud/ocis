@@ -159,7 +159,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
-
 }
 
 // Sanitize sanitizes the configuration

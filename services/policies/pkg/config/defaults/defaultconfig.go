@@ -53,7 +53,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
 		cfg.Reva = &shared.Reva{
 			Address: cfg.Commons.Reva.Address,
