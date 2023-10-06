@@ -619,7 +619,7 @@ class WebDavLockingContext implements Context {
 		$headers = [
 			"If" => "(<" . $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf] . ">)"
 		];
-		$this->publicWebDavContext->publicUploadContent(
+		$response = $this->publicWebDavContext->publicUploadContent(
 			$filename,
 			'',
 			$content,
@@ -627,6 +627,7 @@ class WebDavLockingContext implements Context {
 			$headers,
 			$publicWebDAVAPIVersion
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
