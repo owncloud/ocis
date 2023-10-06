@@ -20,6 +20,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
+* Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
@@ -136,6 +137,13 @@ The following sections list the changes for unreleased.
    Add the clientlog service which will send machine readable notifications to clients
 
    https://github.com/owncloud/ocis/pull/7217
+
+* Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
+
+   Async Uploads are meanwhile standard and needed for multiple features. Hence we default them
+   to true
+
+   https://github.com/owncloud/ocis/pull/7416
 
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 
