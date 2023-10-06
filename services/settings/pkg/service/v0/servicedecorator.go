@@ -2,12 +2,12 @@ package svc
 
 import (
 	"context"
+	"strings"
 
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
-
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
@@ -29,10 +29,11 @@ type defaultLanguageDecorator struct {
 func (s *defaultLanguageDecorator) GetValueByUniqueIdentifiers(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, res *settingssvc.GetValueResponse) error {
 	err := s.ServiceHandler.GetValueByUniqueIdentifiers(ctx, req, res)
 	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "not found") && req.GetSettingId() == defaults.SettingUUIDProfileLanguage && res.GetValue() == nil {
+			res.Value = s.withDefaultLanguageSetting(req.AccountUuid)
+			return nil
+		}
 		return err
-	}
-	if res.Value == nil {
-		res.Value = s.withDefaultLanguageSetting(req.AccountUuid)
 	}
 	return nil
 }
@@ -54,15 +55,13 @@ func (s *defaultLanguageDecorator) ListValues(ctx context.Context, req *settings
 }
 
 func (s *defaultLanguageDecorator) withDefaultLanguageSetting(accountUUID string) *settingsmsg.ValueWithIdentifier {
-	bundle := generateBundleProfileRequest()
 	return &settingsmsg.ValueWithIdentifier{
 		Identifier: &settingsmsg.Identifier{
-			Extension: bundle.Extension,
-			Bundle:    bundle.Name,
+			Extension: "ocis-accounts",
+			Bundle:    "profile",
 			Setting:   "language",
 		},
 		Value: &settingsmsg.Value{
-			Id:          "",
 			BundleId:    defaults.BundleUUIDProfile,
 			SettingId:   defaults.SettingUUIDProfileLanguage,
 			AccountUuid: accountUUID,
