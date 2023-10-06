@@ -43,6 +43,10 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
 	}
 
+	if cfg.MachineAuthAPIKey == "" {
+		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	}
+
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
