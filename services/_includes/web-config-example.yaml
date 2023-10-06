@@ -70,7 +70,6 @@ asset:
   path: ~/.ocis/web/assets
 file: ""
 web:
-  path: ""
   theme_server: https://localhost:9200
   theme_path: /themes/owncloud/theme.json
   config:

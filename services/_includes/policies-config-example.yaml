@@ -23,7 +23,6 @@ reva:
     mode: ""
     cacert: ""
 grpc_client_tls: null
-machine_auth_api_key: ""
 log:
   level: ""
   pretty: false

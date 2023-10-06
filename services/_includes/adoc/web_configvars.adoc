@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-06-09-11-24]
+[#deprecation-note-2023-10-06-12-43-42]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -253,15 +253,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.
-
-a|`WEB_UI_CONFIG_FILE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Read the ownCloud Web configuration from this file path.
 
 a|`OCIS_URL` +
 `WEB_UI_THEME_SERVER` +

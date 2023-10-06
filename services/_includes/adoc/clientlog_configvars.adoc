@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-06-09-11-24]
+[#deprecation-note-2023-10-06-12-43-42]
 [caption=]
 .Deprecation notes for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`USERLOG_LOG_LEVEL` +
+`CLIENTLOG_USERLOG_LOG_LEVEL` +
 
 a| [subs=-attributes]
 ++string ++
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`USERLOG_LOG_PRETTY` +
+`CLIENTLOG_USERLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -87,7 +87,7 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`USERLOG_LOG_COLOR` +
+`CLIENTLOG_USERLOG_LOG_COLOR` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`USERLOG_LOG_FILE` +
+`CLIENTLOG_USERLOG_LOG_FILE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -106,7 +106,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`USERLOG_DEBUG_ADDR` +
+a|`CLIENTLOG_DEBUG_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -115,7 +115,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`USERLOG_DEBUG_TOKEN` +
+a|`CLIENTLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
 ++string ++
@@ -124,7 +124,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`USERLOG_DEBUG_PPROF` +
+a|`CLIENTLOG_DEBUG_PPROF` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`USERLOG_DEBUG_ZPAGES` +
+a|`CLIENTLOG_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
 ++bool ++

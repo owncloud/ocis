@@ -48,7 +48,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_PASSWORD`
 
@@ -144,7 +144,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Max number of entries to hold in the cache.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -261,7 +261,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
 
 a| [subs=-attributes]
 A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -285,7 +285,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+++[GET] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -357,7 +357,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
 
 a| `OCIS_EDITION`
 
@@ -480,7 +480,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -656,7 +656,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+Whether to verify the server TLS certificates.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1498,7 +1498,6 @@ a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
@@ -1508,7 +1507,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1692,7 +1691,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1707,7 +1706,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1986,7 +1985,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `OCIS_URL`
 
@@ -2048,139 +2047,4 @@ a| [subs=-attributes]
 
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
-
-a| `USERLOG_DEBUG_ADDR`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++127.0.0.1:9260 ++
-
-a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
-a| `USERLOG_DEBUG_PPROF`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Enables pprof, which can be used for profiling.
-
-a| `USERLOG_DEBUG_TOKEN`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-Token to secure the metrics endpoint.
-
-a| `USERLOG_DEBUG_ZPAGES`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
-
-a| `USERLOG_LOG_COLOR`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Activates colorized log output.
-
-a| `USERLOG_LOG_FILE`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
-
-a| `USERLOG_LOG_LEVEL`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
-
-a| `USERLOG_LOG_PRETTY`
-
-a| [subs=attributes+]
-* xref:{s-path}/clientlog.adoc[clientlog] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++bool ++
-
-a| [subs=-attributes]
-++false ++
-
-a| [subs=-attributes]
-Activates pretty log output.
-
-a| `WEB_UI_CONFIG_FILE`
-
-a| [subs=attributes+]
-* xref:{s-path}/web.adoc[web] +
-* xref:{s-path}/web.adoc[web] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++ ++
-
-a| [subs=-attributes]
-Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.
 |===

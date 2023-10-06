@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-06-09-11-24]
+[#deprecation-note-2023-10-06-12-43-42]
 [caption=]
 .Deprecation notes for the policies service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -157,16 +157,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
-
-a|`OCIS_MACHINE_AUTH_API_KEY` +
-`POLICIES_MACHINE_AUTH_API_KEY` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a|`OCIS_LOG_LEVEL` +
 `POLICIES_LOG_LEVEL` +
