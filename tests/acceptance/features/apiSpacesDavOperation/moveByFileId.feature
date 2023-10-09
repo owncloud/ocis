@@ -74,6 +74,82 @@ Feature: moving/renaming file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
+  Scenario Outline: move a file into a folder inside project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "/folder" in space "project-space"
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "/textfile.txt" into "/folder" inside space "project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "folder" of the space "project-space" should contain these files:
+      | textfile.txt |
+    But for user "Alice" the space "project-space" should not contain these entries:
+      | textfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: move a file into a sub-folder inside project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "folder/sub-folder" in space "project-space"
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "/textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "/textfile.txt" into "/folder/sub-folder" inside space "project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "folder/sub-folder/" of the space "project-space" should contain these files:
+      | textfile.txt |
+    But for user "Alice" the space "Personal" should not contain these entries:
+      | textfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: move a file from folder to root inside project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "folder" in space "project-space"
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "folder/textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "folder/textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "project-space" should contain these entries:
+      | textfile.txt |
+    But for user "Alice" folder "folder" of the space "project-space" should not contain these files:
+      | textfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: move a file from sub-folder to root inside project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "folder/sub-folder" in space "project-space"
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "folder/sub-folder/textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "folder/sub-folder/textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "project-space" should contain these entries:
+      | textfile.txt |
+    But for user "Alice" folder "folder/sub-folder" of the space "project-space" should not contain these files:
+      | textfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
   Scenario Outline: rename a root file inside personal space
     Given user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
