@@ -838,7 +838,7 @@ trait WebDav {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userCopyFileUsingTheAPI(
+	public function copyFile(
 		string $user,
 		string $fileSource,
 		string $fileDestination
@@ -870,14 +870,9 @@ trait WebDav {
 		string $fileSource,
 		string $fileDestination
 	):void {
-		$response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
+		$response = $this->copyFile($user, $fileSource, $fileDestination);
 		$this->setResponse($response);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($response)
-		);
-		$this->pushToLastHttpStatusCodesArray(
-			(string) $this->getResponse()->getStatusCode()
-		);
+		$this->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -894,7 +889,7 @@ trait WebDav {
 		string $fileSource,
 		string $fileDestination
 	):void {
-		$response = $this->userCopyFileUsingTheAPI($user, $fileSource, $fileDestination);
+		$response = $this->copyFile($user, $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination' for user '$user'",
@@ -923,7 +918,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasCopiedFileUsingTheAPI(string $fileSource, string $fileDestination):void {
-		$response = $this->userCopyFileUsingTheAPI($this->getCurrentUser(), $fileSource, $fileDestination);
+		$response = $this->copyFile($this->getCurrentUser(), $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination'",
@@ -939,8 +934,8 @@ trait WebDav {
 	 *
 	 * @return void
 	 */
-	public function downloadFileWithRange(string $fileSource, string $range):void {
-		$this->userDownloadsFileWithRange(
+	public function theUserDownloadsFileWithRange(string $fileSource, string $range):void {
+		$this->userDownloadsFileWithRangeUsingWebDavApi(
 			$this->currentUser,
 			$fileSource,
 			$range
@@ -954,7 +949,7 @@ trait WebDav {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userDownloadFileWithRange(string $user, string $fileSource, string $range):ResponseInterface {
+	public function downloadFileWithRange(string $user, string $fileSource, string $range):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$headers['Range'] = $range;
 		return $this->makeDavRequest(
@@ -974,8 +969,8 @@ trait WebDav {
 	 *
 	 * @return void
 	 */
-	public function userDownloadsFileWithRange(string $user, string $fileSource, string $range):void {
-		$this->setResponse($this->userDownloadFileWithRange($user, $fileSource, $range));
+	public function userDownloadsFileWithRangeUsingWebDavApi(string $user, string $fileSource, string $range):void {
+		$this->setResponse($this->downloadFileWithRange($user, $fileSource, $range));
 	}
 
 	/**
@@ -1199,7 +1194,7 @@ trait WebDav {
 	 */
 	public function contentOfFileShouldBe(string $fileName, string $content):void {
 		$response = $this->downloadFileAsUserUsingPassword($this->currentUser, $fileName);
-		$this->checkDownloadedContentMatches($content, "", $response);
+		$this->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
@@ -1248,7 +1243,7 @@ trait WebDav {
 				"Expected status code to be '200', but got '$actualStatus'"
 			);
 		}
-		$this->checkDownloadedContentMatches($content, "", $response);
+		$this->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
@@ -1310,7 +1305,7 @@ trait WebDav {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
 		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
-		$this->checkDownloadedContentMatches($content, "", $response);
+		$this->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
@@ -1469,8 +1464,8 @@ trait WebDav {
 		string $content
 	):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->userDownloadFileWithRange($user, $fileSource, $range);
-		$this->checkDownloadedContentMatches($content, "", $response);
+		$response = $this->downloadFileWithRange($user, $fileSource, $range);
+		$this->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
@@ -2100,7 +2095,7 @@ trait WebDav {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userUploadAFileTo(
+	public function uploadFile(
 		string $user,
 		string $source,
 		string $destination,
@@ -2133,17 +2128,15 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
-	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 */
-	public function userUploadsAFileTo(
+	public function userUploadsAFileToUsingWebDavApi(
 		string $user,
 		string $source,
-		string $destination,
-		?bool $isGivenStep = false
+		string $destination
 	):void {
-		$response = $this->userUploadAFileTo($user, $source, $destination, $isGivenStep);
+		$response = $this->uploadFile($user, $source, $destination);
 		$this->setResponse($response);
 		$this->setResponseXml(
 			HttpRequestHelper::parseResponseAsXml($response)
@@ -2163,7 +2156,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userHasUploadedAFileTo(string $user, string $source, string $destination):void {
-		$response = $this->userUploadAFileTo($user, $source, $destination, true);
+		$response = $this->uploadFile($user, $source, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'",
@@ -2176,16 +2169,14 @@ trait WebDav {
 	 *
 	 * @param string $source
 	 * @param string $destination
-	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 */
 	public function theUserUploadsAFileTo(
 		string $source,
-		string $destination,
-		?bool $isGivenStep = false
+		string $destination
 	):void {
-		$this->userUploadsAFileTo($this->currentUser, $source, $destination, $isGivenStep);
+		$this->userUploadsAFileToUsingWebDavApi($this->currentUser, $source, $destination);
 	}
 
 	/**
@@ -2197,7 +2188,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasUploadedFileTo(string $source, string $destination):void {
-		$response = $this->userUploadAFileTo($this->getCurrentUser(), $source, $destination, true);
+		$response = $this->uploadFile($this->getCurrentUser(), $source, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination'",
@@ -2212,7 +2203,6 @@ trait WebDav {
 	 * @param string $server
 	 * @param string $source
 	 * @param string $destination
-	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 */
@@ -2220,11 +2210,10 @@ trait WebDav {
 		string $user,
 		string $server,
 		string $source,
-		string $destination,
-		?bool $isGivenStep = false
+		string $destination
 	):void {
 		$previousServer = $this->usingServer($server);
-		$this->userUploadsAFileTo($user, $source, $destination, $isGivenStep);
+		$this->userUploadsAFileToUsingWebDavApi($user, $source, $destination);
 		$this->usingServer($previousServer);
 	}
 
@@ -2693,7 +2682,7 @@ trait WebDav {
 	 */
 	public function userShouldBeAbleToUploadFileTo(string $user, string $source, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->userUploadAFileTo($user, $source, $destination);
+		$response = $this->uploadFile($user, $source, $destination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination'",
@@ -2721,7 +2710,7 @@ trait WebDav {
 		$usernames = $table->getHash();
 		foreach ($usernames as $username) {
 			$actualUser = $this->getActualUsername($username["username"]);
-			$this->userUploadAFileTo($actualUser, $source, $destination);
+			$this->uploadFile($actualUser, $source, $destination);
 			$this->asFileOrFolderShouldExist($actualUser, "file", $destination);
 		}
 	}
@@ -2742,7 +2731,7 @@ trait WebDav {
 			$response = $this->downloadFileAsUserUsingPassword($user, $destination);
 			$initialContent = (string) $response->getBody();
 		}
-		$response = $this->userUploadAFileTo($user, $source, $destination);
+		$response = $this->uploadFile($user, $source, $destination);
 		$this->theHTTPStatusCodeShouldBe(["403", "423"], "", $response);
 		if ($fileAlreadyExists) {
 			$response = $this->downloadFileAsUserUsingPassword($user, $destination);
@@ -2956,7 +2945,6 @@ trait WebDav {
 	 * @param string $destination
 	 * @param string $text
 	 * @param string $bytes
-	 * @param bool|null $isGivenStep
 	 *
 	 * @return void
 	 */
@@ -2964,17 +2952,15 @@ trait WebDav {
 		string $user,
 		string $destination,
 		string $text,
-		string $bytes,
-		?bool $isGivenStep = false
+		string $bytes
 	):void {
 		$filename = "filespecificSize.txt";
 		$this->createLocalFileOfSpecificSize($filename, $bytes, $text);
 		Assert::assertFileExists($this->workStorageDirLocation() . $filename);
-		$this->userUploadsAFileTo(
+		$this->userUploadsAFileToUsingWebDavApi(
 			$user,
 			$this->temporaryStorageSubfolderName() . "/$filename",
-			$destination,
-			$isGivenStep
+			$destination
 		);
 		$this->removeFile($this->workStorageDirLocation(), $filename);
 	}
@@ -3402,7 +3388,7 @@ trait WebDav {
 		$user = $this->getActualUsername($user);
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
-		$this->makeDavRequest(
+		$response = $this->makeDavRequest(
 			$user,
 			"PUT",
 			$destination,
@@ -3421,7 +3407,7 @@ trait WebDav {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userUploadAFileWithChecksumAndContentTo(
+	public function uploadFileWithChecksumAndContent(
 		string $user,
 		string $checksum,
 		?string $content,
@@ -3463,7 +3449,7 @@ trait WebDav {
 		string $content,
 		string $destination
 	):void {
-		$response = $this->userUploadAFileWithChecksumAndContentTo($user, $checksum, $content, $destination);
+		$response = $this->uploadFileWithChecksumAndContent($user, $checksum, $content, $destination);
 		$this->setResponse($response);
 	}
 
@@ -3483,7 +3469,7 @@ trait WebDav {
 		?string $content,
 		string $destination
 	):void {
-		$response = $this->userUploadAFileWithChecksumAndContentTo(
+		$response = $this->uploadFileWithChecksumAndContent(
 			$user,
 			$checksum,
 			$content,
@@ -3510,7 +3496,7 @@ trait WebDav {
 	public function userShouldBeAbleToDeleteEntry(string $user, string $entry, string $source):void {
 		$user = $this->getActualUsername($user);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userDeleteFile($user, $source);
+		$this->deleteFile($user, $source);
 		$this->asFileOrFolderShouldNotExist($user, $entry, $source);
 	}
 
@@ -3526,7 +3512,7 @@ trait WebDav {
 	 */
 	public function theUserShouldNotBeAbleToDeleteEntry(string $user, string $entry, string $source):void {
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userDeleteFile($user, $source);
+		$this->deleteFile($user, $source);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
 	}
 
@@ -3548,7 +3534,7 @@ trait WebDav {
 	 *
 	 * @return void
 	 */
-	public function userDeleteFile(string $user, string $resource):ResponseInterface {
+	public function deleteFile(string $user, string $resource):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
 		$response = $this->makeDavRequest($user, 'DELETE', $resource, []);
@@ -3565,7 +3551,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userDeletesFile(string $user, string $resource):void {
-		$response = $this->userDeleteFile($user, $resource);
+		$response = $this->deleteFile($user, $resource);
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -3581,7 +3567,7 @@ trait WebDav {
 	 */
 	public function userHasDeletedResource(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->userDeleteFile($user, $resource);
+		$response = $this->deleteFile($user, $resource);
 		// If the file or folder was there and got deleted then we get a 204
 		// That is good and the expected status
 		// If the file or folder was already not there then we get a 404
@@ -3642,7 +3628,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserDeletesFile(string $file):void {
-		$response = $this->userDeleteFile($this->getCurrentUser(), $file);
+		$response = $this->deleteFile($this->getCurrentUser(), $file);
 		$this->setResponse($response);
 	}
 
@@ -3701,7 +3687,7 @@ trait WebDav {
 	 */
 	public function userOnDeletesFile(string $user, string $server, string $file):void {
 		$previousServer = $this->usingServer($server);
-		$this->setResponse($this->userDeleteFile($user, $file));
+		$this->setResponse($this->deleteFile($user, $file));
 		$this->usingServer($previousServer);
 	}
 
@@ -3728,34 +3714,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string $destination
-	 *
-	 * @return ResponseInterface
-	 * @throws JsonException | GuzzleException
-	 * @throws GuzzleException | JsonException
-	 */
-	public function userCreateFolder(string $user, string $destination, ?bool $isGivenStep = false):ResponseInterface {
-		$user = $this->getActualUsername($user);
-		$destination = '/' . \ltrim($destination, '/');
-		$response = $this->makeDavRequest(
-			$user,
-			"MKCOL",
-			$destination,
-			[],
-			null,
-			"files",
-			null,
-			false,
-			null,
-			[],
-			null,
-			$isGivenStep
-		);
-		return $response;
-	}
-
-	/**
 	 * @When user :user creates folder :destination using the WebDAV API
 	 *
 	 * @param string $user
@@ -3766,11 +3724,8 @@ trait WebDav {
 	 * @throws GuzzleException
 	 */
 	public function userCreatesFolder(string $user, string $destination):void {
-		$response = $this->userCreateFolder($user, $destination);
+		$response = $this->createFolder($user, $destination);
 		$this->setResponse($response);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($response)
-		);
 	}
 
 	/**
@@ -3785,7 +3740,7 @@ trait WebDav {
 	 */
 	public function userHasCreatedFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->userCreateFolder($user, $destination, true);
+		$response = $this->createFolder($user, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'",
@@ -3809,7 +3764,7 @@ trait WebDav {
 			$admin,
 			__METHOD__ . "The provided user is not admin but '" . $admin . "'"
 		);
-		$response = $this->userCreateFolder($admin, $destination, true);
+		$response = $this->createFolder($admin, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for admin '$admin'",
@@ -3855,7 +3810,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasCreatedFolder(string $destination):void {
-		$response = $this->userCreateFolder($this->getCurrentUser(), $destination);
+		$response = $this->createFolder($this->getCurrentUser(), $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to create folder '$destination'",
@@ -3892,7 +3847,7 @@ trait WebDav {
 	 */
 	public function userShouldNotBeAbleToCreateFolder(string $user, string $destination):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->userCreateFolder($user, $destination);
+		$response = $this->createFolder($user, $destination);
 		$this->theHTTPStatusCodeShouldBeBetween(400, 499, $response);
 		$this->asFileOrFolderShouldNotExist(
 			$user,

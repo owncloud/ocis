@@ -891,9 +891,9 @@ class TrashbinContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
 		if ($isInTrash) {
-			$this->featureContext->checkDownloadedContentMatches($content, "", $response);
+			$this->featureContext->checkDownloadedContentMatches($content, '', $response);
 		} else {
-			$this->featureContext->checkDownloadedContentMatches($alternativeContent, "", $response);
+			$this->featureContext->checkDownloadedContentMatches($alternativeContent, '', $response);
 		}
 	}
 

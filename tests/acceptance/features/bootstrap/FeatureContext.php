@@ -3189,7 +3189,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function deleteAllResourceCreatedByAdmin(): void {
 		foreach ($this->adminResources as $resource) {
-			$this->userDeleteFile("admin", $resource);
+			$this->deleteFile("admin", $resource);
 		}
 	}
 

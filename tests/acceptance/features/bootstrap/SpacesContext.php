@@ -1083,7 +1083,7 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
-		$folder = \trim($folder, "/");
+		$folder = \trim($folder, '/');
 		$exploded = explode('/', $folder);
 		$path = '';
 		for ($i = 0; $i < \count($exploded); $i++) {
@@ -1122,17 +1122,17 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function theUserHasCreateAFolderUsingTheGraphApi(
+	public function userHasCreatedAFolderInSpace(
 		string $user,
 		string $folder,
 		string $spaceName
 	): void {
-		$folder = \trim($folder, "/");
-		$exploded = explode('/', $folder);
-		$path = '';
-		for ($i = 0; $i < \count($exploded); $i++) {
-			$path = $path . $exploded[$i] . '/';
-			$response = $this->theUserCreateAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
+		$folder = \trim($folder, '/');
+		$paths = explode('/', $folder);
+		$folderPath = '';
+		foreach ($paths as $path) {
+			$folderPath .= "$path/";
+			$response = $this->createFolderInSpace($user, $folderPath, $spaceName);
 		}
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
@@ -1151,7 +1151,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function theUserCreateAFolderToAnotherOwnerSpaceUsingTheGraphApi(
+	public function createFolderInSpace(
 		string $user,
 		string $folder,
 		string $spaceName,
@@ -1161,7 +1161,7 @@ class SpacesContext implements Context {
 			$ownerUser = $user;
 		}
 		$this->setSpaceIDByName($ownerUser, $spaceName);
-		return $this->featureContext->userCreateFolder($user, $folder);
+		return $this->featureContext->createFolder($user, $folder);
 	}
 
 	/**
@@ -1182,7 +1182,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $ownerUser = ''
 	): void {
-		$response = $this->theUserCreateAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $folder, $spaceName, $ownerUser);
+		$response = $this->createFolderInSpace($user, $folder, $spaceName, $ownerUser);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -1228,7 +1228,8 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userUploadsAFileTo($user, $source, $destination);
+		$response = $this->featureContext->uploadFile($user, $source, $destination);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1869,7 +1870,7 @@ class SpacesContext implements Context {
 	): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->setSpaceIDByName($user, $spaceName);
-		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination);
+		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination, true);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
 		return $response->getHeader('oc-fileid');
 	}
