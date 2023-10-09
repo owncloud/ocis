@@ -37,15 +37,13 @@ class PublicWebDavContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * @When /^the public downloads the last public link shared file with range "([^"]*)" using the (old|new) public WebDAV API$/
-	 *
 	 * @param string $range ignore if empty
 	 * @param string $publicWebDAVAPIVersion
 	 * @param string|null $password
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function downloadPublicFileWithRange(string $range, string $publicWebDAVAPIVersion, ?string $password = ""):void {
+	public function downloadPublicFileWithRange(string $range, string $publicWebDAVAPIVersion, ?string $password = ""):ResponseInterface {
 		if ($publicWebDAVAPIVersion === "new") {
 			// In this case a single file has been shared as a public link.
 			// Even if that file is somewhere down inside a folder(s), when
@@ -58,7 +56,7 @@ class PublicWebDavContext implements Context {
 		} else {
 			$path = "";
 		}
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		return $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			$password,
 			$range,
@@ -81,12 +79,13 @@ class PublicWebDavContext implements Context {
 		} else {
 			$path = "";
 		}
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			$password,
 			$range,
 			$publicWebDAVAPIVersion
 		);
+        $this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -97,7 +96,8 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFile(string $publicWebDAVAPIVersion):void {
-		$this->downloadPublicFileWithRange("", $publicWebDAVAPIVersion);
+		$response = $this->downloadPublicFileWithRange("", $publicWebDAVAPIVersion);
+        $this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -109,7 +109,8 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileWithPassword(string $password, string $publicWebDAVAPIVersion):void {
-		$this->downloadPublicFileWithRange("", $publicWebDAVAPIVersion, $password);
+		$response = $this->downloadPublicFileWithRange("", $publicWebDAVAPIVersion, $password);
+        $this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -231,29 +232,28 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileInsideAFolder(string $path, string $publicWebDAVAPIVersion = "old"):void {
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			"",
 			"",
 			$publicWebDAVAPIVersion
 		);
+        $this->featureContext->setResponse($response);
 	}
 
 	/**
-	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder with password "([^"]*)" using the (old|new) public WebDAV API$/
-	 *
 	 * @param string $path
 	 * @param string|null $password
 	 * @param string $publicWebDAVAPIVersion
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function publicDownloadsTheFileInsideThePublicSharedFolderWithPassword(
+	public function downloadTheFileInsideThePublicSharedFolderWithPassword(
 		string $path,
 		?string $password = "",
 		string $publicWebDAVAPIVersion = "old"
-	):void {
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+	):ResponseInterface {
+		return $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			$password,
 			"",
@@ -271,30 +271,29 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileInsideAFolderWithRange(string $path, string $range, string  $publicWebDAVAPIVersion):void {
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			"",
 			$range,
 			$publicWebDAVAPIVersion
 		);
+        $this->featureContext->setResponse($response);
 	}
 
 	/**
-	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder with password "([^"]*)" with range "([^"]*)" using the (old|new) public WebDAV API$/
-	 *
 	 * @param string $path
 	 * @param string $password
 	 * @param string $range ignored when empty
 	 * @param string $publicWebDAVAPIVersion
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+	public function downloadTheFileInsideThePublicSharedFolder(
 		string $path,
 		string $password,
 		string $range,
 		string $publicWebDAVAPIVersion = "old"
-	):void {
+	):ResponseInterface {
 		$path = \ltrim($path, "/");
 		$password = $this->featureContext->getActualPassword($password);
 		$token = $this->featureContext->getLastCreatedPublicShareToken();
@@ -316,14 +315,13 @@ class PublicWebDavContext implements Context {
 		if ($range !== "") {
 			$headers['Range'] = $range;
 		}
-		$response = HttpRequestHelper::get(
+		return HttpRequestHelper::get(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
 			$userName,
 			$password,
 			$headers
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -720,7 +718,7 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$this->downloadPublicFileWithRange(
+		$response = $this->downloadPublicFileWithRange(
 			"",
 			$publicWebDAVAPIVersion,
 			$password
@@ -728,10 +726,11 @@ class PublicWebDavContext implements Context {
 
 		$this->featureContext->checkDownloadedContentMatches(
 			$expectedContent,
-			"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API"
+			"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API",
+            $response
 		);
 
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -748,19 +747,19 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $expectedHttpCode
 	):void {
-		$this->downloadPublicFileWithRange(
+		$response = $this->downloadPublicFileWithRange(
 			"",
 			$publicWebDAVAPIVersion,
 			$password
 		);
-		$responseContent = $this->featureContext->getResponse()->getBody()->getContents();
+		$responseContent = $response->getBody()->getContents();
 		\libxml_use_internal_errors(true);
 		Assert::assertNotFalse(
 			\simplexml_load_string($responseContent),
 			"response body is not valid XML, maybe download did work\n" .
 			"response body: \n$responseContent\n"
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode);
+		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
 
 	/**
@@ -869,15 +868,15 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPassword(
+		$response = $this->downloadTheFileInsideThePublicSharedFolderWithPassword(
 			$path,
 			$password,
 			$publicWebDAVAPIVersion
 		);
 
-		$this->featureContext->downloadedContentShouldBePlusEndOfLine($content);
+		$this->featureContext->checkDownloadedContentMatches("$content\n", "", $response);
 
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -901,15 +900,15 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPassword(
+		$response = $this->downloadTheFileInsideThePublicSharedFolderWithPassword(
 			$path,
 			$password,
 			$publicWebDAVAPIVersion
 		);
 
-		$this->featureContext->downloadedContentShouldBe($content);
+		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -977,13 +976,13 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			$password,
 			$range,
 			$publicWebDAVAPIVersion
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
@@ -1009,21 +1008,21 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
 			$path,
 			$password,
 			$range,
 			$publicWebDAVAPIVersion
 		);
 
-		$responseContent = $this->featureContext->getResponse()->getBody()->getContents();
+		$responseContent = $response->getBody()->getContents();
 		\libxml_use_internal_errors(true);
 		Assert::assertNotFalse(
 			\simplexml_load_string($responseContent),
 			"response body is not valid XML, maybe download did work\n" .
 			"response body: \n$responseContent\n"
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode);
+		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
 
 	/**
@@ -1277,14 +1276,15 @@ class PublicWebDavContext implements Context {
 				$response->getStatusCode()
 			);
 
-			$this->downloadPublicFileWithRange(
+			$response = $this->downloadPublicFileWithRange(
 				"",
 				$publicWebDAVAPIVersion
 			);
 
 			$this->featureContext->checkDownloadedContentMatches(
 				$content,
-				"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API"
+				"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API",
+                $response
 			);
 		} else {
 			$expectedCode = 403;
