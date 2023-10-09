@@ -3,7 +3,7 @@
  * ownCloud
  *
  * @author Sajan Gurung <sajan@jankaritech.com>
- * @copyright Copyright (c) 2017 Sajan Gurung sajan@jankaritech.com
+ * @copyright Copyright (c) 2023, ownCloud GmbH
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License,
@@ -27,8 +27,6 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Helper for logging HTTP requests and responses
- *
- * Logs are written to '../logs/scenario.log' file
  */
 class HttpLogger {
 	/**

@@ -3656,7 +3656,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Log request and response logs if scnario fails
+	 * Log request and response logs if scenario fails
 	 *
 	 * @AfterScenario
 	 *

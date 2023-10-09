@@ -54,52 +54,52 @@ dirs = {
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
-        # "services/antivirus",
-        # "services/app-provider",
-        # "services/app-registry",
-        # "services/audit",
-        # "services/auth-basic",
-        # "services/auth-bearer",
-        # "services/auth-machine",
-        # "services/auth-service",
-        # "services/clientlog",
-        # "services/eventhistory",
-        # "services/frontend",
-        # "services/gateway",
-        # "services/graph",
-        # "services/groups",
-        # "services/idm",
-        # "services/idp",
-        # "services/invitations",
-        # "services/nats",
-        # "services/notifications",
-        # "services/ocdav",
-        # "services/ocs",
-        # "services/policies",
-        # "services/proxy",
-        # "services/search",
-        # "services/settings",
-        # "services/sharing",
-        # "services/sse",
-        # "services/storage-system",
-        # "services/storage-publiclink",
-        # "services/storage-shares",
-        # "services/storage-users",
-        # "services/store",
-        # "services/thumbnails",
-        # "services/userlog",
-        # "services/users",
-        # "services/web",
-        # "services/webdav",
-        # "services/webfinger",
-        # "ocis-pkg",
-        # "ocis",
+        "services/antivirus",
+        "services/app-provider",
+        "services/app-registry",
+        "services/audit",
+        "services/auth-basic",
+        "services/auth-bearer",
+        "services/auth-machine",
+        "services/auth-service",
+        "services/clientlog",
+        "services/eventhistory",
+        "services/frontend",
+        "services/gateway",
+        "services/graph",
+        "services/groups",
+        "services/idm",
+        "services/idp",
+        "services/invitations",
+        "services/nats",
+        "services/notifications",
+        "services/ocdav",
+        "services/ocs",
+        "services/policies",
+        "services/proxy",
+        "services/search",
+        "services/settings",
+        "services/sharing",
+        "services/sse",
+        "services/storage-system",
+        "services/storage-publiclink",
+        "services/storage-shares",
+        "services/storage-users",
+        "services/store",
+        "services/thumbnails",
+        "services/userlog",
+        "services/users",
+        "services/web",
+        "services/webdav",
+        "services/webfinger",
+        "ocis-pkg",
+        "ocis",
     ],
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "localApiTests": {
         "basic": {
@@ -123,7 +123,6 @@ config = {
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
-            "skip": False,
         },
         "apiNotification": {
             "suites": [
@@ -171,11 +170,11 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
+        "skip": False,
         "skipExceptParts": [],
-        "skip": True,
     },
     "e2eTests": {
-        "skip": True,
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -187,8 +186,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": False,
-    "codestyle": False,
+    "litmus": True,
+    "codestyle": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -264,16 +263,22 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
+        codestyle(ctx) + \
+        buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
+        [licenseCheck(ctx)] + \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx) + \
         [releaseSubmodule(ctx)]
 
     build_release_helpers = [
-        # changelog(),
-        # docs(),
+        changelog(),
+        docs(),
     ]
 
     test_pipelines.append(
@@ -341,7 +346,7 @@ def testOcisModules(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
-    return pipelines  #+ [scan_result_upload]
+    return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []
@@ -786,7 +791,8 @@ def localApiTestPipeline(ctx):
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     localApiTests(suite, storage, params["extraEnvironment"]),
+                                     localApiTests(suite, storage, params["extraEnvironment"]) +
+                                     logRequests(),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
@@ -818,28 +824,14 @@ def localApiTests(suite, storage, extra_environment = {}):
     for item in extra_environment:
         environment[item] = extra_environment[item]
 
-    return [
-        {
-            "name": "localApiTests-%s-%s" % (suite, storage),
-            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-            "environment": environment,
-            "commands": [
-                "make test-acceptance-api",
-            ],
-        },
-        {
-            "name": "logs",
-            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-            "commands": [
-                "cat %s/tests/acceptance/logs/access.log" % dirs["base"],
-            ],
-            "when": {
-                "status": [
-                    "failure",
-                ],
-            },
-        },
-    ]
+    return [{
+        "name": "localApiTests-%s-%s" % (suite, storage),
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+        "environment": environment,
+        "commands": [
+            "make test-acceptance-api",
+        ],
+    }]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
@@ -1016,19 +1008,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
                      },
-                     {
-                         "name": "logs",
-                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                         "commands": [
-                             "cat %s/tests/acceptance/logs/access.log" % dirs["base"],
-                         ],
-                         "when": {
-                             "status": [
-                                 "failure",
-                             ],
-                         },
-                     },
-                 ],
+                 ] +
+                 logRequests(),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -2837,4 +2818,18 @@ def tikaService():
         "commands": [
             "wait-for -it tika:9998 -t 300",
         ],
+    }]
+
+def logRequests():
+    return [{
+        "name": "api-test-failure-logs",
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+        "commands": [
+            "cat %s/tests/acceptance/logs/failed.log" % dirs["base"],
+        ],
+        "when": {
+            "status": [
+                "failure",
+            ],
+        },
     }]
