@@ -2291,7 +2291,8 @@ trait Provisioning {
 			if ($this->isTestingWithLdap() && \in_array($user, $this->ldapCreatedUsers)) {
 				$this->deleteLdapUser($user);
 			} else {
-				$this->deleteUser($user);
+				$response = $this->deleteUser($user);
+				$this->theHTTPStatusCodeShouldBe(204, "", $response);
 			}
 		}
 		$this->userShouldNotExist($user);
@@ -2662,17 +2663,6 @@ trait Provisioning {
 		);
 
 		$this->initializeUser($user, $password);
-	}
-
-	/**
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function cleanUser(string $user):void {
-		$this->deleteUser($user);
-		$this->userShouldNotExist($user);
 	}
 
 	/**
@@ -4898,11 +4888,13 @@ trait Provisioning {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $userData) {
-			$this->cleanUser($userData['actualUsername']);
+			$this->deleteUser($userData['actualUsername']);
+			$this->userShouldNotExist($userData['actualUsername']);
 		}
 		$this->usingServer('REMOTE');
 		foreach ($this->createdRemoteUsers as $userData) {
-			$this->cleanUser($userData['actualUsername']);
+			$this->deleteUser($userData['actualUsername']);
+			$this->userShouldNotExist($userData['actualUsername']);
 		}
 		$this->usingServer($previousServer);
 	}
