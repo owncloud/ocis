@@ -60,6 +60,9 @@ type FileStoreConfig struct {
 	Cipher StoreCipher
 	// Compression is the algorithm to use when compressing.
 	Compression StoreCompression
+
+	// Internal reference to our server.
+	srv *Server
 }
 
 // FileStreamInfo allows us to remember created time.
@@ -387,6 +390,7 @@ func newFileStoreWithCreated(fcfg FileStoreConfig, cfg StreamConfig, created tim
 		qch:    make(chan struct{}),
 		fch:    make(chan struct{}, 1),
 		fsld:   make(chan struct{}),
+		srv:    fcfg.srv,
 	}
 
 	// Set flush in place to AsyncFlush which by default is false.
@@ -525,12 +529,6 @@ func newFileStoreWithCreated(fcfg FileStoreConfig, cfg StreamConfig, created tim
 	go fs.flushStreamStateLoop(fs.fch, fs.qch, fs.fsld)
 
 	return fs, nil
-}
-
-func (fs *fileStore) registerServer(s *Server) {
-	fs.mu.Lock()
-	defer fs.mu.Unlock()
-	fs.srv = s
 }
 
 // Lock all existing message blocks.
@@ -1436,6 +1434,16 @@ func (mb *msgBlock) rebuildStateLocked() (*LostStreamData, []uint64, error) {
 	return nil, tombstones, nil
 }
 
+// For doing warn logging.
+// Lock should be held.
+func (fs *fileStore) warn(format string, args ...any) {
+	// No-op if no server configured.
+	if fs.srv == nil {
+		return
+	}
+	fs.srv.Warnf(fmt.Sprintf("Filestore [%s] %s", fs.cfg.Name, format), args...)
+}
+
 // recoverFullState will attempt to receover our last full state and re-process any state changes
 // that happened afterwards.
 func (fs *fileStore) recoverFullState() (rerr error) {
@@ -1455,12 +1463,16 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 	dios <- struct{}{}
 
 	if err != nil {
+		if !os.IsNotExist(err) {
+			fs.warn("Could not read stream state file: %v", err)
+		}
 		return err
 	}
 
 	const minLen = 32
 	if len(buf) < minLen {
 		os.Remove(fn)
+		fs.warn("Stream state too short (%d bytes)", len(buf))
 		return errCorruptState
 	}
 
@@ -1471,6 +1483,7 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 	fs.hh.Write(buf)
 	if !bytes.Equal(h, fs.hh.Sum(nil)) {
 		os.Remove(fn)
+		fs.warn("Stream state checksum did not match")
 		return errCorruptState
 	}
 
@@ -1482,6 +1495,7 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 			ns := fs.aek.NonceSize()
 			buf, err = fs.aek.Open(nil, buf[:ns], buf[ns:], nil)
 			if err != nil {
+				fs.warn("Stream state error reading encryption key: %v", err)
 				return err
 			}
 		}
@@ -1489,6 +1503,7 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 
 	if buf[0] != fullStateMagic || buf[1] != fullStateVersion {
 		os.Remove(fn)
+		fs.warn("Stream state magic and version mismatch")
 		return errCorruptState
 	}
 
@@ -1543,6 +1558,7 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 			if lsubj := int(readU64()); lsubj > 0 {
 				if bi+lsubj > len(buf) {
 					os.Remove(fn)
+					fs.warn("Stream state bad subject len (%d)", lsubj)
 					return errCorruptState
 				}
 				subj := fs.subjString(buf[bi : bi+lsubj])
@@ -1573,10 +1589,15 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 				dmap, n, err := avl.Decode(buf[bi:])
 				if err != nil {
 					os.Remove(fn)
+					fs.warn("Stream state error decoding avl dmap: %v", err)
 					return errCorruptState
 				}
 				mb.dmap = *dmap
-				mb.msgs -= numDeleted
+				if mb.msgs > numDeleted {
+					mb.msgs -= numDeleted
+				} else {
+					mb.msgs = 0
+				}
 				bi += n
 			}
 			// Only add in if not empty or the lmb.
@@ -1601,6 +1622,7 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 	// Check if we had any errors.
 	if bi < 0 {
 		os.Remove(fn)
+		fs.warn("Stream state has no checksum present")
 		return errCorruptState
 	}
 
@@ -1610,20 +1632,22 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 	// First let's check the happy path, open the blk file that was the lmb when we created the full state.
 	// See if we have the last block available.
 	var matched bool
-	var mb *msgBlock
-	if mb = fs.bim[blkIndex]; mb != nil {
-		if _, err := os.Stat(mb.mfn); err != nil && os.IsNotExist(err) {
-			// If our saved state is past what we see on disk, fallback and rebuild.
-			if ld, _, _ := mb.rebuildState(); ld != nil {
-				fs.addLostData(ld)
-			}
-			return errPriorState
+	mb := fs.lmb
+	if mb == nil || mb.index != blkIndex {
+		fs.warn("Stream state block does not exist or index mismatch")
+		return errCorruptState
+	}
+	if _, err := os.Stat(mb.mfn); err != nil && os.IsNotExist(err) {
+		// If our saved state is past what we see on disk, fallback and rebuild.
+		if ld, _, _ := mb.rebuildState(); ld != nil {
+			fs.addLostData(ld)
 		}
-
-		if matched = bytes.Equal(mb.lastChecksum(), lchk[:]); !matched {
-			// Remove the last message block since we will re-process below.
-			fs.removeMsgBlockFromList(mb)
-		}
+		fs.warn("Stream state detected prior state, could not locate msg block %d", blkIndex)
+		return errPriorState
+	}
+	if matched = bytes.Equal(mb.lastChecksum(), lchk[:]); !matched {
+		// Remove the last message block since we will re-process below.
+		fs.removeMsgBlockFromList(mb)
 	}
 
 	// We may need to check other blocks. Even if we matched last checksum we will see if there is another block.
@@ -1640,12 +1664,14 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 				return nil
 			}
 			os.Remove(fn)
+			fs.warn("Stream state could not recover msg block %d", bi)
 			return err
 		}
 		if nmb != nil {
 			// Check if we have to account for a partial message block.
 			if !matched && mb != nil && mb.index == nmb.index {
 				if err := fs.adjustAccounting(mb, nmb); err != nil {
+					fs.warn("Stream state could not adjust accounting")
 					return err
 				}
 			}
@@ -1677,8 +1703,13 @@ func (fs *fileStore) adjustAccounting(mb, nmb *msgBlock) error {
 	}
 	nmb.ensurePerSubjectInfoLoaded()
 
-	lookupAndAdjust := func(seq uint64) error {
-		var smv StoreMsg
+	// Walk all the original mb's sequences that were included in the stream state.
+	var smv StoreMsg
+	for seq := mb.first.seq; seq <= mb.last.seq; seq++ {
+		// If we had already declared it deleted we can move on since you can not undelete.
+		if mb.dmap.Exists(seq) {
+			continue
+		}
 		// Lookup the message.
 		sm, err := nmb.cacheLookup(seq, &smv)
 		if err != nil {
@@ -1690,29 +1721,10 @@ func (fs *fileStore) adjustAccounting(mb, nmb *msgBlock) error {
 		if len(sm.subj) > 0 && fs.psim != nil {
 			fs.removePerSubject(sm.subj)
 		}
-		return nil
-	}
-
-	// Walk all the original mb's sequences that were included in the stream state.
-	for seq := mb.first.seq; seq <= mb.last.seq; seq++ {
-		// If we had already declared it deleted we can move on since you can not undelete.
-		if mb.dmap.Exists(seq) {
-			continue
-		}
-		// Lookup the message.
-		if err := lookupAndAdjust(seq); err != nil {
-			return err
-		}
 	}
 
 	// Now check to see if we had a higher first for the recovered state mb vs nmb.
 	if nmb.first.seq < mb.first.seq {
-		for seq := nmb.first.seq; seq < mb.first.seq; seq++ {
-			// Lookup the message.
-			if err := lookupAndAdjust(seq); err != nil {
-				return err
-			}
-		}
 		// Now set first for nmb.
 		nmb.first = mb.first
 	}
@@ -1837,7 +1849,10 @@ func (fs *fileStore) recoverMsgs() error {
 			}
 		}
 		for _, mb := range emptyBlks {
+			// Need the mb lock here.
+			mb.mu.Lock()
 			fs.removeMsgBlock(mb)
+			mb.mu.Unlock()
 		}
 	}
 
@@ -2030,6 +2045,12 @@ func (fs *fileStore) expireMsgsOnRecover() {
 		}
 		// Clear any global subject state.
 		fs.psim = make(map[string]*psi)
+	}
+
+	// If we purged anything, make sure we kick flush state loop.
+	if purged > 0 {
+		fs.dirty++
+		fs.kickFlushStateLoop()
 	}
 }
 
@@ -3086,7 +3107,9 @@ func (fs *fileStore) rebuildFirst() {
 	isEmpty := fmb.msgs == 0
 	fmb.mu.RUnlock()
 	if isEmpty {
+		fmb.mu.Lock()
 		fs.removeMsgBlock(fmb)
+		fmb.mu.Unlock()
 	}
 	fs.selectNextFirst()
 	fs.rebuildStateLocked(ld)
@@ -3190,6 +3213,7 @@ func (fs *fileStore) enforceMsgPerSubjectLimit() {
 	// We had an issue with a use case where psim (and hence fss) were correct but idx was not and was not properly being caught.
 	// So do a quick sanity check here. If we detect a skew do a rebuild then re-check.
 	if numMsgs != fs.state.Msgs {
+		fs.warn("Detected skew in subject-based total (%d) vs raw total (%d), rebuilding", numMsgs, fs.state.Msgs)
 		// Clear any global subject state.
 		fs.psim = make(map[string]*psi)
 		for _, mb := range fs.blks {
@@ -3293,7 +3317,9 @@ func (fs *fileStore) removePerSubject(subj string) {
 	// We do not update sense of fblk here but will do so when we resolve during lookup.
 	if info, ok := fs.psim[subj]; ok {
 		info.total--
-		if info.total == 0 {
+		if info.total == 1 {
+			info.fblk = info.lblk
+		} else if info.total == 0 {
 			delete(fs.psim, subj)
 		}
 	}
@@ -3463,10 +3489,6 @@ func (fs *fileStore) removeMsg(seq uint64, secure, viaLimits, needFSLock bool) (
 			}
 		}
 	} else if !isEmpty {
-		if mb.dmap.IsEmpty() {
-			// Mark initial base for delete set.
-			mb.dmap.SetInitialMin(mb.first.seq)
-		}
 		// Out of order delete.
 		mb.dmap.Insert(seq)
 		// Check if <25% utilization and minimum size met.
@@ -3475,6 +3497,7 @@ func (fs *fileStore) removeMsg(seq uint64, secure, viaLimits, needFSLock bool) (
 			rbytes := mb.rbytes - uint64(mb.dmap.Size()*emptyRecordLen)
 			if rbytes>>2 > mb.bytes {
 				mb.compact()
+				fs.kickFlushStateLoop()
 			}
 		}
 	}
@@ -3555,10 +3578,7 @@ func (mb *msgBlock) compact() {
 	var firstSet bool
 
 	isDeleted := func(seq uint64) bool {
-		if seq == 0 || seq&ebit != 0 || seq < mb.first.seq {
-			return true
-		}
-		return mb.dmap.Exists(seq)
+		return seq == 0 || seq&ebit != 0 || seq < mb.first.seq || mb.dmap.Exists(seq)
 	}
 
 	for index, lbuf := uint32(0), uint32(len(buf)); index < lbuf; {
@@ -3601,6 +3621,12 @@ func (mb *msgBlock) compact() {
 		index += rl
 	}
 
+	// Handle compression
+	var err error
+	if nbuf, err = mb.cmp.Compress(nbuf); err != nil {
+		return
+	}
+
 	// Check for encryption.
 	if mb.bek != nil && len(nbuf) > 0 {
 		// Recreate to reset counter.
@@ -3615,7 +3641,7 @@ func (mb *msgBlock) compact() {
 	mb.closeFDsLocked()
 
 	// We will write to a new file and mv/rename it in case of failure.
-	mfn := filepath.Join(filepath.Join(mb.fs.fcfg.StoreDir, msgDir), fmt.Sprintf(newScan, mb.index))
+	mfn := filepath.Join(mb.fs.fcfg.StoreDir, msgDir, fmt.Sprintf(newScan, mb.index))
 	if err := os.WriteFile(mfn, nbuf, defaultFilePerms); err != nil {
 		os.Remove(mfn)
 		return
@@ -3625,19 +3651,14 @@ func (mb *msgBlock) compact() {
 		return
 	}
 
-	// Remove index file and wipe delete map, then rebuild.
-	mb.deleteDmap()
+	// Wipe dmap and rebuild here.
+	mb.dmap.Empty()
 	mb.rebuildStateLocked()
 
 	// If we entered with the msgs loaded make sure to reload them.
 	if wasLoaded {
 		mb.loadMsgsWithLock()
 	}
-}
-
-// Empty out our dmap.
-func (mb *msgBlock) deleteDmap() {
-	mb.dmap.Empty()
 }
 
 // Grab info from a slot.
@@ -4697,29 +4718,30 @@ func (fs *fileStore) syncBlocks() {
 			mb.mu.Unlock()
 			continue
 		}
+		// See if we can close FDs due to being idle.
+		if mb.mfd != nil && mb.sinceLastWriteActivity() > closeFDsIdle {
+			mb.dirtyCloseWithRemove(false)
+		}
+		// Check if we need to sync. We will not hold lock during actual sync.
+		var fn string
 		if mb.needSync {
 			// Flush anything that may be pending.
 			if mb.pendingWriteSizeLocked() > 0 {
 				mb.flushPendingMsgsLocked()
 			}
-			if mb.mfd != nil {
-				mb.mfd.Sync()
-			} else {
-				fd, err := os.OpenFile(mb.mfn, os.O_RDWR, defaultFilePerms)
-				if err != nil {
-					mb.mu.Unlock()
-					continue
-				}
+			fn = mb.mfn
+			mb.needSync = false
+		}
+		mb.mu.Unlock()
+
+		// Check if we need to sync.
+		// This is done not holding any locks.
+		if fn != _EMPTY_ {
+			if fd, _ := os.OpenFile(fn, os.O_RDWR, defaultFilePerms); fd != nil {
 				fd.Sync()
 				fd.Close()
 			}
-			mb.needSync = false
 		}
-		// See if we can close FDs due to being idle.
-		if mb.mfd != nil && mb.sinceLastWriteActivity() > closeFDsIdle {
-			mb.dirtyCloseWithRemove(false)
-		}
-		mb.mu.Unlock()
 	}
 
 	fs.mu.Lock()
@@ -6350,6 +6372,12 @@ func (fs *fileStore) reset() error {
 	fs.psim = make(map[string]*psi)
 	fs.bim = make(map[uint32]*msgBlock)
 
+	// If we purged anything, make sure we kick flush state loop.
+	if purged > 0 {
+		fs.dirty++
+		fs.kickFlushStateLoop()
+	}
+
 	fs.mu.Unlock()
 
 	if cb != nil {
@@ -6473,6 +6501,7 @@ func (fs *fileStore) removeMsgBlockFromList(mb *msgBlock) {
 	// Remove from list.
 	for i, omb := range fs.blks {
 		if mb == omb {
+			fs.dirty++
 			blks := append(fs.blks[:i], fs.blks[i+1:]...)
 			fs.blks = copyMsgBlocks(blks)
 			if fs.bim != nil {

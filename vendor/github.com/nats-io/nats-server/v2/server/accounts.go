@@ -30,6 +30,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/nats-io/jwt/v2"
@@ -72,6 +73,7 @@ type Account struct {
 	lqws         map[string]int32
 	usersRevoked map[string]int64
 	mappings     []*mapping
+	hasMapped    atomic.Bool
 	lmu          sync.RWMutex
 	lleafs       []*client
 	leafClusters map[string]uint64
@@ -291,6 +293,8 @@ func (a *Account) shallowCopy(na *Account) {
 	if len(na.mappings) > 0 && na.prand == nil {
 		na.prand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
+	na.hasMapped.Store(len(na.mappings) > 0)
+
 	// JetStream
 	na.jsLimits = a.jsLimits
 	// Server config account limits.
@@ -703,6 +707,7 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 	}
 	// If we did not replace add to the end.
 	a.mappings = append(a.mappings, m)
+	a.hasMapped.Store(len(a.mappings) > 0)
 
 	// If we have connected leafnodes make sure to update.
 	if a.nleafs > 0 {
@@ -729,6 +734,7 @@ func (a *Account) RemoveMapping(src string) bool {
 			a.mappings[i] = a.mappings[len(a.mappings)-1]
 			a.mappings[len(a.mappings)-1] = nil // gc
 			a.mappings = a.mappings[:len(a.mappings)-1]
+			a.hasMapped.Store(len(a.mappings) > 0)
 			return true
 		}
 	}
@@ -740,28 +746,17 @@ func (a *Account) hasMappings() bool {
 	if a == nil {
 		return false
 	}
-	a.mu.RLock()
-	hm := a.hasMappingsLocked()
-	a.mu.RUnlock()
-	return hm
-}
-
-// Indicates we have mapping entries.
-// The account has been verified to be non-nil.
-// Read or Write lock held on entry.
-func (a *Account) hasMappingsLocked() bool {
-	return len(a.mappings) > 0
+	return a.hasMapped.Load()
 }
 
 // This performs the logic to map to a new dest subject based on mappings.
 // Should only be called from processInboundClientMsg or service import processing.
 func (a *Account) selectMappedSubject(dest string) (string, bool) {
-	a.mu.RLock()
-	if len(a.mappings) == 0 {
-		a.mu.RUnlock()
+	if !a.hasMappings() {
 		return dest, false
 	}
 
+	a.mu.RLock()
 	// In case we have to tokenize for subset matching.
 	tsa := [32]string{}
 	tts := tsa[:0]
@@ -1707,29 +1702,38 @@ func (a *Account) addReverseRespMapEntry(acc *Account, reply, from string) {
 // This will be called from checkForReverseEntry when the reply arg is a wildcard subject.
 // This will usually be called in a go routine since we need to walk all the entries.
 func (a *Account) checkForReverseEntries(reply string, checkInterest, recursed bool) {
+	if subjectIsLiteral(reply) {
+		a._checkForReverseEntry(reply, nil, checkInterest, recursed)
+		return
+	}
+
 	a.mu.RLock()
 	if len(a.imports.rrMap) == 0 {
 		a.mu.RUnlock()
 		return
 	}
 
-	if subjectIsLiteral(reply) {
-		a.mu.RUnlock()
-		a._checkForReverseEntry(reply, nil, checkInterest, recursed)
-		return
-	}
-
 	var _rs [64]string
 	rs := _rs[:0]
+	if n := len(a.imports.rrMap); n > cap(rs) {
+		rs = make([]string, 0, n)
+	}
+
 	for k := range a.imports.rrMap {
-		if subjectIsSubsetMatch(k, reply) {
-			rs = append(rs, k)
-		}
+		rs = append(rs, k)
 	}
 	a.mu.RUnlock()
 
+	tsa := [32]string{}
+	tts := tokenizeSubjectIntoSlice(tsa[:0], reply)
+
+	rsa := [32]string{}
 	for _, r := range rs {
-		a._checkForReverseEntry(r, nil, checkInterest, recursed)
+		rts := tokenizeSubjectIntoSlice(rsa[:0], r)
+		//  isSubsetMatchTokenized is heavy so make sure we do this without the lock.
+		if isSubsetMatchTokenized(rts, tts) {
+			a._checkForReverseEntry(r, nil, checkInterest, recursed)
+		}
 	}
 }
 

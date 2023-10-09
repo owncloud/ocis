@@ -1255,15 +1255,32 @@ func (o *consumer) setLeader(isLeader bool) {
 		// Snapshot initial info.
 		o.infoWithSnap(true)
 
+		// These are the labels we will use to annotate our goroutines.
+		labels := pprofLabels{
+			"type":     "consumer",
+			"account":  mset.accName(),
+			"stream":   mset.name(),
+			"consumer": o.name,
+		}
+
 		// Now start up Go routine to deliver msgs.
-		go o.loopAndGatherMsgs(qch)
+		go func() {
+			setGoRoutineLabels(labels)
+			o.loopAndGatherMsgs(qch)
+		}()
 
 		// Now start up Go routine to process acks.
-		go o.processInboundAcks(qch)
+		go func() {
+			setGoRoutineLabels(labels)
+			o.processInboundAcks(qch)
+		}()
 
 		if pullMode {
 			// Now start up Go routine to process inbound next message requests.
-			go o.processInboundNextMsgReqs(qch)
+			go func() {
+				setGoRoutineLabels(labels)
+				o.processInboundNextMsgReqs(qch)
+			}()
 		}
 
 		// If we are R>1 spin up our proposal loop.
@@ -1272,7 +1289,10 @@ func (o *consumer) setLeader(isLeader bool) {
 			// They must be on server versions >= 2.7.1
 			o.checkAndSetPendingRequestsOk()
 			o.checkPendingRequests()
-			go o.loopAndForwardProposals(qch)
+			go func() {
+				setGoRoutineLabels(labels)
+				o.loopAndForwardProposals(qch)
+			}()
 		}
 
 	} else {
@@ -1536,7 +1556,7 @@ func (o *consumer) deleteNotActive() {
 		}
 	}
 
-	s, js := o.mset.srv, o.mset.srv.js
+	s, js := o.mset.srv, o.srv.js.Load()
 	acc, stream, name, isDirect := o.acc.Name, o.stream, o.name, o.cfg.Direct
 	o.mu.Unlock()
 
@@ -1564,7 +1584,7 @@ func (o *consumer) deleteNotActive() {
 			// Don't think this needs to be a monitored go routine.
 			go func() {
 				const (
-					startInterval = 5 * time.Second
+					startInterval = 30 * time.Second
 					maxInterval   = 5 * time.Minute
 				)
 				jitter := time.Duration(rand.Int63n(int64(startInterval)))
@@ -1573,6 +1593,10 @@ func (o *consumer) deleteNotActive() {
 				defer ticker.Stop()
 				for range ticker.C {
 					js.mu.RLock()
+					if js.shuttingDown {
+						js.mu.RUnlock()
+						return
+					}
 					nca := js.consumerAssignment(acc, stream, name)
 					js.mu.RUnlock()
 					// Make sure this is not a new consumer with the same name.
@@ -2473,7 +2497,7 @@ func (o *consumer) infoWithSnap(snap bool) *ConsumerInfo {
 func (o *consumer) infoWithSnapAndReply(snap bool, reply string) *ConsumerInfo {
 	o.mu.Lock()
 	mset := o.mset
-	if mset == nil || mset.srv == nil {
+	if o.closed || mset == nil || mset.srv == nil {
 		o.mu.Unlock()
 		return nil
 	}

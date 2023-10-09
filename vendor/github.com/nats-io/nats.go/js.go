@@ -1118,6 +1118,7 @@ type ConsumerConfig struct {
 	MaxDeliver      int             `json:"max_deliver,omitempty"`
 	BackOff         []time.Duration `json:"backoff,omitempty"`
 	FilterSubject   string          `json:"filter_subject,omitempty"`
+	FilterSubjects  []string        `json:"filter_subjects,omitempty"`
 	ReplayPolicy    ReplayPolicy    `json:"replay_policy"`
 	RateLimit       uint64          `json:"rate_limit_bps,omitempty"` // Bits per sec
 	SampleFrequency string          `json:"sample_freq,omitempty"`
@@ -1143,6 +1144,11 @@ type ConsumerConfig struct {
 	Replicas int `json:"num_replicas"`
 	// Force memory storage.
 	MemoryStorage bool `json:"mem_storage,omitempty"`
+
+	// Metadata is additional metadata for the Consumer.
+	// Keys starting with `_nats` are reserved.
+	// NOTE: Metadata requires nats-server v2.10.0+
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // ConsumerInfo is the info from a JetStream consumer.
@@ -1176,10 +1182,11 @@ type SequencePair struct {
 
 // nextRequest is for getting next messages for pull based consumers from JetStream.
 type nextRequest struct {
-	Expires  time.Duration `json:"expires,omitempty"`
-	Batch    int           `json:"batch,omitempty"`
-	NoWait   bool          `json:"no_wait,omitempty"`
-	MaxBytes int           `json:"max_bytes,omitempty"`
+	Expires   time.Duration `json:"expires,omitempty"`
+	Batch     int           `json:"batch,omitempty"`
+	NoWait    bool          `json:"no_wait,omitempty"`
+	MaxBytes  int           `json:"max_bytes,omitempty"`
+	Heartbeat time.Duration `json:"idle_heartbeat,omitempty"`
 }
 
 // jsSub includes JetStream subscription info.
@@ -2469,6 +2476,7 @@ func EnableFlowControl() SubOpt {
 }
 
 // IdleHeartbeat enables push based consumers to have idle heartbeats delivered.
+// For pull consumers, idle heartbeat has to be set on each [Fetch] call.
 func IdleHeartbeat(duration time.Duration) SubOpt {
 	return subOptFn(func(opts *subOpts) error {
 		opts.cfg.Heartbeat = duration
@@ -2568,6 +2576,16 @@ func ConsumerName(name string) SubOpt {
 	})
 }
 
+// ConsumerFilterSubjects can be used to set multiple subject filters on the consumer.
+// It has to be used in conjunction with [nats.BindStream] and
+// with empty 'subject' parameter.
+func ConsumerFilterSubjects(subjects ...string) SubOpt {
+	return subOptFn(func(opts *subOpts) error {
+		opts.cfg.FilterSubjects = subjects
+		return nil
+	})
+}
+
 func (sub *Subscription) ConsumerInfo() (*ConsumerInfo, error) {
 	sub.mu.Lock()
 	// TODO(dlc) - Better way to mark especially if we attach.
@@ -2588,6 +2606,7 @@ type pullOpts struct {
 	maxBytes int
 	ttl      time.Duration
 	ctx      context.Context
+	hb       time.Duration
 }
 
 // PullOpt are the options that can be passed when pulling a batch of messages.
@@ -2601,6 +2620,16 @@ func PullMaxWaiting(n int) SubOpt {
 		opts.cfg.MaxWaiting = n
 		return nil
 	})
+}
+
+type PullHeartbeat time.Duration
+
+func (h PullHeartbeat) configurePull(opts *pullOpts) error {
+	if h <= 0 {
+		return fmt.Errorf("%w: idle heartbeat has to be greater than 0", ErrInvalidArg)
+	}
+	opts.hb = time.Duration(h)
+	return nil
 }
 
 // PullMaxBytes defines the max bytes allowed for a fetch request.
@@ -2644,6 +2673,11 @@ func checkMsg(msg *Msg, checkSts, isNoWait bool) (usrMsg bool, err error) {
 
 	// If we don't care about status, we are done.
 	if !checkSts {
+		return
+	}
+
+	// if it's a heartbeat message, report as not user msg
+	if isHb, _ := isJSControlMessage(msg); isHb {
 		return
 	}
 	switch val {
@@ -2732,7 +2766,6 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 	)
 	if ctx == nil {
 		ctx, cancel = context.WithTimeout(context.Background(), ttl)
-		defer cancel()
 	} else if _, hasDeadline := ctx.Deadline(); !hasDeadline {
 		// Prevent from passing the background context which will just block
 		// and cannot be canceled either.
@@ -2743,7 +2776,17 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 		// If the context did not have a deadline, then create a new child context
 		// that will use the default timeout from the JS context.
 		ctx, cancel = context.WithTimeout(ctx, ttl)
-		defer cancel()
+	} else {
+		ctx, cancel = context.WithCancel(ctx)
+	}
+	defer cancel()
+
+	// if heartbeat is set, validate it against the context timeout
+	if o.hb > 0 {
+		deadline, _ := ctx.Deadline()
+		if 2*o.hb >= time.Until(deadline) {
+			return nil, fmt.Errorf("%w: idle heartbeat value too large", ErrInvalidArg)
+		}
 	}
 
 	// Check if context not done already before making the request.
@@ -2783,6 +2826,8 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 			msgs = append(msgs, msg)
 		}
 	}
+	var hbTimer *time.Timer
+	var hbErr error
 	if err == nil && len(msgs) < batch {
 		// For batch real size of 1, it does not make sense to set no_wait in
 		// the request.
@@ -2813,8 +2858,26 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 			nr.Expires = expires
 			nr.NoWait = noWait
 			nr.MaxBytes = o.maxBytes
+			if 2*o.hb < expires {
+				nr.Heartbeat = o.hb
+			} else {
+				nr.Heartbeat = 0
+			}
 			req, _ := json.Marshal(nr)
-			return nc.PublishRequest(nms, rply, req)
+			if err := nc.PublishRequest(nms, rply, req); err != nil {
+				return err
+			}
+			if o.hb > 0 {
+				if hbTimer == nil {
+					hbTimer = time.AfterFunc(2*o.hb, func() {
+						hbErr = ErrNoHeartbeat
+						cancel()
+					})
+				} else {
+					hbTimer.Reset(2 * o.hb)
+				}
+			}
+			return nil
 		}
 
 		err = sendReq()
@@ -2822,6 +2885,9 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 			// Ask for next message and wait if there are no messages
 			msg, err = sub.nextMsgWithContext(ctx, true, true)
 			if err == nil {
+				if hbTimer != nil {
+					hbTimer.Reset(2 * o.hb)
+				}
 				var usrMsg bool
 
 				usrMsg, err = checkMsg(msg, true, noWait)
@@ -2840,9 +2906,15 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 				}
 			}
 		}
+		if hbTimer != nil {
+			hbTimer.Stop()
+		}
 	}
 	// If there is at least a message added to msgs, then need to return OK and no error
 	if err != nil && len(msgs) == 0 {
+		if hbErr != nil {
+			return nil, hbErr
+		}
 		return nil, o.checkCtxErr(err)
 	}
 	return msgs, nil
@@ -2970,13 +3042,23 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 		// If the context did not have a deadline, then create a new child context
 		// that will use the default timeout from the JS context.
 		ctx, cancel = context.WithTimeout(ctx, ttl)
+	} else {
+		ctx, cancel = context.WithCancel(ctx)
 	}
 	defer func() {
 		// only cancel the context here if we are sure the fetching goroutine has not been started yet
-		if cancel != nil && cancelContext {
+		if cancelContext {
 			cancel()
 		}
 	}()
+
+	// if heartbeat is set, validate it against the context timeout
+	if o.hb > 0 {
+		deadline, _ := ctx.Deadline()
+		if 2*o.hb >= time.Until(deadline) {
+			return nil, fmt.Errorf("%w: idle heartbeat value too large", ErrInvalidArg)
+		}
+	}
 
 	// Check if context not done already before making the request.
 	select {
@@ -3031,9 +3113,10 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 
 	requestBatch := batch - len(result.msgs)
 	req := nextRequest{
-		Expires:  expires,
-		Batch:    requestBatch,
-		MaxBytes: o.maxBytes,
+		Expires:   expires,
+		Batch:     requestBatch,
+		MaxBytes:  o.maxBytes,
+		Heartbeat: o.hb,
 	}
 	reqJSON, err := json.Marshal(req)
 	if err != nil {
@@ -3051,17 +3134,26 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 		result.err = err
 		return result, nil
 	}
+	var hbTimer *time.Timer
+	var hbErr error
+	if o.hb > 0 {
+		hbTimer = time.AfterFunc(2*o.hb, func() {
+			hbErr = ErrNoHeartbeat
+			cancel()
+		})
+	}
 	cancelContext = false
 	go func() {
-		if cancel != nil {
-			defer cancel()
-		}
+		defer cancel()
 		var requestMsgs int
 		for requestMsgs < requestBatch {
 			// Ask for next message and wait if there are no messages
 			msg, err = sub.nextMsgWithContext(ctx, true, true)
 			if err != nil {
 				break
+			}
+			if hbTimer != nil {
+				hbTimer.Reset(2 * o.hb)
 			}
 			var usrMsg bool
 
@@ -3082,7 +3174,11 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 			}
 		}
 		if err != nil {
-			result.err = o.checkCtxErr(err)
+			if hbErr != nil {
+				result.err = hbErr
+			} else {
+				result.err = o.checkCtxErr(err)
+			}
 		}
 		close(result.msgs)
 		result.done <- struct{}{}
@@ -3650,6 +3746,53 @@ func (st *StorageType) UnmarshalJSON(data []byte) error {
 		*st = FileStorage
 	default:
 		return fmt.Errorf("nats: can not unmarshal %q", data)
+	}
+	return nil
+}
+
+type StoreCompression uint8
+
+const (
+	NoCompression StoreCompression = iota
+	S2Compression
+)
+
+func (alg StoreCompression) String() string {
+	switch alg {
+	case NoCompression:
+		return "None"
+	case S2Compression:
+		return "S2"
+	default:
+		return "Unknown StoreCompression"
+	}
+}
+
+func (alg StoreCompression) MarshalJSON() ([]byte, error) {
+	var str string
+	switch alg {
+	case S2Compression:
+		str = "s2"
+	case NoCompression:
+		str = "none"
+	default:
+		return nil, fmt.Errorf("unknown compression algorithm")
+	}
+	return json.Marshal(str)
+}
+
+func (alg *StoreCompression) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return err
+	}
+	switch str {
+	case "s2":
+		*alg = S2Compression
+	case "none":
+		*alg = NoCompression
+	default:
+		return fmt.Errorf("unknown compression algorithm")
 	}
 	return nil
 }
