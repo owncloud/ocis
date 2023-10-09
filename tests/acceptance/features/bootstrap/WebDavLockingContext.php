@@ -627,7 +627,7 @@ class WebDavLockingContext implements Context {
 			$headers,
 			$publicWebDAVAPIVersion
 		);
-        $this->featureContext->setResponse($response);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
