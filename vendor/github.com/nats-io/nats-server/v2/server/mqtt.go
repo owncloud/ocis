@@ -425,6 +425,10 @@ type mqttParsedPublishNATSHeader struct {
 }
 
 func (s *Server) startMQTT() {
+	if s.isShuttingDown() {
+		return
+	}
+
 	sopts := s.getOpts()
 	o := &sopts.MQTT
 
@@ -437,10 +441,6 @@ func (s *Server) startMQTT() {
 	}
 	hp := net.JoinHostPort(o.Host, strconv.Itoa(port))
 	s.mu.Lock()
-	if s.shutdown {
-		s.mu.Unlock()
-		return
-	}
 	s.mqtt.sessmgr.sessions = make(map[string]*mqttAccountSessionManager)
 	hl, err = net.Listen("tcp", hp)
 	s.mqtt.listenerErr = err
@@ -499,8 +499,8 @@ func (s *Server) createMQTTClient(conn net.Conn, ws *websocket) *client {
 	c.mu.Unlock()
 
 	s.mu.Lock()
-	if !s.running || s.ldm {
-		if s.shutdown {
+	if !s.isRunning() || s.ldm {
+		if s.isShuttingDown() {
 			conn.Close()
 		}
 		s.mu.Unlock()
@@ -3915,6 +3915,14 @@ func (c *client) mqttEnqueuePubResponse(packetType byte, pi uint16, trace bool) 
 	proto := [4]byte{packetType, 0x2, 0, 0}
 	proto[2] = byte(pi >> 8)
 	proto[3] = byte(pi)
+
+	// Bits 3,2,1 and 0 of the fixed header in the PUBREL Control Packet are
+	// reserved and MUST be set to 0,0,1 and 0 respectively. The Server MUST treat
+	// any other value as malformed and close the Network Connection [MQTT-3.6.1-1].
+	if packetType == mqttPacketPubRel {
+		proto[0] |= 0x2
+	}
+
 	c.mu.Lock()
 	c.enqueueProto(proto[:4])
 	c.mu.Unlock()

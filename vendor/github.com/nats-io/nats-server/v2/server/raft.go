@@ -134,6 +134,7 @@ type raft struct {
 	track    bool
 	werr     error
 	state    RaftState
+	isLeader atomic.Bool
 	hh       hash.Hash64
 	snapfile string
 	csz      int
@@ -588,14 +589,15 @@ func (s *Server) stepdownRaftNodes() {
 		s.Debugf("Stepping down all leader raft nodes")
 	}
 	for _, n := range s.raftNodes {
-		if n.Leader() {
-			nodes = append(nodes, n)
-		}
+		nodes = append(nodes, n)
 	}
 	s.rnMu.RUnlock()
 
 	for _, node := range nodes {
-		node.StepDown()
+		if node.Leader() {
+			node.StepDown()
+		}
+		node.SetObserver(true)
 	}
 }
 
@@ -652,9 +654,9 @@ func (s *Server) transferRaftLeaders() bool {
 // This should only be called on the leader.
 func (n *raft) Propose(data []byte) error {
 	n.RLock()
-	if n.state != Leader {
+	if state := n.state; state != Leader {
 		n.RUnlock()
-		n.debug("Proposal ignored, not leader (state: %v)", n.state)
+		n.debug("Proposal ignored, not leader (state: %v)", state)
 		return errNotLeader
 	}
 	// Error if we had a previous write error.
@@ -1157,14 +1159,12 @@ func (n *raft) loadLastSnapshot() (*snapshot, error) {
 }
 
 // Leader returns if we are the leader for our group.
+// We use an atomic here now vs acquiring the read lock.
 func (n *raft) Leader() bool {
 	if n == nil {
 		return false
 	}
-	n.RLock()
-	isLeader := n.state == Leader
-	n.RUnlock()
-	return isLeader
+	return n.isLeader.Load()
 }
 
 func (n *raft) isCatchingUp() bool {
@@ -1687,8 +1687,7 @@ func (n *raft) run() {
 	// We want to wait for some routing to be enabled, so we will wait for
 	// at least a route, leaf or gateway connection to be established before
 	// starting the run loop.
-	gw := s.gateway
-	for {
+	for gw := s.gateway; ; {
 		s.mu.Lock()
 		ready := s.numRemotes()+len(s.leafs) > 0
 		if !ready && gw.enabled {
@@ -3830,6 +3829,9 @@ func (n *raft) quorumNeeded() int {
 
 // Lock should be held.
 func (n *raft) updateLeadChange(isLeader bool) {
+	// Update our atomic about being the leader.
+	n.isLeader.Store(isLeader)
+
 	// We don't care about values that have not been consumed (transitory states),
 	// so we dequeue any state that is pending and push the new one.
 	for {

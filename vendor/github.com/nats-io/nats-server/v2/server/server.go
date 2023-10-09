@@ -131,13 +131,14 @@ type Server struct {
 	configFile          string
 	optsMu              sync.RWMutex
 	opts                *Options
-	running             bool
-	shutdown            bool
+	running             atomic.Bool
+	shutdown            atomic.Bool
 	listener            net.Listener
 	listenerErr         error
 	gacc                *Account
 	sys                 *internal
-	js                  *jetStream
+	js                  atomic.Pointer[jetStream]
+	isMetaLeader        atomic.Bool
 	accounts            sync.Map
 	tmpAccounts         sync.Map // Temporarily stores accounts that are being built
 	activeAccounts      int32
@@ -572,13 +573,18 @@ func selectS2AutoModeBasedOnRTT(rtt time.Duration, rttThresholds []time.Duration
 // with a nil []s2.WriterOption, but not with a nil s2.WriterOption, so
 // this is more versatile.
 func s2WriterOptions(cm string) []s2.WriterOption {
+	_opts := [2]s2.WriterOption{}
+	opts := append(
+		_opts[:0],
+		s2.WriterConcurrency(1), // Stop asynchronous flushing in separate goroutines
+	)
 	switch cm {
 	case CompressionS2Uncompressed:
-		return []s2.WriterOption{s2.WriterUncompressed()}
+		return append(opts, s2.WriterUncompressed())
 	case CompressionS2Best:
-		return []s2.WriterOption{s2.WriterBestCompression()}
+		return append(opts, s2.WriterBestCompression())
 	case CompressionS2Better:
-		return []s2.WriterOption{s2.WriterBetterCompression()}
+		return append(opts, s2.WriterBetterCompression())
 	default:
 		return nil
 	}
@@ -1234,8 +1240,8 @@ func (s *Server) configureAccounts(reloading bool) (map[string]struct{}, error) 
 		// If we have defined a system account here check to see if its just us and the $G account.
 		// We would do this to add user/pass to the system account. If this is the case add in
 		// no-auth-user for $G.
-		// Only do this if non-operator mode.
-		if len(opts.TrustedOperators) == 0 && numAccounts == 2 && opts.NoAuthUser == _EMPTY_ {
+		// Only do this if non-operator mode and we did not have an authorization block defined.
+		if len(opts.TrustedOperators) == 0 && numAccounts == 2 && opts.NoAuthUser == _EMPTY_ && !opts.authBlockDefined {
 			// If we come here from config reload, let's not recreate the fake user name otherwise
 			// it will cause currently clients to be disconnected.
 			uname := s.sysAccOnlyNoAuthUser
@@ -1267,6 +1273,7 @@ func (s *Server) configureAccounts(reloading bool) (map[string]struct{}, error) 
 
 // Setup the account resolver. For memory resolver, make sure the JWTs are
 // properly formed but do not enforce expiration etc.
+// Lock is held on entry, but may be released/reacquired during this call.
 func (s *Server) configureResolver() error {
 	opts := s.getOpts()
 	s.accResolver = opts.AccountResolver
@@ -1281,7 +1288,12 @@ func (s *Server) configureResolver() error {
 			}
 		}
 		if len(opts.resolverPreloads) > 0 {
-			if s.accResolver.IsReadOnly() {
+			// Lock ordering is account resolver -> server, so we need to release
+			// the lock and reacquire it when done with account resolver's calls.
+			ar := s.accResolver
+			s.mu.Unlock()
+			defer s.mu.Lock()
+			if ar.IsReadOnly() {
 				return fmt.Errorf("resolver preloads only available for writeable resolver types MEM/DIR/CACHE_DIR")
 			}
 			for k, v := range opts.resolverPreloads {
@@ -1289,7 +1301,7 @@ func (s *Server) configureResolver() error {
 				if err != nil {
 					return fmt.Errorf("preload account error for %q: %v", k, err)
 				}
-				s.accResolver.Store(k, v)
+				ar.Store(k, v)
 			}
 		}
 	}
@@ -1477,10 +1489,7 @@ func (s *Server) Running() bool {
 
 // Protected check on running state
 func (s *Server) isRunning() bool {
-	s.mu.RLock()
-	running := s.running
-	s.mu.RUnlock()
-	return running
+	return s.running.Load()
 }
 
 func (s *Server) logPid() error {
@@ -2078,8 +2087,8 @@ func (s *Server) Start() {
 	s.checkAuthforWarnings()
 
 	// Avoid RACE between Start() and Shutdown()
+	s.running.Store(true)
 	s.mu.Lock()
-	s.running = true
 	// Update leafNodeEnabled in case options have changed post NewServer()
 	// and before Start() (we should not be able to allow that, but server has
 	// direct reference to user-provided options - at least before a Reload() is
@@ -2096,6 +2105,10 @@ func (s *Server) Start() {
 	// Pprof http endpoint for the profiler.
 	if opts.ProfPort != 0 {
 		s.StartProfiler()
+	} else {
+		// It's still possible to access this profile via a SYS endpoint, so set
+		// this anyway. (Otherwise StartProfiler would have called it.)
+		s.setBlockProfileRate(opts.ProfBlockRate)
 	}
 
 	if opts.ConfigFile != _EMPTY_ {
@@ -2338,6 +2351,10 @@ func (s *Server) Start() {
 	s.startOCSPResponseCache()
 }
 
+func (s *Server) isShuttingDown() bool {
+	return s.shutdown.Load()
+}
+
 // Shutdown will shutdown the server instance by kicking out the AcceptLoop
 // and closing all associated clients.
 func (s *Server) Shutdown() {
@@ -2357,20 +2374,20 @@ func (s *Server) Shutdown() {
 	// eventing items associated with accounts.
 	s.shutdownEventing()
 
-	s.mu.Lock()
 	// Prevent issues with multiple calls.
-	if s.shutdown {
-		s.mu.Unlock()
+	if s.isShuttingDown() {
 		return
 	}
+
+	s.mu.Lock()
 	s.Noticef("Initiating Shutdown...")
 
 	accRes := s.accResolver
 
 	opts := s.getOpts()
 
-	s.shutdown = true
-	s.running = false
+	s.shutdown.Store(true)
+	s.running.Store(false)
 	s.grMu.Lock()
 	s.grRunning = false
 	s.grMu.Unlock()
@@ -2380,7 +2397,7 @@ func (s *Server) Shutdown() {
 		accRes.Close()
 	}
 
-	// Now check jetstream.
+	// Now check and shutdown jetstream.
 	s.shutdownJetStream()
 
 	// Now shutdown the nodes
@@ -2533,16 +2550,15 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 		}
 	}()
 
+	if s.isShuttingDown() {
+		return
+	}
+
 	// Snapshot server options.
 	opts := s.getOpts()
 
 	// Setup state that can enable shutdown
 	s.mu.Lock()
-	if s.shutdown {
-		s.mu.Unlock()
-		return
-	}
-
 	hp := net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
 	l, e := natsListen("tcp", hp)
 	s.listenerErr = e
@@ -2665,6 +2681,10 @@ func (s *Server) setInfoHostPort() error {
 
 // StartProfiler is called to enable dynamic profiling.
 func (s *Server) StartProfiler() {
+	if s.isShuttingDown() {
+		return
+	}
+
 	// Snapshot server options.
 	opts := s.getOpts()
 
@@ -2676,12 +2696,7 @@ func (s *Server) StartProfiler() {
 	}
 
 	s.mu.Lock()
-	if s.shutdown {
-		s.mu.Unlock()
-		return
-	}
 	hp := net.JoinHostPort(opts.Host, strconv.Itoa(port))
-
 	l, err := net.Listen("tcp", hp)
 
 	if err != nil {
@@ -2699,14 +2714,13 @@ func (s *Server) StartProfiler() {
 	s.profiler = l
 	s.profilingServer = srv
 
+	s.setBlockProfileRate(opts.ProfBlockRate)
+
 	go func() {
 		// if this errors out, it's probably because the server is being shutdown
 		err := srv.Serve(l)
 		if err != nil {
-			s.mu.Lock()
-			shutdown := s.shutdown
-			s.mu.Unlock()
-			if !shutdown {
+			if !s.isShuttingDown() {
 				s.Fatalf("error starting profiler: %s", err)
 			}
 		}
@@ -2714,6 +2728,15 @@ func (s *Server) StartProfiler() {
 		s.done <- true
 	}()
 	s.mu.Unlock()
+}
+
+func (s *Server) setBlockProfileRate(rate int) {
+	// Passing i ProfBlockRate <= 0 here will disable or > 0 will enable.
+	runtime.SetBlockProfileRate(rate)
+
+	if rate > 0 {
+		s.Warnf("Block profiling is enabled (rate %d), this may have a performance impact", rate)
+	}
 }
 
 // StartHTTPMonitoring will enable the HTTP monitoring port.
@@ -2804,6 +2827,10 @@ func (s *Server) getMonitoringTLSConfig(_ *tls.ClientHelloInfo) (*tls.Config, er
 
 // Start the monitoring server
 func (s *Server) startMonitoring(secure bool) error {
+	if s.isShuttingDown() {
+		return nil
+	}
+
 	// Snapshot server options.
 	opts := s.getOpts()
 
@@ -2885,11 +2912,6 @@ func (s *Server) startMonitoring(secure bool) error {
 		ErrorLog:       log.New(&captureHTTPServerLog{s, "monitoring: "}, _EMPTY_, 0),
 	}
 	s.mu.Lock()
-	if s.shutdown {
-		httpListener.Close()
-		s.mu.Unlock()
-		return nil
-	}
 	s.http = httpListener
 	s.httpHandler = mux
 	s.monitoringServer = srv
@@ -2897,10 +2919,7 @@ func (s *Server) startMonitoring(secure bool) error {
 
 	go func() {
 		if err := srv.Serve(httpListener); err != nil {
-			s.mu.Lock()
-			shutdown := s.shutdown
-			s.mu.Unlock()
-			if !shutdown {
+			if !s.isShuttingDown() {
 				s.Fatalf("Error starting monitor on %q: %v", hp, err)
 			}
 		}
@@ -3036,13 +3055,13 @@ func (s *Server) createClientEx(conn net.Conn, inProcess bool) *client {
 	// list of connections to close. It won't contain this one, so we need
 	// to bail out now otherwise the readLoop started down there would not
 	// be interrupted. Skip also if in lame duck mode.
-	if !s.running || s.ldm {
+	if !s.isRunning() || s.ldm {
 		// There are some tests that create a server but don't start it,
 		// and use "async" clients and perform the parsing manually. Such
 		// clients would branch here (since server is not running). However,
 		// when a server was really running and has been shutdown, we must
 		// close this connection.
-		if s.shutdown {
+		if s.isShuttingDown() {
 			conn.Close()
 		}
 		s.mu.Unlock()
@@ -3590,22 +3609,28 @@ func (s *Server) String() string {
 
 type pprofLabels map[string]string
 
+func setGoRoutineLabels(tags ...pprofLabels) {
+	var labels []string
+	for _, m := range tags {
+		for k, v := range m {
+			labels = append(labels, k, v)
+		}
+	}
+	if len(labels) > 0 {
+		pprof.SetGoroutineLabels(
+			pprof.WithLabels(context.Background(), pprof.Labels(labels...)),
+		)
+	}
+}
+
 func (s *Server) startGoRoutine(f func(), tags ...pprofLabels) bool {
 	var started bool
 	s.grMu.Lock()
 	defer s.grMu.Unlock()
 	if s.grRunning {
-		var labels []string
-		for _, m := range tags {
-			for k, v := range m {
-				labels = append(labels, k, v)
-			}
-		}
 		s.grWG.Add(1)
 		go func() {
-			pprof.SetGoroutineLabels(
-				pprof.WithLabels(context.Background(), pprof.Labels(labels...)),
-			)
+			setGoRoutineLabels(tags...)
 			f()
 		}()
 		started = true
@@ -3944,11 +3969,12 @@ func (s *Server) isLameDuckMode() bool {
 }
 
 // This function will close the client listener then close the clients
-// at some interval to avoid a reconnecting storm.
+// at some interval to avoid a reconnect storm.
+// We will also transfer any raft leaders and shutdown JetStream.
 func (s *Server) lameDuckMode() {
 	s.mu.Lock()
 	// Check if there is actually anything to do
-	if s.shutdown || s.ldm || s.listener == nil {
+	if s.isShuttingDown() || s.ldm || s.listener == nil {
 		s.mu.Unlock()
 		return
 	}
@@ -3985,6 +4011,12 @@ func (s *Server) lameDuckMode() {
 		}
 	}
 
+	// Now check and shutdown jetstream.
+	s.shutdownJetStream()
+
+	// Now shutdown the nodes
+	s.shutdownRaftNodes()
+
 	// Wait for accept loops to be done to make sure that no new
 	// client can connect
 	for i := 0; i < expected; i++ {
@@ -3993,7 +4025,7 @@ func (s *Server) lameDuckMode() {
 
 	s.mu.Lock()
 	// Need to recheck few things
-	if s.shutdown || len(s.clients) == 0 {
+	if s.isShuttingDown() || len(s.clients) == 0 {
 		s.mu.Unlock()
 		// If there is no client, we need to call Shutdown() to complete
 		// the LDMode. If server has been shutdown while lock was released,

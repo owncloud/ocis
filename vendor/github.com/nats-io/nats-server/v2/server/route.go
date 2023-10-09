@@ -653,11 +653,14 @@ func (c *client) processRouteInfo(info *Info) {
 		// We receive an INFO from a server that informs us about another server,
 		// so the info.ID in the INFO protocol does not match the ID of this route.
 		if remoteID != _EMPTY_ && remoteID != info.ID {
+			// We want to know if the existing route supports pooling/pinned-account
+			// or not when processing the implicit route.
+			noPool := c.route.noPool
 			c.mu.Unlock()
 
 			// Process this implicit route. We will check that it is not an explicit
 			// route and/or that it has not been connected already.
-			s.processImplicitRoute(info)
+			s.processImplicitRoute(info, noPool)
 			return
 		}
 
@@ -812,10 +815,14 @@ func (c *client) processRouteInfo(info *Info) {
 		}
 	}
 	// For accounts that are configured to have their own route:
-	// If this is a solicit route, we already have c.route.accName set in createRoute.
+	// If this is a solicited route, we already have c.route.accName set in createRoute.
 	// For non solicited route (the accept side), we will set the account name that
 	// is present in the INFO protocol.
-	if !didSolicit {
+	if didSolicit && len(c.route.accName) > 0 {
+		// Set it in the info.RouteAccount so that addRoute can use that
+		// and we properly gossip that this is a route for an account.
+		info.RouteAccount = string(c.route.accName)
+	} else if !didSolicit && info.RouteAccount != _EMPTY_ {
 		c.route.accName = []byte(info.RouteAccount)
 	}
 	accName := string(c.route.accName)
@@ -977,7 +984,7 @@ func (s *Server) updateRemoteRoutePerms(c *client, info *Info) {
 func (s *Server) sendAsyncInfoToClients(regCli, wsCli bool) {
 	// If there are no clients supporting async INFO protocols, we are done.
 	// Also don't send if we are shutting down...
-	if s.cproto == 0 || s.shutdown {
+	if s.cproto == 0 || s.isShuttingDown() {
 		return
 	}
 	info := s.copyInfo()
@@ -1002,7 +1009,7 @@ func (s *Server) sendAsyncInfoToClients(regCli, wsCli bool) {
 // This will process implicit route information received from another server.
 // We will check to see if we have configured or are already connected,
 // and if so we will ignore. Otherwise we will attempt to connect.
-func (s *Server) processImplicitRoute(info *Info) {
+func (s *Server) processImplicitRoute(info *Info, routeNoPool bool) {
 	remoteID := info.ID
 
 	s.mu.Lock()
@@ -1012,8 +1019,16 @@ func (s *Server) processImplicitRoute(info *Info) {
 	if remoteID == s.info.ID {
 		return
 	}
+
+	// Snapshot server options.
+	opts := s.getOpts()
+
 	// Check if this route already exists
 	if accName := info.RouteAccount; accName != _EMPTY_ {
+		// If we don't support pooling/pinned account, bail.
+		if opts.Cluster.PoolSize <= 0 {
+			return
+		}
 		if remotes, ok := s.accRoutes[accName]; ok {
 			if r := remotes[remoteID]; r != nil {
 				return
@@ -1034,13 +1049,22 @@ func (s *Server) processImplicitRoute(info *Info) {
 		return
 	}
 
-	// Snapshot server options.
-	opts := s.getOpts()
-
 	if info.AuthRequired {
 		r.User = url.UserPassword(opts.Cluster.Username, opts.Cluster.Password)
 	}
 	s.startGoRoutine(func() { s.connectToRoute(r, false, true, info.RouteAccount) })
+	// If we are processing an implicit route from a route that does not
+	// support pooling/pinned-accounts, we won't receive an INFO for each of
+	// the pinned-accounts that we would normally receive. In that case, just
+	// initiate routes for all our configured pinned accounts.
+	if routeNoPool && info.RouteAccount == _EMPTY_ && len(opts.Cluster.PinnedAccounts) > 0 {
+		// Copy since we are going to pass as closure to a go routine.
+		rURL := r
+		for _, an := range opts.Cluster.PinnedAccounts {
+			accName := an
+			s.startGoRoutine(func() { s.connectToRoute(rURL, false, true, accName) })
+		}
+	}
 }
 
 // hasThisRouteConfigured returns true if info.Host:info.Port is present
@@ -1071,7 +1095,10 @@ func (s *Server) forwardNewRouteInfoToKnownServers(info *Info) {
 
 	s.forEachRemote(func(r *client) {
 		r.mu.Lock()
-		if r.route.remoteID != info.ID {
+		// If this is a new route for a given account, do not send to a server
+		// that does not support pooling/pinned-accounts.
+		if r.route.remoteID != info.ID &&
+			(info.RouteAccount == _EMPTY_ || (info.RouteAccount != _EMPTY_ && !r.route.noPool)) {
 			r.enqueueProto(infoJSON)
 		}
 		r.mu.Unlock()
@@ -1834,7 +1861,7 @@ func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string
 	id := info.ID
 
 	s.mu.Lock()
-	if !s.running || s.routesReject {
+	if !s.isRunning() || s.routesReject {
 		s.mu.Unlock()
 		return false
 	}
@@ -1855,7 +1882,7 @@ func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string
 	// server and need to handle things differently.
 	if info.RoutePoolSize <= 0 || opts.Cluster.PoolSize < 0 {
 		if accName != _EMPTY_ {
-			invProtoErr = fmt.Sprintf("Not possible to have a dedicate route for account %q between those servers", accName)
+			invProtoErr = fmt.Sprintf("Not possible to have a dedicated route for account %q between those servers", accName)
 			// In this case, make sure this route does not attempt to reconnect
 			c.setNoReconnect()
 		} else {
@@ -2302,6 +2329,10 @@ func (s *Server) updateRouteSubscriptionMap(acc *Account, sub *subscription, del
 // is detected that the server has already been shutdown.
 // It will also start soliciting explicit routes.
 func (s *Server) startRouteAcceptLoop() {
+	if s.isShuttingDown() {
+		return
+	}
+
 	// Snapshot server options.
 	opts := s.getOpts()
 
@@ -2316,10 +2347,6 @@ func (s *Server) startRouteAcceptLoop() {
 	clusterName := s.ClusterName()
 
 	s.mu.Lock()
-	if s.shutdown {
-		s.mu.Unlock()
-		return
-	}
 	s.Noticef("Cluster name is %s", clusterName)
 	if s.isClusterNameDynamic() {
 		s.Warnf("Cluster name was dynamically generated, consider setting one")
@@ -2654,7 +2681,9 @@ func (c *client) processRouteConnect(srv *Server, arg []byte, lang string) error
 				// We will take on their name since theirs is configured or higher then ours.
 				srv.setClusterName(proto.Cluster)
 				if !proto.Dynamic {
-					srv.getOpts().Cluster.Name = proto.Cluster
+					srv.optsMu.Lock()
+					srv.opts.Cluster.Name = proto.Cluster
+					srv.optsMu.Unlock()
 				}
 				c.mu.Lock()
 				remoteID := c.opts.Name
@@ -2729,6 +2758,7 @@ func (s *Server) removeRoute(c *client) {
 		opts          = s.getOpts()
 		rURL          *url.URL
 		noPool        bool
+		didSolicit    bool
 	)
 	c.mu.Lock()
 	cid := c.cid
@@ -2747,6 +2777,7 @@ func (s *Server) removeRoute(c *client) {
 		connectURLs = r.connectURLs
 		wsConnectURLs = r.wsConnURLs
 		rURL = r.url
+		didSolicit = r.didSolicit
 	}
 	c.mu.Unlock()
 	if accName != _EMPTY_ {
@@ -2805,10 +2836,18 @@ func (s *Server) removeRoute(c *client) {
 			if lnURL != _EMPTY_ && s.removeLeafNodeURL(lnURL) {
 				s.sendAsyncLeafNodeInfo()
 			}
-			// If this server has pooling and the route for this remote
-			// was a "no pool" route, attempt to reconnect.
-			if s.routesPoolSize > 1 && noPool {
-				s.startGoRoutine(func() { s.connectToRoute(rURL, true, true, _EMPTY_) })
+			// If this server has pooling/pinned accounts and the route for
+			// this remote was a "no pool" route, attempt to reconnect.
+			if noPool {
+				if s.routesPoolSize > 1 {
+					s.startGoRoutine(func() { s.connectToRoute(rURL, didSolicit, true, _EMPTY_) })
+				}
+				if len(opts.Cluster.PinnedAccounts) > 0 {
+					for _, an := range opts.Cluster.PinnedAccounts {
+						accName := an
+						s.startGoRoutine(func() { s.connectToRoute(rURL, didSolicit, true, accName) })
+					}
+				}
 			}
 		}
 		// This is for gateway code. Remove this route from a map that uses

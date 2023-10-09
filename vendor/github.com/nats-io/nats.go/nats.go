@@ -47,7 +47,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.29.0"
+	Version                   = "1.30.2"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -3168,8 +3168,10 @@ func (nc *Conn) processMsg(data []byte) {
 		}
 	}
 
-	// Skip processing if this is a control message.
-	if !ctrlMsg {
+	// Skip processing if this is a control message and
+	// if not a pull consumer heartbeat. For pull consumers,
+	// heartbeats have to be handled on per request basis.
+	if !ctrlMsg || (jsi != nil && jsi.pull) {
 		var chanSubCheckFC bool
 		// Subscription internal stats (applicable only for non ChanSubscription's)
 		if sub.typ != ChanSubscription {

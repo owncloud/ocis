@@ -3014,6 +3014,10 @@ func queueMatches(queue string, qsubs [][]*subscription) bool {
 
 // Low level unsubscribe for a given client.
 func (c *client) unsubscribe(acc *Account, sub *subscription, force, remove bool) {
+	if s := c.srv; s != nil && s.isShuttingDown() {
+		return
+	}
+
 	c.mu.Lock()
 	if !force && sub.max > 0 && sub.nm < sub.max {
 		c.Debugf(
@@ -3067,7 +3071,8 @@ func (c *client) unsubscribe(acc *Account, sub *subscription, force, remove bool
 	}
 
 	// Now check to see if this was part of a respMap entry for service imports.
-	if acc != nil {
+	// We can skip subscriptions on reserved replies.
+	if acc != nil && !isReservedReply(sub.subject) {
 		acc.checkForReverseEntry(string(sub.subject), nil, true)
 	}
 }
@@ -3735,7 +3740,7 @@ func (c *client) processInboundMsg(msg []byte) {
 	}
 }
 
-// selectMappedSubject will chose the mapped subject based on the client's inbound subject.
+// selectMappedSubject will choose the mapped subject based on the client's inbound subject.
 func (c *client) selectMappedSubject() bool {
 	nsubj, changed := c.acc.selectMappedSubject(string(c.pa.subject))
 	if changed {
@@ -4558,6 +4563,12 @@ func (c *client) processMsgResults(acc *Account, r *SublistResult, msg, deliver,
 				continue
 			}
 
+			// If we are a spoke leaf node make sure to not forward across routes.
+			// This mimics same behavior for normal subs above.
+			if c.kind == LEAF && c.isSpokeLeafNode() && sub.client.kind == ROUTER {
+				continue
+			}
+
 			// We have taken care of preferring local subs for a message from a route above.
 			// Here we just care about a client or leaf and skipping a leaf and preferring locals.
 			if dst := sub.client.kind; dst == ROUTER || dst == LEAF {
@@ -5071,6 +5082,23 @@ func (c *client) closeConnection(reason ClosedState) {
 		c.out.stc = nil
 	}
 
+	// If we have remote latency tracking running shut that down.
+	if c.rrTracking != nil {
+		c.rrTracking.ptmr.Stop()
+		c.rrTracking = nil
+	}
+
+	// If we are shutting down, no need to do all the accounting on subs, etc.
+	if reason == ServerShutdown {
+		s := c.srv
+		c.mu.Unlock()
+		if s != nil {
+			// Unregister
+			s.removeClient(c)
+		}
+		return
+	}
+
 	var (
 		kind        = c.kind
 		srv         = c.srv
@@ -5093,12 +5121,6 @@ func (c *client) closeConnection(reason ClosedState) {
 			subs = append(subs, sub)
 		}
 		spoke = c.isSpokeLeafNode()
-	}
-
-	// If we have remote latency tracking running shut that down.
-	if c.rrTracking != nil {
-		c.rrTracking.ptmr.Stop()
-		c.rrTracking = nil
 	}
 
 	c.mu.Unlock()
@@ -5219,7 +5241,7 @@ func (c *client) reconnect() {
 
 		// It is possible that the server is being shutdown.
 		// If so, don't try to reconnect
-		if !srv.running {
+		if !srv.isRunning() {
 			return
 		}
 
