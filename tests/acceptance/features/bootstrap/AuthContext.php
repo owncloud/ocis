@@ -61,6 +61,19 @@ class AuthContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return array
+	 */
+	public function createBasicAuthHeader(string $user, string $password): array {
+		$header = [];
+		$authString = \base64_encode("$user:$password");
+		$header["Authorization"] = "basic $authString";
+		return $header;
+	}
+
+	/**
 	 * @param string $url
 	 * @param string $method
 	 * @param string|null $body
@@ -110,8 +123,8 @@ class AuthContext implements Context {
 			$url,
 			$user
 		);
-		$authString = \base64_encode("$user:" . $this->featureContext->getPasswordForUser($user));
-		$headers["Authorization"] = "basic $authString";
+		$authHeader = $this->createBasicAuthHeader($user, $this->featureContext->getPasswordForUser($user));
+		$headers = \array_merge($headers ?? [], $authHeader);
 
 		if ($property !== null) {
 			$body = $this->featureContext->getBodyForOCSRequest($method, $property);
@@ -180,7 +193,7 @@ class AuthContext implements Context {
 				$row['endpoint'],
 				$ofUser
 			);
-			$response = $this->sendRequest($row['endpoint'], $method, $body);
+			$response = $this->sendRequest($row['endpoint'], $method);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
@@ -223,7 +236,7 @@ class AuthContext implements Context {
 	}
 
 	/**
-	 * @When /^the user "([^"]*)" requests these endpoints with "([^"]*)" to (?:get|set) property "([^"]*)" about user "([^"]*)"$/
+	 * @When /^user "([^"]*)" requests these endpoints with "([^"]*)" to (?:get|set) property "([^"]*)" about user "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $method
@@ -297,7 +310,6 @@ class AuthContext implements Context {
 	 */
 	public function userRequestsURLWithUsingBasicAuthAndDepthHeader(string $user, string $url, string $method, TableNode $headersTable):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$authString = "$user:" . $this->featureContext->getPasswordForUser($user);
 		$url = $this->featureContext->substituteInLineCodes(
 			$url,
 			$user
@@ -341,11 +353,250 @@ class AuthContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 
-		$authString = \base64_encode("$user:$password");
-		$headers["Authorization"] = "basic $authString";
+		$authHeader = $this->createBasicAuthHeader($user, $password);
 
 		foreach ($table->getHash() as $row) {
-			$response = $this->sendRequest($row['endpoint'], $method, null, $headers);
+			$response = $this->sendRequest($row['endpoint'], $method, null, $authHeader);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method using password :password about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $password
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsUsingPasswordAboutUser(
+		string $user,
+		string $method,
+		string $password,
+		string $ofUser,
+		TableNode $table
+	):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
+
+		$headers = $this->createBasicAuthHeader($user, $password);
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			if (isset($row['destination'])) {
+				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
+					$this->featureContext->getBaseUrl() . $row['destination'],
+					$ofUser
+				);
+			}
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				null,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method including body :body using password :password about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $body
+	 * @param string $password
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsWithBodyUsingPasswordAboutUser(
+		string $user,
+		string $method,
+		string $body,
+		string $password,
+		string $ofUser,
+		TableNode $table
+	):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
+
+		$headers = $this->createBasicAuthHeader($user, $password);
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			if (isset($row['destination'])) {
+				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
+					$this->featureContext->getBaseUrl() . $row['destination'],
+					$ofUser
+				);
+			}
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				$body,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method including body :body about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $body
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsIncludingBodyAboutUser(string $user, string $method, string $body, string $ofUser, TableNode $table):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		$headers = [];
+		if ($method === 'MOVE' || $method === 'COPY') {
+			$headers['Destination'] = '/path/to/destination';
+		}
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->requestUrlWithBasicAuth(
+				$user,
+				$row['endpoint'],
+				$method,
+				$body,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :asUser requests these endpoints with :method using the password of user :ofUser
+	 *
+	 * @param string $asUser
+	 * @param string $method
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(string $asUser, string $method, string $ofUser, TableNode $table):void {
+		$asUser = $this->featureContext->getActualUsername($asUser);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		// do request as $asUser using password of $ofUser
+		$authHeader = $this->createBasicAuthHeader($asUser, $this->featureContext->getPasswordForUser($ofUser));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				null,
+				$authHeader
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :asUser requests these endpoints with :method including body :body using the password of user :user
+	 *
+	 * @param string $asUser
+	 * @param string $method
+	 * @param string $body
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsIncludingBodyUsingPasswordOfUser(string $asUser, string $method, ?string $body, string $ofUser, TableNode $table):void {
+		$asUser = $this->featureContext->getActualUsername($asUser);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		// do request as $asUser using password of $ofUser
+		$authHeader = $this->createBasicAuthHeader($asUser, $this->featureContext->getPasswordForUser($ofUser));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				$body,
+				$authHeader
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsAboutUser(string $user, string $method, string $ofUser, TableNode $table):void {
+		$headers = [];
+		if ($method === 'MOVE' || $method === 'COPY') {
+			$headers['Destination'] = '/path/to/destination';
+		}
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->requestUrlWithBasicAuth(
+				$user,
+				$row['endpoint'],
+				$method,
+				null,
+				$headers
+			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
