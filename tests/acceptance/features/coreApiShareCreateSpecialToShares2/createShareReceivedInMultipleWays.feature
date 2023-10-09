@@ -176,16 +176,15 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareWith | grp1       |
     And user "Brian" has accepted share "/lorem.txt" offered by user "Alice"
     When the administrator adds user "Carol" to group "grp1" using the provisioning API
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "200"
+    Then the HTTP status code should be "204"
     And user "Carol" should be able to accept pending share "/lorem.txt" offered by user "Alice"
     And the content of file "Shares/lorem.txt" for user "Brian" should be "Shared content"
     And the content of file "lorem.txt" for user "Carol" should be "My content"
     And the content of file "Shares/lorem.txt" for user "Carol" should be "Shared content"
     Examples:
-      | ocs_api_version | ocs_status_code |
-      | 1               | 100             |
-      | 2               | 200             |
+      | ocs_api_version |
+      | 1               |
+      | 2               |
 
   @issue-2440
   Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check create operation

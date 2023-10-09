@@ -762,8 +762,7 @@ class GraphContext implements Context {
 
 	/**
 	 * adds a user to a group
-	 * Note that the string "nonexistent" shouldn't be used for username and groupname
-	 * Only for nonexistent testcase
+	 * NOTE: If you want to do request with non-existing user or group,use provide "nonexistent" as their name
 	 *
 	 * @param string $group
 	 * @param string $user
@@ -774,13 +773,13 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		//user shouldn't be created with "nonexistent" name but only used when for nonexistent group testcase
+		// NOTE: If you want to do request with non-existing group,use "nonexistent" as the name
 		if ($group === "nonexistent") {
 			$groupId = WebDavHelper::generateUUIDv4();
 		} else {
 			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		}
-		//user shouldn't be created with "nonexistent" name but used when for nonexistent users testcase
+		// NOTE: If you want to do request with non-existing user,use "nonexistent" as the name
 		if ($user === "nonexistent") {
 			$userId = WebDavHelper::generateUUIDv4();
 		} else {
@@ -811,11 +810,12 @@ class GraphContext implements Context {
 		string $user,
 		string $group,
 		bool $checkResult = true
-	): void {
+	): ResponseInterface {
 		$result = $this->addUserToGroup($group, $user);
 		if ($checkResult && ($result->getStatusCode() !== 204)) {
 			$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
 		}
+		return $result;
 	}
 
 	/**

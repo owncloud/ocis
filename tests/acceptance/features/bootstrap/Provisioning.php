@@ -2966,7 +2966,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->addUserToGroup($user, $group);
+		$this->setResponse($this->addUserToGroup($user, $group));
 	}
 
 	/**
@@ -3035,7 +3035,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function addUserToGroup(string $user, string $group, ?string $method = null, bool $checkResult = false):void {
+	public function addUserToGroup(string $user, string $group, ?string $method = null, bool $checkResult = false):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		if ($method === null
 			&& $this->isTestingWithLdap()
@@ -3061,7 +3061,7 @@ trait Provisioning {
 				};
 				break;
 			case "graph":
-				$this->graphContext->adminHasAddedUserToGroupUsingTheGraphApi(
+				$result = $this->graphContext->adminHasAddedUserToGroupUsingTheGraphApi(
 					$user,
 					$group
 				);
@@ -3071,6 +3071,7 @@ trait Provisioning {
 					"Invalid method to add a user to a group"
 				);
 		}
+		return $result;
 	}
 
 	/**
