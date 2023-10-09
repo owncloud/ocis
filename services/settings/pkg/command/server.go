@@ -55,7 +55,7 @@ func Server(cfg *config.Config) *cli.Command {
 			mtrcs := metrics.New()
 			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
-			handle := svc.NewService(cfg, logger)
+			handle := svc.NewDefaultLanguageService(cfg, svc.NewService(cfg, logger))
 
 			// prepare an HTTP server and add it to the group run.
 			httpServer, err := http.Server(

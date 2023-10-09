@@ -18,6 +18,9 @@ const (
 	// BundleUUIDRoleUserLight represents the user light role.
 	BundleUUIDRoleUserLight = "38071a68-456a-4553-846a-fa67bf5596cc"
 
+	// BundleUUIDProfile represents the user profile
+	BundleUUIDProfile = "2a506de7-99bd-4f0d-994e-c38e72c28fd9"
+
 	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
 	// RoleManagementPermissionName is the hardcoded setting name for the role management permission
@@ -767,7 +770,7 @@ func generateBundleUserLightRole() *settingsmsg.Bundle {
 
 func generateBundleProfileRequest() *settingsmsg.Bundle {
 	return &settingsmsg.Bundle{
-		Id:        "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
+		Id:        BundleUUIDProfile,
 		Name:      "profile",
 		Extension: "ocis-accounts",
 		Type:      settingsmsg.Bundle_TYPE_DEFAULT,
@@ -837,7 +840,6 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 					},
 				},
 				DisplayValue: "English",
-				Default:      true,
 			},
 			{
 				Value: &settingsmsg.ListOptionValue{
@@ -885,10 +887,12 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 			{
 				AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
 				RoleId:      BundleUUIDRoleUser,
-			}, {
+			},
+			{
 				AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
 				RoleId:      BundleUUIDRoleUser,
-			}, {
+			},
+			{
 				AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
 				RoleId:      BundleUUIDRoleUser,
 			},
@@ -896,7 +900,8 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 				// additional admin user
 				AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 				RoleId:      BundleUUIDRoleAdmin,
-			}, {
+			},
+			{
 				// default users with role "spaceadmin"
 				AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
 				RoleId:      BundleUUIDRoleSpaceAdmin,

@@ -33,7 +33,7 @@ type Service struct {
 }
 
 // NewService returns a service implementation for Service.
-func NewService(cfg *config.Config, logger log.Logger) Service {
+func NewService(cfg *config.Config, logger log.Logger) settings.ServiceHandler {
 	service := Service{
 		id:     "ocis-settings",
 		config: cfg,
