@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
+* Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
@@ -152,6 +153,13 @@ The following sections list the changes for unreleased.
    to true
 
    https://github.com/owncloud/ocis/pull/7416
+
+* Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
+
+   The ability of configuration the default language has been added to the setting service.
+
+   https://github.com/owncloud/enterprise/issues/5915
+   https://github.com/owncloud/ocis/pull/7417
 
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 
