@@ -1425,7 +1425,7 @@ trait Provisioning {
 	 */
 	public function theAdministratorHasDeletedUserUsingTheProvisioningApi(?string $user):void {
 		$user = $this->getActualUsername($user);
-		$response =  $this->deleteTheUserUsingTheProvisioningApi($user);
+		$response =  $this->deleteUser($user);
 		$this->theHttpStatusCodeShouldBe(204, "", $response);
 		WebDavHelper::removeSpaceIdReferenceForUser($user);
 		$this->userShouldNotExist($user);
@@ -1441,7 +1441,7 @@ trait Provisioning {
 	 */
 	public function theAdminDeletesUserUsingTheProvisioningApi(string $user):void {
 		$user = $this->getActualUsername($user);
-		$this->setResponse($this->deleteTheUserUsingTheProvisioningApi($user));
+		$this->setResponse($this->deleteUser($user));
 		$this->pushToLastHttpStatusCodesArray();
 	}
 
@@ -2291,7 +2291,7 @@ trait Provisioning {
 			if ($this->isTestingWithLdap() && \in_array($user, $this->ldapCreatedUsers)) {
 				$this->deleteLdapUser($user);
 			} else {
-				$this->deleteTheUserUsingTheProvisioningApi($user);
+				$this->deleteUser($user);
 			}
 		}
 		$this->userShouldNotExist($user);
@@ -2670,8 +2670,8 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteUser(string $user):void {
-		$this->deleteTheUserUsingTheProvisioningApi($user);
+	public function cleanUser(string $user):void {
+		$this->deleteUser($user);
 		$this->userShouldNotExist($user);
 	}
 
@@ -3480,7 +3480,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteTheUserUsingTheProvisioningApi(string $user):ResponseInterface {
+	public function deleteUser(string $user):ResponseInterface {
 		// Always try to delete the user
 		if (OcisHelper::isTestingWithGraphApi()) {
 			// users can be deleted using the username in the GraphApi too
@@ -4898,11 +4898,11 @@ trait Provisioning {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $userData) {
-			$this->deleteUser($userData['actualUsername']);
+			$this->cleanUser($userData['actualUsername']);
 		}
 		$this->usingServer('REMOTE');
 		foreach ($this->createdRemoteUsers as $userData) {
-			$this->deleteUser($userData['actualUsername']);
+			$this->cleanUser($userData['actualUsername']);
 		}
 		$this->usingServer($previousServer);
 	}
