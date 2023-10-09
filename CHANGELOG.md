@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [4.0.2] (2023-09-28)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 4.0.2.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.0...master
+[4.0.2]: https://github.com/owncloud/ocis/compare/v4.0.0...v4.0.2
 
 ## Summary
 
