@@ -39,6 +39,7 @@ use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
+use TestHelpers\HttpLogger;
 use TestHelpers\UploadHelper;
 use TestHelpers\OcisHelper;
 use Laminas\Ldap\Ldap;
@@ -575,7 +576,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Create a request-response log file
+	 * Create log directory if it doesn't exist
 	 *
 	 * @BeforeSuite
 	 *
@@ -584,15 +585,10 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function setupLogFile(BeforeSuiteScope $scope): void {
-		$logPath = __DIR__ . '/../../logs';
-		$logFile = "$logPath/access.log";
-		if (!\file_exists($logPath)) {
-			\mkdir($logPath, 0777, true);
+	public static function setupLogDir(BeforeSuiteScope $scope): void {
+		if (!\file_exists(HttpLogger::getLogDir())) {
+			\mkdir(HttpLogger::getLogDir(), 0777, true);
 		}
-		$file = \fopen($logFile, 'a+') or die('Cannot open file:  ' . $logFile);
-		\fwrite($file, '# Access Logs' . "\n\n");
-		\fclose($file);
 	}
 
 	/**
@@ -605,32 +601,23 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function logScenario(BeforeScenarioScope $scope): void {
-		$suite = $scope->getFeature()->getFile();
-		$suite = \explode('/', $suite);
-		$suite = \array_slice($suite, -2);
-		$suite = \implode('/', $suite);
-		$scenarioLine = $scope->getScenario()->getLine();
-		$suite = $suite . ':' . $scenarioLine;
+		$scenarioLine = self::getScenarioLine($scope);
 
 		if ($scope->getScenario()->getNodeType() === "Example") {
-			$keyword = "Scenario Outline";
-			$title = $scope->getScenario()->getOutlineTitle();
+			$scenario = "Scenario Outline: " . $scope->getScenario()->getOutlineTitle();
 		} else {
-			$title = $scope->getScenario()->getTitle();
-			$keyword = $scope->getScenario()->getNodeType();
+			$scenario = $scope->getScenario()->getNodeType() . ": " .$scope->getScenario()->getTitle();
 		}
-	
-		$logPath = __DIR__ . '/../../logs';
-		$logFile = "$logPath/scenario.log";
-		// Delete previous scenario.log file
-		if (\file_exists($logFile)) {
-			\unlink($logFile);
-		}
-		$file = \fopen($logFile, 'w') or die('Cannot open file:  ' . $logFile);
 
-		$log = "## $suite" . "\n\n### $keyword: $title\n\n";
-		\fwrite($file, $log);
-		\fclose($file);
+		$logMessage = "## $scenario ($scenarioLine)\n";
+	
+		// Delete previous scenario's log file
+		if (\file_exists(HttpLogger::getScenarioLogPath())) {
+			\unlink(HttpLogger::getScenarioLogPath());
+		}
+
+		// Write the scenario log
+		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
 	}
 
 	/**
@@ -642,17 +629,10 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function logStepRequests(BeforeStepScope $scope): void {
-		$step = $scope->getStep()->getType();
-		$step = $step . " " . $scope->getStep()->getText();
-
-		$logPath = __DIR__ . '/../../logs';
-		$logFile = "$logPath/scenario.log";
-		$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
-
-		$log = "#### $step\n";
-		\fwrite($file, $log);
-		\fclose($file);
+	public static function logStep(BeforeStepScope $scope): void {
+		$step = $scope->getStep()->getType() . " " . $scope->getStep()->getText();
+		$logMessage = "\t### $step\n";
+		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
 	}
 
 	/**
@@ -3669,38 +3649,14 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function suiteEnd(): void {
-		$logPath = __DIR__ . '/../../logs';
-		$logFile = "$logPath/access.log";
-		$scenarioLog = "$logPath/scenario.log";
-
-		if (\file_exists($scenarioLog)) {
-			\unlink($scenarioLog);
-		}
-	
-		$file = \fopen($logFile, 'a+') or die('Cannot open file:  ' . $logFile);
-		\fwrite($file, "\n\n");
-		\fclose($file);
-	}
-
-	/**
-	 *
-	 * @AfterFeature
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public static function clearScnarioLog(): void {
-		$logPath = __DIR__ . '/../../logs';
-		$scenarioLog = "$logPath/scenario.log";
-
-		if (\file_exists($scenarioLog)) {
-			\unlink($scenarioLog);
+	public static function clearScenarioLog(): void {
+		if (\file_exists(HttpLogger::getScenarioLogPath())) {
+			\unlink(HttpLogger::getScenarioLogPath());
 		}
 	}
 
 	/**
-	 * wrap up logs
+	 * Log request and response logs if scnario fails
 	 *
 	 * @AfterScenario
 	 *
@@ -3710,33 +3666,28 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function checkScenario(AfterScenarioScope $scope): void {
-		$logPath = __DIR__ . '/../../logs';
-		$logFile = "$logPath/access.log";
-		$scenarioLog = "$logPath/scenario.log";
-
-		if ($scope->getTestResult()->getResultCode() !== 0 && !self::isExpectedToFail(self::getScenarioLine($scope))) {
-			$accessLogs = \file_get_contents($scenarioLog);
-
-			$file = \fopen($logFile, 'a') or die('Cannot open file:  ' . $logFile);
-			\fwrite($file, $accessLogs);
-			\fclose($file);
+		if (($scope->getTestResult()->getResultCode() !== 0)
+			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))) {
+			$logs = \file_get_contents(HttpLogger::getScenarioLogPath());
+			// add new lines
+			$logs = \rtrim($logs, "\n") . "\n\n\n";
+			HttpLogger::writeLog(HttpLogger::getFailedLogPath(), $logs);
 		}
-
-		\unlink($scenarioLog);
 	}
 
 	/**
-	 * @param AfterScenarioScope $scope
+	 * @param BeforeScenarioScope|AfterScenarioScope $scope
 	 *
 	 * @return string
 	 */
-	public static function getScenarioLine(AfterScenarioScope $scope): string {
-		$suite = $scope->getFeature()->getFile();
-		$suite = \explode('/', $suite);
-		$suite = \array_slice($suite, -2);
-		$suite = \implode('/', $suite);
+	public static function getScenarioLine($scope): string {
+		$feature = $scope->getFeature()->getFile();
+		$feature = \explode('/', $feature);
+		$feature = \array_slice($feature, -2);
+		$feature = \implode('/', $feature);
 		$scenarioLine = $scope->getScenario()->getLine();
-		return $suite . ':' . $scenarioLine;
+		// Example: apiGraph/createUser.feature:24
+		return $feature . ':' . $scenarioLine;
 	}
 
 	/**
