@@ -67,3 +67,4 @@ token_manager:
   jwt_secret: ""
 set_default_assignments: false
 service_account_id_admin: service-user-id
+default_language: ""

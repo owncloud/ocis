@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-09-07-12-03]
+[#deprecation-note-2023-10-09-13-33-08]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -416,5 +416,14 @@ a| [subs=-attributes]
 ++service-user-id ++
 a| [subs=-attributes]
 The ID of the service account having the admin role. See the 'auth-service' service description for more details.
+
+a|`SETTINGS_DEFAULT_LANGUAGE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The default language. If not defined, English will be used as default. See the documentation for more details.
 |===
 
