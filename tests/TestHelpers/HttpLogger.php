@@ -34,23 +34,23 @@ class HttpLogger {
 	/**
 	 * @return string
 	 */
-    public static function getLogDir(): string {
-        return __DIR__ . '/../acceptance/logs';
-    }
+	public static function getLogDir(): string {
+		return __DIR__ . '/../acceptance/logs';
+	}
 
 	/**
 	 * @return string
 	 */
-    public static function getFailedLogPath(): string {
+	public static function getFailedLogPath(): string {
 		return self::getLogDir() . "/failed.log";
-    }
+	}
 
 	/**
 	 * @return string
 	 */
-    public static function getScenarioLogPath(): string {
+	public static function getScenarioLogPath(): string {
 		return self::getLogDir() . "/scenario.log";
-    }
+	}
 
 	/**
 	 * @param string $logFile
@@ -58,11 +58,11 @@ class HttpLogger {
 	 *
 	 * @return void
 	 */
-    public static function writeLog(string $logFile, string $logMessage): void {
+	public static function writeLog(string $logFile, string $logMessage): void {
 		$file = \fopen($logFile, 'a+') or die('Cannot open file:  ' . $logFile);
-        \fwrite($file, $logMessage);
+		\fwrite($file, $logMessage);
 		\fclose($file);
-    }
+	}
 
 	/**
 	 * @param RequestInterface $request
@@ -80,16 +80,16 @@ class HttpLogger {
 		}
 
 		$logMessage = "\t\t_______________________________________________________________________\n\n";
-        $logMessage .= "\t\t==> REQUEST\n";
+		$logMessage .= "\t\t==> REQUEST\n";
 		$logMessage .= "\t\t$method $path\n";
 		$logMessage .= "\t\t$headers";
 
 		if ($body->getSize() > 0) {
 			$logMessage .= "\t\t==> REQ BODY\n";
-            $logMessage .= "\t\t$body\n";
+			$logMessage .= "\t\t$body\n";
 		}
-        $logMessage .= "\n";
-        self::writeLog(self::getScenarioLogPath(), $logMessage);
+		$logMessage .= "\n";
+		self::writeLog(self::getScenarioLogPath(), $logMessage);
 	}
 
 	/**
@@ -109,18 +109,18 @@ class HttpLogger {
 
 		$logMessage = "\t\t<== RESPONSE\n";
 		$logMessage .= "\t\t$statusCode $statusMessage\n";
-        $logMessage .= "\t\t$headers";
+		$logMessage .= "\t\t$headers";
 
 		if ($body->getSize() > 0) {
 			$logMessage .= "\t\t<== RES BODY\n";
-            foreach(\explode("\n", \strval($body)) as $line) {
-                $logMessage .= "\t\t$line\n";
-            }
+			foreach (\explode("\n", \strval($body)) as $line) {
+				$logMessage .= "\t\t$line\n";
+			}
 		}
-        // rewind the body stream so that later code can read from the start.
-        $response->getBody()->rewind();
+		// rewind the body stream so that later code can read from the start.
+		$response->getBody()->rewind();
 
-        $logMessage = \rtrim($logMessage) . "\n\n";
-        self::writeLog(self::getScenarioLogPath(), $logMessage);
+		$logMessage = \rtrim($logMessage) . "\n\n";
+		self::writeLog(self::getScenarioLogPath(), $logMessage);
 	}
 }

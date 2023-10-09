@@ -606,7 +606,7 @@ class FeatureContext extends BehatVariablesContext {
 		if ($scope->getScenario()->getNodeType() === "Example") {
 			$scenario = "Scenario Outline: " . $scope->getScenario()->getOutlineTitle();
 		} else {
-			$scenario = $scope->getScenario()->getNodeType() . ": " .$scope->getScenario()->getTitle();
+			$scenario = $scope->getScenario()->getNodeType() . ": " . $scope->getScenario()->getTitle();
 		}
 
 		$logMessage = "## $scenario ($scenarioLine)\n";
@@ -3667,7 +3667,8 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public static function checkScenario(AfterScenarioScope $scope): void {
 		if (($scope->getTestResult()->getResultCode() !== 0)
-			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))) {
+			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))
+		) {
 			$logs = \file_get_contents(HttpLogger::getScenarioLogPath());
 			// add new lines
 			$logs = \rtrim($logs, "\n") . "\n\n\n";
