@@ -104,14 +104,14 @@ Feature: auth
 
   @issue-1319
   Scenario: using OCS with admin basic auth
-    When the administrator requests these endpoint with "GET"
+    When the administrator requests these endpoints with "GET"
       | endpoint                 |
       | /ocs/v1.php/cloud/apps   |
       | /ocs/v1.php/cloud/groups |
       | /ocs/v1.php/cloud/users  |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "100"
-    When the administrator requests these endpoint with "GET"
+    When the administrator requests these endpoints with "GET"
       | endpoint                 |
       | /ocs/v2.php/cloud/apps   |
       | /ocs/v2.php/cloud/groups |
