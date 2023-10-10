@@ -42,9 +42,9 @@ Feature: A manager of the space can edit public link
       | share_type        | public_link           |
       | displayname_owner | %displayname%         |
       | name              | <linkName>            |
-    And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
     When the public downloads file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
-    Then the downloaded content should be "some content"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
     Examples:
       | permissions | expectedPermissions       | password | linkName |
       | 5           | read,create               | newPass  |          |

@@ -56,7 +56,7 @@ class PublicWebDavContext implements Context {
 		} else {
 			$path = "";
 		}
-		return $this->downloadTheFileInsideThePublicSharedFolder(
+		return $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			$range,
@@ -79,7 +79,7 @@ class PublicWebDavContext implements Context {
 		} else {
 			$path = "";
 		}
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			$range,
@@ -232,7 +232,7 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileInsideAFolder(string $path, string $publicWebDAVAPIVersion = "old"):void {
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			"",
 			"",
@@ -251,33 +251,13 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileInsideAFolderWithPassword(string $path, string $publicWebDAVAPIVersion = "old", string $password = ""):void {
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
 			$publicWebDAVAPIVersion
 		);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @param string $path
-	 * @param string|null $password
-	 * @param string $publicWebDAVAPIVersion
-	 *
-	 * @return ResponseInterface
-	 */
-	public function downloadTheFileInsideThePublicSharedFolderWithPassword(
-		string $path,
-		?string $password = "",
-		string $publicWebDAVAPIVersion = "old"
-	):ResponseInterface {
-		return $this->downloadTheFileInsideThePublicSharedFolder(
-			$path,
-			$password,
-			"",
-			$publicWebDAVAPIVersion
-		);
 	}
 
 	/**
@@ -290,7 +270,7 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function downloadPublicFileInsideAFolderWithRange(string $path, string $range, string  $publicWebDAVAPIVersion):void {
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			"",
 			$range,
@@ -307,7 +287,7 @@ class PublicWebDavContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function downloadTheFileInsideThePublicSharedFolder(
+	public function downloadFileFromPublicFolder(
 		string $path,
 		string $password,
 		string $range,
@@ -885,9 +865,10 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$response = $this->downloadTheFileInsideThePublicSharedFolderWithPassword(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
+			"",
 			$publicWebDAVAPIVersion
 		);
 
@@ -917,12 +898,12 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$response = $this->downloadTheFileInsideThePublicSharedFolderWithPassword(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
+			"",
 			$publicWebDAVAPIVersion
 		);
-
 		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
@@ -993,7 +974,7 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			$range,
@@ -1025,7 +1006,7 @@ class PublicWebDavContext implements Context {
 			return;
 		}
 
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			$range,
@@ -1252,7 +1233,7 @@ class PublicWebDavContext implements Context {
 			$path,
 			$publicWebDAVAPIVersion
 		);
-		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			"",
 			"",

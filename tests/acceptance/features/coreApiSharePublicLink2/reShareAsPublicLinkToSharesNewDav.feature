@@ -37,9 +37,9 @@ Feature: reshare as public link
       | publicUpload | false        |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And the public should be able to download file "file.txt" from inside the last public link shared folder using the new public WebDAV API
     When the public downloads file "file.txt" from inside the last public link shared folder using the new public WebDAV API
-    Then the downloaded content should be "some content"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
     But uploading a file should not work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -91,9 +91,9 @@ Feature: reshare as public link
       | publicUpload | false        |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And the public should be able to download file "file.txt" from inside the last public link shared folder using the new public WebDAV API
     When the public downloads file "file.txt" from inside the last public link shared folder using the new public WebDAV API
-    Then the downloaded content should be "some content"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
     But uploading a file should not work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -113,9 +113,9 @@ Feature: reshare as public link
       | publicUpload | true                      |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And the public should be able to download file "file.txt" from inside the last public link shared folder using the new public WebDAV API
     When the public downloads file "file.txt" from inside the last public link shared folder using the new public WebDAV API
-    Then the downloaded content should be "some content"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
     And uploading a file should work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
