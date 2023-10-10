@@ -110,7 +110,6 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 				},
 				"auth": map[string]interface{}{
 					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
-					"credential_chain":          []string{"bearer"},
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",
