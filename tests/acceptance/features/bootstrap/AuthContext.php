@@ -36,36 +36,6 @@ class AuthContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * get the client token that was last generated
-	 * app acceptance tests that have their own step code may need to use this
-	 *
-	 * @return string client token
-	 */
-	public function getClientToken():string {
-		return $this->clientToken;
-	}
-
-	/**
-	 * get the app token that was last generated
-	 * app acceptance tests that have their own step code may need to use this
-	 *
-	 * @return string app token
-	 */
-	public function getAppToken():string {
-		return $this->appToken;
-	}
-
-	/**
-	 * get the app token that was last generated
-	 * app acceptance tests that have their own step code may need to use this
-	 *
-	 * @return array app tokens
-	 */
-	public function getAppTokens():array {
-		return $this->appTokens;
-	}
-
-	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -91,6 +61,84 @@ class AuthContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return array
+	 */
+	public function createBasicAuthHeader(string $user, string $password): array {
+		$header = [];
+		$authString = \base64_encode("$user:$password");
+		$header["Authorization"] = "basic $authString";
+		return $header;
+	}
+
+	/**
+	 * @param string $url
+	 * @param string $method
+	 * @param string|null $body
+	 * @param array|null $headers
+	 *
+	 * @return ResponseInterface
+	 */
+	public function sendRequest(
+		string $url,
+		string $method,
+		?string $body = null,
+		?array $headers = []
+	): ResponseInterface {
+		$fullUrl = $this->featureContext->getBaseUrl() . $url;
+
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$method,
+			null,
+			null,
+			$headers,
+			$body,
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $url
+	 * @param string $method
+	 * @param string|null $body
+	 * @param array|null $headers
+	 * @param string|null $property
+	 *
+	 * @return ResponseInterface
+	 */
+	public function requestUrlWithBasicAuth(
+		string $user,
+		string $url,
+		string $method,
+		?string $body = null,
+		?array $headers = null,
+		?string $property = null
+	): ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$url = $this->featureContext->substituteInLineCodes(
+			$url,
+			$user
+		);
+		$authHeader = $this->createBasicAuthHeader($user, $this->featureContext->getPasswordForUser($user));
+		$headers = \array_merge($headers ?? [], $authHeader);
+
+		if ($property !== null) {
+			$body = $this->featureContext->getBodyForOCSRequest($method, $property);
+		}
+
+		return $this->sendRequest(
+			$url,
+			$method,
+			$body,
+			$headers
+		);
+	}
+
+	/**
 	 * @When a user requests :url with :method and no authentication
 	 *
 	 * @param string $url
@@ -98,83 +146,31 @@ class AuthContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userRequestsURLWith(string $url, string $method):void {
+	public function userRequestsURLWithNoAuth(string $url, string $method):void {
 		$this->featureContext->setResponse($this->sendRequest($url, $method));
-	}
-
-	/**
-	 * @When user :user requests :url with :method and no authentication
-	 *
-	 * @param string $user
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
-	public function userRequestsURLWithNoAuth(string $user, string $url, string $method):void {
-		$userRenamed = $this->featureContext->getActualUsername($user);
-		$url = $this->featureContext->substituteInLineCodes($url, $userRenamed);
-		$this->featureContext->setResponse($this->sendRequest($url, $method));
-	}
-
-	/**
-	 * @Given a user has requested :url with :method and no authentication
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userHasRequestedURLWith(string $url, string $method):void {
-		$this->featureContext->theHTTPStatusCodeShouldBeBetween(200, 299, $this->sendRequest($url, $method));
-	}
-
-	/**
-	 * Verifies status code
-	 *
-	 * @param string $ocsCode
-	 * @param string $httpCode
-	 * @param string $endPoint
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function verifyStatusCode(string $ocsCode, string $httpCode, string $endPoint):void {
-		if ($ocsCode !== '') {
-			$this->featureContext->ocsContext->theOCSStatusCodeShouldBe(
-				$ocsCode,
-				"Got unexpected OCS code while sending request to endpoint " . $endPoint
-			);
-		}
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			$httpCode,
-			"Got unexpected HTTP code while sending request to endpoint " . $endPoint
-		);
 	}
 
 	/**
 	 * @When a user requests these endpoints with :method with body :body and no authentication about user :user
 	 *
 	 * @param string $method
-	 * @param ?string $body
-	 * @param string|null $ofUser
+	 * @param string $body
+	 * @param string $ofUser
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(string $method, ?string $body, ?string $ofUser, TableNode $table):void {
+	public function userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(string $method, string $body, string $ofUser, TableNode $table): void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
 				$ofUser
 			);
-			$this->featureContext->setResponse($this->sendRequest($row['endpoint'], $method, null, false, $body));
+			$response = $this->sendRequest($row['endpoint'], $method, $body);
+			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -189,13 +185,18 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpointsWithoutBodyAndNoAuth(string $method, string $ofUser, TableNode $table):void {
-		$this->userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(
-			$method,
-			null,
-			$ofUser,
-			$table
-		);
+	public function userRequestsEndpointsWithoutBodyAndNoAuthAboutUser(string $method, string $ofUser, TableNode $table): void {
+		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->sendRequest($row['endpoint'], $method);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
@@ -209,8 +210,6 @@ class AuthContext implements Context {
 	 */
 	public function userRequestsEndpointsWithNoAuthentication(string $method, TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
 		foreach ($table->getHash() as $row) {
 			$this->featureContext->setResponse($this->sendRequest($row['endpoint'], $method));
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -228,27 +227,16 @@ class AuthContext implements Context {
 	 * @throws Exception
 	 */
 	public function userRequestsEndpointsWithBasicAuth(string $user, string $method, TableNode $table):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$this->userRequestsEndpointsWithPassword($user, $method, null, $table);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+		foreach ($table->getHash() as $row) {
+			$response = $this->requestUrlWithBasicAuth($user, $row['endpoint'], $method);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
-	 * @When the user :user requests these endpoints with :method using basic auth and generated app password about user :ofUser
-	 *
-	 * @param string $user
-	 * @param string $method
-	 * @param string $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsWithBasicAuthAndGeneratedPassword(string $user, string $method, string $ofUser, TableNode $table):void {
-		$this->requestEndpointsWithBasicAuthAndGeneratedPassword($user, $method, $ofUser, $table);
-	}
-
-	/**
-	 * @When /^the user "([^"]*)" requests these endpoints with "([^"]*)" to (?:get|set) property "([^"]*)" using basic auth and generated app password about user "([^"]*)"$/
+	 * @When /^user "([^"]*)" requests these endpoints with "([^"]*)" to (?:get|set) property "([^"]*)" about user "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $method
@@ -259,163 +247,28 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpointsWithBasicAuthAndGeneratedPasswordWithProperty(
+	public function theUserRequestsTheseEndpointsToGetOrSetPropertyAboutUser(
 		string $user,
 		string $method,
 		string $property,
 		string $ofUser,
 		TableNode $table
 	):void {
-		$this->requestEndpointsWithBasicAuthAndGeneratedPassword(
-			$user,
-			$method,
-			$ofUser,
-			$table,
-			null,
-			$property
-		);
-	}
-
-	/**
-	 * @When /^the user "([^"]*)" requests these endpoints with "([^"]*)" to (?:get|set) property "([^"]*)" with password "([^"]*)" about user "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $method
-	 * @param string $property
-	 * @param string $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsWithPasswordWithProperty(
-		string $user,
-		string $method,
-		string $property,
-		string $ofUser,
-		TableNode $table
-	):void {
-		$this->userRequestsEndpointsWithPassword(
-			$user,
-			$method,
-			$ofUser,
-			$table,
-			$property
-		);
-	}
-
-	/**
-	 * @When the user :user requests these endpoints with :method with body :body using basic auth and generated app password about user :ofUser
-	 *
-	 * @param string $user
-	 * @param string $method
-	 * @param string $body
-	 * @param string $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsWithBasicAuthAndGeneratedPasswordWithBody(
-		string $user,
-		string $method,
-		string $body,
-		string $ofUser,
-		TableNode $table
-	):void {
-		$header = [];
-		if ($method === 'MOVE' || $method === 'COPY') {
-			$header['Destination'] = '/path/to/destination';
-		}
-
-		$this->requestEndpointsWithBasicAuthAndGeneratedPassword(
-			$user,
-			$method,
-			$ofUser,
-			$table,
-			$body,
-			null,
-			$header,
-		);
-	}
-
-	/**
-	 * @param string $user requesting user
-	 * @param string $method http method
-	 * @param string $ofUser resource owner
-	 * @param TableNode $table endpoints table
-	 * @param string|null $body body for request
-	 * @param string|null $property property to get
-	 * @param Array|null $header request header
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function requestEndpointsWithBasicAuthAndGeneratedPassword(
-		string $user,
-		string $method,
-		string $ofUser,
-		TableNode $table,
-		?string $body = null,
-		?string $property = null,
-		?array $header = null
-	):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		if ($body === null && $property !== null) {
-			$body = $this->featureContext->getBodyForOCSRequest($method, $property);
-		}
 
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
 				$ofUser
 			);
-			$this->userRequestsURLWithUsingBasicAuth($user, $row['endpoint'], $method, $this->appToken, $body, $header);
+			$response = $this->requestUrlWithBasicAuth($user, $row['endpoint'], $method, null, null, $property);
+			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
 
 	/**
-	 * @When user :user requests these endpoints with :method using password :password
-	 *
-	 * @param string $user
-	 * @param string $method
-	 * @param string|null $password
-	 * @param TableNode $table
-	 * @param string|null $property
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsWithPassword(
-		string $user,
-		string $method,
-		?string $password,
-		TableNode $table,
-		?string $property = null
-	):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		foreach ($table->getHash() as $row) {
-			$body = null;
-			if ($property !== null) {
-				$body = $this->featureContext->getBodyForOCSRequest($method, $property);
-			}
-			$this->userRequestsURLWithUsingBasicAuth($user, $row['endpoint'], $method, $password, $body);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @When the administrator requests these endpoint with :method
+	 * @When the administrator requests these endpoints with :method
 	 *
 	 * @param string $method
 	 * @param TableNode $table
@@ -428,367 +281,21 @@ class AuthContext implements Context {
 	}
 
 	/**
-	 * @When the administrator requests these endpoints with :method with body :body using password :password about user :ofUser
-	 *
-	 * @param string|null $method
-	 * @param string|null $body
-	 * @param string|null $password
-	 * @param string|null $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminRequestsEndpointsWithBodyWithPassword(
-		?string $method,
-		?string $body,
-		?string $password,
-		?string $ofUser,
-		TableNode $table
-	):void {
-		$ofUser = $this->featureContext->getActualUsername($ofUser);
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		foreach ($table->getHash() as $row) {
-			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
-				$row['endpoint'],
-				$ofUser
-			);
-			$this->userRequestsURLWithUsingBasicAuth(
-				$this->featureContext->getAdminUsername(),
-				$row['endpoint'],
-				$method,
-				$password,
-				$body
-			);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @When the administrator requests these endpoints with :method using password :password about user :ofUser
-	 *
-	 * @param string $method
-	 * @param string $password
-	 * @param string $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminRequestsEndpointsWithPassword(
-		string $method,
-		string $password,
-		string $ofUser,
-		TableNode $table
-	):void {
-		$this->adminRequestsEndpointsWithBodyWithPassword($method, null, $password, $ofUser, $table);
-	}
-
-	/**
-	 * @When user :user requests these endpoints with :method using basic token auth
-	 *
-	 * @param string $user
-	 * @param string $method
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function whenUserWithNewClientTokenRequestsForEndpointUsingBasicTokenAuth(string $user, string $method, TableNode $table):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		foreach ($table->getHash() as $row) {
-			$this->userRequestsURLWithUsingBasicTokenAuth($user, $row['endpoint'], $method);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @When the user requests these endpoints with :method using a new browser session
-	 *
-	 * @param string $method
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsTheseEndpointsUsingNewBrowserSession(string $method, TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		foreach ($table->getHash() as $row) {
-			$this->userRequestsURLWithBrowserSession($row['endpoint'], $method);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @When the user requests these endpoints with :method using the generated app password about user :user
-	 *
-	 * @param string $method
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsUsingTheGeneratedAppPasswordThenStatusCodeAboutUser(string $method, string $user, TableNode $table):void {
-		$user = \strtolower($this->featureContext->getActualUsername($user));
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		foreach ($table->getHash() as $row) {
-			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
-				$row['endpoint'],
-				$user
-			);
-			$this->userRequestsURLWithUsingAppPassword($row['endpoint'], $method);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @When the user requests these endpoints with :method using the generated app password
-	 *
-	 * @param string $method
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRequestsEndpointsUsingTheGeneratedAppPassword(string $method, TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
-		$this->featureContext->emptyLastOCSStatusCodesArray();
-		foreach ($table->getHash() as $row) {
-			$this->userRequestsURLWithUsingAppPassword($row['endpoint'], $method);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
-	 * @param string $url
-	 * @param string $method
-	 * @param string|null $authHeader
-	 * @param bool $useCookies
-	 * @param string|null $body
-	 * @param array|null $headers
-	 *
-	 * @return ResponseInterface
-	 */
-	public function sendRequest(
-		string $url,
-		string $method,
-		?string $authHeader = null,
-		bool $useCookies = false,
-		?string $body = null,
-		?array $headers = []
-	):ResponseInterface {
-		// reset responseXml
-		$this->featureContext->setResponseXml([]);
-
-		$fullUrl = $this->featureContext->getBaseUrl() . $url;
-
-		$cookies = null;
-		if ($useCookies) {
-			$cookies = $this->featureContext->getCookieJar();
-		}
-
-		if ($authHeader) {
-			$headers['Authorization'] = $authHeader;
-		}
-		$headers['OCS-APIREQUEST'] = 'true';
-		if (isset($this->requestToken)) {
-			$headers['requesttoken'] = $this->featureContext->getRequestToken();
-		}
-		return HttpRequestHelper::sendRequest(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
-			$method,
-			null,
-			null,
-			$headers,
-			$body,
-			null,
-			$cookies
-		);
-	}
-
-	/**
-	 * Use the private API to generate an app password
-	 *
-	 * @param string $name
-	 *
-	 * @return void
-	 */
-	public function userGeneratesNewAppPasswordNamed(string $name):void {
-		$url = $this->featureContext->getBaseUrl() . '/index.php/settings/personal/authtokens';
-		$body = ['name' => $name];
-		$headers = [
-			'Content-Type' => 'application/x-www-form-urlencoded',
-			'OCS-APIREQUEST' => 'true',
-			'requesttoken' => $this->featureContext->getRequestToken(),
-			'X-Requested-With' => 'XMLHttpRequest'
-		];
-		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$url,
-				$this->featureContext->getStepLineRef(),
-				null,
-				null,
-				$headers,
-				$body,
-				null,
-				$this->featureContext->getCookieJar()
-			)
-		);
-		$token = \json_decode($this->featureContext->getResponse()->getBody()->getContents());
-		$this->appToken = $token->token;
-		$this->appTokens[$token->deviceToken->name]
-			= ["id" => $token->deviceToken->id, "token" => $token->token];
-	}
-
-	/**
-	 * Use the private API to generate an app password
-	 *
-	 * @param string $name
-	 *
-	 * @return void
-	 */
-	public function userDeletesAppPasswordNamed(string $name):void {
-		$url = $this->featureContext->getBaseUrl() . '/index.php/settings/personal/authtokens/' . $this->appTokens[$name]["id"];
-		$headers = [
-			'Content-Type' => 'application/x-www-form-urlencoded',
-			'OCS-APIREQUEST' => 'true',
-			'requesttoken' => $this->featureContext->getRequestToken(),
-			'X-Requested-With' => 'XMLHttpRequest'
-		];
-		$this->featureContext->setResponse(
-			HttpRequestHelper::delete(
-				$url,
-				$this->featureContext->getStepLineRef(),
-				null,
-				null,
-				$headers,
-				null,
-				null,
-				$this->featureContext->getCookieJar()
-			)
-		);
-	}
-
-	/**
-	 * @Given the user has generated a new app password named :name
-	 *
-	 * @param string $name
-	 *
-	 * @return void
-	 */
-	public function aNewAppPasswordHasBeenGenerated(string $name):void {
-		$this->userGeneratesNewAppPasswordNamed($name);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200);
-	}
-
-	/**
-	 * @Given the user has deleted the app password named :name
-	 *
-	 * @param string $name
-	 *
-	 * @return void
-	 */
-	public function aNewAppPasswordHasBeenDeleted(string $name):void {
-		$this->userDeletesAppPasswordNamed($name);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200);
-	}
-
-	/**
-	 * @When user :user generates a new client token using the token API
-	 * @Given a new client token for :user has been generated
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function aNewClientTokenHasBeenGenerated(string $user):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$body = \json_encode(
-			[
-				'user' => $this->featureContext->getActualUsername($user),
-				'password' => $this->featureContext->getPasswordForUser($user),
-			]
-		);
-		$headers = ['Content-Type' => 'application/json'];
-		$url = $this->featureContext->getBaseUrl() . '/token/generate';
-		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$url,
-				$this->featureContext->getStepLineRef(),
-				null,
-				null,
-				$headers,
-				$body
-			)
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBe("200");
-		$this->clientToken
-			= \json_decode($this->featureContext->getResponse()->getBody()->getContents())->token;
-	}
-
-	/**
-	 * @When the administrator generates a new client token using the token API
-	 * @Given a new client token for the administrator has been generated
-	 *
-	 * @return void
-	 */
-	public function aNewClientTokenForTheAdministratorHasBeenGenerated():void {
-		$admin = $this->featureContext->getAdminUsername();
-		$this->aNewClientTokenHasBeenGenerated($admin);
-	}
-
-	/**
 	 * @When user :user requests :url with :method using basic auth
 	 *
 	 * @param string $user
 	 * @param string $url
 	 * @param string $method
-	 * @param string|null $password
-	 * @param string|null $body
-	 * @param array|null $header
 	 *
 	 * @return void
 	 */
-	public function userRequestsURLWithUsingBasicAuth(
+	public function userRequestsURLUsingBasicAuth(
 		string $user,
 		string $url,
-		string $method,
-		?string $password = null,
-		?string $body = null,
-		?array $header = null
+		string $method
 	):void {
-		$userRenamed = $this->featureContext->getActualUsername($user);
-		$url = $this->featureContext->substituteInLineCodes(
-			$url,
-			$userRenamed
-		);
-		if ($password === null) {
-			$authString = "$userRenamed:" . $this->featureContext->getPasswordForUser($user);
-		} else {
-			$authString = $userRenamed . ":" . $this->featureContext->getActualPassword($password);
-		}
-		$this->featureContext->setResponse(
-			$this->sendRequest(
-				$url,
-				$method,
-				'basic ' . \base64_encode($authString),
-				false,
-				$body,
-				$header
-			)
-		);
+		$response = $this->requestUrlWithBasicAuth($user, $url, $method);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -804,7 +311,6 @@ class AuthContext implements Context {
 	 */
 	public function userRequestsURLWithUsingBasicAuthAndDepthHeader(string $user, string $url, string $method, TableNode $headersTable):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$authString = "$user:" . $this->featureContext->getPasswordForUser($user);
 		$url = $this->featureContext->substituteInLineCodes(
 			$url,
 			$user
@@ -818,11 +324,10 @@ class AuthContext implements Context {
 			$headers[$row['header']] = $row ['value'];
 		}
 		$this->featureContext->setResponse(
-			$this->sendRequest(
+			$this->requestUrlWithBasicAuth(
+				$user,
 				$url,
 				$method,
-				'basic ' . \base64_encode($authString),
-				false,
 				null,
 				$headers
 			)
@@ -830,239 +335,272 @@ class AuthContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has requested :url with :method using basic auth
+	 * @When user :user requests these endpoints with :method using password :password
 	 *
 	 * @param string $user
-	 * @param string $url
 	 * @param string $method
-	 * @param string|null $password
-	 * @param string|null $body
+	 * @param string $password
+	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
-	public function userHasRequestedURLWithUsingBasicAuth(
+	public function userRequestsTheseEndpointsWithPassword(
 		string $user,
-		string $url,
 		string $method,
-		?string $password = null,
-		?string $body = null
+		string $password,
+		TableNode $table
+	): void {
+		$user = $this->featureContext->getActualUsername($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		$authHeader = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
+
+		foreach ($table->getHash() as $row) {
+			$response = $this->sendRequest($row['endpoint'], $method, null, $authHeader);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method using password :password about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $password
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsUsingPasswordAboutUser(
+		string $user,
+		string $method,
+		string $password,
+		string $ofUser,
+		TableNode $table
 	):void {
-		$this->userRequestsURLWithUsingBasicAuth(
-			$user,
-			$url,
-			$method,
-			$password,
-			$body
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @When the administrator requests :url with :method using basic auth
-	 *
-	 * @param string $url
-	 * @param string $method
-	 * @param string|null $password
-	 *
-	 * @return void
-	 */
-	public function administratorRequestsURLWithUsingBasicAuth(string $url, string $method, ?string $password = null):void {
-		$this->userRequestsURLWithUsingBasicAuth(
-			$this->featureContext->getAdminUsername(),
-			$url,
-			$method,
-			$password
-		);
-	}
-
-	/**
-	 * @When user :user requests :url with :method using basic token auth
-	 *
-	 * @param string $user
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userRequestsURLWithUsingBasicTokenAuth(string $user, string $url, string $method):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$this->featureContext->setResponse(
-			$this->sendRequest(
-				$url,
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
+
+		$headers = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			if (isset($row['destination'])) {
+				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
+					$this->featureContext->getBaseUrl() . $row['destination'],
+					$ofUser
+				);
+			}
+			$response = $this->sendRequest(
+				$row['endpoint'],
 				$method,
-				'basic ' . \base64_encode("$user:" . $this->clientToken)
-			)
-		);
+				null,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
-	 * @Given user :user has requested :url with :method using basic token auth
+	 * @When user :user requests these endpoints with :method including body :body using password :password about user :ofUser
 	 *
 	 * @param string $user
-	 * @param string $url
 	 * @param string $method
+	 * @param string $body
+	 * @param string $password
+	 * @param string $ofUser
+	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
-	public function userHasRequestedURLWithUsingBasicTokenAuth(string $user, string $url, string $method):void {
-		$this->userRequestsURLWithUsingBasicTokenAuth($user, $url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @When the user requests :url with :method using the generated client token
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userRequestsURLWithUsingAClientToken(string $url, string $method):void {
-		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->clientToken));
-	}
-
-	/**
-	 * @Given the user has requested :url with :method using the generated client token
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userHasRequestedURLWithUsingAClientToken(string $url, string $method):void {
-		$this->userRequestsURLWithUsingAClientToken($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @When the user requests :url with :method using the generated app password
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userRequestsURLWithUsingAppPassword(string $url, string $method):void {
-		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->appToken));
-	}
-
-	/**
-	 * @When the user requests :url with :method using app password named :tokenName
-	 *
-	 * @param string $url
-	 * @param string $method
-	 * @param string $tokenName
-	 *
-	 * @return void
-	 */
-	public function theUserRequestsWithUsingAppPasswordNamed(string $url, string $method, string $tokenName):void {
-		$this->featureContext->setResponse($this->sendRequest($url, $method, 'token ' . $this->appTokens[$tokenName]['token']));
-	}
-
-	/**
-	 * @Given the user has requested :url with :method using the generated app password
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userHasRequestedURLWithUsingAppPassword(string $url, string $method):void {
-		$this->userRequestsURLWithUsingAppPassword($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @When the user requests :url with :method using the browser session
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userRequestsURLWithBrowserSession(string $url, string $method):void {
-		$this->featureContext->setResponse($this->sendRequest($url, $method, null, true));
-	}
-
-	/**
-	 * @Given the user has requested :url with :method using the browser session
-	 *
-	 * @param string $url
-	 * @param string $method
-	 *
-	 * @return void
-	 */
-	public function userHasRequestedURLWithBrowserSession(string $url, string $method):void {
-		$this->userRequestsURLWithBrowserSession($url, $method);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @Given a new browser session for :user has been started
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function aNewBrowserSessionForHasBeenStarted(string $user):void {
+	public function userRequestsTheseEndpointsWithBodyUsingPasswordAboutUser(
+		string $user,
+		string $method,
+		string $body,
+		string $password,
+		string $ofUser,
+		TableNode $table
+	):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$loginUrl = $this->featureContext->getBaseUrl() . '/index.php/login';
-		// Request a new session and extract CSRF token
-		$this->featureContext->setResponse(
-			HttpRequestHelper::get(
-				$loginUrl,
-				$this->featureContext->getStepLineRef(),
-				null,
-				null,
-				null,
-				null,
-				null,
-				$this->featureContext->getCookieJar()
-			)
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-		$this->featureContext->extractRequestTokenFromResponse($this->featureContext->getResponse());
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
 
-		// Login and extract new token
-		$body = [
-			'user' => $this->featureContext->getActualUsername($user),
-			'password' => $this->featureContext->getPasswordForUser($user),
-			'requesttoken' => $this->featureContext->getRequestToken()
-		];
-		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$loginUrl,
-				$this->featureContext->getStepLineRef(),
-				null,
-				null,
-				null,
+		$headers = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			if (isset($row['destination'])) {
+				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
+					$this->featureContext->getBaseUrl() . $row['destination'],
+					$ofUser
+				);
+			}
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
 				$body,
-				null,
-				$this->featureContext->getCookieJar()
-			)
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-		$this->featureContext->extractRequestTokenFromResponse($this->featureContext->getResponse());
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
-	 * @Given a new browser session for the administrator has been started
+	 * @When user :user requests these endpoints with :method including body :body about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $body
+	 * @param string $ofUser
+	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
-	public function aNewBrowserSessionForTheAdministratorHasBeenStarted():void {
-		$admin = $this->featureContext->getAdminUsername();
-		$this->aNewBrowserSessionForHasBeenStarted($admin);
+	public function userRequestsTheseEndpointsIncludingBodyAboutUser(string $user, string $method, string $body, string $ofUser, TableNode $table):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		$headers = [];
+		if ($method === 'MOVE' || $method === 'COPY') {
+			$headers['Destination'] = '/path/to/destination';
+		}
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->requestUrlWithBasicAuth(
+				$user,
+				$row['endpoint'],
+				$method,
+				$body,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
+	 * @When user :asUser requests these endpoints with :method using the password of user :ofUser
 	 *
-	 * @return string
+	 * @param string $asUser
+	 * @param string $method
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
 	 */
-	public function generateAuthTokenForAdmin():string {
-		$this->aNewBrowserSessionForHasBeenStarted($this->featureContext->getAdminUsername());
-		$this->userGeneratesNewAppPasswordNamed('acceptance-test ' . \microtime());
-		return $this->appToken;
+	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(string $asUser, string $method, string $ofUser, TableNode $table):void {
+		$asUser = $this->featureContext->getActualUsername($asUser);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		// do request as $asUser using password of $ofUser
+		$authHeader = $this->createBasicAuthHeader($asUser, $this->featureContext->getPasswordForUser($ofUser));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				null,
+				$authHeader
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :asUser requests these endpoints with :method including body :body using the password of user :user
+	 *
+	 * @param string $asUser
+	 * @param string $method
+	 * @param string $body
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsIncludingBodyUsingPasswordOfUser(string $asUser, string $method, ?string $body, string $ofUser, TableNode $table):void {
+		$asUser = $this->featureContext->getActualUsername($asUser);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		// do request as $asUser using password of $ofUser
+		$authHeader = $this->createBasicAuthHeader($asUser, $this->featureContext->getPasswordForUser($ofUser));
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->sendRequest(
+				$row['endpoint'],
+				$method,
+				$body,
+				$authHeader
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When user :user requests these endpoints with :method about user :ofUser
+	 *
+	 * @param string $user
+	 * @param string $method
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsAboutUser(string $user, string $method, string $ofUser, TableNode $table):void {
+		$headers = [];
+		if ($method === 'MOVE' || $method === 'COPY') {
+			$headers['Destination'] = '/path/to/destination';
+		}
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->requestUrlWithBasicAuth(
+				$user,
+				$row['endpoint'],
+				$method,
+				null,
+				$headers
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
