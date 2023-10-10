@@ -4866,16 +4866,17 @@ trait WebDav {
 				$fileFound = $this->findEntryFromSearchResponse(
 					$resource
 				);
+				if (\is_object($fileFound)) {
+					$fileFound = $fileFound->xpath("d:propstat//oc:name");
+				}
 			} else {
 				$fileFound = $this->findEntryFromPropfindResponse(
 					$resource,
 					$user,
-					$method,
 					"files",
 					$folderpath
 				);
 			}
-
 			if ($should) {
 				Assert::assertNotEmpty(
 					$fileFound,
@@ -5045,7 +5046,7 @@ trait WebDav {
 			},
 			$elementRows
 		);
-		$resultEntries = $this->findEntryFromPropfindResponse(null, $user, "REPORT");
+		$resultEntries = $this->findEntryFromSearchResponse();
 		foreach ($resultEntries as $resultEntry) {
 			Assert::assertContains($resultEntry, $expectedEntries);
 		}
@@ -5121,7 +5122,7 @@ trait WebDav {
 		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $user, null, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $user, $type);
 			Assert::assertNotFalse($res, "expected $path to be in DAV response but was not found");
 		}
 	}
@@ -5140,7 +5141,7 @@ trait WebDav {
 		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $user, null, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $user, $type);
 			Assert::assertFalse($res, "expected $path to not be in DAV response but was found");
 		}
 	}
@@ -5261,7 +5262,6 @@ trait WebDav {
 	 *
 	 * @param string|null $entryNameToSearch
 	 * @param string|null $user
-	 * @param string|null $method
 	 * @param string $type
 	 * @param string $folderPath
 	 *
@@ -5276,7 +5276,6 @@ trait WebDav {
 	public function findEntryFromPropfindResponse(
 		?string $entryNameToSearch = null,
 		?string $user = null,
-		?string $method = null,
 		string $type = "files",
 		string $folderPath = ''
 	) {
@@ -5305,19 +5304,6 @@ trait WebDav {
 		$results = [];
 		foreach ($multistatusResults as $multistatusResult) {
 			$entryPath = $multistatusResult['value'][0]['value'];
-			if ($method === "REPORT") {
-				if ($entryNameToSearch !== null && str_ends_with($entryPath, $entryNameToSearch)) {
-					return $multistatusResult;
-				} else {
-					$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
-						$this->getBaseUrl(),
-						$user,
-						$this->getPasswordForUser($user),
-						$this->getStepLineRef()
-					);
-					$topWebDavPath = "/remote.php/dav/spaces/" . $spaceId . "/" . $folderPath;
-				}
-			}
 			$entryName = \str_replace($topWebDavPath, "", $entryPath);
 			$entryName = \rawurldecode($entryName);
 			$entryName = \trim($entryName, "/");
@@ -5369,12 +5355,25 @@ trait WebDav {
 			}
 			$resourcePath = \rawurldecode($resourcePath);
 			if ($entryNameToSearch === $resourcePath) {
-				return $resourcePath;
+				// If searching for single entry,
+				// we return an SimpleXmlElement of found item
+				return $item;
 			}
 			if ($searchForHighlightString) {
+				// If searching for highlighted string,
+				// we return an array of entries with highlighted content as value
+				// Example:
+				//      [
+				//          "<entryName1>" => "<highlighted-content>"
+				//          "<entryName2>" => "<highlighted-content>"
+				//      ]
 				$actualHighlightString =  $item->xpath("d:propstat//oc:highlights");
 				$results[$resourcePath] = (string)$actualHighlightString[0];
 			} else {
+				// If list all the entries i.e. $entryNameToSearch=null,
+				// we return an array of entries in the response
+				// Example:
+				//      ["<entry1>", "<entry2>"]
 				$results[] = $resourcePath;
 			}
 		}
