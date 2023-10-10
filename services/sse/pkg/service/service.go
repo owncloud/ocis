@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -12,12 +11,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
 )
-
-// ServerSentEvent is the data structure sent by the sse service
-type ServerSentEvent struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
-}
 
 // SSE defines implements the business logic for Service.
 type SSE struct {
@@ -58,16 +51,9 @@ func (s SSE) ListenForEvents() {
 		default:
 			s.l.Error().Interface("event", ev).Msg("unhandled event")
 		case events.SendSSE:
-			b, err := json.Marshal(ServerSentEvent{
-				Type: ev.Type,
-				Data: ev.Message,
-			})
-			if err != nil {
-				s.l.Error().Interface("event", ev).Msg("cannot marshal event")
-				continue
-			}
 			s.sse.Publish(ev.UserID, &sse.Event{
-				Data: b,
+				Event: []byte(ev.Type),
+				Data:  ev.Message,
 			})
 		}
 	}
