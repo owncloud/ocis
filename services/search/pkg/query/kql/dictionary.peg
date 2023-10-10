@@ -200,8 +200,11 @@ NaturalLanguageDateTime  <-
     "today" /
     "yesterday" /
     "this week" /
+    "last week" /
+    "last 7 days" /
     "this month" /
     "last month" /
+    "last 30 days" /
     "this year" /
     "last year"  {
         return c.text, nil
