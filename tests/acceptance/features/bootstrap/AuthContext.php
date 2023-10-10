@@ -255,6 +255,7 @@ class AuthContext implements Context {
 		TableNode $table
 	):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
@@ -353,7 +354,7 @@ class AuthContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 
-		$authHeader = $this->createBasicAuthHeader($user, $password);
+		$authHeader = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
 
 		foreach ($table->getHash() as $row) {
 			$response = $this->sendRequest($row['endpoint'], $method, null, $authHeader);
@@ -385,7 +386,7 @@ class AuthContext implements Context {
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
 
-		$headers = $this->createBasicAuthHeader($user, $password);
+		$headers = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
 
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
@@ -434,7 +435,7 @@ class AuthContext implements Context {
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
 
-		$headers = $this->createBasicAuthHeader($user, $password);
+		$headers = $this->createBasicAuthHeader($user, $this->featureContext->getActualPassword($password));
 
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
