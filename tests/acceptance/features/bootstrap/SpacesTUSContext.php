@@ -58,7 +58,6 @@ class SpacesTUSContext implements Context {
 	 */
 	public function userHasUploadedFileViaTusInSpace(string $user, string $source, string $destination, string $spaceName): void {
 		$this->userUploadsAFileViaTusInsideOfTheSpaceUsingTheWebdavApi($user, $source, $destination, $spaceName);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Expected response status code should be 200");
 	}
 
 	/**
@@ -102,8 +101,9 @@ class SpacesTUSContext implements Context {
 		string $content,
 		TableNode $headers
 	): void {
-		$this->userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders($user, $spaceName, $content, $headers);
-		$this->featureContext->theHTTPStatusCodeShouldBe(201, "Expected response status code should be 201");
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "Expected response status code should be 201", $response);
 	}
 
 	/**
@@ -169,10 +169,6 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->userUploadsAFileWithContentToViaTusInsideOfTheSpaceUsingTheWebdavApi($user, $content, $resource, $spaceName);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			200,
-			"Expected response status code should be 200"
-		);
 	}
 
 	/**
@@ -262,7 +258,8 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsFileWithChecksum($user, $checksum, $offset, $content);
+		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
