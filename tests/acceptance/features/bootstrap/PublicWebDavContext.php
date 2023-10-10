@@ -242,6 +242,25 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
+	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)"$/
+	 *
+	 * @param string $path
+	 * @param string $publicWebDAVAPIVersion
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function downloadPublicFileInsideAFolderWithPassword(string $path, string $publicWebDAVAPIVersion = "old", string $password = ""):void {
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+			$path,
+			$password,
+			"",
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @param string $path
 	 * @param string|null $password
 	 * @param string $publicWebDAVAPIVersion
@@ -1233,7 +1252,13 @@ class PublicWebDavContext implements Context {
 			$path,
 			$publicWebDAVAPIVersion
 		);
-		$this->featureContext->checkDownloadedContentMatches($content);
+		$response = $this->downloadTheFileInsideThePublicSharedFolder(
+			$path,
+			"",
+			"",
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**

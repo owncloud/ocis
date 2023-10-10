@@ -37,7 +37,8 @@ Feature: Share spaces via link
       | uid_owner         | %username%            |
       | name              | <linkName>            |
     And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
-    And the downloaded content should be "some content"
+    When the public downloads file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
+    Then the downloaded content should be "some content"
     But the public should not be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
     Examples:
       | permissions | expectedPermissions       | password       | linkName | expireDate               |
