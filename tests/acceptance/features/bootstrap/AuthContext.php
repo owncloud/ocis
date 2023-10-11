@@ -276,8 +276,49 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminRequestsEndpoint(string $method, TableNode $table):void {
-		$this->adminRequestsEndpointsWithBodyWithPassword($method, null, null, null, $table);
+	public function theAdminRequestsTheseEndpointsWithMethod(string $method, TableNode $table):void {
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+		foreach ($table->getHash() as $row) {
+			$response = $this->requestUrlWithBasicAuth(
+				$this->featureContext->getAdminUsername(),
+				$row['endpoint'],
+				$method
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When the administrator requests these endpoints with :method using password :password about user :ofUser
+	 *
+	 * @param string $method
+	 * @param string $password
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theAdminRequestsTheseEndpointsUsingPasswordAboutUser(
+		string $method,
+		string $password,
+		string $ofUser,
+		TableNode $table
+	): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		$authHeader = $this->createBasicAuthHeader($this->featureContext->getAdminUsername(), $password);
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$this->featureContext->getActualUsername($ofUser)
+			);
+			$response = $this->sendRequest($row['endpoint'], $method, null, $authHeader);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
