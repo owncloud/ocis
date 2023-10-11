@@ -519,7 +519,7 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 }
 
 // ListReceivedShares returns the list of shares the user has access to.
-func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userpb.UserId) ([]*collaboration.ReceivedShare, error) {
 	if err := m.initialize(); err != nil {
 		return nil, err
 	}
@@ -529,11 +529,20 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 		return nil, errtypes.UserRequired("error getting user from context")
 	}
 
+	uid, groups := user.GetId(), user.GetGroups()
+	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
+		u, err := utils.GetUser(forUser, m.gatewayClient)
+		if err != nil {
+			return nil, errtypes.BadRequest("user not found")
+		}
+		uid = forUser
+		groups = u.GetGroups()
+	}
 	result := []*collaboration.ReceivedShare{}
 
 	ids, err := granteeToIndex(&provider.Grantee{
 		Type: provider.GranteeType_GRANTEE_TYPE_USER,
-		Id:   &provider.Grantee_UserId{UserId: user.Id},
+		Id:   &provider.Grantee_UserId{UserId: uid},
 	})
 	if err != nil {
 		return nil, err
@@ -544,7 +553,7 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	if err != nil {
 		return nil, err
 	}
-	for _, group := range user.Groups {
+	for _, group := range groups {
 		index, err := granteeToIndex(&provider.Grantee{
 			Type: provider.GranteeType_GRANTEE_TYPE_GROUP,
 			Id:   &provider.Grantee_GroupId{GroupId: &groupv1beta1.GroupId{OpaqueId: group}},

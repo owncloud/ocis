@@ -1014,7 +1014,7 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 	// 1. we can start iterating over the acls / grants on the node or
 	// 2. we can iterate over the number of groups
 	// The current implementation tries to be defensive for cases where users have hundreds or thousands of groups, so we iterate over the existing acls.
-	userace := prefixes.GrantUserAcePrefix + u.Id.OpaqueId
+	userace := prefixes.GrantPrefix + ace.UserAce(u.Id)
 	userFound := false
 	for i := range grantees {
 		switch {

@@ -25,6 +25,7 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
@@ -252,7 +253,46 @@ func (h *Handler) listUserShares(r *http.Request, filters []*collaboration.Filte
 			log.Debug().Interface("share", s).Interface("info", info).Interface("shareData", data).Msg("mapped")
 			ocsDataPayload = append(ocsDataPayload, data)
 		}
+
+		if h.listOCMShares {
+			// include the ocm shares
+			ocmShares, err := h.listOutcomingFederatedShares(ctx, client, convertToOCMFilters(filters))
+			if err != nil {
+				return nil, nil, err
+			}
+			ocsDataPayload = append(ocsDataPayload, ocmShares...)
+		}
 	}
 
 	return ocsDataPayload, nil, nil
+}
+
+func convertToOCMFilters(filters []*collaboration.Filter) []*ocmpb.ListOCMSharesRequest_Filter {
+	ocmfilters := []*ocmpb.ListOCMSharesRequest_Filter{}
+	for _, f := range filters {
+		switch v := f.Term.(type) {
+		case *collaboration.Filter_ResourceId:
+			ocmfilters = append(ocmfilters, &ocmpb.ListOCMSharesRequest_Filter{
+				Type: ocmpb.ListOCMSharesRequest_Filter_TYPE_RESOURCE_ID,
+				Term: &ocmpb.ListOCMSharesRequest_Filter_ResourceId{
+					ResourceId: v.ResourceId,
+				},
+			})
+		case *collaboration.Filter_Creator:
+			ocmfilters = append(ocmfilters, &ocmpb.ListOCMSharesRequest_Filter{
+				Type: ocmpb.ListOCMSharesRequest_Filter_TYPE_CREATOR,
+				Term: &ocmpb.ListOCMSharesRequest_Filter_Creator{
+					Creator: v.Creator,
+				},
+			})
+		case *collaboration.Filter_Owner:
+			ocmfilters = append(ocmfilters, &ocmpb.ListOCMSharesRequest_Filter{
+				Type: ocmpb.ListOCMSharesRequest_Filter_TYPE_OWNER,
+				Term: &ocmpb.ListOCMSharesRequest_Filter_Owner{
+					Owner: v.Owner,
+				},
+			})
+		}
+	}
+	return ocmfilters
 }

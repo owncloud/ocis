@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2023 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,21 +60,6 @@ func (s *svc) extractEndpointInfo(ctx context.Context, targetURL string) (*webda
 	}, nil
 }
 
-func appendNameQuery(targetURL string, nameQueries ...string) (string, error) {
-	uri, err := url.Parse(targetURL)
-	if err != nil {
-		return "", err
-	}
-	q, err := url.ParseQuery(uri.RawQuery)
-	if err != nil {
-		return "", err
-	}
-	name := append([]string{q["name"][0]}, nameQueries...)
-	q.Set("name", path.Join(name...))
-	uri.RawQuery = q.Encode()
-	return uri.String(), nil
-}
-
 func (s *svc) getWebdavEndpoint(ctx context.Context, domain string) (string, error) {
 	meshProvider, err := s.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
 		Domain: domain,
@@ -88,4 +73,34 @@ func (s *svc) getWebdavEndpoint(ctx context.Context, domain string) (string, err
 		}
 	}
 	return "", errtypes.NotFound(domain)
+}
+
+func (s *svc) getWebdavHost(ctx context.Context, domain string) (string, error) {
+	meshProvider, err := s.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+		Domain: domain,
+	})
+	if err != nil {
+		return "", errors.Wrap(err, "gateway: error calling GetInfoByDomain")
+	}
+	for _, s := range meshProvider.ProviderInfo.Services {
+		if strings.ToLower(s.Endpoint.Type.Name) == "webdav" {
+			return s.Host, nil
+		}
+	}
+	return "", errtypes.NotFound(domain)
+}
+
+func appendNameQuery(targetURL string, nameQueries ...string) (string, error) {
+	uri, err := url.Parse(targetURL)
+	if err != nil {
+		return "", err
+	}
+	q, err := url.ParseQuery(uri.RawQuery)
+	if err != nil {
+		return "", err
+	}
+	name := append([]string{q["name"][0]}, nameQueries...)
+	q.Set("name", path.Join(name...))
+	uri.RawQuery = q.Encode()
+	return uri.String(), nil
 }

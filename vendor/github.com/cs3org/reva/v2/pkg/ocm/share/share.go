@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2023 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,39 +22,41 @@ import (
 	"context"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"google.golang.org/genproto/protobuf/field_mask"
 )
 
-// Manager is the interface that manipulates the OCM shares.
-type Manager interface {
-	// Create a new share in fn with the given acl.
-	Share(ctx context.Context, md *provider.ResourceId, g *ocm.ShareGrant, name string,
-		pi *ocmprovider.ProviderInfo, pm string, owner *userpb.UserId, token string, st ocm.Share_ShareType) (*ocm.Share, error)
+// Repository is the interface that manipulates the OCM shares repository.
+type Repository interface {
+	// StoreShare stores a share.
+	StoreShare(ctx context.Context, share *ocm.Share) (*ocm.Share, error)
 
 	// GetShare gets the information for a share by the given ref.
-	GetShare(ctx context.Context, ref *ocm.ShareReference) (*ocm.Share, error)
+	GetShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference) (*ocm.Share, error)
 
-	// Unshare deletes the share pointed by ref.
-	Unshare(ctx context.Context, ref *ocm.ShareReference) error
+	// DeleteShare deletes the share pointed by ref.
+	DeleteShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference) error
 
 	// UpdateShare updates the mode of the given share.
-	UpdateShare(ctx context.Context, ref *ocm.ShareReference, p *ocm.SharePermissions) (*ocm.Share, error)
+	UpdateShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference, f ...*ocm.UpdateOCMShareRequest_UpdateField) (*ocm.Share, error)
 
 	// ListShares returns the shares created by the user. If md is provided is not nil,
 	// it returns only shares attached to the given resource.
-	ListShares(ctx context.Context, filters []*ocm.ListOCMSharesRequest_Filter) ([]*ocm.Share, error)
+	ListShares(ctx context.Context, user *userpb.User, filters []*ocm.ListOCMSharesRequest_Filter) ([]*ocm.Share, error)
+
+	// StoreReceivedShare stores a received share.
+	StoreReceivedShare(ctx context.Context, share *ocm.ReceivedShare) (*ocm.ReceivedShare, error)
 
 	// ListReceivedShares returns the list of shares the user has access.
-	ListReceivedShares(ctx context.Context) ([]*ocm.ReceivedShare, error)
+	ListReceivedShares(ctx context.Context, user *userpb.User) ([]*ocm.ReceivedShare, error)
 
 	// GetReceivedShare returns the information for a received share the user has access.
-	GetReceivedShare(ctx context.Context, ref *ocm.ShareReference) (*ocm.ReceivedShare, error)
+	GetReceivedShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference) (*ocm.ReceivedShare, error)
 
 	// UpdateReceivedShare updates the received share with share state.
-	UpdateReceivedShare(ctx context.Context, share *ocm.ReceivedShare, fieldMask *field_mask.FieldMask) (*ocm.ReceivedShare, error)
+	UpdateReceivedShare(ctx context.Context, user *userpb.User, share *ocm.ReceivedShare, fieldMask *field_mask.FieldMask) (*ocm.ReceivedShare, error)
 }
 
 // ResourceIDFilter is an abstraction for creating filter by resource id.
@@ -66,3 +68,10 @@ func ResourceIDFilter(id *provider.ResourceId) *ocm.ListOCMSharesRequest_Filter 
 		},
 	}
 }
+
+// ErrShareAlreadyExisting is the error returned when the share already exists
+// for the 3-tuple consisting of (owner, resource, grantee).
+var ErrShareAlreadyExisting = errtypes.AlreadyExists("share already exists")
+
+// ErrShareNotFound is the error returned where the share does not exist.
+var ErrShareNotFound = errtypes.NotFound("share not found")

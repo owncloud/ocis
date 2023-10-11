@@ -40,8 +40,8 @@ import (
 
 var defaultFilePerm = os.FileMode(0664)
 
-func (fs *localfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	upload, err := fs.GetUpload(ctx, ref.GetPath())
+func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+	upload, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error retrieving upload")
 	}
@@ -51,7 +51,7 @@ func (fs *localfs) Upload(ctx context.Context, ref *provider.Reference, r io.Rea
 	p := uploadInfo.info.Storage["InternalDestination"]
 	if chunking.IsChunked(p) {
 		var assembledFile string
-		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, r)
+		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, req.Body)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
@@ -59,7 +59,7 @@ func (fs *localfs) Upload(ctx context.Context, ref *provider.Reference, r io.Rea
 			if err = uploadInfo.Terminate(ctx); err != nil {
 				return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(ref.String())
+			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.info.Storage["InternalDestination"] = p
 		fd, err := os.Open(assembledFile)
@@ -68,10 +68,10 @@ func (fs *localfs) Upload(ctx context.Context, ref *provider.Reference, r io.Rea
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
-		r = fd
+		req.Body = fd
 	}
 
-	if _, err := uploadInfo.WriteChunk(ctx, 0, r); err != nil {
+	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error writing to binary file")
 	}
 
@@ -100,7 +100,7 @@ func (fs *localfs) Upload(ctx context.Context, ref *provider.Reference, r io.Rea
 	}
 
 	// return id, etag and mtime
-	ri, err := fs.GetMD(ctx, ref, []string{}, []string{"id", "etag", "mtime"})
+	ri, err := fs.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
 	if err != nil {
 		return provider.ResourceInfo{}, err
 	}

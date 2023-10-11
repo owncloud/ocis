@@ -42,12 +42,12 @@ import (
 	tusd "github.com/tus/tusd/pkg/handler"
 )
 
-func (fs *cephfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
 	user := fs.makeUser(ctx)
-	upload, err := fs.GetUpload(ctx, ref.GetPath())
+	upload, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		metadata := map[string]string{"sizedeferred": "true"}
-		uploadIDs, err := fs.InitiateUpload(ctx, ref, 0, metadata)
+		uploadIDs, err := fs.InitiateUpload(ctx, req.Ref, 0, metadata)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
@@ -65,7 +65,7 @@ func (fs *cephfs) Upload(ctx context.Context, ref *provider.Reference, r io.Read
 	}
 	if ok {
 		var assembledFile string
-		p, assembledFile, err = NewChunkHandler(ctx, fs).WriteChunk(p, r)
+		p, assembledFile, err = NewChunkHandler(ctx, fs).WriteChunk(p, req.Body)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
@@ -73,17 +73,17 @@ func (fs *cephfs) Upload(ctx context.Context, ref *provider.Reference, r io.Read
 			if err = uploadInfo.Terminate(ctx); err != nil {
 				return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(ref.String())
+			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.info.Storage["InternalDestination"] = p
 
 		user.op(func(cv *cacheVal) {
-			r, err = cv.mount.Open(assembledFile, os.O_RDONLY, 0)
+			req.Body, err = cv.mount.Open(assembledFile, os.O_RDONLY, 0)
 		})
 		if err != nil {
 			return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error opening assembled file")
 		}
-		defer r.Close()
+		defer req.Body.Close()
 		defer user.op(func(cv *cacheVal) {
 			_ = cv.mount.Unlink(assembledFile)
 		})
@@ -102,7 +102,7 @@ func (fs *cephfs) Upload(ctx context.Context, ref *provider.Reference, r io.Read
 		ri.Mtime = &mtime
 	}
 
-	if _, err := uploadInfo.WriteChunk(ctx, 0, r); err != nil {
+	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error writing to binary file")
 	}
 

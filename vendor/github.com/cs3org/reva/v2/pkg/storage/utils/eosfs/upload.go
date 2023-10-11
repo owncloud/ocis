@@ -20,7 +20,6 @@ package eosfs
 
 import (
 	"context"
-	"io"
 	"os"
 	"path"
 
@@ -31,8 +30,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (fs *eosfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	p, err := fs.resolve(ctx, ref)
+func (fs *eosfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+	p, err := fs.resolve(ctx, req.Ref)
 	if err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "eos: error resolving reference")
 	}
@@ -43,12 +42,12 @@ func (fs *eosfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadC
 
 	if chunking.IsChunked(p) {
 		var assembledFile string
-		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, r)
+		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, req.Body)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
 		if p == "" {
-			return provider.ResourceInfo{}, errtypes.PartialContent(ref.String())
+			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		fd, err := os.Open(assembledFile)
 		if err != nil {
@@ -56,7 +55,7 @@ func (fs *eosfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadC
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
-		r = fd
+		req.Body = fd
 	}
 
 	fn := fs.wrap(ctx, p)
@@ -73,7 +72,7 @@ func (fs *eosfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadC
 		return provider.ResourceInfo{}, err
 	}
 
-	if err := fs.c.Write(ctx, auth, fn, r); err != nil {
+	if err := fs.c.Write(ctx, auth, fn, req.Body); err != nil {
 		return provider.ResourceInfo{}, err
 	}
 

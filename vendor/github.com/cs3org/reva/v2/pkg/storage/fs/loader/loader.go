@@ -20,6 +20,7 @@ package loader
 
 import (
 	// Load core storage filesystem backends.
+	_ "github.com/cs3org/reva/v2/pkg/ocm/storage/received"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/cephfs"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/eos"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/eosgrpc"

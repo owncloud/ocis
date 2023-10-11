@@ -20,7 +20,6 @@ package decomposedfs
 
 import (
 	"context"
-	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -48,8 +47,8 @@ var _idRegexp = regexp.MustCompile(".*/([^/]+).info")
 // Upload uploads data to the given resource
 // TODO Upload (and InitiateUpload) needs a way to receive the expected checksum.
 // Maybe in metadata as 'checksum' => 'sha1 aeosvp45w5xaeoe' = lowercase, space separated?
-func (fs *Decomposedfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	up, err := fs.GetUpload(ctx, ref.GetPath())
+func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+	up, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error retrieving upload")
 	}
@@ -59,7 +58,7 @@ func (fs *Decomposedfs) Upload(ctx context.Context, ref *provider.Reference, r i
 	p := uploadInfo.Info.Storage["NodeName"]
 	if chunking.IsChunked(p) { // check chunking v1
 		var assembledFile string
-		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, r)
+		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, req.Body)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
@@ -67,7 +66,7 @@ func (fs *Decomposedfs) Upload(ctx context.Context, ref *provider.Reference, r i
 			if err = uploadInfo.Terminate(ctx); err != nil {
 				return provider.ResourceInfo{}, errors.Wrap(err, "ocfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(ref.String())
+			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.Info.Storage["NodeName"] = p
 		fd, err := os.Open(assembledFile)
@@ -76,10 +75,10 @@ func (fs *Decomposedfs) Upload(ctx context.Context, ref *provider.Reference, r i
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
-		r = fd
+		req.Body = fd
 	}
 
-	if _, err := uploadInfo.WriteChunk(ctx, 0, r); err != nil {
+	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
 	}
 

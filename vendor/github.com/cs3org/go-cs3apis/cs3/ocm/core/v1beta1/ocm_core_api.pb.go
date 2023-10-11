@@ -7,7 +7,9 @@ import (
 	context "context"
 	fmt "fmt"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	v1beta12 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta14 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta13 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
+	v1beta12 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
@@ -27,7 +29,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-// https://rawgit.com/GEANT/OCM-API/v1/docs.html#null%2Fpaths%2F~1shares%2Fpost
 type CreateOCMCoreShareRequest struct {
 	// OPTIONAL.
 	// Opaque information.
@@ -40,22 +41,37 @@ type CreateOCMCoreShareRequest struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// REQUIRED.
 	// Identifier to identify the resource at the provider side. This is unique per provider.
-	ProviderId string `protobuf:"bytes,4,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	ResourceId string `protobuf:"bytes,4,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	// REQUIRED.
+	// Provider specific identifier of the owner of the resource.
+	Owner *v1beta11.UserId `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
 	// REQUIRED.
 	// Provider specific identifier of the user that wants to share the resource.
-	Owner *v1beta11.UserId `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
+	Sender *v1beta11.UserId `protobuf:"bytes,6,opt,name=sender,proto3" json:"sender,omitempty"`
 	// REQUIRED.
 	// Consumer specific identifier of the user or group the provider wants to share the resource with.
 	// This is known in advance, for example using the OCM invitation flow.
 	// Please note that the consumer service endpoint is known in advance as well, so this is no part of the request body.
 	// TODO: this field needs to represent either a user or group in the future, not only a user.
-	ShareWith *v1beta11.UserId `protobuf:"bytes,6,opt,name=share_with,json=shareWith,proto3" json:"share_with,omitempty"`
+	ShareWith *v1beta11.UserId `protobuf:"bytes,7,opt,name=share_with,json=shareWith,proto3" json:"share_with,omitempty"`
 	// REQUIRED.
-	// The protocol which is used to establish synchronisation.
-	Protocol             *Protocol `protobuf:"bytes,7,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Resource type.
+	ResourceType v1beta12.ResourceType `protobuf:"varint,8,opt,name=resource_type,json=resourceType,proto3,enum=cs3.storage.provider.v1beta1.ResourceType" json:"resource_type,omitempty"`
+	// REQUIRED.
+	// Recipient share type.
+	ShareType v1beta13.ShareType `protobuf:"varint,9,opt,name=share_type,json=shareType,proto3,enum=cs3.sharing.ocm.v1beta1.ShareType" json:"share_type,omitempty"`
+	// OPTIONAL.
+	// The expiration time for the OCM share.
+	Expiration *v1beta1.Timestamp `protobuf:"bytes,10,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	// REQUIRED.
+	// The protocols which are used to establish synchronisation,
+	// with their access rights.
+	// See also cs3/sharing/ocm/v1beta1/resources.proto for how to map
+	// this to the OCM share payload.
+	Protocols            []*v1beta13.Protocol `protobuf:"bytes,11,rep,name=protocols,proto3" json:"protocols,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
 func (m *CreateOCMCoreShareRequest) Reset()         { *m = CreateOCMCoreShareRequest{} }
@@ -104,9 +120,9 @@ func (m *CreateOCMCoreShareRequest) GetName() string {
 	return ""
 }
 
-func (m *CreateOCMCoreShareRequest) GetProviderId() string {
+func (m *CreateOCMCoreShareRequest) GetResourceId() string {
 	if m != nil {
-		return m.ProviderId
+		return m.ResourceId
 	}
 	return ""
 }
@@ -118,6 +134,13 @@ func (m *CreateOCMCoreShareRequest) GetOwner() *v1beta11.UserId {
 	return nil
 }
 
+func (m *CreateOCMCoreShareRequest) GetSender() *v1beta11.UserId {
+	if m != nil {
+		return m.Sender
+	}
+	return nil
+}
+
 func (m *CreateOCMCoreShareRequest) GetShareWith() *v1beta11.UserId {
 	if m != nil {
 		return m.ShareWith
@@ -125,9 +148,30 @@ func (m *CreateOCMCoreShareRequest) GetShareWith() *v1beta11.UserId {
 	return nil
 }
 
-func (m *CreateOCMCoreShareRequest) GetProtocol() *Protocol {
+func (m *CreateOCMCoreShareRequest) GetResourceType() v1beta12.ResourceType {
 	if m != nil {
-		return m.Protocol
+		return m.ResourceType
+	}
+	return v1beta12.ResourceType_RESOURCE_TYPE_INVALID
+}
+
+func (m *CreateOCMCoreShareRequest) GetShareType() v1beta13.ShareType {
+	if m != nil {
+		return m.ShareType
+	}
+	return v1beta13.ShareType_SHARE_TYPE_INVALID
+}
+
+func (m *CreateOCMCoreShareRequest) GetExpiration() *v1beta1.Timestamp {
+	if m != nil {
+		return m.Expiration
+	}
+	return nil
+}
+
+func (m *CreateOCMCoreShareRequest) GetProtocols() []*v1beta13.Protocol {
+	if m != nil {
+		return m.Protocols
 	}
 	return nil
 }
@@ -135,7 +179,7 @@ func (m *CreateOCMCoreShareRequest) GetProtocol() *Protocol {
 type CreateOCMCoreShareResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta14.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
 	Opaque *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
@@ -174,7 +218,7 @@ func (m *CreateOCMCoreShareResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateOCMCoreShareResponse proto.InternalMessageInfo
 
-func (m *CreateOCMCoreShareResponse) GetStatus() *v1beta12.Status {
+func (m *CreateOCMCoreShareResponse) GetStatus() *v1beta14.Status {
 	if m != nil {
 		return m.Status
 	}
@@ -202,9 +246,258 @@ func (m *CreateOCMCoreShareResponse) GetCreated() *v1beta1.Timestamp {
 	return nil
 }
 
+type UpdateOCMCoreShareRequest struct {
+	// OPTIONAL.
+	// Opaque information.
+	Opaque *v1beta1.Opaque `protobuf:"bytes,1,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	// REQUIRED.
+	// Unique ID to identify the share at the consumer side.
+	OcmShareId string `protobuf:"bytes,2,opt,name=ocm_share_id,json=ocmShareId,proto3" json:"ocm_share_id,omitempty"`
+	// OPTIONAL.
+	// Description for the share.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// OPTIONAL.
+	// Recipient share type.
+	ShareType v1beta13.ShareType `protobuf:"varint,5,opt,name=share_type,json=shareType,proto3,enum=cs3.sharing.ocm.v1beta1.ShareType" json:"share_type,omitempty"`
+	// OPTIONAL.
+	// The expiration time for the OCM share.
+	Expiration *v1beta1.Timestamp `protobuf:"bytes,6,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	// OPTIONAL.
+	// The protocols which are used to establish synchronisation,
+	// with their access rights.
+	Protocols            []*v1beta13.Protocol `protobuf:"bytes,7,rep,name=protocols,proto3" json:"protocols,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *UpdateOCMCoreShareRequest) Reset()         { *m = UpdateOCMCoreShareRequest{} }
+func (m *UpdateOCMCoreShareRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateOCMCoreShareRequest) ProtoMessage()    {}
+func (*UpdateOCMCoreShareRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4e8f411283db0fc7, []int{2}
+}
+
+func (m *UpdateOCMCoreShareRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateOCMCoreShareRequest.Unmarshal(m, b)
+}
+func (m *UpdateOCMCoreShareRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateOCMCoreShareRequest.Marshal(b, m, deterministic)
+}
+func (m *UpdateOCMCoreShareRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateOCMCoreShareRequest.Merge(m, src)
+}
+func (m *UpdateOCMCoreShareRequest) XXX_Size() int {
+	return xxx_messageInfo_UpdateOCMCoreShareRequest.Size(m)
+}
+func (m *UpdateOCMCoreShareRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateOCMCoreShareRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateOCMCoreShareRequest proto.InternalMessageInfo
+
+func (m *UpdateOCMCoreShareRequest) GetOpaque() *v1beta1.Opaque {
+	if m != nil {
+		return m.Opaque
+	}
+	return nil
+}
+
+func (m *UpdateOCMCoreShareRequest) GetOcmShareId() string {
+	if m != nil {
+		return m.OcmShareId
+	}
+	return ""
+}
+
+func (m *UpdateOCMCoreShareRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *UpdateOCMCoreShareRequest) GetShareType() v1beta13.ShareType {
+	if m != nil {
+		return m.ShareType
+	}
+	return v1beta13.ShareType_SHARE_TYPE_INVALID
+}
+
+func (m *UpdateOCMCoreShareRequest) GetExpiration() *v1beta1.Timestamp {
+	if m != nil {
+		return m.Expiration
+	}
+	return nil
+}
+
+func (m *UpdateOCMCoreShareRequest) GetProtocols() []*v1beta13.Protocol {
+	if m != nil {
+		return m.Protocols
+	}
+	return nil
+}
+
+type UpdateOCMCoreShareResponse struct {
+	// REQUIRED.
+	// The response status.
+	Status *v1beta14.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// OPTIONAL.
+	// Opaque information.
+	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *UpdateOCMCoreShareResponse) Reset()         { *m = UpdateOCMCoreShareResponse{} }
+func (m *UpdateOCMCoreShareResponse) String() string { return proto.CompactTextString(m) }
+func (*UpdateOCMCoreShareResponse) ProtoMessage()    {}
+func (*UpdateOCMCoreShareResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4e8f411283db0fc7, []int{3}
+}
+
+func (m *UpdateOCMCoreShareResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateOCMCoreShareResponse.Unmarshal(m, b)
+}
+func (m *UpdateOCMCoreShareResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateOCMCoreShareResponse.Marshal(b, m, deterministic)
+}
+func (m *UpdateOCMCoreShareResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateOCMCoreShareResponse.Merge(m, src)
+}
+func (m *UpdateOCMCoreShareResponse) XXX_Size() int {
+	return xxx_messageInfo_UpdateOCMCoreShareResponse.Size(m)
+}
+func (m *UpdateOCMCoreShareResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateOCMCoreShareResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateOCMCoreShareResponse proto.InternalMessageInfo
+
+func (m *UpdateOCMCoreShareResponse) GetStatus() *v1beta14.Status {
+	if m != nil {
+		return m.Status
+	}
+	return nil
+}
+
+func (m *UpdateOCMCoreShareResponse) GetOpaque() *v1beta1.Opaque {
+	if m != nil {
+		return m.Opaque
+	}
+	return nil
+}
+
+type DeleteOCMCoreShareRequest struct {
+	// REQUIRED.
+	// Unique ID to identify the share at the consumer side.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// OPTIONAL.
+	// Opaque information.
+	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *DeleteOCMCoreShareRequest) Reset()         { *m = DeleteOCMCoreShareRequest{} }
+func (m *DeleteOCMCoreShareRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteOCMCoreShareRequest) ProtoMessage()    {}
+func (*DeleteOCMCoreShareRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4e8f411283db0fc7, []int{4}
+}
+
+func (m *DeleteOCMCoreShareRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteOCMCoreShareRequest.Unmarshal(m, b)
+}
+func (m *DeleteOCMCoreShareRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteOCMCoreShareRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteOCMCoreShareRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteOCMCoreShareRequest.Merge(m, src)
+}
+func (m *DeleteOCMCoreShareRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteOCMCoreShareRequest.Size(m)
+}
+func (m *DeleteOCMCoreShareRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteOCMCoreShareRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteOCMCoreShareRequest proto.InternalMessageInfo
+
+func (m *DeleteOCMCoreShareRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DeleteOCMCoreShareRequest) GetOpaque() *v1beta1.Opaque {
+	if m != nil {
+		return m.Opaque
+	}
+	return nil
+}
+
+type DeleteOCMCoreShareResponse struct {
+	// REQUIRED.
+	// The response status.
+	Status *v1beta14.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// OPTIONAL.
+	// Opaque information.
+	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *DeleteOCMCoreShareResponse) Reset()         { *m = DeleteOCMCoreShareResponse{} }
+func (m *DeleteOCMCoreShareResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteOCMCoreShareResponse) ProtoMessage()    {}
+func (*DeleteOCMCoreShareResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4e8f411283db0fc7, []int{5}
+}
+
+func (m *DeleteOCMCoreShareResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteOCMCoreShareResponse.Unmarshal(m, b)
+}
+func (m *DeleteOCMCoreShareResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteOCMCoreShareResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteOCMCoreShareResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteOCMCoreShareResponse.Merge(m, src)
+}
+func (m *DeleteOCMCoreShareResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteOCMCoreShareResponse.Size(m)
+}
+func (m *DeleteOCMCoreShareResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteOCMCoreShareResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteOCMCoreShareResponse proto.InternalMessageInfo
+
+func (m *DeleteOCMCoreShareResponse) GetStatus() *v1beta14.Status {
+	if m != nil {
+		return m.Status
+	}
+	return nil
+}
+
+func (m *DeleteOCMCoreShareResponse) GetOpaque() *v1beta1.Opaque {
+	if m != nil {
+		return m.Opaque
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*CreateOCMCoreShareRequest)(nil), "cs3.ocm.core.v1beta1.CreateOCMCoreShareRequest")
 	proto.RegisterType((*CreateOCMCoreShareResponse)(nil), "cs3.ocm.core.v1beta1.CreateOCMCoreShareResponse")
+	proto.RegisterType((*UpdateOCMCoreShareRequest)(nil), "cs3.ocm.core.v1beta1.UpdateOCMCoreShareRequest")
+	proto.RegisterType((*UpdateOCMCoreShareResponse)(nil), "cs3.ocm.core.v1beta1.UpdateOCMCoreShareResponse")
+	proto.RegisterType((*DeleteOCMCoreShareRequest)(nil), "cs3.ocm.core.v1beta1.DeleteOCMCoreShareRequest")
+	proto.RegisterType((*DeleteOCMCoreShareResponse)(nil), "cs3.ocm.core.v1beta1.DeleteOCMCoreShareResponse")
 }
 
 func init() {
@@ -212,38 +505,52 @@ func init() {
 }
 
 var fileDescriptor_4e8f411283db0fc7 = []byte{
-	// 484 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0xdd, 0x6a, 0xd4, 0x40,
-	0x14, 0x26, 0x69, 0xbb, 0xb5, 0x27, 0xa0, 0x30, 0x14, 0x4c, 0x97, 0xaa, 0x6b, 0x11, 0xac, 0x37,
-	0x13, 0x77, 0x17, 0x14, 0xbc, 0xd2, 0xcd, 0x55, 0x2f, 0x24, 0x4b, 0xea, 0x0f, 0xc8, 0xc2, 0x92,
-	0x4e, 0x0e, 0xec, 0x80, 0xc9, 0x4c, 0x67, 0x26, 0x5d, 0xfa, 0x00, 0xbe, 0x88, 0x97, 0x3e, 0x89,
-	0xf8, 0x0c, 0x3e, 0x8c, 0xcc, 0x64, 0x12, 0x8a, 0x46, 0xd8, 0xbb, 0xe4, 0xfb, 0x39, 0x39, 0xe7,
-	0xfb, 0x02, 0xcf, 0x99, 0x9e, 0x27, 0x82, 0x55, 0x09, 0x13, 0x0a, 0x93, 0x9b, 0xe9, 0x15, 0x9a,
-	0x62, 0x6a, 0x81, 0xb5, 0x05, 0xd6, 0x85, 0xe4, 0x54, 0x2a, 0x61, 0x04, 0x39, 0x66, 0x7a, 0x4e,
-	0x05, 0xab, 0xa8, 0xc5, 0xa9, 0x17, 0x8e, 0x5f, 0x58, 0x3b, 0x2f, 0xb1, 0x36, 0xdc, 0xdc, 0x26,
-	0x8d, 0x46, 0xd5, 0xcf, 0x50, 0xa8, 0x45, 0xa3, 0x18, 0xea, 0x76, 0xc0, 0xf8, 0xd9, 0xe0, 0x97,
-	0xfe, 0x56, 0x9d, 0x5a, 0x95, 0x92, 0xac, 0x17, 0x68, 0x53, 0x98, 0xa6, 0x63, 0x1f, 0x59, 0xd6,
-	0xdc, 0x4a, 0xd4, 0x3d, 0xef, 0xde, 0x5a, 0xfa, 0xec, 0x77, 0x08, 0x27, 0xa9, 0xc2, 0xc2, 0x60,
-	0x96, 0xbe, 0x4f, 0x85, 0xc2, 0xcb, 0x4d, 0xa1, 0x30, 0xc7, 0xeb, 0x06, 0xb5, 0x21, 0x53, 0x18,
-	0x09, 0x59, 0x5c, 0x37, 0x18, 0x07, 0x93, 0xe0, 0x3c, 0x9a, 0x9d, 0x50, 0x7b, 0x52, 0xeb, 0xf7,
-	0xd3, 0x68, 0xe6, 0x04, 0xb9, 0x17, 0x92, 0x09, 0x44, 0x25, 0x6a, 0xa6, 0xb8, 0x34, 0x5c, 0xd4,
-	0x71, 0x38, 0x09, 0xce, 0x8f, 0xf2, 0xbb, 0x10, 0x21, 0xb0, 0x5f, 0x17, 0x15, 0xc6, 0x7b, 0x8e,
-	0x72, 0xcf, 0xe4, 0x09, 0x44, 0x52, 0x89, 0x1b, 0x5e, 0xa2, 0x5a, 0xf3, 0x32, 0xde, 0x77, 0x14,
-	0x74, 0xd0, 0x45, 0x49, 0x5e, 0xc3, 0x81, 0xd8, 0xd6, 0xa8, 0xe2, 0x03, 0xb7, 0xc8, 0x53, 0xb7,
-	0x48, 0x97, 0x22, 0xb5, 0x29, 0xf6, 0x0b, 0x7d, 0xd4, 0xd6, 0x91, 0xb7, 0x7a, 0xf2, 0x16, 0x40,
-	0xdb, 0x93, 0xd6, 0x5b, 0x6e, 0x36, 0xf1, 0x68, 0x57, 0xf7, 0x91, 0x33, 0x7d, 0xe6, 0x66, 0x43,
-	0xde, 0xc0, 0x3d, 0x97, 0x15, 0x13, 0x5f, 0xe3, 0x43, 0xe7, 0x7f, 0x4c, 0x87, 0x9a, 0xa5, 0x4b,
-	0xaf, 0xca, 0x7b, 0xfd, 0xd9, 0xcf, 0x00, 0xc6, 0x43, 0xf1, 0x6a, 0x29, 0x6a, 0x8d, 0x24, 0x81,
-	0x51, 0x5b, 0x96, 0xcf, 0xf7, 0xa1, 0x1b, 0xac, 0x24, 0xeb, 0x67, 0x5e, 0x3a, 0x3a, 0xf7, 0xb2,
-	0x3b, 0x85, 0x84, 0xbb, 0x16, 0x72, 0x1f, 0x42, 0x5e, 0xfa, 0xb0, 0x43, 0x5e, 0x92, 0x57, 0x70,
-	0xc8, 0xdc, 0x46, 0x6d, 0xcc, 0xd1, 0xec, 0x74, 0x60, 0xc6, 0x07, 0x5e, 0xa1, 0x36, 0x45, 0x25,
-	0xf3, 0x4e, 0x3c, 0xfb, 0x16, 0x00, 0x64, 0xac, 0xb2, 0x47, 0xbc, 0x5b, 0x5e, 0x90, 0x2d, 0x90,
-	0x7f, 0x0f, 0x23, 0xc9, 0x70, 0x32, 0xff, 0xfd, 0xc3, 0xc6, 0x2f, 0x77, 0x37, 0xb4, 0x99, 0x2d,
-	0x6a, 0x88, 0x99, 0xa8, 0x06, 0x6d, 0x8b, 0x07, 0xdd, 0x82, 0x92, 0xbb, 0x32, 0x96, 0xc1, 0x97,
-	0xc8, 0x0a, 0x3c, 0xff, 0x3d, 0xdc, 0x4b, 0xb3, 0xf4, 0x47, 0x78, 0x9c, 0xea, 0x39, 0xcd, 0x58,
-	0x45, 0xad, 0x96, 0x7e, 0x9a, 0x2e, 0x2c, 0xf9, 0xcb, 0xc1, 0xab, 0x8c, 0x55, 0x2b, 0x0b, 0xaf,
-	0x3c, 0x7c, 0x35, 0x72, 0x65, 0xce, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0x1f, 0x27, 0xaa, 0xb1,
-	0xf7, 0x03, 0x00, 0x00,
+	// 711 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x41, 0x6f, 0xd3, 0x4a,
+	0x10, 0x96, 0x9d, 0x36, 0x7d, 0x99, 0xf4, 0xf5, 0x49, 0xab, 0x4a, 0xcf, 0x89, 0xfa, 0xf4, 0x42,
+	0x2e, 0x14, 0x84, 0x1c, 0xd2, 0x48, 0x20, 0x24, 0x24, 0x68, 0xc3, 0x25, 0x07, 0xe4, 0xca, 0xb4,
+	0x20, 0xa1, 0x8a, 0xc8, 0x5d, 0xaf, 0x9a, 0x95, 0x6a, 0xaf, 0xbb, 0xeb, 0x34, 0xf4, 0xc6, 0x6f,
+	0xe1, 0xc8, 0x2f, 0x41, 0x9c, 0xf9, 0x1d, 0x5c, 0xb9, 0xa2, 0x1d, 0xaf, 0xdd, 0x40, 0xec, 0x12,
+	0xb5, 0xa8, 0xb7, 0x66, 0xe6, 0x9b, 0x6f, 0x66, 0xe7, 0xfb, 0xa6, 0x86, 0xbb, 0x54, 0x0d, 0x7a,
+	0x82, 0x46, 0x3d, 0x2a, 0x24, 0xeb, 0x9d, 0xf7, 0x8f, 0x59, 0x1a, 0xf4, 0x75, 0x60, 0xac, 0x03,
+	0xe3, 0x20, 0xe1, 0x6e, 0x22, 0x45, 0x2a, 0xc8, 0x26, 0x55, 0x03, 0x57, 0xd0, 0xc8, 0xd5, 0x71,
+	0xd7, 0x00, 0xdb, 0xf7, 0x74, 0x39, 0x0f, 0x59, 0x9c, 0xf2, 0xf4, 0xa2, 0x37, 0x55, 0x4c, 0x16,
+	0x1c, 0x92, 0x29, 0x31, 0x95, 0x94, 0xa9, 0x8c, 0xa0, 0xbd, 0xa5, 0xa1, 0x32, 0xa1, 0x05, 0x40,
+	0xa5, 0x41, 0x3a, 0xcd, 0xb3, 0x38, 0x87, 0x9a, 0x04, 0x92, 0xc7, 0x27, 0x38, 0x4f, 0x15, 0xcd,
+	0x03, 0x04, 0xa6, 0x42, 0x06, 0x27, 0xac, 0x97, 0x48, 0x71, 0xce, 0xc3, 0x2b, 0x9a, 0xfe, 0xa7,
+	0xd1, 0xe9, 0x45, 0xc2, 0x54, 0x01, 0xc1, 0x5f, 0x59, 0xba, 0xfb, 0x6d, 0x05, 0x5a, 0x43, 0xc9,
+	0x82, 0x94, 0x79, 0xc3, 0x97, 0x43, 0x21, 0xd9, 0xab, 0x49, 0x20, 0x99, 0xcf, 0xce, 0xa6, 0x4c,
+	0xa5, 0xa4, 0x0f, 0x75, 0x91, 0x04, 0x67, 0x53, 0xe6, 0x58, 0x1d, 0x6b, 0xbb, 0xb9, 0xd3, 0x72,
+	0xf5, 0x0e, 0xb2, 0x7a, 0xc3, 0xe6, 0x7a, 0x08, 0xf0, 0x0d, 0x90, 0x74, 0xa0, 0x19, 0x32, 0x45,
+	0x25, 0x4f, 0x52, 0x2e, 0x62, 0xc7, 0xee, 0x58, 0xdb, 0x0d, 0x7f, 0x3e, 0x44, 0x08, 0xac, 0xc4,
+	0x41, 0xc4, 0x9c, 0x1a, 0xa6, 0xf0, 0x6f, 0xf2, 0x3f, 0x34, 0xf3, 0xc1, 0xc7, 0x3c, 0x74, 0x56,
+	0x30, 0x05, 0x79, 0x68, 0x14, 0x92, 0xc7, 0xb0, 0x2a, 0x66, 0x31, 0x93, 0xce, 0x2a, 0x0e, 0x72,
+	0x07, 0x07, 0xc9, 0xd7, 0xee, 0xea, 0xb5, 0x17, 0x03, 0x1d, 0x2a, 0x26, 0x47, 0xa1, 0x9f, 0xe1,
+	0xc9, 0x13, 0xa8, 0x2b, 0x16, 0x87, 0x4c, 0x3a, 0xf5, 0x65, 0x2b, 0x4d, 0x01, 0x79, 0x0e, 0xa0,
+	0xf5, 0x60, 0xe3, 0x19, 0x4f, 0x27, 0xce, 0xda, 0xb2, 0xe5, 0x0d, 0x2c, 0x7a, 0xc3, 0xd3, 0x09,
+	0xf1, 0xe0, 0xef, 0xe2, 0x59, 0x7a, 0x6b, 0xce, 0x5f, 0x1d, 0x6b, 0x7b, 0x63, 0xe7, 0x3e, 0x92,
+	0x18, 0x09, 0xdd, 0x5c, 0xc2, 0x82, 0xc7, 0x37, 0x25, 0x07, 0x17, 0x09, 0xf3, 0xd7, 0xe5, 0xdc,
+	0x2f, 0xb2, 0x9b, 0x8f, 0x84, 0x6c, 0x0d, 0x64, 0xeb, 0x66, 0x6c, 0x99, 0x73, 0xd0, 0xa0, 0x39,
+	0x11, 0x6a, 0x89, 0x2c, 0xd9, 0x4c, 0x48, 0xf1, 0x14, 0x80, 0xbd, 0x4f, 0xb8, 0x0c, 0x50, 0x1f,
+	0xc0, 0x57, 0x6d, 0x95, 0xe8, 0x7a, 0xc0, 0x23, 0xa6, 0xd2, 0x20, 0x4a, 0xfc, 0x39, 0x3c, 0x79,
+	0x06, 0x0d, 0x34, 0x0e, 0x15, 0xa7, 0xca, 0x69, 0x76, 0x6a, 0xc5, 0x4a, 0xca, 0xfa, 0xef, 0x1b,
+	0xa4, 0x7f, 0x59, 0xd3, 0xfd, 0x6c, 0x41, 0xbb, 0xcc, 0x70, 0x2a, 0x11, 0xb1, 0x62, 0xa4, 0x07,
+	0xf5, 0xec, 0x2a, 0x8c, 0xe3, 0xfe, 0x45, 0x72, 0x99, 0xd0, 0xcb, 0x47, 0x61, 0xda, 0x37, 0xb0,
+	0x39, 0x8b, 0xda, 0xcb, 0x5a, 0x74, 0x03, 0x6c, 0x1e, 0x1a, 0xfb, 0xd9, 0x3c, 0x24, 0x8f, 0x60,
+	0x8d, 0xe2, 0x44, 0x99, 0xf1, 0x7e, 0xb7, 0x8e, 0x1c, 0xdc, 0xfd, 0x6a, 0x43, 0xeb, 0x30, 0x09,
+	0xff, 0xe4, 0xed, 0xac, 0xeb, 0xff, 0x3b, 0x99, 0xc2, 0x3c, 0x34, 0xc7, 0x03, 0x82, 0x46, 0xc8,
+	0x3c, 0x0a, 0x7f, 0xbd, 0xae, 0xda, 0xe2, 0x75, 0xfd, 0xec, 0x90, 0xd5, 0x9b, 0x3b, 0xa4, 0x7e,
+	0x13, 0x87, 0xac, 0x5d, 0xc3, 0x21, 0x1f, 0x2c, 0x68, 0x97, 0xad, 0xf5, 0xf6, 0x1c, 0xd2, 0x7d,
+	0x07, 0xad, 0x17, 0xec, 0x94, 0x95, 0x0b, 0x9b, 0xd9, 0xc7, 0x2a, 0xec, 0x73, 0x0d, 0x7e, 0xfd,
+	0xc4, 0xb2, 0x06, 0xb7, 0xf7, 0xc4, 0x9d, 0xef, 0x36, 0x80, 0x47, 0x23, 0xdd, 0x7c, 0x77, 0x7f,
+	0x44, 0x66, 0x40, 0x16, 0xaf, 0x92, 0xf4, 0xdc, 0xb2, 0x6f, 0x9e, 0x5b, 0xf9, 0xc1, 0x68, 0x3f,
+	0x5c, 0xbe, 0xc0, 0xbc, 0x75, 0x06, 0x64, 0x51, 0xec, 0xaa, 0xc6, 0x95, 0xd7, 0x56, 0xd5, 0xf8,
+	0x0a, 0x1f, 0xcd, 0x80, 0x2c, 0x4a, 0x50, 0xd5, 0xb8, 0xd2, 0x0d, 0x55, 0x8d, 0xab, 0xd5, 0xdd,
+	0x8b, 0xc1, 0xa1, 0x22, 0x2a, 0x2d, 0xdb, 0xfb, 0x27, 0x97, 0x24, 0xe1, 0x78, 0x1a, 0xfb, 0xd6,
+	0xdb, 0xa6, 0x06, 0x98, 0xfc, 0x47, 0xbb, 0x36, 0xf4, 0x86, 0x9f, 0xec, 0xcd, 0xa1, 0x1a, 0xb8,
+	0x1e, 0x8d, 0x5c, 0x8d, 0x75, 0x5f, 0xf7, 0xf7, 0x74, 0xf2, 0x0b, 0x86, 0x8f, 0x3c, 0x1a, 0x1d,
+	0xe9, 0xf0, 0x91, 0x09, 0x1f, 0xd7, 0xf1, 0xb4, 0x06, 0x3f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xd8,
+	0xa2, 0xd7, 0x40, 0xe9, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -258,8 +565,15 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type OcmCoreAPIClient interface {
-	// Creates a new ocm share.
+	// Creates a new OCM share, in response to a call from remote to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1shares/post
 	CreateOCMCoreShare(ctx context.Context, in *CreateOCMCoreShareRequest, opts ...grpc.CallOption) (*CreateOCMCoreShareResponse, error)
+	// Updates an OCM share, in response to a notification from the remote system to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+	UpdateOCMCoreShare(ctx context.Context, in *UpdateOCMCoreShareRequest, opts ...grpc.CallOption) (*UpdateOCMCoreShareResponse, error)
+	// Deletes an OCM share, in response to a notification from the remote system to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+	DeleteOCMCoreShare(ctx context.Context, in *DeleteOCMCoreShareRequest, opts ...grpc.CallOption) (*DeleteOCMCoreShareResponse, error)
 }
 
 type ocmCoreAPIClient struct {
@@ -279,10 +593,35 @@ func (c *ocmCoreAPIClient) CreateOCMCoreShare(ctx context.Context, in *CreateOCM
 	return out, nil
 }
 
+func (c *ocmCoreAPIClient) UpdateOCMCoreShare(ctx context.Context, in *UpdateOCMCoreShareRequest, opts ...grpc.CallOption) (*UpdateOCMCoreShareResponse, error) {
+	out := new(UpdateOCMCoreShareResponse)
+	err := c.cc.Invoke(ctx, "/cs3.ocm.core.v1beta1.OcmCoreAPI/UpdateOCMCoreShare", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ocmCoreAPIClient) DeleteOCMCoreShare(ctx context.Context, in *DeleteOCMCoreShareRequest, opts ...grpc.CallOption) (*DeleteOCMCoreShareResponse, error) {
+	out := new(DeleteOCMCoreShareResponse)
+	err := c.cc.Invoke(ctx, "/cs3.ocm.core.v1beta1.OcmCoreAPI/DeleteOCMCoreShare", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OcmCoreAPIServer is the server API for OcmCoreAPI service.
 type OcmCoreAPIServer interface {
-	// Creates a new ocm share.
+	// Creates a new OCM share, in response to a call from remote to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1shares/post
 	CreateOCMCoreShare(context.Context, *CreateOCMCoreShareRequest) (*CreateOCMCoreShareResponse, error)
+	// Updates an OCM share, in response to a notification from the remote system to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+	UpdateOCMCoreShare(context.Context, *UpdateOCMCoreShareRequest) (*UpdateOCMCoreShareResponse, error)
+	// Deletes an OCM share, in response to a notification from the remote system to:
+	// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+	DeleteOCMCoreShare(context.Context, *DeleteOCMCoreShareRequest) (*DeleteOCMCoreShareResponse, error)
 }
 
 // UnimplementedOcmCoreAPIServer can be embedded to have forward compatible implementations.
@@ -291,6 +630,12 @@ type UnimplementedOcmCoreAPIServer struct {
 
 func (*UnimplementedOcmCoreAPIServer) CreateOCMCoreShare(ctx context.Context, req *CreateOCMCoreShareRequest) (*CreateOCMCoreShareResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOCMCoreShare not implemented")
+}
+func (*UnimplementedOcmCoreAPIServer) UpdateOCMCoreShare(ctx context.Context, req *UpdateOCMCoreShareRequest) (*UpdateOCMCoreShareResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateOCMCoreShare not implemented")
+}
+func (*UnimplementedOcmCoreAPIServer) DeleteOCMCoreShare(ctx context.Context, req *DeleteOCMCoreShareRequest) (*DeleteOCMCoreShareResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOCMCoreShare not implemented")
 }
 
 func RegisterOcmCoreAPIServer(s *grpc.Server, srv OcmCoreAPIServer) {
@@ -315,6 +660,42 @@ func _OcmCoreAPI_CreateOCMCoreShare_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OcmCoreAPI_UpdateOCMCoreShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOCMCoreShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcmCoreAPIServer).UpdateOCMCoreShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cs3.ocm.core.v1beta1.OcmCoreAPI/UpdateOCMCoreShare",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcmCoreAPIServer).UpdateOCMCoreShare(ctx, req.(*UpdateOCMCoreShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OcmCoreAPI_DeleteOCMCoreShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOCMCoreShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcmCoreAPIServer).DeleteOCMCoreShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cs3.ocm.core.v1beta1.OcmCoreAPI/DeleteOCMCoreShare",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcmCoreAPIServer).DeleteOCMCoreShare(ctx, req.(*DeleteOCMCoreShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _OcmCoreAPI_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "cs3.ocm.core.v1beta1.OcmCoreAPI",
 	HandlerType: (*OcmCoreAPIServer)(nil),
@@ -322,6 +703,14 @@ var _OcmCoreAPI_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateOCMCoreShare",
 			Handler:    _OcmCoreAPI_CreateOCMCoreShare_Handler,
+		},
+		{
+			MethodName: "UpdateOCMCoreShare",
+			Handler:    _OcmCoreAPI_UpdateOCMCoreShare_Handler,
+		},
+		{
+			MethodName: "DeleteOCMCoreShare",
+			Handler:    _OcmCoreAPI_DeleteOCMCoreShare_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

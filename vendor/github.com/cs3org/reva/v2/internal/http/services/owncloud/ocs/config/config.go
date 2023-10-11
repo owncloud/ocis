@@ -47,6 +47,9 @@ type Config struct {
 	MachineAuthAPIKey                     string                            `mapstructure:"machine_auth_apikey"`
 	SkipUpdatingExistingSharesMountpoints bool                              `mapstructure:"skip_updating_existing_shares_mountpoint"`
 	EnableDenials                         bool                              `mapstructure:"enable_denials"`
+	OCMMountPoint                         string                            `mapstructure:"ocm_mount_point"`
+	ListOCMShares                         bool                              `mapstructure:"list_ocm_shares"`
+	Notifications                         map[string]interface{}            `mapstructure:"notifications"`
 }
 
 // Init sets sane defaults

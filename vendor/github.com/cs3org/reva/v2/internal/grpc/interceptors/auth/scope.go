@@ -32,6 +32,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -81,6 +82,10 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 
 			case strings.HasPrefix(k, "lightweight"):
 				if err = resolveLightweightScope(ctx, ref, tokenScope[k], user, client, mgr); err == nil {
+					return nil
+				}
+			case strings.HasPrefix(k, "ocmshare"):
+				if err = resolveOCMShare(ctx, ref, tokenScope[k], client, mgr); err == nil {
 					return nil
 				}
 			}
@@ -156,6 +161,21 @@ func resolvePublicShare(ctx context.Context, ref *provider.Reference, scope *aut
 	var share link.PublicShare
 	err := utils.UnmarshalJSONToProtoV1(scope.Resource.Value, &share)
 	if err != nil {
+		return err
+	}
+
+	if err := checkCacheForNestedResource(ctx, ref, share.ResourceId, client, mgr); err == nil {
+		return nil
+	}
+
+	// Some services like wopi don't access the shared resource relative to the
+	// share root but instead relative to the shared resources parent.
+	return checkRelativeReference(ctx, ref, share.ResourceId, client)
+}
+
+func resolveOCMShare(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, client gateway.GatewayAPIClient, mgr token.Manager) error {
+	var share ocmv1beta1.Share
+	if err := utils.UnmarshalJSONToProtoV1(scope.Resource.Value, &share); err != nil {
 		return err
 	}
 

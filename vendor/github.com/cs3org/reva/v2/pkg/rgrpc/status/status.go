@@ -131,6 +131,14 @@ func NewAlreadyExists(ctx context.Context, err error, msg string) *rpc.Status {
 	}
 }
 
+// NewInvalidArg returns a Status with CODE_INVALID_ARGUMENT.
+func NewInvalidArg(ctx context.Context, msg string) *rpc.Status {
+	return &rpc.Status{Code: rpc.Code_CODE_INVALID_ARGUMENT,
+		Message: msg,
+		Trace:   getTrace(ctx),
+	}
+}
+
 // NewConflict returns a Status with Code_CODE_ABORTED.
 //
 // Deprecated: NewConflict exists for historical compatibility
