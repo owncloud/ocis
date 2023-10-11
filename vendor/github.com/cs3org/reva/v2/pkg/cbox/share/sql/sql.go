@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -34,6 +35,7 @@ import (
 	conversions "github.com/cs3org/reva/v2/pkg/cbox/utils"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -60,11 +62,13 @@ type config struct {
 	DbHost     string `mapstructure:"db_host"`
 	DbPort     int    `mapstructure:"db_port"`
 	DbName     string `mapstructure:"db_name"`
+	GatewaySvc string `mapstructure:"gatewaysvc"`
 }
 
 type mgr struct {
-	c  *config
-	db *sql.DB
+	c      *config
+	db     *sql.DB
+	client gatewayv1beta1.GatewayAPIClient
 }
 
 // New returns a new share manager.
@@ -80,9 +84,15 @@ func New(m map[string]interface{}) (share.Manager, error) {
 		return nil, err
 	}
 
+	gw, err := pool.GetGatewayServiceClient(c.GatewaySvc)
+	if err != nil {
+		return nil, err
+	}
+
 	return &mgr{
-		c:  c,
-		db: db,
+		c:      c,
+		db:     db,
+		client: gw,
 	}, nil
 }
 
@@ -175,7 +185,11 @@ func (m *mgr) getByID(ctx context.Context, id *collaboration.ShareId) (*collabor
 		}
 		return nil, err
 	}
-	return conversions.ConvertToCS3Share(s), nil
+	share, err := conversions.ConvertToCS3Share(ctx, m.client, s)
+	if err != nil {
+		return nil, err
+	}
+	return share, nil
 }
 
 func (m *mgr) getByKey(ctx context.Context, key *collaboration.ShareKey) (*collaboration.Share, error) {
@@ -191,7 +205,11 @@ func (m *mgr) getByKey(ctx context.Context, key *collaboration.ShareKey) (*colla
 		}
 		return nil, err
 	}
-	return conversions.ConvertToCS3Share(s), nil
+	share, err := conversions.ConvertToCS3Share(ctx, m.client, s)
+	if err != nil {
+		return nil, err
+	}
+	return share, nil
 }
 
 func (m *mgr) GetShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.Share, error) {
@@ -313,7 +331,11 @@ func (m *mgr) ListShares(ctx context.Context, filters []*collaboration.Filter) (
 		if err := rows.Scan(&s.UIDOwner, &s.UIDInitiator, &s.ShareWith, &s.Prefix, &s.ItemSource, &s.ItemType, &s.ID, &s.STime, &s.Permissions, &s.ShareType); err != nil {
 			continue
 		}
-		shares = append(shares, conversions.ConvertToCS3Share(s))
+		share, err := conversions.ConvertToCS3Share(ctx, m.client, s)
+		if err != nil {
+			continue
+		}
+		shares = append(shares, share)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -323,7 +345,7 @@ func (m *mgr) ListShares(ctx context.Context, filters []*collaboration.Filter) (
 }
 
 // we list the shares that are targeted to the user in context or to the user groups.
-func (m *mgr) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (m *mgr) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, _ *userpb.UserId) ([]*collaboration.ReceivedShare, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
 	uid := conversions.FormatUserID(user.Id)
 
@@ -365,7 +387,11 @@ func (m *mgr) ListReceivedShares(ctx context.Context, filters []*collaboration.F
 		if err := rows.Scan(&s.UIDOwner, &s.UIDInitiator, &s.ShareWith, &s.Prefix, &s.ItemSource, &s.ItemType, &s.FileTarget, &s.ID, &s.STime, &s.Permissions, &s.ShareType, &s.State); err != nil {
 			continue
 		}
-		shares = append(shares, conversions.ConvertToCS3ReceivedShare(s))
+		share, err := conversions.ConvertToCS3ReceivedShare(ctx, m.client, s)
+		if err != nil {
+			continue
+		}
+		shares = append(shares, share)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -400,7 +426,11 @@ func (m *mgr) getReceivedByID(ctx context.Context, id *collaboration.ShareId) (*
 		}
 		return nil, err
 	}
-	return conversions.ConvertToCS3ReceivedShare(s), nil
+	share, err := conversions.ConvertToCS3ReceivedShare(ctx, m.client, s)
+	if err != nil {
+		return nil, err
+	}
+	return share, nil
 }
 
 func (m *mgr) getReceivedByKey(ctx context.Context, key *collaboration.ShareKey) (*collaboration.ReceivedShare, error) {
@@ -431,7 +461,11 @@ func (m *mgr) getReceivedByKey(ctx context.Context, key *collaboration.ShareKey)
 		}
 		return nil, err
 	}
-	return conversions.ConvertToCS3ReceivedShare(s), nil
+	share, err := conversions.ConvertToCS3ReceivedShare(ctx, m.client, s)
+	if err != nil {
+		return nil, err
+	}
+	return share, nil
 }
 
 func (m *mgr) GetReceivedShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.ReceivedShare, error) {

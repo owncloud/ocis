@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2023 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,26 +20,39 @@ package invite
 
 import (
 	"context"
+	"errors"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
-	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 )
 
-// Manager is the interface that is used to perform operations to invites.
-type Manager interface {
-	// GenerateToken creates a new token for the user with a specified validity.
-	GenerateToken(ctx context.Context) (*invitepb.InviteToken, error)
+// Repository is the interfaces used to store the tokens and the invited users.
+type Repository interface {
+	// AddToken stores the token in the repository.
+	AddToken(ctx context.Context, token *invitepb.InviteToken) error
 
-	// ForwardInvite forwards a received invite to the sync'n'share system provider.
-	ForwardInvite(ctx context.Context, invite *invitepb.InviteToken, originProvider *ocmprovider.ProviderInfo) error
+	// GetToken gets the token from the repository.
+	GetToken(ctx context.Context, token string) (*invitepb.InviteToken, error)
 
-	// AcceptInvite completes an invitation acceptance.
-	AcceptInvite(ctx context.Context, invite *invitepb.InviteToken, remoteUser *userpb.User) error
+	// ListTokens gets the valid tokens from the repository (i.e. not expired).
+	ListTokens(ctx context.Context, initiator *userpb.UserId) ([]*invitepb.InviteToken, error)
 
-	// GetAcceptedUser retrieves details about a remote user who has accepted an invite to share.
-	GetAcceptedUser(ctx context.Context, remoteUserID *userpb.UserId) (*userpb.User, error)
+	// AddRemoteUser stores the remote user.
+	AddRemoteUser(ctx context.Context, initiator *userpb.UserId, remoteUser *userpb.User) error
 
-	// FindAcceptedUsers finds remote users who have accepted invites based on their attributes.
-	FindAcceptedUsers(ctx context.Context, query string) ([]*userpb.User, error)
+	// GetRemoteUser retrieves details about a remote user who has accepted an invite to share.
+	GetRemoteUser(ctx context.Context, initiator *userpb.UserId, remoteUserID *userpb.UserId) (*userpb.User, error)
+
+	// FindRemoteUsers finds remote users who have accepted invites based on their attributes.
+	FindRemoteUsers(ctx context.Context, initiator *userpb.UserId, query string) ([]*userpb.User, error)
+
+	// DeleteRemoteUser removes from the remote user from the initiator's list.
+	DeleteRemoteUser(ctx context.Context, initiator *userpb.UserId, remoteUser *userpb.UserId) error
 }
+
+// ErrTokenNotFound is the error returned when the token does not exist.
+var ErrTokenNotFound = errors.New("token not found")
+
+// ErrUserAlreadyAccepted is the error returned when the user was
+// already added to the accepted users list.
+var ErrUserAlreadyAccepted = errors.New("user already added to accepted users")

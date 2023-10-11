@@ -334,7 +334,7 @@ github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
 github.com/crewjam/saml/xmlenc
-# github.com/cs3org/go-cs3apis v0.0.0-20230516150832-730ac860c71d => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147
+# github.com/cs3org/go-cs3apis v0.0.0-20230727093620-0f4399be4543 => github.com/aduffeck/go-cs3apis v0.0.0-20231009082215-ad45e19edac0
 ## explicit; go 1.13
 github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1
@@ -357,7 +357,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.16.1-0.20231004143709-c089e31b8175
+# github.com/cs3org/reva/v2 v2.16.1-0.20231011081722-044d686b88e1
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -401,8 +401,10 @@ github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/loader
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/registry
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/basic
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/bearer
+github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/ocmshares
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/token/loader
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/token/registry
+github.com/cs3org/reva/v2/internal/http/interceptors/auth/token/strategy/bearer
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/token/strategy/header
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/tokenwriter/loader
 github.com/cs3org/reva/v2/internal/http/interceptors/auth/tokenwriter/registry
@@ -421,7 +423,6 @@ github.com/cs3org/reva/v2/internal/http/services/dataprovider
 github.com/cs3org/reva/v2/internal/http/services/helloworld
 github.com/cs3org/reva/v2/internal/http/services/loader
 github.com/cs3org/reva/v2/internal/http/services/mentix
-github.com/cs3org/reva/v2/internal/http/services/meshdirectory
 github.com/cs3org/reva/v2/internal/http/services/metrics
 github.com/cs3org/reva/v2/internal/http/services/ocmd
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav
@@ -444,7 +445,9 @@ github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/handlers/config
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response
 github.com/cs3org/reva/v2/internal/http/services/preferences
 github.com/cs3org/reva/v2/internal/http/services/prometheus
+github.com/cs3org/reva/v2/internal/http/services/reqres
 github.com/cs3org/reva/v2/internal/http/services/reverseproxy
+github.com/cs3org/reva/v2/internal/http/services/sciencemesh
 github.com/cs3org/reva/v2/internal/http/services/siteacc
 github.com/cs3org/reva/v2/internal/http/services/sysinfo
 github.com/cs3org/reva/v2/internal/http/services/wellknown
@@ -471,6 +474,7 @@ github.com/cs3org/reva/v2/pkg/auth/manager/ldap
 github.com/cs3org/reva/v2/pkg/auth/manager/loader
 github.com/cs3org/reva/v2/pkg/auth/manager/machine
 github.com/cs3org/reva/v2/pkg/auth/manager/nextcloud
+github.com/cs3org/reva/v2/pkg/auth/manager/ocmshares
 github.com/cs3org/reva/v2/pkg/auth/manager/oidc
 github.com/cs3org/reva/v2/pkg/auth/manager/owncloudsql
 github.com/cs3org/reva/v2/pkg/auth/manager/owncloudsql/accounts
@@ -537,12 +541,13 @@ github.com/cs3org/reva/v2/pkg/metrics/driver/xcloud
 github.com/cs3org/reva/v2/pkg/metrics/reader
 github.com/cs3org/reva/v2/pkg/micro/ocdav
 github.com/cs3org/reva/v2/pkg/mime
+github.com/cs3org/reva/v2/pkg/ocm/client
 github.com/cs3org/reva/v2/pkg/ocm/invite
-github.com/cs3org/reva/v2/pkg/ocm/invite/manager/json
-github.com/cs3org/reva/v2/pkg/ocm/invite/manager/loader
-github.com/cs3org/reva/v2/pkg/ocm/invite/manager/memory
-github.com/cs3org/reva/v2/pkg/ocm/invite/manager/registry
-github.com/cs3org/reva/v2/pkg/ocm/invite/token
+github.com/cs3org/reva/v2/pkg/ocm/invite/repository/json
+github.com/cs3org/reva/v2/pkg/ocm/invite/repository/loader
+github.com/cs3org/reva/v2/pkg/ocm/invite/repository/memory
+github.com/cs3org/reva/v2/pkg/ocm/invite/repository/registry
+github.com/cs3org/reva/v2/pkg/ocm/invite/repository/sql
 github.com/cs3org/reva/v2/pkg/ocm/provider
 github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/json
 github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/loader
@@ -550,11 +555,11 @@ github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/mentix
 github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/open
 github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/registry
 github.com/cs3org/reva/v2/pkg/ocm/share
-github.com/cs3org/reva/v2/pkg/ocm/share/manager/json
-github.com/cs3org/reva/v2/pkg/ocm/share/manager/loader
-github.com/cs3org/reva/v2/pkg/ocm/share/manager/nextcloud
-github.com/cs3org/reva/v2/pkg/ocm/share/manager/registry
-github.com/cs3org/reva/v2/pkg/ocm/share/sender
+github.com/cs3org/reva/v2/pkg/ocm/share/repository/json
+github.com/cs3org/reva/v2/pkg/ocm/share/repository/loader
+github.com/cs3org/reva/v2/pkg/ocm/share/repository/nextcloud
+github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry
+github.com/cs3org/reva/v2/pkg/ocm/storage/received
 github.com/cs3org/reva/v2/pkg/password
 github.com/cs3org/reva/v2/pkg/permission
 github.com/cs3org/reva/v2/pkg/permission/manager/demo
@@ -707,7 +712,9 @@ github.com/cs3org/reva/v2/pkg/user/manager/owncloudsql
 github.com/cs3org/reva/v2/pkg/user/manager/owncloudsql/accounts
 github.com/cs3org/reva/v2/pkg/user/manager/registry
 github.com/cs3org/reva/v2/pkg/utils
+github.com/cs3org/reva/v2/pkg/utils/cfg
 github.com/cs3org/reva/v2/pkg/utils/ldap
+github.com/cs3org/reva/v2/pkg/utils/list
 github.com/cs3org/reva/v2/tests/cs3mocks/mocks
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
@@ -941,6 +948,18 @@ github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry
 ## explicit; go 1.13
 github.com/go-ozzo/ozzo-validation/v4
 github.com/go-ozzo/ozzo-validation/v4/is
+# github.com/go-playground/locales v0.13.0
+## explicit; go 1.13
+github.com/go-playground/locales
+github.com/go-playground/locales/currency
+github.com/go-playground/locales/en
+# github.com/go-playground/universal-translator v0.17.0
+## explicit; go 1.13
+github.com/go-playground/universal-translator
+# github.com/go-playground/validator/v10 v10.4.1
+## explicit; go 1.13
+github.com/go-playground/validator/v10
+github.com/go-playground/validator/v10/translations/en
 # github.com/go-redis/redis/v8 v8.11.5
 ## explicit; go 1.17
 github.com/go-redis/redis/v8
@@ -1198,6 +1217,9 @@ github.com/klauspost/compress/s2
 # github.com/klauspost/cpuid/v2 v2.1.0
 ## explicit; go 1.15
 github.com/klauspost/cpuid/v2
+# github.com/leodido/go-urn v1.2.0
+## explicit; go 1.13
+github.com/leodido/go-urn
 # github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 ## explicit; go 1.13
 github.com/leonelquinteros/gotext
@@ -1617,9 +1639,6 @@ github.com/russellhaering/goxmldsig/types
 # github.com/russross/blackfriday/v2 v2.1.0
 ## explicit
 github.com/russross/blackfriday/v2
-# github.com/sciencemesh/meshdirectory-web v1.0.4
-## explicit; go 1.16
-github.com/sciencemesh/meshdirectory-web
 # github.com/segmentio/ksuid v1.0.4
 ## explicit; go 1.12
 github.com/segmentio/ksuid
@@ -1669,6 +1688,9 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
+# github.com/studio-b12/gowebdav v0.0.0-20221015232716-17255f2e7423
+## explicit; go 1.17
+github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.1
 ## explicit; go 1.16
 github.com/tchap/go-patricia/v2/patricia
@@ -2233,4 +2255,4 @@ stash.kopano.io/kgol/oidc-go
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
-# github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20230918130959-ae732d4b8147
+# github.com/cs3org/go-cs3apis => github.com/aduffeck/go-cs3apis v0.0.0-20231009082215-ad45e19edac0

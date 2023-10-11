@@ -112,7 +112,11 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				Path:       fn,
 			}
 			var info provider.ResourceInfo
-			info, err = fs.Upload(ctx, ref, r.Body, func(spaceOwner, owner *userpb.UserId, ref *provider.Reference) {
+			info, err = fs.Upload(ctx, storage.UploadRequest{
+				Ref:    ref,
+				Body:   r.Body,
+				Length: r.ContentLength,
+			}, func(spaceOwner, owner *userpb.UserId, ref *provider.Reference) {
 				datatx.InvalidateCache(owner, ref, m.statCache)
 				if err := datatx.EmitFileUploadedEvent(spaceOwner, owner, ref, m.publisher); err != nil {
 					sublog.Error().Err(err).Msg("failed to publish FileUploaded event")

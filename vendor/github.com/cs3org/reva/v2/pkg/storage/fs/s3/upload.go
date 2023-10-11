@@ -20,7 +20,6 @@ package s3
 
 import (
 	"context"
-	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -33,10 +32,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (fs *s3FS) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
 	log := appctx.GetLogger(ctx)
 
-	fn, err := fs.resolve(ctx, ref)
+	fn, err := fs.resolve(ctx, req.Ref)
 	if err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "error resolving ref")
 	}
@@ -44,7 +43,7 @@ func (fs *s3FS) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCl
 	upParams := &s3manager.UploadInput{
 		Bucket: aws.String(fs.config.Bucket),
 		Key:    aws.String(fn),
-		Body:   r,
+		Body:   req.Body,
 	}
 	uploader := s3manager.NewUploaderWithClient(fs.client)
 	result, err := uploader.Upload(upParams)
@@ -62,7 +61,7 @@ func (fs *s3FS) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCl
 	log.Debug().Interface("result", result) // todo cache etag?
 
 	// return id, etag and mtime
-	ri, err := fs.GetMD(ctx, ref, []string{}, []string{"id", "etag", "mtime"})
+	ri, err := fs.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
 	if err != nil {
 		return provider.ResourceInfo{}, err
 	}

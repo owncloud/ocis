@@ -44,7 +44,7 @@ import (
 var tracer trace.Tracer
 
 func init() {
-	tracer = otel.Tracer("github.com/cs3org/reva/pkg/share/manager/jsoncs3/providercache")
+	tracer = otel.Tracer("github.com/cs3org/reva/v2/pkg/share/manager/jsoncs3/providercache")
 }
 
 // Cache holds share information structured by provider and space

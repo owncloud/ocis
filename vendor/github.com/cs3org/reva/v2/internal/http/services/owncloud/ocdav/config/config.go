@@ -16,6 +16,7 @@ type Config struct {
 	// /users/<first char of username>/<username>/docs
 	WebdavNamespace string `mapstructure:"webdav_namespace"`
 	SharesNamespace string `mapstructure:"shares_namespace"`
+	OCMNamespace    string `mapstructure:"ocm_namespace"`
 	GatewaySvc      string `mapstructure:"gatewaysvc"`
 	Timeout         int64  `mapstructure:"timeout"`
 	Insecure        bool   `mapstructure:"insecure"`

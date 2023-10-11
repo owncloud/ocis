@@ -173,6 +173,13 @@ func SharesNamespace(val string) Option {
 	}
 }
 
+// OCMNamespace provides a function to set the OCMNamespace config option.
+func OCMNamespace(val string) Option {
+	return func(o *Options) {
+		o.config.OCMNamespace = val
+	}
+}
+
 // GatewaySvc provides a function to set the GatewaySvc config option.
 func GatewaySvc(val string) Option {
 	return func(o *Options) {

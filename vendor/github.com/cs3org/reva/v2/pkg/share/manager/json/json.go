@@ -475,11 +475,22 @@ func (m *mgr) ListShares(ctx context.Context, filters []*collaboration.Filter) (
 }
 
 // we list the shares that are targeted to the user in context or to the user groups.
-func (m *mgr) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (m *mgr) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userv1beta1.UserId) ([]*collaboration.ReceivedShare, error) {
 	m.Lock()
 	defer m.Unlock()
 
 	user := ctxpkg.ContextMustGetUser(ctx)
+	if user.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
+		gwc, err := pool.GetGatewayServiceClient(m.c.GatewayAddr)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list shares")
+		}
+		u, err := utils.GetUser(forUser, gwc)
+		if err != nil {
+			return nil, errtypes.BadRequest("user not found")
+		}
+		user = u
+	}
 	mem := make(map[string]int)
 	var rss []*collaboration.ReceivedShare
 	for _, s := range m.model.Shares {

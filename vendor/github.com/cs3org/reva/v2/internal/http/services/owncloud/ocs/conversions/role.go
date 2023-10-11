@@ -45,6 +45,8 @@ const (
 	RoleSpaceEditor = "spaceeditor"
 	// RoleFileEditor grants editor permission on a single file.
 	RoleFileEditor = "file-editor"
+	// RoleCoowner grants co-owner permissions on a resource.
+	RoleCoowner = "coowner"
 	// RoleUploader grants uploader permission to upload onto a resource.
 	RoleUploader = "uploader"
 	// RoleManager grants manager permissions on a resource. Semantically equivalent to co-owner.
@@ -283,6 +285,34 @@ func NewFileEditorRole() *Role {
 			RestoreRecycleItem:   true,
 		},
 		ocsPermissions: PermissionRead | PermissionWrite,
+	}
+}
+
+// NewCoownerRole creates a coowner role.
+func NewCoownerRole() *Role {
+	return &Role{
+		Name: RoleCoowner,
+		cS3ResourcePermissions: &provider.ResourcePermissions{
+			GetPath:              true,
+			GetQuota:             true,
+			InitiateFileDownload: true,
+			ListGrants:           true,
+			ListContainer:        true,
+			ListFileVersions:     true,
+			ListRecycle:          true,
+			Stat:                 true,
+			InitiateFileUpload:   true,
+			RestoreFileVersion:   true,
+			RestoreRecycleItem:   true,
+			CreateContainer:      true,
+			Delete:               true,
+			Move:                 true,
+			PurgeRecycle:         true,
+			AddGrant:             true,
+			UpdateGrant:          true,
+			RemoveGrant:          true,
+		},
+		ocsPermissions: PermissionAll,
 	}
 }
 

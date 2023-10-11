@@ -20,6 +20,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -282,11 +283,15 @@ func (m *manager) ListShares(ctx context.Context, filters []*collaboration.Filte
 }
 
 // we list the shares that are targeted to the user in context or to the user groups.
-func (m *manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (m *manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userv1beta1.UserId) ([]*collaboration.ReceivedShare, error) {
 	var rss []*collaboration.ReceivedShare
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	user := ctxpkg.ContextMustGetUser(ctx)
+	if user.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
+		// TODO: gateway missing!
+		return nil, errors.New("can't use inmem share manager and service accounts")
+	}
 	for _, s := range m.shares {
 		if share.IsCreatedByUser(s, user) || !share.IsGrantedToUser(s, user) {
 			// omit shares created by the user or shares the user can't access

@@ -22,5 +22,6 @@ import (
 	// Load core authentication strategies.
 	_ "github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/basic"
 	_ "github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/bearer"
+	_ "github.com/cs3org/reva/v2/internal/http/interceptors/auth/credential/strategy/ocmshares"
 	// Add your own here.
 )

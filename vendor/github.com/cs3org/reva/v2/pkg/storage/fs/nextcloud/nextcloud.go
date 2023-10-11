@@ -397,14 +397,14 @@ func (nc *StorageDriver) InitiateUpload(ctx context.Context, ref *provider.Refer
 }
 
 // Upload as defined in the storage.FS interface
-func (nc *StorageDriver) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, _ storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	err := nc.doUpload(ctx, ref.Path, r)
+func (nc *StorageDriver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+	err := nc.doUpload(ctx, req.Ref.Path, req.Body)
 	if err != nil {
 		return provider.ResourceInfo{}, err
 	}
 
 	// return id, etag and mtime
-	ri, err := nc.GetMD(ctx, ref, []string{}, []string{"id", "etag", "mtime"})
+	ri, err := nc.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
 	if err != nil {
 		return provider.ResourceInfo{}, err
 	}

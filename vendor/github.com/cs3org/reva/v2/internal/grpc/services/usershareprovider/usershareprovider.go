@@ -246,7 +246,10 @@ func (s *service) ListReceivedShares(ctx context.Context, req *collaboration.Lis
 	if !foundExclude {
 		req.Filters = append(req.Filters, &collaboration.Filter{Type: collaboration.Filter_TYPE_EXCLUDE_DENIALS})
 	}
-	shares, err := s.sm.ListReceivedShares(ctx, req.Filters) // TODO(labkode): check what to update
+
+	var uid userpb.UserId
+	_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &uid)
+	shares, err := s.sm.ListReceivedShares(ctx, req.Filters, &uid) // TODO(labkode): check what to update
 	if err != nil {
 		return &collaboration.ListReceivedSharesResponse{
 			Status: status.NewInternal(ctx, "error listing received shares"),

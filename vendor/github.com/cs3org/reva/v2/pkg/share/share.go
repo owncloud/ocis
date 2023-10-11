@@ -62,13 +62,13 @@ type Manager interface {
 	// it returns only shares attached to the given resource.
 	ListShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.Share, error)
 
-	// ListReceivedShares returns the list of shares the user has access to.
-	ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
+	// ListReceivedShares returns the list of shares the user has access to. `forUser` parameter for service accounts only
+	ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userv1beta1.UserId) ([]*collaboration.ReceivedShare, error)
 
 	// GetReceivedShare returns the information for a received share.
 	GetReceivedShare(ctx context.Context, ref *collaboration.ShareReference) (*collaboration.ReceivedShare, error)
 
-	// UpdateReceivedShare updates the received share with share state.
+	// UpdateReceivedShare updates the received share with share state.`forUser` parameter for service accounts only
 	UpdateReceivedShare(ctx context.Context, share *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userv1beta1.UserId) (*collaboration.ReceivedShare, error)
 }
 

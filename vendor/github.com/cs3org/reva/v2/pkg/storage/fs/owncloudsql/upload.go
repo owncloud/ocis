@@ -49,8 +49,8 @@ import (
 
 var defaultFilePerm = os.FileMode(0664)
 
-func (fs *owncloudsqlfs) Upload(ctx context.Context, ref *provider.Reference, r io.ReadCloser, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	upload, err := fs.GetUpload(ctx, ref.GetPath())
+func (fs *owncloudsqlfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+	upload, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "owncloudsql: error retrieving upload")
 	}
@@ -60,7 +60,7 @@ func (fs *owncloudsqlfs) Upload(ctx context.Context, ref *provider.Reference, r 
 	p := uploadInfo.info.Storage["InternalDestination"]
 	if chunking.IsChunked(p) {
 		var assembledFile string
-		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, r)
+		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, req.Body)
 		if err != nil {
 			return provider.ResourceInfo{}, err
 		}
@@ -68,7 +68,7 @@ func (fs *owncloudsqlfs) Upload(ctx context.Context, ref *provider.Reference, r 
 			if err = uploadInfo.Terminate(ctx); err != nil {
 				return provider.ResourceInfo{}, errors.Wrap(err, "owncloudsql: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(ref.String())
+			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.info.Storage["InternalDestination"] = p
 		fd, err := os.Open(assembledFile)
@@ -77,10 +77,10 @@ func (fs *owncloudsqlfs) Upload(ctx context.Context, ref *provider.Reference, r 
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
-		r = fd
+		req.Body = fd
 	}
 
-	if _, err := uploadInfo.WriteChunk(ctx, 0, r); err != nil {
+	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
 		return provider.ResourceInfo{}, errors.Wrap(err, "owncloudsql: error writing to binary file")
 	}
 

@@ -31,6 +31,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -39,6 +40,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -59,11 +61,13 @@ type config struct {
 	DbHost                     string `mapstructure:"db_host"`
 	DbPort                     int    `mapstructure:"db_port"`
 	DbName                     string `mapstructure:"db_name"`
+	GatewaySvc                 string `mapstructure:"gatewaysvc"`
 }
 
 type manager struct {
-	c  *config
-	db *sql.DB
+	c      *config
+	db     *sql.DB
+	client gatewayv1beta1.GatewayAPIClient
 }
 
 func (c *config) init() {
@@ -107,9 +111,15 @@ func New(m map[string]interface{}) (publicshare.Manager, error) {
 		return nil, err
 	}
 
+	gw, err := pool.GetGatewayServiceClient(c.GatewaySvc)
+	if err != nil {
+		return nil, err
+	}
+
 	mgr := manager{
-		c:  c,
-		db: db,
+		c:      c,
+		db:     db,
+		client: gw,
 	}
 	go mgr.startJanitorRun()
 
@@ -259,7 +269,11 @@ func (m *manager) getByToken(ctx context.Context, token string, u *user.User) (*
 		}
 		return nil, "", err
 	}
-	return conversions.ConvertToCS3PublicShare(s), s.ShareWith, nil
+	share, err := conversions.ConvertToCS3PublicShare(ctx, m.client, s)
+	if err != nil {
+		return nil, "", err
+	}
+	return share, s.ShareWith, nil
 }
 
 func (m *manager) getByID(ctx context.Context, id *link.PublicShareId, u *user.User) (*link.PublicShare, string, error) {
@@ -272,7 +286,11 @@ func (m *manager) getByID(ctx context.Context, id *link.PublicShareId, u *user.U
 		}
 		return nil, "", err
 	}
-	return conversions.ConvertToCS3PublicShare(s), s.ShareWith, nil
+	share, err := conversions.ConvertToCS3PublicShare(ctx, m.client, s)
+	if err != nil {
+		return nil, "", err
+	}
+	return share, s.ShareWith, nil
 }
 
 func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.PublicShareReference, sign bool) (*link.PublicShare, error) {
@@ -362,7 +380,10 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 		if err := rows.Scan(&s.UIDOwner, &s.UIDInitiator, &s.ShareWith, &s.Prefix, &s.ItemSource, &s.ItemType, &s.Token, &s.Expiration, &s.ShareName, &s.ID, &s.STime, &s.Permissions); err != nil {
 			continue
 		}
-		cs3Share := conversions.ConvertToCS3PublicShare(s)
+		cs3Share, err := conversions.ConvertToCS3PublicShare(ctx, m.client, s)
+		if err != nil {
+			return nil, err
+		}
 		if expired(cs3Share) {
 			_ = m.cleanupExpiredShares()
 		} else {
@@ -425,7 +446,10 @@ func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 		}
 		return nil, err
 	}
-	cs3Share := conversions.ConvertToCS3PublicShare(s)
+	cs3Share, err := conversions.ConvertToCS3PublicShare(ctx, m.client, s)
+	if err != nil {
+		return nil, err
+	}
 	if s.ShareWith != "" {
 		if !authenticate(cs3Share, s.ShareWith, auth) {
 			// if check := checkPasswordHash(auth.Password, s.ShareWith); !check {
