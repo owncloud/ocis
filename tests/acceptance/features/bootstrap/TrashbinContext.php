@@ -889,11 +889,11 @@ class TrashbinContext implements Context {
 	):void {
 		$isInTrash = $this->isInTrash($user, $fileName);
 		$user = $this->featureContext->getActualUsername($user);
-		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
+		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
 		if ($isInTrash) {
-			$this->featureContext->downloadedContentShouldBe($content);
+			$this->featureContext->checkDownloadedContentMatches($content, '', $response);
 		} else {
-			$this->featureContext->downloadedContentShouldBe($alternativeContent);
+			$this->featureContext->checkDownloadedContentMatches($alternativeContent, '', $response);
 		}
 	}
 

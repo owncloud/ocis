@@ -1083,6 +1083,7 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
+		$folder = \trim($folder, '/');
 		$exploded = explode('/', $folder);
 		$path = '';
 		for ($i = 0; $i < \count($exploded); $i++) {
@@ -1121,17 +1122,46 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function theUserHasCreateAFolderUsingTheGraphApi(
+	public function userHasCreatedAFolderInSpace(
 		string $user,
 		string $folder,
 		string $spaceName
 	): void {
-		$this->theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName);
-
+		$folder = \trim($folder, '/');
+		$paths = explode('/', $folder);
+		$folderPath = '';
+		foreach ($paths as $path) {
+			$folderPath .= "$path/";
+			$response = $this->createFolderInSpace($user, $folderPath, $spaceName);
+		}
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
-			"Expected response status code should be 201"
+			"Expected response status code should be 201",
+			$response
 		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $folder
+	 * @param string $spaceName
+	 * @param string $ownerUser
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function createFolderInSpace(
+		string $user,
+		string $folder,
+		string $spaceName,
+		string $ownerUser = ''
+	): ResponseInterface {
+		if ($ownerUser === '') {
+			$ownerUser = $user;
+		}
+		$this->setSpaceIDByName($ownerUser, $spaceName);
+		return $this->featureContext->createFolder($user, $folder);
 	}
 
 	/**
@@ -1152,11 +1182,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $ownerUser = ''
 	): void {
-		if ($ownerUser === '') {
-			$ownerUser = $user;
-		}
-		$this->setSpaceIDByName($ownerUser, $spaceName);
-		$response = $this->featureContext->createFolder($user, $folder);
+		$response = $this->createFolderInSpace($user, $folder, $spaceName, $ownerUser);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -1168,7 +1194,7 @@ class SpacesContext implements Context {
 	 * @param string $content
 	 * @param string $destination
 	 *
-	 * @return string[]
+	 * @return void
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
@@ -1177,9 +1203,10 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $content,
 		string $destination
-	): array {
+	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		return $this->featureContext->uploadFileWithContent($user, $content, $destination);
+		$response = $this->featureContext->uploadFileWithContent($user, $content, $destination);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1201,7 +1228,8 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userUploadsAFileTo($user, $source, $destination);
+		$response = $this->featureContext->uploadFile($user, $source, $destination);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1225,7 +1253,8 @@ class SpacesContext implements Context {
 		string $destination
 	): void {
 		$this->setSpaceIDByName($ownerUser, $spaceName);
-		$this->featureContext->uploadFileWithContent($user, $content, $destination);
+		$response = $this->featureContext->uploadFileWithContent($user, $content, $destination);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1706,19 +1735,19 @@ class SpacesContext implements Context {
 		string $spaceName
 	):void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
+		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 		Assert::assertGreaterThanOrEqual(
 			400,
-			$this->featureContext->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' download must fail'
 		);
 		Assert::assertLessThanOrEqual(
 			499,
-			$this->featureContext->getResponse()->getStatusCode(),
+			$response->getStatusCode(),
 			__METHOD__
 			. ' 4xx error expected but got status code "'
-			. $this->featureContext->getResponse()->getStatusCode() . '"'
+			. $response->getStatusCode() . '"'
 		);
 	}
 
@@ -1830,7 +1859,7 @@ class SpacesContext implements Context {
 	 * @param string $fileContent
 	 * @param string $destination
 	 *
-	 * @return string[]
+	 * @return array
 	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFile(
@@ -1840,9 +1869,10 @@ class SpacesContext implements Context {
 		string $destination
 	): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		$fileId = $this->theUserUploadsAFileToSpace($user, $spaceName, $fileContent, $destination);
-		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
-		return $fileId;
+		$this->setSpaceIDByName($user, $spaceName);
+		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination, true);
+		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
+		return $response->getHeader('oc-fileid');
 	}
 
 	/**
@@ -2646,7 +2676,8 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
+		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
