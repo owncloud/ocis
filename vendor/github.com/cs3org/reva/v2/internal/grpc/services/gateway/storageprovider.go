@@ -1030,11 +1030,6 @@ func (s *svc) GetQuota(ctx context.Context, req *gateway.GetQuotaRequest) (*prov
 	return res, nil
 }
 
-func (s *svc) findByPath(ctx context.Context, path string) (provider.ProviderAPIClient, *registry.ProviderInfo, error) {
-	ref := &provider.Reference{Path: path}
-	return s.find(ctx, ref)
-}
-
 // find looks up the provider that is responsible for the given request
 // It will return a client that the caller can use to make the call, as well as the ProviderInfo. It:
 // - contains the provider path, which is the mount point of the provider

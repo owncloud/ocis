@@ -34,6 +34,7 @@ import (
 	"strings"
 	"time"
 
+	appprovider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -379,6 +380,22 @@ func GetViewMode(viewMode string) gateway.OpenInAppRequest_ViewMode {
 		return gateway.OpenInAppRequest_VIEW_MODE_READ_WRITE
 	default:
 		return gateway.OpenInAppRequest_VIEW_MODE_INVALID
+	}
+}
+
+// GetAppViewMode converts a human-readable string to an appprovider view mode for opening a resource in an app.
+func GetAppViewMode(viewMode string) appprovider.ViewMode {
+	switch viewMode {
+	case "view":
+		return appprovider.ViewMode_VIEW_MODE_VIEW_ONLY
+	case "read":
+		return appprovider.ViewMode_VIEW_MODE_READ_ONLY
+	case "write":
+		return appprovider.ViewMode_VIEW_MODE_READ_WRITE
+	case "preview":
+		return appprovider.ViewMode_VIEW_MODE_PREVIEW
+	default:
+		return appprovider.ViewMode_VIEW_MODE_INVALID
 	}
 }
 

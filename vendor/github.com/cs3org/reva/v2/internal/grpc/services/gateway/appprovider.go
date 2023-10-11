@@ -171,7 +171,7 @@ func (s *svc) openLocalResources(ctx context.Context, ri *storageprovider.Resour
 
 	appProviderReq := &providerpb.OpenInAppRequest{
 		ResourceInfo: ri,
-		ViewMode:     providerpb.OpenInAppRequest_ViewMode(vm),
+		ViewMode:     providerpb.ViewMode(vm),
 		AccessToken:  accessToken,
 		Opaque:       opaque,
 	}

@@ -33,6 +33,7 @@ import (
 	conversions "github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 )
 
@@ -62,6 +63,7 @@ type DBShare struct {
 type UserConverter interface {
 	UserNameToUserID(ctx context.Context, username string) (*userpb.UserId, error)
 	UserIDToUserName(ctx context.Context, userid *userpb.UserId) (string, error)
+	GetUser(userid *userpb.UserId) (*userpb.User, error)
 }
 
 // GatewayUserConverter converts usernames and ids using the gateway
@@ -137,6 +139,15 @@ func (c *GatewayUserConverter) UserNameToUserID(ctx context.Context, username st
 	}
 	_ = c.IDCache.Set(username, getUserResponse.User.Id)
 	return getUserResponse.User.Id, nil
+}
+
+// GetUser gets the user
+func (c *GatewayUserConverter) GetUser(userid *userpb.UserId) (*userpb.User, error) {
+	gwc, err := pool.GetGatewayServiceClient(c.gwAddr)
+	if err != nil {
+		return nil, err
+	}
+	return utils.GetUser(userid, gwc)
 }
 
 func (m *mgr) formatGrantee(ctx context.Context, g *provider.Grantee) (int, string, error) {

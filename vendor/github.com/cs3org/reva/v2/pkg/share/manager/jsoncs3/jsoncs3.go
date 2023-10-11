@@ -759,7 +759,7 @@ func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User,
 }
 
 // ListReceivedShares returns the list of shares the user has access to.
-func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userv1beta1.UserId) ([]*collaboration.ReceivedShare, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListReceivedShares")
 	defer span.End()
 
@@ -768,6 +768,13 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	}
 
 	user := ctxpkg.ContextMustGetUser(ctx)
+	if user.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
+		u, err := utils.GetUser(forUser, m.gateway)
+		if err != nil {
+			return nil, errtypes.BadRequest("user not found")
+		}
+		user = u
+	}
 
 	ssids := map[string]*receivedsharecache.Space{}
 

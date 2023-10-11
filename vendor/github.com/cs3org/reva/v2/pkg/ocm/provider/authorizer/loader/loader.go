@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2023 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,5 +23,5 @@ import (
 	_ "github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/json"
 	_ "github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/mentix"
 	_ "github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/open"
-	// Add your own here
+	// Add your own here.
 )

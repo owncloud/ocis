@@ -561,6 +561,72 @@ func (_m *GatewayAPIClient) Delete(ctx context.Context, in *providerv1beta1.Dele
 	return r0, r1
 }
 
+// DeleteAcceptedUser provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayAPIClient) DeleteAcceptedUser(ctx context.Context, in *invitev1beta1.DeleteAcceptedUserRequest, opts ...grpc.CallOption) (*invitev1beta1.DeleteAcceptedUserResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *invitev1beta1.DeleteAcceptedUserResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *invitev1beta1.DeleteAcceptedUserRequest, ...grpc.CallOption) (*invitev1beta1.DeleteAcceptedUserResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *invitev1beta1.DeleteAcceptedUserRequest, ...grpc.CallOption) *invitev1beta1.DeleteAcceptedUserResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*invitev1beta1.DeleteAcceptedUserResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *invitev1beta1.DeleteAcceptedUserRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DeleteOCMCoreShare provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayAPIClient) DeleteOCMCoreShare(ctx context.Context, in *corev1beta1.DeleteOCMCoreShareRequest, opts ...grpc.CallOption) (*corev1beta1.DeleteOCMCoreShareResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *corev1beta1.DeleteOCMCoreShareResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *corev1beta1.DeleteOCMCoreShareRequest, ...grpc.CallOption) (*corev1beta1.DeleteOCMCoreShareResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *corev1beta1.DeleteOCMCoreShareRequest, ...grpc.CallOption) *corev1beta1.DeleteOCMCoreShareResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*corev1beta1.DeleteOCMCoreShareResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *corev1beta1.DeleteOCMCoreShareRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DeleteStorageSpace provides a mock function with given fields: ctx, in, opts
 func (_m *GatewayAPIClient) DeleteStorageSpace(ctx context.Context, in *providerv1beta1.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*providerv1beta1.DeleteStorageSpaceResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -1180,6 +1246,39 @@ func (_m *GatewayAPIClient) GetOCMShare(ctx context.Context, in *ocmv1beta1.GetO
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *ocmv1beta1.GetOCMShareRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetOCMShareByToken provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayAPIClient) GetOCMShareByToken(ctx context.Context, in *ocmv1beta1.GetOCMShareByTokenRequest, opts ...grpc.CallOption) (*ocmv1beta1.GetOCMShareByTokenResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *ocmv1beta1.GetOCMShareByTokenResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *ocmv1beta1.GetOCMShareByTokenRequest, ...grpc.CallOption) (*ocmv1beta1.GetOCMShareByTokenResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *ocmv1beta1.GetOCMShareByTokenRequest, ...grpc.CallOption) *ocmv1beta1.GetOCMShareByTokenResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ocmv1beta1.GetOCMShareByTokenResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *ocmv1beta1.GetOCMShareByTokenRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -1939,6 +2038,39 @@ func (_m *GatewayAPIClient) ListFileVersions(ctx context.Context, in *providerv1
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ListFileVersionsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListInviteTokens provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayAPIClient) ListInviteTokens(ctx context.Context, in *invitev1beta1.ListInviteTokensRequest, opts ...grpc.CallOption) (*invitev1beta1.ListInviteTokensResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *invitev1beta1.ListInviteTokensResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *invitev1beta1.ListInviteTokensRequest, ...grpc.CallOption) (*invitev1beta1.ListInviteTokensResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *invitev1beta1.ListInviteTokensRequest, ...grpc.CallOption) *invitev1beta1.ListInviteTokensResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*invitev1beta1.ListInviteTokensResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *invitev1beta1.ListInviteTokensRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -2863,6 +2995,39 @@ func (_m *GatewayAPIClient) UnsetArbitraryMetadata(ctx context.Context, in *prov
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.UnsetArbitraryMetadataRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateOCMCoreShare provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayAPIClient) UpdateOCMCoreShare(ctx context.Context, in *corev1beta1.UpdateOCMCoreShareRequest, opts ...grpc.CallOption) (*corev1beta1.UpdateOCMCoreShareResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *corev1beta1.UpdateOCMCoreShareResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *corev1beta1.UpdateOCMCoreShareRequest, ...grpc.CallOption) (*corev1beta1.UpdateOCMCoreShareResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *corev1beta1.UpdateOCMCoreShareRequest, ...grpc.CallOption) *corev1beta1.UpdateOCMCoreShareResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*corev1beta1.UpdateOCMCoreShareResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *corev1beta1.UpdateOCMCoreShareRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
