@@ -276,8 +276,17 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminRequestsEndpoint(string $method, TableNode $table):void {
-		$this->adminRequestsEndpointsWithBodyWithPassword($method, null, null, null, $table);
+	public function theAdminRequestsTheseEndpointsWithMethod(string $method, TableNode $table):void {
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+		foreach ($table->getHash() as $row) {
+			$response = $this->requestUrlWithBasicAuth(
+				$this->featureContext->getAdminUsername(),
+				$row['endpoint'],
+				$method
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 
 	/**
