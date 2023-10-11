@@ -290,38 +290,6 @@ class AuthContext implements Context {
 	}
 
 	/**
-	 * @When the administrator requests these endpoints with :method using password :password about user :ofUser
-	 *
-	 * @param string $method
-	 * @param string $password
-	 * @param string $ofUser
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdminRequestsTheseEndpointsUsingPasswordAboutUser(
-		string $method,
-		string $password,
-		string $ofUser,
-		TableNode $table
-	): void {
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
-
-		$authHeader = $this->createBasicAuthHeader($this->featureContext->getAdminUsername(), $password);
-
-		foreach ($table->getHash() as $row) {
-			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
-				$row['endpoint'],
-				$this->featureContext->getActualUsername($ofUser)
-			);
-			$response = $this->sendRequest($row['endpoint'], $method, null, $authHeader);
-			$this->featureContext->setResponse($response);
-			$this->featureContext->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
 	 * @When user :user requests :url with :method using basic auth
 	 *
 	 * @param string $user
