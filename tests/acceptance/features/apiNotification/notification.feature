@@ -268,6 +268,30 @@ Feature: Notification
       | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt |
       | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     |
 
+  @env-config
+  Scenario: get a notification about a file share in default languages
+    Given the config "SETTINGS_DEFAULT_LANGUAGE" has been set to "de"
+    And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "Neue Freigabe" and the message-details should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Alice Hansen hat textfile1.txt mit Ihnen geteilt"
+            ]
+          }
+        }
+      }
+      """
+
 
   Scenario Outline: notifications related to a resource get deleted when the resource is deleted
     Given user "Alice" has shared entry "<resource>" with user "Brian"
