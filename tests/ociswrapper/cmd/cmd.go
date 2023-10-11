@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"ociswrapper/common"
 	ocis "ociswrapper/ocis"
 	ocisConfig "ociswrapper/ocis/config"
@@ -14,7 +16,9 @@ var rootCmd = &cobra.Command{
 	Use:   "ociswrapper",
 	Short: "ociswrapper is a wrapper for oCIS server",
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		if err := cmd.Help(); err != nil {
+			fmt.Printf("error executing help command: %v\n", err)
+		}
 	},
 }
 
@@ -25,15 +29,15 @@ func serveCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			common.Wg.Add(2)
 
-			go ocis.Start(nil)
-			go wrapper.Start(cmd.Flag("port").Value.String())
-
 			// set configs
 			ocisConfig.Set("bin", cmd.Flag("bin").Value.String())
 			ocisConfig.Set("url", cmd.Flag("url").Value.String())
 			ocisConfig.Set("retry", cmd.Flag("retry").Value.String())
 			ocisConfig.Set("adminUsername", cmd.Flag("admin-username").Value.String())
 			ocisConfig.Set("adminPassword", cmd.Flag("admin-password").Value.String())
+
+			go ocis.Start(nil)
+			go wrapper.Start(cmd.Flag("port").Value.String())
 		},
 	}
 
@@ -49,9 +53,12 @@ func serveCmd() *cobra.Command {
 	return serveCmd
 }
 
+// Execute executes the command
 func Execute() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	rootCmd.AddCommand(serveCmd())
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("error executing command: %v\n", err)
+	}
 }
