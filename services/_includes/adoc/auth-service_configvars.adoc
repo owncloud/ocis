@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-11-12-19-14]
+[#deprecation-note-2023-10-11-13-50-26]
 [caption=]
 .Deprecation notes for the auth-service service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -111,7 +111,7 @@ a|`AUTH_SERVICE_DEBUG_ADDR` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9169 ++
+++127.0.0.1:9198 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
