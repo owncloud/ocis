@@ -452,15 +452,15 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(string $user, string $sender, string $spaceName, PyStringNode $content):void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$this->featureContext->setResponse(
-			GraphHelper::getMySpaces(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				'',
-				$this->featureContext->getStepLineRef()
-			)
-		);
+		// $this->featureContext->setResponse(
+		// 	GraphHelper::getMySpaces(
+		// 		$this->featureContext->getBaseUrl(),
+		// 		$user,
+		// 		$this->featureContext->getPasswordForUser($user),
+		// 		'',
+		// 		$this->featureContext->getStepLineRef()
+		// 	)
+		// );
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
 			$sender,
