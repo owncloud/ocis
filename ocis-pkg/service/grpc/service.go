@@ -58,7 +58,6 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
-		micro.Flags(sopts.Flags...),
 		micro.Registry(registry.GetRegistry()),
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),

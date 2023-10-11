@@ -23,7 +23,6 @@ func Server(opts ...Option) (grpc.Service, func(), error) {
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
-		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
 		grpc.TraceProvider(options.TraceProvider),
 	)

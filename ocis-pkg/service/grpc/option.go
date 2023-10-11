@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -22,7 +21,6 @@ type Options struct {
 	TLSCert       string
 	TLSKey        string
 	Context       context.Context
-	Flags         []cli.Flag
 	TraceProvider trace.TracerProvider
 }
 
@@ -93,13 +91,6 @@ func TLSCert(c string, k string) Option {
 func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.Context = ctx
-	}
-}
-
-// Flags provides a function to set the flags option.
-func Flags(flags ...cli.Flag) Option {
-	return func(o *Options) {
-		o.Flags = append(o.Flags, flags...)
 	}
 }
 
