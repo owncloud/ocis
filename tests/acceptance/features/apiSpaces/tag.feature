@@ -113,12 +113,6 @@ Feature: Tag
       | role      | viewer     |
     When user "Brian" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
-    And the response should not contain following tags:
-      | folderTag |
-      | marketing |
-    When user "Brian" accepts share "/folderMain" offered by user "Alice" using the sharing API
-    And user "Brian" lists all available tags via the GraphApi
-    Then the HTTP status code should be "200"
     And the response should contain following tags:
       | folderTag |
       | marketing |
@@ -129,7 +123,6 @@ Feature: Tag
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | <role>     |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" creates the following tags for <resource> "<resourceName>" of space "Shares":
       | tag in a shared resource |
       | second tag               |
@@ -157,7 +150,6 @@ Feature: Tag
     And user "Alice" has created the following tags for <resource> "<resourceName>" of the space "use-tag":
       | tag in a shared resource |
       | second tag               |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" removes the following tags for <resource> "<resourceName>" of space "Shares":
       | tag in a shared resource |
       | second tag               |

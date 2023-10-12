@@ -8,6 +8,7 @@ Feature: Sharing resources with different case names with the sharee and checkin
       | username |
       | Alice    |
       | Brian    |
+    And user "Brian" has disabled auto-accepting 
 
 
   Scenario: sharing files with different case names with an internal user

@@ -14,7 +14,6 @@ Feature: actions on a locked item are possible if the token is sent with the req
     And user "Alice" has uploaded file with content "some data" to "textfile0.txt"
     And user "Brian" has uploaded file with content "some data" to "textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | shared |
     And user "Brian" has locked file "Shares/textfile0.txt" setting the following properties

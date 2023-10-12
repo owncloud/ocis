@@ -13,7 +13,6 @@ Feature: shares are received in the default folder for received shares
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     When user "Alice" shares folder "/FOLDER" with user "Brian" using the sharing API
-    And user "Brian" accepts share "/FOLDER" offered by user "Alice" using the sharing API
     And user "Brian" declines share "/Shares/FOLDER" offered by user "Alice" using the sharing API
     And user "Brian" shares folder "/Shares" with user "Alice" using the sharing API
     Then the OCS status code of responses on each endpoint should be "<ocs_status_code>" respectively

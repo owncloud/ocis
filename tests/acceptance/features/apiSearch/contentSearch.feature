@@ -36,7 +36,6 @@ Feature: content search
     And user "Alice" has uploaded file with content "nepal want to say hello" to "uploadFolder/keywordAtLast.txt"
     And user "Alice" has uploaded file with content "Namaste nepal" to "uploadFolder/hello.txt"
     And user "Alice" has shared folder "/uploadFolder" with user "Brian"
-    And user "Brian" has accepted share "/uploadFolder" offered by user "Alice"
     When user "Brian" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these files:

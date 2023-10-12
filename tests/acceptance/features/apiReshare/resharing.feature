@@ -18,16 +18,12 @@ Feature: Resharing
       | Gina     |
     And user "Alice" has created folder "folder"
     And user "Alice" has shared folder "folder" with user "Brian" with permissions "31"
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     And user "Brian" has shared folder "Shares/folder" with user "Carol" with permissions "31"
-    And user "Carol" has accepted share "/folder" offered by user "Brian"
     And user "Carol" has shared folder "Shares/folder" with user "Damian" with permissions "17"
-    And user "Damian" has accepted share "/folder" offered by user "Carol"
 
 
   Scenario Outline: user should only be able to see direct outgoing shares not all the chain
     Given user "Brian" has shared folder "Shares/folder" with user "Fred" with permissions "17"
-    And user "Fred" has accepted share "/folder" offered by user "Brian"
     When user "<user>" gets all the shares inside the folder "Shares/folder" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -62,7 +58,6 @@ Feature: Resharing
 
   Scenario Outline: editing reshares
     Given user "Carol" has shared folder "Shares/folder" with user "Fred" with permissions "17"
-    And user "Fred" has accepted share "/folder" offered by user "Carol"
     When user "<user>" updates the last share using the sharing API with
       | permissions | 31 |
     Then the OCS status code should be "<code>"
@@ -76,7 +71,6 @@ Feature: Resharing
 
   Scenario Outline: deleting reshares
     Given user "Carol" has shared folder "Shares/folder" with user "Gina" with permissions "17"
-    And user "Gina" has accepted share "/folder" offered by user "Carol"
     When user "<user>" deletes the last share using the sharing API
     Then the OCS status code should be "<code>"
     And as "Gina" folder "Shares/folder" <exists>
@@ -103,7 +97,6 @@ Feature: Resharing
   Scenario Outline: Resharing files with different permissions
     Given user "Alice" has uploaded file with content "Random data" to "/file.txt"
     And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<shareepermissions>"
-    And user "Brian" has accepted share "/file.txt" offered by user "Alice"
     When user "Brian" shares file "Shares/file.txt" with user "Fred" with permissions "<granteepermissions>" using the sharing API
     Then the OCS status code should be "<code>"
     Examples:
@@ -119,10 +112,8 @@ Feature: Resharing
     And the administrator has added a user "Fred" to the group "security department" using GraphApi
     When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<permissions>" using the sharing API
     Then the OCS status code should be "100"
-    When user "Ember" accepts share "/folder" offered by user "Brian" using the sharing API
-    Then user "Ember" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
-    When user "Fred" accepts share "/folder" offered by user "Brian" using the sharing API
-    Then user "Fred" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+    And user "Ember" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+    And user "Fred" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
     Examples:
       | permissions | canUpload     |
       | 17          | should not be |

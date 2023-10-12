@@ -128,7 +128,6 @@ Feature: Notification
 
   Scenario Outline: user gets a notification of unsharing resource
     Given user "Alice" has shared entry "<resource>" with user "Brian"
-    And user "Brian" has accepted share "/<resource>" offered by user "Alice"
     And user "Alice" has unshared entity "<resource>" shared to "Brian"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
@@ -295,7 +294,6 @@ Feature: Notification
 
   Scenario Outline: notifications related to a resource get deleted when the resource is deleted
     Given user "Alice" has shared entry "<resource>" with user "Brian"
-    And user "Brian" has accepted share "/<resource>" offered by user "Alice"
     And user "Alice" has unshared entity "<resource>" shared to "Brian"
     And user "Alice" has deleted entity "/<resource>"
     When user "Brian" lists all notifications

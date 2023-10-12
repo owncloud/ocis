@@ -40,7 +40,6 @@ Feature: share by disabling re-share
       | path      | test   |
       | shareWith | Brian  |
       | role      | <role> |
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a share inside of space "Shares" with settings:
       | path      | test   |
       | shareWith | Carol  |

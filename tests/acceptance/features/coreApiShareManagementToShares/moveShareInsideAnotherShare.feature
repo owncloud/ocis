@@ -15,8 +15,6 @@ Feature: moving a share inside another share
     And user "Alice" has uploaded file with content "text B" to "/folderB/fileB.txt"
     And user "Alice" has shared folder "folderA" with user "Brian"
     And user "Alice" has shared folder "folderB" with user "Brian"
-    And user "Brian" has accepted share "/folderA" offered by user "Alice"
-    And user "Brian" has accepted share "/folderB" offered by user "Alice"
 
 
   Scenario: share receiver cannot move a whole share inside another share

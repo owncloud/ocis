@@ -24,7 +24,6 @@ Feature: Report test
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
@@ -45,7 +44,6 @@ Feature: Report test
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | editor     |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
@@ -62,7 +60,8 @@ Feature: Report test
 
 
   Scenario: search for the shared folder when the share is not accepted
-    Given user "Alice" has created a share inside of space "find data" with settings:
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |

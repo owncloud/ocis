@@ -48,6 +48,7 @@ dirs = {
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
     "ocisWrapper": "/drone/src/tests/ociswrapper",
+    "bannedPasswordList": "tests/config/drone/banned-password-list.txt",
 }
 
 # configuration
@@ -1147,6 +1148,10 @@ def e2eTests(ctx):
         },
     }
 
+    extra_server_environment = {
+        "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+    }
+
     e2e_trigger = {
         "ref": [
             "refs/heads/master",
@@ -1178,18 +1183,16 @@ def e2eTests(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if suite["tikaNeeded"] else []) + \
-            ocisServer("ocis", 4, [], tika_enabled = suite["tikaNeeded"]) + \
+            ocisServer("ocis", 4, [], extra_server_environment = extra_server_environment, tika_enabled = suite["tikaNeeded"]) + \
             [{
                 "name": "e2e-tests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
                     "BASE_URL_OCIS": "ocis-server:9200",
                     "HEADLESS": "true",
-                    "OCIS": "true",
                     "RETRY": "1",
                     "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
                     "LOCAL_UPLOAD_DIR": "/uploads",
-                    "API_TOKEN": "true",
                 },
                 "commands": [
                     "cd %s" % dirs["web"],

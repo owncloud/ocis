@@ -14,6 +14,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
 
   Scenario: accept an incoming file share
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
@@ -23,6 +24,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
 
   Scenario: accept an incoming folder share
     Given user "Alice" has created folder "/PARENT"
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has shared file "/PARENT" with user "Brian"
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
@@ -31,6 +33,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
 
   Scenario: accept an incoming file share and check the response
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
@@ -52,6 +55,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
 
   Scenario: accept an incoming folder share and check the response
     Given user "Alice" has created folder "/PARENT"
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has shared file "/PARENT" with user "Brian"
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API

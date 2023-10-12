@@ -14,7 +14,6 @@ Feature: share access by ID
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
-    And user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     And user "Alice" gets share with id "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -59,7 +58,6 @@ Feature: share access by ID
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
-    And user "Brian" accepts share with ID "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
@@ -75,7 +73,6 @@ Feature: share access by ID
 
   Scenario Outline: accept a share using the invalid share Id
     Given using OCS API version "<ocs_api_version>"
-    When user "Brian" accepts share with ID "<share_id>" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http_status_code>"
     And the API should not return any data
@@ -93,7 +90,6 @@ Feature: share access by ID
 
   Scenario Outline: accept a share using empty share Id
     Given using OCS API version "<ocs_api_version>"
-    When user "Brian" accepts share with ID "" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "<http_status_code>"
     And the API should not return any data
@@ -107,7 +103,6 @@ Feature: share access by ID
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" declines share with ID "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

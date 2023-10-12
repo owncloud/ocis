@@ -21,12 +21,10 @@ Feature: get the received shares filtered by type (user, group etc)
   Scenario Outline: getting shares received from users when there are none
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
-    And user "Brian" has accepted share "/folderToShareWithGroup" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
-    And user "Brian" has accepted share "/fileToShareWithGroup.txt" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
@@ -43,12 +41,10 @@ Feature: get the received shares filtered by type (user, group etc)
   Scenario Outline: getting shares received from groups when there are none
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
-    And user "Brian" has accepted share "/folderToShareWithUser" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
     And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
-    And user "Brian" has accepted share "/fileToShareWithUser.txt" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
@@ -68,16 +64,12 @@ Feature: get the received shares filtered by type (user, group etc)
     #       that are "shared with me" should always return an empty list.
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
-    And user "Brian" has accepted share "/folderToShareWithUser" offered by user "Alice"
     And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
-    And user "Brian" has accepted share "/folderToShareWithGroup" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
     And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
-    And user "Brian" has accepted share "/fileToShareWithUser.txt" offered by user "Alice"
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
-    And user "Brian" has accepted share "/fileToShareWithGroup.txt" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |

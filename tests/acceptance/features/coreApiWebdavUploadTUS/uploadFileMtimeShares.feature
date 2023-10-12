@@ -14,7 +14,6 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
-    And user "Brian" has accepted share "/toShare" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" using the TUS protocol on the WebDAV API
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
@@ -28,7 +27,6 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
-    And user "Brian" has accepted share "/toShare" offered by user "Alice"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" using the TUS protocol on the WebDAV API
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
     And as "Brian" the mtime of the file "/Shares/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
@@ -42,7 +40,6 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
-    And user "Brian" has accepted share "/toShare" offered by user "Alice"
     And user "Alice" has uploaded file with content "uploaded content" to "/toShare/file.txt"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" using the TUS protocol on the WebDAV API
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"
@@ -57,7 +54,6 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
     And user "Alice" has shared folder "/toShare" with user "Brian"
-    And user "Brian" has accepted share "/toShare" offered by user "Alice"
     And user "Brian" has uploaded file with content "uploaded content" to "/Shares/toShare/file.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" using the TUS protocol on the WebDAV API
     Then as "Alice" the mtime of the file "/toShare/file.txt" should be "Thu, 08 Aug 2012 04:18:13 GMT"

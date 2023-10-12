@@ -18,8 +18,6 @@ Feature: independent locks - make sure all locks are independent and don't inter
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "/FromBrian/textfile0.txt"
     And user "Alice" has shared folder "FromAlice" with user "Carol"
     And user "Brian" has shared folder "FromBrian" with user "Carol"
-    And user "Carol" has accepted share "/FromAlice" offered by user "Alice"
-    And user "Carol" has accepted share "/FromBrian" offered by user "Brian"
     When user "Carol" locks file "/Shares/FromBrian/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -47,8 +45,6 @@ Feature: independent locks - make sure all locks are independent and don't inter
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/notlocked/textfile0.txt"
     And user "Alice" has shared folder "locked" with user "Brian"
     And user "Alice" has shared folder "notlocked" with user "Brian"
-    And user "Brian" has accepted share "/locked" offered by user "Alice"
-    And user "Brian" has accepted share "/notlocked" offered by user "Alice"
     When user "Brian" locks file "/Shares/locked/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"

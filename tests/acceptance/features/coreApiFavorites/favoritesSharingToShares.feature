@@ -13,7 +13,6 @@ Feature: favorite
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" favorites element "/Shares/PARENT/parent.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/Shares/PARENT/parent.txt" should be favorited
@@ -28,7 +27,6 @@ Feature: favorite
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT/sub-folder"
     And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" favorites element "/Shares/PARENT/sub-folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/Shares/PARENT/sub-folder" should be favorited
@@ -42,7 +40,6 @@ Feature: favorite
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" favorites element "/Shares/PARENT" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/Shares/PARENT" should be favorited
@@ -56,7 +53,6 @@ Feature: favorite
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Brian" has favorited element "/Shares/PARENT/parent.txt"
     When user "Brian" moves file "/Shares/PARENT/parent.txt" to "/taken_out.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -72,7 +68,6 @@ Feature: favorite
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has shared file "/PARENT/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
     When user "Brian" favorites element "/Shares/parent.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/Shares/parent.txt" should be favorited

@@ -59,7 +59,6 @@ Feature: Search
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
@@ -91,7 +90,8 @@ Feature: Search
 
 
   Scenario Outline: user cannot find pending share
-    Given using <dav-path-version> DAV path
+    Given user "Brian" has disabled auto-accepting
+    And using <dav-path-version> DAV path
     And user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
@@ -116,7 +116,7 @@ Feature: Search
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    And user "Brian" has declined share "/folderMain" offered by user "Alice"
+    And user "Brian" has declined share "/Shares/folderMain" offered by user "Alice"
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
@@ -181,7 +181,6 @@ Feature: Search
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "*folder*" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
@@ -227,7 +226,6 @@ Feature: Search
       | path      | foo    |
       | shareWith | Brian  |
       | role      | viewer |
-    And user "Brian" has accepted share "/foo" offered by user "Alice"
     When user "Brian" searches for "shared*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain these entries:

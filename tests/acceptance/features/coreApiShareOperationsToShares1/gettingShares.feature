@@ -14,7 +14,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
     And user "Alice" has shared file "file_to_share.txt" with user "Brian"
-    And user "Brian" has accepted share "/file_to_share.txt" offered by user "Alice"
     When user "Alice" gets all shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -29,7 +28,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When the administrator gets all shares shared by him using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -49,8 +47,6 @@ Feature: sharing
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     And user "Alice" has shared file "textfile0.txt" with user "Carol"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
-    And user "Carol" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -71,9 +67,7 @@ Feature: sharing
       | David    |
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Brian" has shared file "/Shares/textfile0.txt" with user "Carol"
-    And user "Carol" has accepted share "/textfile0.txt" offered by user "Brian"
     When user "Alice" gets all the shares with reshares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -94,7 +88,6 @@ Feature: sharing
     And user "Carol" has created folder "/shared"
     And user "Carol" has uploaded file with content "some data" to "/shared/shared_file.txt"
     And user "Carol" has shared folder "/shared" with user "Brian"
-    And user "Brian" has accepted share "/shared" offered by user "Carol"
     And user "Brian" has shared folder "/Shares/shared" with group "grp1"
     # no need to accept this share as it is Carol's file
     When user "Carol" gets all the shares shared with her using the sharing API
@@ -111,7 +104,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
     And user "Alice" has shared file "file_to_share.txt" with user "Brian"
-    And user "Brian" has accepted share "/file_to_share.txt" offered by user "Alice"
     When user "Alice" gets the info of the last share using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -161,8 +153,6 @@ Feature: sharing
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
     And user "Alice" has shared folder "/PARENT" with group "group0"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Carol" has accepted share "/PARENT" offered by user "Alice"
     When the administrator removes user "Carol" from group "group0" using the provisioning API
     Then the HTTP status code should be "200"
     And user "Brian" should see the following elements
@@ -178,7 +168,6 @@ Feature: sharing
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
     When user "Alice" gets all the shares inside the folder "PARENT" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

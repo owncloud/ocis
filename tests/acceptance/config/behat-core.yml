@@ -75,6 +75,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - SettingsContext:
 
     coreApiShareCreateSpecialToShares2:
       paths:
@@ -84,6 +85,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - SettingsContext:
 
     coreApiSharees:
       paths:
@@ -103,6 +105,7 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - FilesVersionsContext:
+        - SettingsContext:
 
     coreApiShareManagementBasicToShares:
       paths:
@@ -124,6 +127,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - SettingsContext:
 
     coreApiShareOperationsToShares2:
       paths:

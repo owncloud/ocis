@@ -18,7 +18,6 @@ Feature: UNLOCK locked items (sharing)
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
     When user "Brian" unlocks file "Shares/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
     Then the HTTP status code should be "403"
     And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
@@ -42,7 +41,6 @@ Feature: UNLOCK locked items (sharing)
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" unlocks file "Shares/PARENT/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
     Then the HTTP status code should be "403"
     And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
@@ -64,7 +62,6 @@ Feature: UNLOCK locked items (sharing)
   Scenario Outline: sharee unlock a shared file
     Given using <dav-path-version> DAV path
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Brian" unlocks the last created lock of file "Shares/parent.txt" using the WebDAV API
@@ -88,7 +85,6 @@ Feature: UNLOCK locked items (sharing)
   Scenario Outline: as owner unlocking a shared file locked by the receiver is not possible. To unlock use the receivers locktoken
     Given using <dav-path-version> DAV path
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
-    And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/parent.txt" of user "Brian" using the WebDAV API
@@ -112,7 +108,6 @@ Feature: UNLOCK locked items (sharing)
   Scenario Outline: unlocking a file in a shared folder, which was locked by the sharee is not possible for the owner unless the receiver's locktoken is used
     Given using <dav-path-version> DAV path
     And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Brian" has locked file "Shares/PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/PARENT/parent.txt" of user "Brian" using the WebDAV API

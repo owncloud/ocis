@@ -105,7 +105,6 @@ Feature: propfind a file using file id
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has shared file "/textfile.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile.txt" offered by user "Alice"
     When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Brian Murphy" with these key and value pairs:
@@ -122,7 +121,6 @@ Feature: propfind a file using file id
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     And user "Alice" has uploaded file with content "some data" to "/folder/textfile.txt"
     And we save it into "FILEID"
     When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"

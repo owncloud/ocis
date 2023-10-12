@@ -18,7 +18,6 @@ Feature: move (rename) file
       | permissions | change    |
       | shareWith   | Alice     |
     And user "<mover>" has uploaded file with content "test data" to "/testfile.txt"
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "<mover>" moves file "/testfile.txt" to "<destination_folder>/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/testfile.txt" for user "Alice" should be "test data"
@@ -42,7 +41,6 @@ Feature: move (rename) file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Brian" moves file "/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/testfile.txt" for user "Brian" should be "test data"
@@ -64,7 +62,6 @@ Feature: move (rename) file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" moves file "/Shares/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "502"
     And as "Alice" file "/Shares/testshare/testfile.txt" should exist
@@ -86,7 +83,6 @@ Feature: move (rename) file
       | shareWith   | Alice     |
     And user "<mover>" has created folder "/testsubfolder"
     And user "<mover>" has uploaded file with content "test data" to "/testsubfolder/testfile.txt"
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "<mover>" moves folder "/testsubfolder" to "<destination_folder>/testsubfolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/testsubfolder/testfile.txt" for user "Alice" should be "test data"
@@ -113,7 +109,6 @@ Feature: move (rename) file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Brian" moves folder "/testshare/testsubfolder" to "/testsubfolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/testsubfolder/testfile.txt" for user "Brian" should be "test data"
@@ -138,7 +133,6 @@ Feature: move (rename) file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" moves folder "/Shares/testshare/testsubfolder" to "/testsubfolder" using the WebDAV API
     Then the HTTP status code should be "502"
     And as "Alice" folder "/Shares/testshare/testsubfolder" should exist
@@ -159,7 +153,6 @@ Feature: move (rename) file
       | shareType   | user      |
       | permissions | read      |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" moves file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
@@ -181,7 +174,6 @@ Feature: move (rename) file
       | permissions | read      |
       | shareWith   | Alice     |
     And user "Brian" has copied file "/fileToCopy.txt" to "/testshare/overwritethis.txt"
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" moves file "/textfile0.txt" to "/Shares/testshare/overwritethis.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And the content of file "/Shares/testshare/overwritethis.txt" for user "Alice" should be "Welcome to ownCloud"
@@ -200,8 +192,6 @@ Feature: move (rename) file
       | /folderB |
     And user "Alice" has shared folder "/folderA" with user "Brian"
     And user "Alice" has shared folder "/folderB" with user "Brian"
-    And user "Brian" has accepted share "/folderA" offered by user "Alice"
-    And user "Brian" has accepted share "/folderB" offered by user "Alice"
     And user "Brian" has created the following folders
       | path                    |
       | /Shares/folderA/ONE     |

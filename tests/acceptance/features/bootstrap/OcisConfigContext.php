@@ -86,8 +86,7 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
-		$path = UploadHelper::getUploadFilesDir($path);
-	
+		$path = \dirname(__FILE__) . "/../../../" . $path;
 		$this->theConfigHasBeenSetTo($configVariable, $path);
 	}
 
