@@ -24,7 +24,6 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Context(options.Context),
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Logger(options.Logger),
-		grpc.Flags(options.Flags...),
 		grpc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
