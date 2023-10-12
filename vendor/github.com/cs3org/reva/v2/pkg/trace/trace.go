@@ -85,6 +85,8 @@ func NewTracerProvider(opts ...Option) trace.TracerProvider {
 // SetDefaultTracerProvider sets the default trace provider
 func SetDefaultTracerProvider(tp trace.TracerProvider) {
 	otel.SetTracerProvider(tp)
+	defaultProvider.mutex.Lock()
+	defer defaultProvider.mutex.Unlock()
 	defaultProvider.initialized = true
 }
 
