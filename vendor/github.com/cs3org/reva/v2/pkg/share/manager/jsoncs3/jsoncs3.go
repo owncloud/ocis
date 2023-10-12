@@ -511,8 +511,6 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 				toUpdate.Permissions = updated.Permissions
 			case "expiration":
 				toUpdate.Expiration = updated.Expiration
-			case "hide":
-				toUpdate.Hide = updated.Hide
 			default:
 				return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
 			}
@@ -759,7 +757,7 @@ func (m *Manager) listCreatedShares(ctx context.Context, user *userv1beta1.User,
 }
 
 // ListReceivedShares returns the list of shares the user has access to.
-func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userv1beta1.UserId) ([]*collaboration.ReceivedShare, error) {
+func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListReceivedShares")
 	defer span.End()
 
@@ -768,13 +766,6 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	}
 
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if user.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
-		u, err := utils.GetUser(forUser, m.gateway)
-		if err != nil {
-			return nil, errtypes.BadRequest("user not found")
-		}
-		user = u
-	}
 
 	ssids := map[string]*receivedsharecache.Space{}
 
@@ -887,7 +878,6 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 
 					if share.IsGrantedToUser(s, user) {
 						if share.MatchesFiltersWithState(s, state.State, filters) {
-							s.Hide = state.Hide
 							rs := &collaboration.ReceivedShare{
 								Share:      s,
 								State:      state.State,
@@ -943,7 +933,6 @@ func (m *Manager) convert(ctx context.Context, userID string, s *collaboration.S
 	if err == nil && state != nil {
 		rs.State = state.State
 		rs.MountPoint = state.MountPoint
-		rs.Share.Hide = state.Hide
 	}
 	return rs
 }
@@ -966,7 +955,7 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 		return nil, err
 	}
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if user.GetId().GetType() != userv1beta1.UserType_USER_TYPE_SERVICE && !share.IsGrantedToUser(s, user) {
+	if !share.IsGrantedToUser(s, user) {
 		return nil, errtypes.NotFound(ref.String())
 	}
 	if share.IsExpired(s) {
@@ -989,7 +978,7 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 }
 
 // UpdateReceivedShare updates the received share with share state.
-func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userv1beta1.UserId) (*collaboration.ReceivedShare, error) {
+func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "UpdateReceivedShare")
 	defer span.End()
 
@@ -1008,21 +997,16 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 			rs.State = receivedShare.State
 		case "mount_point":
 			rs.MountPoint = receivedShare.MountPoint
-		case "hide":
-			rs.Share.Hide = receivedShare.Share.Hide
 		default:
 			return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
 		}
 	}
 
 	// write back
-	u := ctxpkg.ContextMustGetUser(ctx)
-	uid := u.GetId().GetOpaqueId()
-	if u.GetId().GetType() == userv1beta1.UserType_USER_TYPE_SERVICE {
-		uid = forUser.GetOpaqueId()
-	}
 
-	err = m.UserReceivedStates.Add(ctx, uid, rs.Share.ResourceId.StorageId+shareid.IDDelimiter+rs.Share.ResourceId.SpaceId, rs)
+	userID := ctxpkg.ContextMustGetUser(ctx)
+
+	err = m.UserReceivedStates.Add(ctx, userID.GetId().GetOpaqueId(), rs.Share.ResourceId.StorageId+shareid.IDDelimiter+rs.Share.ResourceId.SpaceId, rs)
 	if err != nil {
 		return nil, err
 	}

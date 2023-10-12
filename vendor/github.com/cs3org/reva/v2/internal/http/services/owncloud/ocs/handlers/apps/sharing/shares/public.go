@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	permissionsv1beta1 "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -30,7 +31,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/huandu/xstrings"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
@@ -142,21 +142,12 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	password := r.FormValue("password")
+	password := strings.TrimSpace(r.FormValue("password"))
 	if h.enforcePassword(permKey) && len(password) == 0 {
 		return nil, &ocsError{
 			Code:    response.MetaBadRequest.StatusCode,
 			Message: "missing required password",
 			Error:   errors.New("missing required password"),
-		}
-	}
-	if len(password) > 0 {
-		if err := h.passwordValidator.Validate(password); err != nil {
-			return nil, &ocsError{
-				Code:    response.MetaBadRequest.StatusCode,
-				Message: xstrings.FirstRuneToUpper(err.Error()),
-				Error:   fmt.Errorf("password validation failed: %w", err),
-			}
 		}
 	}
 
@@ -469,7 +460,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	newPassword, ok := r.Form["password"]
 	// enforcePassword
 	if h.enforcePassword(permKey) {
-		if !ok && !share.PasswordProtected || ok && len(newPassword[0]) == 0 {
+		if (!ok && !share.PasswordProtected) || (ok && len(strings.TrimSpace(newPassword[0])) == 0) {
 			response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing required password", err)
 			return
 		}
@@ -477,13 +468,6 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 
 	// update or clear password
 	if ok {
-		// skip validation if the clear password scenario
-		if len(newPassword[0]) > 0 {
-			if err := h.passwordValidator.Validate(newPassword[0]); err != nil {
-				response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, xstrings.FirstRuneToUpper(err.Error()), err)
-				return
-			}
-		}
 		updatesFound = true
 		logger.Info().Str("shares", "update").Msg("password updated")
 		updates = append(updates, &link.UpdatePublicShareRequest_Update{

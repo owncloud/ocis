@@ -1,4 +1,4 @@
-// Copyright 2018-2023 CERN
+// Copyright 2018-2021 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,48 +19,27 @@
 package ocmd
 
 import (
-	"io"
-	"mime"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/internal/http/services/reqres"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 )
 
-// var validate = validator.New()
-
-type notifHandler struct {
+type notificationsHandler struct {
 }
 
-func (h *notifHandler) init(c *config) error {
-	return nil
+func (h *notificationsHandler) init(c *Config) {
 }
 
-// Notifications dispatches any notifications received from remote OCM sites
-// according to the specifications at:
-// https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
-func (h *notifHandler) Notifications(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	log := appctx.GetLogger(ctx)
-	req, err := getNotification(r)
-	if err != nil {
-		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
-		return
-	}
+func (h *notificationsHandler) Handler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := appctx.GetLogger(r.Context())
 
-	// TODO(lopresti) this is all to be implemented. For now we just log what we got
-	log.Debug().Msgf("Received OCM notification: %+v", req)
+		var head string
+		head, r.URL.Path = router.ShiftPath(r.URL.Path)
 
-	// this is to please Nextcloud
-	w.WriteHeader(http.StatusCreated)
-}
+		log.Debug().Str("head", head).Str("tail", r.URL.Path).Msg("http routing")
 
-func getNotification(r *http.Request) (string, error) {
-	// var req notificationRequest
-	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err == nil && contentType == "application/json" {
-		bytes, _ := io.ReadAll(r.Body)
-		return string(bytes), nil
-	}
-	return "", nil
+		w.WriteHeader(http.StatusOK)
+	})
 }

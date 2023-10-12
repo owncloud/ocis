@@ -18,9 +18,7 @@
 
 package registry
 
-import (
-	"github.com/cs3org/reva/v2/pkg/auth"
-)
+import "github.com/cs3org/reva/v2/pkg/auth"
 
 // NewFunc is the function that auth implementations
 // should register to at init time.

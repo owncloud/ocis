@@ -204,7 +204,7 @@ func FromGrant(g *provider.Grant) *ACE {
 		e.flags = "g"
 		e.principal = "g:" + g.Grantee.GetGroupId().OpaqueId
 	} else {
-		e.principal = UserAce(g.Grantee.GetUserId())
+		e.principal = "u:" + g.Grantee.GetUserId().OpaqueId
 	}
 
 	if g.Expiration != nil {
@@ -212,14 +212,6 @@ func FromGrant(g *provider.Grant) *ACE {
 	}
 
 	return e
-}
-
-func UserAce(id *userpb.UserId) string {
-	if id.GetType() == userpb.UserType_USER_TYPE_FEDERATED {
-		return "u:" + id.OpaqueId + "@" + id.Idp
-	}
-
-	return "u:" + id.OpaqueId
 }
 
 // Principal returns the principal of the ACE, eg. `u:<userid>` or `g:<groupid>`

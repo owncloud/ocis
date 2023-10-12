@@ -1635,17 +1635,6 @@ func activeLocks(log *zerolog.Logger, lock *provider.Lock) string {
 		}
 		activelocks.WriteString("</d:owner>")
 	}
-
-	if un := utils.ReadPlainFromOpaque(lock.Opaque, "lockownername"); un != "" {
-		activelocks.WriteString("<oc:ownername>")
-		activelocks.WriteString(un)
-		activelocks.WriteString("</oc:ownername>")
-	}
-	if lt := utils.ReadPlainFromOpaque(lock.Opaque, "locktime"); lt != "" {
-		activelocks.WriteString("<oc:locktime>")
-		activelocks.WriteString(lt)
-		activelocks.WriteString("</oc:locktime>")
-	}
 	activelocks.WriteString("<d:timeout>")
 	activelocks.WriteString(expiration)
 	activelocks.WriteString("</d:timeout>")

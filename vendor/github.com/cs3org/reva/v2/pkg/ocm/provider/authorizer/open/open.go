@@ -1,4 +1,4 @@
-// Copyright 2018-2023 CERN
+// Copyright 2018-2021 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package open
 import (
 	"context"
 	"encoding/json"
+	"net/url"
 	"os"
 	"strings"
 
@@ -28,7 +29,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/registry"
-	"github.com/cs3org/reva/v2/pkg/utils/cfg"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -37,10 +39,12 @@ func init() {
 
 // New returns a new authorizer object.
 func New(m map[string]interface{}) (provider.Authorizer, error) {
-	var c config
-	if err := cfg.Decode(m, &c); err != nil {
+	c := &config{}
+	if err := mapstructure.Decode(m, c); err != nil {
+		err = errors.Wrap(err, "error decoding conf")
 		return nil, err
 	}
+	c.init()
 
 	f, err := os.ReadFile(c.Providers)
 	if err != nil {
@@ -63,7 +67,7 @@ type config struct {
 	Providers string `mapstructure:"providers"`
 }
 
-func (c *config) ApplyDefaults() {
+func (c *config) init() {
 	if c.Providers == "" {
 		c.Providers = "/etc/revad/ocm-providers.json"
 	}
@@ -103,7 +107,11 @@ func (a *authorizer) getOCMProviders(providers []*ocmprovider.ProviderInfo) (po 
 func (a *authorizer) getOCMHost(provider *ocmprovider.ProviderInfo) (string, error) {
 	for _, s := range provider.Services {
 		if s.Endpoint.Type.Name == "OCM" {
-			return s.Host, nil
+			ocmHost, err := url.Parse(s.Host)
+			if err != nil {
+				return "", errors.Wrap(err, "json: error parsing OCM host URL")
+			}
+			return ocmHost.Host, nil
 		}
 	}
 	return "", errtypes.NotFound("OCM Host")

@@ -1,4 +1,4 @@
-// Copyright 2018-2023 CERN
+// Copyright 2018-2021 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,10 @@ import (
 	"sync"
 
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/registry"
-	"github.com/cs3org/reva/v2/pkg/utils/cfg"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
@@ -42,27 +41,26 @@ func init() {
 
 // New returns a new authorizer object.
 func New(m map[string]interface{}) (provider.Authorizer, error) {
-	var c config
-	if err := cfg.Decode(m, &c); err != nil {
+	c := &config{}
+	if err := mapstructure.Decode(m, c); err != nil {
+		err = errors.Wrap(err, "error decoding conf")
 		return nil, err
 	}
+	c.init()
 
-	providers := []*ocmprovider.ProviderInfo{}
 	f, err := os.ReadFile(c.Providers)
 	if err != nil {
-		if !os.IsNotExist(err) {
-			return nil, err
-		}
-	} else {
-		err = json.Unmarshal(f, &providers)
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
+	}
+	providers := []*ocmprovider.ProviderInfo{}
+	err = json.Unmarshal(f, &providers)
+	if err != nil {
+		return nil, err
 	}
 
 	a := &authorizer{
 		providerIPs: sync.Map{},
-		conf:        &c,
+		conf:        c,
 	}
 	a.providers = a.getOCMProviders(providers)
 
@@ -74,7 +72,7 @@ type config struct {
 	VerifyRequestHostname bool   `mapstructure:"verify_request_hostname"`
 }
 
-func (c *config) ApplyTemplates() {
+func (c *config) init() {
 	if c.Providers == "" {
 		c.Providers = "/etc/revad/ocm-providers.json"
 	}
@@ -115,10 +113,9 @@ func (a *authorizer) GetInfoByDomain(ctx context.Context, domain string) (*ocmpr
 	return nil, errtypes.NotFound(domain)
 }
 
-func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.ProviderInfo) error {
-	log := appctx.GetLogger(ctx)
+func (a *authorizer) IsProviderAllowed(ctx context.Context, provider *ocmprovider.ProviderInfo) error {
 	var err error
-	normalizedDomain, err := normalizeDomain(pi.Domain)
+	normalizedDomain, err := normalizeDomain(provider.Domain)
 	if err != nil {
 		return err
 	}
@@ -136,22 +133,20 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 
 	switch {
 	case !providerAuthorized:
-		return errtypes.NotFound(pi.GetDomain())
+		return errtypes.NotFound(provider.GetDomain())
 	case !a.conf.VerifyRequestHostname:
 		return nil
-	case len(pi.Services) == 0:
+	case len(provider.Services) == 0:
 		return errtypes.NotSupported("No IP provided")
 	}
 
 	var ocmHost string
 	for _, p := range a.providers {
-		log.Debug().Msgf("Comparing '%s' to '%s'", p.Domain, normalizedDomain)
 		if p.Domain == normalizedDomain {
 			ocmHost, err = a.getOCMHost(p)
 			if err != nil {
 				return err
 			}
-			break
 		}
 	}
 	if ocmHost == "" {
@@ -174,9 +169,8 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	}
 
 	for _, ip := range ipList {
-		if ip == pi.Services[0].Host {
+		if ip == provider.Services[0].Host {
 			providerAuthorized = true
-			break
 		}
 	}
 	if !providerAuthorized {
@@ -200,10 +194,14 @@ func (a *authorizer) getOCMProviders(providers []*ocmprovider.ProviderInfo) (po 
 	return
 }
 
-func (a *authorizer) getOCMHost(pi *ocmprovider.ProviderInfo) (string, error) {
-	for _, s := range pi.Services {
+func (a *authorizer) getOCMHost(provider *ocmprovider.ProviderInfo) (string, error) {
+	for _, s := range provider.Services {
 		if s.Endpoint.Type.Name == "OCM" {
-			return s.Host, nil
+			ocmHost, err := url.Parse(s.Host)
+			if err != nil {
+				return "", errors.Wrap(err, "json: error parsing OCM host URL")
+			}
+			return ocmHost.Host, nil
 		}
 	}
 	return "", errtypes.NotFound("OCM Host")
