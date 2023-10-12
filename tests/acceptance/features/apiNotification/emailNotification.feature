@@ -180,3 +180,31 @@ Feature: Email notification
 
       Click here to check it: %base_url%/f/%space_id%
       """
+
+  @env-config
+  Scenario: group members get an email notification in default language when someone shares a file with the group
+    Given the config "SETTINGS_DEFAULT_LANGUAGE" has been set to "de"
+    And user "Carol" has been created with default attributes and without skeleton files
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Carol" has been added to group "group1"
+    And user "Alice" has uploaded file with content "hello world" to "text.txt"
+    When user "Alice" shares file "text.txt" with group "group1" using the sharing API
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hallo Brian Murphy
+
+      %displayname% hat "text.txt" mit Ihnen geteilt.
+
+      Zum Ansehen hier klicken: %base_url%/files/shares/with-me
+      """
+    And user "Carol" should have received the following email from user "Alice"
+      """
+      Hallo Carol King
+
+      %displayname% hat "text.txt" mit Ihnen geteilt.
+
+      Zum Ansehen hier klicken: %base_url%/files/shares/with-me
+      """

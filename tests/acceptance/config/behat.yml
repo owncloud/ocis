@@ -168,6 +168,7 @@ default:
         - GraphContext:
         - FilesVersionsContext:
         - SettingsContext:
+        - OcisConfigContext:
 
     apiAntivirus:
       paths:
