@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
@@ -81,6 +82,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7345
 
+* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
+
+   The reva ldap backend for the users and groups service did not hex escape binary uuids in LDAP
+   filter correctly this could cause problems in Active Directory setups for services using the
+   GetUserByClaim CS3 request with claim "userid".
+
+   https://github.com/owncloud/ocis/issues/7469
+   https://github.com/owncloud/ocis/pull/7476
+
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 
    We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently removed from
@@ -133,6 +143,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7178
    https://github.com/owncloud/ocis/pull/7217
    https://github.com/owncloud/ocis/pull/7410
+   https://github.com/owncloud/ocis/pull/7476
 
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 
