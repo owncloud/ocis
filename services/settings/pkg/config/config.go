@@ -39,7 +39,7 @@ type Config struct {
 
 	ServiceAccountIDAdmin string `yaml:"service_account_id_admin" env:"OCIS_SERVICE_ACCOUNT_ID;SETTINGS_SERVICE_ACCOUNT_ID_ADMIN" desc:"The ID of the service account having the admin role. See the 'auth-service' service description for more details."`
 
-	DefaultLanguage string `yaml:"default_language" env:"SETTINGS_DEFAULT_LANGUAGE" desc:"The default language. If not defined, English will be used as default. See the documentation for more details."`
+	DefaultLanguage string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE,SETTINGS_DEFAULT_LANGUAGE" desc:"(optional) The default language. If not defined, English will be used as default. See the documentation for more details."`
 
 	Context context.Context `yaml:"-"`
 }

@@ -59,7 +59,7 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath)
+	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage)
 
 	var outdatedEvents []string
 	resp := GetEventResponseOC10{}

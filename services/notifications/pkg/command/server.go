@@ -116,7 +116,7 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
 			}
 			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
-			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
+			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret, cfg.Notifications.EmailTemplatePath, cfg.Notifications.DefaultLanguage, cfg.WebUIURL)
 
 			gr.Add(svc.Run, func(error) {
 				cancel()

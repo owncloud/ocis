@@ -42,7 +42,7 @@ func NewEventsNotifier(
 	logger log.Logger,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
-	serviceAccountID, serviceAccountSecret, emailTemplatePath, ocisURL string) Service {
+	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL string) Service {
 
 	return eventsNotifier{
 		logger:               logger,
@@ -54,6 +54,7 @@ func NewEventsNotifier(
 		serviceAccountID:     serviceAccountID,
 		serviceAccountSecret: serviceAccountSecret,
 		emailTemplatePath:    emailTemplatePath,
+		defaultLanguage:      defaultLanguage,
 		ocisURL:              ocisURL,
 	}
 }
@@ -67,6 +68,7 @@ type eventsNotifier struct {
 	valueService         settingssvc.ValueService
 	emailTemplatePath    string
 	translationPath      string
+	defaultLanguage      string
 	ocisURL              string
 	serviceAccountID     string
 	serviceAccountSecret string
@@ -109,7 +111,7 @@ func (s eventsNotifier) render(ctx context.Context, template email.MessageTempla
 		locale := s.getUserLang(ctx, usr.GetId())
 		fields[granteeFieldName] = usr.GetDisplayName()
 
-		rendered, err := email.RenderEmailTemplate(template, locale, s.emailTemplatePath, s.translationPath, fields)
+		rendered, err := email.RenderEmailTemplate(template, locale, s.defaultLanguage, s.emailTemplatePath, s.translationPath, fields)
 		if err != nil {
 			return nil, err
 		}

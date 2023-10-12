@@ -183,7 +183,7 @@ Feature: Email notification
 
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
-    Given the config "SETTINGS_DEFAULT_LANGUAGE" has been set to "de"
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
     And user "Carol" has been created with default attributes and without skeleton files
     And group "group1" has been created
     And user "Brian" has been added to group "group1"

@@ -24,6 +24,7 @@ type Config struct {
 
 	RevaGateway     string      `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
 	TranslationPath string      `yaml:"translation_path" env:"OCIS_TRANSLATION_PATH;USERLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details."`
+	DefaultLanguage string      `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE,USERLOG_DEFAULT_LANGUAGE" desc:"(optional) The default language. If not defined, English will be used as default. See the documentation for more details."`
 	Events          Events      `yaml:"events"`
 	Persistence     Persistence `yaml:"persistence"`
 

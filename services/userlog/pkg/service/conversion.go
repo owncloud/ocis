@@ -55,6 +55,7 @@ type Converter struct {
 	gwc                   gateway.GatewayAPIClient
 	serviceName           string
 	translationPath       string
+	defaultLanguage       string
 	serviceAccountContext context.Context
 
 	// cached within one request not to query other service too much
@@ -64,12 +65,13 @@ type Converter struct {
 }
 
 // NewConverter returns a new Converter
-func NewConverter(ctx context.Context, loc string, gwc gateway.GatewayAPIClient, name string, translationPath string) *Converter {
+func NewConverter(ctx context.Context, loc string, gwc gateway.GatewayAPIClient, name, translationPath, defaultLanguage string) *Converter {
 	return &Converter{
 		locale:                loc,
 		gwc:                   gwc,
 		serviceName:           name,
 		translationPath:       translationPath,
+		defaultLanguage:       defaultLanguage,
 		serviceAccountContext: ctx,
 		spaces:                make(map[string]*storageprovider.StorageSpace),
 		users:                 make(map[string]*user.User),
@@ -137,7 +139,7 @@ func (c *Converter) spaceDeletedMessage(eventid string, executant *user.UserId, 
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(SpaceDeleted, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(SpaceDeleted, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"username":  usr.GetDisplayName(),
 		"spacename": spacename,
 	})
@@ -173,7 +175,7 @@ func (c *Converter) spaceMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"username":  usr.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
@@ -207,7 +209,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"username":     usr.GetDisplayName(),
 		"resourcename": info.GetName(),
 	})
@@ -231,7 +233,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 }
 
 func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, executant *user.User, rid *storageprovider.ResourceId, filename string, virus string, ts time.Time) (OC10Notification, error) {
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"resourcename":     filename,
 		"virusdescription": virus,
 	})
@@ -265,7 +267,7 @@ func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, execut
 }
 
 func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, executant *user.User, filename string, ts time.Time) (OC10Notification, error) {
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"resourcename": filename,
 	})
 	if err != nil {
@@ -293,7 +295,7 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 }
 
 func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string) (OC10Notification, error) {
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
 		"date": deproDate,
 	})
 	if err != nil {
@@ -347,8 +349,8 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	return usr, err
 }
 
-func composeMessage(nt NotificationTemplate, locale string, path string, vars map[string]interface{}) (string, string, string, string, error) {
-	subjectraw, messageraw := loadTemplates(nt, locale, path)
+func composeMessage(nt NotificationTemplate, locale, defaultLocale, path string, vars map[string]interface{}) (string, string, string, string, error) {
+	subjectraw, messageraw := loadTemplates(nt, locale, defaultLocale, path)
 
 	subject, err := executeTemplate(subjectraw, vars)
 	if err != nil {
@@ -359,7 +361,7 @@ func composeMessage(nt NotificationTemplate, locale string, path string, vars ma
 	return subject, subjectraw, message, messageraw, err
 }
 
-func loadTemplates(nt NotificationTemplate, locale string, path string) (string, string) {
+func newLocate(locale string, path string) *gotext.Locale {
 	// Create Locale with library path and language code and load default domain
 	var l *gotext.Locale
 	if path == "" {
@@ -369,6 +371,14 @@ func loadTemplates(nt NotificationTemplate, locale string, path string) (string,
 		l = gotext.NewLocale(path, locale)
 	}
 	l.AddDomain(_domain) // make domain configurable only if needed
+	return l
+}
+
+func loadTemplates(nt NotificationTemplate, locale, defaultLocale, path string) (string, string) {
+	l := newLocate(locale, path)
+	if locale != "en" && len(l.GetTranslations()) == 0 {
+		l = newLocate(defaultLocale, path)
+	}
 	return l.Get(nt.Subject), l.Get(nt.Message)
 }
 

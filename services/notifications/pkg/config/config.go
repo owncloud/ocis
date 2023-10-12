@@ -1,3 +1,4 @@
+// Package config provides the service configuration.
 package config
 
 import (
@@ -31,6 +32,7 @@ type Notifications struct {
 	Events            Events                `yaml:"events"`
 	EmailTemplatePath string                `yaml:"email_template_path" env:"OCIS_EMAIL_TEMPLATE_PATH;NOTIFICATIONS_EMAIL_TEMPLATE_PATH" desc:"Path to Email notification templates overriding embedded ones."`
 	TranslationPath   string                `yaml:"translation_path" env:"OCIS_TRANSLATION_PATH,NOTIFICATIONS_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details."`
+	DefaultLanguage   string                `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE,NOTIFICATIONS_DEFAULT_LANGUAGE" desc:"(optional) The default language. If not defined, English will be used as default. See the documentation for more details."`
 	RevaGateway       string                `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
 	GRPCClientTLS     *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 }
