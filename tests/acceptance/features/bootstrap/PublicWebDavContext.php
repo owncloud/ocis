@@ -90,6 +90,7 @@ class PublicWebDavContext implements Context {
 
 	/**
 	 * @When /^the public downloads the last public link shared file using the (old|new) public WebDAV API$/
+	 * @When /^the public tries to download the last public link shared file using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $publicWebDAVAPIVersion
 	 *
@@ -102,6 +103,7 @@ class PublicWebDavContext implements Context {
 
 	/**
 	 * @When /^the public downloads the last public link shared file with password "([^"]*)" using the (old|new) public WebDAV API$/
+	 * @When /^the public tries to download the last public link shared file with password "([^"]*)" using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $password
 	 * @param string $publicWebDAVAPIVersion
@@ -242,15 +244,15 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)"$/
+	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder with password "([^"]*)" using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $path
-	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
+	 * @param string $publicWebDAVAPIVersion
 	 *
 	 * @return void
 	 */
-	public function downloadPublicFileInsideAFolderWithPassword(string $path, string $publicWebDAVAPIVersion = "old", string $password = ""):void {
+	public function publicDownloadsFileFromInsideLastPublicSharedFolderWithPassword(string $path, string $password = "", string $publicWebDAVAPIVersion = "old"):void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
@@ -721,13 +723,13 @@ class PublicWebDavContext implements Context {
 			$password
 		);
 
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+
 		$this->featureContext->checkDownloadedContentMatches(
 			$expectedContent,
 			"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API",
 			$response
 		);
-
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**

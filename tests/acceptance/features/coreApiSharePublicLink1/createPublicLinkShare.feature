@@ -59,10 +59,10 @@ Feature: create a public link share
       | uid_owner              | %username%      |
       | name                   |                 |
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
-    When the public downloads the last public link shared file with password "%regular%" using the new public WebDAV API
+    When the public tries to download the last public link shared file with password "%regular%" using the new public WebDAV API
     Then the HTTP status code should be "401"
     And the value of the item "//s:message" in the response should match "/Username or password was incorrect/"
-    When the public downloads the last public link shared file using the new public WebDAV API
+    When the public tries to download the last public link shared file using the new public WebDAV API
     Then the HTTP status code should be "401"
     And the value of the item "//s:message" in the response should match "/No 'Authorization: Basic' header found/"
     Examples:
