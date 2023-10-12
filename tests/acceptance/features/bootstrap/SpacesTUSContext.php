@@ -57,7 +57,8 @@ class SpacesTUSContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFileViaTusInSpace(string $user, string $source, string $destination, string $spaceName): void {
-		$this->userUploadsAFileViaTusInsideOfTheSpaceUsingTheWebdavApi($user, $source, $destination, $spaceName);
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$this->tusContext->userUploadsUsingTusAFileTo($user, $source, $destination);
 	}
 
 	/**
@@ -152,7 +153,7 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has uploaded a file with content "([^"]*)" to "([^"]*)" via TUS inside of the space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has uploaded a file with content "([^"]*)" to "([^"]*)" via TUS inside of the space "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $content
@@ -239,7 +240,7 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" uploads file with checksum "([^"]*)" to the last created TUS Location with offset "([^"]*)" and content "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" uploads file with checksum "([^"]*)" to the last created TUS Location with offset "([^"]*)" and content "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $checksum
@@ -259,7 +260,7 @@ class SpacesTUSContext implements Context {
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
