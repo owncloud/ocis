@@ -2966,21 +2966,8 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		if ($this->isTestingWithLdap()  && !$this->isLocalAdminGroup($group)) {
-			try {
-				$this->addUserToLdapGroup(
-					$user,
-					$group
-				);
-			} catch (LdapException $exception) {
-				throw new Exception(
-					"User $user cannot be added to $group Error: $exception"
-				);
-			};
-		} elseif (OcisHelper::isTestingWithGraphApi()) {
-			$response = $this->graphContext->addUserToGroup($group, $user);
-			$this->setResponse($response);
-		}
+		$response = $this->graphContext->addUserToGroup($group, $user);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -2994,7 +2981,21 @@ trait Provisioning {
 	 */
 	public function userHasBeenAddedToGroup(string $user, string $group):void {
 		$user = $this->getActualUsername($user);
-		$this->addUserToGroup($user, $group, null);
+		if ($this->isTestingWithLdap() && !$this->isLocalAdminGroup($group)) {
+			try {
+				$this->addUserToLdapGroup(
+					$user,
+					$group
+				);
+			} catch (LdapException $exception) {
+				throw new Exception(
+					"User $user cannot be added to $group Error: $exception"
+				);
+			}
+		} else {
+			$response = $this->graphContext->addUserToGroup($group, $user);
+			$this->theHTTPStatusCodeShouldBe(204, '', $response);
+		}
 	}
 
 	/**
@@ -3009,52 +3010,6 @@ trait Provisioning {
 		$this->verifyTableNodeColumns($table, ['username', 'groupname']);
 		foreach ($table as $row) {
 			$this->userHasBeenAddedToGroup($row['username'], $row['groupname']);
-		}
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $group
-	 * @param string|null $method how to add the user to the group api|occ
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function addUserToGroup(string $user, string $group, ?string $method = null):void {
-		$user = $this->getActualUsername($user);
-		if ($method === null
-			&& $this->isTestingWithLdap()
-			&& !$this->isLocalAdminGroup($group)
-		) {
-			//guess yourself
-			$method = "ldap";
-		} elseif ($method === null && OcisHelper::isTestingWithGraphApi()) {
-			$method = "graph";
-		}
-		$method = \trim(\strtolower($method));
-		switch ($method) {
-			case "ldap":
-				try {
-					$this->addUserToLdapGroup(
-						$user,
-						$group
-					);
-				} catch (LdapException $exception) {
-					throw new Exception(
-						"User $user cannot be added to $group Error: $exception"
-					);
-				};
-				break;
-			case "graph":
-				$result = $this->graphContext->addUserToGroup($group, $user);
-				if ($result->getStatusCode() !== 204) {
-					$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
-				}
-				break;
-			default:
-				throw new InvalidArgumentException(
-					"Invalid method to add a user to a group"
-				);
 		}
 	}
 
