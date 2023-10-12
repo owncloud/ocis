@@ -1426,4 +1426,46 @@ class GraphHelper {
 			self::getRequestHeaders(),
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $path
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public static function getShareMountId(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $path
+	): string {
+		$response = self::getMySpaces(
+			$baseUrl,
+			$user,
+			$password,
+			'',
+			$xRequestId
+		);
+		$drives = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+
+		// the response returns the shared resource in driveAlias all in lowercase,
+		// For example: if we get the property of a shared resource "FOLDER" then the response contains "driveAlias": "mountpoint/folder"
+		// In case of two shares with same name, the response for the second shared resource will contain, "driveAlias": "mountpoint/folder-(2)"
+		$path = strtolower($path);
+		foreach ($drives["value"] as $value) {
+			if ($value["driveAlias"] === "mountpoint/" . $path) {
+				return $value["id"];
+			}
+		}
+		throw new \Exception(
+			__METHOD__
+			. " Cannot find share mountpoint id of '$path' for user '$user'"
+		);
+	}
 }
