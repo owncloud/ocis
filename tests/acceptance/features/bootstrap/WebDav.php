@@ -3362,7 +3362,8 @@ trait WebDav {
 		$files = $table->getHash();
 		$this->emptyLastHTTPStatusCodesArray();
 		foreach ($files as $fileName) {
-			$this->downloadFileAsUserUsingPassword($user, $fileName["path"]);
+			$response = $this->downloadFileAsUserUsingPassword($user, $fileName["path"]);
+			$this->setResponse($response);
 			$this->pushToLastStatusCodesArrays();
 		}
 	}
@@ -4933,7 +4934,7 @@ trait WebDav {
 		if ($this->getDavPathVersion() === 3) {
 			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
 		} else {
-			$this->uploadFileWithContent($user, $content, $destination);
+			$this->setResponse($this->uploadFileWithContent($user, $content, $destination));
 		}
 	}
 
