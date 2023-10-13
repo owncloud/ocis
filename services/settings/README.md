@@ -79,3 +79,14 @@ The settings service needs to know the ID's of service accounts but it doesn't n
 The default language can be defined via `OCIS_DEFAULT_LANGUAGE` environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for notification and invitation emails.
 
 Important developer note: the list of supported languages is at the moment not easy defineable, as it is the minimum intersection of languages shown in the WebUI and languages defined in the ocis code for the use of notifications. Even more, not all languages where there are translations available on transifex, are available in the WebUI respectively for ocis notifications, and the translation rate for existing languages is partially not that high. You will see therefore quite often English default strings though a supported language may exist and was selected.
+
+The `OCIS_DEFAULT_LANGUAGE` impact `notification` and `userlog` services and UI and depends on existing translation.
+
+If  `OCIS_DEFAULT_LANGUAGE` is not set the expected behavior is: `notification` and `userlog` services and UI use
+English by default until a user sets another language in an Account-> Language. If a user sets another language in an
+Account-> Language then `notification` and `userlog` services and UI use a user language but if no translation found falls back to English.
+
+If  `OCIS_DEFAULT_LANGUAGE` is set the expected behavior is: `notification` and `userlog` services and UI
+use `OCIS_DEFAULT_LANGUAGE`  by default until a user sets another language in an Account-> Language. If a user sets
+another language in an Account-> Language then `notification` and `userlog` services and UI to use a user language
+but if no translation found falls back to `OCIS_DEFAULT_LANGUAGE` and then to English.
