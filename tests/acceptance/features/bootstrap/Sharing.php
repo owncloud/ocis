@@ -2525,8 +2525,8 @@ trait Sharing {
 	 */
 	public function userDownloadsFailWithMessage(string $fileName, string $user, PyStringNode $errorMessage):void {
 		$user = $this->getActualUsername($user);
-		$this->downloadFileAsUserUsingPassword($user, $fileName);
-		$receivedErrorMessage = $this->getResponseXml(null, __METHOD__)->xpath('//s:message');
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
+		$receivedErrorMessage = $this->getResponseXml($response, __METHOD__)->xpath('//s:message');
 		Assert::assertEquals(
 			$errorMessage,
 			(string) $receivedErrorMessage[0],

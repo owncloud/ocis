@@ -310,7 +310,7 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "first time upload content" to "file.txt"
     When user "Alice" uploads a file with content "Overwrite file" and mtime "Thu, 08 Aug 2019 04:18:13 GMT" to "file.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
+    Then the HTTP status code should be "204"
     And as "Alice" file "file.txt" should exist
     And as "Alice" the mtime of the file "file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
     And the content of file "file.txt" for user "Alice" should be "Overwrite file"
