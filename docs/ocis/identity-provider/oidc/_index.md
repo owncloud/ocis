@@ -3,12 +3,12 @@ title: "OIDC"
 date: 2023-10-10T00:00:00+00:00
 weight: 21
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/apis/http/idp
+geekdocEditPath: edit/master/docs/ocis/identity-provider/oidc
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
-Ocis can act as an Identity Provider (IdP) for OpenID Connect (OIDC) authentication .
+Infinite Scale has implemented OpenID Connect (OIDC) for authentication.
 OIDC defines a discovery mechanism, called OpenID Connect Discovery,
 where an OpenID server publishes its metadata at a well-known URL, typically
 
@@ -102,8 +102,3 @@ Here is an example of data returned:
   "request_uri_parameter_supported": false
 }
 ```
-
-In OIDC, authentication can follow one of the three as described in [Visit Offical site](https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3):
-1. Authorization Code Flow
-2. Implicit Flow
-3. Hybrid Flow
