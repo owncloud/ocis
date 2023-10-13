@@ -3697,9 +3697,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return bool
 	 */
 	public static function isExpectedToFail(string $scenarioLine): bool {
-		$expectedFailFile = __DIR__ . '/../../expected-failures-localAPI-on-OCIS-storage.md';
-		if (\strpos($scenarioLine, "coreApi") === 0) {
-			$expectedFailFile = __DIR__ . '/../../expected-failures-API-on-OCIS-storage.md';
+		$expectedFailFile = \getenv('EXPECTED_FAILURES_FILE');
+		if (!$expectedFailFile) {
+			$expectedFailFile = __DIR__ . '/../../expected-failures-localAPI-on-OCIS-storage.md';
+			if (\strpos($scenarioLine, "coreApi") === 0) {
+				$expectedFailFile = __DIR__ . '/../../expected-failures-API-on-OCIS-storage.md';
+			}
 		}
 
 		$reader = \fopen($expectedFailFile, 'r');
