@@ -21,6 +21,7 @@ import (
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config/defaults"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config/defaults"
+	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config/defaults"
 	policies "github.com/owncloud/ocis/v2/services/policies/pkg/config/defaults"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/defaults"
@@ -70,6 +71,7 @@ func DefaultConfig() *Config {
 		Nats:              nats.DefaultConfig(),
 		Notifications:     notifications.DefaultConfig(),
 		OCDav:             ocdav.DefaultConfig(),
+		OCM:               ocm.DefaultConfig(),
 		OCS:               ocs.DefaultConfig(),
 		Postprocessing:    postprocessing.DefaultConfig(),
 		Policies:          policies.DefaultConfig(),

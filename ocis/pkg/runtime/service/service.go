@@ -39,6 +39,7 @@ import (
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
+	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/command"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/command"
 	policies "github.com/owncloud/ocis/v2/services/policies/pkg/command"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/command"
@@ -271,6 +272,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Webfinger.Context = ctx
 		cfg.Webfinger.Commons = cfg.Commons
 		return webfinger.Execute(cfg.Webfinger)
+	})
+	reg(opts.Config.OCM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.OCM.Context = ctx
+		cfg.OCM.Commons = cfg.Commons
+		return ocm.Execute(cfg.OCM)
 	})
 
 	// populate optional services

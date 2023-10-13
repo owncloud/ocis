@@ -22,6 +22,7 @@ import (
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
+	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 	policies "github.com/owncloud/ocis/v2/services/policies/pkg/config"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
@@ -98,6 +99,7 @@ type Config struct {
 	Nats              *nats.Config           `yaml:"nats"`
 	Notifications     *notifications.Config  `yaml:"notifications"`
 	OCDav             *ocdav.Config          `yaml:"ocdav"`
+	OCM               *ocm.Config            `yaml:"ocm"`
 	OCS               *ocs.Config            `yaml:"ocs"`
 	Postprocessing    *postprocessing.Config `yaml:"postprocessing"`
 	Policies          *policies.Config       `yaml:"policies"`

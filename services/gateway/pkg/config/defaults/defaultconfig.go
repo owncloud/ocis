@@ -63,6 +63,7 @@ func DefaultConfig() *config.Config {
 		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",
 		StorageUsersEndpoint:      "com.owncloud.api.storage-users",
 		UsersEndpoint:             "com.owncloud.api.users",
+		OCMEndpoint:               "com.owncloud.api.ocm",
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",
