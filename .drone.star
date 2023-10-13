@@ -791,7 +791,8 @@ def localApiTestPipeline(ctx):
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     localApiTests(suite, storage, params["extraEnvironment"]),
+                                     localApiTests(suite, storage, params["extraEnvironment"]) +
+                                     logRequests(),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
@@ -1007,7 +1008,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
                      },
-                 ],
+                 ] +
+                 logRequests(),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -2816,4 +2818,18 @@ def tikaService():
         "commands": [
             "wait-for -it tika:9998 -t 300",
         ],
+    }]
+
+def logRequests():
+    return [{
+        "name": "api-test-failure-logs",
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+        "commands": [
+            "cat %s/tests/acceptance/logs/failed.log" % dirs["base"],
+        ],
+        "when": {
+            "status": [
+                "failure",
+            ],
+        },
     }]
