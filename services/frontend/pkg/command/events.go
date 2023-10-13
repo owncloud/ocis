@@ -3,6 +3,12 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
+	"path"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -23,6 +29,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
@@ -115,12 +122,25 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 		return
 	}
 
+	info, err := utils.GetResourceByID(ctx, ev.ItemID, gwc)
+	if err != nil {
+		l.Error().Err(err).Msg("error getting resource")
+		return
+	}
+
 	for _, uid := range uids {
 		if !autoAcceptShares(ctx, uid, autoAcceptDefault, vs) {
 			continue
 		}
 
-		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid))
+		mountpoint, err := getMountpoint(ctx, ev.ItemID, uid, gwc, info)
+		if err != nil {
+			l.Error().Err(err).Msg("error getting mountpoint")
+			continue
+
+		}
+
+		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid, mountpoint))
 		if err != nil {
 			l.Error().Err(err).Msg("error sending grpc request")
 			continue
@@ -131,6 +151,49 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 		}
 	}
 
+}
+
+func getMountpoint(ctx context.Context, itemid *provider.ResourceId, uid *user.UserId, gwc gateway.GatewayAPIClient, info *provider.ResourceInfo) (string, error) {
+	lrs, err := getSharesList(ctx, gwc, uid)
+	if err != nil {
+		return "", err
+	}
+
+	// we need to sort the received shares by mount point in order to make things easier to evaluate.
+	base := path.Base(info.GetPath())
+	mount := base
+	var mountedShares []*collaboration.ReceivedShare
+	for _, s := range lrs.Shares {
+		if !utils.ResourceIDEqual(s.Share.ResourceId, itemid) && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			mountedShares = append(mountedShares, s)
+		}
+	}
+
+	sort.Slice(mountedShares, func(i, j int) bool {
+		return mountedShares[i].MountPoint.Path > mountedShares[j].MountPoint.Path
+	})
+
+	// now we have a list of shares, we want to iterate over all of them and check for name collisions
+	for i, ms := range mountedShares {
+		if ms.MountPoint.Path == mount {
+			// does the shared resource still exist?
+			_, err := utils.GetResourceByID(ctx, ms.Share.ResourceId, gwc)
+			if err == nil {
+				// The mount point really already exists, we need to insert a number into the filename
+				ext := filepath.Ext(base)
+				name := strings.TrimSuffix(base, ext)
+				// be smart about .tar.(gz|bz) files
+				if strings.HasSuffix(name, ".tar") {
+					name = strings.TrimSuffix(name, ".tar")
+					ext = ".tar" + ext
+				}
+
+				mount = fmt.Sprintf("%s (%s)%s", name, strconv.Itoa(i+1), ext)
+			}
+			// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
+		}
+	}
+	return mount, nil
 }
 
 func getUserIDs(ctx context.Context, gwc gateway.GatewayAPIClient, uid *user.UserId, gid *group.GroupId) ([]*user.UserId, error) {
@@ -149,11 +212,11 @@ func getUserIDs(ctx context.Context, gwc gateway.GatewayAPIClient, uid *user.Use
 	return res.GetGroup().GetMembers(), nil
 }
 
-func autoAcceptShares(ctx context.Context, u *user.UserId, defaultValue bool, vs settingssvc.ValueService) bool {
-	granteeCtx := metadata.Set(ctx, middleware.AccountID, u.OpaqueId)
+func autoAcceptShares(ctx context.Context, uid *user.UserId, defaultValue bool, vs settingssvc.ValueService) bool {
+	granteeCtx := metadata.Set(ctx, middleware.AccountID, uid.GetOpaqueId())
 	if resp, err := vs.GetValueByUniqueIdentifiers(granteeCtx,
 		&settingssvc.GetValueByUniqueIdentifiersRequest{
-			AccountUuid: u.OpaqueId,
+			AccountUuid: uid.GetOpaqueId(),
 			SettingId:   defaults.SettingUUIDProfileAutoAcceptShares,
 		},
 	); err == nil {
@@ -163,15 +226,36 @@ func autoAcceptShares(ctx context.Context, u *user.UserId, defaultValue bool, vs
 	return defaultValue
 }
 
-func updateShareRequest(shareID *collaboration.ShareId, uid *user.UserId) *collaboration.UpdateReceivedShareRequest {
+func updateShareRequest(shareID *collaboration.ShareId, uid *user.UserId, path string) *collaboration.UpdateReceivedShareRequest {
 	return &collaboration.UpdateReceivedShareRequest{
 		Opaque: utils.AppendJSONToOpaque(nil, "userid", uid),
 		Share: &collaboration.ReceivedShare{
 			Share: &collaboration.Share{
 				Id: shareID,
 			},
+			MountPoint: &provider.Reference{
+				Path: path,
+			},
 			State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
 		},
-		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state"}},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}},
 	}
+}
+
+// getSharesList gets the list of all shares for the given user.
+func getSharesList(ctx context.Context, client gateway.GatewayAPIClient, uid *user.UserId) (*collaboration.ListReceivedSharesResponse, error) {
+	shares, err := client.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
+		Opaque: utils.AppendJSONToOpaque(nil, "userid", uid),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if shares.Status.Code != rpc.Code_CODE_OK {
+		if shares.Status.Code == rpc.Code_CODE_NOT_FOUND {
+			return nil, fmt.Errorf("not found")
+		}
+		return nil, fmt.Errorf(shares.GetStatus().GetMessage())
+	}
+	return shares, nil
 }
