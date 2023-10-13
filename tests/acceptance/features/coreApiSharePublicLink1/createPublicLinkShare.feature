@@ -59,10 +59,11 @@ Feature: create a public link share
       | uid_owner              | %username%      |
       | name                   |                 |
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
-    And the HTTP status code should be "200"
-    And the public download of the last publicly shared file using the new public WebDAV API with password "%regular%" should fail with HTTP status code "401"
+    When the public tries to download the last public link shared file with password "%regular%" using the new public WebDAV API
+    Then the HTTP status code should be "401"
     And the value of the item "//s:message" in the response should match "/Username or password was incorrect/"
-    And the public download of the last publicly shared file using the new public WebDAV API without a password should fail with HTTP status code "401"
+    When the public tries to download the last public link shared file using the new public WebDAV API
+    Then the HTTP status code should be "401"
     And the value of the item "//s:message" in the response should match "/No 'Authorization: Basic' header found/"
     Examples:
       | ocs_api_version | ocs_status_code |
