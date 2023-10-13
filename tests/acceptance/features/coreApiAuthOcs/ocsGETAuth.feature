@@ -121,9 +121,7 @@ Feature: auth
 
   @issue-1337 @issue-1319
   Scenario: using OCS as admin user with wrong password
-    Given user "another-admin" has been created with default attributes and without skeleton files
-    And user "another-admin" has been added to group "admin"
-    When user "another-admin" requests these endpoints with "GET" using password "invalid"
+    When user "admin" requests these endpoints with "GET" using password "invalid"
       | endpoint                                                    |
       | /ocs/v1.php/apps/files_sharing/api/v1/remote_shares         |
       | /ocs/v2.php/apps/files_sharing/api/v1/remote_shares         |

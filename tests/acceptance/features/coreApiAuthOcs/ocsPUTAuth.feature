@@ -3,13 +3,9 @@ Feature: auth
   I want to send PUT request to various endpoints
   So that I can make sure the endpoints need proper authentication
 
-  Background:
-    Given user "another-admin" has been created with default attributes and without skeleton files
-
   @issue-1337 @smokeTest
   Scenario: send PUT request to OCS endpoints as admin with wrong password
-    Given user "another-admin" has been added to group "admin"
-    When user "another-admin" requests these endpoints with "PUT" including body "doesnotmatter" using password "invalid" about user "Alice"
+    When user "admin" requests these endpoints with "PUT" including body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                                         |
       | /ocs/v1.php/cloud/users/%username%               |
       | /ocs/v2.php/cloud/users/%username%               |
@@ -24,8 +20,7 @@ Feature: auth
 
 
   Scenario: request to edit nonexistent user by authorized admin gets unauthorized in http response
-    Given user "another-admin" has been added to group "admin"
-    When user "another-admin" requests these endpoints with "PUT" including body "doesnotmatter" about user "nonexistent"
+    When user "admin" requests these endpoints with "PUT" including body "doesnotmatter" about user "nonexistent"
       | endpoint                                         |
       | /ocs/v1.php/cloud/users/%username%               |
       | /ocs/v2.php/cloud/users/%username%               |
