@@ -2,6 +2,8 @@
 
 The `settings` service provides functionality for other services to register new settings as well as storing and retrieving the respective settings' values.
 
+## Settings Managed
+
 The settings service is currently used for managing the:
 
 *   users' `profile` settings like the language and the email notification settings,
@@ -66,7 +68,7 @@ Infinite Scale services can register *settings bundles* with the settings servic
 
 ## Settings Usage
 
-Services can set or query ocis *setting values* of a user from settings bundles.
+Services can set or query Infinite Scale *setting values* of a user from settings bundles.
 
 ## Service Accounts
 
