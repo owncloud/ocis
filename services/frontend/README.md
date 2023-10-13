@@ -82,7 +82,7 @@ Define the minimum password length.
 Define the minimum number of uppercase letters.
 -   `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`  
 Define the minimum number of lowercase letters.
--   `FRONTEND_PASSWORD_POLICIY_MIN_DIGITS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_DIGITS`  
 Define the minimum number of digits.
 -   `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`  
 Define the minimum number of special characters.
