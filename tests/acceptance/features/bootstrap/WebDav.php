@@ -31,6 +31,7 @@ use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\Asserts\WebDav as WebDavAssert;
+use TestHelpers\GraphHelper;
 
 /**
  * WebDav functions
@@ -4848,6 +4849,195 @@ trait WebDav {
 			$height
 		);
 		$this->setResponse($response);
+	}
+
+	/**
+	 * @When user :user downloads the preview of shared resource :path with width :width and height :height using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 */
+	public function userDownloadsThePreviewOfSharedResourceWithWidthAndHeightUsingTheWebdavApi(string $user, string $path, string $width, string $height): void {
+		if ($this->getDavPathVersion() === 3) {
+			$this->setResponse($this->downloadSharedFilePreview($user, $path, $width, $height));
+		} else {
+			$this->setResponse($this->downloadPreviews($user, $path, null, $width, $height));
+		}
+	}
+
+	/**
+	 * @Given user :user has downloaded the preview of shared resource :path with width :width and height :height
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 */
+	public function userHasDownloadedThePreviewOfSharedResourceWithWidthAndHeight(string $user, string $path, string $width, string $height): void {
+		if ($this->getDavPathVersion() === 3) {
+			$response = $this->downloadSharedFilePreview($user, $path, $width, $height);
+		} else {
+			$response = $this->downloadPreviews($user, $path, null, $width, $height);
+		}
+		$this->setResponse($response);
+		$this->theHTTPStatusCodeShouldBe(200, '', $response);
+		$this->imageDimensionsShouldBe($width, $height);
+		// save response to user response dictionary for further comparisons
+		$this->userResponseBodyContents[$user] = $this->responseBodyContent;
+	}
+
+	/**
+	 * @Then as user :user the preview of shared resource :path with width :width and height :height should have been changed
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 */
+	public function asUserThePreviewOfSharedResourceWithWidthAndHeightShouldHaveBeenChanged(string $user, string $path, string $width, string $height):void {
+		if ($this->getDavPathVersion() === 3) {
+			$response = $this->downloadSharedFilePreview($user, $path, $width, $height);
+		} else {
+			$response = $this->downloadPreviews($user, $path, null, $width, $height);
+		}
+		$this->setResponse($response);
+		$this->theHTTPStatusCodeShouldBe(200, '', $response);
+		$newResponseBodyContents = $this->response->getBody()->getContents();
+		Assert::assertNotEquals(
+			$newResponseBodyContents,
+			// different users can download files before and after an update is made to a file
+			// previous response content is fetched from user response body content array for that user
+			$this->userResponseBodyContents[$user],
+			__METHOD__ . " previous and current previews content is same but expected to be different",
+		);
+		// update the saved content for the next comparison
+		$this->userResponseBodyContents[$user] = $newResponseBodyContents;
+	}
+
+	/**
+	 * @When user :user uploads file with content :content to shared resource :destination using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $content
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function userUploadsFileWithContentSharedResourceToUsingTheWebdavApi(string $user, string $content, string $destination): void {
+		if ($this->getDavPathVersion() === 3) {
+			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
+		} else {
+			$this->setResponse($this->uploadFileWithContent($user, $content, $destination));
+		}
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $path
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getMountSharesPath(
+		string $user,
+		string $path
+	): string {
+		$user = $this->getActualUsername($user);
+		$path = trim($path, "/");
+		$pathArray = explode("/", $path);
+
+		$shareMountId = GraphHelper::getShareMountId(
+			$this->getBaseUrl(),
+			$this->getStepLineRef(),
+			$user,
+			$this->getPasswordForUser($user),
+			$pathArray[1]
+		);
+
+		if (\count($pathArray) > 2) {
+			$pathArray = \array_slice($pathArray, 2);
+			$path = '/' . implode("/", array_map("strval", $pathArray));
+		} else {
+			$path = null;
+		}
+		return $shareMountId . $path;
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $path
+	 * @param string|null $width
+	 * @param string|null $height
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function downloadSharedFilePreview(
+		string $user,
+		string $path,
+		?string $width = null,
+		?string $height = null
+	): ResponseInterface {
+		if ($width !== null && $height !== null) {
+			$urlParameter = [
+				'x' => $width,
+				'y' => $height,
+				'forceIcon' => '0',
+				'preview' => '1'
+			];
+			$urlParameter = \http_build_query($urlParameter, '', '&');
+		} else {
+			$urlParameter = null;
+		}
+		$sharesPath = $this->getMountSharesPath($user, $path) . '/?' . $urlParameter;
+
+		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
+		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->getStepLineRef(),
+			'GET',
+			$user,
+			$this->getPasswordForUser($user)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $destination
+	 * @param string|null $content
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function uploadToSharedFolder(
+		string $user,
+		string $destination,
+		?string $content = null
+	): ResponseInterface {
+		$sharesPath = $this->getMountSharesPath($user, $destination);
+
+		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
+		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->getStepLineRef(),
+			'PUT',
+			$user,
+			$this->getPasswordForUser($user),
+			null,
+			$content
+		);
 	}
 
 	/**
