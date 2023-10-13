@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
 * Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
@@ -98,6 +99,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7312
    https://github.com/owncloud/ocis-charts/issues/397
+
+* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
+
+   On shares auto accept set a mountpoint with same logic as ocs handler
+
+   https://github.com/owncloud/ocis/pull/7460
 
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 
