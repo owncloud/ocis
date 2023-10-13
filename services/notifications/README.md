@@ -66,3 +66,7 @@ Important: For the time being, the embedded ownCloud Web frontend only supports 
 *   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if the requested language-code `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
 *   If the base language `de` is also not available, the service falls back to the system's default English (`en`),
 which is the source of the texts provided by the code.
+
+## Default Language
+
+The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
