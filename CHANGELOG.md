@@ -25,6 +25,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
 * Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
+* Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
@@ -178,6 +179,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/enterprise/issues/5915
    https://github.com/owncloud/ocis/pull/7417
+
+* Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
+
+   A new config for disabling specific Web extensions via their id has been added.
+
+   https://github.com/owncloud/web/issues/8524
+   https://github.com/owncloud/ocis/pull/7486
 
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 
