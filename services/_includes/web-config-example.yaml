@@ -131,6 +131,7 @@ web:
       privacyUrl: ""
       accessDeniedHelpUrl: ""
       tokenStorageLocal: true
+      disabledExtensions: []
     styles: []
     scripts: []
     custom_translations: []
