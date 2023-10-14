@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-13-11-39-52]
+[#deprecation-note-2023-10-14-00-19-41]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| SHARING_EVENTS_TLS_ROOT_CA_CERT changing name for consistency
+| 4.0.3
+| 5.0.0
+| SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE
 |===
 
 endif::[]
@@ -228,8 +233,9 @@ a| [subs=-attributes]
 Whether to verify the server TLS certificates.
 
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-
+xref:deprecation-note-2023-10-14-00-19-41[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
