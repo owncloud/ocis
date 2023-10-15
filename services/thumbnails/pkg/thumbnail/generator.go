@@ -18,7 +18,7 @@ type Generator interface {
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
 type SimpleGenerator struct{}
 
-// Generate creates the image version based on the processor.
+// Generate generates a alternative image version.
 func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
 	m, ok := img.(image.Image)
 	if !ok {
@@ -31,6 +31,7 @@ func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}, process
 // GifGenerator is used to create a web friendly version of the provided gif image.
 type GifGenerator struct{}
 
+// Generate generates a alternative gif version.
 func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
 	// Code inspired by https://github.com/willnorris/gifresize/blob/db93a7e1dcb1c279f7eeb99cc6d90b9e2e23e871/gifresize.go
 

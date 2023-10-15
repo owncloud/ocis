@@ -53,10 +53,10 @@ Returned: 15x10
 
 Image generation can be configured by defining different processors, following processors are available:
 
-* resize
-* fit
-* fill
-* thumbnail
+*   resize
+*   fit
+*   fill
+*   thumbnail
 
 to apply one of those, a query parameter has to be added to the request, e.g. `?processor=fit`
 

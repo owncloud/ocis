@@ -28,7 +28,7 @@ func (p DefinableProcessor) Process(img image.Image, width, height int, filter i
 }
 
 // ProcessorFor returns a matching Processor
-func ProcessorFor(id, fileType string) (Processor, error) {
+func ProcessorFor(id, fileType string) (DefinableProcessor, error) {
 	switch strings.ToLower(id) {
 	case "fit":
 		return DefinableProcessor{Slug: strings.ToLower(id), Converter: imaging.Fit}, nil
