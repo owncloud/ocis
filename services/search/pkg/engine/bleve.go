@@ -6,6 +6,7 @@ import (
 	"math"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -208,6 +210,7 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Highlights: getFragmentValue(hit.Fragments, "Content", 0),
+				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
 			},
 		}
 
@@ -325,8 +328,58 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			MimeType: getFieldValue[string](fields, "MimeType"),
 			Content:  getFieldValue[string](fields, "Content"),
 			Tags:     getFieldSliceValue[string](fields, "Tags"),
+			Audio:    getAudioValue[libregraph.Audio](fields),
 		},
 	}, nil
+}
+
+func newPointerOfType[T any]() *T {
+	t := reflect.TypeOf((*T)(nil)).Elem()
+	ptr := reflect.New(t).Interface()
+	return ptr.(*T)
+}
+
+func getFieldName(structField reflect.StructField) string {
+	tag := structField.Tag.Get("json")
+	if tag == "" {
+		return structField.Name
+	}
+
+	return strings.Split(tag, ",")[0]
+}
+
+func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix string) bool {
+	nonEmpty := false
+	obj := reflect.ValueOf(out).Elem()
+	for i := 0; i < obj.NumField(); i++ {
+		field := obj.Field(i)
+		structField := obj.Type().Field(i)
+		mapKey := prefix + getFieldName(structField)
+
+		if value, ok := flatMap[mapKey]; ok {
+			if field.Kind() == reflect.Ptr {
+				alloc := reflect.New(field.Type().Elem())
+				alloc.Elem().Set(reflect.ValueOf(value).Convert(field.Type().Elem()))
+				field.Set(alloc)
+				nonEmpty = true
+			}
+		}
+	}
+
+	return nonEmpty
+}
+
+func getAudioValue[T any](fields map[string]interface{}) *T {
+	if !strings.HasPrefix(getFieldValue[string](fields, "MimeType"), "audio/") {
+		return nil
+	}
+
+	var audio = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(audio, fields, "audio."); ok {
+		return audio
+	}
+
+	return nil
 }
 
 func (b *Bleve) updateEntity(id string, mutateFunc func(r *Resource)) (*Resource, error) {

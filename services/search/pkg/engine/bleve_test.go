@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -352,6 +353,7 @@ var _ = Describe("Bleve", func() {
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 			})
 		})
+
 	})
 
 	Describe("Upsert", func() {
@@ -482,5 +484,69 @@ var _ = Describe("Bleve", func() {
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname"))
 
 		})
+	})
+
+	Describe("File type specific metadata", func() {
+
+		Context("with audio metadata", func() {
+			BeforeEach(func() {
+				resource := engine.Resource{
+					ID:       "1$2!7",
+					ParentID: rootResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./some_song.mp3",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{
+						Name:     "some_song.mp3",
+						MimeType: "audio/mpeg",
+						Audio: &libregraph.Audio{
+							Album:             libregraph.PtrString("Some Album"),
+							AlbumArtist:       libregraph.PtrString("Some AlbumArtist"),
+							Artist:            libregraph.PtrString("Some Artist"),
+							Bitrate:           libregraph.PtrInt64(192),
+							Composers:         libregraph.PtrString("Some Composers"),
+							Copyright:         libregraph.PtrString(""),
+							Disc:              libregraph.PtrInt32(2),
+							DiscCount:         libregraph.PtrInt32(5),
+							Duration:          libregraph.PtrInt64(225000),
+							Genre:             libregraph.PtrString("Some Genre"),
+							HasDrm:            libregraph.PtrBool(false),
+							IsVariableBitrate: libregraph.PtrBool(true),
+							Title:             libregraph.PtrString("Some Title"),
+							Track:             libregraph.PtrInt32(34),
+							TrackCount:        libregraph.PtrInt32(99),
+							Year:              libregraph.PtrInt32(2004),
+						},
+					},
+				}
+				err := eng.Upsert(resource.ID, resource)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns audio metadata for search", func() {
+				matches := assertDocCount(rootResource.ID, `*song*`, 1)
+				audio := matches[0].Entity.Audio
+
+				Expect(audio).ToNot(BeNil())
+
+				Expect(audio.Album).To(Equal(libregraph.PtrString("Some Album")))
+				Expect(audio.AlbumArtist).To(Equal(libregraph.PtrString("Some AlbumArtist")))
+				Expect(audio.Artist).To(Equal(libregraph.PtrString("Some Artist")))
+				Expect(audio.Bitrate).To(Equal(libregraph.PtrInt64(192)))
+				Expect(audio.Composers).To(Equal(libregraph.PtrString("Some Composers")))
+				Expect(audio.Copyright).To(Equal(libregraph.PtrString("")))
+				Expect(audio.Disc).To(Equal(libregraph.PtrInt32(2)))
+				Expect(audio.DiscCount).To(Equal(libregraph.PtrInt32(5)))
+				Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225000)))
+				Expect(audio.Genre).To(Equal(libregraph.PtrString("Some Genre")))
+				Expect(audio.HasDrm).To(Equal(libregraph.PtrBool(false)))
+				Expect(audio.IsVariableBitrate).To(Equal(libregraph.PtrBool(true)))
+				Expect(audio.Title).To(Equal(libregraph.PtrString("Some Title")))
+				Expect(audio.Track).To(Equal(libregraph.PtrInt32(34)))
+				Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(99)))
+				Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
+			})
+		})
+
 	})
 })
