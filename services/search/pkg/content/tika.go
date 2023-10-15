@@ -3,6 +3,7 @@ package content
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -10,6 +11,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/go-tika/tika"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
@@ -85,6 +87,68 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 
 		if content, err := getFirstValue(meta, "X-TIKA:content"); err == nil {
 			doc.Content = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Content, content))
+		}
+
+		if contentType, err := getFirstValue(meta, "Content-Type"); err == nil && strings.HasPrefix(contentType, "audio/") {
+			audio := libregraph.Audio{}
+
+			if v, err := getFirstValue(meta, "xmpDM:album"); err == nil {
+				audio.SetAlbum(v)
+			}
+
+			if v, err := getFirstValue(meta, "xmpDM:albumArtist"); err == nil {
+				audio.SetAlbumArtist(v)
+			}
+
+			if v, err := getFirstValue(meta, "xmpDM:artist"); err == nil {
+				audio.SetArtist(v)
+			}
+
+			// TODO: audio.Bitrate: not provided by tika
+			// TODO: audio.Composers: not provided by tika
+			// TODO: audio.Copyright: not provided by tika for audio files?
+
+			if v, err := getFirstValue(meta, "xmpDM:discNumber"); err == nil {
+				if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+					audio.SetDisc(int32(i))
+				}
+
+			}
+
+			//  TODO: audio.DiscCount: not provided by tika
+
+			if v, err := getFirstValue(meta, "xmpDM:duration"); err == nil {
+				if i, err := strconv.ParseInt(v, 10, 64); err == nil {
+					audio.SetDuration(i * 1000)
+				}
+			}
+
+			if v, err := getFirstValue(meta, "xmpDM:genre"); err == nil {
+				audio.SetGenre(v)
+			}
+
+			// TODO: audio.HasDrm: not provided by tika
+			// TODO: audio.IsVariableBitrate: not provided by tika
+
+			if v, err := getFirstValue(meta, "dc:title"); err == nil {
+				audio.SetTitle(v)
+			}
+
+			if v, err := getFirstValue(meta, "xmpDM:trackNumber"); err == nil {
+				if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+					audio.SetTrack(int32(i))
+				}
+			}
+
+			// TODO: audio.TrackCount: not provided by tika
+
+			if v, err := getFirstValue(meta, "xmpDM:releaseDate"); err == nil {
+				if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+					audio.SetYear(int32(i))
+				}
+			}
+
+			doc.Audio = &audio
 		}
 	}
 

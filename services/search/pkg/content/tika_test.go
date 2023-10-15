@@ -22,11 +22,12 @@ import (
 var _ = Describe("Tika", func() {
 	Describe("extract", func() {
 		var (
-			body     string
-			language string
-			version  string
-			srv      *httptest.Server
-			tika     *content.Tika
+			body         string
+			fullResponse string
+			language     string
+			version      string
+			srv          *httptest.Server
+			tika         *content.Tika
 		)
 
 		BeforeEach(func() {
@@ -41,7 +42,11 @@ var _ = Describe("Tika", func() {
 				case "/language/string":
 					out = language
 				case "/rmeta/text":
-					out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
+					if fullResponse != "" {
+						out = fullResponse
+					} else {
+						out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
+					}
 				}
 
 				_, _ = w.Write([]byte(out))
@@ -81,6 +86,52 @@ var _ = Describe("Tika", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal(body))
+		})
+
+		It("adds audio content", func() {
+			fullResponse = `[
+				{
+					"xmpDM:genre": "Some Genre",
+					"xmpDM:album": "Some Album",
+					"xmpDM:trackNumber": "7",
+					"xmpDM:discNumber": "4",
+					"xmpDM:releaseDate": "2004",
+					"xmpDM:artist": "Some Artist",
+					"xmpDM:albumArtist": "Some AlbumArtist",
+					"xmpDM:audioCompressor": "MP3",
+					"xmpDM:audioChannelType": "Stereo",
+					"version": "MPEG 3 Layer III Version 1",
+					"xmpDM:logComment": "some comment",
+					"xmpDM:audioSampleRate": "44100",
+					"channels": "2",
+					"dc:title": "Some Title",
+					"xmpDM:duration": "225",
+					"Content-Type": "audio/mpeg",
+					"samplerate": "44100"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Audio).ToNot(BeNil())
+			Expect(*doc.Audio.Album).To(Equal("Some Album"))
+			Expect(*doc.Audio.AlbumArtist).To(Equal("Some AlbumArtist"))
+			Expect(*doc.Audio.Artist).To(Equal("Some Artist"))
+			// Expect(*doc.Audio.Bitrate).To(Equal())
+			// Expect(*doc.Audio.Composers).To(Equal())
+			// Expect(*doc.Audio.Copyright).To(Equal())
+			Expect(*doc.Audio.Disc).To(Equal(int32(4)))
+			// Expect(*doc.Audio.DiscCount).To(Equal())
+			Expect(*doc.Audio.Duration).To(Equal(int64(225000)))
+			Expect(*doc.Audio.Genre).To(Equal("Some Genre"))
+			// Expect(*doc.Audio.HasDrm).To(Equal())
+			// Expect(*doc.Audio.IsVariableBitrate).To(Equal())
+			Expect(*doc.Audio.Title).To(Equal("Some Title"))
+			Expect(*doc.Audio.Track).To(Equal(int32(7)))
+			// Expect(*doc.Audio.TrackCount).To(Equal())
+			Expect(*doc.Audio.Year).To(Equal(int32(2004)))
 		})
 
 		It("removes stop words", func() {
