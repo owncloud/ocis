@@ -2,10 +2,12 @@ package preprocessor
 
 import (
 	"bufio"
+	"bytes"
 	"image"
 	"image/draw"
 	"image/gif"
 	"io"
+	"log"
 	"math"
 	"mime"
 	"strings"
@@ -15,6 +17,8 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/dhowden/tag"
 )
 
 type FileConverter interface {
@@ -39,6 +43,28 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
 	return img, nil
+}
+
+type AudioDecoder struct{}
+
+func (i AudioDecoder) Convert(r io.Reader) (interface{}, error) {
+	readSeeker := NewLazyReadSeeker(r)
+	m, err := tag.ReadFrom(readSeeker)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	picture := m.Picture()
+	if picture == nil {
+		return nil, errors.New(`could not extract image from audio file`)
+	}
+
+	converter := ForType(picture.MIMEType, nil)
+	if converter == nil {
+		return nil, errors.New(`could not find converter for image extraced from audio file`)
+	}
+
+	return converter.Convert(bytes.NewReader(picture.Data))
 }
 
 type TxtToImageConverter struct {
@@ -197,6 +223,12 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 		}
 	case "image/gif":
 		return GifDecoder{}
+	case "audio/flac":
+		fallthrough
+	case "audio/mpeg":
+		fallthrough
+	case "audio/ogg":
+		return AudioDecoder{}
 	default:
 		return ImageDecoder{}
 	}
