@@ -157,6 +157,66 @@
         }
       }
     },
+    "v0Audio": {
+      "type": "object",
+      "properties": {
+        "album": {
+          "type": "string"
+        },
+        "albumArtist": {
+          "type": "string"
+        },
+        "artist": {
+          "type": "string"
+        },
+        "bitrate": {
+          "type": "string",
+          "format": "int64"
+        },
+        "composers": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "disc": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "discCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "hasDrm": {
+          "type": "boolean"
+        },
+        "isVariableBitrate": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string"
+        },
+        "track": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "trackCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "year": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "v0Entity": {
       "type": "object",
       "properties": {
@@ -207,6 +267,9 @@
         },
         "highlights": {
           "type": "string"
+        },
+        "audio": {
+          "$ref": "#/definitions/v0Audio"
         }
       }
     },
