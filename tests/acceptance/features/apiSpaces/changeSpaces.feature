@@ -339,6 +339,7 @@ Feature: Change data of space
     When user "<user>" uploads a file inside space "Project Jupiter" owned by the user "Alice" with content "new content" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<expectedContent>"
+    When user "<user>" lists all available spaces via the GraphApi
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
     """
     {
@@ -422,7 +423,7 @@ Feature: Change data of space
     Given user "Alice" has created a folder ".space" in space "Project Jupiter"
     And user "Alice" has uploaded a file inside space "Project Jupiter" with content "" to ".space/spaceImage.jpeg"
     And user "Alice" has set the file ".space/spaceImage.jpeg" as a space image in a special section of the "Project Jupiter" space
-    When user "<user>" has uploaded a file inside space "Project Jupiter" with content "" to ".space/newSpaceImage.png"
+    When user "<user>" uploads a file inside space "Project Jupiter" with content "" to ".space/newSpaceImage.png" using the WebDAV API
     And user "<user>" sets the file ".space/newSpaceImage.png" as a space image in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/newSpaceImage.png" and match
