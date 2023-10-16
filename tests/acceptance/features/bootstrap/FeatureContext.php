@@ -27,9 +27,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use Helmich\JsonAssert\JsonAssertions;
 use rdx\behatvars\BehatVariablesContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
+use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
@@ -37,6 +39,7 @@ use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
+use TestHelpers\HttpLogger;
 use TestHelpers\UploadHelper;
 use TestHelpers\OcisHelper;
 use Laminas\Ldap\Ldap;
@@ -570,6 +573,66 @@ class FeatureContext extends BehatVariablesContext {
 			$this->publicLinkSharePassword = $publicLinkSharePasswordFromEnvironment;
 		}
 		$this->originalAdminPassword = $this->adminPassword;
+	}
+
+	/**
+	 * Create log directory if it doesn't exist
+	 *
+	 * @BeforeSuite
+	 *
+	 * @param BeforeSuiteScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function setupLogDir(BeforeSuiteScope $scope): void {
+		if (!\file_exists(HttpLogger::getLogDir())) {
+			\mkdir(HttpLogger::getLogDir(), 0777, true);
+		}
+	}
+
+	/**
+	 *
+	 * @BeforeScenario
+	 *
+	 * @param BeforeScenarioScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function logScenario(BeforeScenarioScope $scope): void {
+		$scenarioLine = self::getScenarioLine($scope);
+
+		if ($scope->getScenario()->getNodeType() === "Example") {
+			$scenario = "Scenario Outline: " . $scope->getScenario()->getOutlineTitle();
+		} else {
+			$scenario = $scope->getScenario()->getNodeType() . ": " . $scope->getScenario()->getTitle();
+		}
+
+		$logMessage = "## $scenario ($scenarioLine)\n";
+	
+		// Delete previous scenario's log file
+		if (\file_exists(HttpLogger::getScenarioLogPath())) {
+			\unlink(HttpLogger::getScenarioLogPath());
+		}
+
+		// Write the scenario log
+		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
+	}
+
+	/**
+	 *
+	 * @BeforeStep
+	 *
+	 * @param BeforeStepScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function logStep(BeforeStepScope $scope): void {
+		$step = $scope->getStep()->getType() . " " . $scope->getStep()->getText();
+		$logMessage = "\t### $step\n";
+		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
 	}
 
 	/**
@@ -3577,5 +3640,81 @@ class FeatureContext extends BehatVariablesContext {
 		} else {
 			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+	}
+
+	/**
+	 *
+	 * @AfterSuite
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function clearScenarioLog(): void {
+		if (\file_exists(HttpLogger::getScenarioLogPath())) {
+			\unlink(HttpLogger::getScenarioLogPath());
+		}
+	}
+
+	/**
+	 * Log request and response logs if scenario fails
+	 *
+	 * @AfterScenario
+	 *
+	 * @param AfterScenarioScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function checkScenario(AfterScenarioScope $scope): void {
+		if (($scope->getTestResult()->getResultCode() !== 0)
+			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))
+		) {
+			$logs = \file_get_contents(HttpLogger::getScenarioLogPath());
+			// add new lines
+			$logs = \rtrim($logs, "\n") . "\n\n\n";
+			HttpLogger::writeLog(HttpLogger::getFailedLogPath(), $logs);
+		}
+	}
+
+	/**
+	 * @param BeforeScenarioScope|AfterScenarioScope $scope
+	 *
+	 * @return string
+	 */
+	public static function getScenarioLine($scope): string {
+		$feature = $scope->getFeature()->getFile();
+		$feature = \explode('/', $feature);
+		$feature = \array_slice($feature, -2);
+		$feature = \implode('/', $feature);
+		$scenarioLine = $scope->getScenario()->getLine();
+		// Example: apiGraph/createUser.feature:24
+		return $feature . ':' . $scenarioLine;
+	}
+
+	/**
+	 * @param string $scenarioLine
+	 *
+	 * @return bool
+	 */
+	public static function isExpectedToFail(string $scenarioLine): bool {
+		$expectedFailFile = \getenv('EXPECTED_FAILURES_FILE');
+		if (!$expectedFailFile) {
+			$expectedFailFile = __DIR__ . '/../../expected-failures-localAPI-on-OCIS-storage.md';
+			if (\strpos($scenarioLine, "coreApi") === 0) {
+				$expectedFailFile = __DIR__ . '/../../expected-failures-API-on-OCIS-storage.md';
+			}
+		}
+
+		$reader = \fopen($expectedFailFile, 'r');
+		if ($reader) {
+			while (($line = \fgets($reader)) !== false) {
+				if (\strpos($line, $scenarioLine) !== false) {
+					\fclose($reader);
+					return true;
+				}
+			}
+			\fclose($reader);
+		}
+		return false;
 	}
 }

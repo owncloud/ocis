@@ -155,6 +155,7 @@ class HttpRequestHelper {
 			}
 		}
 
+		HttpLogger::logResponse($response);
 		return $response;
 	}
 
@@ -428,6 +429,7 @@ class HttpRequestHelper {
 			$headers,
 			$body
 		);
+		HttpLogger::logRequest($request);
 		return $request;
 	}
 
