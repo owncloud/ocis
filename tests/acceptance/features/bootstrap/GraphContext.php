@@ -773,13 +773,11 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		// NOTE: If you want to make a request with non-existing group,provide "nonexistent" as the name
 		if ($group === "nonexistent") {
 			$groupId = WebDavHelper::generateUUIDv4();
 		} else {
 			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		}
-		// NOTE: If you want to make a request with non-existing user,provide "nonexistent" as the name
 		if ($user === "nonexistent") {
 			$userId = WebDavHelper::generateUUIDv4();
 		} else {

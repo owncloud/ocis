@@ -2981,7 +2981,7 @@ trait Provisioning {
 	 */
 	public function userHasBeenAddedToGroup(string $user, string $group):void {
 		$user = $this->getActualUsername($user);
-		if ($this->isTestingWithLdap() && !$this->isLocalAdminGroup($group)) {
+		if ($this->isTestingWithLdap()) {
 			try {
 				$this->addUserToLdapGroup(
 					$user,
