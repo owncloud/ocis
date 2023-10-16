@@ -70,6 +70,7 @@ class HttpLogger {
 	public static function logRequest(RequestInterface $request): void {
 		$method = $request->getMethod();
 		$path = $request->getUri()->getPath();
+		$query = $request->getUri()->getQuery();
 		$body = $request->getBody();
 
 		$headers = "";
@@ -80,6 +81,7 @@ class HttpLogger {
 		$logMessage = "\t\t_______________________________________________________________________\n\n";
 		$logMessage .= "\t\t==> REQUEST\n";
 		$logMessage .= "\t\t$method $path\n";
+		$logMessage .= $query ? "\t\tQUERY: $query\n" : "";
 		$logMessage .= "\t\t$headers";
 
 		if ($body->getSize() > 0) {
