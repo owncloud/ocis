@@ -191,8 +191,8 @@ devDependencies:
     specifier: 29.7.0
     version: 29.7.0(@types/node@20.5.9)
   license-checker-rseidelsohn:
-    specifier: ^4.2.6
-    version: 4.2.6
+    specifier: ^4.2.10
+    version: 4.2.10
   mini-css-extract-plugin:
     specifier: 1.6.2
     version: 1.6.2(webpack@4.47.0)
@@ -3364,8 +3364,9 @@ packages:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
     dev: true
 
-  /abbrev@1.1.1:
-    resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
+  /abbrev@2.0.0:
+    resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dev: true
 
   /abort-controller@3.0.0:
@@ -8152,8 +8153,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /license-checker-rseidelsohn@4.2.6:
-    resolution: {integrity: sha512-cV69Exm7y7stSVoYpFaQ1rEdmTtA7y1bMgTeeB1fqE0TZRkW1zpn8uIsIKeHK5rMvJYQzEuExNmLOTDXJMplgg==}
+  /license-checker-rseidelsohn@4.2.10:
+    resolution: {integrity: sha512-phvcph9WTQ/Kb209kqwLxVA6CV8BAeUnFMIo+I+wBlp74El4ngbMwq49qSqqPYC5bfj49EWBXqwjvTFswGE2Fg==}
     engines: {node: '>=18', npm: '>=8'}
     hasBin: true
     dependencies:
@@ -8161,7 +8162,7 @@ packages:
       debug: 4.3.4
       lodash.clonedeep: 4.5.0
       mkdirp: 1.0.4
-      nopt: 5.0.0
+      nopt: 7.2.0
       read-installed-packages: 2.0.1
       semver: 7.5.4
       spdx-correct: 3.2.0
@@ -8682,12 +8683,12 @@ packages:
   /node-releases@2.0.13:
     resolution: {integrity: sha512-uYr7J37ae/ORWdZeQ1xxMJe3NtdmqMC/JZK+geofDrkLUApKRHPd18/TxtBOJ4A0/+uUIliorNrfYV6s1b02eQ==}
 
-  /nopt@5.0.0:
-    resolution: {integrity: sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==}
-    engines: {node: '>=6'}
+  /nopt@7.2.0:
+    resolution: {integrity: sha512-CVDtwCdhYIvnAzFoJ6NJ6dX3oga9/HyciQDnG1vQDjSLMeKLJ4A93ZqYKDrgYSr1FBY5/hMYC+2VCi24pgpkGA==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     hasBin: true
     dependencies:
-      abbrev: 1.1.1
+      abbrev: 2.0.0
     dev: true
 
   /normalize-package-data@5.0.0:
