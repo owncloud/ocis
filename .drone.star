@@ -1965,6 +1965,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": True,
         "OCIS_EVENTS_ENABLE_TLS": False,
+        "FRONTEND_AUTO_ACCEPT_SHARES": True,
     }
 
     if deploy_type == "":
