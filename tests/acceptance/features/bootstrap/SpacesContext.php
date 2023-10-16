@@ -900,7 +900,6 @@ class SpacesContext implements Context {
 			null,
 			$userName,
 		);
-
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
@@ -930,7 +929,7 @@ class SpacesContext implements Context {
 			"Expected response status code should be 200",
 			$response
 		);
-		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
+		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName, $response), "No space with name $spaceName found");
 		$permissions = $spaceAsArray["root"]["permissions"];
 		$userId = $this->featureContext->getUserIdByUserName($grantedUser);
 
@@ -981,9 +980,9 @@ class SpacesContext implements Context {
 			$response
 		);
 		if (\trim($shouldOrNot) === "not") {
-			$this->jsonRespondedShouldNotContain($spaceName);
+			Assert::assertEmpty($this->getSpaceByNameFromResponse($spaceName, $response), "space $spaceName should not be available for a user");
 		} else {
-			Assert::assertNotEmpty($this->getSpaceByNameFromResponse($spaceName), "space '$spaceName' should be available for a user '$user' but not found");
+			Assert::assertNotEmpty($this->getSpaceByNameFromResponse($spaceName, $response), "space '$spaceName' should be available for a user '$user' but not found");
 		}
 	}
 
