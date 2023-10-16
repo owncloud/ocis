@@ -870,8 +870,8 @@ trait Provisioning {
 			if (!$this->isTestingWithLdap()) {
 				// for graph api, we need to save the user id to be able to add it in some group
 				// can be fetched with the "onPremisesSamAccountName" i.e. userid
-				$this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
-				$userAttributes['id'] = $this->getJsonDecodedResponse()['id'];
+				$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
+				$userAttributes['id'] = $this->getJsonDecodedResponse($response)['id'];
 			} else {
 				$userAttributes['id'] = null;
 			}
