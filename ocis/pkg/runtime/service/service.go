@@ -162,11 +162,6 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.EventHistory.Commons = cfg.Commons
 		return eventhistory.Execute(cfg.EventHistory)
 	})
-	reg(opts.Config.Frontend.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.Frontend.Context = ctx
-		cfg.Frontend.Commons = cfg.Commons
-		return frontend.Execute(cfg.Frontend)
-	})
 	reg(opts.Config.Gateway.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Gateway.Context = ctx
 		cfg.Gateway.Commons = cfg.Commons
@@ -302,6 +297,11 @@ func NewService(options ...Option) (*Service, error) {
 	dreg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
 		s.Delayed[name] = NewSutureServiceBuilder(exec)
 	}
+	dreg(opts.Config.Frontend.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Frontend.Context = ctx
+		cfg.Frontend.Commons = cfg.Commons
+		return frontend.Execute(cfg.Frontend)
+	})
 	dreg(opts.Config.IDP.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.IDP.Context = ctx
 		cfg.IDP.Commons = cfg.Commons
