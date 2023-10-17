@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-17-12-06-10]
+[#deprecation-note-2023-10-17-14-30-45]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -664,7 +664,7 @@ a|`FRONTEND_AUTO_ACCEPT_SHARES` +
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++false ++
+++true ++
 a| [subs=-attributes]
 Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.
 

@@ -69,7 +69,7 @@
 | OCIS_INSECURE<br/>FRONTEND_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>FRONTEND_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| FRONTEND_AUTO_ACCEPT_SHARES | bool | false | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
+| FRONTEND_AUTO_ACCEPT_SHARES | bool | true | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>FRONTEND_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>FRONTEND_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
 | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 0 | Define the minimum password length. Defaults to 0 if not set.|

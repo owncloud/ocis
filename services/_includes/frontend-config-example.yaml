@@ -126,7 +126,7 @@ events:
   tls_root_ca_certificate: ""
   enable_tls: false
 grpc_client_tls: null
-auto_accept_shares: false
+auto_accept_shares: true
 service_account:
   service_account_id: ""
   service_account_secret: ""
