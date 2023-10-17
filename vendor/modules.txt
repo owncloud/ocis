@@ -328,8 +328,8 @@ github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/crewjam/httperr v0.2.0
 ## explicit; go 1.13
 github.com/crewjam/httperr
-# github.com/crewjam/saml v0.4.13
-## explicit; go 1.16
+# github.com/crewjam/saml v0.4.14
+## explicit; go 1.19
 github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
