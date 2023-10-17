@@ -6,9 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
 ## Details
+
+* Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
+
+  *   Bugfix [cs3org/reva#4251](https://github.com/cs3org/reva/pull/4251): ldap: fix GetUserByClaim for binary encoded UUIDs
+
+   https://github.com/owncloud/ocis/issues/7469
+   https://github.com/owncloud/ocis/pull/7512
 
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
