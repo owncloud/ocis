@@ -260,7 +260,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusTooEarly:
 			// StatusTooEarly if file is processing
-			renderError(w, r, errTooEarly(err.Error()))
+			renderError(w, r, errTooEarly(e.Detail))
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
@@ -350,6 +350,10 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusNotFound:
 			// StatusNotFound is expected for unsupported files
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			return
+		case http.StatusTooEarly:
+			// StatusTooEarly if file is processing
+			renderError(w, r, errTooEarly(e.Detail))
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
