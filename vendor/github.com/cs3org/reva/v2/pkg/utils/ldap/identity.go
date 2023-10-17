@@ -526,7 +526,7 @@ func (i *Identity) getUserAttributeFilter(attribute, value string) (string, erro
 	default:
 		return "", errors.New("ldap: invalid field " + attribute)
 	}
-	if attribute == "userid" && i.User.Schema.IDIsOctetString {
+	if attribute == i.User.Schema.ID && i.User.Schema.IDIsOctetString {
 		id, err := uuid.Parse(value)
 		if err != nil {
 			err := errors.Wrap(err, fmt.Sprintf("error parsing OpaqueID '%s' as UUID", value))
@@ -687,7 +687,7 @@ func (i *Identity) getGroupAttributeFilter(attribute, value string) (string, err
 	default:
 		return "", errors.New("ldap: invalid field " + attribute)
 	}
-	if attribute == "group_id" && i.Group.Schema.IDIsOctetString {
+	if attribute == i.Group.Schema.ID && i.Group.Schema.IDIsOctetString {
 		id, err := uuid.Parse(value)
 		if err != nil {
 			err := errors.Wrap(err, fmt.Sprintf("error parsing OpaqueID '%s' as UUID", value))
