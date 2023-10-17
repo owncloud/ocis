@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
@@ -62,6 +63,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7282
    https://github.com/owncloud/ocis/pull/7290
+
+* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
+
+   Add the default language for the webui, the settings, userlog and notification service.
+
+   https://github.com/owncloud/ocis/issues/7465
 
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 
