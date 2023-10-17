@@ -43,4 +43,4 @@
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>IDM_CREATE_DEMO_USERS | bool | false | The default role assignments the demo users should be setup.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>SETTINGS_SERVICE_ACCOUNT_ID_ADMIN | string | service-user-id | The ID of the service account having the admin role. See the 'auth-service' service description for more details.|
-| SETTINGS_DEFAULT_LANGUAGE | string |  | The default language. If not defined, English will be used as default. See the documentation for more details.|
+| OCIS_DEFAULT_LANGUAGE | string |  | The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|

@@ -26,6 +26,7 @@
 | OCIS_JWT_SECRET<br/>USERLOG_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
 | OCIS_TRANSLATION_PATH<br/>USERLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
+| OCIS_DEFAULT_LANGUAGE | string |  | The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
 | OCIS_EVENTS_ENDPOINT<br/>USERLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>USERLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>USERLOG_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

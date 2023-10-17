@@ -42,6 +42,7 @@ token_manager:
   jwt_secret: ""
 reva_gateway: com.owncloud.api.gateway
 translation_path: ""
+default_language: ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

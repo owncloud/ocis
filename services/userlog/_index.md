@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-10-17T07:46:06.829958678Z
+date: 2023-10-17T07:58:14.465865282Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -29,6 +29,7 @@ The `userlog` service is a mediator between the `eventhistory` service and clien
 * [Deleting](#deleting)
 * [Translations](#translations)
   * [Translation Rules](#translation-rules)
+* [Default Language](#default-language)
 * [Example Yaml Config](#example-yaml-config)
 
 ## The Log Service Ecosystem
@@ -105,6 +106,10 @@ Important: For the time being, the embedded ownCloud Web frontend only supports 
 *   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if the requested language-code `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
 *   If the base language `de` is also not available, the service falls back to the system's default English (`en`),
 which is the source of the texts provided by the code.
+
+## Default Language
+
+The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
 ## Example Yaml Config
 {{< include file="services/_includes/userlog-config-example.yaml"  language="yaml" >}}
 

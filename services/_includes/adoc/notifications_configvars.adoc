@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-17-07-46-04]
+[#deprecation-note-2023-10-17-07-58-12]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -221,7 +221,7 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2023-10-17-07-46-04[Deprecation Note]
+xref:deprecation-note-2023-10-17-07-58-12[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -297,6 +297,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
+
+a|`OCIS_DEFAULT_LANGUAGE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
 
 a|`OCIS_REVA_GATEWAY` +
 

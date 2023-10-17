@@ -35,6 +35,7 @@ notifications:
     enable_tls: false
   email_template_path: ""
   translation_path: ""
+  default_language: ""
   reva_gateway: com.owncloud.api.gateway
   grpc_client_tls: null
 grpc_client_tls:

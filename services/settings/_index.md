@@ -1,6 +1,6 @@
 ---
 title: Settings
-date: 2023-10-17T07:46:06.829421269Z
+date: 2023-10-17T07:58:14.465076314Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/settings
@@ -100,9 +100,19 @@ The settings service needs to know the ID's of service accounts but it doesn't n
 
 ## Default Language
 
-The default language can be defined via `SETTINGS_DEFAULT_LANGUAGE` environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for invitation emails.
+The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for notification and invitation emails.
 
-Important developer note: the list of supported languages is at the moment not easy defineable, as it is the minimum intersection of languages shown in the WebUI and languages defined in the ocis code for the use of notifications. Even more, not all languages where there are translations available on transifex, are available in the WebUI respectively for ocis notifications, and the translation rate for existing languages is partially not that high. You will see therefore quite often English default strings though a supported language may exist and was selected.
+Important developer note: the list of supported languages is at the moment not easy defineable, as it is the minimum intersection of languages shown in the WebUI and languages defined in the ocis code for the use of notifications and userlog. Even more, not all languages where there are translations available on transifex, are available in the WebUI respectively for ocis notifications, and the translation rate for existing languages is partially not that high. You will see therefore quite often English default strings though a supported language may exist and was selected.
+
+The `OCIS_DEFAULT_LANGUAGE` setting impacts the `notification` and `userlog` services and the WebUI. Note that translations must exist for all named components to be presented correctly.
+
+*   If  `OCIS_DEFAULT_LANGUAGE` **is not set**, the expected behavior is:
+    *   The `notification` and `userlog` services and the WebUI use English by default until a user sets another language in the WebUI via _Account -> Language_.
+    *    If a user sets another language in the WebUI in _Account -> Language_, then the `notification` and `userlog` services and WebUI use the language defined by the user. If no translation is found, it falls back to English.
+
+*   If  `OCIS_DEFAULT_LANGUAGE` **is set**, the expected behavior is:
+    *   The `notification` and `userlog` services and the WebUI use `OCIS_DEFAULT_LANGUAGE`  by default until a user sets another language in the WebUI via _Account -> Language_.
+    *   If a user sets another language in the WebUI in _Account -> Language_, the `notification` and `userlog` services and WebUI use the language defined by the user. If no translation is found, it falls back to `OCIS_DEFAULT_LANGUAGE` and then to English.
 ## Example Yaml Config
 {{< include file="services/_includes/settings-config-example.yaml"  language="yaml" >}}
 
