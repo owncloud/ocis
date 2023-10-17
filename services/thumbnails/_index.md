@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2023-10-17T07:21:03.327177057Z
+date: 2023-10-17T07:46:06.829828995Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
@@ -23,6 +23,7 @@ The thumbnails service provides methods to generate thumbnails for various files
 * [Thumbnail Source File Types](#thumbnail-source-file-types)
 * [Thumbnail Target File Types](#thumbnail-target-file-types)
 * [Thumbnail Resolution](#thumbnail-resolution)
+* [Thumbnail Processors](#thumbnail-processors)
 * [Deleting Thumbnails](#deleting-thumbnails)
 * [Memory Considerations](#memory-considerations)
 * [Example Yaml Config](#example-yaml-config)
@@ -35,9 +36,9 @@ The relevant environment variables defining file locations are:
 -   (2) `STORAGE_USERS_OCIS_ROOT`
 -   (3) `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 
-(1) ... Having a default set by the Infinite Scale code, but if defined, used as base path for other services.  
-(2) ... Source files, defaults to (1) plus path component, but can be freely defined if required.  
-(3) ... Target files, defaults to (1) plus path component, but can be freely defined if required.  
+(1) ... Having a default set by the Infinite Scale code, but if defined, used as base path for other services.
+(2) ... Source files, defaults to (1) plus path component, but can be freely defined if required.
+(3) ... Target files, defaults to (1) plus path component, but can be freely defined if required.
 
 For details and defaults for these environment variables see the ocis admin documentation.
 
@@ -70,9 +71,20 @@ Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can
 
 Example:
 
-Requested: 18x12  
-Available: 30x20, 15x10, 9x6  
-Returned: 15x10  
+Requested: 18x12
+Available: 30x20, 15x10, 9x6
+Returned: 15x10
+
+## Thumbnail Processors
+
+Image generation can be configured by defining different processors, following processors are available:
+
+*   `resize`
+*   `fit`
+*   `fill`
+*   `thumbnail`
+
+To apply one of those, a query parameter has to be added to the request, e.g. `?processor=fit`
 
 ## Deleting Thumbnails
 
