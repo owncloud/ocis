@@ -36,6 +36,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
+* Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
 
 ## Details
 
@@ -309,6 +310,34 @@ The following sections list the changes for unreleased.
    fixed.
 
    https://github.com/owncloud/ocis/pull/7382
+
+* Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
+
+   Thumbnails can now be changed during creation, previously the images were always scaled to fit
+   the given frame, but it could happen that the images were cut off because they could not be placed
+   better due to the aspect ratio.
+
+   This pr introduces the possibility of specifying how the behavior should be, following
+   processors are available
+
+  * resize
+  * fit
+  * fill
+  * thumbnail
+
+   The processor can be applied by adding the processor query param to the request, e.g.
+   `processor=fit`, `processor=fill`, ...
+
+   To find out more how the individual processors work please read
+   https://github.com/disintegration/imaging
+
+   If no processor is provided it behaves the same as before (resize for gif's and thumbnail for all
+   other)
+
+   https://github.com/owncloud/enterprise/issues/6057
+   https://github.com/owncloud/ocis/issues/5179
+   https://github.com/owncloud/web/issues/7728
+   https://github.com/owncloud/ocis/pull/7409
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
