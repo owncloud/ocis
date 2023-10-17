@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.2...master
+
+## Summary
+
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+
+## Details
+
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+
+   AD FS `/adfs/.well-known/openid-configuration` has an optional `access_token_issuer`
+   which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
+
+   https://github.com/owncloud/ocis/pull/7138
 # Changelog for [4.0.2] (2023-09-28)
 
 The following sections list the changes for 4.0.2.
