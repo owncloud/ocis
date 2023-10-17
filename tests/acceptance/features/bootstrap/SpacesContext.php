@@ -167,7 +167,7 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceByNameFromResponse(string $name, ?ResponseInterface $response = null): array {
 		$response = $response ?? $this->featureContext->getResponse();
-		$decodedResponse = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$spaceAsArray = $decodedResponse;
 		if (isset($decodedResponse['name']) && $decodedResponse['name'] === $name) {
 			return $decodedResponse;
@@ -196,9 +196,9 @@ class SpacesContext implements Context {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
 		}
 		if (strtolower($user) === 'admin') {
-			$this->listAllAvailableSpacesUsingTheGraphApi($user);
+			$this->listAllAvailableSpaces($user);
 		} else {
-			$this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+			$this->listAllAvailableSpacesOfUser($user);
 		}
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name $spaceName for user $user not found");
@@ -247,7 +247,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByNameManager(string $user, string $spaceName): array {
-		$this->listAllAvailableSpacesUsingTheGraphApi($user);
+		$this->listAllAvailableSpaces($user);
 
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
@@ -427,7 +427,7 @@ class SpacesContext implements Context {
 		$query = "\$filter=driveType eq project";
 		$userAdmin = $this->featureContext->getAdminUsername();
 
-		$this->listAllAvailableSpacesUsingTheGraphApi(
+		$this->listAllAvailableSpaces(
 			$userAdmin,
 			$query
 		);
@@ -512,7 +512,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function listAllAvailableSpacesOfUserUsingTheGraphApi(string $user, string $query = ''): ResponseInterface {
+	public function listAllAvailableSpacesOfUser(string $user, string $query = ''): ResponseInterface {
 		$response = GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -537,7 +537,7 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
-		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUserUsingTheGraphApi($user, $query));
+		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUser($user, $query));
 	}
 
 	/**
@@ -551,7 +551,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function listAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): ResponseInterface {
+	public function listAllAvailableSpaces(string $user, string $query = ''): ResponseInterface {
 		$response = GraphHelper::getAllSpaces(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -578,7 +578,7 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
-			$this->listAllAvailableSpacesUsingTheGraphApi($user, $query)
+			$this->listAllAvailableSpaces($user, $query)
 		);
 	}
 
@@ -923,7 +923,7 @@ class SpacesContext implements Context {
 		string $grantedUser,
 		string $role
 	): void {
-		$response = $this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -973,7 +973,7 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		string $spaceName
 	): void {
-		$response = $this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -999,13 +999,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$response = $this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
 			$response
 		);
-		$decodedResponse = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		if (isset($decodedResponse["value"])) {
 			foreach ($decodedResponse["value"] as $spaceCandidate) {
 				if ($spaceCandidate['name'] === $spaceName) {
@@ -1493,7 +1493,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function userSetsFileAsImageInSpecialSectionOfSpace(
+	public function userSetsFileAsDescriptionOrImageInSpecialSectionOfSpace(
 		string $user,
 		string $file,
 		string $type,
@@ -1646,7 +1646,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function moveFileWithinSpaceUsingTheWebDAVAPI(
+	public function moveFileWithinSpace(
 		string $user,
 		string $fileSource,
 		string $fileDestination,
@@ -1682,7 +1682,7 @@ class SpacesContext implements Context {
 		string $fileDestination,
 		string $spaceName
 	):void {
-		$this->featureContext->setResponse($this->moveFileWithinSpaceUsingTheWebDAVAPI($user, $fileSource, $fileDestination, $spaceName));
+		$this->featureContext->setResponse($this->moveFileWithinSpace($user, $fileSource, $fileDestination, $spaceName));
 		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
@@ -1703,7 +1703,7 @@ class SpacesContext implements Context {
 		string $fileDestination,
 		string $spaceName
 	):void {
-		$response = $this->moveFileWithinSpaceUsingTheWebDAVAPI(
+		$response = $this->moveFileWithinSpace(
 			$user,
 			$fileSource,
 			$fileDestination,
@@ -1947,7 +1947,7 @@ class SpacesContext implements Context {
 		string $fileContent,
 		string $destination
 	): array {
-		$response = $this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->setSpaceIDByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination, true);
@@ -2082,7 +2082,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesShareInsideSpace(
+	public function userCreatesShareInsideOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
 		TableNode $table
@@ -2221,7 +2221,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesPublicLinkShareInsideOfSpace(
+	public function userCreatesPublicLinkShareInsideOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
 		TableNode $table
@@ -2357,7 +2357,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendRemoveObjectFromSpaceRequest(
+	public function removeObjectFromSpace(
 		string $user,
 		string $object,
 		string $spaceName
@@ -2388,7 +2388,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendRemoveObjectFromSpaceRequest($user, $object, $spaceName)
+			$this->removeObjectFromSpace($user, $object, $spaceName)
 		);
 	}
 
@@ -2405,7 +2405,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	):void {
-		$response = $this->sendDeleteSpaceRequest($user, $spaceName);
+		$response = $this->deleteSpace($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			204,
 			"Expected response status code should be 200",
@@ -2421,7 +2421,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendDisableSpaceRequest(
+	public function disableSpace(
 		string $user,
 		string $spaceName,
 		string $owner = ''
@@ -2453,7 +2453,7 @@ class SpacesContext implements Context {
 		string $owner = ''
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendDisableSpaceRequest($user, $spaceName, $owner)
+			$this->disableSpace($user, $spaceName, $owner)
 		);
 	}
 
@@ -2472,7 +2472,7 @@ class SpacesContext implements Context {
 		string $object,
 		string $spaceName
 	): void {
-		$response = $this->sendRemoveObjectFromSpaceRequest($user, $object, $spaceName);
+		$response = $this->removeObjectFromSpace($user, $object, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -2494,7 +2494,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$response = $this->sendDisableSpaceRequest($user, $spaceName);
+		$response = $this->disableSpace($user, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -2511,7 +2511,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendDeleteSpaceRequest(
+	public function deleteSpace(
 		string $user,
 		string $spaceName,
 		string $owner = ''
@@ -2544,7 +2544,7 @@ class SpacesContext implements Context {
 		string $owner = ''
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendDeleteSpaceRequest($user, $spaceName, $owner)
+			$this->deleteSpace($user, $spaceName, $owner)
 		);
 	}
 
@@ -2556,7 +2556,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendRestoreSpaceRequest(
+	public function restoreSpace(
 		string $user,
 		string $spaceName,
 		string $owner = ''
@@ -2588,7 +2588,7 @@ class SpacesContext implements Context {
 		string $owner = ''
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendRestoreSpaceRequest($user, $spaceName, $owner)
+			$this->restoreSpace($user, $spaceName, $owner)
 		);
 	}
 
@@ -2605,7 +2605,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$response = $this->sendRestoreSpaceRequest($user, $spaceName);
+		$response = $this->restoreSpace($user, $spaceName);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -2621,7 +2621,7 @@ class SpacesContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function listAllDeletedFilesInTrash(
+	public function listAllDeletedFilesFromTrash(
 		string $user,
 		string $spaceName
 	): ResponseInterface {
@@ -2650,7 +2650,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->featureContext->setResponse(
-			$this->listAllDeletedFilesInTrash($user, $spaceName)
+			$this->listAllDeletedFilesFromTrash($user, $spaceName)
 		);
 	}
 
@@ -2697,7 +2697,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): array {
-		$response = $this->listAllDeletedFilesInTrash($user, $spaceName);
+		$response = $this->listAllDeletedFilesFromTrash($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			207,
 			"Expected response status code should be 207",
@@ -3184,7 +3184,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesAPublicLinkShareOfSpace(
+	public function userCreatesAPublicLinkShareOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
 		?TableNode $table
@@ -3615,7 +3615,7 @@ class SpacesContext implements Context {
 		string $role,
 		string $expirationDate = null
 	): void {
-		$response = $this->listAllAvailableSpacesOfUserUsingTheGraphApi($user);
+		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
