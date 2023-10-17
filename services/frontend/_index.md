@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2023-10-17T11:06:42.692609116Z
+date: 2023-10-17T11:29:22.450661509Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -30,6 +30,7 @@ The frontend service translates various owncloud related HTTP APIs to CS3 reques
 * [Event Handler](#event-handler)
   * [Auto-Accept Shares](#auto-accept-shares)
 * [The password policy](#the-password-policy)
+  * [The password policy capability](#the-password-policy-capability)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Endpoints Overview
@@ -106,20 +107,43 @@ The validation against the banned passwords list can be configured via a text fi
 
 Following environment variables can be set to define the password policy behaviour:
 
--   `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
--   `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
 Define the minimum number of uppercase letters.
--   `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
 Define the minimum number of lowercase letters.
--   `FRONTEND_PASSWORD_POLICY_MIN_DIGITS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_DIGITS`
 Define the minimum number of digits.
--   `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`  
+-   `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
 Define the minimum number of special characters.
--   `FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`  
+-   `FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 Path to the 'banned passwords list' file.
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
+
+### The password policy capability
+
+The capabilities endpoint (e.g. https://ocis.test/ocs/v1.php/cloud/capabilities?format=json) gives you following capabilities which are relevant for the password policy:
+
+```json
+{
+  "ocs": {
+    "data": {
+      "capabilities": {
+        "password_policy": {
+          "min_characters": 10,
+          "max_characters": 72,
+          "min_lowercase_characters": 1,
+          "min_uppercase_characters": 2,
+          "min_digits": 1,
+          "min_special_characters": 1
+        }
+      }
+    }
+  }
+}
+```
 ## Example Yaml Config
 {{< include file="services/_includes/frontend-config-example.yaml"  language="yaml" >}}
 
