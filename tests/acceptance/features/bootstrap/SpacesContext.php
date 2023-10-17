@@ -167,7 +167,7 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceByNameFromResponse(string $name, ?ResponseInterface $response = null): array {
 		$response = $response ?? $this->featureContext->getResponse();
-		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
 		$spaceAsArray = $decodedResponse;
 		if (isset($decodedResponse['name']) && $decodedResponse['name'] === $name) {
 			return $decodedResponse;
@@ -1005,7 +1005,7 @@ class SpacesContext implements Context {
 			"Expected response status code should be 200",
 			$response
 		);
-		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
 		if (isset($decodedResponse["value"])) {
 			foreach ($decodedResponse["value"] as $spaceCandidate) {
 				if ($spaceCandidate['name'] === $spaceName) {
