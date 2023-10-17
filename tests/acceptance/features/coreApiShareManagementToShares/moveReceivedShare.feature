@@ -16,8 +16,6 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/TMP"
     When user "Alice" shares folder "TMP" with group "grp1" using the sharing API
-    And user "Brian" accepts share "/TMP" offered by user "Alice" using the sharing API
-    And user "Carol" accepts share "/TMP" offered by user "Alice" using the sharing API
     And user "Brian" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
     And the administrator deletes user "Carol" using the provisioning API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -30,8 +28,6 @@ Feature: sharing
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And user "Alice" has shared file "/sharefile.txt" with user "Brian"
     And user "Alice" has shared file "/sharefile.txt" with user "Carol"
-    And user "Brian" has accepted share "/sharefile.txt" offered by user "Alice"
-    And user "Carol" has accepted share "/sharefile.txt" offered by user "Alice"
     When user "Carol" moves file "/Shares/sharefile.txt" to "/Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "/Shares/renamedsharefile.txt" should exist
@@ -43,7 +39,6 @@ Feature: sharing
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
     And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "share,read,change"
-    And user "Brian" has accepted share "/folderToShare" offered by user "Alice"
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -59,7 +54,6 @@ Feature: sharing
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
     And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/folderToShare" offered by user "Alice"
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -73,7 +67,6 @@ Feature: sharing
   Scenario: receiver renames a received folder share to a different name on the same folder
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -83,7 +76,6 @@ Feature: sharing
   Scenario: receiver renames a received file share to different name on the same folder
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has shared file "fileToShare.txt" with user "Brian"
-    And user "Brian" has accepted share "/fileToShare.txt" offered by user "Alice"
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -95,7 +87,6 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has shared file "fileToShare.txt" with group "grp1"
-    And user "Brian" has accepted share "/fileToShare.txt" offered by user "Alice"
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -107,7 +98,6 @@ Feature: sharing
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared folder "PARENT" with group "grp1"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -119,7 +109,6 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read,update,share"
-    And user "Brian" has accepted share "/fileToShare.txt" offered by user "Alice"
     When user "Brian" moves folder "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -131,7 +120,6 @@ Feature: sharing
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "share,read,change"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -143,7 +131,6 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "share,read"
-    And user "Brian" has accepted share "/fileToShare.txt" offered by user "Alice"
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -155,7 +142,6 @@ Feature: sharing
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "share,read"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -168,13 +154,11 @@ Feature: sharing
     And user "Alice" has created folder "<sharer_folder>"
     And user "Alice" has created folder "<group_folder>"
     And user "Alice" has shared folder "<sharer_folder>" with user "Brian"
-    And user "Brian" has accepted share "/<sharer_folder>" offered by user "Alice"
     When user "Brian" moves folder "/Shares/<sharer_folder>" to "/Shares/<receiver_folder>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" folder "<receiver_folder>" should not exist
     And as "Brian" folder "/Shares/<receiver_folder>" should exist
     When user "Alice" shares folder "<group_folder>" with group "grp1" using the sharing API
-    And user "Carol" accepts share "/<group_folder>" offered by user "Alice" using the sharing API
     And user "Carol" moves folder "/Shares/<group_folder>" to "/Shares/<receiver_folder>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" folder "<receiver_folder>" should not exist
@@ -193,13 +177,11 @@ Feature: sharing
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<sharer_folder>/fileInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<group_folder>/fileInside"
     And user "Alice" has shared folder "<sharer_folder>" with user "Brian" with permissions "share,read,change"
-    And user "Brian" has accepted share "/<sharer_folder>" offered by user "Alice"
     When user "Brian" moves folder "/Shares/<sharer_folder>/fileInside" to "/Shares/<sharer_folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<sharer_folder>/<receiver_file>" should exist
     And as "Brian" file "/Shares/<sharer_folder>/<receiver_file>" should exist
     When user "Alice" shares folder "<group_folder>" with group "grp1" with permissions "share,read,change" using the sharing API
-    And user "Carol" accepts share "/<group_folder>" offered by user "Alice" using the sharing API
     And user "Carol" moves folder "/Shares/<group_folder>/fileInside" to "/Shares/<group_folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<group_folder>/<receiver_file>" should exist

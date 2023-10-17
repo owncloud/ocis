@@ -70,7 +70,6 @@ Feature: copy file
       | shareType   | user      |
       | permissions | read      |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
@@ -90,7 +89,6 @@ Feature: copy file
       | shareType   | user      |
       | permissions | read      |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Brian" has copied file "textfile1.txt" to "/testshare/overwritethis.txt"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/overwritethis.txt" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -259,7 +257,6 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
     And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
-    And user "Alice" has accepted share "/BRIAN-Folder" offered by user "Brian"
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -277,7 +274,6 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
     And user "Brian" has shared file "/sharedfile1.txt" with user "Alice"
-    And user "Alice" has accepted share "/sharedfile1.txt" offered by user "Brian"
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -297,7 +293,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
     And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -320,7 +315,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
     And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -344,7 +338,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
     And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -369,7 +362,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
     And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "/Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -395,7 +387,6 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
     And user "Brian" has shared folder "BRIAN-Folder" with group "grp1" with permissions "15"
-    And user "Alice" has accepted share "/BRIAN-Folder" offered by user "Brian"
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -421,7 +412,6 @@ Feature: copy file
     And user "Brian" has been added to group "grp1"
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
     And user "Brian" has shared file "/sharedfile1.txt" with group "grp1"
-    And user "Alice" has accepted share "/sharedfile1.txt" offered by user "Brian"
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -449,7 +439,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
     And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -475,7 +464,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
     And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -502,7 +490,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
     And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -530,7 +517,6 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
     And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
-    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -626,7 +612,6 @@ Feature: copy file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
@@ -647,7 +632,6 @@ Feature: copy file
       | permissions | change    |
       | shareWith   | Alice     |
     And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Brian" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
@@ -667,7 +651,6 @@ Feature: copy file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Alice" has uploaded file with content "ownCloud test text file inside share" to "/Shares/testshare/fileInsideShare.txt"
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -690,7 +673,6 @@ Feature: copy file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Brian" copies file "testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/fileInsideShare.txt" should exist
@@ -746,8 +728,6 @@ Feature: copy file
       | shareType   | user       |
       | permissions | change     |
       | shareWith   | Alice      |
-    And user "Alice" has accepted share "/testshare0" offered by user "Brian"
-    And user "Alice" has accepted share "/testshare1" offered by user "Carol"
     When user "Alice" copies file "/Shares/testshare0/testshare0.txt" to "/Shares/testshare1/testshare0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/testshare0.txt" should exist
@@ -778,8 +758,6 @@ Feature: copy file
       | shareType   | user       |
       | permissions | change     |
       | shareWith   | Alice      |
-    And user "Alice" has accepted share "/testshare0" offered by user "Brian"
-    And user "Alice" has accepted share "/testshare1" offered by user "Carol"
     When user "Alice" copies file "/Shares/testshare0/folder_to_copy/" to "/Shares/testshare1/folder_to_copy/" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/folder_to_copy/testshare0.txt" should exist
@@ -802,13 +780,11 @@ Feature: copy file
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Brian     |
-    And user "Brian" has accepted share "/testshare" offered by user "Alice"
     And user "Alice" has created a share with settings
       | path        | testshare |
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Carol     |
-    And user "Carol" has accepted share "/testshare" offered by user "Alice"
     When user "Alice" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/testshare/textfile0.txt" should exist

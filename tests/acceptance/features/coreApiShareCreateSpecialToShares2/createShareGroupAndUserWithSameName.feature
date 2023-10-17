@@ -16,11 +16,9 @@ Feature: sharing works when a username and group name are the same
     And user "Carol" has been added to group "Brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has shared file "randomfile.txt" with group "Brian"
-    And user "Carol" has accepted share "/randomfile.txt" offered by user "Alice"
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
-    And user "Brian" accepts share "/randomfile.txt" offered by user "Alice" using the sharing API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should see the following elements
       | /Shares/randomfile.txt |
     And user "Carol" should see the following elements
@@ -38,11 +36,9 @@ Feature: sharing works when a username and group name are the same
     And user "Carol" has been added to group "Brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has shared file "randomfile.txt" with user "Brian"
-    And user "Brian" has accepted share "/randomfile.txt" offered by user "Alice"
     When user "Alice" shares file "randomfile.txt" with group "Brian" using the sharing API
-    And user "Carol" accepts share "/randomfile.txt" offered by user "Alice" using the sharing API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should see the following elements
       | /Shares/randomfile.txt |
     And user "Carol" should see the following elements
@@ -60,11 +56,9 @@ Feature: sharing works when a username and group name are the same
     And user "Carol" has been added to group "brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has shared file "randomfile.txt" with group "brian"
-    And user "Carol" has accepted share "/randomfile.txt" offered by user "Alice"
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
-    And user "Brian" accepts share "/randomfile.txt" offered by user "Alice" using the sharing API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Brian" should see the following elements
       | /Shares/randomfile.txt |
     And user "Carol" should see the following elements
@@ -82,11 +76,9 @@ Feature: sharing works when a username and group name are the same
     And user "Carol" has been added to group "brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has shared file "randomfile.txt" with user "Brian"
-    And user "Brian" has accepted share "/randomfile.txt" offered by user "Alice"
     When user "Alice" shares file "randomfile.txt" with group "brian" using the sharing API
-    And user "Carol" accepts share "/randomfile.txt" offered by user "Alice" using the sharing API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And user "Carol" should see the following elements
       | /Shares/randomfile.txt |
     And user "Brian" should see the following elements

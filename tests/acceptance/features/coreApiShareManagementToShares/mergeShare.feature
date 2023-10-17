@@ -9,6 +9,7 @@ Feature: sharing
       | Brian    |
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
+    And user "Brian" has disabled auto-accepting
 
   @smokeTest
   Scenario: merging shares for recipient when shared from outside with group and member

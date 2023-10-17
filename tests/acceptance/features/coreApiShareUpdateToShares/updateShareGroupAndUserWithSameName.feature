@@ -20,8 +20,6 @@ Feature: updating shares to users and groups that have the same name
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with group "Brian"
     And user "Alice" has shared folder "/TMP" with user "Brian"
-    And user "Carol" has accepted share "/TMP" offered by user "Alice"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
     Then the HTTP status code should be "200"
@@ -40,8 +38,6 @@ Feature: updating shares to users and groups that have the same name
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian"
     And user "Alice" has shared folder "/TMP" with group "Brian"
-    And user "Carol" has accepted share "/TMP" offered by user "Alice"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
     Then the HTTP status code should be "200"

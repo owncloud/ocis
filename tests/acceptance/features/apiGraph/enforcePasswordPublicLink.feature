@@ -245,11 +245,11 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
-    And user "Alice" has created a public link share with settings
+    And user "Alice" has created a public link share with settings 
       | path        | /testfile.txt |
       | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
@@ -269,7 +269,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "bannedPassword/banned-password-list.txt"
+    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"

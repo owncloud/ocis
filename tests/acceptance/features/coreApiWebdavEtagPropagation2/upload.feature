@@ -57,7 +57,6 @@ Feature: propagation of etags when uploading data
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -82,7 +81,6 @@ Feature: propagation of etags when uploading data
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -108,7 +106,6 @@ Feature: propagation of etags when uploading data
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -134,7 +131,6 @@ Feature: propagation of etags when uploading data
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"

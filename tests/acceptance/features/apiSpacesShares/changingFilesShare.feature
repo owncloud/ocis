@@ -19,8 +19,6 @@ Feature: change shared resource
     And user "Alice" has moved file "textfile0.txt" to "PARENT/from_alice.txt" in space "Personal"
     And user "Alice" has shared folder "/PARENT" with user "Carol"
     And user "Brian" has shared folder "/PARENT" with user "Carol"
-    And user "Carol" has accepted share "/PARENT" offered by user "Alice"
-    And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     When user "Carol" moves file "PARENT/from_alice.txt" to "PARENT (1)/from_alice.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Carol" folder "PARENT" of the space "Shares" should not contain these entries:
@@ -34,7 +32,6 @@ Feature: change shared resource
     And user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
     When user "Brian" uploads a file inside space "Shares" with content "this is a new content" to "textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should contain these entries:

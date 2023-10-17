@@ -275,7 +275,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
     And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Brian" has accepted share "/sharefile.txt" offered by user "Alice"
     When user "Brian" uploads file with content "Second content" to "/Shares/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/sharefile.txt" for user "Alice" should contain "1" element
@@ -287,7 +286,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
     And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Brian" has accepted share "/sharefile.txt" offered by user "Alice"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -299,7 +297,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with user "Brian"
-    And user "Brian" has accepted share "/sharingfolder" offered by user "Alice"
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -312,7 +309,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/sharingfolder" offered by user "Alice"
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     When user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" gets the number of versions of file "/Shares/sharingfolder/sharefile.txt"
@@ -325,7 +321,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/sharingfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "First content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Alice" has uploaded file with content "Second content" to "/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -338,7 +333,6 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/sharingfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "old content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "new content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -355,8 +349,6 @@ Feature: dav-versions
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with group "grp1"
-    And user "Brian" has accepted share "/sharingfolder" offered by user "Alice"
-    And user "Carol" has accepted share "/sharingfolder" offered by user "Alice"
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Carol" has uploaded file with content "Third content" to "/Shares/sharingfolder/sharefile.txt"
@@ -376,7 +368,6 @@ Feature: dav-versions
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
@@ -404,7 +395,6 @@ Feature: dav-versions
       | shareType   | user      |
       | permissions | change    |
       | shareWith   | Alice     |
-    And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Brian" moves file "/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/testfile.txt" for user "Brian" should be "test data 3"
@@ -422,7 +412,6 @@ Feature: dav-versions
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "textfile1" to "textfile1.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" tries to get versions of file "textfile1.txt" from "Alice"
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
@@ -435,7 +424,6 @@ Feature: dav-versions
     And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 3" to "textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
 

@@ -15,7 +15,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | read   |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
@@ -32,7 +31,6 @@ Feature: sharing
       | shareType   | group  |
       | permissions | read   |
       | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
@@ -51,7 +49,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -79,7 +76,6 @@ Feature: sharing
       | shareType   | group  |
       | permissions | create |
       | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -105,7 +101,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | change |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -131,7 +126,6 @@ Feature: sharing
       | shareType   | group  |
       | permissions | change |
       | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -152,7 +146,6 @@ Feature: sharing
     And the quota of user "Brian" has been set to "0"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
     And user "Alice" has shared file "myfile.txt" with user "Brian"
-    And user "Brian" has accepted share "/myfile.txt" offered by user "Alice"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the following headers should match these regular expressions for user "Brian"
@@ -178,7 +171,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | change |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And the quota of user "Alice" has been set to "0"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -200,7 +192,6 @@ Feature: sharing
       | shareType   | group  |
       | permissions | change |
       | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And the quota of user "Alice" has been set to "0"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -220,7 +211,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And the quota of user "Alice" has been set to "0"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -242,7 +232,6 @@ Feature: sharing
       | shareType   | group  |
       | permissions | create |
       | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And the quota of user "Alice" has been set to "0"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -262,7 +251,6 @@ Feature: sharing
       | shareType   | user          |
       | permissions | <permissions> |
       | shareWith   | Brian         |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" uploads file with content "some content" to "/Shares/FOLDER/textFile.txt" using the WebDAV API
     And user "Alice" downloads file "/FOLDER/textFile.txt" using the WebDAV API
     Then the HTTP status code should be "200"
@@ -278,7 +266,6 @@ Feature: sharing
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/folder-to-share"
     And user "Brian" has shared folder "/folder-to-share" with user "Alice"
-    And user "Alice" has accepted share "/folder-to-share" offered by user "Brian"
     When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "/Shares/folder-to-share/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/Shares/folder-to-share/zerobyte.txt" should exist

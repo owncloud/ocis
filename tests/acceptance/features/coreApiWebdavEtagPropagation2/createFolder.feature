@@ -59,7 +59,6 @@ Feature: propagation of etags when creating folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
     And user "Brian" has stored etag of element "/"
@@ -85,7 +84,6 @@ Feature: propagation of etags when creating folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has shared folder "/folder" with user "Brian"
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
     And user "Brian" has stored etag of element "/"

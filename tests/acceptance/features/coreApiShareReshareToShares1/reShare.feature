@@ -16,7 +16,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions "read,update" using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -33,7 +32,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read,update"
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" shares folder "/Shares/FOLDER" with user "Carol" with permissions "read,update" using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -50,11 +48,9 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions "share,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/textfile0.txt" offered by user "Brian"
     And as "Carol" file "/Shares/textfile0.txt" should exist
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -66,11 +62,9 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" shares folder "/Shares/FOLDER" with user "Carol" with permissions "share,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/FOLDER" offered by user "Brian"
     And as "Carol" folder "/Shares/FOLDER" should exist
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -82,11 +76,9 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "share,update,read"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions "share,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/textfile0.txt" offered by user "Brian"
     And as "Carol" file "/Shares/textfile0.txt" should exist
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -98,11 +90,9 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "share,update,read"
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     When user "Brian" shares folder "/Shares/FOLDER" with user "Carol" with permissions "share,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/FOLDER" offered by user "Brian"
     And as "Carol" folder "/Shares/FOLDER" should exist
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -114,7 +104,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions 17
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -143,15 +132,13 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions <received_permissions>
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" shares file "/Shares/textfile0.txt" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/textfile0.txt" offered by user "Brian"
     And the fields of the last response to user "Brian" sharing with user "Carol" should include
       | share_with  | %username%            |
       | file_target | /Shares/textfile0.txt |
-      | path        | /Shares/textfile0.txt |
+      | path        | /textfile0.txt |
       | permissions | <granted_permissions> |
       | uid_owner   | %username%            |
     And as "Carol" file "/Shares/textfile0.txt" should exist
@@ -184,7 +171,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has shared folder "/PARENT" with user "Brian" with permissions <received_permissions>
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" shares folder "/Shares/PARENT" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -225,7 +211,6 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has shared folder "/PARENT" with user "Brian" with permissions <received_permissions>
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" shares folder "/Shares/PARENT" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -254,13 +239,11 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Alice" has deleted file "textfile0.txt"
     And user "Alice" has uploaded file with content "ownCloud new test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Brian" should be able to accept pending share "/textfile0.txt" offered by user "Alice"
     And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud new test text file 0"
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -272,13 +255,11 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Alice" has deleted folder "PARENT"
     And user "Alice" has created folder "/PARENT"
     When user "Alice" shares folder "PARENT" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Brian" should be able to accept pending share "/PARENT" offered by user "Alice"
     And as "Brian" folder "/Shares/PARENT" should exist
     Examples:
       | ocs_api_version | ocs_status_code |
@@ -290,13 +271,11 @@ Feature: sharing
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has created folder "/textfile0.txt"
     When user "Alice" shares folder "textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Brian" should be able to accept pending share "/textfile0.txt" offered by user "Alice"
     And as "Brian" folder "/Shares/textfile0.txt" should exist
     Examples:
       | ocs_api_version | ocs_status_code |

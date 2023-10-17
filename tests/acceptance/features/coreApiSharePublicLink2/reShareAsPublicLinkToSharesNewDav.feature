@@ -14,7 +14,6 @@ Feature: reshare as public link
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test |
       | publicUpload | false        |
@@ -31,7 +30,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file with content "some content" to "/test/file.txt"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test |
       | publicUpload | false        |
@@ -51,7 +49,6 @@ Feature: reshare as public link
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test              |
       | permissions  | read,update,create,delete |
@@ -68,7 +65,6 @@ Feature: reshare as public link
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "change"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test |
       | publicUpload | true         |
@@ -85,7 +81,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file with content "some content" to "/test/file.txt"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test |
       | publicUpload | false        |
@@ -106,7 +101,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file with content "some content" to "/test/file.txt"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test              |
       | permissions  | read,update,create,delete |
@@ -128,7 +122,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test/sub"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     When user "Brian" creates a public link share using the sharing API with settings
       | path         | /Shares/test/sub          |
       | permissions  | read,update,create,delete |
@@ -146,7 +139,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test/sub"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test |
       | permissions  | read         |
@@ -167,7 +159,6 @@ Feature: reshare as public link
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test/sub"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test/sub |
       | permissions  | read             |

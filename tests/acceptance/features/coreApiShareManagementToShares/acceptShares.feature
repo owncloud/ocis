@@ -26,7 +26,9 @@ Feature: accept/decline shares coming from internal users
 
   @smokeTest  @issue-2540
   Scenario: share a file & folder with another internal group when auto accept is disabled
-    Given user "Carol" has created folder "FOLDER"
+    Given user "Brian" has disabled auto-accepting
+    And user "Carol" has disabled auto-accepting
+    And user "Carol" has created folder "FOLDER"
     And user "Carol" has created folder "PARENT"
     And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
@@ -60,6 +62,7 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2540
   Scenario: share a file & folder with another internal user when auto accept is disabled
+    Given user "Brian" has disabled auto-accepting
     When user "Alice" shares folder "/PARENT" with user "Brian" using the sharing API
     And user "Alice" shares file "/textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -79,7 +82,8 @@ Feature: accept/decline shares coming from internal users
 
   @smokeTest @issue-2131
   Scenario: accept a pending share
-    Given user "Alice" has shared folder "/PARENT" with user "Brian"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has shared folder "/PARENT" with user "Brian"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -119,7 +123,8 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: accept an accepted share
-    Given user "Alice" has created folder "/shared"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has created folder "/shared"
     And user "Alice" has shared folder "/shared" with user "Brian"
     When user "Brian" accepts share "/shared" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
@@ -132,7 +137,8 @@ Feature: accept/decline shares coming from internal users
 
   @smokeTest  @issue-2540
   Scenario: declines a pending share
-    Given user "Alice" has shared folder "/PARENT" with user "Brian"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has shared folder "/PARENT" with user "Brian"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" declines share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" declines share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -153,7 +159,8 @@ Feature: accept/decline shares coming from internal users
 
   @smokeTest @issue-2128 @issue-2540
   Scenario: decline an accepted share
-    Given user "Alice" has shared folder "/PARENT" with user "Brian"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has shared folder "/PARENT" with user "Brian"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
@@ -181,7 +188,9 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2540
   Scenario: only one user in a group accepts a share
-    Given user "Alice" has shared folder "/PARENT" with group "grp1"
+    Given user "Brian" has disabled auto-accepting
+    And user "Carol" has disabled auto-accepting
+    And user "Alice" has shared folder "/PARENT" with group "grp1"
     And user "Alice" has shared file "/textfile0.txt" with group "grp1"
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -206,7 +215,8 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2131
   Scenario: receive two shares with identical names from different users, accept one by one
-    Given user "Alice" has created folder "/shared"
+    Given user "Carol" has disabled auto-accepting
+    And user "Alice" has created folder "/shared"
     And user "Alice" has created folder "/shared/Alice"
     And user "Brian" has created folder "/shared"
     And user "Brian" has created folder "/shared/Brian"
@@ -226,6 +236,7 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2540
   Scenario: share with a group that you are part of yourself
+    Given user "Brian" has disabled auto-accepting
     When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -236,18 +247,16 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user accepts file that was initially accepted from another user and then declined
-    Given user "Alice" has uploaded file with content "First file" to "/testfile.txt"
+    Given user "Carol" has disabled auto-accepting
+    And user "Alice" has uploaded file with content "First file" to "/testfile.txt"
     And user "Brian" has uploaded file with content "Second file" to "/testfile.txt"
     And user "Carol" has created folder "Shares"
     And user "Carol" has uploaded file with content "Third file" to "/Shares/testfile.txt"
     And user "Alice" has shared file "/testfile.txt" with user "Carol"
-    And user "Carol" has accepted share "/testfile.txt" offered by user "Alice"
     When user "Carol" declines share "/Shares/testfile (2).txt" offered by user "Alice" using the sharing API
     And user "Brian" shares file "/testfile.txt" with user "Carol" using the sharing API
-    And user "Carol" accepts share "/testfile.txt" offered by user "Brian" using the sharing API
-    And user "Carol" accepts share "/testfile (2).txt" offered by user "Alice" using the sharing API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
     And the sharing API should report to user "Carol" that these shares are in the accepted state
       | path                         |
       | /Shares/testfile (2).txt     |
@@ -258,7 +267,8 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user accepts shares received from multiple users with the same name when auto-accept share is disabled
-    Given user "David" has been created with default attributes and without skeleton files
+    Given user "Alice" has disabled auto-accepting
+    And user "David" has been created with default attributes and without skeleton files
     And user "David" has created folder "PARENT"
     And user "Brian" has shared folder "/PARENT" with user "Alice"
     And user "Carol" has created folder "PARENT"
@@ -285,7 +295,8 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares folder with matching folder-name for both user involved in sharing
-    Given user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/FOLDER/abc.txt"
     When user "Alice" shares folder "/PARENT" with user "Brian" using the sharing API
     And user "Alice" shares folder "/FOLDER" with user "Brian" using the sharing API
@@ -308,7 +319,9 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares folder in a group with matching folder-name for every users involved
-    Given user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"
+    Given user "Brian" has disabled auto-accepting
+    And user "Carol" has disabled auto-accepting
+    And user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/FOLDER/abc.txt"
     And user "Carol" has created folder "PARENT"
     And user "Carol" has created folder "FOLDER"
@@ -347,7 +360,9 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares files in a group with matching file-names for every users involved in sharing
-    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile1.txt"
+    Given user "Brian" has disabled auto-accepting
+    And user "Carol" has disabled auto-accepting
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile1.txt"
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "textfile1.txt"
     And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "textfile1.txt"
@@ -372,6 +387,7 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares resource with matching resource-name with another user when auto accept is disabled
+    Given user "Brian" has disabled auto-accepting
     When user "Alice" shares folder "/PARENT" with user "Brian" using the sharing API
     And user "Alice" shares file "/textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -394,7 +410,9 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares file in a group with matching filename when auto accept is disabled
-    Given user "Carol" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
+    Given user "Brian" has disabled auto-accepting
+    And user "Carol" has disabled auto-accepting
+    And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     When user "Alice" shares file "/textfile0.txt" with group "grp1" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -422,6 +440,7 @@ Feature: accept/decline shares coming from internal users
     Given these users have been created without skeleton files and not initialized:
       | username |
       | David    |
+    And user "David" has disabled auto-accepting
     And user "Alice" has uploaded file with content "uploaded content" to "/PARENT/abc.txt"
     When user "Alice" shares folder "/PARENT" with user "David" using the sharing API
     And user "David" accepts share "/PARENT" offered by user "Alice" using the sharing API
@@ -436,7 +455,8 @@ Feature: accept/decline shares coming from internal users
 
   @issue-1123 @issue-2540
   Scenario: deleting a share accepted file and folder
-    Given user "Alice" has shared folder "/PARENT" with user "Brian"
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has shared folder "/PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" deletes file "/Shares/PARENT" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -446,6 +466,7 @@ Feature: accept/decline shares coming from internal users
 
   @issue-765 @issue-2131
   Scenario: shares exist after restoring already shared file to a previous version
+    Given user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "Test Content." to "/toShareFile.txt"
     And user "Alice" has uploaded file with content "Content Test Updated." to "/toShareFile.txt"
     And user "Alice" has shared file "/toShareFile.txt" with user "Brian"
@@ -457,7 +478,8 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2131
   Scenario: user receives multiple group shares for matching file and folder name
-    Given group "grp2" has been created
+    Given user "Brian" has disabled auto-accepting
+    And group "grp2" has been created
     And user "Alice" has been added to group "grp2"
     And user "Brian" has been added to group "grp2"
     And user "Carol" has created folder "/PARENT"
@@ -522,7 +544,8 @@ Feature: accept/decline shares coming from internal users
 
   @issue-2131
   Scenario: group receives multiple shares from non-member for matching file and folder name
-    Given user "Brian" has been removed from group "grp1"
+    Given user "Carol" has disabled auto-accepting
+    And user "Brian" has been removed from group "grp1"
     And user "Alice" has created folder "/PaRent"
     And user "Carol" has created folder "/PARENT"
     And user "Alice" has uploaded the following files with content "subfile, from alice to grp1"

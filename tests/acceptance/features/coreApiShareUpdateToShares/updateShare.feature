@@ -16,9 +16,7 @@ Feature: sharing
       | Carol    |
     And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "TMP" with user "Brian"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP" with user "Carol"
-    And user "Carol" has accepted share "/TMP" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | read |
     Then the OCS status code should be "<ocs_status_code>"
@@ -38,7 +36,6 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with group "grp1"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Brian" has moved file "/Shares/textfile0.txt" to "/Shares/textfile_new.txt"
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
@@ -84,7 +81,6 @@ Feature: sharing
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
@@ -108,7 +104,6 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with group "grp1"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
@@ -134,9 +129,7 @@ Feature: sharing
     And user "Alice" has created folder "/folder1/folder2"
     And user "Brian" has created folder "/moved-out"
     And user "Alice" has shared folder "/folder1" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/folder1" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/folder1/folder2" with user "Carol" with permissions "all"
-    And user "Carol" has accepted share "/folder2" offered by user "Brian"
     When user "Brian" moves folder "/Shares/folder1/folder2" to "/moved-out/folder2" using the WebDAV API
     Then the HTTP status code should be "201"
     And the response when user "Brian" gets the info of the last share should include
@@ -166,9 +159,7 @@ Feature: sharing
     And user "Alice" has created folder "/Alice-folder/folder2"
     And user "Carol" has created folder "/Carol-folder"
     And user "Alice" has shared folder "/Alice-folder" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/Alice-folder" offered by user "Alice"
     And user "Carol" has shared folder "/Carol-folder" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/Carol-folder" offered by user "Carol"
     When user "Brian" moves folder "/Shares/Alice-folder/folder2" to "/Shares/Carol-folder/folder2" using the WebDAV API
     Then the HTTP status code should be "201"
     And the response when user "Carol" gets the info of the last share should include
@@ -245,7 +236,6 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Carol" has created folder "/FOLDER"
     And user "Carol" has shared folder "/FOLDER" with group "grp1"
-    And user "Brian" has accepted share "/FOLDER" offered by user "Carol"
     And user "Carol" has updated the last share with
       | permissions | read |
     When user "Carol" updates the last share using the sharing API with
@@ -268,7 +258,6 @@ Feature: sharing
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And user "Brian" has uploaded file with content "some content" to "/Shares/FOLDER/textFile.txt"
     When user "Alice" deletes file "/FOLDER/textFile.txt" using the WebDAV API
     Then the HTTP status code should be "204"

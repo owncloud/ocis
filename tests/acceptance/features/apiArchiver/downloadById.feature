@@ -84,10 +84,6 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has shared file "textfile1.txt" with user "Brian"
     And user "Alice" has shared folder "my_data" with user "Brian"
     And user "Alice" has shared folder "more_data" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
-    And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
-    And user "Brian" has accepted share "/my_data" offered by user "Alice"
-    And user "Brian" has accepted share "/more_data" offered by user "Alice"
     When user "Brian" downloads the archive of these items using the resource ids
       | /Shares/textfile0.txt |
       | /Shares/textfile1.txt |
@@ -114,10 +110,6 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has shared file "textfile1.txt" with user "Brian"
     And user "Alice" has shared folder "my_data" with user "Brian"
     And user "Alice" has shared folder "more_data" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
-    And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
-    And user "Brian" has accepted share "/my_data" offered by user "Alice"
-    And user "Brian" has accepted share "/more_data" offered by user "Alice"
     When user "Brian" downloads the archive of "/Shares" using the resource id and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |

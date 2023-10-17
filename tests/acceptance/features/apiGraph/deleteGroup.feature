@@ -83,7 +83,6 @@ Feature: delete groups
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared file "lorem.txt" with group "grp1"
-    And user "Brian" has accepted share "/lorem.txt" offered by user "Alice"
     When user "Alice" deletes group "grp1" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not have any received shares

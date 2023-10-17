@@ -418,4 +418,56 @@ class SettingsContext implements Context {
 			$response
 		);
 	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendRequestToDisableAutoAccepting(string $user): ResponseInterface {
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-save";
+		$body = json_encode(
+			[
+			"value" => [
+			"account_uuid" => "me",
+			"bundleId" => "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
+			"settingId" => "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9",
+			"resource" => [
+			"type" => "TYPE_USER"
+			],
+			"boolValue" => false
+			]
+			],
+			JSON_THROW_ON_ERROR
+		);
+		return $this->spacesContext->sendPostRequestToUrl(
+			$fullUrl,
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$this->featureContext->getStepLineRef()
+		);
+	}
+
+	/**
+	 * @Given user :user has disabled auto-accepting
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theUserHasDisabledAutoAccepting(string $user): void {
+		$response = $this->sendRequestToDisableAutoAccepting($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+	}
 }

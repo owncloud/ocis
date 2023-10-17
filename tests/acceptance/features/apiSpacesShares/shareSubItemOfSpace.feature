@@ -29,8 +29,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    When user "Brian" accepts share "/<entity>" offered by user "Alice" using the sharing API
-    Then as "Brian" <type> "Shares/<entity>" should exist
+    And as "Brian" <type> "Shares/<entity>" should exist
     And the information about the last share for user "Brian" should include
       | expiration | <expiration> |
     Examples:
@@ -53,8 +52,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    When user "Bob" accepts share "/<entity>" offered by user "Brian" using the sharing API
-    Then as "Bob" <type> "Shares/<entity>" should exist
+    And as "Bob" <type> "Shares/<entity>" should exist
     And the information about the last share for user "Brian" should include
       | expiration | <expiration> |
     Examples:
@@ -113,8 +111,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    When user "Brian" accepts share "/folder" offered by user "Alice" using the sharing API
-    Then as "Brian" folder "Shares/folder" should exist
+    And as "Brian" folder "Shares/folder" should exist
     And the information about the last share for user "Brian" should include
       | expiration | 2042-01-01 |
 
@@ -125,7 +122,6 @@ Feature: Share a file or folder that is inside a space
       | shareWith  | Brian                    |
       | role       | viewer                   |
       | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" changes the last share with settings:
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
     Then the HTTP status code should be "200"
@@ -139,7 +135,6 @@ Feature: Share a file or folder that is inside a space
       | shareWith  | Brian                    |
       | role       | viewer                   |
       | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" changes the last share with settings:
       | expireDate |  |
     Then the HTTP status code should be "200"
@@ -153,7 +148,6 @@ Feature: Share a file or folder that is inside a space
       | shareWith  | Brian                    |
       | role       | viewer                   |
       | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist
@@ -168,7 +162,6 @@ Feature: Share a file or folder that is inside a space
       | shareType  | 1                        |
       | role       | viewer                   |
       | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist

@@ -161,7 +161,6 @@ Feature: delete user
       | path      | new    |
       | shareWith | Alice  |
       | role      | viewer |
-    And user "Alice" has accepted share "/new" offered by user "Brian"
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And as "Alice" folder "Shares/new" should not exist

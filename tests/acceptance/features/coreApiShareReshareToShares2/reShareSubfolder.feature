@@ -17,11 +17,9 @@ Feature: a subfolder of a received share can be reshared
   Scenario Outline: user is allowed to reshare a sub-folder with the same permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Brian" shares folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And user "Carol" should be able to accept pending share "/SUB" offered by user "Brian"
     And as "Carol" folder "/Shares/SUB" should exist
     And as "Brian" folder "/Shares/TMP/SUB" should exist
     Examples:
@@ -33,7 +31,6 @@ Feature: a subfolder of a received share can be reshared
   Scenario Outline: user is not allowed to reshare a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions <received_permissions>
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Brian" shares folder "/Shares/TMP/SUB" with user "Carol" with permissions <reshare_permissions> using the sharing API
     Then the OCS status code should be "403"
     And the HTTP status code should be "<http_status_code>"
@@ -87,9 +84,7 @@ Feature: a subfolder of a received share can be reshared
   Scenario Outline: user is allowed to update reshare of a sub-folder with less permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,create,update,read"
-    And user "Carol" has accepted share "/SUB" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | share,read |
     Then the OCS status code should be "<ocs_status_code>"
@@ -107,9 +102,7 @@ Feature: a subfolder of a received share can be reshared
   Scenario Outline: user is allowed to update reshare of a sub-folder to the maximum allowed permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read"
-    And user "Carol" has accepted share "/SUB" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | share,create,update,read |
     Then the OCS status code should be "<ocs_status_code>"
@@ -127,9 +120,7 @@ Feature: a subfolder of a received share can be reshared
   Scenario Outline: user is not allowed to update reshare of a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read"
-    And user "Carol" has accepted share "/SUB" offered by user "Brian"
     When user "Brian" updates the last share using the sharing API with
       | permissions | all |
     Then the OCS status code should be "403"

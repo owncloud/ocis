@@ -15,7 +15,6 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/shared"
     And user "Alice" has shared folder "/shared" with user "Brian"
-    And user "Brian" has accepted share "/shared" offered by user "Alice"
     And user "Brian" has uploaded file with content "some data" to "/textfile0.txt"
     When user "Brian" moves file "textfile0.txt" to "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -35,8 +34,6 @@ Feature: sharing
     And user "Alice" has moved file "textfile0.txt" to "share1/textfile0.txt"
     And user "Alice" has shared folder "/share1" with user "Brian"
     And user "Alice" has shared folder "/share2" with user "Brian"
-    And user "Brian" has accepted share "/share1" offered by user "Alice"
-    And user "Brian" has accepted share "/share2" offered by user "Alice"
     When user "Brian" moves file "/Shares/share1/textfile0.txt" to "/Shares/share2/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/share1/textfile0.txt" should not exist
@@ -56,8 +53,6 @@ Feature: sharing
     And user "Brian" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has shared folder "/share1" with user "Brian"
     And user "Alice" has shared folder "/share2" with user "Brian"
-    And user "Brian" has accepted share "/share1" offered by user "Alice"
-    And user "Brian" has accepted share "/share2" offered by user "Alice"
     When user "Brian" moves file "textfile0.txt" to "/Shares/share1/shared_file.txt" using the WebDAV API
     And user "Brian" moves file "/Shares/share1/shared_file.txt" to "/Shares/share2/shared_file.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "201"
@@ -80,8 +75,6 @@ Feature: sharing
     And user "Alice" has moved file "textfile0.txt" to "PARENT/shared_file.txt"
     And user "Alice" has shared folder "/PARENT" with user "Carol"
     And user "Brian" has shared folder "/PARENT" with user "Carol"
-    And user "Carol" has accepted share "/PARENT" offered by user "Alice"
-    And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     When user "Carol" moves file "/Shares/PARENT/shared_file.txt" to "/Shares/PARENT (2)/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "/Shares/PARENT (2)/shared_file.txt" should exist
@@ -97,7 +90,6 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "this is the old content" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
     When user "Brian" uploads file with content "this is a new content" to "/Shares/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" file "Shares/textfile1.txt" should exist

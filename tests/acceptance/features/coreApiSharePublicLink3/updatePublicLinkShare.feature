@@ -251,7 +251,6 @@ Feature: update a public link share
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test |
       | publicUpload | false        |
@@ -272,7 +271,6 @@ Feature: update a public link share
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test |
       | publicUpload | false        |
@@ -293,7 +291,6 @@ Feature: update a public link share
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path        | /Shares/test |
       | permissions | read         |
@@ -314,7 +311,6 @@ Feature: update a public link share
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
     And user "Brian" has created a public link share with settings
       | path        | /Shares/test |
       | permissions | read         |
