@@ -270,7 +270,7 @@ Feature: Notification
 
   @env-config
   Scenario: get a notification about a file share in default languages
-    Given the config "SETTINGS_DEFAULT_LANGUAGE" has been set to "de"
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
     And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"

@@ -26,8 +26,8 @@ var (
 )
 
 // RenderEmailTemplate renders the email template for a new share
-func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath string, translationPath string, vars map[string]string) (*channels.Message, error) {
-	textMt, err := NewTextTemplate(mt, locale, translationPath, vars)
+func RenderEmailTemplate(mt MessageTemplate, locale, defaultLocale string, emailTemplatePath string, translationPath string, vars map[string]string) (*channels.Message, error) {
+	textMt, err := NewTextTemplate(mt, locale, defaultLocale, translationPath, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 	if err != nil {
 		return nil, err
 	}
-	htmlMt, err := NewHTMLTemplate(mt, locale, translationPath, escapeStringMap(vars))
+	htmlMt, err := NewHTMLTemplate(mt, locale, defaultLocale, translationPath, escapeStringMap(vars))
 	if err != nil {
 		return nil, err
 	}
