@@ -308,7 +308,14 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 		return claims, mapClaims, err
 	}
 
-	if !claims.VerifyIssuer(c.issuer, true) {
+	issuer := c.issuer
+	if c.provider.AccessTokenIssuer != "" {
+		// AD FS .well-known/openid-configuration has an optional `access_token_issuer` which takes precedence over `issuer`
+		// See https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oidce/586de7dd-3385-47c7-93a2-935d9e90441c
+		issuer = c.provider.AccessTokenIssuer
+	}
+
+	if !claims.VerifyIssuer(issuer, true) {
 		vErr := jwt.ValidationError{}
 		vErr.Inner = jwt.ErrTokenInvalidIssuer
 		vErr.Errors |= jwt.ValidationErrorIssuer
