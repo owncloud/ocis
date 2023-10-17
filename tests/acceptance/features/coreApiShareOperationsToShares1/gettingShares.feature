@@ -80,7 +80,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: resource cannot be reshared to resource owner
+  Scenario Outline: resource can be reshared to resource owner
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
@@ -93,7 +93,7 @@ Feature: sharing
     When user "Carol" gets all the shares shared with her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And the last share id should not be included in the response
+    And file "/Shares/shared" should be included in the response
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |

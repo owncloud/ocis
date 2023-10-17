@@ -459,48 +459,48 @@ Feature: share resources where the sharee receives the share in multiple ways
     And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
 
 
-  # Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions
-  #   Given using OCS API version "<ocs_api_version>"
-  #   And group "grp" has been created
-  #   And user "Brian" has been added to group "grp"
-  #   And user "Alice" has been added to group "grp"
-  #   And user "Alice" has created folder "parent"
-  #   And user "Alice" has created folder "parent/child"
-  #   And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
-  #   And user "Alice" has created a share with settings
-  #     | path        | parent |
-  #     | shareType   | group  |
-  #     | shareWith   | grp    |
-  #     | permissions | read   |
-  #   And user "Brian" has moved folder "/Shares/parent" to "/Shares/sharedParent"
-  #   When user "Alice" shares folder "parent" with user "Brian" with permissions "all" using the sharing API
-  #   # Note: Brian has already accepted the share of this resource as a member of "grp".
-  #   #       Now he has also received the same resource shared directly to "Brian".
-  #   #       The server should effectively "auto-accept" this new "copy" of the resource
-  #   #       and present to Brian only the single resource "Shares/sharedParent"
-  #   Then as "Brian" folder "Shares/parent" should not exist
-  #   And as "Brian" folder "Shares/sharedParent" should exist
-  #   And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
-  #   Examples:
-  #     | ocs_api_version |
-  #     | 1               |
-  #     | 2               |
+  Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions
+    Given using OCS API version "<ocs_api_version>"
+    And group "grp" has been created
+    And user "Brian" has been added to group "grp"
+    And user "Alice" has been added to group "grp"
+    And user "Alice" has created folder "parent"
+    And user "Alice" has created folder "parent/child"
+    And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
+    And user "Alice" has created a share with settings
+      | path        | parent |
+      | shareType   | group  |
+      | shareWith   | grp    |
+      | permissions | read   |
+    And user "Brian" has moved folder "/Shares/parent" to "/Shares/sharedParent"
+    When user "Alice" shares folder "parent" with user "Brian" with permissions "all" using the sharing API
+    # Note: Brian has already accepted the share of this resource as a member of "grp".
+    #       Now he has also received the same resource shared directly to "Brian".
+    #       The server should effectively "auto-accept" this new "copy" of the resource
+    #       and present to Brian only the single resource "Shares/sharedParent"
+    Then as "Brian" folder "Shares/parent" should not exist
+    And as "Brian" folder "Shares/sharedParent" should exist
+    And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
+    Examples:
+      | ocs_api_version |
+      | 1               |
+      | 2               |
 
 
-  # Scenario: share receiver renames a group share and receives same resource through user share with less permissions
-  #   Given group "grp" has been created
-  #   And user "Brian" has been added to group "grp"
-  #   And user "Alice" has been added to group "grp"
-  #   And user "Alice" has created folder "parent"
-  #   And user "Alice" has created folder "parent/child"
-  #   And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
-  #   And user "Alice" has shared folder "parent" with group "grp" with permissions "all"
-  #   And user "Brian" should be able to rename folder "/Shares/parent" to "/Shares/sharedParent"
-  #   And user "Alice" should be able to share folder "parent" with user "Brian" with permissions "read" using the sharing API
-  #   # Note: Brian has already accepted the share of this resource as a member of "grp".
-  #   #       Now he has also received the same resource shared directly to "Brian".
-  #   #       The server should effectively "auto-accept" this new "copy" of the resource
-  #   #       and present to Brian only the single resource "Shares/sharedParent"
-  #   And as "Brian" folder "Shares/parent" should not exist
-  #   And as "Brian" folder "Shares/sharedParent" should exist
-  #   And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
+  Scenario: share receiver renames a group share and receives same resource through user share with less permissions
+    Given group "grp" has been created
+    And user "Brian" has been added to group "grp"
+    And user "Alice" has been added to group "grp"
+    And user "Alice" has created folder "parent"
+    And user "Alice" has created folder "parent/child"
+    And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
+    And user "Alice" has shared folder "parent" with group "grp" with permissions "all"
+    And user "Brian" should be able to rename folder "/Shares/parent" to "/Shares/sharedParent"
+    And user "Alice" should be able to share folder "parent" with user "Brian" with permissions "read" using the sharing API
+    # Note: Brian has already accepted the share of this resource as a member of "grp".
+    #       Now he has also received the same resource shared directly to "Brian".
+    #       The server should effectively "auto-accept" this new "copy" of the resource
+    #       and present to Brian only the single resource "Shares/sharedParent"
+    And as "Brian" folder "Shares/parent" should not exist
+    And as "Brian" folder "Shares/sharedParent" should exist
+    And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist

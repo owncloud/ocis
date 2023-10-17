@@ -228,11 +228,11 @@ Feature: accept/decline shares coming from internal users
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Carol" should see the following elements
       | /Shares/shared/Brian/     |
-      | /Shares/shared (2)/Alice/ |
+      | /Shares/shared (1)/Alice/ |
     And the sharing API should report to user "Carol" that these shares are in the accepted state
       | path                |
       | /Shares/shared/     |
-      | /Shares/shared (2)/ |
+      | /Shares/shared (1)/ |
 
   @issue-2540
   Scenario: share with a group that you are part of yourself
