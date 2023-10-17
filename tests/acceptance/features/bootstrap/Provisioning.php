@@ -2966,82 +2966,8 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->addUserToGroup($user, $group, "api");
-	}
-
-	/**
-	 * @When the administrator adds the following users to the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorAddsUserToTheFollowingGroupsUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["username", "groupname"], ["comment"]);
-		$rows = $table->getHash();
-		foreach ($rows as $row) {
-			$this->adminAddsUserToGroupUsingTheProvisioningApi($row["username"], $row["groupname"]);
-		}
-	}
-
-	/**
-	 * @When user :user tries to add user :otherUser to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $otherUser
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToAddUserToGroupUsingTheProvisioningApi(string $user, string $otherUser, string $group):void {
-		$actualUser = $this->getActualUsername($user);
-		$actualPassword = $this->getUserPassword($actualUser);
-		$actualOtherUser = $this->getActualUsername($otherUser);
-		$result = UserHelper::addUserToGroup(
-			$this->getBaseUrl(),
-			$actualOtherUser,
-			$group,
-			$actualUser,
-			$actualPassword,
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
-		$this->response = $result;
-	}
-
-	/**
-	 * @When user :user tries to add himself to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToAddHimselfToGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->userTriesToAddUserToGroupUsingTheProvisioningApi($user, $user, $group);
-	}
-
-	/**
-	 * @When the administrator tries to add user :user to group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheProvisioningApi(
-		string $user,
-		string $group
-	):void {
-		$this->userTriesToAddUserToGroupUsingTheProvisioningApi(
-			$this->getAdminUsername(),
-			$user,
-			$group
-		);
+		$response = $this->graphContext->addUserToGroup($group, $user);
+		$this->setResponse($response);
 	}
 
 	/**
@@ -3055,7 +2981,21 @@ trait Provisioning {
 	 */
 	public function userHasBeenAddedToGroup(string $user, string $group):void {
 		$user = $this->getActualUsername($user);
-		$this->addUserToGroup($user, $group, null, true);
+		if ($this->isTestingWithLdap()) {
+			try {
+				$this->addUserToLdapGroup(
+					$user,
+					$group
+				);
+			} catch (LdapException $exception) {
+				throw new Exception(
+					"User $user cannot be added to $group Error: $exception"
+				);
+			}
+		} else {
+			$response = $this->graphContext->addUserToGroup($group, $user);
+			$this->theHTTPStatusCodeShouldBe(204, '', $response);
+		}
 	}
 
 	/**
@@ -3071,105 +3011,6 @@ trait Provisioning {
 		foreach ($table as $row) {
 			$this->userHasBeenAddedToGroup($row['username'], $row['groupname']);
 		}
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has been added to database backend group "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasBeenAddedToDatabaseBackendGroup(string $user, string $group):void {
-		$this->addUserToGroup($user, $group, 'api', true);
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $group
-	 * @param string|null $method how to add the user to the group api|occ
-	 * @param bool $checkResult if true, then check the status of the operation. default false.
-	 * 			                for given step checkResult is expected to be set as true
-	 * 			                for when step checkResult is expected to be set as false
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function addUserToGroup(string $user, string $group, ?string $method = null, bool $checkResult = false):void {
-		$user = $this->getActualUsername($user);
-		if ($method === null
-			&& $this->isTestingWithLdap()
-			&& !$this->isLocalAdminGroup($group)
-		) {
-			//guess yourself
-			$method = "ldap";
-		} elseif ($method === null && OcisHelper::isTestingWithGraphApi()) {
-			$method = "graph";
-		} elseif ($method === null) {
-			$method = "api";
-		}
-		$method = \trim(\strtolower($method));
-		switch ($method) {
-			case "api":
-				$result = UserHelper::addUserToGroup(
-					$this->getBaseUrl(),
-					$user,
-					$group,
-					$this->getAdminUsername(),
-					$this->getAdminPassword(),
-					$this->getStepLineRef(),
-					$this->ocsApiVersion
-				);
-				if ($checkResult && ($result->getStatusCode() !== 200)) {
-					throw new Exception(
-						"could not add user to group. "
-						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				$this->response = $result;
-				if (!$checkResult) {
-					// for when step only
-					$this->pushToLastStatusCodesArrays();
-				}
-				break;
-			case "ldap":
-				try {
-					$this->addUserToLdapGroup(
-						$user,
-						$group
-					);
-				} catch (LdapException $exception) {
-					throw new Exception(
-						"User $user cannot be added to $group Error: $exception"
-					);
-				};
-				break;
-			case "graph":
-				$this->graphContext->adminHasAddedUserToGroupUsingTheGraphApi(
-					$user,
-					$group
-				);
-				break;
-			default:
-				throw new InvalidArgumentException(
-					"Invalid method to add a user to a group"
-				);
-		}
-	}
-
-	/**
-	 * @Given the administrator has been added to group :group
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasBeenAddedToGroup(string $group):void {
-		$admin = $this->getAdminUsername();
-		$this->addUserToGroup($admin, $group, null, true);
 	}
 
 	/**
