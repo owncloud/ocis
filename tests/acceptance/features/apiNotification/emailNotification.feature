@@ -140,7 +140,7 @@ Feature: Email notification
     And user "Brian" has switched the system language to "es"
     And user "Carol" has switched the system language to "de"
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
-    When user "Alice" has shared a space "new-space" with settings:
+    When user "Alice" shares a space "new-space" with settings:
       | shareWith | group1 |
       | role      | viewer |
     Then the HTTP status code should be "200"
