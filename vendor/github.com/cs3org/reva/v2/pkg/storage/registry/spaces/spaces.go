@@ -481,7 +481,7 @@ func (r *registry) findProvidersForResource(ctx context.Context, id string, find
 				},
 			})
 		}
-		spaces, err := r.findStorageSpaceOnProvider(ctx, address, filters, unrestricted)
+		spaces, err := r.findStorageSpaceOnProvider(ctx, address, filters, false)
 		if err != nil {
 			appctx.GetLogger(ctx).Debug().Err(err).Interface("provider", provider).Msg("findStorageSpaceOnProvider by id failed, continuing")
 			continue

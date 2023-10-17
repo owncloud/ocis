@@ -343,7 +343,7 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 
 	// check if we are the owner or the grantee
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE || share.IsCreatedByUser(s, user) || share.IsGrantedToUser(s, user) {
+	if share.IsCreatedByUser(s, user) || share.IsGrantedToUser(s, user) {
 		return s, nil
 	}
 
@@ -519,7 +519,7 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 }
 
 // ListReceivedShares returns the list of shares the user has access to.
-func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter, forUser *userpb.UserId) ([]*collaboration.ReceivedShare, error) {
+func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
 	if err := m.initialize(); err != nil {
 		return nil, err
 	}
@@ -529,20 +529,11 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 		return nil, errtypes.UserRequired("error getting user from context")
 	}
 
-	uid, groups := user.GetId(), user.GetGroups()
-	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
-		u, err := utils.GetUser(forUser, m.gatewayClient)
-		if err != nil {
-			return nil, errtypes.BadRequest("user not found")
-		}
-		uid = forUser
-		groups = u.GetGroups()
-	}
 	result := []*collaboration.ReceivedShare{}
 
 	ids, err := granteeToIndex(&provider.Grantee{
 		Type: provider.GranteeType_GRANTEE_TYPE_USER,
-		Id:   &provider.Grantee_UserId{UserId: uid},
+		Id:   &provider.Grantee_UserId{UserId: user.Id},
 	})
 	if err != nil {
 		return nil, err
@@ -553,7 +544,7 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	if err != nil {
 		return nil, err
 	}
-	for _, group := range groups {
+	for _, group := range user.Groups {
 		index, err := granteeToIndex(&provider.Grantee{
 			Type: provider.GranteeType_GRANTEE_TYPE_GROUP,
 			Id:   &provider.Grantee_GroupId{GroupId: &groupv1beta1.GroupId{OpaqueId: group}},
@@ -626,7 +617,7 @@ func (m *Manager) GetReceivedShare(ctx context.Context, ref *collaboration.Share
 }
 
 // UpdateReceivedShare updates the received share with share state.
-func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask, forUser *userpb.UserId) (*collaboration.ReceivedShare, error) {
+func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration.ReceivedShare, fieldMask *field_mask.FieldMask) (*collaboration.ReceivedShare, error) {
 	if err := m.initialize(); err != nil {
 		return nil, err
 	}
@@ -647,19 +638,12 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, rshare *collaboration
 			rs.State = rshare.State
 		case "mount_point":
 			rs.MountPoint = rshare.MountPoint
-		case "hide":
-			continue
 		default:
 			return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
 		}
 	}
 
-	uid := user.GetId()
-	if user.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
-		uid = forUser
-	}
-
-	err = m.persistReceivedShare(ctx, uid, rs)
+	err = m.persistReceivedShare(ctx, user.Id, rs)
 	if err != nil {
 		return nil, err
 	}

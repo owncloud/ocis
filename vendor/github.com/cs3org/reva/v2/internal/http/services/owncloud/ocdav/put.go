@@ -172,35 +172,32 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if tfRes.Status.Code == rpc.Code_CODE_OK {
-			sRes, err := client.Stat(ctx, &provider.StatRequest{
-				Ref: ref,
-			})
-			if err != nil {
-				log.Error().Err(err).Msg("error sending grpc touch file request")
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			if sRes.Status.Code != rpc.Code_CODE_OK {
-				log.Error().Interface("status", sRes.Status).Msg("error touching file")
-				errors.HandleErrorStatus(&log, w, sRes.Status)
-				return
-			}
-
-			w.Header().Set(net.HeaderETag, sRes.Info.Etag)
-			w.Header().Set(net.HeaderOCETag, sRes.Info.Etag)
-			w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*sRes.Info.Id))
-			w.Header().Set(net.HeaderLastModified, net.RFC1123Z(sRes.Info.Mtime))
-
-			w.WriteHeader(http.StatusCreated)
-			return
-		}
-
-		if tfRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+		if tfRes.Status.Code != rpc.Code_CODE_OK {
 			log.Error().Interface("status", tfRes.Status).Msg("error touching file")
-			errors.HandleErrorStatus(&log, w, tfRes.Status)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		sRes, err := client.Stat(ctx, &provider.StatRequest{
+			Ref: ref,
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("error sending grpc touch file request")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if sRes.Status.Code != rpc.Code_CODE_OK {
+			log.Error().Interface("status", sRes.Status).Msg("error touching file")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set(net.HeaderETag, sRes.Info.Etag)
+		w.Header().Set(net.HeaderOCETag, sRes.Info.Etag)
+		w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*sRes.Info.Id))
+		w.Header().Set(net.HeaderLastModified, net.RFC1123Z(sRes.Info.Mtime))
+
+		w.WriteHeader(http.StatusCreated)
+		return
 	}
 
 	utils.AppendPlainToOpaque(opaque, net.HeaderUploadLength, strconv.FormatInt(length, 10))

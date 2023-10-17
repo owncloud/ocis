@@ -104,10 +104,7 @@ func (s *svc) routerInit(log *zerolog.Logger) error {
 	capabilitiesHandler.Init(s.c)
 	usersHandler.Init(s.c)
 	configHandler.Init(s.c)
-	err := sharesHandler.Init(s.c)
-	if err != nil {
-		log.Fatal().Msg(err.Error())
-	}
+	sharesHandler.Init(s.c)
 	shareesHandler.Init(s.c)
 
 	s.router.Route("/v{version:(1|2)}.php", func(r chi.Router) {

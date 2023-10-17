@@ -157,7 +157,7 @@ func (s *svc) Close() error {
 }
 
 func (s *svc) Unprotected() []string {
-	return []string{"/status.php", "/status", "/remote.php/dav/public-files/", "/apps/files/", "/index.php/f/", "/index.php/s/", "/remote.php/dav/ocm/", "/dav/ocm/"}
+	return []string{"/status.php", "/status", "/remote.php/dav/public-files/", "/apps/files/", "/index.php/f/", "/index.php/s/"}
 }
 
 func (s *svc) Handler() http.Handler {
@@ -412,10 +412,4 @@ func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[g
 	cp := path.Join(childPathRes.Path, child.Path) + "/"
 	pp := path.Join(parentPathRes.Path, parent.Path) + "/"
 	return strings.HasPrefix(cp, pp), nil
-}
-
-func isSpaceRoot(info *provider.ResourceInfo) bool {
-	f := info.GetId()
-	s := info.GetSpace().GetRoot()
-	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
 }

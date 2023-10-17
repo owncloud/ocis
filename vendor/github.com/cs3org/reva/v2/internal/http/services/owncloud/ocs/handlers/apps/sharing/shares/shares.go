@@ -23,7 +23,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"mime"
 	"net/http"
 	"path"
@@ -40,13 +39,11 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/password"
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
@@ -83,8 +80,6 @@ type Handler struct {
 	publicURL                             string
 	sharePrefix                           string
 	homeNamespace                         string
-	ocmMountPoint                         string
-	listOCMShares                         bool
 	skipUpdatingExistingSharesMountpoints bool
 	additionalInfoTemplate                *template.Template
 	userIdentifierCache                   *ttlcache.Cache
@@ -92,7 +87,6 @@ type Handler struct {
 	deniable                              bool
 	resharing                             bool
 	publicPasswordEnforced                passwordEnforced
-	passwordValidator                     password.Validator
 
 	getClient GatewayClientGetter
 }
@@ -128,15 +122,13 @@ func getCacheWarmupManager(c *config.Config) (sharecache.Warmup, error) {
 type GatewayClientGetter func() (gateway.GatewayAPIClient, error)
 
 // Init initializes this and any contained handlers
-func (h *Handler) Init(c *config.Config) error {
+func (h *Handler) Init(c *config.Config) {
 	h.gatewayAddr = c.GatewaySvc
 	h.machineAuthAPIKey = c.MachineAuthAPIKey
 	h.storageRegistryAddr = c.StorageregistrySvc
 	h.publicURL = c.Config.Host
 	h.sharePrefix = c.SharePrefix
 	h.homeNamespace = c.HomeNamespace
-	h.ocmMountPoint = c.OCMMountPoint
-	h.listOCMShares = c.ListOCMShares
 	h.skipUpdatingExistingSharesMountpoints = c.SkipUpdatingExistingSharesMountpoints
 
 	h.additionalInfoTemplate, _ = template.New("additionalInfo").Parse(c.AdditionalInfoAttribute)
@@ -146,26 +138,20 @@ func (h *Handler) Init(c *config.Config) error {
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
 	h.publicPasswordEnforced = publicPwdEnforced(c)
-	h.passwordValidator = passwordPolicies(c)
 
 	h.statCache = cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize)
 	if c.CacheWarmupDriver != "" {
 		cwm, err := getCacheWarmupManager(c)
-		if err != nil {
-			return err
+		if err == nil {
+			go h.startCacheWarmup(cwm)
 		}
-		go h.startCacheWarmup(cwm)
 	}
 	h.getClient = h.getPoolClient
-	return nil
 }
 
 // InitWithGetter initializes the handler and adds the clientGetter
 func (h *Handler) InitWithGetter(c *config.Config, clientGetter GatewayClientGetter) {
-	err := h.Init(c)
-	if err != nil {
-		log.Fatal(err)
-	}
+	h.Init(c)
 	h.getClient = clientGetter
 }
 
@@ -739,7 +725,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 
 	share.Permissions = &collaboration.SharePermissions{Permissions: role.CS3ResourcePermissions()}
 
-	var fieldMaskPaths = []string{"permissions", "hide"}
+	var fieldMaskPaths = []string{"permissions"}
 
 	expireDate := r.PostFormValue("expireDate")
 	var expirationTs *types.Timestamp
@@ -866,10 +852,7 @@ const (
 
 func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 	// which pending state to list
-	state := r.FormValue("state")
-	stateFilter := getStateFilter(state)
-
-	showHidden, _ := strconv.ParseBool(r.URL.Query().Get("show_hidden"))
+	stateFilter := getStateFilter(r.FormValue("state"))
 
 	ctx := r.Context()
 	p := r.URL.Query().Get("path")
@@ -958,9 +941,6 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 
 	// TODO(refs) filter out "invalid" shares
 	for _, rs := range lrsRes.GetShares() {
-		if rs.Share.Hide && !showHidden {
-			continue
-		}
 		if stateFilter != ocsStateUnknown && rs.GetState() != stateFilter {
 			continue
 		}
@@ -1041,18 +1021,6 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 
 		shares = append(shares, data)
 		sublog.Debug().Msgf("share: %+v", *data)
-	}
-
-	if h.listOCMShares {
-		// include ocm shares in the response
-		stateFilter := getOCMStateFilter(state)
-		lst, err := h.listReceivedFederatedShares(ctx, client, stateFilter)
-		if err != nil {
-			sublog.Err(err).Msg("error listing received ocm shares")
-			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error listing received ocm shares", err)
-			return
-		}
-		shares = append(shares, lst...)
 	}
 
 	response.WriteOCSSuccess(w, r, shares)
@@ -1538,19 +1506,6 @@ func mapState(state collaboration.ShareState) int {
 	return mapped
 }
 
-func mapOCMState(state ocmv1beta1.ShareState) int {
-	switch state {
-	case ocmv1beta1.ShareState_SHARE_STATE_PENDING:
-		return ocsStatePending
-	case ocmv1beta1.ShareState_SHARE_STATE_ACCEPTED:
-		return ocsStateAccepted
-	case ocmv1beta1.ShareState_SHARE_STATE_REJECTED:
-		return ocsStateRejected
-	default:
-		return ocsStateUnknown
-	}
-}
-
 func getStateFilter(s string) collaboration.ShareState {
 	var stateFilter collaboration.ShareState
 	switch s {
@@ -1566,21 +1521,6 @@ func getStateFilter(s string) collaboration.ShareState {
 		stateFilter = collaboration.ShareState_SHARE_STATE_ACCEPTED
 	}
 	return stateFilter
-}
-
-func getOCMStateFilter(s string) ocmv1beta1.ShareState {
-	switch s {
-	case "all":
-		return ocsStateUnknown // no filter
-	case "0": // accepted
-		return ocmv1beta1.ShareState_SHARE_STATE_ACCEPTED
-	case "1": // pending
-		return ocmv1beta1.ShareState_SHARE_STATE_PENDING
-	case "2": // rejected
-		return ocmv1beta1.ShareState_SHARE_STATE_REJECTED
-	default:
-		return ocmv1beta1.ShareState_SHARE_STATE_ACCEPTED
-	}
 }
 
 func (h *Handler) getPoolClient() (gateway.GatewayAPIClient, error) {
@@ -1639,20 +1579,6 @@ func publicPwdEnforced(c *config.Config) passwordEnforced {
 	enf.EnforcedForReadWriteDelete = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.ReadWriteDelete)
 	enf.EnforcedForUploadOnly = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.UploadOnly)
 	return enf
-}
-
-func passwordPolicies(c *config.Config) password.Validator {
-	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicy == nil {
-		return password.NewPasswordPolicy(0, 0, 0, 0, 0, nil)
-	}
-	return password.NewPasswordPolicy(
-		c.Capabilities.Capabilities.PasswordPolicy.MinCharacters,
-		c.Capabilities.Capabilities.PasswordPolicy.MinLowerCaseCharacters,
-		c.Capabilities.Capabilities.PasswordPolicy.MinUpperCaseCharacters,
-		c.Capabilities.Capabilities.PasswordPolicy.MinDigits,
-		c.Capabilities.Capabilities.PasswordPolicy.MinSpecialCharacters,
-		c.Capabilities.Capabilities.PasswordPolicy.BannedPasswordsList,
-	)
 }
 
 // sufficientPermissions returns true if the `existing` permissions contain the `requested` permissions

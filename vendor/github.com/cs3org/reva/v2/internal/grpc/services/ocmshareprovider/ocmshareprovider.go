@@ -1,4 +1,4 @@
-// Copyright 2018-2023 CERN
+// Copyright 2018-2021 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,33 +20,14 @@ package ocmshareprovider
 
 import (
 	"context"
-	"fmt"
-	"net/url"
-	"path/filepath"
-	"strings"
-	"text/template"
-	"time"
 
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
-	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/internal/http/services/ocmd"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/ocm/client"
 	"github.com/cs3org/reva/v2/pkg/ocm/share"
-	"github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry"
+	"github.com/cs3org/reva/v2/pkg/ocm/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/sharedconf"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/cs3org/reva/v2/pkg/utils/cfg"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
@@ -56,85 +37,58 @@ func init() {
 }
 
 type config struct {
-	Driver         string                            `mapstructure:"driver"`
-	Drivers        map[string]map[string]interface{} `mapstructure:"drivers"`
-	ClientTimeout  int                               `mapstructure:"client_timeout"`
-	ClientInsecure bool                              `mapstructure:"client_insecure"`
-	GatewaySVC     string                            `mapstructure:"gatewaysvc"      validate:"required"`
-	ProviderDomain string                            `mapstructure:"provider_domain" validate:"required" docs:"The same domain registered in the provider authorizer"`
-	WebDAVEndpoint string                            `mapstructure:"webdav_endpoint" validate:"required"`
-	WebappTemplate string                            `mapstructure:"webapp_template"`
+	Driver  string                            `mapstructure:"driver"`
+	Drivers map[string]map[string]interface{} `mapstructure:"drivers"`
 }
 
 type service struct {
-	conf            *config
-	repo            share.Repository
-	client          *client.OCMClient
-	gatewaySelector *pool.Selector[gateway.GatewayAPIClient]
-	webappTmpl      *template.Template
-	walker          walker.Walker
+	conf *config
+	sm   share.Manager
 }
 
-func (c *config) ApplyDefaults() {
+func (c *config) init() {
 	if c.Driver == "" {
 		c.Driver = "json"
 	}
-	if c.ClientTimeout == 0 {
-		c.ClientTimeout = 10
-	}
-	if c.WebappTemplate == "" {
-		c.WebappTemplate = "https://cernbox.cern.ch/external/sciencemesh/{{.Token}}{relative-path-to-shared-resource}"
-	}
-
-	c.GatewaySVC = sharedconf.GetGatewaySVC(c.GatewaySVC)
 }
 
 func (s *service) Register(ss *grpc.Server) {
 	ocm.RegisterOcmAPIServer(ss, s)
 }
 
-func getShareRepository(c *config) (share.Repository, error) {
+func getShareManager(c *config) (share.Manager, error) {
 	if f, ok := registry.NewFuncs[c.Driver]; ok {
 		return f(c.Drivers[c.Driver])
 	}
 	return nil, errtypes.NotFound("driver not found: " + c.Driver)
 }
 
-// New creates a new ocm share provider svc.
+func parseConfig(m map[string]interface{}) (*config, error) {
+	c := &config{}
+	if err := mapstructure.Decode(m, c); err != nil {
+		err = errors.Wrap(err, "error decoding conf")
+		return nil, err
+	}
+	return c, nil
+}
+
+// New creates a new ocm share provider svc
 func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
-	var c config
-	if err := cfg.Decode(m, &c); err != nil {
-		return nil, err
-	}
 
-	repo, err := getShareRepository(&c)
+	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
 	}
+	c.init()
 
-	client := client.New(&client.Config{
-		Timeout:  time.Duration(c.ClientTimeout) * time.Second,
-		Insecure: c.ClientInsecure,
-	})
-
-	gatewaySelector, err := pool.GatewaySelector(c.GatewaySVC)
+	sm, err := getShareManager(c)
 	if err != nil {
 		return nil, err
 	}
-
-	tpl, err := template.New("webapp_template").Parse(c.WebappTemplate)
-	if err != nil {
-		return nil, err
-	}
-	walker := walker.NewWalker(gatewaySelector)
 
 	service := &service{
-		conf:            &c,
-		repo:            repo,
-		client:          client,
-		gatewaySelector: gatewaySelector,
-		webappTmpl:      tpl,
-		walker:          walker,
+		conf: c,
+		sm:   sm,
 	}
 
 	return service, nil
@@ -145,240 +99,98 @@ func (s *service) Close() error {
 }
 
 func (s *service) UnprotectedEndpoints() []string {
-	return []string{"/cs3.sharing.ocm.v1beta1.OcmAPI/GetOCMShareByToken"}
+	return []string{}
 }
 
-func getOCMEndpoint(originProvider *ocmprovider.ProviderInfo) (string, error) {
-	for _, s := range originProvider.Services {
-		if s.Endpoint.Type.Name == "OCM" {
-			return s.Endpoint.Path, nil
-		}
-	}
-	return "", errors.New("ocm endpoint not specified for mesh provider")
-}
-
-func formatOCMUser(u *userpb.UserId) string {
-	return fmt.Sprintf("%s@%s", u.OpaqueId, u.Idp)
-}
-
-func getResourceType(info *providerpb.ResourceInfo) string {
-	switch info.Type {
-	case providerpb.ResourceType_RESOURCE_TYPE_FILE:
-		return "file"
-	case providerpb.ResourceType_RESOURCE_TYPE_CONTAINER:
-		return "folder"
-	}
-	return "unknown"
-}
-
-func (s *service) webdavURL(ctx context.Context, share *ocm.Share) string {
-	// the url is in the form of https://cernbox.cern.ch/remote.php/dav/ocm/token
-	p, _ := url.JoinPath(s.conf.WebDAVEndpoint, "/dav/ocm", share.Token)
-	return p
-}
-
-func (s *service) getWebdavProtocol(ctx context.Context, share *ocm.Share, m *ocm.AccessMethod_WebdavOptions) *ocmd.WebDAV {
-	var perms []string
-	if m.WebdavOptions.Permissions.InitiateFileDownload {
-		perms = append(perms, "read")
-	}
-	if m.WebdavOptions.Permissions.InitiateFileUpload {
-		perms = append(perms, "write")
-	}
-
-	return &ocmd.WebDAV{
-		Permissions:  perms,
-		URL:          s.webdavURL(ctx, share),
-		SharedSecret: share.Token,
-	}
-}
-
-func (s *service) getWebappProtocol(share *ocm.Share) *ocmd.Webapp {
-	var b strings.Builder
-	if err := s.webappTmpl.Execute(&b, share); err != nil {
-		return nil
-	}
-	return &ocmd.Webapp{
-		URITemplate: b.String(),
-	}
-}
-
-func (s *service) getDataTransferProtocol(ctx context.Context, share *ocm.Share) *ocmd.Datatx {
-	var size uint64
-
-	gatewayClient, err := s.gatewaySelector.Next()
-	if err != nil {
-		return nil
-	}
-	// get the path of the share
-	statRes, err := gatewayClient.Stat(ctx, &providerpb.StatRequest{
-		Ref: &providerpb.Reference{
-			ResourceId: share.ResourceId,
-		},
-	})
-	if err != nil {
-		return nil
-	}
-
-	err = s.walker.Walk(ctx, statRes.GetInfo().GetId(), func(path string, info *providerpb.ResourceInfo, err error) error {
-		if info.Type == providerpb.ResourceType_RESOURCE_TYPE_FILE {
-			size += info.Size
-		}
-		return nil
-	})
-	if err != nil {
-		return nil
-	}
-	return &ocmd.Datatx{
-		SourceURI: s.webdavURL(ctx, share),
-		Size:      size,
-	}
-}
-
-func (s *service) getProtocols(ctx context.Context, share *ocm.Share) ocmd.Protocols {
-	var p ocmd.Protocols
-	for _, m := range share.AccessMethods {
-		var newProtocol ocmd.Protocol
-		switch t := m.Term.(type) {
-		case *ocm.AccessMethod_WebdavOptions:
-			newProtocol = s.getWebdavProtocol(ctx, share, t)
-		case *ocm.AccessMethod_WebappOptions:
-			newProtocol = s.getWebappProtocol(share)
-		case *ocm.AccessMethod_TransferOptions:
-			newProtocol = s.getDataTransferProtocol(ctx, share)
-		}
-		if newProtocol != nil {
-			p = append(p, newProtocol)
-		}
-	}
-	return p
-}
-
+// Note: this is for outgoing OCM shares
+// This function is used when you for instance
+// call `ocm-share-create` in reva-cli.
+// For incoming OCM shares from internal/http/services/ocmd/shares.go
+// there is the very similar but slightly different function
+// CreateOCMCoreShare (the "Core" somehow means "incoming").
+// So make sure to keep in mind the difference between this file for outgoing:
+// internal/grpc/services/ocmshareprovider/ocmshareprovider.go
+// and the other one for incoming:
+// internal/grpc/service/ocmcore/ocmcore.go
+// Both functions end up calling the same s.sm.Share function
+// on the OCM share manager:
+// pkg/ocm/share/manager/{json|nextcloud|...}
 func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareRequest) (*ocm.CreateOCMShareResponse, error) {
-	gatewayClient, err := s.gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-	statRes, err := gatewayClient.Stat(ctx, &providerpb.StatRequest{
-		Ref: &providerpb.Reference{
-			ResourceId: req.ResourceId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if statRes.Status.Code != rpc.Code_CODE_OK {
-		if statRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
-			return &ocm.CreateOCMShareResponse{
-				Status: status.NewNotFound(ctx, statRes.Status.Message),
-			}, nil
-		}
+	if req.Opaque == nil {
 		return &ocm.CreateOCMShareResponse{
-			Status: status.NewInternal(ctx, statRes.Status.Message),
+			Status: status.NewInternal(ctx, "can't find resource permissions"),
 		}, nil
 	}
 
-	info := statRes.Info
-	user := ctxpkg.ContextMustGetUser(ctx)
-	tkn := utils.RandString(32)
-	now := time.Now().UnixNano()
-	ts := &typespb.Timestamp{
-		Seconds: uint64(now / 1000000000),
-		Nanos:   uint32(now % 1000000000),
-	}
-
-	ocmshare := &ocm.Share{
-		Token:         tkn,
-		Name:          filepath.Base(info.Path),
-		ResourceId:    req.ResourceId,
-		Grantee:       req.Grantee,
-		ShareType:     ocm.ShareType_SHARE_TYPE_USER,
-		Owner:         info.Owner,
-		Creator:       user.Id,
-		Ctime:         ts,
-		Mtime:         ts,
-		Expiration:    req.Expiration,
-		AccessMethods: req.AccessMethods,
-	}
-
-	ocmshare, err = s.repo.StoreShare(ctx, ocmshare)
-	if err != nil {
-		if errors.Is(err, share.ErrShareAlreadyExisting) {
-			return &ocm.CreateOCMShareResponse{
-				Status: status.NewAlreadyExists(ctx, err, "share already exists"),
-			}, nil
-		}
+	var permissions string
+	permOpaque, ok := req.Opaque.Map["permissions"]
+	if !ok {
 		return &ocm.CreateOCMShareResponse{
-			Status: status.NewInternal(ctx, err.Error()),
+			Status: status.NewInternal(ctx, "resource permissions not set"),
+		}, nil
+	}
+	switch permOpaque.Decoder {
+	case "plain":
+		permissions = string(permOpaque.Value)
+	default:
+		return &ocm.CreateOCMShareResponse{
+			Status: status.NewInternal(ctx, "invalid opaque entry decoder"),
 		}, nil
 	}
 
-	ocmEndpoint, err := getOCMEndpoint(req.RecipientMeshProvider)
-	if err != nil {
+	var name string
+	nameOpaque, ok := req.Opaque.Map["name"]
+	if !ok {
 		return &ocm.CreateOCMShareResponse{
-			Status: status.NewInvalidArg(ctx, "the selected provider does not have an OCM endpoint"),
+			Status: status.NewInternal(ctx, "resource name not set"),
+		}, nil
+	}
+	switch nameOpaque.Decoder {
+	case "plain":
+		name = string(nameOpaque.Value)
+	default:
+		return &ocm.CreateOCMShareResponse{
+			Status: status.NewInternal(ctx, "invalid opaque entry decoder"),
 		}, nil
 	}
 
-	newShareReq := &client.NewShareRequest{
-		ShareWith:  formatOCMUser(req.Grantee.GetUserId()),
-		Name:       ocmshare.Name,
-		ProviderID: ocmshare.Id.OpaqueId,
-		Owner: formatOCMUser(&userpb.UserId{
-			OpaqueId: info.Owner.OpaqueId,
-			Idp:      s.conf.ProviderDomain, // FIXME: this is not generally true in case of resharing
-		}),
-		Sender: formatOCMUser(&userpb.UserId{
-			OpaqueId: user.Id.OpaqueId,
-			Idp:      s.conf.ProviderDomain,
-		}),
-		SenderDisplayName: user.DisplayName,
-		ShareType:         "user",
-		ResourceType:      getResourceType(info),
-		Protocols:         s.getProtocols(ctx, ocmshare),
-	}
-
-	if req.Expiration != nil {
-		newShareReq.Expiration = req.Expiration.Seconds
-	}
-
-	newShareRes, err := s.client.NewShare(ctx, ocmEndpoint, newShareReq)
-	if err != nil {
-		switch {
-		case errors.Is(err, client.ErrInvalidParameters):
-			return &ocm.CreateOCMShareResponse{
-				Status: status.NewInvalidArg(ctx, err.Error()),
-			}, nil
-		case errors.Is(err, client.ErrServiceNotTrusted):
-			return &ocm.CreateOCMShareResponse{
-				Status: status.NewInvalidArg(ctx, err.Error()),
-			}, nil
+	// discover share type
+	sharetype := ocm.Share_SHARE_TYPE_REGULAR
+	// FIXME: https://github.com/cs3org/reva/issues/2402
+	protocol, ok := req.Opaque.Map["protocol"]
+	if ok {
+		switch protocol.Decoder {
+		case "plain":
+			if string(protocol.Value) == "datatx" {
+				sharetype = ocm.Share_SHARE_TYPE_TRANSFER
+			}
 		default:
 			return &ocm.CreateOCMShareResponse{
-				Status: status.NewInternal(ctx, err.Error()),
+				Status: status.NewInternal(ctx, "error creating share"),
 			}, nil
 		}
+		// token = protocol FIXME!
+	}
+
+	var sharedSecret string
+	share, err := s.sm.Share(ctx, req.ResourceId, req.Grant, name, req.RecipientMeshProvider, permissions, nil, sharedSecret, sharetype)
+
+	if err != nil {
+		return &ocm.CreateOCMShareResponse{
+			Status: status.NewInternal(ctx, "error creating share"),
+		}, nil
 	}
 
 	res := &ocm.CreateOCMShareResponse{
-		Status:               status.NewOK(ctx),
-		Share:                ocmshare,
-		RecipientDisplayName: newShareRes.RecipientDisplayName,
+		Status: status.NewOK(ctx),
+		Share:  share,
 	}
 	return res, nil
 }
 
 func (s *service) RemoveOCMShare(ctx context.Context, req *ocm.RemoveOCMShareRequest) (*ocm.RemoveOCMShareResponse, error) {
-	// TODO (gdelmont): notify the remote provider using the /notification ocm endpoint
-	// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
-	user := ctxpkg.ContextMustGetUser(ctx)
-	if err := s.repo.DeleteShare(ctx, user, req.Ref); err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.RemoveOCMShareResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
+	err := s.sm.Unshare(ctx, req.Ref)
+	if err != nil {
 		return &ocm.RemoveOCMShareResponse{
 			Status: status.NewInternal(ctx, "error removing share"),
 		}, nil
@@ -390,18 +202,8 @@ func (s *service) RemoveOCMShare(ctx context.Context, req *ocm.RemoveOCMShareReq
 }
 
 func (s *service) GetOCMShare(ctx context.Context, req *ocm.GetOCMShareRequest) (*ocm.GetOCMShareResponse, error) {
-	// if the request is by token, the user does not need to be in the ctx
-	var user *userpb.User
-	if req.Ref.GetToken() == "" {
-		user = ctxpkg.ContextMustGetUser(ctx)
-	}
-	ocmshare, err := s.repo.GetShare(ctx, user, req.Ref)
+	share, err := s.sm.GetShare(ctx, req.Ref)
 	if err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.GetOCMShareResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
 		return &ocm.GetOCMShareResponse{
 			Status: status.NewInternal(ctx, "error getting share"),
 		}, nil
@@ -409,36 +211,12 @@ func (s *service) GetOCMShare(ctx context.Context, req *ocm.GetOCMShareRequest) 
 
 	return &ocm.GetOCMShareResponse{
 		Status: status.NewOK(ctx),
-		Share:  ocmshare,
-	}, nil
-}
-
-func (s *service) GetOCMShareByToken(ctx context.Context, req *ocm.GetOCMShareByTokenRequest) (*ocm.GetOCMShareByTokenResponse, error) {
-	ocmshare, err := s.repo.GetShare(ctx, nil, &ocm.ShareReference{
-		Spec: &ocm.ShareReference_Token{
-			Token: req.Token,
-		},
-	})
-	if err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.GetOCMShareByTokenResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
-		return &ocm.GetOCMShareByTokenResponse{
-			Status: status.NewInternal(ctx, "error getting share"),
-		}, nil
-	}
-
-	return &ocm.GetOCMShareByTokenResponse{
-		Status: status.NewOK(ctx),
-		Share:  ocmshare,
+		Share:  share,
 	}, nil
 }
 
 func (s *service) ListOCMShares(ctx context.Context, req *ocm.ListOCMSharesRequest) (*ocm.ListOCMSharesResponse, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	shares, err := s.repo.ListShares(ctx, user, req.Filters)
+	shares, err := s.sm.ListShares(ctx, req.Filters) // TODO(labkode): add filter to share manager
 	if err != nil {
 		return &ocm.ListOCMSharesResponse{
 			Status: status.NewInternal(ctx, "error listing shares"),
@@ -453,19 +231,8 @@ func (s *service) ListOCMShares(ctx context.Context, req *ocm.ListOCMSharesReque
 }
 
 func (s *service) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareRequest) (*ocm.UpdateOCMShareResponse, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	if len(req.Field) == 0 {
-		return &ocm.UpdateOCMShareResponse{
-			Status: status.NewOK(ctx),
-		}, nil
-	}
-	_, err := s.repo.UpdateShare(ctx, user, req.Ref, req.Field...)
+	_, err := s.sm.UpdateShare(ctx, req.Ref, req.Field.GetPermissions()) // TODO(labkode): check what to update
 	if err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.UpdateOCMShareResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
 		return &ocm.UpdateOCMShareResponse{
 			Status: status.NewInternal(ctx, "error updating share"),
 		}, nil
@@ -478,8 +245,7 @@ func (s *service) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareReq
 }
 
 func (s *service) ListReceivedOCMShares(ctx context.Context, req *ocm.ListReceivedOCMSharesRequest) (*ocm.ListReceivedOCMSharesResponse, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	shares, err := s.repo.ListReceivedShares(ctx, user)
+	shares, err := s.sm.ListReceivedShares(ctx)
 	if err != nil {
 		return &ocm.ListReceivedOCMSharesResponse{
 			Status: status.NewInternal(ctx, "error listing received shares"),
@@ -494,14 +260,8 @@ func (s *service) ListReceivedOCMShares(ctx context.Context, req *ocm.ListReceiv
 }
 
 func (s *service) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceivedOCMShareRequest) (*ocm.UpdateReceivedOCMShareResponse, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	_, err := s.repo.UpdateReceivedShare(ctx, user, req.Share, req.UpdateMask)
+	_, err := s.sm.UpdateReceivedShare(ctx, req.Share, req.UpdateMask) // TODO(labkode): check what to update
 	if err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.UpdateReceivedOCMShareResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
 		return &ocm.UpdateReceivedOCMShareResponse{
 			Status: status.NewInternal(ctx, "error updating received share"),
 		}, nil
@@ -514,14 +274,8 @@ func (s *service) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateRec
 }
 
 func (s *service) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedOCMShareRequest) (*ocm.GetReceivedOCMShareResponse, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	ocmshare, err := s.repo.GetReceivedShare(ctx, user, req.Ref)
+	share, err := s.sm.GetReceivedShare(ctx, req.Ref)
 	if err != nil {
-		if errors.Is(err, share.ErrShareNotFound) {
-			return &ocm.GetReceivedOCMShareResponse{
-				Status: status.NewNotFound(ctx, "share does not exist"),
-			}, nil
-		}
 		return &ocm.GetReceivedOCMShareResponse{
 			Status: status.NewInternal(ctx, "error getting received share"),
 		}, nil
@@ -529,7 +283,7 @@ func (s *service) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedO
 
 	res := &ocm.GetReceivedOCMShareResponse{
 		Status: status.NewOK(ctx),
-		Share:  ocmshare,
+		Share:  share,
 	}
 	return res, nil
 }

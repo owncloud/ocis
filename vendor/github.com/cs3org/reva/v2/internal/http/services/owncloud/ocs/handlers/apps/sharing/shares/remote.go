@@ -1,4 +1,4 @@
-// Copyright 2018-2023 CERN
+// Copyright 2018-2021 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,28 +19,24 @@
 package shares
 
 import (
-	"context"
 	"net/http"
-	"path/filepath"
-	"strings"
+	"strconv"
 
-	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
-	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
-	providerpb "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
+	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
+
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
-	"github.com/cs3org/reva/v2/pkg/ocm/share"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/go-chi/chi/v5"
-	"github.com/pkg/errors"
 )
 
-func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Request, resource *provider.ResourceInfo, role *conversions.Role, roleVal []byte) {
+func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Request, statInfo *provider.ResourceInfo, role *conversions.Role, roleVal []byte) {
 	ctx := r.Context()
 
 	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
@@ -55,7 +51,7 @@ func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	providerInfoResp, err := c.GetInfoByDomain(ctx, &providerpb.GetInfoByDomainRequest{
+	providerInfoResp, err := c.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
 		Domain: shareWithProvider,
 	})
 	if err != nil {
@@ -63,14 +59,8 @@ func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if providerInfoResp.Status.Code != rpc.Code_CODE_OK {
-		// return proper error
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error from provider info response", errors.New(providerInfoResp.Status.Message))
-		return
-	}
-
 	remoteUserRes, err := c.GetAcceptedUser(ctx, &invitepb.GetAcceptedUserRequest{
-		RemoteUserId: &userpb.UserId{OpaqueId: shareWithUser, Idp: shareWithProvider, Type: userpb.UserType_USER_TYPE_FEDERATED},
+		RemoteUserId: &userpb.UserId{OpaqueId: shareWithUser, Idp: shareWithProvider, Type: userpb.UserType_USER_TYPE_PRIMARY},
 	})
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error searching recipient", err)
@@ -81,20 +71,39 @@ func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	createShareResponse, err := c.CreateOCMShare(ctx, &ocm.CreateOCMShareRequest{
-		ResourceId: resource.Id,
-		Grantee: &provider.Grantee{
-			Type: provider.GranteeType_GRANTEE_TYPE_USER,
-			Id: &provider.Grantee_UserId{
-				UserId: remoteUserRes.RemoteUser.Id,
+	createShareReq := &ocm.CreateOCMShareRequest{
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				/* TODO extend the spec with role names?
+				"role": {
+					Decoder: "plain",
+					Value:   []byte(role.Name),
+				},
+				*/
+				"permissions": {
+					Decoder: "plain",
+					Value:   []byte(strconv.Itoa(int(role.OCSPermissions()))),
+				},
+				"name": {
+					Decoder: "plain",
+					Value:   []byte(statInfo.Path),
+				},
+			},
+		},
+		ResourceId: statInfo.Id,
+		Grant: &ocm.ShareGrant{
+			Grantee: &provider.Grantee{
+				Type: provider.GranteeType_GRANTEE_TYPE_USER,
+				Id:   &provider.Grantee_UserId{UserId: remoteUserRes.RemoteUser.GetId()},
+			},
+			Permissions: &ocm.SharePermissions{
+				Permissions: role.CS3ResourcePermissions(),
 			},
 		},
 		RecipientMeshProvider: providerInfoResp.ProviderInfo,
-		AccessMethods: []*ocm.AccessMethod{
-			share.NewWebDavAccessMethod(role.CS3ResourcePermissions()),
-			share.NewWebappAccessMethod(getViewModeFromRole(role)),
-		},
-	})
+	}
+
+	createShareResponse, err := c.CreateOCMShare(ctx, createShareReq)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc create ocm share request", err)
 		return
@@ -108,41 +117,12 @@ func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	s := createShareResponse.Share
-	data, err := conversions.OCMShare2ShareData(s)
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error converting share", err)
-		return
-	}
-	h.mapUserIdsFederatedShare(ctx, c, data)
-
-	info, status, err := h.getResourceInfoByID(ctx, c, s.ResourceId)
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error statting resource id", err)
-		return
-	}
-	if status.Code != rpc.Code_CODE_OK {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error statting resource id", errors.New(status.Message))
-		return
-	}
-
-	h.addFileInfo(ctx, data, info)
-
-	response.WriteOCSSuccess(w, r, data)
+	response.WriteOCSSuccess(w, r, "OCM Share created")
 }
 
-func getViewModeFromRole(role *conversions.Role) providerv1beta1.ViewMode {
-	switch role.Name {
-	case conversions.RoleViewer:
-		return providerv1beta1.ViewMode_VIEW_MODE_READ_ONLY
-	case conversions.RoleEditor:
-		return providerv1beta1.ViewMode_VIEW_MODE_READ_WRITE
-	}
-	return providerv1beta1.ViewMode_VIEW_MODE_INVALID
-}
-
-// GetFederatedShare handles GET requests on /apps/files_sharing/api/v1/shares/remote_shares/{shareid}.
+// GetFederatedShare handles GET requests on /apps/files_sharing/api/v1/shares/remote_shares/{shareid}
 func (h *Handler) GetFederatedShare(w http.ResponseWriter, r *http.Request) {
+
 	// TODO: Implement response with HAL schemating
 	ctx := r.Context()
 
@@ -176,125 +156,28 @@ func (h *Handler) GetFederatedShare(w http.ResponseWriter, r *http.Request) {
 	response.WriteOCSSuccess(w, r, share)
 }
 
-// ListFederatedShares handles GET requests on /apps/files_sharing/api/v1/shares/remote_shares.
+// ListFederatedShares handles GET requests on /apps/files_sharing/api/v1/shares/remote_shares
 func (h *Handler) ListFederatedShares(w http.ResponseWriter, r *http.Request) {
+
 	// TODO Implement pagination.
 	// TODO Implement response with HAL schemating
-}
+	ctx := r.Context()
 
-func (h *Handler) listReceivedFederatedShares(ctx context.Context, gw gatewayv1beta1.GatewayAPIClient, state ocm.ShareState) ([]*conversions.ShareData, error) {
-	listRes, err := gw.ListReceivedOCMShares(ctx, &ocm.ListReceivedOCMSharesRequest{})
+	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
-		return nil, err
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		return
 	}
 
-	shares := []*conversions.ShareData{}
-	for _, s := range listRes.Shares {
-		if state != ocsStateUnknown && s.State != state {
-			continue
-		}
-		sd, err := conversions.ReceivedOCMShare2ShareData(s, h.ocmLocalMount(s))
-		if err != nil {
-			continue
-		}
-		h.mapUserIdsReceivedFederatedShare(ctx, gw, sd)
-		sd.State = mapOCMState(s.State)
-		shares = append(shares, sd)
-	}
-	return shares, nil
-}
-
-func (h *Handler) ocmLocalMount(share *ocm.ReceivedShare) string {
-	return filepath.Join("/", h.ocmMountPoint, share.Id.OpaqueId)
-}
-
-func (h *Handler) mapUserIdsReceivedFederatedShare(ctx context.Context, gw gatewayv1beta1.GatewayAPIClient, sd *conversions.ShareData) {
-	if sd.ShareWith != "" {
-		user := h.mustGetIdentifiers(ctx, gw, sd.ShareWith, false)
-		sd.ShareWith = user.Username
-		sd.ShareWithDisplayname = user.DisplayName
-	}
-
-	if sd.UIDOwner != "" {
-		user := h.mustGetRemoteUser(ctx, gw, sd.UIDOwner)
-		sd.DisplaynameOwner = user.DisplayName
-	}
-
-	if sd.UIDFileOwner != "" {
-		user := h.mustGetRemoteUser(ctx, gw, sd.UIDFileOwner)
-		sd.DisplaynameFileOwner = user.DisplayName
-	}
-}
-
-func (h *Handler) mapUserIdsFederatedShare(ctx context.Context, gw gatewayv1beta1.GatewayAPIClient, sd *conversions.ShareData) {
-	if sd.ShareWith != "" {
-		user := h.mustGetRemoteUser(ctx, gw, sd.ShareWith)
-		sd.ShareWith = user.Username
-		sd.ShareWithDisplayname = user.DisplayName
-	}
-
-	if sd.UIDOwner != "" {
-		user := h.mustGetIdentifiers(ctx, gw, sd.UIDOwner, false)
-		sd.DisplaynameOwner = user.DisplayName
-	}
-
-	if sd.UIDFileOwner != "" {
-		user := h.mustGetIdentifiers(ctx, gw, sd.UIDFileOwner, false)
-		sd.DisplaynameFileOwner = user.DisplayName
-	}
-}
-
-func (h *Handler) mustGetRemoteUser(ctx context.Context, gw gatewayv1beta1.GatewayAPIClient, id string) *userIdentifiers {
-	s := strings.SplitN(id, "@", 2)
-	opaqueID, idp := s[0], s[1]
-	userRes, err := gw.GetAcceptedUser(ctx, &invitepb.GetAcceptedUserRequest{
-		RemoteUserId: &userpb.UserId{
-			Idp:      idp,
-			OpaqueId: opaqueID,
-		},
-	})
+	listOCMSharesResponse, err := gatewayClient.ListOCMShares(ctx, &ocm.ListOCMSharesRequest{})
 	if err != nil {
-		return &userIdentifiers{}
-	}
-	if userRes.Status.Code != rpc.Code_CODE_OK {
-		return &userIdentifiers{}
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc list ocm share request", err)
+		return
 	}
 
-	user := userRes.RemoteUser
-	return &userIdentifiers{
-		DisplayName: user.DisplayName,
-		Username:    user.Username,
-		Mail:        user.Mail,
+	shares := listOCMSharesResponse.GetShares()
+	if shares == nil {
+		shares = make([]*ocm.Share, 0)
 	}
-}
-
-func (h *Handler) listOutcomingFederatedShares(ctx context.Context, gw gatewayv1beta1.GatewayAPIClient, filters []*ocm.ListOCMSharesRequest_Filter) ([]*conversions.ShareData, error) {
-	listRes, err := gw.ListOCMShares(ctx, &ocm.ListOCMSharesRequest{
-		Filters: filters,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	shares := []*conversions.ShareData{}
-	for _, s := range listRes.Shares {
-		sd, err := conversions.OCMShare2ShareData(s)
-		if err != nil {
-			continue
-		}
-		h.mapUserIdsFederatedShare(ctx, gw, sd)
-
-		info, status, err := h.getResourceInfoByID(ctx, gw, s.ResourceId)
-		if err != nil {
-			return nil, err
-		}
-
-		if status.Code != rpc.Code_CODE_OK {
-			return nil, err
-		}
-
-		h.addFileInfo(ctx, sd, info)
-		shares = append(shares, sd)
-	}
-	return shares, nil
+	response.WriteOCSSuccess(w, r, shares)
 }
