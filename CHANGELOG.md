@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
+* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 * Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
 * Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
@@ -57,6 +58,13 @@ The following sections list the changes for unreleased.
    loaded on service startup.
 
    https://github.com/owncloud/ocis/pull/7369
+
+* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
+
+   We the auth service env variable to the service specific name. Before it was configurable via
+   `AUTH_MACHINE_JWT_SECRET` and now is configurable via `AUTH_SERVICE_JWT_SECRET`.
+
+   https://github.com/owncloud/ocis/pull/7523
 
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
 
