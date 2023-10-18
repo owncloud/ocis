@@ -325,6 +325,13 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		lastModified := cs3TimestampToTime(res.Mtime)
 		driveItem.LastModifiedDateTime = &lastModified
 	}
+	if res.ParentId != nil {
+		parentRef := libregraph.NewItemReference()
+		parentRef.SetDriveType(res.Space.SpaceType)
+		parentRef.SetDriveId(storagespace.FormatStorageID(res.ParentId.StorageId, res.ParentId.SpaceId))
+		parentRef.SetId(storagespace.FormatResourceID(*res.ParentId))
+		driveItem.ParentReference = parentRef
+	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
 		// We cannot use a libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 		driveItem.File = &libregraph.OpenGraphFile{
