@@ -30,6 +30,7 @@ Simple examples would be audio metadata like artist, album and title or exif met
 ## Decision Outcome
 
 Chosen option: "[store only subset of extracted metadata required for graph api](#store-subset-of-extracted-metadata-required-for-graph-api)", because Graph API is a simple common denominator and we want to avoid putting the complexity of mapping non-standardized data from potentially different extractors in several areas of the code base. Storage and index keys are determined by facet and property name, e.g. `audio.artist` for the artist in a music file. Storage keys are additionally prefixed with `libre.graph.`, i.e. `libre.graph.audio.artist`.
+Handling Graph API specific metadata is a first step towards handling metadata. More generic and extensible handling of arbitrary metadata can be added later.
 
 ### Positive Consequences:
 
