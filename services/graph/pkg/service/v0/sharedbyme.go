@@ -7,6 +7,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/render"
@@ -108,13 +109,15 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 		resIDStr := storagespace.FormatResourceID(*s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
-			item = libregraph.DriveItem{
-				Id: libregraph.PtrString(resIDStr),
+			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})
+			if err != nil {
+				g.logger.Debug().Err(err).Interface("Share", s.ResourceId).Msg("could not stat share, skipping")
+				continue
 			}
+			item = *itemptr
 		}
 		driveItems[resIDStr] = item
 	}
-
 	return driveItems, nil
 }
 
@@ -124,9 +127,12 @@ func (g Graph) cs3PublicSharesToDriveItems(ctx context.Context, shares []*link.P
 		resIDStr := storagespace.FormatResourceID(*s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
-			item = libregraph.DriveItem{
-				Id: libregraph.PtrString(resIDStr),
+			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})
+			if err != nil {
+				g.logger.Debug().Err(err).Interface("Share", s.ResourceId).Msg("could not stat share, skipping")
+				continue
 			}
+			item = *itemptr
 		}
 		driveItems[resIDStr] = item
 	}

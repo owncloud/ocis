@@ -33,7 +33,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var _ = Describe("Driveitems", func() {
+var _ = Describe("sharedbyme", func() {
 	var (
 		svc             service.Service
 		ctx             context.Context
@@ -47,6 +47,61 @@ var _ = Describe("Driveitems", func() {
 
 		newGroup *libregraph.Group
 	)
+	userShare := collaboration.Share{
+		Id: &collaboration.ShareId{
+			OpaqueId: "share-id",
+		},
+		ResourceId: &provider.ResourceId{
+			StorageId: "storageid",
+			SpaceId:   "spaceid",
+			OpaqueId:  "opaqueid",
+		},
+		Grantee: &provider.Grantee{
+			Type: provider.GranteeType_GRANTEE_TYPE_USER,
+			Id: &provider.Grantee_UserId{
+				UserId: &userpb.UserId{
+					OpaqueId: "user-id",
+				},
+			},
+		},
+	}
+	groupShare := collaboration.Share{
+		Id: &collaboration.ShareId{
+			OpaqueId: "share-id",
+		},
+		ResourceId: &provider.ResourceId{
+			StorageId: "storageid",
+			SpaceId:   "spaceid",
+			OpaqueId:  "opaqueid",
+		},
+		Grantee: &provider.Grantee{
+			Type: provider.GranteeType_GRANTEE_TYPE_GROUP,
+			Id: &provider.Grantee_GroupId{
+				GroupId: &grouppb.GroupId{
+					OpaqueId: "group-id",
+				},
+			},
+		},
+	}
+	userShareWithExpiration := collaboration.Share{
+		Id: &collaboration.ShareId{
+			OpaqueId: "expire-share-id",
+		},
+		ResourceId: &provider.ResourceId{
+			StorageId: "storageid",
+			SpaceId:   "spaceid",
+			OpaqueId:  "expire-opaqueid",
+		},
+		Grantee: &provider.Grantee{
+			Type: provider.GranteeType_GRANTEE_TYPE_USER,
+			Id: &provider.Grantee_UserId{
+				UserId: &userpb.UserId{
+					OpaqueId: "user-id",
+				},
+			},
+		},
+		Expiration: utils.TimeToTS(time.Now()),
+	}
 
 	BeforeEach(func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -62,6 +117,28 @@ var _ = Describe("Driveitems", func() {
 			},
 			nil,
 		)
+		// no stat for the image
+		gatewayClient.On("Stat",
+			mock.Anything,
+			mock.MatchedBy(
+				func(req *provider.StatRequest) bool {
+					return req.Ref.ResourceId.OpaqueId == userShareWithExpiration.ResourceId.OpaqueId
+				})).
+			Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: userShareWithExpiration.ResourceId,
+				},
+			}, nil)
+		gatewayClient.On("Stat",
+			mock.Anything,
+			mock.Anything).
+			Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: userShare.ResourceId,
+				},
+			}, nil)
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
@@ -93,66 +170,8 @@ var _ = Describe("Driveitems", func() {
 	})
 
 	Describe("GetSharedByMe", func() {
-		expiration := time.Now()
-		userShare := collaboration.Share{
-			Id: &collaboration.ShareId{
-				OpaqueId: "share-id",
-			},
-			ResourceId: &provider.ResourceId{
-				StorageId: "storageid",
-				SpaceId:   "spaceid",
-				OpaqueId:  "opaqueid",
-			},
-			Grantee: &provider.Grantee{
-				Type: provider.GranteeType_GRANTEE_TYPE_USER,
-				Id: &provider.Grantee_UserId{
-					UserId: &userpb.UserId{
-						OpaqueId: "user-id",
-					},
-				},
-			},
-		}
-		groupShare := collaboration.Share{
-			Id: &collaboration.ShareId{
-				OpaqueId: "share-id",
-			},
-			ResourceId: &provider.ResourceId{
-				StorageId: "storageid",
-				SpaceId:   "spaceid",
-				OpaqueId:  "opaqueid",
-			},
-			Grantee: &provider.Grantee{
-				Type: provider.GranteeType_GRANTEE_TYPE_GROUP,
-				Id: &provider.Grantee_GroupId{
-					GroupId: &grouppb.GroupId{
-						OpaqueId: "group-id",
-					},
-				},
-			},
-		}
-		userShareWithExpiration := collaboration.Share{
-			Id: &collaboration.ShareId{
-				OpaqueId: "expire-share-id",
-			},
-			ResourceId: &provider.ResourceId{
-				StorageId: "storageid",
-				SpaceId:   "spaceid",
-				OpaqueId:  "expire-opaqueid",
-			},
-			Grantee: &provider.Grantee{
-				Type: provider.GranteeType_GRANTEE_TYPE_USER,
-				Id: &provider.Grantee_UserId{
-					UserId: &userpb.UserId{
-						OpaqueId: "user-id",
-					},
-				},
-			},
-			Expiration: utils.TimeToTS(expiration),
-		}
-
 		It("handles a failing ListShares", func() {
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(nil, errors.New("some error"))
-
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
 			svc.GetSharedByMe(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
@@ -202,6 +221,7 @@ var _ = Describe("Driveitems", func() {
 				},
 				nil,
 			)
+
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
 			svc.GetSharedByMe(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
