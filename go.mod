@@ -343,3 +343,5 @@ require (
 
 // the replacement build is based on https://github.com/aduffeck/cs3apis/tree/master
 replace github.com/cs3org/go-cs3apis => github.com/aduffeck/go-cs3apis v0.0.0-20231009082215-ad45e19edac0
+
+replace github.com/cs3org/reva/v2 => github.com/aduffeck/reva/v2 v2.0.0-20231018064757-07ffaed37694

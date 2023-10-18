@@ -188,6 +188,37 @@ func (c *Cache) Sync(ctx context.Context, userID string) error {
 	return c.syncWithLock(ctx, userID)
 }
 
+// List returns a list of received shares for a given user
+// The return list is guaranteed to be thread-safe
+func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, error) {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
+	unlock := c.lockUser(userID)
+	span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+	defer unlock()
+
+	err := c.syncWithLock(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	spaces := map[string]*Space{}
+	for spaceID, space := range c.ReceivedSpaces[userID].Spaces {
+		spaceCopy := &Space{
+			States: map[string]*State{},
+		}
+		for shareID, state := range space.States {
+			spaceCopy.States[shareID] = &State{
+				State:      state.State,
+				MountPoint: state.MountPoint,
+				Hide:       state.Hide,
+			}
+		}
+		spaces[spaceID] = spaceCopy
+	}
+	return spaces, nil
+}
+
 func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()

@@ -809,7 +809,11 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	_ = m.UserReceivedStates.Sync(ctx, user.Id.OpaqueId) // ignore error, cache will be updated on next read
 
 	if m.UserReceivedStates.ReceivedSpaces[user.Id.OpaqueId] != nil {
-		for ssid, rspace := range m.UserReceivedStates.ReceivedSpaces[user.Id.OpaqueId].Spaces {
+		spaces, err := m.UserReceivedStates.List(ctx, user.Id.OpaqueId)
+		if err != nil {
+			return nil, err
+		}
+		for ssid, rspace := range spaces {
 			if rs, ok := ssids[ssid]; ok {
 				for shareid, state := range rspace.States {
 					// overwrite state
