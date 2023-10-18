@@ -64,6 +64,8 @@ import (
 var (
 	// runset keeps track of which services to start supervised.
 	runset map[string]struct{}
+	// time to wait between starting service groups (preliminary, main, delayed)
+	_startDelay = 2 * time.Second
 )
 
 type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
@@ -412,7 +414,7 @@ func Start(o ...Option) error {
 	go trap(s, halt)
 
 	// grace period for supervisor to get up
-	time.Sleep(time.Second)
+	time.Sleep(_startDelay)
 
 	// schedule services that we are sure don't have interdependencies.
 	scheduleServiceTokens(s, s.ServicesRegistry)
@@ -421,7 +423,7 @@ func Start(o ...Option) error {
 	scheduleServiceTokens(s, s.Additional)
 
 	// add services with delayed execution.
-	time.Sleep(1 * time.Second)
+	time.Sleep(_startDelay)
 	scheduleServiceTokens(s, s.Delayed)
 
 	return http.Serve(l, nil)
