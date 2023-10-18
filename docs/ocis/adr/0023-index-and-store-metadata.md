@@ -15,9 +15,9 @@ geekdocFilePath: 0023-index-and-store-metadata.md
 ## Context and Problem Statement
 
 ownCloud Infinite Scale is supposed to become a data platform and as such it needs to provide access to metadata.
-Currently only metadata available for all file types (filesize, mime-type, ...) is stored in the index and the metadata storage.
-We want to make other metadata available to consumers of our internal and external APIs. Simple examples would be audio metadata
-like artist, album and title or exif metadata in images.
+Currently only metadata common to all file types (filesize, mime-type, ...) is stored in the index and the metadata storage.
+We want to make other file type specific metadata available to consumers of our internal and external APIs.
+Simple examples would be audio metadata like artist, album and title or exif metadata in images.
 
 ## Decision Drivers <!-- optional -->
 
