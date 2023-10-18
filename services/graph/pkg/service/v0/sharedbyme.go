@@ -3,6 +3,8 @@ package svc
 import (
 	"context"
 	"net/http"
+	"net/url"
+	"path"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -30,7 +32,7 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = g.listPublicShares(ctx, driveItems)
+	driveItems, err = g.listPublicShares(ctx, driveItems)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -116,6 +118,29 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 			}
 			item = *itemptr
 		}
+		perm := libregraph.Permission{}
+		perm.SetRoles([]string{})
+		perm.SetId(s.Id.OpaqueId)
+		grantedTo := libregraph.SharePointIdentitySet{}
+		switch s.Grantee.Type {
+		case storageprovider.GranteeType_GRANTEE_TYPE_USER:
+			user := libregraph.NewIdentityWithDefaults()
+			user.SetId(s.Grantee.GetUserId().GetOpaqueId())
+			grantedTo.SetUser(*user)
+		case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+			grp := libregraph.NewIdentityWithDefaults()
+			grp.SetId(s.Grantee.GetGroupId().GetOpaqueId())
+			grantedTo.SetGroup(*grp)
+
+		}
+
+		// set expiration date
+		if s.GetExpiration() != nil {
+			perm.SetExpirationDateTime(cs3TimestampToTime(s.GetExpiration()))
+		}
+
+		perm.SetGrantedToV2(grantedTo)
+		item.Permissions = append(item.Permissions, perm)
 		driveItems[resIDStr] = item
 	}
 	return driveItems, nil
@@ -134,6 +159,28 @@ func (g Graph) cs3PublicSharesToDriveItems(ctx context.Context, shares []*link.P
 			}
 			item = *itemptr
 		}
+		perm := libregraph.Permission{}
+		perm.SetRoles([]string{})
+		perm.SetId(s.Id.OpaqueId)
+		link := libregraph.SharingLink{}
+		webURL, err := url.Parse(g.config.Spaces.WebDavBase)
+		if err != nil {
+			g.logger.Error().
+				Err(err).
+				Str("url", g.config.Spaces.WebDavBase).
+				Msg("failed to parse webURL base url")
+			return driveItems, err
+		}
+
+		webURL.Path = path.Join(webURL.Path, "s", s.GetToken())
+		link.SetWebUrl(webURL.String())
+		perm.SetLink(link)
+		// set expiration date
+		if s.GetExpiration() != nil {
+			perm.SetExpirationDateTime(cs3TimestampToTime(s.GetExpiration()))
+		}
+
+		item.Permissions = append(item.Permissions, perm)
 		driveItems[resIDStr] = item
 	}
 

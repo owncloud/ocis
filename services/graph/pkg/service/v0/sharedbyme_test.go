@@ -22,7 +22,6 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -44,9 +43,8 @@ var _ = Describe("sharedbyme", func() {
 		identityBackend *identitymocks.Backend
 
 		rr *httptest.ResponseRecorder
-
-		newGroup *libregraph.Group
 	)
+	expiration := time.Now()
 	userShare := collaboration.Share{
 		Id: &collaboration.ShareId{
 			OpaqueId: "share-id",
@@ -100,7 +98,19 @@ var _ = Describe("sharedbyme", func() {
 				},
 			},
 		},
-		Expiration: utils.TimeToTS(time.Now()),
+		Expiration: utils.TimeToTS(expiration),
+	}
+
+	publicShare := link.PublicShare{
+		Id: &link.PublicShareId{
+			OpaqueId: "public-share-id",
+		},
+		Token: "public-share-token",
+		ResourceId: &provider.ResourceId{
+			StorageId: "storageid",
+			SpaceId:   "spaceid",
+			OpaqueId:  "public-share-opaqueid",
+		},
 	}
 
 	BeforeEach(func() {
@@ -110,14 +120,6 @@ var _ = Describe("sharedbyme", func() {
 
 		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
-		gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(
-			&link.ListPublicSharesResponse{
-				Status: status.NewOK(ctx),
-				Share:  []*link.PublicShare{},
-			},
-			nil,
-		)
-		// no stat for the image
 		gatewayClient.On("Stat",
 			mock.Anything,
 			mock.MatchedBy(
@@ -128,6 +130,18 @@ var _ = Describe("sharedbyme", func() {
 				Status: status.NewOK(ctx),
 				Info: &provider.ResourceInfo{
 					Id: userShareWithExpiration.ResourceId,
+				},
+			}, nil)
+		gatewayClient.On("Stat",
+			mock.Anything,
+			mock.MatchedBy(
+				func(req *provider.StatRequest) bool {
+					return req.Ref.ResourceId.OpaqueId == publicShare.ResourceId.OpaqueId
+				})).
+			Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: publicShare.ResourceId,
 				},
 			}, nil)
 		gatewayClient.On("Stat",
@@ -148,9 +162,6 @@ var _ = Describe("sharedbyme", func() {
 		)
 
 		identityBackend = &identitymocks.Backend{}
-		newGroup = libregraph.NewGroup()
-		newGroup.SetMembersodataBind([]string{"/users/user1"})
-		newGroup.SetId("group1")
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -169,8 +180,27 @@ var _ = Describe("sharedbyme", func() {
 		)
 	})
 
+	emptyListPublicSharesMock := func() {
+		gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(
+			&link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+				Share:  []*link.PublicShare{},
+			},
+			nil,
+		)
+	}
+	emptyListSharesMock := func() {
+		gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
+			&collaboration.ListSharesResponse{
+				Status: status.NewOK(ctx),
+				Shares: []*collaboration.Share{},
+			},
+			nil,
+		)
+	}
 	Describe("GetSharedByMe", func() {
 		It("handles a failing ListShares", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(nil, errors.New("some error"))
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
 			svc.GetSharedByMe(rr, r)
@@ -178,6 +208,7 @@ var _ = Describe("sharedbyme", func() {
 		})
 
 		It("handles ListShares returning an error status", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
 				&collaboration.ListSharesResponse{Status: status.NewInternal(ctx, "error listing shares")},
 				nil,
@@ -189,13 +220,8 @@ var _ = Describe("sharedbyme", func() {
 		})
 
 		It("succeeds, when no shares are returned", func() {
-			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
-				&collaboration.ListSharesResponse{
-					Status: status.NewOK(ctx),
-					Shares: []*collaboration.Share{},
-				},
-				nil,
-			)
+			emptyListPublicSharesMock()
+			emptyListSharesMock()
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
 			svc.GetSharedByMe(rr, r)
@@ -212,6 +238,7 @@ var _ = Describe("sharedbyme", func() {
 		})
 
 		It("returns a proper driveItem, when a single user share is returned", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
 				&collaboration.ListSharesResponse{
 					Status: status.NewOK(ctx),
@@ -237,9 +264,22 @@ var _ = Describe("sharedbyme", func() {
 
 			di := res.Value[0]
 			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*userShare.GetResourceId())))
+
+			perm := di.GetPermissions()
+			Expect(perm[0].GetId()).To(Equal(userShare.GetId().GetOpaqueId()))
+			_, ok := perm[0].GetExpirationDateTimeOk()
+			Expect(ok).To(BeFalse())
+			_, ok = perm[0].GrantedToV2.GetGroupOk()
+			Expect(ok).To(BeFalse())
+			user, ok := perm[0].GrantedToV2.GetUserOk()
+			Expect(ok).To(BeTrue())
+			Expect(user.GetId()).To(Equal(userShare.GetGrantee().GetUserId().GetOpaqueId()))
+			_, ok = perm[0].GetLinkOk()
+			Expect(ok).To(BeFalse())
 		})
 
 		It("returns a proper driveItem, when a single group share is returned", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
 				&collaboration.ListSharesResponse{
 					Status: status.NewOK(ctx),
@@ -264,9 +304,22 @@ var _ = Describe("sharedbyme", func() {
 
 			di := res.Value[0]
 			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*groupShare.GetResourceId())))
+
+			perm := di.GetPermissions()
+			Expect(perm[0].GetId()).To(Equal(userShare.GetId().GetOpaqueId()))
+			_, ok := perm[0].GetExpirationDateTimeOk()
+			Expect(ok).To(BeFalse())
+			_, ok = perm[0].GrantedToV2.GetUserOk()
+			Expect(ok).To(BeFalse())
+			group, ok := perm[0].GrantedToV2.GetGroupOk()
+			Expect(ok).To(BeTrue())
+			Expect(group.GetId()).To(Equal(groupShare.GetGrantee().GetGroupId().GetOpaqueId()))
+			_, ok = perm[0].GetLinkOk()
+			Expect(ok).To(BeFalse())
 		})
 
 		It("returns a single driveItem, when a mulitple shares for the same resource are returned", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
 				&collaboration.ListSharesResponse{
 					Status: status.NewOK(ctx),
@@ -292,9 +345,13 @@ var _ = Describe("sharedbyme", func() {
 
 			di := res.Value[0]
 			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*groupShare.GetResourceId())))
+
+			// one permission per share
+			Expect(len(di.GetPermissions())).To(Equal(2))
 		})
 
 		It("return a driveItem with the expiration date set, for expiring shares", func() {
+			emptyListPublicSharesMock()
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(
 				&collaboration.ListSharesResponse{
 					Status: status.NewOK(ctx),
@@ -319,6 +376,80 @@ var _ = Describe("sharedbyme", func() {
 
 			di := res.Value[0]
 			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*userShareWithExpiration.GetResourceId())))
+
+			perm := di.GetPermissions()
+			Expect(perm[0].GetId()).To(Equal(userShareWithExpiration.GetId().GetOpaqueId()))
+			exp, ok := perm[0].GetExpirationDateTimeOk()
+			Expect(ok).To(BeTrue())
+			Expect(exp.Equal(expiration)).To(BeTrue())
+			_, ok = perm[0].GrantedToV2.GetGroupOk()
+			Expect(ok).To(BeFalse())
+			user, ok := perm[0].GrantedToV2.GetUserOk()
+			Expect(ok).To(BeTrue())
+			Expect(user.GetId()).To(Equal(userShareWithExpiration.GetGrantee().GetUserId().GetOpaqueId()))
+			_, ok = perm[0].GetLinkOk()
+			Expect(ok).To(BeFalse())
 		})
+
+		// Public Shares / "links" in graph terms
+		It("handles a failing ListPublicShares", func() {
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(nil, errors.New("some error"))
+			emptyListSharesMock()
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
+			svc.GetSharedByMe(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("handles ListPublicShares returning an error status", func() {
+			emptyListSharesMock()
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(
+				&link.ListPublicSharesResponse{Status: status.NewInternal(ctx, "error listing shares")},
+				nil,
+			)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
+			svc.GetSharedByMe(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("returns a proper driveItem, when a single public share is returned", func() {
+			emptyListSharesMock()
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(
+				&link.ListPublicSharesResponse{
+					Status: status.NewOK(ctx),
+					Share: []*link.PublicShare{
+						&publicShare,
+					},
+				},
+				nil,
+			)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/sharedByMe", nil)
+			svc.GetSharedByMe(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := itemsList{}
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(len(res.Value)).To(Equal(1))
+
+			di := res.Value[0]
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*publicShare.GetResourceId())))
+
+			perm := di.GetPermissions()
+			Expect(perm[0].GetId()).To(Equal(publicShare.GetId().GetOpaqueId()))
+			_, ok := perm[0].GetExpirationDateTimeOk()
+			Expect(ok).To(BeFalse())
+			_, ok = perm[0].GetGrantedToV2Ok()
+			Expect(ok).To(BeFalse())
+			link, ok := perm[0].GetLinkOk()
+			Expect(ok).To(BeTrue())
+			Expect(link.GetWebUrl()).To(Equal("https://localhost:9200/s/" + publicShare.GetToken()))
+		})
+
 	})
 })
