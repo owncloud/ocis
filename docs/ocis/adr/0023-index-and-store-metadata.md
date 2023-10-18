@@ -28,13 +28,13 @@ Chosen option: "[store only subset of extracted metadata required for graph api]
 ### Positive Consequences:
 
 * Graph API endpoint implementation is trivial
-* documented public api and stored data are the same
-* reasonable complexity for the initial implementation
+* Documented public api and stored data are the same
+* Reasonable complexity for the initial implementation
 
 ### Negative consequences:
 
 * Graph API is limited, so not *all* available metadata can be accessed
-* switching the internal format and adding more metadata later will require re-indexing
+* Switching the internal format and adding more metadata later will require re-indexing
 
 ## Pros and Cons of the Options <!-- optional -->
 
