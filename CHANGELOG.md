@@ -24,7 +24,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
-* Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Bump Reva: [#7526](https://github.com/owncloud/ocis/pull/7526)
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
@@ -175,10 +175,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7097
 
-* Enhancement - Bump Reva: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Bump Reva: [#7526](https://github.com/owncloud/ocis/pull/7526)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/7526
    https://github.com/owncloud/ocis/pull/7138
    https://github.com/owncloud/ocis/pull/6427
    https://github.com/owncloud/ocis/pull/7178
