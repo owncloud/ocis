@@ -196,13 +196,33 @@ class SpacesContext implements Context {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
 		}
 		if (strtolower($user) === 'admin') {
-			$this->listAllAvailableSpaces($user);
+			$listSpacesFn = 'listAllAvailableSpaces';
 		} else {
-			$this->listAllAvailableSpacesOfUser($user);
+			$listSpacesFn = 'listAllAvailableSpacesOfUser';
 		}
-		$spaces = $this->getAvailableSpaces();
-		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name $spaceName for user $user not found");
-		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
+
+		// Sometimes listing available spaces might not return newly created/shared spaces
+		// so we try again until we find the space or we reach the max number of retries (i.e. 10)
+		$tryAgain = false;
+		$retried = 0;
+		do {
+			// empty the available spaces array
+			$this->setAvailableSpaces([]);
+
+			$this->$listSpacesFn($user);
+			$spaces = $this->getAvailableSpaces();
+
+			$tryAgain = !\array_key_exists($spaceName, $spaces) && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			if ($tryAgain) {
+				$retried += 1;
+				echo "Space '$spaceName' not found for user '$user', retrying ($retried)...\n";
+				// wait 500ms and try again
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
+
+		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name '$spaceName' for user '$user' not found");
 		return $spaces[$spaceName];
 	}
 
@@ -232,7 +252,7 @@ class SpacesContext implements Context {
 	 */
 	public function setSpaceIDByName(string $user, string $spaceName): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space, "Space with name $spaceName not found");
+		Assert::assertIsArray($space, "Space with name '$spaceName' not found");
 		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 	}
