@@ -1,6 +1,12 @@
 ---
 title: "23. Index and store metadata"
+date: 2023-10-17T15:15:00+01:00
+weight: 23
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0023-index-and-store-metadata.md
 ---
+
 
 * Status: proposed
 * Deciders: @butonic, @micbar
