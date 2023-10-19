@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CollectionOfGroup type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CollectionOfGroup{}
+
 // CollectionOfGroup struct for CollectionOfGroup
 type CollectionOfGroup struct {
 	Value         []Group `json:"value,omitempty"`
@@ -39,7 +42,7 @@ func NewCollectionOfGroupWithDefaults() *CollectionOfGroup {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *CollectionOfGroup) GetValue() []Group {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		var ret []Group
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *CollectionOfGroup) GetValue() []Group {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CollectionOfGroup) GetValueOk() ([]Group, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -57,7 +60,7 @@ func (o *CollectionOfGroup) GetValueOk() ([]Group, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *CollectionOfGroup) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !IsNil(o.Value) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *CollectionOfGroup) SetValue(v []Group) {
 
 // GetOdataNextLink returns the OdataNextLink field value if set, zero value otherwise.
 func (o *CollectionOfGroup) GetOdataNextLink() string {
-	if o == nil || o.OdataNextLink == nil {
+	if o == nil || IsNil(o.OdataNextLink) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *CollectionOfGroup) GetOdataNextLink() string {
 // GetOdataNextLinkOk returns a tuple with the OdataNextLink field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CollectionOfGroup) GetOdataNextLinkOk() (*string, bool) {
-	if o == nil || o.OdataNextLink == nil {
+	if o == nil || IsNil(o.OdataNextLink) {
 		return nil, false
 	}
 	return o.OdataNextLink, true
@@ -89,7 +92,7 @@ func (o *CollectionOfGroup) GetOdataNextLinkOk() (*string, bool) {
 
 // HasOdataNextLink returns a boolean if a field has been set.
 func (o *CollectionOfGroup) HasOdataNextLink() bool {
-	if o != nil && o.OdataNextLink != nil {
+	if o != nil && !IsNil(o.OdataNextLink) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *CollectionOfGroup) SetOdataNextLink(v string) {
 }
 
 func (o CollectionOfGroup) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
-	}
-	if o.OdataNextLink != nil {
-		toSerialize["@odata.nextLink"] = o.OdataNextLink
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CollectionOfGroup) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	if !IsNil(o.OdataNextLink) {
+		toSerialize["@odata.nextLink"] = o.OdataNextLink
+	}
+	return toSerialize, nil
 }
 
 type NullableCollectionOfGroup struct {

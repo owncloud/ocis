@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CollectionOfEducationUser type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CollectionOfEducationUser{}
+
 // CollectionOfEducationUser struct for CollectionOfEducationUser
 type CollectionOfEducationUser struct {
 	Value []EducationUser `json:"value,omitempty"`
@@ -38,7 +41,7 @@ func NewCollectionOfEducationUserWithDefaults() *CollectionOfEducationUser {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *CollectionOfEducationUser) GetValue() []EducationUser {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		var ret []EducationUser
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *CollectionOfEducationUser) GetValue() []EducationUser {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CollectionOfEducationUser) GetValueOk() ([]EducationUser, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -56,7 +59,7 @@ func (o *CollectionOfEducationUser) GetValueOk() ([]EducationUser, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *CollectionOfEducationUser) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !IsNil(o.Value) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *CollectionOfEducationUser) SetValue(v []EducationUser) {
 }
 
 func (o CollectionOfEducationUser) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CollectionOfEducationUser) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	return toSerialize, nil
 }
 
 type NullableCollectionOfEducationUser struct {

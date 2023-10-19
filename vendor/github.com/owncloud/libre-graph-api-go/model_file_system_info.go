@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the FileSystemInfo type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &FileSystemInfo{}
+
 // FileSystemInfo File system information on client. Read-write.
 type FileSystemInfo struct {
 	// The UTC date and time the file was created on a client.
@@ -44,7 +47,7 @@ func NewFileSystemInfoWithDefaults() *FileSystemInfo {
 
 // GetCreatedDateTime returns the CreatedDateTime field value if set, zero value otherwise.
 func (o *FileSystemInfo) GetCreatedDateTime() time.Time {
-	if o == nil || o.CreatedDateTime == nil {
+	if o == nil || IsNil(o.CreatedDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -54,7 +57,7 @@ func (o *FileSystemInfo) GetCreatedDateTime() time.Time {
 // GetCreatedDateTimeOk returns a tuple with the CreatedDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FileSystemInfo) GetCreatedDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.CreatedDateTime == nil {
+	if o == nil || IsNil(o.CreatedDateTime) {
 		return nil, false
 	}
 	return o.CreatedDateTime, true
@@ -62,7 +65,7 @@ func (o *FileSystemInfo) GetCreatedDateTimeOk() (*time.Time, bool) {
 
 // HasCreatedDateTime returns a boolean if a field has been set.
 func (o *FileSystemInfo) HasCreatedDateTime() bool {
-	if o != nil && o.CreatedDateTime != nil {
+	if o != nil && !IsNil(o.CreatedDateTime) {
 		return true
 	}
 
@@ -76,7 +79,7 @@ func (o *FileSystemInfo) SetCreatedDateTime(v time.Time) {
 
 // GetLastAccessedDateTime returns the LastAccessedDateTime field value if set, zero value otherwise.
 func (o *FileSystemInfo) GetLastAccessedDateTime() time.Time {
-	if o == nil || o.LastAccessedDateTime == nil {
+	if o == nil || IsNil(o.LastAccessedDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -86,7 +89,7 @@ func (o *FileSystemInfo) GetLastAccessedDateTime() time.Time {
 // GetLastAccessedDateTimeOk returns a tuple with the LastAccessedDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FileSystemInfo) GetLastAccessedDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.LastAccessedDateTime == nil {
+	if o == nil || IsNil(o.LastAccessedDateTime) {
 		return nil, false
 	}
 	return o.LastAccessedDateTime, true
@@ -94,7 +97,7 @@ func (o *FileSystemInfo) GetLastAccessedDateTimeOk() (*time.Time, bool) {
 
 // HasLastAccessedDateTime returns a boolean if a field has been set.
 func (o *FileSystemInfo) HasLastAccessedDateTime() bool {
-	if o != nil && o.LastAccessedDateTime != nil {
+	if o != nil && !IsNil(o.LastAccessedDateTime) {
 		return true
 	}
 
@@ -108,7 +111,7 @@ func (o *FileSystemInfo) SetLastAccessedDateTime(v time.Time) {
 
 // GetLastModifiedDateTime returns the LastModifiedDateTime field value if set, zero value otherwise.
 func (o *FileSystemInfo) GetLastModifiedDateTime() time.Time {
-	if o == nil || o.LastModifiedDateTime == nil {
+	if o == nil || IsNil(o.LastModifiedDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -118,7 +121,7 @@ func (o *FileSystemInfo) GetLastModifiedDateTime() time.Time {
 // GetLastModifiedDateTimeOk returns a tuple with the LastModifiedDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FileSystemInfo) GetLastModifiedDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.LastModifiedDateTime == nil {
+	if o == nil || IsNil(o.LastModifiedDateTime) {
 		return nil, false
 	}
 	return o.LastModifiedDateTime, true
@@ -126,7 +129,7 @@ func (o *FileSystemInfo) GetLastModifiedDateTimeOk() (*time.Time, bool) {
 
 // HasLastModifiedDateTime returns a boolean if a field has been set.
 func (o *FileSystemInfo) HasLastModifiedDateTime() bool {
-	if o != nil && o.LastModifiedDateTime != nil {
+	if o != nil && !IsNil(o.LastModifiedDateTime) {
 		return true
 	}
 
@@ -139,17 +142,25 @@ func (o *FileSystemInfo) SetLastModifiedDateTime(v time.Time) {
 }
 
 func (o FileSystemInfo) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.CreatedDateTime != nil {
-		toSerialize["createdDateTime"] = o.CreatedDateTime
-	}
-	if o.LastAccessedDateTime != nil {
-		toSerialize["lastAccessedDateTime"] = o.LastAccessedDateTime
-	}
-	if o.LastModifiedDateTime != nil {
-		toSerialize["lastModifiedDateTime"] = o.LastModifiedDateTime
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o FileSystemInfo) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.CreatedDateTime) {
+		toSerialize["createdDateTime"] = o.CreatedDateTime
+	}
+	if !IsNil(o.LastAccessedDateTime) {
+		toSerialize["lastAccessedDateTime"] = o.LastAccessedDateTime
+	}
+	if !IsNil(o.LastModifiedDateTime) {
+		toSerialize["lastModifiedDateTime"] = o.LastModifiedDateTime
+	}
+	return toSerialize, nil
 }
 
 type NullableFileSystemInfo struct {

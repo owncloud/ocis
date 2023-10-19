@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the EducationSchool type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &EducationSchool{}
+
 // EducationSchool Represents a school
 type EducationSchool struct {
 	// The unique idenfier for an entity. Read-only.
@@ -46,7 +49,7 @@ func NewEducationSchoolWithDefaults() *EducationSchool {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *EducationSchool) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *EducationSchool) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationSchool) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -64,7 +67,7 @@ func (o *EducationSchool) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *EducationSchool) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *EducationSchool) SetId(v string) {
 
 // GetDisplayName returns the DisplayName field value if set, zero value otherwise.
 func (o *EducationSchool) GetDisplayName() string {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		var ret string
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *EducationSchool) GetDisplayName() string {
 // GetDisplayNameOk returns a tuple with the DisplayName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationSchool) GetDisplayNameOk() (*string, bool) {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		return nil, false
 	}
 	return o.DisplayName, true
@@ -96,7 +99,7 @@ func (o *EducationSchool) GetDisplayNameOk() (*string, bool) {
 
 // HasDisplayName returns a boolean if a field has been set.
 func (o *EducationSchool) HasDisplayName() bool {
-	if o != nil && o.DisplayName != nil {
+	if o != nil && !IsNil(o.DisplayName) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *EducationSchool) SetDisplayName(v string) {
 
 // GetSchoolNumber returns the SchoolNumber field value if set, zero value otherwise.
 func (o *EducationSchool) GetSchoolNumber() string {
-	if o == nil || o.SchoolNumber == nil {
+	if o == nil || IsNil(o.SchoolNumber) {
 		var ret string
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *EducationSchool) GetSchoolNumber() string {
 // GetSchoolNumberOk returns a tuple with the SchoolNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationSchool) GetSchoolNumberOk() (*string, bool) {
-	if o == nil || o.SchoolNumber == nil {
+	if o == nil || IsNil(o.SchoolNumber) {
 		return nil, false
 	}
 	return o.SchoolNumber, true
@@ -128,7 +131,7 @@ func (o *EducationSchool) GetSchoolNumberOk() (*string, bool) {
 
 // HasSchoolNumber returns a boolean if a field has been set.
 func (o *EducationSchool) HasSchoolNumber() bool {
-	if o != nil && o.SchoolNumber != nil {
+	if o != nil && !IsNil(o.SchoolNumber) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *EducationSchool) SetSchoolNumber(v string) {
 
 // GetTerminationDate returns the TerminationDate field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *EducationSchool) GetTerminationDate() time.Time {
-	if o == nil || o.TerminationDate.Get() == nil {
+	if o == nil || IsNil(o.TerminationDate.Get()) {
 		var ret time.Time
 		return ret
 	}
@@ -184,20 +187,28 @@ func (o *EducationSchool) UnsetTerminationDate() {
 }
 
 func (o EducationSchool) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o EducationSchool) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
+	if !IsNil(o.Id) {
 		toSerialize["id"] = o.Id
 	}
-	if o.DisplayName != nil {
+	if !IsNil(o.DisplayName) {
 		toSerialize["displayName"] = o.DisplayName
 	}
-	if o.SchoolNumber != nil {
+	if !IsNil(o.SchoolNumber) {
 		toSerialize["schoolNumber"] = o.SchoolNumber
 	}
 	if o.TerminationDate.IsSet() {
 		toSerialize["terminationDate"] = o.TerminationDate.Get()
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableEducationSchool struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Deleted type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Deleted{}
+
 // Deleted Information about the deleted state of the item. Read-only.
 type Deleted struct {
 	// Represents the state of the deleted item.
@@ -39,7 +42,7 @@ func NewDeletedWithDefaults() *Deleted {
 
 // GetState returns the State field value if set, zero value otherwise.
 func (o *Deleted) GetState() string {
-	if o == nil || o.State == nil {
+	if o == nil || IsNil(o.State) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *Deleted) GetState() string {
 // GetStateOk returns a tuple with the State field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Deleted) GetStateOk() (*string, bool) {
-	if o == nil || o.State == nil {
+	if o == nil || IsNil(o.State) {
 		return nil, false
 	}
 	return o.State, true
@@ -57,7 +60,7 @@ func (o *Deleted) GetStateOk() (*string, bool) {
 
 // HasState returns a boolean if a field has been set.
 func (o *Deleted) HasState() bool {
-	if o != nil && o.State != nil {
+	if o != nil && !IsNil(o.State) {
 		return true
 	}
 
@@ -70,11 +73,19 @@ func (o *Deleted) SetState(v string) {
 }
 
 func (o Deleted) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.State != nil {
-		toSerialize["state"] = o.State
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Deleted) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.State) {
+		toSerialize["state"] = o.State
+	}
+	return toSerialize, nil
 }
 
 type NullableDeleted struct {

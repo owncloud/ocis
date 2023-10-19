@@ -13,7 +13,7 @@ package libregraph
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -68,7 +68,7 @@ func (a *EducationClassTeachersApiService) AddTeacherToClassExecute(r ApiAddTeac
 	}
 
 	localVarPath := localBasePath + "/education/classes/{class-id}/teachers/$ref"
-	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterToString(r.classId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -106,9 +106,9 @@ func (a *EducationClassTeachersApiService) AddTeacherToClassExecute(r ApiAddTeac
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -124,6 +124,7 @@ func (a *EducationClassTeachersApiService) AddTeacherToClassExecute(r ApiAddTeac
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -173,8 +174,8 @@ func (a *EducationClassTeachersApiService) DeleteTeacherFromClassExecute(r ApiDe
 	}
 
 	localVarPath := localBasePath + "/education/classes/{class-id}/teachers/{user-id}/$ref"
-	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterToString(r.classId, "")), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterToString(r.userId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -207,9 +208,9 @@ func (a *EducationClassTeachersApiService) DeleteTeacherFromClassExecute(r ApiDe
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -225,6 +226,7 @@ func (a *EducationClassTeachersApiService) DeleteTeacherFromClassExecute(r ApiDe
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -273,7 +275,7 @@ func (a *EducationClassTeachersApiService) GetTeachersExecute(r ApiGetTeachersRe
 	}
 
 	localVarPath := localBasePath + "/education/classes/{class-id}/teachers"
-	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterToString(r.classId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -306,9 +308,9 @@ func (a *EducationClassTeachersApiService) GetTeachersExecute(r ApiGetTeachersRe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -324,6 +326,7 @@ func (a *EducationClassTeachersApiService) GetTeachersExecute(r ApiGetTeachersRe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

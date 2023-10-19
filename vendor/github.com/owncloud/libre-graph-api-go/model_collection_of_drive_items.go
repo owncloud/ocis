@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CollectionOfDriveItems type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CollectionOfDriveItems{}
+
 // CollectionOfDriveItems struct for CollectionOfDriveItems
 type CollectionOfDriveItems struct {
 	Value         []DriveItem `json:"value,omitempty"`
@@ -39,7 +42,7 @@ func NewCollectionOfDriveItemsWithDefaults() *CollectionOfDriveItems {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *CollectionOfDriveItems) GetValue() []DriveItem {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		var ret []DriveItem
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *CollectionOfDriveItems) GetValue() []DriveItem {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CollectionOfDriveItems) GetValueOk() ([]DriveItem, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -57,7 +60,7 @@ func (o *CollectionOfDriveItems) GetValueOk() ([]DriveItem, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *CollectionOfDriveItems) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !IsNil(o.Value) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *CollectionOfDriveItems) SetValue(v []DriveItem) {
 
 // GetOdataNextLink returns the OdataNextLink field value if set, zero value otherwise.
 func (o *CollectionOfDriveItems) GetOdataNextLink() string {
-	if o == nil || o.OdataNextLink == nil {
+	if o == nil || IsNil(o.OdataNextLink) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *CollectionOfDriveItems) GetOdataNextLink() string {
 // GetOdataNextLinkOk returns a tuple with the OdataNextLink field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CollectionOfDriveItems) GetOdataNextLinkOk() (*string, bool) {
-	if o == nil || o.OdataNextLink == nil {
+	if o == nil || IsNil(o.OdataNextLink) {
 		return nil, false
 	}
 	return o.OdataNextLink, true
@@ -89,7 +92,7 @@ func (o *CollectionOfDriveItems) GetOdataNextLinkOk() (*string, bool) {
 
 // HasOdataNextLink returns a boolean if a field has been set.
 func (o *CollectionOfDriveItems) HasOdataNextLink() bool {
-	if o != nil && o.OdataNextLink != nil {
+	if o != nil && !IsNil(o.OdataNextLink) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *CollectionOfDriveItems) SetOdataNextLink(v string) {
 }
 
 func (o CollectionOfDriveItems) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
-	}
-	if o.OdataNextLink != nil {
-		toSerialize["@odata.nextLink"] = o.OdataNextLink
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CollectionOfDriveItems) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	if !IsNil(o.OdataNextLink) {
+		toSerialize["@odata.nextLink"] = o.OdataNextLink
+	}
+	return toSerialize, nil
 }
 
 type NullableCollectionOfDriveItems struct {
