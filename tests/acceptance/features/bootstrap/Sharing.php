@@ -610,11 +610,11 @@ trait Sharing {
 	/**
 	 * @param TableNode|null $body
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function updateLastShareByCurrentUser(?TableNode $body):void {
-		$this->updateLastShareWithSettings($this->currentUser, $body);
+	public function updateLastShareByCurrentUser(?TableNode $body):ResponseInterface {
+		return $this->updateLastShareWithSettings($this->currentUser, $body);
 	}
 
 	/**
@@ -626,7 +626,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function theUserUpdatesTheLastShareWith(?TableNode $body):void {
-		$this->updateLastShareByCurrentUser($body);
+		$this->setResponse($this->updateLastShareByCurrentUser($body));
 	}
 
 	/**
@@ -638,8 +638,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function theUserHasUpdatedTheLastShareWith(?TableNode $body):void {
-		$this->updateLastShareByCurrentUser($body);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->updateLastShareByCurrentUser($body);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -667,7 +667,7 @@ trait Sharing {
 	 * @param string|null $shareOwner
 	 * @param bool $updateLastPublicLink
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
 	public function updateLastShareWithSettings(
@@ -675,7 +675,7 @@ trait Sharing {
 		?TableNode $body,
 		?string $shareOwner = null,
 		?bool $updateLastPublicLink = false
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 
 		if ($updateLastPublicLink) {
@@ -706,7 +706,7 @@ trait Sharing {
 				$bodyRows['permissions'] = SharingHelper::getPermissionSum($bodyRows['permissions']);
 			}
 		}
-		$this->response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
 			$this->getPasswordForUser($user),
@@ -728,7 +728,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userUpdatesTheLastShareWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body);
+		$this->setResponse($this->updateLastShareWithSettings($user, $body));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -742,7 +742,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userUpdatesTheLastPublicLinkShareWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body, null, true);
+		$this->response = $this->updateLastShareWithSettings($user, $body, null, true);
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -756,8 +756,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userHasUpdatedTheLastShareWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->updateLastShareWithSettings($user, $body);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -770,8 +770,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userHasUpdatedTheLastPublicLinkShareWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body, null, true);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->updateLastShareWithSettings($user, $body, null, true);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -785,12 +785,12 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userHasUpdatedTheLastShareOfWith(string $user, string $shareOwner, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body, $shareOwner);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$response = $this->updateLastShareWithSettings($user, $body, $shareOwner);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 		if ($this->ocsApiVersion == 1) {
-			$this->ocsContext->theOCSStatusCodeShouldBe("100");
+			$this->ocsContext->theOCSStatusCodeShouldBe("100", "", $response);
 		} elseif ($this->ocsApiVersion === 2) {
-			$this->ocsContext->theOCSStatusCodeShouldBe("200");
+			$this->ocsContext->theOCSStatusCodeShouldBe("200", "", $response);
 		} else {
 			throw new Exception('Invalid ocs api version used');
 		}
@@ -1492,7 +1492,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userTriesToUpdateTheLastShareUsingTheSharingApiWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body);
+		$this->response = $this->updateLastShareWithSettings($user, $body);
 	}
 
 	/**
@@ -1505,7 +1505,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userTriesToUpdateTheLastPublicLinkShareUsingTheSharingApiWith(string $user, ?TableNode $body):void {
-		$this->updateLastShareWithSettings($user, $body, null, true);
+		$this->response = $this->updateLastShareWithSettings($user, $body, null, true);
 	}
 
 	/**
@@ -1800,7 +1800,7 @@ trait Sharing {
 	 */
 	public function getListOfShares(string $user):ResponseInterface {
 		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
 			$this->getPasswordForUser($user),
@@ -1810,7 +1810,6 @@ trait Sharing {
 			[],
 			$this->ocsApiVersion
 		);
-		return $this->response;
 	}
 
 	/**
@@ -2561,97 +2560,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string $fileName
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function removeAllSharesFromResource(string $user, string $fileName):void {
-		$headers = ['Content-Type' => 'application/json'];
-		$res = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?format=json"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion,
-			$headers
-		);
-
-		$this->setResponse($res);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-
-		$json = \json_decode($res->getBody()->getContents(), true);
-		$deleted = false;
-		foreach ($json['ocs']['data'] as $data) {
-			if (\stripslashes($data['path']) === $fileName) {
-				$id = $data['id'];
-				$response = OcsApiHelper::sendRequest(
-					$this->getBaseUrl(),
-					$user,
-					$this->getPasswordForUser($user),
-					"DELETE",
-					$this->getSharesEndpointPath("/$id"),
-					$this->getStepLineRef(),
-					[],
-					$this->ocsApiVersion
-				);
-
-				$this->setResponse($response);
-				$this->theHTTPStatusCodeShouldBeSuccess();
-
-				$deleted = true;
-			}
-		}
-
-		if ($deleted === false) {
-			throw new Exception(
-				"Could not delete shares for user $user file $fileName"
-			);
-		}
-	}
-
-	/**
-	 * @When user :user removes all shares from the file named :fileName using the sharing API
-	 *
-	 * @param string $user
-	 * @param string $fileName
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRemovesAllSharesFromTheFileNamed(string $user, string $fileName):void {
-		$user = $this->getActualUsername($user);
-		$this->removeAllSharesFromResource($user, $fileName);
-	}
-
-	/**
-	 * @Given user :user has removed all shares from the file named :fileName
-	 *
-	 * @param string $user
-	 * @param string $fileName
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasRemovedAllSharesFromTheFileNamed(string $user, string $fileName):void {
-		$user = $this->getActualUsername($user);
-		$this->removeAllSharesFromResource($user, $fileName);
-		$response = $this->getShares($user, $fileName);
-		Assert::assertEquals(
-			0,
-			\count($response),
-			__METHOD__
-			. " Expected all shares to be removed from '$fileName' but got '"
-			. \count($response)
-			. "' shares still present"
-		);
-	}
-
-	/**
 	 * Returns shares of a file or folder as a SimpleXMLElement
 	 *
 	 * Note: the "single" SimpleXMLElement may contain one or more actual
@@ -2667,7 +2575,7 @@ trait Sharing {
 	 * @return SimpleXMLElement
 	 */
 	public function getShares(string $user, string $path):SimpleXMLElement {
-		$this->response = OcsApiHelper::sendRequest(
+		$response = OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
 			$this->getPasswordForUser($user),
@@ -2677,7 +2585,7 @@ trait Sharing {
 			[],
 			$this->ocsApiVersion
 		);
-		return $this->getResponseXml(null, __METHOD__)->data->element;
+		return $this->getResponseXml($response, __METHOD__)->data->element;
 	}
 
 	/**
@@ -3297,13 +3205,13 @@ trait Sharing {
 	 * @param string $shareServer
 	 * @param string|null $password
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function saveLastSharedPublicLinkShare(
 		string $user,
 		string $shareServer,
 		?string $password = ""
-	):void {
+	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$userPassword = $this->getPasswordForUser($user);
 
@@ -3342,7 +3250,7 @@ trait Sharing {
 			null,
 			$body
 		);
-		$this->setResponse($response);
+		return $response;
 	}
 
 	/**
@@ -3432,8 +3340,7 @@ trait Sharing {
 			null,
 			$requestPayload
 		);
-		$this->setResponse($response);
-		$this->theHTTPStatusCodeShouldBe(200);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -3445,18 +3352,18 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userAddsPublicShareCreatedByUser(string $user, string $shareServer):void {
-		$this->saveLastSharedPublicLinkShare($user, $shareServer);
+		$this->setResponse($this->saveLastSharedPublicLinkShare($user, $shareServer));
 	}
 
 	/**
 	 * Expires last created public link share using the testing API
 	 *
 	 * @return void
-	 * @throws GuzzleException
+	 * @throws ResponseInterface
 	 */
-	public function expireLastCreatedPublicLinkShare():void {
+	public function expireLastCreatedPublicLinkShare():ResponseInterface {
 		$shareId = (string) $this->getLastCreatedPublicShare()->id;
-		$this->expireShare($shareId);
+		return $this->expireShare($shareId);
 	}
 
 	/**
@@ -3464,10 +3371,10 @@ trait Sharing {
 	 *
 	 * @param string|null $shareId optional share id, if null then expire the last share that was created.
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function expireShare(string $shareId = null):void {
+	public function expireShare(string $shareId = null):ResponseInterface {
 		$adminUser = $this->getAdminUsername();
 		if ($shareId === null) {
 			$shareId = $this->getLastCreatedUserGroupShareId();
@@ -3482,7 +3389,7 @@ trait Sharing {
 			[],
 			$this->getOcsApiVersion()
 		);
-		$this->setResponse($response);
+		return $response;
 	}
 
 	/**
@@ -3544,7 +3451,7 @@ trait Sharing {
 	 * @throws GuzzleException
 	 */
 	public function theAdministratorExpiresTheLastCreatedShare():void {
-		$this->expireShare();
+		$this->setResponse($this->expireShare());
 	}
 
 	/**
@@ -3554,7 +3461,7 @@ trait Sharing {
 	 * @throws GuzzleException
 	 */
 	public function theAdministratorExpiresTheLastCreatedPublicLinkShare():void {
-		$this->expireLastCreatedPublicLinkShare();
+		$this->setResponse($this->expireLastCreatedPublicLinkShare());
 	}
 
 	/**
