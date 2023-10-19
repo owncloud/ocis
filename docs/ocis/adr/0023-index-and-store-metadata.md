@@ -38,14 +38,14 @@ Handling Graph API specific metadata is a first step towards handling metadata. 
 * Documented public api and stored data are the same
 * Reasonable complexity for the initial implementation
 
-### Negative consequences:
+### Negative Consequences:
 
 * Graph API is limited, so not *all* available metadata can be accessed
 * Switching the internal format and adding more metadata later will require re-indexing
 
 ## Pros and Cons of the Options <!-- optional -->
 
-### Store subset of extracted metadata required for Graph API
+### Store Subset of Extracted Metadata Required for Graph API
 
 Use Graph API facets and properties for determining the subset of stored metadata and the storage key.
 The index key for the `artist` property of the `audio` facet is `audio.artist`, the storage key is additionally prefixed with `libre.graph.`.
@@ -56,15 +56,14 @@ The index key for the `artist` property of the `audio` facet is `audio.artist`, 
 * Bad, because not all metadata is available, not everything can be searched
 * Good, because Graph API already chose a reasonable subset of most interesting properties
 
-### Store subset of extracted metadata specified by another standard
+### Store Subset of Extracted Metadata Specified by Another Standard
 
-There are a bunch of metadata standards but none of them is really universal, there is always something that is only supported in or the other standard.
-Tika for example extracts audio metadata using a mixture of Dublin Core and XMP Dynamic Media keys.
+There are a bunch of metadata standards but none of them is really universal. There is always something that is only supported in one or the other standard. Tika for example extracts audio metadata using a mixture of Dublin Core and XMP Dynamic Media keys.
 
 - Bad, because it makes implementing a new extractor integration harder
 - Bad, because it makes using the stored data more complicated than a simple standard like discussed above
 
-### Store everything from extractors
+### Store Everything from Extractors
 
 - Good, because all metadata is available and searchable
 - Good, because consuming applications can decide how to map data
