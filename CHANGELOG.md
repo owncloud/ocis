@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Add "Last modified" filter Chip: [#7431](https://github.com/owncloud/ocis/issues/7431)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
@@ -153,6 +154,13 @@ The following sections list the changes for unreleased.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Add "Last modified" filter Chip: [#7431](https://github.com/owncloud/ocis/issues/7431)
+
+   Add "Last modified" filter Chip
+
+   https://github.com/owncloud/ocis/issues/7431
+   https://github.com/owncloud/ocis/pull/7455
 
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 
