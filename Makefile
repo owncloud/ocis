@@ -188,9 +188,7 @@ go-mod-tidy:
 
 .PHONY: test
 test:
-	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod test || exit 1; \
-    done
+	@go test -v -tags '$(TAGS)' -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
 go-coverage:
@@ -210,6 +208,10 @@ golangci-lint:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod golangci-lint; \
     done
+
+.PHONY: ci-golangci-lint
+ci-golangci-lint: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: golangci-lint-fix
 golangci-lint-fix:
