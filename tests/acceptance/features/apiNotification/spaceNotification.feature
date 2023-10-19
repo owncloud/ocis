@@ -232,7 +232,7 @@ Feature: Notification
                   },
                   "id": {
                     "type": "string",
-                    "enim": [
+                    "enum": [
                       "%user_id%"
                     ]
                   },

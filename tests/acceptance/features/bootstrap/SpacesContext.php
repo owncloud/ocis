@@ -388,6 +388,16 @@ class SpacesContext implements Context {
 		return \str_replace('"', '\"', $fileData["Etag"][0]);
 	}
 
+	public function getEtagOfASpace(string $user, string $spaceName) {
+		$this->theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId($user, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse();
+		return $decodedResponse["root"]["eTag"];
+	}
+
 	/**
 	 * @BeforeScenario
 	 *
@@ -916,6 +926,12 @@ class SpacesContext implements Context {
 						[$this, "getETag"],
 					"parameter" => [$userName, $spaceName, $fileName]
 				],
+				[
+					"code" => "%space_eTag%",
+					"function" =>
+						[$this, "getEtagOfASpace"],
+					"parameter" => [$userName, $spaceName]
+				]
 			],
 			null,
 			$userName,
