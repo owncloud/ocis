@@ -104,6 +104,13 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 	case "this week":
 		from = n.BeginningOfWeek()
 		to = n.EndOfWeek()
+	case "last week":
+		lastWeek := n.With(n.AddDate(0, 0, -7))
+		from = lastWeek.BeginningOfWeek()
+		to = lastWeek.EndOfWeek()
+	case "last 7 days":
+		from = n.With(n.AddDate(0, 0, -6)).BeginningOfDay()
+		to = n.EndOfDay()
 	case "this month":
 		from = n.BeginningOfMonth()
 		to = n.EndOfMonth()
@@ -111,6 +118,9 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 		lastMonth := n.With(n.AddDate(0, -1, 0))
 		from = lastMonth.BeginningOfMonth()
 		to = lastMonth.EndOfMonth()
+	case "last 30 days":
+		from = n.With(n.AddDate(0, 0, -29)).BeginningOfDay()
+		to = n.EndOfDay()
 	case "this year":
 		from = n.BeginningOfYear()
 		to = n.EndOfYear()

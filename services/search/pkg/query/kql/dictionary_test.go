@@ -607,6 +607,50 @@ func TestParse_DateTimeRestrictionNode(t *testing.T) {
 			},
 		},
 		{
+			name:  "NaturalLanguage DateTimeNode - last week",
+			patch: setWorldClock(t, "2023-09-06"),
+			query: join([]string{
+				`Mtime:"last week"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-28"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-03 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last 7 days",
+			patch: setWorldClock(t, "2023-09-06"),
+			query: join([]string{
+				`Mtime:"last 7 days"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-31"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-06 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
 			name:  "NaturalLanguage DateTimeNode - this month",
 			patch: setWorldClock(t, "2023-09-02"),
 			query: join([]string{
@@ -668,6 +712,28 @@ func TestParse_DateTimeRestrictionNode(t *testing.T) {
 						Key:      "Mtime",
 						Operator: &ast.OperatorNode{Value: "<="},
 						Value:    mustParseTime(t, "2022-12-31 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last 30 days",
+			patch: setWorldClock(t, "2023-09-06"),
+			query: join([]string{
+				`Mtime:"last 30 days"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-08-08"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-06 23:59:59.999999999"),
 					},
 				},
 			},

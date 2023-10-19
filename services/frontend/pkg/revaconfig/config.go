@@ -289,6 +289,58 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								"share_jail": cfg.EnableShareJail,
 								"max_quota":  cfg.MaxQuota,
 							},
+							"search": map[string]interface{}{
+								"property": []map[string]interface{}{
+									{
+										"name": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"mtime": []map[string]interface{}{
+											{
+												"keywords": []string{"today", "yesterday", "this week", "last week", "last 7 days", "this month", "last month", "last 30 days", "this year", "last year"},
+												"enabled":  true,
+											},
+										},
+										"size": []map[string]interface{}{
+											{
+												"enabled": false,
+											},
+										},
+										"mimetype": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"type": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"tag": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"tags": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"content": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+										"scope": []map[string]interface{}{
+											{
+												"enabled": true,
+											},
+										},
+									},
+								},
+							},
 							"password_policy": map[string]interface{}{
 								"max_characters":           72,
 								"min_characters":           cfg.PasswordPolicy.MinCharacters,
