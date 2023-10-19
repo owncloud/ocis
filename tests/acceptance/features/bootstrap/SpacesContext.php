@@ -388,7 +388,15 @@ class SpacesContext implements Context {
 		return \str_replace('"', '\"', $fileData["Etag"][0]);
 	}
 
-	public function getEtagOfASpace(string $user, string $spaceName) {
+	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 *
+	 * @throws GuzzleException
+	 */
+	public function getEtagOfASpace(string $user, string $spaceName): string {
 		$this->theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
