@@ -23,7 +23,9 @@ Feature: get the pending shares filtered by type (user, group etc)
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
     And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
+    And user "Brian" has accepted share "/fileToShareWithUser.txt" offered by user "Alice"
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
+    And user "Brian" has accepted share "/fileToShareWithGroup.txt" offered by user "Alice"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |

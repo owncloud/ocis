@@ -243,9 +243,9 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Brian" has been added to group "grp2"
     And user "Alice" has created folder "/PARENT"
-    When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API 
+    When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
     Then user "Brian" should see the following elements
-      | /Shares/PARENT |
+      | /Shares/PARENT/ |
 
 
   Scenario: sharing again an own file while belonging to a group
@@ -258,7 +258,7 @@ Feature: sharing
     And user "Brian" has deleted the last share
     When user "Brian" shares file "/randomfile.txt" with group "grp1" using the sharing API
     And as "Alice" file "/Shares/randomfile.txt" should exist
-  
+
   @issue-2201
   Scenario Outline: sharing subfolder of already shared folder, GET result is correct
     Given using OCS API version "<ocs_api_version>"
@@ -423,7 +423,12 @@ Feature: sharing
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the content of file "/Shares/lorem.txt" for user "Brian" should be "some content"
-    And the content of file "/Shares/lorem.txt" for user "Carol" should be "some content"
+    When the administrator adds user "Carol" to group "grp1" using the provisioning API
+    And user "Carol" should not see the following elements
+      | /Shares/lorem.txt |
+    And the sharing API should report to user "Carol" that these shares are in the pending state
+      | path       |
+      | /lorem.txt |
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -464,7 +469,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-2146
+  @issue-2146 @issue-764
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
     Given these users have been created with default attributes and without skeleton files:
       | username |
