@@ -8,8 +8,8 @@ geekdocFilePath: 0023-index-and-store-metadata.md
 ---
 
 
-* Status: proposed
-* Deciders: @butonic, @micbar
+* Status: accepted
+* Deciders: @butonic, @dschmidt, @micbar, @dragotin
 * Date: 2023-10-17
 
 ## Context and Problem Statement
