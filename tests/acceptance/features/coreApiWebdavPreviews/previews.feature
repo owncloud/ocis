@@ -213,7 +213,7 @@ Feature: previews of files downloaded through the webdav API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has shared file "/parent.txt" with user "Brian"
-    And user "Brian" has downloaded the preview of "/Shares/parent.txt" with width "32" and height "32"
+    And user "Brian" has downloaded the preview of shared resource "/Shares/parent.txt" with width "32" and height "32"
     When user "Alice" uploads file with content "this is a file to upload" to "/parent.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Brian" the preview of shared resource "/Shares/parent.txt" with width "32" and height "32" should have been changed
