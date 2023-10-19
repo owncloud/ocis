@@ -231,8 +231,7 @@ def main(ctx):
     build_release_pipelines = \
         [licenseCheck(ctx)] + \
         dockerReleases(ctx) + \
-        binaryReleases(ctx) + \
-        [releaseSubmodule(ctx)]
+        binaryReleases(ctx)
 
     build_release_helpers = [
         changelog(),
@@ -1581,49 +1580,6 @@ def licenseCheck(ctx):
             ],
         },
         "volumes": [pipelineVolumeGo],
-    }
-
-def releaseSubmodule(ctx):
-    depends = []
-    if len(ctx.build.ref.replace("refs/tags/", "").split("/")) == 2:
-        depends = ["linting&unitTests-%s" % (ctx.build.ref.replace("refs/tags/", "").split("/")[0])]
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "release-%s" % (ctx.build.ref.replace("refs/tags/", "")),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": [
-            {
-                "name": "release-submodule",
-                "image": PLUGINS_GITHUB_RELEASE,
-                "settings": {
-                    "api_key": {
-                        "from_secret": "github_token",
-                    },
-                    "files": [
-                    ],
-                    "title": ctx.build.ref.replace("refs/tags/", "").replace("/v", " "),
-                    "note": "Release %s submodule" % (ctx.build.ref.replace("refs/tags/", "").replace("/v", " ")),
-                    "overwrite": True,
-                    "prerelease": len(ctx.build.ref.split("-")) > 1,
-                },
-                "when": {
-                    "ref": [
-                        "refs/tags/*/v*",
-                    ],
-                },
-            },
-        ],
-        "depends_on": depends,
-        "trigger": {
-            "ref": [
-                "refs/tags/*/v*",
-            ],
-        },
     }
 
 def releaseDockerManifest():
