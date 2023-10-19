@@ -527,6 +527,7 @@ class SpacesContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi$/
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi with query "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to list all available spaces via the GraphApi$/
 	 *
 	 * @param string $user
 	 * @param string $query
@@ -561,25 +562,6 @@ class SpacesContext implements Context {
 		);
 		$this->rememberTheAvailableSpaces($response);
 		return $response;
-	}
-
-	/**
-	 * @When /^user "([^"]*)" lists all spaces via the GraphApi$/
-	 * @When /^user "([^"]*)" lists all spaces via the GraphApi with query "([^"]*)"$/
-	 * @When /^user "([^"]*)" tries to list all spaces via the GraphApi$/
-	 *
-	 * @param string $user
-	 * @param string $query
-	 *
-	 * @return void
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
-		$this->featureContext->setResponse(
-			$this->listAllAvailableSpaces($user, $query)
-		);
 	}
 
 	/**
