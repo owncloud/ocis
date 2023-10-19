@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ExportPersonalDataRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ExportPersonalDataRequest{}
+
 // ExportPersonalDataRequest struct for ExportPersonalDataRequest
 type ExportPersonalDataRequest struct {
 	// the path where the file should be created in the users personal space
@@ -39,7 +42,7 @@ func NewExportPersonalDataRequestWithDefaults() *ExportPersonalDataRequest {
 
 // GetStorageLocation returns the StorageLocation field value if set, zero value otherwise.
 func (o *ExportPersonalDataRequest) GetStorageLocation() string {
-	if o == nil || o.StorageLocation == nil {
+	if o == nil || IsNil(o.StorageLocation) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *ExportPersonalDataRequest) GetStorageLocation() string {
 // GetStorageLocationOk returns a tuple with the StorageLocation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ExportPersonalDataRequest) GetStorageLocationOk() (*string, bool) {
-	if o == nil || o.StorageLocation == nil {
+	if o == nil || IsNil(o.StorageLocation) {
 		return nil, false
 	}
 	return o.StorageLocation, true
@@ -57,7 +60,7 @@ func (o *ExportPersonalDataRequest) GetStorageLocationOk() (*string, bool) {
 
 // HasStorageLocation returns a boolean if a field has been set.
 func (o *ExportPersonalDataRequest) HasStorageLocation() bool {
-	if o != nil && o.StorageLocation != nil {
+	if o != nil && !IsNil(o.StorageLocation) {
 		return true
 	}
 
@@ -70,11 +73,19 @@ func (o *ExportPersonalDataRequest) SetStorageLocation(v string) {
 }
 
 func (o ExportPersonalDataRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.StorageLocation != nil {
-		toSerialize["storageLocation"] = o.StorageLocation
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ExportPersonalDataRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.StorageLocation) {
+		toSerialize["storageLocation"] = o.StorageLocation
+	}
+	return toSerialize, nil
 }
 
 type NullableExportPersonalDataRequest struct {

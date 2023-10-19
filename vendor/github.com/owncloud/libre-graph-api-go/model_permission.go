@@ -15,12 +15,27 @@ import (
 	"time"
 )
 
-// Permission The Permission resource provides information about a sharing permission granted for a DriveItem resource.
+// checks if the Permission type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Permission{}
+
+// Permission The Permission resource provides information about a sharing permission granted for a DriveItem resource.  ### Remarks  The Permission resource uses *facets* to provide information about the kind of permission represented by the resource.  Permissions with a `link` facet represent sharing links created on the item. Sharing links contain a unique token that provides access to the item for anyone with the link.  Permissions with a `invitation` facet represent permissions added by inviting specific users or groups to have access to the file.
 type Permission struct {
+	// The unique identifier of the permission among all permissions on the item. Read-only.
+	Id *string `json:"id,omitempty"`
+	// Indicates whether the password is set for this permission. This property only appears in the response. Optional. Read-only.
+	HasPassword *bool `json:"hasPassword,omitempty"`
 	// An optional expiration date which limits the permission in time.
-	ExpirationDateTime  *time.Time    `json:"expirationDateTime,omitempty"`
+	ExpirationDateTime *time.Time             `json:"expirationDateTime,omitempty"`
+	GrantedToV2        *SharePointIdentitySet `json:"grantedToV2,omitempty"`
+	Link               *SharingLink           `json:"link,omitempty"`
+	Roles              []string               `json:"roles,omitempty"`
+	// For link type permissions, the details of the identity to whom permission was granted. This could be used to grant access to a an external user that can be identified by email, aka guest accounts.
+	// Deprecated
 	GrantedToIdentities []IdentitySet `json:"grantedToIdentities,omitempty"`
-	Roles               []string      `json:"roles,omitempty"`
+	// Use this to create a permission with custom actions.
+	LibreGraphPermissionsActions []string `json:"@libre.graph.permissions.actions,omitempty"`
+	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
+	UIHidden *bool `json:"@UI.Hidden,omitempty"`
 }
 
 // NewPermission instantiates a new Permission object
@@ -40,9 +55,73 @@ func NewPermissionWithDefaults() *Permission {
 	return &this
 }
 
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *Permission) GetId() string {
+	if o == nil || IsNil(o.Id) {
+		var ret string
+		return ret
+	}
+	return *o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetIdOk() (*string, bool) {
+	if o == nil || IsNil(o.Id) {
+		return nil, false
+	}
+	return o.Id, true
+}
+
+// HasId returns a boolean if a field has been set.
+func (o *Permission) HasId() bool {
+	if o != nil && !IsNil(o.Id) {
+		return true
+	}
+
+	return false
+}
+
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *Permission) SetId(v string) {
+	o.Id = &v
+}
+
+// GetHasPassword returns the HasPassword field value if set, zero value otherwise.
+func (o *Permission) GetHasPassword() bool {
+	if o == nil || IsNil(o.HasPassword) {
+		var ret bool
+		return ret
+	}
+	return *o.HasPassword
+}
+
+// GetHasPasswordOk returns a tuple with the HasPassword field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetHasPasswordOk() (*bool, bool) {
+	if o == nil || IsNil(o.HasPassword) {
+		return nil, false
+	}
+	return o.HasPassword, true
+}
+
+// HasHasPassword returns a boolean if a field has been set.
+func (o *Permission) HasHasPassword() bool {
+	if o != nil && !IsNil(o.HasPassword) {
+		return true
+	}
+
+	return false
+}
+
+// SetHasPassword gets a reference to the given bool and assigns it to the HasPassword field.
+func (o *Permission) SetHasPassword(v bool) {
+	o.HasPassword = &v
+}
+
 // GetExpirationDateTime returns the ExpirationDateTime field value if set, zero value otherwise.
 func (o *Permission) GetExpirationDateTime() time.Time {
-	if o == nil || o.ExpirationDateTime == nil {
+	if o == nil || IsNil(o.ExpirationDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -52,7 +131,7 @@ func (o *Permission) GetExpirationDateTime() time.Time {
 // GetExpirationDateTimeOk returns a tuple with the ExpirationDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Permission) GetExpirationDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.ExpirationDateTime == nil {
+	if o == nil || IsNil(o.ExpirationDateTime) {
 		return nil, false
 	}
 	return o.ExpirationDateTime, true
@@ -60,7 +139,7 @@ func (o *Permission) GetExpirationDateTimeOk() (*time.Time, bool) {
 
 // HasExpirationDateTime returns a boolean if a field has been set.
 func (o *Permission) HasExpirationDateTime() bool {
-	if o != nil && o.ExpirationDateTime != nil {
+	if o != nil && !IsNil(o.ExpirationDateTime) {
 		return true
 	}
 
@@ -72,41 +151,73 @@ func (o *Permission) SetExpirationDateTime(v time.Time) {
 	o.ExpirationDateTime = &v
 }
 
-// GetGrantedToIdentities returns the GrantedToIdentities field value if set, zero value otherwise.
-func (o *Permission) GetGrantedToIdentities() []IdentitySet {
-	if o == nil || o.GrantedToIdentities == nil {
-		var ret []IdentitySet
+// GetGrantedToV2 returns the GrantedToV2 field value if set, zero value otherwise.
+func (o *Permission) GetGrantedToV2() SharePointIdentitySet {
+	if o == nil || IsNil(o.GrantedToV2) {
+		var ret SharePointIdentitySet
 		return ret
 	}
-	return o.GrantedToIdentities
+	return *o.GrantedToV2
 }
 
-// GetGrantedToIdentitiesOk returns a tuple with the GrantedToIdentities field value if set, nil otherwise
+// GetGrantedToV2Ok returns a tuple with the GrantedToV2 field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Permission) GetGrantedToIdentitiesOk() ([]IdentitySet, bool) {
-	if o == nil || o.GrantedToIdentities == nil {
+func (o *Permission) GetGrantedToV2Ok() (*SharePointIdentitySet, bool) {
+	if o == nil || IsNil(o.GrantedToV2) {
 		return nil, false
 	}
-	return o.GrantedToIdentities, true
+	return o.GrantedToV2, true
 }
 
-// HasGrantedToIdentities returns a boolean if a field has been set.
-func (o *Permission) HasGrantedToIdentities() bool {
-	if o != nil && o.GrantedToIdentities != nil {
+// HasGrantedToV2 returns a boolean if a field has been set.
+func (o *Permission) HasGrantedToV2() bool {
+	if o != nil && !IsNil(o.GrantedToV2) {
 		return true
 	}
 
 	return false
 }
 
-// SetGrantedToIdentities gets a reference to the given []IdentitySet and assigns it to the GrantedToIdentities field.
-func (o *Permission) SetGrantedToIdentities(v []IdentitySet) {
-	o.GrantedToIdentities = v
+// SetGrantedToV2 gets a reference to the given SharePointIdentitySet and assigns it to the GrantedToV2 field.
+func (o *Permission) SetGrantedToV2(v SharePointIdentitySet) {
+	o.GrantedToV2 = &v
+}
+
+// GetLink returns the Link field value if set, zero value otherwise.
+func (o *Permission) GetLink() SharingLink {
+	if o == nil || IsNil(o.Link) {
+		var ret SharingLink
+		return ret
+	}
+	return *o.Link
+}
+
+// GetLinkOk returns a tuple with the Link field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetLinkOk() (*SharingLink, bool) {
+	if o == nil || IsNil(o.Link) {
+		return nil, false
+	}
+	return o.Link, true
+}
+
+// HasLink returns a boolean if a field has been set.
+func (o *Permission) HasLink() bool {
+	if o != nil && !IsNil(o.Link) {
+		return true
+	}
+
+	return false
+}
+
+// SetLink gets a reference to the given SharingLink and assigns it to the Link field.
+func (o *Permission) SetLink(v SharingLink) {
+	o.Link = &v
 }
 
 // GetRoles returns the Roles field value if set, zero value otherwise.
 func (o *Permission) GetRoles() []string {
-	if o == nil || o.Roles == nil {
+	if o == nil || IsNil(o.Roles) {
 		var ret []string
 		return ret
 	}
@@ -116,7 +227,7 @@ func (o *Permission) GetRoles() []string {
 // GetRolesOk returns a tuple with the Roles field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Permission) GetRolesOk() ([]string, bool) {
-	if o == nil || o.Roles == nil {
+	if o == nil || IsNil(o.Roles) {
 		return nil, false
 	}
 	return o.Roles, true
@@ -124,7 +235,7 @@ func (o *Permission) GetRolesOk() ([]string, bool) {
 
 // HasRoles returns a boolean if a field has been set.
 func (o *Permission) HasRoles() bool {
-	if o != nil && o.Roles != nil {
+	if o != nil && !IsNil(o.Roles) {
 		return true
 	}
 
@@ -136,18 +247,143 @@ func (o *Permission) SetRoles(v []string) {
 	o.Roles = v
 }
 
+// GetGrantedToIdentities returns the GrantedToIdentities field value if set, zero value otherwise.
+// Deprecated
+func (o *Permission) GetGrantedToIdentities() []IdentitySet {
+	if o == nil || IsNil(o.GrantedToIdentities) {
+		var ret []IdentitySet
+		return ret
+	}
+	return o.GrantedToIdentities
+}
+
+// GetGrantedToIdentitiesOk returns a tuple with the GrantedToIdentities field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// Deprecated
+func (o *Permission) GetGrantedToIdentitiesOk() ([]IdentitySet, bool) {
+	if o == nil || IsNil(o.GrantedToIdentities) {
+		return nil, false
+	}
+	return o.GrantedToIdentities, true
+}
+
+// HasGrantedToIdentities returns a boolean if a field has been set.
+func (o *Permission) HasGrantedToIdentities() bool {
+	if o != nil && !IsNil(o.GrantedToIdentities) {
+		return true
+	}
+
+	return false
+}
+
+// SetGrantedToIdentities gets a reference to the given []IdentitySet and assigns it to the GrantedToIdentities field.
+// Deprecated
+func (o *Permission) SetGrantedToIdentities(v []IdentitySet) {
+	o.GrantedToIdentities = v
+}
+
+// GetLibreGraphPermissionsActions returns the LibreGraphPermissionsActions field value if set, zero value otherwise.
+func (o *Permission) GetLibreGraphPermissionsActions() []string {
+	if o == nil || IsNil(o.LibreGraphPermissionsActions) {
+		var ret []string
+		return ret
+	}
+	return o.LibreGraphPermissionsActions
+}
+
+// GetLibreGraphPermissionsActionsOk returns a tuple with the LibreGraphPermissionsActions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetLibreGraphPermissionsActionsOk() ([]string, bool) {
+	if o == nil || IsNil(o.LibreGraphPermissionsActions) {
+		return nil, false
+	}
+	return o.LibreGraphPermissionsActions, true
+}
+
+// HasLibreGraphPermissionsActions returns a boolean if a field has been set.
+func (o *Permission) HasLibreGraphPermissionsActions() bool {
+	if o != nil && !IsNil(o.LibreGraphPermissionsActions) {
+		return true
+	}
+
+	return false
+}
+
+// SetLibreGraphPermissionsActions gets a reference to the given []string and assigns it to the LibreGraphPermissionsActions field.
+func (o *Permission) SetLibreGraphPermissionsActions(v []string) {
+	o.LibreGraphPermissionsActions = v
+}
+
+// GetUIHidden returns the UIHidden field value if set, zero value otherwise.
+func (o *Permission) GetUIHidden() bool {
+	if o == nil || IsNil(o.UIHidden) {
+		var ret bool
+		return ret
+	}
+	return *o.UIHidden
+}
+
+// GetUIHiddenOk returns a tuple with the UIHidden field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetUIHiddenOk() (*bool, bool) {
+	if o == nil || IsNil(o.UIHidden) {
+		return nil, false
+	}
+	return o.UIHidden, true
+}
+
+// HasUIHidden returns a boolean if a field has been set.
+func (o *Permission) HasUIHidden() bool {
+	if o != nil && !IsNil(o.UIHidden) {
+		return true
+	}
+
+	return false
+}
+
+// SetUIHidden gets a reference to the given bool and assigns it to the UIHidden field.
+func (o *Permission) SetUIHidden(v bool) {
+	o.UIHidden = &v
+}
+
 func (o Permission) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.ExpirationDateTime != nil {
-		toSerialize["expirationDateTime"] = o.ExpirationDateTime
-	}
-	if o.GrantedToIdentities != nil {
-		toSerialize["grantedToIdentities"] = o.GrantedToIdentities
-	}
-	if o.Roles != nil {
-		toSerialize["roles"] = o.Roles
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Permission) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.HasPassword) {
+		toSerialize["hasPassword"] = o.HasPassword
+	}
+	if !IsNil(o.ExpirationDateTime) {
+		toSerialize["expirationDateTime"] = o.ExpirationDateTime
+	}
+	if !IsNil(o.GrantedToV2) {
+		toSerialize["grantedToV2"] = o.GrantedToV2
+	}
+	if !IsNil(o.Link) {
+		toSerialize["link"] = o.Link
+	}
+	if !IsNil(o.Roles) {
+		toSerialize["roles"] = o.Roles
+	}
+	if !IsNil(o.GrantedToIdentities) {
+		toSerialize["grantedToIdentities"] = o.GrantedToIdentities
+	}
+	if !IsNil(o.LibreGraphPermissionsActions) {
+		toSerialize["@libre.graph.permissions.actions"] = o.LibreGraphPermissionsActions
+	}
+	if !IsNil(o.UIHidden) {
+		toSerialize["@UI.Hidden"] = o.UIHidden
+	}
+	return toSerialize, nil
 }
 
 type NullablePermission struct {

@@ -15,7 +15,6 @@ Install the following dependencies:
 
 ```shell
 go get github.com/stretchr/testify/assert
-go get golang.org/x/oauth2
 go get golang.org/x/net/context
 ```
 
@@ -85,6 +84,12 @@ Class | Method | HTTP request | Description
 *DrivesApi* | [**GetDrive**](docs/DrivesApi.md#getdrive) | **Get** /drives/{drive-id} | Get drive by id
 *DrivesApi* | [**UpdateDrive**](docs/DrivesApi.md#updatedrive) | **Patch** /drives/{drive-id} | Update the drive
 *DrivesGetDrivesApi* | [**ListAllDrives**](docs/DrivesGetDrivesApi.md#listalldrives) | **Get** /drives | Get all available drives
+*DrivesPermissionsApi* | [**CreateLink**](docs/DrivesPermissionsApi.md#createlink) | **Post** /drives/{drive-id}/items/{item-id}/createLink | Create a sharing link for a DriveItem
+*DrivesPermissionsApi* | [**DeletePermission**](docs/DrivesPermissionsApi.md#deletepermission) | **Delete** /drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Delete entity from groups
+*DrivesPermissionsApi* | [**GetPermission**](docs/DrivesPermissionsApi.md#getpermission) | **Get** /drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Get sharing permission for a file or folder
+*DrivesPermissionsApi* | [**Invite**](docs/DrivesPermissionsApi.md#invite) | **Post** /drives/{drive-id}/items/{item-id}/invite | Send a sharing invitation
+*DrivesPermissionsApi* | [**ListPermissions**](docs/DrivesPermissionsApi.md#listpermissions) | **Get** /drives/{drive-id}/items/{item-id}/permissions | List the effective sharing permissions on a driveItem.
+*DrivesPermissionsApi* | [**UpdatePermission**](docs/DrivesPermissionsApi.md#updatepermission) | **Patch** /drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Update sharing permission
 *DrivesRootApi* | [**GetRoot**](docs/DrivesRootApi.md#getroot) | **Get** /drives/{drive-id}/root | Get root from arbitrary space
 *EducationClassApi* | [**AddUserToClass**](docs/EducationClassApi.md#addusertoclass) | **Post** /education/classes/{class-id}/members/$ref | Assign a user to a class
 *EducationClassApi* | [**CreateClass**](docs/EducationClassApi.md#createclass) | **Post** /education/classes | Add new education class
@@ -123,10 +128,14 @@ Class | Method | HTTP request | Description
 *GroupsApi* | [**ListGroups**](docs/GroupsApi.md#listgroups) | **Get** /groups | Get entities from groups
 *MeChangepasswordApi* | [**ChangeOwnPassword**](docs/MeChangepasswordApi.md#changeownpassword) | **Post** /me/changePassword | Chanage your own password
 *MeDriveApi* | [**GetHome**](docs/MeDriveApi.md#gethome) | **Get** /me/drive | Get personal space for user
+*MeDriveApi* | [**ListSharedByMe**](docs/MeDriveApi.md#listsharedbyme) | **Get** /me/drive/sharedByMe | Get a list of driveItem objects shared by the current user.
+*MeDriveApi* | [**ListSharedWithMe**](docs/MeDriveApi.md#listsharedwithme) | **Get** /me/drive/sharedWithMe | Get a list of driveItem objects shared with the owner of a drive.
 *MeDriveRootApi* | [**HomeGetRoot**](docs/MeDriveRootApi.md#homegetroot) | **Get** /me/drive/root | Get root from personal space
 *MeDriveRootChildrenApi* | [**HomeGetChildren**](docs/MeDriveRootChildrenApi.md#homegetchildren) | **Get** /me/drive/root/children | Get children from drive
 *MeDrivesApi* | [**ListMyDrives**](docs/MeDrivesApi.md#listmydrives) | **Get** /me/drives | Get all drives where the current user is a regular member of
 *MeUserApi* | [**GetOwnUser**](docs/MeUserApi.md#getownuser) | **Get** /me | Get current user
+*RoleManagementApi* | [**GetPermissionRoleDefinition**](docs/RoleManagementApi.md#getpermissionroledefinition) | **Get** /roleManagement/permissions/roleDefinitions/{role-id} | Get unifiedRoleDefinition
+*RoleManagementApi* | [**ListPermissionRoleDefinitions**](docs/RoleManagementApi.md#listpermissionroledefinitions) | **Get** /roleManagement/permissions/roleDefinitions | List roleDefinitions
 *TagsApi* | [**AssignTags**](docs/TagsApi.md#assigntags) | **Put** /extensions/org.libregraph/tags | Assign tags to a resource
 *TagsApi* | [**GetTags**](docs/TagsApi.md#gettags) | **Get** /extensions/org.libregraph/tags | Get all known tags
 *TagsApi* | [**UnassignTags**](docs/TagsApi.md#unassigntags) | **Delete** /extensions/org.libregraph/tags | Unassign tags from a resource
@@ -146,6 +155,7 @@ Class | Method | HTTP request | Description
  - [AppRole](docs/AppRole.md)
  - [AppRoleAssignment](docs/AppRoleAssignment.md)
  - [Application](docs/Application.md)
+ - [Audio](docs/Audio.md)
  - [ClassMemberReference](docs/ClassMemberReference.md)
  - [ClassReference](docs/ClassReference.md)
  - [ClassTeacherReference](docs/ClassTeacherReference.md)
@@ -153,12 +163,14 @@ Class | Method | HTTP request | Description
  - [CollectionOfApplications](docs/CollectionOfApplications.md)
  - [CollectionOfClass](docs/CollectionOfClass.md)
  - [CollectionOfDriveItems](docs/CollectionOfDriveItems.md)
+ - [CollectionOfDriveItems1](docs/CollectionOfDriveItems1.md)
  - [CollectionOfDrives](docs/CollectionOfDrives.md)
  - [CollectionOfDrives1](docs/CollectionOfDrives1.md)
  - [CollectionOfEducationClass](docs/CollectionOfEducationClass.md)
  - [CollectionOfEducationUser](docs/CollectionOfEducationUser.md)
  - [CollectionOfEducationUser1](docs/CollectionOfEducationUser1.md)
  - [CollectionOfGroup](docs/CollectionOfGroup.md)
+ - [CollectionOfPermissions](docs/CollectionOfPermissions.md)
  - [CollectionOfSchools](docs/CollectionOfSchools.md)
  - [CollectionOfTags](docs/CollectionOfTags.md)
  - [CollectionOfUser](docs/CollectionOfUser.md)
@@ -167,6 +179,9 @@ Class | Method | HTTP request | Description
  - [DirectoryObject](docs/DirectoryObject.md)
  - [Drive](docs/Drive.md)
  - [DriveItem](docs/DriveItem.md)
+ - [DriveItemCreateLink](docs/DriveItemCreateLink.md)
+ - [DriveItemInvite](docs/DriveItemInvite.md)
+ - [DriveRecipient](docs/DriveRecipient.md)
  - [EducationClass](docs/EducationClass.md)
  - [EducationOrganization](docs/EducationOrganization.md)
  - [EducationSchool](docs/EducationSchool.md)
@@ -177,6 +192,7 @@ Class | Method | HTTP request | Description
  - [FileSystemInfo](docs/FileSystemInfo.md)
  - [Folder](docs/Folder.md)
  - [FolderView](docs/FolderView.md)
+ - [GeoCoordinates](docs/GeoCoordinates.md)
  - [Group](docs/Group.md)
  - [Hashes](docs/Hashes.md)
  - [Identity](docs/Identity.md)
@@ -192,19 +208,27 @@ Class | Method | HTTP request | Description
  - [PasswordChange](docs/PasswordChange.md)
  - [PasswordProfile](docs/PasswordProfile.md)
  - [Permission](docs/Permission.md)
+ - [Photo](docs/Photo.md)
  - [Quota](docs/Quota.md)
  - [RemoteItem](docs/RemoteItem.md)
+ - [SharePointIdentitySet](docs/SharePointIdentitySet.md)
  - [Shared](docs/Shared.md)
+ - [SharingLink](docs/SharingLink.md)
+ - [SharingLinkType](docs/SharingLinkType.md)
  - [SpecialFolder](docs/SpecialFolder.md)
  - [TagAssignment](docs/TagAssignment.md)
  - [TagUnassignment](docs/TagUnassignment.md)
  - [Trash](docs/Trash.md)
+ - [UnifiedRoleDefinition](docs/UnifiedRoleDefinition.md)
+ - [UnifiedRolePermission](docs/UnifiedRolePermission.md)
  - [User](docs/User.md)
 
 
 ## Documentation For Authorization
 
 
+Authentication schemes defined for the API:
+### openId
 
 ### bearerAuth
 

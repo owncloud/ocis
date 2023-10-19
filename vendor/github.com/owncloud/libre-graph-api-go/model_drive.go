@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the Drive type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Drive{}
+
 // Drive The drive represents a space on the storage.
 type Drive struct {
 	// The unique idenfier for this drive.
@@ -67,7 +70,7 @@ func NewDriveWithDefaults() *Drive {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *Drive) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -77,7 +80,7 @@ func (o *Drive) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -85,7 +88,7 @@ func (o *Drive) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *Drive) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
@@ -99,7 +102,7 @@ func (o *Drive) SetId(v string) {
 
 // GetCreatedBy returns the CreatedBy field value if set, zero value otherwise.
 func (o *Drive) GetCreatedBy() IdentitySet {
-	if o == nil || o.CreatedBy == nil {
+	if o == nil || IsNil(o.CreatedBy) {
 		var ret IdentitySet
 		return ret
 	}
@@ -109,7 +112,7 @@ func (o *Drive) GetCreatedBy() IdentitySet {
 // GetCreatedByOk returns a tuple with the CreatedBy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetCreatedByOk() (*IdentitySet, bool) {
-	if o == nil || o.CreatedBy == nil {
+	if o == nil || IsNil(o.CreatedBy) {
 		return nil, false
 	}
 	return o.CreatedBy, true
@@ -117,7 +120,7 @@ func (o *Drive) GetCreatedByOk() (*IdentitySet, bool) {
 
 // HasCreatedBy returns a boolean if a field has been set.
 func (o *Drive) HasCreatedBy() bool {
-	if o != nil && o.CreatedBy != nil {
+	if o != nil && !IsNil(o.CreatedBy) {
 		return true
 	}
 
@@ -131,7 +134,7 @@ func (o *Drive) SetCreatedBy(v IdentitySet) {
 
 // GetCreatedDateTime returns the CreatedDateTime field value if set, zero value otherwise.
 func (o *Drive) GetCreatedDateTime() time.Time {
-	if o == nil || o.CreatedDateTime == nil {
+	if o == nil || IsNil(o.CreatedDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -141,7 +144,7 @@ func (o *Drive) GetCreatedDateTime() time.Time {
 // GetCreatedDateTimeOk returns a tuple with the CreatedDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetCreatedDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.CreatedDateTime == nil {
+	if o == nil || IsNil(o.CreatedDateTime) {
 		return nil, false
 	}
 	return o.CreatedDateTime, true
@@ -149,7 +152,7 @@ func (o *Drive) GetCreatedDateTimeOk() (*time.Time, bool) {
 
 // HasCreatedDateTime returns a boolean if a field has been set.
 func (o *Drive) HasCreatedDateTime() bool {
-	if o != nil && o.CreatedDateTime != nil {
+	if o != nil && !IsNil(o.CreatedDateTime) {
 		return true
 	}
 
@@ -163,7 +166,7 @@ func (o *Drive) SetCreatedDateTime(v time.Time) {
 
 // GetDescription returns the Description field value if set, zero value otherwise.
 func (o *Drive) GetDescription() string {
-	if o == nil || o.Description == nil {
+	if o == nil || IsNil(o.Description) {
 		var ret string
 		return ret
 	}
@@ -173,7 +176,7 @@ func (o *Drive) GetDescription() string {
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetDescriptionOk() (*string, bool) {
-	if o == nil || o.Description == nil {
+	if o == nil || IsNil(o.Description) {
 		return nil, false
 	}
 	return o.Description, true
@@ -181,7 +184,7 @@ func (o *Drive) GetDescriptionOk() (*string, bool) {
 
 // HasDescription returns a boolean if a field has been set.
 func (o *Drive) HasDescription() bool {
-	if o != nil && o.Description != nil {
+	if o != nil && !IsNil(o.Description) {
 		return true
 	}
 
@@ -195,7 +198,7 @@ func (o *Drive) SetDescription(v string) {
 
 // GetETag returns the ETag field value if set, zero value otherwise.
 func (o *Drive) GetETag() string {
-	if o == nil || o.ETag == nil {
+	if o == nil || IsNil(o.ETag) {
 		var ret string
 		return ret
 	}
@@ -205,7 +208,7 @@ func (o *Drive) GetETag() string {
 // GetETagOk returns a tuple with the ETag field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetETagOk() (*string, bool) {
-	if o == nil || o.ETag == nil {
+	if o == nil || IsNil(o.ETag) {
 		return nil, false
 	}
 	return o.ETag, true
@@ -213,7 +216,7 @@ func (o *Drive) GetETagOk() (*string, bool) {
 
 // HasETag returns a boolean if a field has been set.
 func (o *Drive) HasETag() bool {
-	if o != nil && o.ETag != nil {
+	if o != nil && !IsNil(o.ETag) {
 		return true
 	}
 
@@ -227,7 +230,7 @@ func (o *Drive) SetETag(v string) {
 
 // GetLastModifiedBy returns the LastModifiedBy field value if set, zero value otherwise.
 func (o *Drive) GetLastModifiedBy() IdentitySet {
-	if o == nil || o.LastModifiedBy == nil {
+	if o == nil || IsNil(o.LastModifiedBy) {
 		var ret IdentitySet
 		return ret
 	}
@@ -237,7 +240,7 @@ func (o *Drive) GetLastModifiedBy() IdentitySet {
 // GetLastModifiedByOk returns a tuple with the LastModifiedBy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetLastModifiedByOk() (*IdentitySet, bool) {
-	if o == nil || o.LastModifiedBy == nil {
+	if o == nil || IsNil(o.LastModifiedBy) {
 		return nil, false
 	}
 	return o.LastModifiedBy, true
@@ -245,7 +248,7 @@ func (o *Drive) GetLastModifiedByOk() (*IdentitySet, bool) {
 
 // HasLastModifiedBy returns a boolean if a field has been set.
 func (o *Drive) HasLastModifiedBy() bool {
-	if o != nil && o.LastModifiedBy != nil {
+	if o != nil && !IsNil(o.LastModifiedBy) {
 		return true
 	}
 
@@ -259,7 +262,7 @@ func (o *Drive) SetLastModifiedBy(v IdentitySet) {
 
 // GetLastModifiedDateTime returns the LastModifiedDateTime field value if set, zero value otherwise.
 func (o *Drive) GetLastModifiedDateTime() time.Time {
-	if o == nil || o.LastModifiedDateTime == nil {
+	if o == nil || IsNil(o.LastModifiedDateTime) {
 		var ret time.Time
 		return ret
 	}
@@ -269,7 +272,7 @@ func (o *Drive) GetLastModifiedDateTime() time.Time {
 // GetLastModifiedDateTimeOk returns a tuple with the LastModifiedDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetLastModifiedDateTimeOk() (*time.Time, bool) {
-	if o == nil || o.LastModifiedDateTime == nil {
+	if o == nil || IsNil(o.LastModifiedDateTime) {
 		return nil, false
 	}
 	return o.LastModifiedDateTime, true
@@ -277,7 +280,7 @@ func (o *Drive) GetLastModifiedDateTimeOk() (*time.Time, bool) {
 
 // HasLastModifiedDateTime returns a boolean if a field has been set.
 func (o *Drive) HasLastModifiedDateTime() bool {
-	if o != nil && o.LastModifiedDateTime != nil {
+	if o != nil && !IsNil(o.LastModifiedDateTime) {
 		return true
 	}
 
@@ -315,7 +318,7 @@ func (o *Drive) SetName(v string) {
 
 // GetParentReference returns the ParentReference field value if set, zero value otherwise.
 func (o *Drive) GetParentReference() ItemReference {
-	if o == nil || o.ParentReference == nil {
+	if o == nil || IsNil(o.ParentReference) {
 		var ret ItemReference
 		return ret
 	}
@@ -325,7 +328,7 @@ func (o *Drive) GetParentReference() ItemReference {
 // GetParentReferenceOk returns a tuple with the ParentReference field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetParentReferenceOk() (*ItemReference, bool) {
-	if o == nil || o.ParentReference == nil {
+	if o == nil || IsNil(o.ParentReference) {
 		return nil, false
 	}
 	return o.ParentReference, true
@@ -333,7 +336,7 @@ func (o *Drive) GetParentReferenceOk() (*ItemReference, bool) {
 
 // HasParentReference returns a boolean if a field has been set.
 func (o *Drive) HasParentReference() bool {
-	if o != nil && o.ParentReference != nil {
+	if o != nil && !IsNil(o.ParentReference) {
 		return true
 	}
 
@@ -347,7 +350,7 @@ func (o *Drive) SetParentReference(v ItemReference) {
 
 // GetWebUrl returns the WebUrl field value if set, zero value otherwise.
 func (o *Drive) GetWebUrl() string {
-	if o == nil || o.WebUrl == nil {
+	if o == nil || IsNil(o.WebUrl) {
 		var ret string
 		return ret
 	}
@@ -357,7 +360,7 @@ func (o *Drive) GetWebUrl() string {
 // GetWebUrlOk returns a tuple with the WebUrl field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetWebUrlOk() (*string, bool) {
-	if o == nil || o.WebUrl == nil {
+	if o == nil || IsNil(o.WebUrl) {
 		return nil, false
 	}
 	return o.WebUrl, true
@@ -365,7 +368,7 @@ func (o *Drive) GetWebUrlOk() (*string, bool) {
 
 // HasWebUrl returns a boolean if a field has been set.
 func (o *Drive) HasWebUrl() bool {
-	if o != nil && o.WebUrl != nil {
+	if o != nil && !IsNil(o.WebUrl) {
 		return true
 	}
 
@@ -379,7 +382,7 @@ func (o *Drive) SetWebUrl(v string) {
 
 // GetDriveType returns the DriveType field value if set, zero value otherwise.
 func (o *Drive) GetDriveType() string {
-	if o == nil || o.DriveType == nil {
+	if o == nil || IsNil(o.DriveType) {
 		var ret string
 		return ret
 	}
@@ -389,7 +392,7 @@ func (o *Drive) GetDriveType() string {
 // GetDriveTypeOk returns a tuple with the DriveType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetDriveTypeOk() (*string, bool) {
-	if o == nil || o.DriveType == nil {
+	if o == nil || IsNil(o.DriveType) {
 		return nil, false
 	}
 	return o.DriveType, true
@@ -397,7 +400,7 @@ func (o *Drive) GetDriveTypeOk() (*string, bool) {
 
 // HasDriveType returns a boolean if a field has been set.
 func (o *Drive) HasDriveType() bool {
-	if o != nil && o.DriveType != nil {
+	if o != nil && !IsNil(o.DriveType) {
 		return true
 	}
 
@@ -411,7 +414,7 @@ func (o *Drive) SetDriveType(v string) {
 
 // GetDriveAlias returns the DriveAlias field value if set, zero value otherwise.
 func (o *Drive) GetDriveAlias() string {
-	if o == nil || o.DriveAlias == nil {
+	if o == nil || IsNil(o.DriveAlias) {
 		var ret string
 		return ret
 	}
@@ -421,7 +424,7 @@ func (o *Drive) GetDriveAlias() string {
 // GetDriveAliasOk returns a tuple with the DriveAlias field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetDriveAliasOk() (*string, bool) {
-	if o == nil || o.DriveAlias == nil {
+	if o == nil || IsNil(o.DriveAlias) {
 		return nil, false
 	}
 	return o.DriveAlias, true
@@ -429,7 +432,7 @@ func (o *Drive) GetDriveAliasOk() (*string, bool) {
 
 // HasDriveAlias returns a boolean if a field has been set.
 func (o *Drive) HasDriveAlias() bool {
-	if o != nil && o.DriveAlias != nil {
+	if o != nil && !IsNil(o.DriveAlias) {
 		return true
 	}
 
@@ -443,7 +446,7 @@ func (o *Drive) SetDriveAlias(v string) {
 
 // GetOwner returns the Owner field value if set, zero value otherwise.
 func (o *Drive) GetOwner() IdentitySet {
-	if o == nil || o.Owner == nil {
+	if o == nil || IsNil(o.Owner) {
 		var ret IdentitySet
 		return ret
 	}
@@ -453,7 +456,7 @@ func (o *Drive) GetOwner() IdentitySet {
 // GetOwnerOk returns a tuple with the Owner field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetOwnerOk() (*IdentitySet, bool) {
-	if o == nil || o.Owner == nil {
+	if o == nil || IsNil(o.Owner) {
 		return nil, false
 	}
 	return o.Owner, true
@@ -461,7 +464,7 @@ func (o *Drive) GetOwnerOk() (*IdentitySet, bool) {
 
 // HasOwner returns a boolean if a field has been set.
 func (o *Drive) HasOwner() bool {
-	if o != nil && o.Owner != nil {
+	if o != nil && !IsNil(o.Owner) {
 		return true
 	}
 
@@ -475,7 +478,7 @@ func (o *Drive) SetOwner(v IdentitySet) {
 
 // GetQuota returns the Quota field value if set, zero value otherwise.
 func (o *Drive) GetQuota() Quota {
-	if o == nil || o.Quota == nil {
+	if o == nil || IsNil(o.Quota) {
 		var ret Quota
 		return ret
 	}
@@ -485,7 +488,7 @@ func (o *Drive) GetQuota() Quota {
 // GetQuotaOk returns a tuple with the Quota field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetQuotaOk() (*Quota, bool) {
-	if o == nil || o.Quota == nil {
+	if o == nil || IsNil(o.Quota) {
 		return nil, false
 	}
 	return o.Quota, true
@@ -493,7 +496,7 @@ func (o *Drive) GetQuotaOk() (*Quota, bool) {
 
 // HasQuota returns a boolean if a field has been set.
 func (o *Drive) HasQuota() bool {
-	if o != nil && o.Quota != nil {
+	if o != nil && !IsNil(o.Quota) {
 		return true
 	}
 
@@ -507,7 +510,7 @@ func (o *Drive) SetQuota(v Quota) {
 
 // GetItems returns the Items field value if set, zero value otherwise.
 func (o *Drive) GetItems() []DriveItem {
-	if o == nil || o.Items == nil {
+	if o == nil || IsNil(o.Items) {
 		var ret []DriveItem
 		return ret
 	}
@@ -517,7 +520,7 @@ func (o *Drive) GetItems() []DriveItem {
 // GetItemsOk returns a tuple with the Items field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetItemsOk() ([]DriveItem, bool) {
-	if o == nil || o.Items == nil {
+	if o == nil || IsNil(o.Items) {
 		return nil, false
 	}
 	return o.Items, true
@@ -525,7 +528,7 @@ func (o *Drive) GetItemsOk() ([]DriveItem, bool) {
 
 // HasItems returns a boolean if a field has been set.
 func (o *Drive) HasItems() bool {
-	if o != nil && o.Items != nil {
+	if o != nil && !IsNil(o.Items) {
 		return true
 	}
 
@@ -539,7 +542,7 @@ func (o *Drive) SetItems(v []DriveItem) {
 
 // GetRoot returns the Root field value if set, zero value otherwise.
 func (o *Drive) GetRoot() DriveItem {
-	if o == nil || o.Root == nil {
+	if o == nil || IsNil(o.Root) {
 		var ret DriveItem
 		return ret
 	}
@@ -549,7 +552,7 @@ func (o *Drive) GetRoot() DriveItem {
 // GetRootOk returns a tuple with the Root field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetRootOk() (*DriveItem, bool) {
-	if o == nil || o.Root == nil {
+	if o == nil || IsNil(o.Root) {
 		return nil, false
 	}
 	return o.Root, true
@@ -557,7 +560,7 @@ func (o *Drive) GetRootOk() (*DriveItem, bool) {
 
 // HasRoot returns a boolean if a field has been set.
 func (o *Drive) HasRoot() bool {
-	if o != nil && o.Root != nil {
+	if o != nil && !IsNil(o.Root) {
 		return true
 	}
 
@@ -571,7 +574,7 @@ func (o *Drive) SetRoot(v DriveItem) {
 
 // GetSpecial returns the Special field value if set, zero value otherwise.
 func (o *Drive) GetSpecial() []DriveItem {
-	if o == nil || o.Special == nil {
+	if o == nil || IsNil(o.Special) {
 		var ret []DriveItem
 		return ret
 	}
@@ -581,7 +584,7 @@ func (o *Drive) GetSpecial() []DriveItem {
 // GetSpecialOk returns a tuple with the Special field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Drive) GetSpecialOk() ([]DriveItem, bool) {
-	if o == nil || o.Special == nil {
+	if o == nil || IsNil(o.Special) {
 		return nil, false
 	}
 	return o.Special, true
@@ -589,7 +592,7 @@ func (o *Drive) GetSpecialOk() ([]DriveItem, bool) {
 
 // HasSpecial returns a boolean if a field has been set.
 func (o *Drive) HasSpecial() bool {
-	if o != nil && o.Special != nil {
+	if o != nil && !IsNil(o.Special) {
 		return true
 	}
 
@@ -602,59 +605,65 @@ func (o *Drive) SetSpecial(v []DriveItem) {
 }
 
 func (o Drive) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.CreatedBy != nil {
-		toSerialize["createdBy"] = o.CreatedBy
-	}
-	if o.CreatedDateTime != nil {
-		toSerialize["createdDateTime"] = o.CreatedDateTime
-	}
-	if o.Description != nil {
-		toSerialize["description"] = o.Description
-	}
-	if o.ETag != nil {
-		toSerialize["eTag"] = o.ETag
-	}
-	if o.LastModifiedBy != nil {
-		toSerialize["lastModifiedBy"] = o.LastModifiedBy
-	}
-	if o.LastModifiedDateTime != nil {
-		toSerialize["lastModifiedDateTime"] = o.LastModifiedDateTime
-	}
-	if true {
-		toSerialize["name"] = o.Name
-	}
-	if o.ParentReference != nil {
-		toSerialize["parentReference"] = o.ParentReference
-	}
-	if o.WebUrl != nil {
-		toSerialize["webUrl"] = o.WebUrl
-	}
-	if o.DriveType != nil {
-		toSerialize["driveType"] = o.DriveType
-	}
-	if o.DriveAlias != nil {
-		toSerialize["driveAlias"] = o.DriveAlias
-	}
-	if o.Owner != nil {
-		toSerialize["owner"] = o.Owner
-	}
-	if o.Quota != nil {
-		toSerialize["quota"] = o.Quota
-	}
-	if o.Items != nil {
-		toSerialize["items"] = o.Items
-	}
-	if o.Root != nil {
-		toSerialize["root"] = o.Root
-	}
-	if o.Special != nil {
-		toSerialize["special"] = o.Special
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Drive) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.CreatedBy) {
+		toSerialize["createdBy"] = o.CreatedBy
+	}
+	if !IsNil(o.CreatedDateTime) {
+		toSerialize["createdDateTime"] = o.CreatedDateTime
+	}
+	if !IsNil(o.Description) {
+		toSerialize["description"] = o.Description
+	}
+	if !IsNil(o.ETag) {
+		toSerialize["eTag"] = o.ETag
+	}
+	if !IsNil(o.LastModifiedBy) {
+		toSerialize["lastModifiedBy"] = o.LastModifiedBy
+	}
+	if !IsNil(o.LastModifiedDateTime) {
+		toSerialize["lastModifiedDateTime"] = o.LastModifiedDateTime
+	}
+	toSerialize["name"] = o.Name
+	if !IsNil(o.ParentReference) {
+		toSerialize["parentReference"] = o.ParentReference
+	}
+	if !IsNil(o.WebUrl) {
+		toSerialize["webUrl"] = o.WebUrl
+	}
+	if !IsNil(o.DriveType) {
+		toSerialize["driveType"] = o.DriveType
+	}
+	if !IsNil(o.DriveAlias) {
+		toSerialize["driveAlias"] = o.DriveAlias
+	}
+	if !IsNil(o.Owner) {
+		toSerialize["owner"] = o.Owner
+	}
+	if !IsNil(o.Quota) {
+		toSerialize["quota"] = o.Quota
+	}
+	if !IsNil(o.Items) {
+		toSerialize["items"] = o.Items
+	}
+	if !IsNil(o.Root) {
+		toSerialize["root"] = o.Root
+	}
+	if !IsNil(o.Special) {
+		toSerialize["special"] = o.Special
+	}
+	return toSerialize, nil
 }
 
 type NullableDrive struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the EducationOrganization type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &EducationOrganization{}
+
 // EducationOrganization Abstract. Represents an organization in educational context
 type EducationOrganization struct {
 	// The unique idenfier for an entity. Read-only.
@@ -41,7 +44,7 @@ func NewEducationOrganizationWithDefaults() *EducationOrganization {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *EducationOrganization) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *EducationOrganization) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationOrganization) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -59,7 +62,7 @@ func (o *EducationOrganization) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *EducationOrganization) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *EducationOrganization) SetId(v string) {
 
 // GetDisplayName returns the DisplayName field value if set, zero value otherwise.
 func (o *EducationOrganization) GetDisplayName() string {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		var ret string
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *EducationOrganization) GetDisplayName() string {
 // GetDisplayNameOk returns a tuple with the DisplayName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationOrganization) GetDisplayNameOk() (*string, bool) {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		return nil, false
 	}
 	return o.DisplayName, true
@@ -91,7 +94,7 @@ func (o *EducationOrganization) GetDisplayNameOk() (*string, bool) {
 
 // HasDisplayName returns a boolean if a field has been set.
 func (o *EducationOrganization) HasDisplayName() bool {
-	if o != nil && o.DisplayName != nil {
+	if o != nil && !IsNil(o.DisplayName) {
 		return true
 	}
 
@@ -104,14 +107,22 @@ func (o *EducationOrganization) SetDisplayName(v string) {
 }
 
 func (o EducationOrganization) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.DisplayName != nil {
-		toSerialize["displayName"] = o.DisplayName
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o EducationOrganization) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.DisplayName) {
+		toSerialize["displayName"] = o.DisplayName
+	}
+	return toSerialize, nil
 }
 
 type NullableEducationOrganization struct {

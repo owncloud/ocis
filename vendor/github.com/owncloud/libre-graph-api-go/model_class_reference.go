@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ClassReference type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ClassReference{}
+
 // ClassReference struct for ClassReference
 type ClassReference struct {
 	OdataId *string `json:"@odata.id,omitempty"`
@@ -38,7 +41,7 @@ func NewClassReferenceWithDefaults() *ClassReference {
 
 // GetOdataId returns the OdataId field value if set, zero value otherwise.
 func (o *ClassReference) GetOdataId() string {
-	if o == nil || o.OdataId == nil {
+	if o == nil || IsNil(o.OdataId) {
 		var ret string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *ClassReference) GetOdataId() string {
 // GetOdataIdOk returns a tuple with the OdataId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ClassReference) GetOdataIdOk() (*string, bool) {
-	if o == nil || o.OdataId == nil {
+	if o == nil || IsNil(o.OdataId) {
 		return nil, false
 	}
 	return o.OdataId, true
@@ -56,7 +59,7 @@ func (o *ClassReference) GetOdataIdOk() (*string, bool) {
 
 // HasOdataId returns a boolean if a field has been set.
 func (o *ClassReference) HasOdataId() bool {
-	if o != nil && o.OdataId != nil {
+	if o != nil && !IsNil(o.OdataId) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *ClassReference) SetOdataId(v string) {
 }
 
 func (o ClassReference) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.OdataId != nil {
-		toSerialize["@odata.id"] = o.OdataId
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ClassReference) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.OdataId) {
+		toSerialize["@odata.id"] = o.OdataId
+	}
+	return toSerialize, nil
 }
 
 type NullableClassReference struct {

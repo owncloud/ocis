@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Hashes type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Hashes{}
+
 // Hashes Hashes of the file's binary content, if available. Read-only.
 type Hashes struct {
 	// The CRC32 value of the file (if available). Read-only.
@@ -45,7 +48,7 @@ func NewHashesWithDefaults() *Hashes {
 
 // GetCrc32Hash returns the Crc32Hash field value if set, zero value otherwise.
 func (o *Hashes) GetCrc32Hash() string {
-	if o == nil || o.Crc32Hash == nil {
+	if o == nil || IsNil(o.Crc32Hash) {
 		var ret string
 		return ret
 	}
@@ -55,7 +58,7 @@ func (o *Hashes) GetCrc32Hash() string {
 // GetCrc32HashOk returns a tuple with the Crc32Hash field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Hashes) GetCrc32HashOk() (*string, bool) {
-	if o == nil || o.Crc32Hash == nil {
+	if o == nil || IsNil(o.Crc32Hash) {
 		return nil, false
 	}
 	return o.Crc32Hash, true
@@ -63,7 +66,7 @@ func (o *Hashes) GetCrc32HashOk() (*string, bool) {
 
 // HasCrc32Hash returns a boolean if a field has been set.
 func (o *Hashes) HasCrc32Hash() bool {
-	if o != nil && o.Crc32Hash != nil {
+	if o != nil && !IsNil(o.Crc32Hash) {
 		return true
 	}
 
@@ -77,7 +80,7 @@ func (o *Hashes) SetCrc32Hash(v string) {
 
 // GetQuickXorHash returns the QuickXorHash field value if set, zero value otherwise.
 func (o *Hashes) GetQuickXorHash() string {
-	if o == nil || o.QuickXorHash == nil {
+	if o == nil || IsNil(o.QuickXorHash) {
 		var ret string
 		return ret
 	}
@@ -87,7 +90,7 @@ func (o *Hashes) GetQuickXorHash() string {
 // GetQuickXorHashOk returns a tuple with the QuickXorHash field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Hashes) GetQuickXorHashOk() (*string, bool) {
-	if o == nil || o.QuickXorHash == nil {
+	if o == nil || IsNil(o.QuickXorHash) {
 		return nil, false
 	}
 	return o.QuickXorHash, true
@@ -95,7 +98,7 @@ func (o *Hashes) GetQuickXorHashOk() (*string, bool) {
 
 // HasQuickXorHash returns a boolean if a field has been set.
 func (o *Hashes) HasQuickXorHash() bool {
-	if o != nil && o.QuickXorHash != nil {
+	if o != nil && !IsNil(o.QuickXorHash) {
 		return true
 	}
 
@@ -109,7 +112,7 @@ func (o *Hashes) SetQuickXorHash(v string) {
 
 // GetSha1Hash returns the Sha1Hash field value if set, zero value otherwise.
 func (o *Hashes) GetSha1Hash() string {
-	if o == nil || o.Sha1Hash == nil {
+	if o == nil || IsNil(o.Sha1Hash) {
 		var ret string
 		return ret
 	}
@@ -119,7 +122,7 @@ func (o *Hashes) GetSha1Hash() string {
 // GetSha1HashOk returns a tuple with the Sha1Hash field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Hashes) GetSha1HashOk() (*string, bool) {
-	if o == nil || o.Sha1Hash == nil {
+	if o == nil || IsNil(o.Sha1Hash) {
 		return nil, false
 	}
 	return o.Sha1Hash, true
@@ -127,7 +130,7 @@ func (o *Hashes) GetSha1HashOk() (*string, bool) {
 
 // HasSha1Hash returns a boolean if a field has been set.
 func (o *Hashes) HasSha1Hash() bool {
-	if o != nil && o.Sha1Hash != nil {
+	if o != nil && !IsNil(o.Sha1Hash) {
 		return true
 	}
 
@@ -141,7 +144,7 @@ func (o *Hashes) SetSha1Hash(v string) {
 
 // GetSha256Hash returns the Sha256Hash field value if set, zero value otherwise.
 func (o *Hashes) GetSha256Hash() string {
-	if o == nil || o.Sha256Hash == nil {
+	if o == nil || IsNil(o.Sha256Hash) {
 		var ret string
 		return ret
 	}
@@ -151,7 +154,7 @@ func (o *Hashes) GetSha256Hash() string {
 // GetSha256HashOk returns a tuple with the Sha256Hash field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Hashes) GetSha256HashOk() (*string, bool) {
-	if o == nil || o.Sha256Hash == nil {
+	if o == nil || IsNil(o.Sha256Hash) {
 		return nil, false
 	}
 	return o.Sha256Hash, true
@@ -159,7 +162,7 @@ func (o *Hashes) GetSha256HashOk() (*string, bool) {
 
 // HasSha256Hash returns a boolean if a field has been set.
 func (o *Hashes) HasSha256Hash() bool {
-	if o != nil && o.Sha256Hash != nil {
+	if o != nil && !IsNil(o.Sha256Hash) {
 		return true
 	}
 
@@ -172,20 +175,28 @@ func (o *Hashes) SetSha256Hash(v string) {
 }
 
 func (o Hashes) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Crc32Hash != nil {
-		toSerialize["crc32Hash"] = o.Crc32Hash
-	}
-	if o.QuickXorHash != nil {
-		toSerialize["quickXorHash"] = o.QuickXorHash
-	}
-	if o.Sha1Hash != nil {
-		toSerialize["sha1Hash"] = o.Sha1Hash
-	}
-	if o.Sha256Hash != nil {
-		toSerialize["sha256Hash"] = o.Sha256Hash
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Hashes) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Crc32Hash) {
+		toSerialize["crc32Hash"] = o.Crc32Hash
+	}
+	if !IsNil(o.QuickXorHash) {
+		toSerialize["quickXorHash"] = o.QuickXorHash
+	}
+	if !IsNil(o.Sha1Hash) {
+		toSerialize["sha1Hash"] = o.Sha1Hash
+	}
+	if !IsNil(o.Sha256Hash) {
+		toSerialize["sha256Hash"] = o.Sha256Hash
+	}
+	return toSerialize, nil
 }
 
 type NullableHashes struct {

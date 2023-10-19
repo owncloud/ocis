@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Group type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Group{}
+
 // Group struct for Group
 type Group struct {
 	// Read-only.
@@ -49,7 +52,7 @@ func NewGroupWithDefaults() *Group {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *Group) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -59,7 +62,7 @@ func (o *Group) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -67,7 +70,7 @@ func (o *Group) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *Group) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
@@ -81,7 +84,7 @@ func (o *Group) SetId(v string) {
 
 // GetDescription returns the Description field value if set, zero value otherwise.
 func (o *Group) GetDescription() string {
-	if o == nil || o.Description == nil {
+	if o == nil || IsNil(o.Description) {
 		var ret string
 		return ret
 	}
@@ -91,7 +94,7 @@ func (o *Group) GetDescription() string {
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetDescriptionOk() (*string, bool) {
-	if o == nil || o.Description == nil {
+	if o == nil || IsNil(o.Description) {
 		return nil, false
 	}
 	return o.Description, true
@@ -99,7 +102,7 @@ func (o *Group) GetDescriptionOk() (*string, bool) {
 
 // HasDescription returns a boolean if a field has been set.
 func (o *Group) HasDescription() bool {
-	if o != nil && o.Description != nil {
+	if o != nil && !IsNil(o.Description) {
 		return true
 	}
 
@@ -113,7 +116,7 @@ func (o *Group) SetDescription(v string) {
 
 // GetDisplayName returns the DisplayName field value if set, zero value otherwise.
 func (o *Group) GetDisplayName() string {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		var ret string
 		return ret
 	}
@@ -123,7 +126,7 @@ func (o *Group) GetDisplayName() string {
 // GetDisplayNameOk returns a tuple with the DisplayName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetDisplayNameOk() (*string, bool) {
-	if o == nil || o.DisplayName == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		return nil, false
 	}
 	return o.DisplayName, true
@@ -131,7 +134,7 @@ func (o *Group) GetDisplayNameOk() (*string, bool) {
 
 // HasDisplayName returns a boolean if a field has been set.
 func (o *Group) HasDisplayName() bool {
-	if o != nil && o.DisplayName != nil {
+	if o != nil && !IsNil(o.DisplayName) {
 		return true
 	}
 
@@ -145,7 +148,7 @@ func (o *Group) SetDisplayName(v string) {
 
 // GetGroupTypes returns the GroupTypes field value if set, zero value otherwise.
 func (o *Group) GetGroupTypes() []string {
-	if o == nil || o.GroupTypes == nil {
+	if o == nil || IsNil(o.GroupTypes) {
 		var ret []string
 		return ret
 	}
@@ -155,7 +158,7 @@ func (o *Group) GetGroupTypes() []string {
 // GetGroupTypesOk returns a tuple with the GroupTypes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetGroupTypesOk() ([]string, bool) {
-	if o == nil || o.GroupTypes == nil {
+	if o == nil || IsNil(o.GroupTypes) {
 		return nil, false
 	}
 	return o.GroupTypes, true
@@ -163,7 +166,7 @@ func (o *Group) GetGroupTypesOk() ([]string, bool) {
 
 // HasGroupTypes returns a boolean if a field has been set.
 func (o *Group) HasGroupTypes() bool {
-	if o != nil && o.GroupTypes != nil {
+	if o != nil && !IsNil(o.GroupTypes) {
 		return true
 	}
 
@@ -177,7 +180,7 @@ func (o *Group) SetGroupTypes(v []string) {
 
 // GetMembers returns the Members field value if set, zero value otherwise.
 func (o *Group) GetMembers() []User {
-	if o == nil || o.Members == nil {
+	if o == nil || IsNil(o.Members) {
 		var ret []User
 		return ret
 	}
@@ -187,7 +190,7 @@ func (o *Group) GetMembers() []User {
 // GetMembersOk returns a tuple with the Members field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetMembersOk() ([]User, bool) {
-	if o == nil || o.Members == nil {
+	if o == nil || IsNil(o.Members) {
 		return nil, false
 	}
 	return o.Members, true
@@ -195,7 +198,7 @@ func (o *Group) GetMembersOk() ([]User, bool) {
 
 // HasMembers returns a boolean if a field has been set.
 func (o *Group) HasMembers() bool {
-	if o != nil && o.Members != nil {
+	if o != nil && !IsNil(o.Members) {
 		return true
 	}
 
@@ -209,7 +212,7 @@ func (o *Group) SetMembers(v []User) {
 
 // GetMembersodataBind returns the MembersodataBind field value if set, zero value otherwise.
 func (o *Group) GetMembersodataBind() []string {
-	if o == nil || o.MembersodataBind == nil {
+	if o == nil || IsNil(o.MembersodataBind) {
 		var ret []string
 		return ret
 	}
@@ -219,7 +222,7 @@ func (o *Group) GetMembersodataBind() []string {
 // GetMembersodataBindOk returns a tuple with the MembersodataBind field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetMembersodataBindOk() ([]string, bool) {
-	if o == nil || o.MembersodataBind == nil {
+	if o == nil || IsNil(o.MembersodataBind) {
 		return nil, false
 	}
 	return o.MembersodataBind, true
@@ -227,7 +230,7 @@ func (o *Group) GetMembersodataBindOk() ([]string, bool) {
 
 // HasMembersodataBind returns a boolean if a field has been set.
 func (o *Group) HasMembersodataBind() bool {
-	if o != nil && o.MembersodataBind != nil {
+	if o != nil && !IsNil(o.MembersodataBind) {
 		return true
 	}
 
@@ -240,26 +243,34 @@ func (o *Group) SetMembersodataBind(v []string) {
 }
 
 func (o Group) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Description != nil {
-		toSerialize["description"] = o.Description
-	}
-	if o.DisplayName != nil {
-		toSerialize["displayName"] = o.DisplayName
-	}
-	if o.GroupTypes != nil {
-		toSerialize["groupTypes"] = o.GroupTypes
-	}
-	if o.Members != nil {
-		toSerialize["members"] = o.Members
-	}
-	if o.MembersodataBind != nil {
-		toSerialize["members@odata.bind"] = o.MembersodataBind
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Group) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.Description) {
+		toSerialize["description"] = o.Description
+	}
+	if !IsNil(o.DisplayName) {
+		toSerialize["displayName"] = o.DisplayName
+	}
+	if !IsNil(o.GroupTypes) {
+		toSerialize["groupTypes"] = o.GroupTypes
+	}
+	if !IsNil(o.Members) {
+		toSerialize["members"] = o.Members
+	}
+	if !IsNil(o.MembersodataBind) {
+		toSerialize["members@odata.bind"] = o.MembersodataBind
+	}
+	return toSerialize, nil
 }
 
 type NullableGroup struct {
