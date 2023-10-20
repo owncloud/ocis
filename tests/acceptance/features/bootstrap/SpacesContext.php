@@ -935,7 +935,7 @@ class SpacesContext implements Context {
 					"parameter" => [$userName, $spaceName, $fileName]
 				],
 				[
-					"code" => "%space_eTag%",
+					"code" => "%space_etag%",
 					"function" =>
 						[$this, "getEtagOfASpace"],
 					"parameter" => [$userName, $spaceName]

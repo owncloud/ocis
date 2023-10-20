@@ -433,8 +433,8 @@ Feature: List and create spaces
     And user "Alice" has disabled auto-accepting
     And user "Brian" has uploaded file with content "this is a test file." to "test.txt"
     And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
-    When user "Brian" shares file "/test.txt" with user "Alice" using the sharing API
-    And user "Alice" lists all available spaces via the GraphApi
+    And user "Brian" has shared file "/test.txt" with user "Alice"
+    When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Shares" owned by "Alice" and match
     """
@@ -486,7 +486,7 @@ Feature: List and create spaces
           "properties": {
               "eTag": {
                 "type": "string",
-                "enum": ["%space_eTag%"]
+                "enum": ["%space_etag%"]
               },
               "webDavUrl": {
                 "type": "string",
