@@ -31,7 +31,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	conversions "github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

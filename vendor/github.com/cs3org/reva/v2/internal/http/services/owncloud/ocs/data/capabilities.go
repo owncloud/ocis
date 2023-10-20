@@ -58,8 +58,37 @@ type Capabilities struct {
 	Spaces         *Spaces                     `json:"spaces,omitempty" xml:"spaces,omitempty" mapstructure:"spaces"`
 	Graph          *CapabilitiesGraph          `json:"graph,omitempty" xml:"graph,omitempty" mapstructure:"graph"`
 	PasswordPolicy *CapabilitiesPasswordPolicy `json:"password_policy,omitempty" xml:"password_policy,omitempty" mapstructure:"password_policy"`
+	Search         *CapabilitiesSearch         `json:"search,omitempty" xml:"search,omitempty" mapstructure:"search"`
+	Notifications  *CapabilitiesNotifications  `json:"notifications,omitempty" xml:"notifications,omitempty"`
+}
 
-	Notifications *CapabilitiesNotifications `json:"notifications,omitempty" xml:"notifications,omitempty"`
+// CapabilitiesSearch holds the search capabilities
+type CapabilitiesSearch struct {
+	Property *CapabilitiesSearchProperties `json:"property" xml:"property" mapstructure:"property"`
+}
+
+// CapabilitiesSearchProperties holds the search property capabilities
+type CapabilitiesSearchProperties struct {
+	Name     *CapabilitiesSearchProperty      `json:"name" xml:"name" mapstructure:"name"`
+	Mtime    *CapabilitiesSearchPropertyMtime `json:"mtime" xml:"mtime" mapstructure:"mtime"`
+	Size     *CapabilitiesSearchProperty      `json:"size" xml:"size" mapstructure:"size"`
+	Mimetype *CapabilitiesSearchProperty      `json:"mimetype" xml:"mimetype" mapstructure:"mimetype"`
+	Type     *CapabilitiesSearchProperty      `json:"type" xml:"type" mapstructure:"type"`
+	Tag      *CapabilitiesSearchProperty      `json:"tag" xml:"tag" mapstructure:"tag"`
+	Tags     *CapabilitiesSearchProperty      `json:"tags" xml:"tags" mapstructure:"tags"`
+	Content  *CapabilitiesSearchProperty      `json:"content" xml:"content" mapstructure:"content"`
+	Scope    *CapabilitiesSearchProperty      `json:"scope" xml:"scope" mapstructure:"scope"`
+}
+
+// CapabilitiesSearchProperty represents the default search property
+type CapabilitiesSearchProperty struct {
+	Enabled bool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
+}
+
+// CapabilitiesSearchPropertyMtime represents the mtime search property
+type CapabilitiesSearchPropertyMtime struct {
+	CapabilitiesSearchProperty
+	Keywords []string `json:"keywords" xml:"keywords" mapstructure:"keywords"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.

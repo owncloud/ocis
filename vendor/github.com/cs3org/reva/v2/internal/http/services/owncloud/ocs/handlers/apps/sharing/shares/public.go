@@ -29,11 +29,11 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/huandu/xstrings"
 	"github.com/rs/zerolog/log"
 
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"

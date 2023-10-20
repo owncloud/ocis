@@ -357,7 +357,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.16.1-0.20231018140500-4565fd54f281
+# github.com/cs3org/reva/v2 v2.16.1-0.20231020092327-051345fa7b18
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -434,7 +434,6 @@ github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/config
-github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/data
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/handlers/apps/sharing/sharees
 github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/handlers/apps/sharing/shares
@@ -496,6 +495,7 @@ github.com/cs3org/reva/v2/pkg/cbox/storage/eoshomewrapper
 github.com/cs3org/reva/v2/pkg/cbox/storage/eoswrapper
 github.com/cs3org/reva/v2/pkg/cbox/user/rest
 github.com/cs3org/reva/v2/pkg/cbox/utils
+github.com/cs3org/reva/v2/pkg/conversions
 github.com/cs3org/reva/v2/pkg/ctx
 github.com/cs3org/reva/v2/pkg/datatx
 github.com/cs3org/reva/v2/pkg/datatx/manager/loader
@@ -2016,7 +2016,7 @@ golang.org/x/net/netutil
 golang.org/x/net/proxy
 golang.org/x/net/publicsuffix
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.12.0
+# golang.org/x/oauth2 v0.13.0
 ## explicit; go 1.18
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
@@ -2096,7 +2096,7 @@ golang.org/x/tools/internal/typesinternal
 ## explicit; go 1.17
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# google.golang.org/appengine v1.6.7
+# google.golang.org/appengine v1.6.8
 ## explicit; go 1.11
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/base

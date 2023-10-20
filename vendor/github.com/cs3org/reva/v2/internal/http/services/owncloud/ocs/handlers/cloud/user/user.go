@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 )
 
