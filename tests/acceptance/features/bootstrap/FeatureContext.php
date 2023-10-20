@@ -630,7 +630,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function logStep(BeforeStepScope $scope): void {
-		$step = $scope->getStep()->getType() . " " . $scope->getStep()->getText();
+		$step = $scope->getStep()->getKeyword() . " " . $scope->getStep()->getText();
 		$logMessage = "\t### $step\n";
 		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
 	}
@@ -1725,7 +1725,7 @@ class FeatureContext extends BehatVariablesContext {
 			];
 		}
 
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$loginUrl,
 			$this->getStepLineRef(),
 			null,
@@ -1735,8 +1735,8 @@ class FeatureContext extends BehatVariablesContext {
 			$config,
 			$this->cookieJar
 		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-		$this->extractRequestTokenFromResponse($this->response);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->extractRequestTokenFromResponse($response);
 
 		// Login and extract new token
 		$password = $this->getPasswordForUser($user);
@@ -1745,7 +1745,7 @@ class FeatureContext extends BehatVariablesContext {
 			'password' => $password,
 			'requesttoken' => $this->requestToken
 		];
-		$this->response = HttpRequestHelper::post(
+		$response = HttpRequestHelper::post(
 			$loginUrl,
 			$this->getStepLineRef(),
 			null,
@@ -1755,8 +1755,8 @@ class FeatureContext extends BehatVariablesContext {
 			$config,
 			$this->cookieJar
 		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-		$this->extractRequestTokenFromResponse($this->response);
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
+		$this->extractRequestTokenFromResponse($response);
 	}
 
 	/**
@@ -2359,8 +2359,8 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return void
 	 */
-	public function readFileInServerRootForCore(string $path): void {
-		$response = OcsApiHelper::sendRequest(
+	public function readFileInServerRootForCore(string $path): ResponseInterface {
+		return OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
@@ -2368,7 +2368,6 @@ class FeatureContext extends BehatVariablesContext {
 			"/apps/testing/api/v1/file?file=$path",
 			$this->getStepLineRef()
 		);
-		$this->setResponse($response);
 	}
 
 	/**
