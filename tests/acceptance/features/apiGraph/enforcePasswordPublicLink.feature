@@ -40,6 +40,44 @@ Feature: enforce password on public link
       | 2               | 400       |
 
 
+  Scenario Outline: create a public link with view permission without a password
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
+    When user "Alice" creates a public link share using the sharing API with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
+    Then the HTTP status code should be "<http-code>"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | ocs-api-version | http-code |
+      | 1               | 200       |
+      | 2               | 400       |
+
+
+  Scenario Outline: updates a public link to edit permission without a password
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
+    And using OCS API version "<ocs-api-version>"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 1             |
+      | password    | test12GD!sdf  |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | 3 |
+      | password    |   |
+    Then the HTTP status code should be "<http-code>"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | ocs-api-version | http-code |
+      | 1               | 200       |
+      | 2               | 400       |
+
+
   Scenario Outline: updates a public link to edit permission with a password
     Given the config "OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" has been set to "true"
     And user "Alice" has been created with default attributes and without skeleton files
@@ -249,7 +287,7 @@ Feature: enforce password on public link
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
-    And user "Alice" has created a public link share with settings 
+    And user "Alice" has created a public link share with settings
       | path        | /testfile.txt |
       | permissions | 1             |
     When user "Alice" updates the last public link share using the sharing API with
