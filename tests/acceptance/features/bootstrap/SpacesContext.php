@@ -389,6 +389,24 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 *
+	 * @throws GuzzleException
+	 */
+	public function getEtagOfASpace(string $user, string $spaceName): string {
+		$this->theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId($user, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse();
+		return $decodedResponse["root"]["eTag"];
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -916,6 +934,12 @@ class SpacesContext implements Context {
 						[$this, "getETag"],
 					"parameter" => [$userName, $spaceName, $fileName]
 				],
+				[
+					"code" => "%space_etag%",
+					"function" =>
+						[$this, "getEtagOfASpace"],
+					"parameter" => [$userName, $spaceName]
+				]
 			],
 			null,
 			$userName,
