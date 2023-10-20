@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-20-11-16-12]
+[#deprecation-note-2023-10-20-14-18-35]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -407,6 +407,33 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The public facing URL of the oCIS frontend.
+
+a|`GATEWAY_STORAGE_REGISTRY_DRIVER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++spaces ++
+a| [subs=-attributes]
+The driver name of the storage registry to use.
+
+a|`GATEWAY_STORAGE_REGISTRY_RULES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+The rules for the storage registry.
+
+a|`GATEWAY_STORAGE_REGISTRY_CONFIG_JSON` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Additional configuration for the storage registry in json format.
 
 a|`GATEWAY_STORAGE_USERS_MOUNT_ID` +
 

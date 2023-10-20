@@ -42,4 +42,7 @@
 | OCIS_CACHE_TTL<br/>GATEWAY_CREATE_HOME_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).|
 | OCIS_CACHE_SIZE<br/>GATEWAY_CREATE_HOME_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_URL<br/>GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
+| GATEWAY_STORAGE_REGISTRY_DRIVER | string | spaces | The driver name of the storage registry to use.|
+| GATEWAY_STORAGE_REGISTRY_RULES | []string | [] | The rules for the storage registry.|
+| GATEWAY_STORAGE_REGISTRY_CONFIG_JSON | string |  | Additional configuration for the storage registry in json format.|
 | GATEWAY_STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
