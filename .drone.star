@@ -52,46 +52,6 @@ dirs = {
 
 # configuration
 config = {
-    "modules": [
-        # if you add a module here please also add it to the root level Makefile
-        "services/antivirus",
-        "services/app-provider",
-        "services/app-registry",
-        "services/audit",
-        "services/auth-basic",
-        "services/auth-bearer",
-        "services/auth-machine",
-        "services/eventhistory",
-        "services/frontend",
-        "services/gateway",
-        "services/graph",
-        "services/groups",
-        "services/idm",
-        "services/idp",
-        "services/invitations",
-        "services/nats",
-        "services/notifications",
-        "services/ocdav",
-        "services/ocs",
-        "services/policies",
-        "services/proxy",
-        "services/search",
-        "services/settings",
-        "services/sharing",
-        "services/storage-system",
-        "services/storage-publiclink",
-        "services/storage-shares",
-        "services/storage-users",
-        "services/store",
-        "services/thumbnails",
-        "services/userlog",
-        "services/users",
-        "services/web",
-        "services/webdav",
-        "services/webfinger",
-        "ocis-pkg",
-        "ocis",
-    ],
     "cs3ApiTests": {
         "skip": False,
     },
@@ -263,14 +223,13 @@ def main(ctx):
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
+        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
         [licenseCheck(ctx)] + \
         dockerReleases(ctx) + \
-        binaryReleases(ctx) + \
-        [releaseSubmodule(ctx)]
+        binaryReleases(ctx)
 
     build_release_helpers = [
         changelog(),
@@ -334,15 +293,13 @@ def buildWebCache(ctx):
         cachePipeline("web-pnpm", generateWebPnpmCache(ctx)),
     ]
 
-def testOcisModules(ctx):
-    pipelines = []
-    for module in config["modules"]:
-        pipelines.append(testOcisModule(ctx, module))
+def testOcisAndUploadResults(ctx):
+    pipeline = testOcis(ctx)
 
     scan_result_upload = uploadScanResults(ctx)
-    scan_result_upload["depends_on"] = getPipelineNames(pipelines)
+    scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    return pipelines + [scan_result_upload]
+    return [pipeline, scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []
@@ -471,15 +428,15 @@ def restoreGoBinCache():
         },
     ]
 
-def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate(module) + [
+def testOcis(ctx):
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/checkstyle",
-                "make -C %s ci-golangci-lint" % (module),
-                "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
+                "make ci-golangci-lint",
+                "mv checkstyle.xml cache/checkstyle/checkstyle.xml",
             ],
             "environment": {
                 "HTTP_PROXY": {
@@ -496,8 +453,8 @@ def testOcisModule(ctx, module):
             "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/coverage",
-                "make -C %s test" % (module),
-                "mv %s/coverage.out cache/coverage/$(basename %s)_coverage.out" % (module, module),
+                "make test",
+                "mv coverage.out cache/coverage/",
             ],
             "volumes": [stepVolumeGo],
         },
@@ -525,7 +482,7 @@ def testOcisModule(ctx, module):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "linting&unitTests-%s" % (module),
+        "name": "linting_and_unitTests",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -534,7 +491,6 @@ def testOcisModule(ctx, module):
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
-                "refs/tags/%s/v*" % (module),
                 "refs/pull/**",
             ],
         },
@@ -1286,7 +1242,7 @@ def dockerRelease(ctx, arch):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
     ]
-    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
 
     if ctx.build.event == "tag":
         depends_on = []
@@ -1375,7 +1331,7 @@ def binaryReleases(ctx):
 def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
     if ctx.build.event == "tag":
         # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1622,49 +1578,6 @@ def licenseCheck(ctx):
             ],
         },
         "volumes": [pipelineVolumeGo],
-    }
-
-def releaseSubmodule(ctx):
-    depends = []
-    if len(ctx.build.ref.replace("refs/tags/", "").split("/")) == 2:
-        depends = ["linting&unitTests-%s" % (ctx.build.ref.replace("refs/tags/", "").split("/")[0])]
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "release-%s" % (ctx.build.ref.replace("refs/tags/", "")),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": [
-            {
-                "name": "release-submodule",
-                "image": PLUGINS_GITHUB_RELEASE,
-                "settings": {
-                    "api_key": {
-                        "from_secret": "github_token",
-                    },
-                    "files": [
-                    ],
-                    "title": ctx.build.ref.replace("refs/tags/", "").replace("/v", " "),
-                    "note": "Release %s submodule" % (ctx.build.ref.replace("refs/tags/", "").replace("/v", " ")),
-                    "overwrite": True,
-                    "prerelease": len(ctx.build.ref.split("-")) > 1,
-                },
-                "when": {
-                    "ref": [
-                        "refs/tags/*/v*",
-                    ],
-                },
-            },
-        ],
-        "depends_on": depends,
-        "trigger": {
-            "ref": [
-                "refs/tags/*/v*",
-            ],
-        },
     }
 
 def releaseDockerManifest():
