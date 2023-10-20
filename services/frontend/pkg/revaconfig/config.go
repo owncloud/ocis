@@ -249,7 +249,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"password": map[string]interface{}{
 										"enforced": false,
 										"enforced_for": map[string]interface{}{
-											"read_only":         false,
+											"read_only":         cfg.OCS.PublicShareMustHavePassword,
 											"read_write":        cfg.OCS.WriteablePublicShareMustHavePassword,
 											"read_write_delete": cfg.OCS.WriteablePublicShareMustHavePassword,
 											"upload_only":       cfg.OCS.WriteablePublicShareMustHavePassword,
