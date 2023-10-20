@@ -76,9 +76,9 @@ type GRPCConfig struct {
 }
 
 type StorageRegistry struct {
-	Driver              string   `yaml:"driver" env:"GATEWAY_STORAGE_REGISTRY_DRIVER" desc:"The driver name of the storage registry to use"`
-	Rules               []string `yaml:"rules" env:"GATEWAY_STORAGE_REGISTRY_RULES" desc:"The rules for the storage registry"`
-	JSON                string   `yaml:"json" env:"GATEWAY_STORAGE_REGISTRY_CONFIG_JSON" desc:"Additional configuration for the storage registry in json format"`
+	Driver              string   `yaml:"driver" env:"GATEWAY_STORAGE_REGISTRY_DRIVER" desc:"The driver name of the storage registry to use."`
+	Rules               []string `yaml:"rules" env:"GATEWAY_STORAGE_REGISTRY_RULES" desc:"The rules for the storage registry."`
+	JSON                string   `yaml:"json" env:"GATEWAY_STORAGE_REGISTRY_CONFIG_JSON" desc:"Additional configuration for the storage registry in json format."`
 	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 }
 
