@@ -180,6 +180,15 @@ MINIO_MC_ENV = {
     },
 }
 
+DRONE_HTTP_PROXY_ENV = {
+    "HTTP_PROXY": {
+        "from_secret": "drone_http_proxy",
+    },
+    "HTTPS_PROXY": {
+        "from_secret": "drone_http_proxy",
+    },
+}
+
 def pipelineDependsOn(pipeline, dependant_pipelines):
     if "depends_on" in pipeline.keys():
         pipeline["depends_on"] = pipeline["depends_on"] + getPipelineNames(dependant_pipelines)
@@ -375,14 +384,7 @@ def cacheGoBin():
                 "make bingo-update",
             ],
             "volumes": [stepVolumeGo],
-            "environment": {
-                "HTTP_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-                "HTTPS_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-            },
+            "environment": DRONE_HTTP_PROXY_ENV,
         },
         {
             "name": "archive-go-bin",
@@ -441,19 +443,13 @@ def testOcis(ctx):
                 "make ci-golangci-lint",
                 "mv checkstyle.xml cache/checkstyle/checkstyle.xml",
             ],
-            "environment": {
-                "HTTP_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-                "HTTPS_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-            },
+            "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
         },
         {
             "name": "test",
             "image": OC_CI_GOLANG,
+            "environment": DRONE_HTTP_PROXY_ENV,
             "commands": [
                 "mkdir -p cache/coverage",
                 "make test",
@@ -1263,6 +1259,7 @@ def dockerRelease(ctx, arch):
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C ocis release-linux-docker-%s" % (arch),
                 ],
@@ -1377,6 +1374,7 @@ def binaryRelease(ctx, name):
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C ocis release-%s" % (name),
                 ],
@@ -1384,6 +1382,7 @@ def binaryRelease(ctx, name):
             {
                 "name": "finish",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C ocis release-finish",
                     "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
@@ -1409,6 +1408,7 @@ def binaryRelease(ctx, name):
             {
                 "name": "changelog",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
                 ],
@@ -1507,6 +1507,7 @@ def licenseCheck(ctx):
             {
                 "name": "go-check-licenses",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make ci-go-check-licenses",
                 ],
@@ -1515,6 +1516,7 @@ def licenseCheck(ctx):
             {
                 "name": "go-save-licenses",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make ci-go-save-licenses",
                 ],
@@ -1541,6 +1543,7 @@ def licenseCheck(ctx):
             {
                 "name": "changelog",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
                 ],
@@ -1629,6 +1632,7 @@ def changelog():
             {
                 "name": "generate",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C ocis changelog",
                 ],
@@ -1731,19 +1735,13 @@ def docs():
             {
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
-                "environment": {
-                    "HTTP_PROXY": {
-                        "from_secret": "drone_http_proxy",
-                    },
-                    "HTTPS_PROXY": {
-                        "from_secret": "drone_http_proxy",
-                    },
-                },
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": ["make docs-generate"],
             },
             {
                 "name": "prepare",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C docs docs-copy",
                 ],
@@ -1751,6 +1749,7 @@ def docs():
             {
                 "name": "test",
                 "image": OC_CI_GOLANG,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C docs test",
                 ],
@@ -1827,14 +1826,7 @@ def makeGoGenerate(module):
             "commands": [
                 "retry -t 3 '%s ci-go-generate'" % (make),
             ],
-            "environment": {
-                "HTTP_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-                "HTTPS_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-            },
+            "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
         },
     ]
@@ -2031,14 +2023,7 @@ def build():
             "commands": [
                 "retry -t 3 'make -C ocis build'",
             ],
-            "environment": {
-                "HTTP_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-                "HTTPS_PROXY": {
-                    "from_secret": "drone_http_proxy",
-                },
-            },
+            "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
         },
     ]
