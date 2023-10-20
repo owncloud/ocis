@@ -58,6 +58,7 @@
 | OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).|
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
+| OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on all public shares.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE | string | sha1 | The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.|

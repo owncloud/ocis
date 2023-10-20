@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-20-14-18-35]
+[#deprecation-note-2023-10-20-15-57-32]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -553,6 +553,16 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 EXPERIMENTAL: enable the feature to deny access on folders.
+
+a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+`FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on all public shares.
 
 a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
 `FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +

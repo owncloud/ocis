@@ -106,6 +106,7 @@ ocs:
   stat_cache_ttl: 5m0s
   stat_cache_size: 0
   enable_denials: false
+  public_sharing_share_must_have_password: false
   public_sharing_writeableshare_must_have_password: false
 checksums:
   supported_types:
