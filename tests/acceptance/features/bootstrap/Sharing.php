@@ -806,6 +806,7 @@ trait Sharing {
 	 * @param string|int|string[]|int[]|null $permissions
 	 * @param string|null $linkName
 	 * @param string|null $expireDate
+	 * @param string|null $space_ref
 	 * @param string $sharingApp
 	 *
 	 * @return ResponseInterface
@@ -822,6 +823,7 @@ trait Sharing {
 		$permissions = null,
 		?string $linkName = null,
 		?string $expireDate = null,
+		?string $space_ref = null,
 		string $sharingApp = 'files_sharing'
 	): ResponseInterface {
 		$userActual = $this->getActualUsername($user);
@@ -842,6 +844,7 @@ trait Sharing {
 			$permissions,
 			$linkName,
 			$expireDate,
+			$space_ref,
 			$this->ocsApiVersion,
 			$this->sharingApiVersion,
 			$sharingApp

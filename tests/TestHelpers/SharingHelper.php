@@ -84,6 +84,7 @@ class SharingHelper {
 	 * @param string|null $expireDate An expire date for public link shares.
 	 *                                This argument expects a date string
 	 *                                in the format 'YYYY-MM-DD'.
+	 * @param string|null $space_ref
 	 * @param int $ocsApiVersion
 	 * @param int $sharingApiVersion
 	 * @param string $sharingApp
@@ -104,6 +105,7 @@ class SharingHelper {
 		$permissions = null,
 		?string  $linkName = null,
 		?string $expireDate = null,
+		?string $space_ref = null,
 		int $ocsApiVersion = 1,
 		int $sharingApiVersion = 1,
 		string $sharingApp = 'files_sharing'
@@ -156,6 +158,9 @@ class SharingHelper {
 		}
 		if ($expireDate !== null) {
 			$fd['expireDate'] = $expireDate;
+		}
+		if ($space_ref !== null) {
+			$fd['space_ref'] = $space_ref;
 		}
 		$headers = ['OCS-APIREQUEST' => 'true'];
 		return HttpRequestHelper::post(
