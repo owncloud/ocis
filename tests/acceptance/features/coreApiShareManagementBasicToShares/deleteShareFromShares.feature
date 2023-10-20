@@ -11,7 +11,7 @@ Feature: sharing
       | Brian    |
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
 
-
+  @issue-7555
   Scenario Outline: delete all group shares
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created

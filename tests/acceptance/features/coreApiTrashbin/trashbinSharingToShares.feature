@@ -7,7 +7,7 @@ Feature: using trashbin together with sharing
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "file to delete" to "/textfile0.txt"
 
-  @smokeTest
+  @smokeTest @issue-7555
   Scenario Outline: deleting a received folder doesn't move it to trashbin
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -27,7 +27,7 @@ Feature: using trashbin together with sharing
       | dav-path-version |
       | spaces           |
 
-
+  @issue-7555
   Scenario Outline: deleting a file in a received folder moves it to trashbin of both users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -150,7 +150,7 @@ Feature: using trashbin together with sharing
       | dav-path-version |
       | spaces           |
 
-
+  @issue-7555
   Scenario Outline: deleting a file in a received folder when restored it comes back to the original path
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

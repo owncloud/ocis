@@ -469,7 +469,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-2146 @issue-764
+  @issue-2146 @issue-764 @issue-7555
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
     Given these users have been created with default attributes and without skeleton files:
       | username |

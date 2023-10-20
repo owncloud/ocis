@@ -261,36 +261,36 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" should not be able to delete folder "/Shares/child1/child2"
 
 
-  # Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check reshare operation
-  #   Given group "grp1" has been created
-  #   And user "Carol" has been created with default attributes and without skeleton files
-  #   And user "Carol" has created the following folders
-  #     | path                  |
-  #     | /parent               |
-  #     | /parent/child1        |
-  #     | /parent/child1/child2 |
-  #   And user "Alice" has been added to group "grp1"
-  #   And user "Brian" has been added to group "grp1"
-  #   And user "Carol" has created a share with settings
-  #     | path        | /parent |
-  #     | shareType   | user    |
-  #     | shareWith   | Brian   |
-  #     | permissions | all     |
-  #   And user "Carol" has created a share with settings
-  #     | path        | /parent/child1 |
-  #     | shareType   | group          |
-  #     | shareWith   | grp1           |
-  #     | permissions | read           |
-  #   When user "Brian" creates a share using the sharing API with settings
-  #     | path        | /Shares/parent |
-  #     | shareType   | user           |
-  #     | shareWith   | Alice          |
-  #     | permissions | read           |
-  #   Then the HTTP status code should be "200"
-  #   And the OCS status code should be "100"
-  #   And as "Brian" folder "/Shares/child1" should exist
-  #   And as "Alice" folder "/Shares/child1" should exist
-  #   And as "Alice" folder "/Shares/parent" should exist
+  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check reshare operation
+    Given group "grp1" has been created
+    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has created the following folders
+      | path                  |
+      | /parent               |
+      | /parent/child1        |
+      | /parent/child1/child2 |
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Carol" has created a share with settings
+      | path        | /parent |
+      | shareType   | user    |
+      | shareWith   | Brian   |
+      | permissions | all     |
+    And user "Carol" has created a share with settings
+      | path        | /parent/child1 |
+      | shareType   | group          |
+      | shareWith   | grp1           |
+      | permissions | read           |
+    When user "Brian" creates a share using the sharing API with settings
+      | path        | /Shares/parent |
+      | shareType   | user           |
+      | shareWith   | Alice          |
+      | permissions | read           |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
+    And as "Brian" folder "/Shares/child1" should exist
+    And as "Alice" folder "/Shares/child1" should exist
+    And as "Alice" folder "/Shares/parent" should exist
 
 
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check create operation
@@ -458,8 +458,8 @@ Feature: share resources where the sharee receives the share in multiple ways
     And as "Brian" folder "Shares/sharedParent" should exist
     And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
 
-
-  Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions
+  @skip @issue-7555
+  Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions 
     Given using OCS API version "<ocs_api_version>"
     And group "grp" has been created
     And user "Brian" has been added to group "grp"

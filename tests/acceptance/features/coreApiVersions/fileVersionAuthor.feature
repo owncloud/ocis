@@ -144,7 +144,7 @@ Feature: file versions remember the author of each version
       | 1     | Brian  |
       | 2     | Alice  |
 
-
+  @issue-7555
   Scenario: enable file versioning and check the history of changes in sharer after renaming file by sharee
     Given group "grp1" has been created
     And user "Alice" has been added to group "grp1"
