@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
 * Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
 * Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
@@ -110,6 +111,13 @@ The following sections list the changes for unreleased.
    they are still used. Please use `starttls` instead for `tls` and `ssltls` instead of `ssl.
 
    https://github.com/owncloud/ocis/issues/7345
+
+* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
+
+   The token storage config in the config.json for web was missing when it was set to `false`.
+
+   https://github.com/owncloud/ocis/issues/7462
+   https://github.com/owncloud/ocis/pull/7528
 
 * Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
 
