@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
+* Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
 
 ## Details
@@ -359,6 +360,12 @@ The following sections list the changes for unreleased.
    fixed.
 
    https://github.com/owncloud/ocis/pull/7382
+
+* Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
+
+   Introduced new envvars to configure the storage registry in the gateway service
+
+   https://github.com/owncloud/ocis/pull/7554
 
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
 
