@@ -43,7 +43,8 @@ func DefaultConfig() *config.Config {
 			Type:             "basic",
 			CS3AllowInsecure: false,
 			Tika: config.ExtractorTika{
-				TikaURL: "http://127.0.0.1:9998",
+				TikaURL:        "http://127.0.0.1:9998",
+				CleanStopWords: true,
 			},
 		},
 		Events: config.Events{
