@@ -1,9 +1,9 @@
 ---
-title: Flow
+title: Authorization
 weight: 40
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis/identity-provider/oidc
-geekdocFilePath: flow.md
+geekdocEditPath: edit/master/docs/apis/http/
+geekdocFilePath: authorization.md
 ---
 
 In its default configuration, Infinite Scale supports three authentication methods as outlined on the [OIDC official site](https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3):
@@ -11,14 +11,15 @@ In its default configuration, Infinite Scale supports three authentication metho
 2. Implicit Flow
 3. Hybrid Flow
 
+For detailed information on Infinite Scale's support for OpenID Connect (OIDC), please consult the [OIDC section](../../ocis/identity-provider/oidc.md).
 To authenticate using OIDC, both `client_id` and `client_secret` are essential.
-Infinite Scale doesn't offer dynamic registration . We have to use one from the default owncloud client.
-By default, [owncloud clients](https://doc.owncloud.com/server/next/admin_manual/configuration/user/oidc/oidc.html#client-ids-secrets-and-redirect-uris) are:
+Infinite Scale doesn't offer dynamic registration. We have to use one from the default ownCloud client.
+By default, [ownCloud clients](https://doc.owncloud.com/server/next/admin_manual/configuration/user/oidc/oidc.html#client-ids-secrets-and-redirect-uris) are:
 - Desktop
 - Android
 - iOS
 
-While selecting owncloud client for authentication, take note of specific limitations such as `Redirect URI`
+While selecting ownCloud client for authentication, take note of specific limitations such as `Redirect URI`
 | Source | Redirect URI |
 |------|--------|
 |Android|oc://android.owncloud.com|
@@ -31,14 +32,14 @@ client_id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
 client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
 ```
 
-# Authorization Code Flow
+## Authorization Code Flow
 1. Requesting authorization
 
    To initiate the OIDC Code Flow, you can use tools like curl and a web browser.
    The user should be directed to a URL to authenticate and give their consent (bypassing consent is against the standard):
 
     ```plaintext
-    https://ocis.test:9200/signin/v1/identifier/_/authorize?client_id=client_id&scope=openid+profile+email+offline_access&response_type=code&redirect_uri=http://path-to-redirect-uri
+    https://ocis.test/signin/v1/identifier/_/authorize?client_id=client_id&scope=openid+profile+email+offline_access&response_type=code&redirect_uri=http://path-to-redirect-uri
     ```
 
     After a successful authentication, the browser will redirect to a URL that looks like this:
@@ -98,7 +99,7 @@ client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
     }
     ```
 
-# Implicit Code Flow
+## Implicit Code Flow
 When using the implicit flow, tokens are provided in a URI fragment of the redirect URL.
 Valid values for the `response_type` request parameter:
 - token
@@ -129,7 +130,7 @@ For the next step extract the access_token from the URL.
 access_token = 'eyJhbGciOiJQ...'
  ```
 
-# Hybrid Flow
+## Hybrid Flow
 The Hybrid Flow in OpenID Connect melds features from both the Implicit and Authorization Code flows. It allows clients to directly retrieve certain tokens from the Authorization Endpoint, yet also offers the option to acquire additional tokens from the Token Endpoint.
 
 The Authorization Server redirects back to the client with appropriate parameters in the response, based on the value of the response_type request parameter:

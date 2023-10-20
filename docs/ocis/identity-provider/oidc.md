@@ -3,8 +3,8 @@ title: "OIDC"
 date: 2023-10-10T00:00:00+00:00
 weight: 21
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis/identity-provider/oidc
-geekdocFilePath: _index.md
+geekdocEditPath: edit/master/docs/ocis/identity-provider
+geekdocFilePath: oidc.md
 geekdocCollapseSection: true
 ---
 
@@ -20,13 +20,13 @@ The field names and values are defined in the [OpenID Connect Discovery Specific
 Here is an example of data returned:
 ```json
 {
-  "issuer": "https://ocis.test:9200",
-  "authorization_endpoint": "https://ocis.test:9200/signin/v1/identifier/_/authorize",
-  "token_endpoint": "https://ocis.test:9200/konnect/v1/token",
-  "userinfo_endpoint": "https://ocis.test:9200/konnect/v1/userinfo",
-  "end_session_endpoint": "https://ocis.test:9200/signin/v1/identifier/_/endsession",
-  "check_session_iframe": "https://ocis.test:9200/konnect/v1/session/check-session.html",
-  "jwks_uri": "https://ocis.test:9200/konnect/v1/jwks.json",
+  "issuer": "https://ocis.test",
+  "authorization_endpoint": "https://ocis.test/signin/v1/identifier/_/authorize",
+  "token_endpoint": "https://ocis.test/konnect/v1/token",
+  "userinfo_endpoint": "https://ocis.test/konnect/v1/userinfo",
+  "end_session_endpoint": "https://ocis.test/signin/v1/identifier/_/endsession",
+  "check_session_iframe": "https://ocis.test/konnect/v1/session/check-session.html",
+  "jwks_uri": "https://ocis.test/konnect/v1/jwks.json",
   "scopes_supported": [
     "openid",
     "offline_access",
@@ -102,3 +102,5 @@ Here is an example of data returned:
   "request_uri_parameter_supported": false
 }
 ```
+
+Refer to the [Authorization](../../apis/http/authorization.md) section for example usages and details.
