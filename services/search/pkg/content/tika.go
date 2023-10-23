@@ -20,8 +20,8 @@ type Tika struct {
 	*Basic
 	Retriever
 	tika                       *tika.Client
-	contentExtractionSizeLimit uint64
-	cleanStopWords             bool
+	ContentExtractionSizeLimit uint64
+	CleanStopWords             bool
 }
 
 // NewTikaExtractor creates a new Tika instance.
@@ -42,8 +42,8 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		Basic:                      basic,
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
-		contentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
-		cleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
+		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
+		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 	}, nil
 }
 
@@ -58,7 +58,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, nil
 	}
 
-	if ri.Size > t.contentExtractionSizeLimit {
+	if ri.Size > t.ContentExtractionSizeLimit {
 		t.logger.Info().Interface("ResourceID", ri.Id).Str("Name", ri.Name).Msg("file exceeds content extraction size limit. skipping.")
 		return doc, nil
 	}
@@ -88,7 +88,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		}
 	}
 
-	if langCode, _ := t.tika.LanguageString(ctx, doc.Content); langCode != "" && t.cleanStopWords {
+	if langCode, _ := t.tika.LanguageString(ctx, doc.Content); langCode != "" && t.CleanStopWords {
 		doc.Content = CleanString(doc.Content, langCode)
 	}
 

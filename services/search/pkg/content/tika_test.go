@@ -11,11 +11,12 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	conf "github.com/owncloud/ocis/v2/services/search/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
-	"github.com/stretchr/testify/mock"
 )
 
 var _ = Describe("Tika", func() {
@@ -48,6 +49,7 @@ var _ = Describe("Tika", func() {
 
 			cfg := conf.DefaultConfig()
 			cfg.Extractor.Tika.TikaURL = srv.URL
+			cfg.Extractor.Tika.CleanStopWords = true
 
 			var err error
 			tika, err = content.NewTikaExtractor(nil, log.NewLogger(), cfg)
@@ -82,7 +84,7 @@ var _ = Describe("Tika", func() {
 		})
 
 		It("removes stop words", func() {
-			body = "body to test stop words!!! I, you, he, she, it, we, you, they, stay"
+			body = "body to test stop words!!! against almost everyone"
 			language = "en"
 
 			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
@@ -90,7 +92,20 @@ var _ = Describe("Tika", func() {
 				Size: 1,
 			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(doc.Content).To(Equal("body test stop words i stay "))
+			Expect(doc.Content).To(Equal("body test stop words!!!"))
+		})
+
+		It("keeps stop words", func() {
+			body = "body to test stop words!!! against almost everyone"
+			language = "en"
+
+			tika.CleanStopWords = false
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Content).To(Equal(body))
 		})
 	})
 })
