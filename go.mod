@@ -11,7 +11,7 @@ require (
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.10
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/coreos/go-oidc/v3 v3.6.0
+	github.com/coreos/go-oidc/v3 v3.7.0
 	github.com/cs3org/go-cs3apis v0.0.0-20230727093620-0f4399be4543
 	github.com/cs3org/reva/v2 v2.16.1-0.20231020092327-051345fa7b18
 	github.com/disintegration/imaging v1.6.2
