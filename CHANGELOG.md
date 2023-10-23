@@ -22,7 +22,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
-* Enhancement - Add "Last modified" filter Chip: [#7431](https://github.com/owncloud/ocis/issues/7431)
+* Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
@@ -165,11 +165,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7138
 
-* Enhancement - Add "Last modified" filter Chip: [#7431](https://github.com/owncloud/ocis/issues/7431)
+* Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 
    Add "Last modified" filter Chip
 
    https://github.com/owncloud/ocis/issues/7431
+   https://github.com/owncloud/ocis/issues/7551
    https://github.com/owncloud/ocis/pull/7455
 
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
@@ -204,6 +205,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7217
    https://github.com/owncloud/ocis/pull/7410
    https://github.com/owncloud/ocis/pull/7476
+   https://github.com/owncloud/ocis/pull/7551
 
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 
