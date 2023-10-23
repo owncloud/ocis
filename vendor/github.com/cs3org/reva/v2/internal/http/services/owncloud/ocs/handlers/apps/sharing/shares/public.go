@@ -19,11 +19,13 @@
 package shares
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	permissionsv1beta1 "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
@@ -360,7 +362,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 			return
 		}
 
-		if !sRes.Info.PermissionSet.UpdateGrant {
+		if sRes.Info == nil || !sRes.Info.GetPermissionSet().UpdateGrant {
 			response.WriteOCSError(w, r, response.MetaUnauthorized.StatusCode, "missing permissions to update share", err)
 			return
 		}
@@ -469,9 +471,15 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	newPassword, ok := r.Form["password"]
 	// enforcePassword
 	if h.enforcePassword(permKey) {
-		if !ok && !share.PasswordProtected || ok && len(newPassword[0]) == 0 {
-			response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing required password", err)
+		p, err := conversions.NewPermissions(decreasePermissionsIfNecessary(*permKey))
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check permissions from request", err)
 			return
+		}
+		if !ok && !share.PasswordProtected || ok && len(newPassword[0]) == 0 {
+			if h.checkPasswordEnforcement(ctx, user, p, w, r) != nil {
+				return
+			}
 		}
 	}
 
@@ -685,6 +693,41 @@ func permKeyFromRequest(r *http.Request, h *Handler) (*int, error) {
 	}
 
 	return &permKey, nil
+}
+
+// checkPasswordEnforcement checks if the password needs to be set for a link
+// some users can opt out of the enforcement based on a user permission
+func (h *Handler) checkPasswordEnforcement(ctx context.Context, user *userv1beta1.User, perm conversions.Permissions, w http.ResponseWriter, r *http.Request) error {
+	// Non-read-only links
+	if perm != conversions.PermissionRead {
+		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing required password", nil)
+		return errors.New("missing required password")
+	}
+	// Check if the user is allowed to opt out of the password enforcement
+	// for read-only links
+	gwC, err := h.getClient()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not check permission", err)
+		return errors.New("could not check permission")
+	}
+	resp, err := gwC.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
+		SubjectRef: &permissionsv1beta1.SubjectReference{
+			Spec: &permissionsv1beta1.SubjectReference_UserId{
+				UserId: user.Id,
+			},
+		},
+		Permission: "ReadOnlyPublicLinkPassword.Delete",
+	})
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check user permission", err)
+		return errors.New("failed to check user permission")
+	}
+
+	if resp.Status.Code != rpc.Code_CODE_OK {
+		response.WriteOCSError(w, r, response.MetaForbidden.StatusCode, "user is not allowed to delete the password from the public link", nil)
+		return errors.New("user is not allowed to delete the password from the public link")
+	}
+	return nil
 }
 
 // TODO: add mapping for user share permissions to role
