@@ -28,7 +28,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-1289
+  @issue-1289 @issue-7555
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
