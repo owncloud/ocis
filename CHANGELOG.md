@@ -26,7 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
-* Enhancement - Bump Reva: [#7526](https://github.com/owncloud/ocis/pull/7526)
+* Enhancement - Bump Reva: [#7540](https://github.com/owncloud/ocis/pull/7540)
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
@@ -39,6 +39,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+* Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 * Enhancement - Add config to enforce passwords on readable links: [#7547](https://github.com/owncloud/ocis/pull/7547)
@@ -195,10 +196,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7097
 
-* Enhancement - Bump Reva: [#7526](https://github.com/owncloud/ocis/pull/7526)
+* Enhancement - Bump Reva: [#7540](https://github.com/owncloud/ocis/pull/7540)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/7540
    https://github.com/owncloud/ocis/pull/7526
    https://github.com/owncloud/ocis/pull/7138
    https://github.com/owncloud/ocis/pull/6427
@@ -350,6 +352,15 @@ The following sections list the changes for unreleased.
    replacement for it is `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`.
 
    https://github.com/owncloud/ocis/issues/7176
+
+* Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
+
+   Users with this new permission can now delete passwords on read-only public links. The
+   permission is added to the default roles "Admin" and "Space Admin".
+
+   https://github.com/owncloud/ocis/issues/7538
+   https://github.com/owncloud/ocis/pull/7538
+   https://github.com/cs3org/reva/pull/4270
 
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 
