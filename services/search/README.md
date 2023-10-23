@@ -70,6 +70,9 @@ When the search service can reach Tika, it begins to read out the content on dem
 
 Content extraction and handling the extracted content can be very resource intensive. Content extraction is therefore limited to files with a certain file size. The default limit is 20MB and can be configured using the `SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` variable.
 
+When extracting the content you can specify whether filler words are ignored or not.
+To keep them, the environment variable `SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS` must be set to false.
+
 When using the Tika container and docker-compose, consider the following:
 
 *   See the [ocis_wopi](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi) example.

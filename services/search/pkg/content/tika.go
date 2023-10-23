@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bbalet/stopwords"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/go-tika/tika"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
@@ -20,7 +20,8 @@ type Tika struct {
 	*Basic
 	Retriever
 	tika                       *tika.Client
-	contentExtractionSizeLimit uint64
+	ContentExtractionSizeLimit uint64
+	CleanStopWords             bool
 }
 
 // NewTikaExtractor creates a new Tika instance.
@@ -41,7 +42,8 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		Basic:                      basic,
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
-		contentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
+		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
+		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 	}, nil
 }
 
@@ -56,7 +58,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, nil
 	}
 
-	if ri.Size > t.contentExtractionSizeLimit {
+	if ri.Size > t.ContentExtractionSizeLimit {
 		t.logger.Info().Interface("ResourceID", ri.Id).Str("Name", ri.Name).Msg("file exceeds content extraction size limit. skipping.")
 		return doc, nil
 	}
@@ -86,8 +88,8 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		}
 	}
 
-	if lang, _ := t.tika.LanguageString(ctx, doc.Content); lang != "" {
-		doc.Content = stopwords.CleanString(doc.Content, lang, true)
+	if langCode, _ := t.tika.LanguageString(ctx, doc.Content); langCode != "" && t.CleanStopWords {
+		doc.Content = CleanString(doc.Content, langCode)
 	}
 
 	return doc, nil
