@@ -119,6 +119,11 @@ const (
 	WritePublicLinkPermissionID string = "11516bbd-7157-49e1-b6ac-d00c820f980b"
 	// WritePublicLinkPermissionName is the hardcoded setting name for the PublicLink.Write permission
 	WritePublicLinkPermissionName string = "PublicLink.Write"
+
+	// DeleteReadOnlyPublicLinkPasswordID is the hardcoded setting UUID for the ReadOnlyPublicLinkPassword.Delete permission
+	DeleteReadOnlyPublicLinkPasswordID string = "e9a697c5-c67b-40fc-982b-bcf628e9916d"
+	// DeleteReadOnlyPublicLinkPasswordName is the hardcoded setting name for the ReadOnlyPublicLinkPassword.Delete permission
+	DeleteReadOnlyPublicLinkPasswordName string = "ReadOnlyPublicLinkPassword.Delete"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -373,6 +378,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
+				Id:          DeleteReadOnlyPublicLinkPasswordID,
+				Name:        DeleteReadOnlyPublicLinkPasswordName,
+				DisplayName: "Delete Read-Only Public link password",
+				Description: "This permission permits to opt out of a public link password enforcement.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SHARE,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_WRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
 				Id:          ManageSpacePropertiesPermissionID,
 				Name:        ManageSpacePropertiesPermissionName,
 				DisplayName: "Manage space properties",
@@ -588,6 +608,21 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Name:        WritePublicLinkPermissionName,
 				DisplayName: "Write publiclink",
 				Description: "This permission permits to write a public link.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SHARE,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_WRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          DeleteReadOnlyPublicLinkPasswordID,
+				Name:        DeleteReadOnlyPublicLinkPasswordName,
+				DisplayName: "Delete Read-Only Public link password",
+				Description: "This permission permits to opt out of a public link password enforcement.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SHARE,
 				},
