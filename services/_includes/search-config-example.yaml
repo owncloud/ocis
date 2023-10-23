@@ -45,6 +45,7 @@ extractor:
   cs3_allow_insecure: false
   tika:
     tika_url: http://127.0.0.1:9998
+    clean_stop_words: true
 content_extraction_size_limit: 20971520
 service_account:
   service_account_id: ""

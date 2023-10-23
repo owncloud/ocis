@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-23-08-23-37]
+[#deprecation-note-2023-10-23-11-42-20]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -311,6 +311,15 @@ a| [subs=-attributes]
 ++http://127.0.0.1:9998 ++
 a| [subs=-attributes]
 URL of the tika server.
+
+a|`SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Defines if stop words should be cleaned or not. See the documentation for more details.
 
 a|`SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` +
 

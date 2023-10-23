@@ -1,6 +1,6 @@
 ---
 title: Search
-date: 2023-10-23T08:23:40.67194088Z
+date: 2023-10-23T11:42:23.05503537Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/search
@@ -111,6 +111,9 @@ As soon as Tika is installed and accessible, the search service must be configur
 When the search service can reach Tika, it begins to read out the content on demand. Note that files must be downloaded during the process, which can lead to delays with larger documents.
 
 Content extraction and handling the extracted content can be very resource intensive. Content extraction is therefore limited to files with a certain file size. The default limit is 20MB and can be configured using the `SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` variable.
+
+When extracting the content you can specify whether filler words are ignored or not.
+To keep them, the environment variable `SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS` must be set to false.
 
 When using the Tika container and docker-compose, consider the following:
 
