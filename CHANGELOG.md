@@ -34,6 +34,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
+* Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
@@ -254,6 +255,21 @@ The following sections list the changes for unreleased.
    default was to not use authentication at all.
 
    https://github.com/owncloud/ocis/issues/7356
+
+* Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
+
+   So far it has not been possible to determine whether the content for search should be cleaned up
+   of 'stop words' or not. Stop words are filling words like "I, you, have, am" etc and defined by the
+   search engine.
+
+   The behaviour can now be set with the newly introduced settings option
+   `SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS=false` which is enabled by default.
+
+   In addition, the stop word cleanup is no longer as aggressive and now ignores numbers, urls,
+   basically everything except the defined stop words.
+
+   https://github.com/owncloud/ocis/issues/6674
+   https://github.com/owncloud/ocis/pull/7553
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
