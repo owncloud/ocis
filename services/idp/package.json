@@ -142,7 +142,7 @@
     "postcss-loader": "4.3.0",
     "postcss-normalize": "10.0.1",
     "postcss-preset-env": "9.1.2",
-    "postcss-safe-parser": "6.0.0",
+    "postcss-safe-parser": "7.0.0",
     "react-dev-utils": "^12.0.1",
     "resolve": "1.22.4",
     "resolve-url-loader": "^5.0.0",
