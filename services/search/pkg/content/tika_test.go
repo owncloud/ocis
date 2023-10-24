@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	conf "github.com/owncloud/ocis/v2/services/search/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -115,23 +116,27 @@ var _ = Describe("Tika", func() {
 				Size: 1,
 			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(doc.Audio).ToNot(BeNil())
-			Expect(*doc.Audio.Album).To(Equal("Some Album"))
-			Expect(*doc.Audio.AlbumArtist).To(Equal("Some AlbumArtist"))
-			Expect(*doc.Audio.Artist).To(Equal("Some Artist"))
-			// Expect(*doc.Audio.Bitrate).To(Equal())
-			// Expect(*doc.Audio.Composers).To(Equal())
-			// Expect(*doc.Audio.Copyright).To(Equal())
-			Expect(*doc.Audio.Disc).To(Equal(int32(4)))
-			// Expect(*doc.Audio.DiscCount).To(Equal())
-			Expect(*doc.Audio.Duration).To(Equal(int64(225000)))
-			Expect(*doc.Audio.Genre).To(Equal("Some Genre"))
-			// Expect(*doc.Audio.HasDrm).To(Equal())
-			// Expect(*doc.Audio.IsVariableBitrate).To(Equal())
-			Expect(*doc.Audio.Title).To(Equal("Some Title"))
-			Expect(*doc.Audio.Track).To(Equal(int32(7)))
-			// Expect(*doc.Audio.TrackCount).To(Equal())
-			Expect(*doc.Audio.Year).To(Equal(int32(2004)))
+
+			audio := doc.Audio
+			Expect(audio).ToNot(BeNil())
+
+			Expect(audio.Album).To(Equal(libregraph.PtrString("Some Album")))
+			Expect(audio.AlbumArtist).To(Equal(libregraph.PtrString("Some AlbumArtist")))
+			Expect(audio.Artist).To(Equal(libregraph.PtrString("Some Artist")))
+			// Expect(audio.Bitrate).To(Equal(libregraph.PtrInt64(192)))
+			// Expect(audio.Composers).To(Equal(libregraph.PtrString("Some Composers")))
+			// Expect(audio.Copyright).To(Equal(libregraph.PtrString("Some Copyright")))
+			Expect(audio.Disc).To(Equal(libregraph.PtrInt32(4)))
+			// Expect(audio.DiscCount).To(Equal(libregraph.PtrInt32(5)))
+			Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225000)))
+			Expect(audio.Genre).To(Equal(libregraph.PtrString("Some Genre")))
+			// Expect(audio.HasDrm).To(Equal(libregraph.PtrBool(false)))
+			// Expect(audio.IsVariableBitrate).To(Equal(libregraph.PtrBool(true)))
+			Expect(audio.Title).To(Equal(libregraph.PtrString("Some Title")))
+			Expect(audio.Track).To(Equal(libregraph.PtrInt32(7)))
+			// Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(9)))
+			Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
+
 		})
 
 		It("removes stop words", func() {
