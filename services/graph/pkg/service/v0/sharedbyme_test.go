@@ -120,6 +120,7 @@ var _ = Describe("sharedbyme", func() {
 
 		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
+
 		gatewayClient.On("Stat",
 			mock.Anything,
 			mock.MatchedBy(
@@ -153,6 +154,52 @@ var _ = Describe("sharedbyme", func() {
 					Id: userShare.ResourceId,
 				},
 			}, nil)
+
+		gatewayClient.On("GetUser",
+			mock.Anything,
+			mock.MatchedBy(func(req *userpb.GetUserRequest) bool {
+				return req.UserId.OpaqueId == "user-id"
+			})).
+			Return(&userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id: &userpb.UserId{
+						Idp:      "idp",
+						OpaqueId: "user-id",
+					},
+					DisplayName: "User Name",
+				},
+			}, nil)
+		gatewayClient.On("GetUser",
+			mock.Anything,
+			mock.Anything).
+			Return(&userpb.GetUserResponse{
+				Status: status.NewNotFound(ctx, "mock user not found"),
+				User:   nil,
+			}, nil)
+		gatewayClient.On("GetGroup",
+			mock.Anything,
+			mock.MatchedBy(func(req *grouppb.GetGroupRequest) bool {
+				return req.GroupId.OpaqueId == "group-id"
+			})).
+			Return(&grouppb.GetGroupResponse{
+				Status: status.NewOK(ctx),
+				Group: &grouppb.Group{
+					Id: &grouppb.GroupId{
+						Idp:      "idp",
+						OpaqueId: "group-id",
+					},
+					DisplayName: "Group Name",
+				},
+			}, nil)
+		gatewayClient.On("GetGroup",
+			mock.Anything,
+			mock.Anything).
+			Return(&grouppb.GetGroupResponse{
+				Status: status.NewNotFound(ctx, "mock group not found"),
+				Group:  nil,
+			}, nil)
+
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
