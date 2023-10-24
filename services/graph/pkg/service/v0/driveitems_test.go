@@ -240,38 +240,113 @@ var _ = Describe("Driveitems", func() {
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
 
-		It("succeeds", func() {
-			mtime := time.Now()
-			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
-				Status: status.NewOK(ctx),
-				Infos: []*provider.ResourceInfo{
-					{
-						Type:  provider.ResourceType_RESOURCE_TYPE_FILE,
-						Id:    &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
-						Etag:  "etag",
-						Mtime: utils.TimeToTS(mtime),
+		Context("it succeeds", func() {
+			var (
+				r     *http.Request
+				mtime = time.Now()
+			)
+
+			BeforeEach(func() {
+				r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/storageid$spaceid/items/storageid$spaceid!nodeid/children", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("driveID", "storageid$spaceid")
+				rctx.URLParams.Add("driveItemID", "storageid$spaceid!nodeid")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			})
+
+			assertItemsList := func(length int) itemsList {
+				svc.GetDriveItemChildren(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				res := itemsList{}
+
+				err = json.Unmarshal(data, &res)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(res.Value)).To(Equal(1))
+				Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
+				Expect(res.Value[0].GetETag()).To(Equal("etag"))
+				Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+				Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+
+				return res
+			}
+
+			It("returns a generic file", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:              provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:                &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:              "etag",
+							Mtime:             utils.TimeToTS(mtime),
+							ArbitraryMetadata: nil,
+						},
 					},
-				},
-			}, nil)
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/storageid$spaceid/items/storageid$spaceid!nodeid/children", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "storageid$spaceid")
-			rctx.URLParams.Add("driveItemID", "storageid$spaceid!nodeid")
-			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetDriveItemChildren(rr, r)
-			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := io.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
+				}, nil)
 
-			res := itemsList{}
+				res := assertItemsList(1)
+				Expect(res.Value[0].Audio).To(BeNil())
+			})
 
-			err = json.Unmarshal(data, &res)
-			Expect(err).ToNot(HaveOccurred())
+			It("returns the audio facet if metadata is available", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "audio/mpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.audio.album":             "Some Album",
+									"libre.graph.audio.albumArtist":       "Some AlbumArtist",
+									"libre.graph.audio.artist":            "Some Artist",
+									"libre.graph.audio.bitrate":           "192",
+									"libre.graph.audio.composers":         "Some Composers",
+									"libre.graph.audio.copyright":         "Some Copyright",
+									"libre.graph.audio.disc":              "2",
+									"libre.graph.audio.discCount":         "5",
+									"libre.graph.audio.duration":          "225000",
+									"libre.graph.audio.genre":             "Some Genre",
+									"libre.graph.audio.hasDrm":            "false",
+									"libre.graph.audio.isVariableBitrate": "true",
+									"libre.graph.audio.title":             "Some Title",
+									"libre.graph.audio.track":             "6",
+									"libre.graph.audio.trackCount":        "9",
+									"libre.graph.audio.year":              "1994",
+								},
+							},
+						},
+					},
+				}, nil)
 
-			Expect(len(res.Value)).To(Equal(1))
-			Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
-			Expect(res.Value[0].GetETag()).To(Equal("etag"))
-			Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+				res := assertItemsList(1)
+				audio := res.Value[0].Audio
+
+				Expect(audio).ToNot(BeNil())
+				Expect(audio.GetAlbum()).To(Equal("Some Album"))
+				Expect(audio.GetAlbumArtist()).To(Equal("Some AlbumArtist"))
+				Expect(audio.GetArtist()).To(Equal("Some Artist"))
+				Expect(audio.GetBitrate()).To(Equal(int64(192)))
+				Expect(audio.GetComposers()).To(Equal("Some Composers"))
+				Expect(audio.GetCopyright()).To(Equal("Some Copyright"))
+				Expect(audio.GetDisc()).To(Equal(int32(2)))
+				Expect(audio.GetDiscCount()).To(Equal(int32(5)))
+				Expect(audio.GetDuration()).To(Equal(int64(225000)))
+				Expect(audio.GetGenre()).To(Equal("Some Genre"))
+				Expect(audio.GetHasDrm()).To(Equal(false))
+				Expect(audio.GetIsVariableBitrate()).To(Equal(true))
+				Expect(audio.GetTitle()).To(Equal("Some Title"))
+				Expect(audio.GetTrack()).To(Equal(int32(6)))
+				Expect(audio.GetTrackCount()).To(Equal(int32(9)))
+				Expect(audio.GetYear()).To(Equal(int32(1994)))
+			})
 		})
 	})
 })
