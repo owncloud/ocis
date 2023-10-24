@@ -36,6 +36,7 @@ The following sections list the changes for unreleased.
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
@@ -285,6 +286,13 @@ The following sections list the changes for unreleased.
   * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
+
+* Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
+
+   Implement libre graph sharing roles
+
+   https://github.com/owncloud/ocis/issues/7418
+   https://github.com/owncloud/ocis/pull/7524
 
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 
