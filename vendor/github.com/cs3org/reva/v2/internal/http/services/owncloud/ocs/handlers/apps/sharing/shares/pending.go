@@ -122,9 +122,20 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 			// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
 		}
 	}
+	// we need to add a path to the share
+	receivedShare := &collaboration.ReceivedShare{
+		Share: &collaboration.Share{
+			Id: &collaboration.ShareId{OpaqueId: shareID},
+		},
+		State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
+		MountPoint: &provider.Reference{
+			Path: mount,
+		},
+	}
+	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "hidden", "mount_point"}}
 
 	for id := range sharesToAccept {
-		data := h.updateReceivedShare(w, r, id, false, mount)
+		data := h.updateReceivedShare(w, r, receivedShare, updateMask)
 		// only render the data for the changed share
 		if id == shareID && data != nil {
 			response.WriteOCSSuccess(w, r, []*conversions.ShareData{data})
@@ -135,15 +146,61 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 // RejectReceivedShare handles DELETE Requests on /apps/files_sharing/api/v1/shares/{shareid}
 func (h *Handler) RejectReceivedShare(w http.ResponseWriter, r *http.Request) {
 	shareID := chi.URLParam(r, "shareid")
-	data := h.updateReceivedShare(w, r, shareID, true, "")
+	// we need to add a path to the share
+	receivedShare := &collaboration.ReceivedShare{
+		Share: &collaboration.Share{
+			Id: &collaboration.ShareId{OpaqueId: shareID},
+		},
+		State: collaboration.ShareState_SHARE_STATE_REJECTED,
+	}
+	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "hidden"}}
+
+	data := h.updateReceivedShare(w, r, receivedShare, updateMask)
 	if data != nil {
 		response.WriteOCSSuccess(w, r, []*conversions.ShareData{data})
 	}
 }
 
-func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, shareID string, rejectShare bool, mountPoint string) *conversions.ShareData {
+func (h *Handler) UpdateReceivedShare(w http.ResponseWriter, r *http.Request) {
+	shareID := chi.URLParam(r, "shareid")
+	hideFlag, _ := strconv.ParseBool(r.URL.Query().Get("hidden"))
+
+	// unfortunately we need to get the share first to read the state
+	client, err := h.getClient()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		return
+	}
+
+	// we need to add a path to the share
+	receivedShare := &collaboration.ReceivedShare{
+		Share: &collaboration.Share{
+			Id: &collaboration.ShareId{OpaqueId: shareID},
+		},
+		Hidden: hideFlag,
+	}
+	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "hidden"}}
+
+	rs, _ := getReceivedShareFromID(r.Context(), client, shareID)
+	if rs != nil && rs.Share != nil {
+		receivedShare.State = rs.Share.State
+	}
+
+	data := h.updateReceivedShare(w, r, receivedShare, updateMask)
+	if data != nil {
+		response.WriteOCSSuccess(w, r, []*conversions.ShareData{data})
+	}
+	// TODO: do we need error handling here?
+}
+
+func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, receivedShare *collaboration.ReceivedShare, fieldMask *fieldmaskpb.FieldMask) *conversions.ShareData {
 	ctx := r.Context()
 	logger := appctx.GetLogger(ctx)
+
+	updateShareRequest := &collaboration.UpdateReceivedShareRequest{
+		Share:      receivedShare,
+		UpdateMask: fieldMask,
+	}
 
 	client, err := h.getClient()
 	if err != nil {
@@ -151,29 +208,7 @@ func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, sh
 		return nil
 	}
 
-	hideFlag, _ := strconv.ParseBool(r.URL.Query().Get("hide"))
-
-	// we need to add a path to the share
-	shareRequest := &collaboration.UpdateReceivedShareRequest{
-		Share: &collaboration.ReceivedShare{
-			Share: &collaboration.Share{
-				Id:   &collaboration.ShareId{OpaqueId: shareID},
-				Hide: hideFlag,
-			},
-			MountPoint: &provider.Reference{
-				Path: mountPoint,
-			},
-		},
-		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state", "hide"}},
-	}
-	if rejectShare {
-		shareRequest.Share.State = collaboration.ShareState_SHARE_STATE_REJECTED
-	} else {
-		shareRequest.UpdateMask.Paths = append(shareRequest.UpdateMask.Paths, "mount_point")
-		shareRequest.Share.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
-	}
-
-	shareRes, err := client.UpdateReceivedShare(ctx, shareRequest)
+	shareRes, err := client.UpdateReceivedShare(ctx, updateShareRequest)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc update received share request failed", err)
 		return nil
@@ -203,6 +238,7 @@ func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, sh
 	}
 
 	data.State = mapState(rs.GetState())
+	data.Hidden = rs.Hidden
 
 	h.addFileInfo(ctx, data, info)
 	h.mapUserIds(r.Context(), client, data)
