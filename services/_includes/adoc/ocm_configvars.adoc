@@ -6,7 +6,7 @@ ifeval::[{show-deprecation} == true]
 
 [#deprecation-note-2023-10-24-12-14-10]
 [caption=]
-.Deprecation notes for the userlog service
+.Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Deprecation Info
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 endif::[]
 
 [caption=]
-.Environment variables for the userlog service
+.Environment variables for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -27,7 +27,7 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`USERLOG_TRACING_ENABLED` +
+`OCM_TRACING_ENABLED` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -37,7 +37,7 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`USERLOG_TRACING_TYPE` +
+`OCM_TRACING_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -47,7 +47,7 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`USERLOG_TRACING_ENDPOINT` +
+`OCM_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -57,7 +57,7 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`USERLOG_TRACING_COLLECTOR` +
+`OCM_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`USERLOG_LOG_LEVEL` +
+`OCM_LOG_LEVEL` +
 
 a| [subs=-attributes]
 ++string ++
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`USERLOG_LOG_PRETTY` +
+`OCM_LOG_PRETTY` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -87,7 +87,7 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`USERLOG_LOG_COLOR` +
+`OCM_LOG_COLOR` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`USERLOG_LOG_FILE` +
+`OCM_LOG_FILE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -106,16 +106,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`USERLOG_DEBUG_ADDR` +
+a|`OCM_DEBUG_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9210 ++
+++127.0.0.1:9281 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`USERLOG_DEBUG_TOKEN` +
+a|`OCM_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
 ++string ++
@@ -124,7 +124,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`USERLOG_DEBUG_PPROF` +
+a|`OCM_DEBUG_PPROF` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`USERLOG_DEBUG_ZPAGES` +
+a|`OCM_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -142,26 +142,35 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 
-a|`USERLOG_HTTP_ADDR` +
+a|`OCM_HTTP_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:0 ++
+++127.0.0.1:9280 ++
 a| [subs=-attributes]
 The bind address of the HTTP service.
 
-a|`USERLOG_HTTP_ROOT` +
+a|`OCM_HTTP_PROTOCOL` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++/ ++
+++tcp ++
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+The transport protocol of the HTTP service.
+
+a|`OCM_HTTP_PREFIX` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The Path prefix where the OCM can be accessed (defaults to /).
 
 a|`OCIS_CORS_ALLOW_ORIGINS` +
-`USERLOG_CORS_ALLOW_ORIGINS` +
+`OCM_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
 ++[]string ++
@@ -171,27 +180,27 @@ a| [subs=-attributes]
 A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
 
 a|`OCIS_CORS_ALLOW_METHODS` +
-`USERLOG_CORS_ALLOW_METHODS` +
+`OCM_CORS_ALLOW_METHODS` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[GET] ++
+++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
 
 a|`OCIS_CORS_ALLOW_HEADERS` +
-`USERLOG_CORS_ALLOW_HEADERS` +
+`OCM_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 a| [subs=-attributes]
 A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
 
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
-`USERLOG_CORS_ALLOW_CREDENTIALS` +
+`OCM_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -200,42 +209,23 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
-a|`OCIS_HTTP_TLS_ENABLED` +
+a|`OCM_GRPC_ADDR` +
 
 a| [subs=-attributes]
-++bool ++
+++string ++
 a| [subs=-attributes]
-++false ++
+++127.0.0.1:9282 ++
 a| [subs=-attributes]
-Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+The bind address of the GRPC service.
 
-a|`OCIS_HTTP_TLS_CERTIFICATE` +
+a|`OCM_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Path/File name of the TLS server certificate (in PEM format) for the http services.
-
-a|`OCIS_HTTP_TLS_KEY` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
-
-a|`OCIS_JWT_SECRET` +
-`USERLOG_JWT_SECRET` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The transport protocol of the GRPC service.
 
 a|`OCIS_REVA_GATEWAY` +
 
@@ -244,171 +234,150 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
-a|`OCIS_TRANSLATION_PATH` +
-`USERLOG_TRANSLATION_PATH` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
-
-a|`OCIS_DEFAULT_LANGUAGE` +
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
 
-a|`OCIS_EVENTS_ENDPOINT` +
-`USERLOG_EVENTS_ENDPOINT` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++127.0.0.1:9233 ++
-a| [subs=-attributes]
-The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
-
-a|`OCIS_EVENTS_CLUSTER` +
-`USERLOG_EVENTS_CLUSTER` +
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ocis-cluster ++
+++ ++
 a| [subs=-attributes]
-The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 
-a|`OCIS_INSECURE` +
-`USERLOG_EVENTS_TLS_INSECURE` +
+a|`OCM_OCMD_PREFIX` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocm ++
+a| [subs=-attributes]
+URL path prefix for the OCMD service. Note that the string must not start with '/'.
+
+a|`OCM_OCMD_EXPOSE_RECIPIENT_DISPLAY_NAME` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Expose the display name of OCM share recipients.
 
-a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
-`USERLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+a|`OCM_SCIENCEMESH_PREFIX` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++sciencemesh ++
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+URL path prefix for the ScienceMesh service. Note that the string must not start with '/'.
 
-a|`OCIS_EVENTS_ENABLE_TLS` +
-`USERLOG_EVENTS_ENABLE_TLS` +
+a|`SHARING_OCM_INVITE_MANAGER_DRIVER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++json ++
+a| [subs=-attributes]
+Driver to be used to persist ocm invites. Supported values 'json'.
+
+a|`SHARING_OCM_INVITE_MANAGER_JSON_FILE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/ocminvites.json ++
+a| [subs=-attributes]
+Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+
+a|`SHARING_OCM_INVITE_MANAGER_INSECURE` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Disable TLS certificate validation for the OCM connections. Do not set this in production environments.
 
-a|`OCIS_PERSISTENT_STORE` +
-`USERLOG_STORE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++memory ++
-a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
-
-a|`OCIS_PERSISTENT_STORE_NODES` +
-`USERLOG_STORE_NODES` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[] ++
-a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
-
-a|`USERLOG_STORE_DATABASE` +
+a|`SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++userlog ++
+++json ++
 a| [subs=-attributes]
-The database name the configured store should use.
+Driver to be used to persist ocm invites. Supported values 'json'.
 
-a|`USERLOG_STORE_TABLE` +
+a|`SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++events ++
+++~/.ocis/storage/ocmproviders.json ++
 a| [subs=-attributes]
-The database table the store should use.
+Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
-a|`OCIS_PERSISTENT_STORE_TTL` +
-`USERLOG_STORE_TTL` +
-
-a| [subs=-attributes]
-++Duration ++
-a| [subs=-attributes]
-++336h0m0s ++
-a| [subs=-attributes]
-Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
-
-a|`OCIS_PERSISTENT_STORE_SIZE` +
-`USERLOG_STORE_SIZE` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
-
-a|`OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE` +
+a|`SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.
 
-a|`USERLOG_GLOBAL_NOTIFICATIONS_SECRET` +
 
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.
-
-a|`OCIS_SERVICE_ACCOUNT_ID` +
-`USERLOG_SERVICE_ACCOUNT_ID` +
+a|`SHARING_OCM_SHARE_PROVIDER_DRIVER` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++json ++
 a| [subs=-attributes]
-The ID of the service account the service should use. See the 'auth-service' service description for more details.
+Driver to be used for the ocm share provider. Supported values 'json'.
 
-a|`OCIS_SERVICE_ACCOUNT_SECRET` +
-`USERLOG_SERVICE_ACCOUNT_SECRET` +
+a|`SHARING_OCM_SHAREPROVIDER_JSON_FILE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++~/.ocis/storage/ocmshares.json ++
 a| [subs=-attributes]
-The service account secret.
+Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+
+a|`SHARING_OCM_SHARE_PROVIDER_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable TLS certificate validation for the OCM connections. Do not set this in production environments.
+
+a|`SHARING_OCM_CORE_DRIVER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++json ++
+a| [subs=-attributes]
+Driver to be used for the ocm core. Supported values 'json'.
+
+a|`SHARING_OCM_CORE_JSON_FILE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/ocmshares.json ++
+a| [subs=-attributes]
+Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 |===
 

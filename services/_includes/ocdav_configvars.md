@@ -29,6 +29,7 @@
 | OCDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_FILES_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_SHARES_NAMESPACE | string | /Shares | The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.|
+| OCDAV_OCM_NAMESPACE | string | /public | The human readable path prefix for the ocm shares.|
 | OCIS_URL<br/>OCDAV_PUBLIC_URL | string | https://localhost:9200 | URL where oCIS is reachable for users.|
 | OCIS_INSECURE<br/>OCDAV_INSECURE | bool | false | Allow insecure connections to the GATEWAY service.|
 | OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the GATEWAY service.|

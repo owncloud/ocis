@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-10-24-09-50-48]
+[#deprecation-note-2023-10-24-12-14-10]
 [caption=]
 .Deprecation notes for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -281,6 +281,15 @@ a| [subs=-attributes]
 ++/Shares ++
 a| [subs=-attributes]
 The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.
+
+a|`OCDAV_OCM_NAMESPACE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/public ++
+a| [subs=-attributes]
+The human readable path prefix for the ocm shares.
 
 a|`OCIS_URL` +
 `OCDAV_PUBLIC_URL` +

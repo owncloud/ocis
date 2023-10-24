@@ -62,6 +62,10 @@ policies:
     endpoint: /ocs/v[12].php/config
     service: com.owncloud.web.frontend
     unprotected: true
+  - endpoint: /sciencemesh/
+    service: com.owncloud.web.ocm
+  - endpoint: /ocm/
+    service: com.owncloud.web.ocm
   - endpoint: /ocs/
     service: com.owncloud.web.frontend
   - type: query
