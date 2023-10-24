@@ -33,6 +33,8 @@ type Config struct {
 	Keycloak       Keycloak       `yaml:"keycloak"`
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
+	FilesSharing FilesSharing `yaml:"files_sharing"`
+
 	Context context.Context `yaml:"-"`
 }
 
@@ -142,4 +144,9 @@ type Keycloak struct {
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
+}
+
+// FilesSharing is the configuration for the files sharing
+type FilesSharing struct {
+	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing."`
 }

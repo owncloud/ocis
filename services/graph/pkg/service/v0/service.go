@@ -310,6 +310,10 @@ func NewService(opts ...Option) (Graph, error) {
 					})
 				})
 			})
+			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
+				r.Get("/", svc.GetRoleDefinitions)
+				r.Get("/{roleID}", svc.GetRoleDefinition)
+			})
 		})
 	})
 
