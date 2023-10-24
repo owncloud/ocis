@@ -133,3 +133,5 @@ keycloak:
 service_account:
   service_account_id: ""
   service_account_secret: ""
+files_sharing:
+  enable_resharing: true
