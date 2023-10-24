@@ -43,6 +43,7 @@ type Config struct {
 	StorageUsersEndpoint      string `yaml:"-"`
 	StorageSharesEndpoint     string `yaml:"-"`
 	AppRegistryEndpoint       string `yaml:"-"`
+	OCMEndpoint               string `yaml:"-"`
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 

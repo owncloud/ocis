@@ -403,7 +403,7 @@ func (m *mgr) UpdateShare(ctx context.Context, ref *collaboration.ShareReference
 				m.model.Shares[idx].Permissions = updated.Permissions
 			case "expiration":
 				m.model.Shares[idx].Expiration = updated.Expiration
-			case "hide":
+			case "hidden":
 				continue
 			default:
 				return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")

@@ -1,13 +1,15 @@
 package defaults
 
 import (
+	"path/filepath"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 )
 
-// FullDefaultConfig returns a fully initialized default configuration
+// FullDefaultConfig returns the full default config
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 	EnsureDefaults(cfg)
@@ -15,17 +17,17 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
-// DefaultConfig returns a basic default configuration
+// DefaultConfig return the default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9163",
+			Addr:   "127.0.0.1:9281",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTPConfig{
-			Addr:      "127.0.0.1:0", // :0 to pick any free local port
+			Addr:      "127.0.0.1:9280",
 			Namespace: "com.owncloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",
@@ -74,30 +76,56 @@ func DefaultConfig() *config.Config {
 				AllowCredentials: true,
 			},
 		},
-		Service: config.Service{
-			Name: "ocdav",
+		GRPC: config.GRPCConfig{
+			Addr:      "127.0.0.1:9282",
+			Namespace: "com.owncloud.api",
 		},
-		Reva:              shared.DefaultRevaConfig(),
-		WebdavNamespace:   "/users/{{.Id.OpaqueId}}",
-		FilesNamespace:    "/users/{{.Id.OpaqueId}}",
-		SharesNamespace:   "/Shares",
-		OCMNamespace:      "/public",
-		PublicURL:         "https://localhost:9200",
-		Insecure:          false,
-		Timeout:           84300,
-		MachineAuthAPIKey: "",
-		Status: config.Status{
-			Version:        version.Legacy,
-			VersionString:  version.LegacyString,
-			ProductVersion: version.GetString(),
-			Product:        "Infinite Scale",
-			ProductName:    "Infinite Scale",
-			Edition:        "Community",
+		Reva: shared.DefaultRevaConfig(),
+		Service: config.Service{
+			Name: "ocm",
+		},
+		ScienceMesh: config.ScienceMesh{
+			Prefix: "sciencemesh",
+		},
+		OCMD: config.OCMD{
+			Prefix: "ocm",
+		},
+		OCMInviteManager: config.OCMInviteManager{
+			Driver: "json",
+			Drivers: config.OCMInviteManagerDrivers{
+				JSON: config.OCMInviteManagerJSONDriver{
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocminvites.json"),
+				},
+			},
+			Insecure: false,
+		},
+		OCMProviderAuthorizerDriver: "json",
+		OCMProviderAuthorizerDrivers: config.OCMProviderAuthorizerDrivers{
+			JSON: config.OCMProviderAuthorizerJSONDriver{
+				Providers: filepath.Join(defaults.BaseDataPath(), "storage", "ocmproviders.json"),
+			},
+		},
+		OCMShareProvider: config.OCMShareProvider{
+			Driver: "json",
+			Drivers: config.OCMShareProviderDrivers{
+				JSON: config.OCMShareProviderJSONDriver{
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocmshares.json"),
+				},
+			},
+			Insecure: false,
+		},
+		OCMCore: config.OCMCore{
+			Driver: "json",
+			Drivers: config.OCMCoreDrivers{
+				JSON: config.OCMCoreJSONDriver{
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocmshares.json"),
+				},
+			},
 		},
 	}
 }
 
-// EnsureDefaults adds default values to the configuration if they are not set yet
+// EnsureDefaults ensures the config contains default values
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
@@ -110,7 +138,7 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
 	}
-	// provide with defaults for shared tracing, since we need a valid destination address for "envdecode".
+
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
 		cfg.Tracing = &config.Tracing{
 			Enabled:   cfg.Commons.Tracing.Enabled,
@@ -126,20 +154,16 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
-	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
-		cfg.TokenManager = &config.TokenManager{
-			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
-		}
-	} else if cfg.TokenManager == nil {
-		cfg.TokenManager = &config.TokenManager{}
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 
-	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
+		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
 }
 
-// Sanitize sanitizes the configuration
+// Sanitize sanitizes the config
 func Sanitize(cfg *config.Config) {
 	// nothing to sanitize here atm
 }

@@ -22,6 +22,7 @@ import (
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
+	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 	policies "github.com/owncloud/ocis/v2/services/policies/pkg/config"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
@@ -71,7 +72,7 @@ type Config struct {
 
 	Registry          string               `yaml:"registry"`
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`
-	MachineAuthAPIKey string               `yaml:"machine_auth_api_key"env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
+	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 	TransferSecret    string               `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests."`
 	SystemUserID      string               `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserAPIKey  string               `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
@@ -98,6 +99,7 @@ type Config struct {
 	Nats              *nats.Config           `yaml:"nats"`
 	Notifications     *notifications.Config  `yaml:"notifications"`
 	OCDav             *ocdav.Config          `yaml:"ocdav"`
+	OCM               *ocm.Config            `yaml:"ocm"`
 	OCS               *ocs.Config            `yaml:"ocs"`
 	Postprocessing    *postprocessing.Config `yaml:"postprocessing"`
 	Policies          *policies.Config       `yaml:"policies"`

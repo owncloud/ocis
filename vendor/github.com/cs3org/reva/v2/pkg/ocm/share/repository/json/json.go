@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -69,6 +70,9 @@ func New(m map[string]interface{}) (share.Repository, error) {
 func loadOrCreate(file string) (*shareModel, error) {
 	_, err := os.Stat(file)
 	if os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(file), 0700); err != nil {
+			return nil, errors.Wrap(err, "error creating the base directory: "+filepath.Dir(file))
+		}
 		if err := os.WriteFile(file, []byte("{}"), 0700); err != nil {
 			return nil, errors.Wrap(err, "error creating the file: "+file)
 		}

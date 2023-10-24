@@ -105,7 +105,6 @@ type UserSharingJSONCS3Driver struct {
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_JSONCS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 	CacheTTL         int    `yaml:"cache_ttl" env:"SHARING_USER_JSONCS3_CACHE_TTL" desc:"TTL for the internal caches in seconds."`
 }
-
 type PublicSharingDrivers struct {
 	JSON    PublicSharingJSONDriver    `yaml:"json"`
 	JSONCS3 PublicSharingJSONCS3Driver `yaml:"jsoncs3"`

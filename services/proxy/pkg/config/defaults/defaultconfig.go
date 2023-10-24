@@ -144,6 +144,14 @@ func DefaultPolicies() []config.Policy {
 					Unprotected: true,
 				},
 				{
+					Endpoint: "/sciencemesh/",
+					Service:  "com.owncloud.web.ocm",
+				},
+				{
+					Endpoint: "/ocm/",
+					Service:  "com.owncloud.web.ocm",
+				},
+				{
 					Endpoint: "/ocs/",
 					Service:  "com.owncloud.web.frontend",
 				},

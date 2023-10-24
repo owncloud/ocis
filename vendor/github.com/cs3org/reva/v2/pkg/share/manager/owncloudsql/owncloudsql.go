@@ -454,7 +454,7 @@ func (m *mgr) UpdateReceivedShare(ctx context.Context, receivedShare *collaborat
 			fields = append(fields, "file_target=?")
 			rs.MountPoint = receivedShare.MountPoint
 			params = append(params, rs.MountPoint.Path)
-		case "hide":
+		case "hidden":
 			continue
 		default:
 			return nil, errtypes.NotSupported("updating " + fieldMask.Paths[i] + " is not supported")
