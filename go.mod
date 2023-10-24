@@ -12,8 +12,8 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.10
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.7.0
-	github.com/cs3org/go-cs3apis v0.0.0-20230727093620-0f4399be4543
-	github.com/cs3org/reva/v2 v2.16.1-0.20231023124625-f9a66375fd79
+	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
+	github.com/cs3org/reva/v2 v2.16.1-0.20231024092538-194fbe4a2c31
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
