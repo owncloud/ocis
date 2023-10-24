@@ -15,7 +15,6 @@ type Visitor interface {
 // v.Visit(expr) is not nil, Walk is invoked recursively with visitor
 // w for each of the non-nil children of Expression, followed by a call of
 // w.Visit(nil).
-//
 func Walk(v Visitor, expr Expression) {
 	if v = v.Visit(expr); v == nil {
 		return

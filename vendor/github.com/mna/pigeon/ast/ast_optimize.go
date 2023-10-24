@@ -34,7 +34,7 @@ func newGrammarOptimizer(protectedRules []string) *grammarOptimizer {
 
 // Visit is a generic Visitor to be used with Walk
 // The actual function, which should be used during Walk
-// is held in ruleRefOptimizer.visitor
+// is held in ruleRefOptimizer.visitor.
 func (r *grammarOptimizer) Visit(expr Expression) Visitor {
 	return r.visitor(expr)
 }
@@ -265,7 +265,7 @@ func (r *grammarOptimizer) optimizeRule(expr Expression) Expression {
 
 // cloneExpr takes an Expression and deep clones it (including all children)
 // This is necessary because referenced Rules are denormalized and therefore
-// have to become independent from their original Expression
+// have to become independent from their original Expression.
 func cloneExpr(expr Expression) Expression {
 	switch expr := expr.(type) {
 	case *ActionExpr:
@@ -359,7 +359,7 @@ func cloneExpr(expr Expression) Expression {
 // The purpose of this function is to cleanup the redundancies created by the
 // optimize Visitor. This includes to remove redundant entries in Chars, Ranges
 // and UnicodeClasses of the given CharClassMatcher as well as regenerating the
-// correct content for the Val field (string representation of the CharClassMatcher)
+// correct content for the Val field (string representation of the CharClassMatcher).
 func (r *grammarOptimizer) cleanupCharClassMatcher(expr0 Expression) Visitor {
 	// We are only interested in nodes of type *CharClassMatcher
 	if chr, ok := expr0.(*CharClassMatcher); ok {
@@ -441,14 +441,14 @@ func escapeRune(r rune) string {
 
 // Optimize walks a given grammar and optimizes the grammar in regards
 // of parsing performance. This is done with several optimizations:
-// * removal of unreferenced rules
-// * replace rule references with a copy of the referenced Rule, if the
-// 	 referenced rule it self has no references.
-// * resolve nested choice expressions
-// * resolve choice expressions with only one alternative
-// * resolve nested sequences expression
-// * resolve sequence expressions with only one element
-// * combine character class matcher and literal matcher, where possible
+//   - removal of unreferenced rules
+//   - replace rule references with a copy of the referenced Rule, if the
+//     referenced rule it self has no references.
+//   - resolve nested choice expressions
+//   - resolve choice expressions with only one alternative
+//   - resolve nested sequences expression
+//   - resolve sequence expressions with only one element
+//   - combine character class matcher and literal matcher, where possible
 func Optimize(g *Grammar, alternateEntrypoints ...string) {
 	entrypoints := alternateEntrypoints
 	if len(g.Rules) > 0 {

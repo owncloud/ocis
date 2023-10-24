@@ -22,7 +22,7 @@ For a new feature, it must be thoroughly tested. New code without new test(s) is
 
 Respect the coding style of the repository, which means essentially to respect the [coding guidelines of the Go community][2]. Use `gofmt` to format your code, and `goimports` to add and format the list of imported packages (or do it manually, but in a `goimports`-style).
 
-Once all code is done and tests pass, regenerate the whole tree with `make`, run `make lint` to make sure the code is correct, and run tests again. You are now ready to submit the pull request.
+Once all code is done and tests pass, regenerate the whole tree with `make`, run `make lint` (does need [`golangci-lint`](https://golangci-lint.run/))to make sure the code is correct, and run tests again. You are now ready to submit the pull request.
 
 ## Licensing
 
