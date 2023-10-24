@@ -20,12 +20,12 @@ The following sections list the changes for unreleased.
 * Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
 * Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
 * Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
+* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
-* Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Enhancement - Bump Reva: [#7540](https://github.com/owncloud/ocis/pull/7540)
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
@@ -153,6 +153,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7460
 
+* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
+
+   Automatically accepts shares. This feature is active by default and can be deactivated via the
+   environment variable `FRONTEND_AUTO_ACCEPT_SHARES`.
+
+   https://github.com/owncloud/ocis/pull/7097
+
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 
    We changed the default TUS chunk size from 100MB to 10MB. You can still use the old value by
@@ -189,12 +196,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7285
    https://github.com/owncloud/ocis/pull/7194
    https://github.com/cs3org/reva/pull/4147
-
-* Enhancement - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
-
-   Automatically accept shares when configured by the user or admin
-
-   https://github.com/owncloud/ocis/pull/7097
 
 * Enhancement - Bump Reva: [#7540](https://github.com/owncloud/ocis/pull/7540)
 
