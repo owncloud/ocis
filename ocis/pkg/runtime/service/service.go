@@ -273,11 +273,6 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Webfinger.Commons = cfg.Commons
 		return webfinger.Execute(cfg.Webfinger)
 	})
-	reg(opts.Config.OCM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.OCM.Context = ctx
-		cfg.OCM.Commons = cfg.Commons
-		return ocm.Execute(cfg.OCM)
-	})
 
 	// populate optional services
 	areg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
@@ -322,6 +317,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.SSE.Context = ctx
 		cfg.SSE.Commons = cfg.Commons
 		return sse.Execute(cfg.SSE)
+	})
+	dreg(opts.Config.OCM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.OCM.Context = ctx
+		cfg.OCM.Commons = cfg.Commons
+		return ocm.Execute(cfg.OCM)
 	})
 
 	return s, nil
