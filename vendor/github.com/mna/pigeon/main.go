@@ -43,7 +43,7 @@ func main() {
 		dbgFlag                = fs.Bool("debug", false, "set debug mode")
 		shortHelpFlag          = fs.Bool("h", false, "show help page")
 		longHelpFlag           = fs.Bool("help", false, "show help page")
-		nolint                 = fs.Bool("nolint", false, "add '// nolint: ...' comments to suppress warnings by gometalinter")
+		nolint                 = fs.Bool("nolint", false, "add '// nolint: ...' comments to suppress warnings by gometalinter or golangci-lint")
 		noRecoverFlag          = fs.Bool("no-recover", false, "do not recover from panic")
 		outputFlag             = fs.String("o", "", "output file, defaults to stdout")
 		optimizeBasicLatinFlag = fs.Bool("optimize-basic-latin", false, "generate optimized parser for Unicode Basic Latin character sets")
@@ -51,6 +51,7 @@ func main() {
 		optimizeParserFlag     = fs.Bool("optimize-parser", false, "generate optimized parser without Debug and Memoize options")
 		recvrNmFlag            = fs.String("receiver-name", "c", "receiver name for the generated methods")
 		noBuildFlag            = fs.Bool("x", false, "do not build, only parse")
+		supportLeftRecursion   = fs.Bool("support-left-recursion", false, "add support left recursion (EXPERIMENTAL FEATURE)")
 
 		altEntrypointsFlag ruleNamesFlag
 	)
@@ -136,7 +137,10 @@ func main() {
 		optimizeParser := builder.Optimize(*optimizeParserFlag)
 		basicLatinOptimize := builder.BasicLatinLookupTable(*optimizeBasicLatinFlag)
 		nolintOpt := builder.Nolint(*nolint)
-		if err := builder.BuildParser(outBuf, grammar, curNmOpt, optimizeParser, basicLatinOptimize, nolintOpt); err != nil {
+		leftRecursionSupporter := builder.SupportLeftRecursion(*supportLeftRecursion)
+		if err := builder.BuildParser(
+			outBuf, grammar, curNmOpt, optimizeParser, basicLatinOptimize,
+			nolintOpt, leftRecursionSupporter); err != nil {
 			fmt.Fprintln(os.Stderr, "build error: ", err)
 			exit(5)
 		}
@@ -185,7 +189,8 @@ the generated code is written to this file instead.
 		display this help message.
 	-nolint
 		add '// nolint: ...' comments for generated parser to suppress
-		warnings by gometalinter (https://github.com/alecthomas/gometalinter).
+		warnings by gometalinter (https://github.com/alecthomas/gometalinter) or
+		golangci-lint (https://golangci-lint.run/).
 	-no-recover
 		do not recover from a panic. Useful to access the panic stack
 		when debugging, otherwise the panic is converted to an error.
@@ -207,6 +212,8 @@ the generated code is written to this file instead.
 		comma-separated list of rule names that may be used as alternate
 		entrypoints for the parser, in addition to the first rule in the
 		grammar.
+	-support-left-recursion
+		add support left recursion (EXPERIMENTAL FEATURE)
 
 See https://godoc.org/github.com/mna/pigeon for more information.
 `
@@ -218,7 +225,7 @@ func usage() {
 
 // argError prints an error message to stderr, prints the command usage
 // and exits with the specified exit code.
-func argError(exitCode int, msg string, args ...interface{}) {
+func argError(exitCode int, msg string, args ...any) {
 	fmt.Fprintf(os.Stderr, msg, args...)
 	fmt.Fprintln(os.Stderr)
 	usage()
@@ -271,18 +278,18 @@ func (c *current) astPos() ast.Pos {
 	return ast.Pos{Line: c.pos.line, Col: c.pos.col, Off: c.pos.offset}
 }
 
-// toIfaceSlice is a helper function for the PEG grammar parser. It converts
+// toAnySlice is a helper function for the PEG grammar parser. It converts
 // v to a slice of empty interfaces.
-func toIfaceSlice(v interface{}) []interface{} {
+func toAnySlice(v any) []any {
 	if v == nil {
 		return nil
 	}
-	return v.([]interface{})
+	return v.([]any)
 }
 
 // validateUnicodeEscape checks that the provided escape sequence is a
 // valid Unicode escape sequence.
-func validateUnicodeEscape(escape, errMsg string) (interface{}, error) {
+func validateUnicodeEscape(escape, errMsg string) (any, error) {
 	r, _, _, err := strconv.UnquoteChar("\\"+escape, '"')
 	if err != nil {
 		return nil, errors.New(errMsg)

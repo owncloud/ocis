@@ -36,7 +36,8 @@ The following options can be specified:
 	-debug : boolean, print debugging info to stdout (default: false).
 
 	-nolint: add '// nolint: ...' comments for generated parser to suppress
-	warnings by gometalinter (https://github.com/alecthomas/gometalinter).
+	warnings by gometalinter (https://github.com/alecthomas/gometalinter) or
+	golangci-lint (https://golangci-lint.run/).
 
 	-no-recover : boolean, if set, do not recover from a panic. Useful
 	to access the panic stack when debugging, otherwise the panic
@@ -88,6 +89,12 @@ The following options can be specified:
 	Entrypoint option that specifies the alternate rule name to use. This is only
 	necessary if the -optimize-parser flag is set, as some rules may be optimized
 	out of the resulting parser.
+
+	-support-left-recursion : boolean, (EXPERIMENTAL FEATURE) if set, add support
+	for left recursion rules, including those with indirect recursion
+	(default: false).
+	E.g.:
+		expr = expr '*' term / expr '+' term
 
 If the code blocks in the grammar (see below, section "Code block") are golint-
 and go vet-compliant, then the resulting generated code will also be golint-
@@ -171,7 +178,7 @@ on the following:
 
 For terminals (character and string literals, character classes and
 the any matcher), the value is []byte. E.g.:
-    Rule = label:'a' { // label is []byte }
+	Rule = label:'a' { // label is []byte }
 
 For predicates (& and !), the value is always nil. E.g.:
 	Rule = label:&'a' { // label is nil }
@@ -179,12 +186,12 @@ For predicates (& and !), the value is always nil. E.g.:
 For a sequence, the value is a slice of empty interfaces, one for each
 expression value in the sequence. The underlying types of each value
 in the slice follow the same rules described here, recursively. E.g.:
-	Rule = label:('a' 'b') { // label is []interface{} }
+	Rule = label:('a' 'b') { // label is []any }
 
 For a repetition (+ and *), the value is a slice of empty interfaces, one for
 each repetition. The underlying types of each value in the slice follow
 the same rules described here, recursively. E.g.:
-	Rule = label:[a-z]+ { // label is []interface{} }
+	Rule = label:[a-z]+ { // label is []any }
 
 For a choice expression, the value is that of the matching choice. E.g.:
 	Rule = label:('a' / 'b') { // label is []byte }
@@ -293,8 +300,8 @@ clause). E.g.:
 Action code blocks are code blocks declared after an expression in a rule.
 Those code blocks are turned into a method on the "*current" type in the
 generated source code. The method receives any labeled expression's value
-as argument (as interface{}) and must return two values, the first being
-the value of the expression (an interface{}), and the second an error.
+as argument (as any) and must return two values, the first being
+the value of the expression (an any), and the second an error.
 If a non-nil error is returned, it is added to the list of errors that the
 parser will return. E.g.:
 	RuleA = "A"+ {
@@ -306,7 +313,7 @@ parser will return. E.g.:
 Predicate code blocks are code blocks declared immediately after the and "&"
 or the not "!" operators. Like action code blocks, predicate code blocks
 are turned into a method on the "*current" type in the generated source code.
-The method receives any labeled expression's value as argument (as interface{})
+The method receives any labeled expression's value as argument (as any)
 and must return two opt, the first being a bool and the second an error.
 If a non-nil error is returned, it is added to the list of errors that the
 parser will return. E.g.:
@@ -320,18 +327,18 @@ modify values in the global "state" store (see below).
 State change code blocks are turned into a method on the "*current" type
 in the generated source code.
 The method is passed any labeled expression's value as an argument (of type
-interface{}) and must return a value of type error.
+any) and must return a value of type error.
 If a non-nil error is returned, it is added to the list of errors that the
 parser will return, note that the parser does NOT backtrack if a non-nil
 error is returned.
 E.g:
-    Rule = [a] #{
-        c.state["a"]++
-        if c.state["a"] > 5 {
-            return fmt.Errorf("we have seen more than 5 a's") // parser will not backtrack
-        }
-        return nil
-    }
+	Rule = [a] #{
+		c.state["a"]++
+		if c.state["a"] > 5 {
+			return fmt.Errorf("we have seen more than 5 a's") // parser will not backtrack
+		}
+		return nil
+	}
 The "*current" type is a struct that provides four useful fields that can be
 accessed in action, state change, and predicate code blocks: "pos", "text",
 "state" and "globalStore".
@@ -345,7 +352,7 @@ The "text" field is the slice of bytes of the current match. It is empty
 in a predicate code block.
 
 The "state" field is a global store, with backtrack support, of type
-"map[string]interface{}". The values in the store are tied to the parser's
+"map[string]any". The values in the store are tied to the parser's
 backtracking, in particular if a rule fails to match then all updates to the
 state that occurred in the process of matching the rule are rolled back. For a
 key-value store that is not tied to the parser's backtracking, see the
@@ -369,7 +376,7 @@ IMPORTANT:
 	  copy functionality may be used in the "Clone" method
 	  (e.g. https://github.com/mitchellh/copystructure).
 
-The "globalStore" field is a global store of type "map[string]interface{}",
+The "globalStore" field is a global store of type "map[string]any",
 which allows to store arbitrary values, which are available in action and
 predicate code blocks for read as well as write access.
 It is important to notice, that the global store is completely independent from
@@ -381,6 +388,23 @@ Be aware, that all keys starting with "_pigeon" are reserved for internal use
 of pigeon and should not be used nor modified. Those keys are treated as
 internal implementation details and therefore there are no guarantees given in
 regards of API stability.
+
+Left recursion
+
+With options -support-left-recursion pigeon supports left recursion. E.g.:
+	expr = expr '*' term
+Supports indirect recursion:
+	A = B / D
+	B = A / C
+The implementation is based on the [Left-recursive PEG Grammars][9] article that
+links to [Left Recursion in Parsing Expression Grammars][10] and
+[Packrat Parsers Can Support Left Recursion][11] papers.
+
+References:
+
+	[9]: https://medium.com/@gvanrossum_83706/left-recursive-peg-grammars-65dab3c580e1
+	[10]: https://arxiv.org/pdf/1207.0443.pdf
+	[11]: http://web.cs.ucla.edu/~todd/research/pepm08.pdf
 
 Failure labels, throw and recover
 
@@ -430,13 +454,13 @@ Using the generated parser
 
 The parser generated by pigeon exports a few symbols so that it can be used
 as a package with public functions to parse input text. The exported API is:
-	- Parse(string, []byte, ...Option) (interface{}, error)
-	- ParseFile(string, ...Option) (interface{}, error)
-	- ParseReader(string, io.Reader, ...Option) (interface{}, error)
+	- Parse(string, []byte, ...Option) (any, error)
+	- ParseFile(string, ...Option) (any, error)
+	- ParseReader(string, io.Reader, ...Option) (any, error)
 	- AllowInvalidUTF8(bool) Option
 	- Debug(bool) Option
 	- Entrypoint(string) Option
-	- GlobalStore(string, interface{}) Option
+	- GlobalStore(string, any) Option
 	- MaxExpressions(uint64) Option
 	- Memoize(bool) Option
 	- Recover(bool) Option
@@ -549,32 +573,32 @@ as the Go 1 compatibility [5]. The following lists what part of the
 current pigeon code falls under that guarantee (features may be added in
 the future):
 
-    - The pigeon command-line flags and arguments: those will not be removed
-    and will maintain the same semantics.
+	- The pigeon command-line flags and arguments: those will not be removed
+	and will maintain the same semantics.
 
-    - The explicitly exported API generated by pigeon. See [6] for the
-    documentation of this API on a generated parser.
+	- The explicitly exported API generated by pigeon. See [6] for the
+	documentation of this API on a generated parser.
 
-    - The PEG syntax, as documented above.
+	- The PEG syntax, as documented above.
 
-    - The code blocks (except the initializer) will always be generated as
-    methods on the *current type, and this type is guaranteed to have
-    the fields pos (type position) and text (type []byte). There are no
-    guarantees on other fields and methods of this type.
+	- The code blocks (except the initializer) will always be generated as
+	methods on the *current type, and this type is guaranteed to have
+	the fields pos (type position) and text (type []byte). There are no
+	guarantees on other fields and methods of this type.
 
-    - The position type will always have the fields line, col and offset,
-    all defined as int. There are no guarantees on other fields and methods
-    of this type.
+	- The position type will always have the fields line, col and offset,
+	all defined as int. There are no guarantees on other fields and methods
+	of this type.
 
-    - The type of the error value returned by the Parse* functions, when
-    not nil, will always be errList defined as a []error. There are no
-    guarantees on methods of this type, other than the fact it implements the
-    error interface.
+	- The type of the error value returned by the Parse* functions, when
+	not nil, will always be errList defined as a []error. There are no
+	guarantees on methods of this type, other than the fact it implements the
+	error interface.
 
-    - Individual errors in the errList will always be of type *parserError,
-    and this type is guaranteed to have an Inner field that contains the
-    original error value. There are no guarantees on other fields and methods
-    of this type.
+	- Individual errors in the errList will always be of type *parserError,
+	and this type is guaranteed to have an Inner field that contains the
+	original error value. There are no guarantees on other fields and methods
+	of this type.
 
 The above guarantee is given to the version 1.0 (https://github.com/mna/pigeon/releases/tag/v1.0.0)
 of pigeon, which has entered maintenance mode (bug fixes only). The current
@@ -587,8 +611,8 @@ may occur at any time.
 
 References:
 
-    [5]: https://golang.org/doc/go1compat
-    [6]: http://godoc.org/github.com/mna/pigeon/test/predicates
+	[5]: https://golang.org/doc/go1compat
+	[6]: http://godoc.org/github.com/mna/pigeon/test/predicates
 
 */
 package main

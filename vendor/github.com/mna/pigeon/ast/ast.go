@@ -35,6 +35,8 @@ type Grammar struct {
 	Rules []*Rule
 }
 
+var _ Expression = (*Grammar)(nil)
+
 // NewGrammar creates a new grammar at the specified position.
 func NewGrammar(p Pos) *Grammar {
 	return &Grammar{p: p}
@@ -56,6 +58,21 @@ func (g *Grammar) String() string {
 	return buf.String()
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (g *Grammar) NullableVisit(rules map[string]*Rule) bool {
+	panic("NullableVisit should not be called on the Grammar")
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (g *Grammar) IsNullable() bool {
+	panic("IsNullable should not be called on the Grammar")
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (g *Grammar) InitialNames() map[string]struct{} {
+	panic("InitialNames should not be called on the Grammar")
+}
+
 // Rule represents a rule in the PEG grammar. It has a name, an optional
 // display name to be used in error messages, and an expression.
 type Rule struct {
@@ -63,7 +80,15 @@ type Rule struct {
 	Name        *Identifier
 	DisplayName *StringLit
 	Expr        Expression
+
+	// Fields below to work with left recursion.
+	Visited       bool
+	Nullable      bool
+	LeftRecursive bool
+	Leader        bool
 }
+
+var _ Expression = (*Rule)(nil)
 
 // NewRule creates a rule with at the specified position and with the
 // specified name as identifier.
@@ -80,9 +105,36 @@ func (r *Rule) String() string {
 		r.p, r, r.Name, r.DisplayName, r.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (r *Rule) NullableVisit(rules map[string]*Rule) bool {
+	if r.Visited {
+		// A left-recursive rule is considered non-nullable.
+		return false
+	}
+	r.Visited = true
+	r.Nullable = r.Expr.NullableVisit(rules)
+	r.Visited = false
+	return r.Nullable
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (r *Rule) IsNullable() bool {
+	return r.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (r *Rule) InitialNames() map[string]struct{} {
+	return r.Expr.InitialNames()
+}
+
 // Expression is the interface implemented by all expression types.
 type Expression interface {
 	Pos() Pos
+
+	// for work with left recursion
+	NullableVisit(rules map[string]*Rule) bool
+	IsNullable() bool
+	InitialNames() map[string]struct{}
 }
 
 // ChoiceExpr is an ordered sequence of expressions. The parser tries to
@@ -91,7 +143,11 @@ type Expression interface {
 type ChoiceExpr struct {
 	p            Pos
 	Alternatives []Expression
+
+	Nullable bool
 }
+
+var _ Expression = (*ChoiceExpr)(nil)
 
 // NewChoiceExpr creates a choice expression at the specified position.
 func NewChoiceExpr(p Pos) *ChoiceExpr {
@@ -113,7 +169,35 @@ func (c *ChoiceExpr) String() string {
 	return buf.String()
 }
 
-// FailureLabel is an identifier, which can by thrown and recovered in a grammar
+// NullableVisit recursively determines whether an object is nullable.
+func (c *ChoiceExpr) NullableVisit(rules map[string]*Rule) bool {
+	for _, alt := range c.Alternatives {
+		if alt.NullableVisit(rules) {
+			c.Nullable = true
+			return true
+		}
+	}
+	c.Nullable = false
+	return false
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (c *ChoiceExpr) IsNullable() bool {
+	return c.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (c *ChoiceExpr) InitialNames() map[string]struct{} {
+	names := make(map[string]struct{})
+	for _, alt := range c.Alternatives {
+		for name := range alt.InitialNames() {
+			names[name] = struct{}{}
+		}
+	}
+	return names
+}
+
+// FailureLabel is an identifier, which can by thrown and recovered in a grammar.
 type FailureLabel string
 
 // RecoveryExpr is an ordered sequence of expressions. The parser tries to
@@ -124,7 +208,11 @@ type RecoveryExpr struct {
 	Expr        Expression
 	RecoverExpr Expression
 	Labels      []FailureLabel
+
+	Nullable bool
 }
+
+var _ Expression = (*RecoveryExpr)(nil)
 
 // NewRecoveryExpr creates a choice expression at the specified position.
 func NewRecoveryExpr(p Pos) *RecoveryExpr {
@@ -139,12 +227,35 @@ func (r *RecoveryExpr) String() string {
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("%s: %T{Expr: %v, RecoverExpr: %v", r.p, r, r.Expr, r.RecoverExpr))
-	buf.WriteString(fmt.Sprintf(", Labels: [\n"))
+	buf.WriteString(", Labels: [\n")
 	for _, e := range r.Labels {
 		buf.WriteString(fmt.Sprintf("%s,\n", e))
 	}
 	buf.WriteString("]}")
 	return buf.String()
+}
+
+// NullableVisit recursively determines whether an object is nullable.
+func (r *RecoveryExpr) NullableVisit(rules map[string]*Rule) bool {
+	r.Nullable = r.Expr.NullableVisit(rules) || r.RecoverExpr.NullableVisit(rules)
+	return r.Nullable
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (r *RecoveryExpr) IsNullable() bool {
+	return r.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (r *RecoveryExpr) InitialNames() map[string]struct{} {
+	names := make(map[string]struct{})
+	for name := range r.Expr.InitialNames() {
+		names[name] = struct{}{}
+	}
+	for name := range r.RecoverExpr.InitialNames() {
+		names[name] = struct{}{}
+	}
+	return names
 }
 
 // ActionExpr is an expression that has an associated block of code to
@@ -154,7 +265,11 @@ type ActionExpr struct {
 	Expr   Expression
 	Code   *CodeBlock
 	FuncIx int
+
+	Nullable bool
 }
+
+var _ Expression = (*ActionExpr)(nil)
 
 // NewActionExpr creates a new action expression at the specified position.
 func NewActionExpr(p Pos) *ActionExpr {
@@ -169,12 +284,34 @@ func (a *ActionExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v, Code: %v}", a.p, a, a.Expr, a.Code)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (a *ActionExpr) NullableVisit(rules map[string]*Rule) bool {
+	a.Nullable = a.Expr.NullableVisit(rules)
+	return a.Nullable
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (a *ActionExpr) IsNullable() bool {
+	return a.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (a *ActionExpr) InitialNames() map[string]struct{} {
+	names := make(map[string]struct{})
+	for name := range a.Expr.InitialNames() {
+		names[name] = struct{}{}
+	}
+	return names
+}
+
 // ThrowExpr is an expression that throws an FailureLabel to be catched by a
 // RecoveryChoiceExpr.
 type ThrowExpr struct {
 	p     Pos
 	Label string
 }
+
+var _ Expression = (*ThrowExpr)(nil)
 
 // NewThrowExpr creates a new throw expression at the specified position.
 func NewThrowExpr(p Pos) *ThrowExpr {
@@ -189,12 +326,31 @@ func (t *ThrowExpr) String() string {
 	return fmt.Sprintf("%s: %T{Label: %v}", t.p, t, t.Label)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (t *ThrowExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (t *ThrowExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (t *ThrowExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // SeqExpr is an ordered sequence of expressions, all of which must match
 // if the SeqExpr is to be a match itself.
 type SeqExpr struct {
 	p     Pos
 	Exprs []Expression
+
+	Nullable bool
 }
+
+var _ Expression = (*SeqExpr)(nil)
 
 // NewSeqExpr creates a new sequence expression at the specified position.
 func NewSeqExpr(p Pos) *SeqExpr {
@@ -216,6 +372,37 @@ func (s *SeqExpr) String() string {
 	return buf.String()
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (s *SeqExpr) NullableVisit(rules map[string]*Rule) bool {
+	for _, item := range s.Exprs {
+		if !item.NullableVisit(rules) {
+			s.Nullable = false
+			return false
+		}
+	}
+	s.Nullable = true
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (s *SeqExpr) IsNullable() bool {
+	return s.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (s *SeqExpr) InitialNames() map[string]struct{} {
+	names := make(map[string]struct{})
+	for _, item := range s.Exprs {
+		for name := range item.InitialNames() {
+			names[name] = struct{}{}
+		}
+		if !item.IsNullable() {
+			break
+		}
+	}
+	return names
+}
+
 // LabeledExpr is an expression that has an associated label. Code blocks
 // can access the value of the expression using that label, that becomes
 // a local variable in the code.
@@ -224,6 +411,8 @@ type LabeledExpr struct {
 	Label *Identifier
 	Expr  Expression
 }
+
+var _ Expression = (*LabeledExpr)(nil)
 
 // NewLabeledExpr creates a new labeled expression at the specified position.
 func NewLabeledExpr(p Pos) *LabeledExpr {
@@ -238,6 +427,21 @@ func (l *LabeledExpr) String() string {
 	return fmt.Sprintf("%s: %T{Label: %v, Expr: %v}", l.p, l, l.Label, l.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (l *LabeledExpr) NullableVisit(rules map[string]*Rule) bool {
+	return l.Expr.NullableVisit(rules)
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (l *LabeledExpr) IsNullable() bool {
+	return l.Expr.IsNullable()
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (l *LabeledExpr) InitialNames() map[string]struct{} {
+	return l.Expr.InitialNames()
+}
+
 // AndExpr is a zero-length matcher that is considered a match if the
 // expression it contains is a match.
 type AndExpr struct {
@@ -250,6 +454,8 @@ func NewAndExpr(p Pos) *AndExpr {
 	return &AndExpr{p: p}
 }
 
+var _ Expression = (*AndExpr)(nil)
+
 // Pos returns the starting position of the node.
 func (a *AndExpr) Pos() Pos { return a.p }
 
@@ -258,12 +464,29 @@ func (a *AndExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v}", a.p, a, a.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (a *AndExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (a *AndExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (a *AndExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // NotExpr is a zero-length matcher that is considered a match if the
 // expression it contains is not a match.
 type NotExpr struct {
 	p    Pos
 	Expr Expression
 }
+
+var _ Expression = (*NotExpr)(nil)
 
 // NewNotExpr creates a new not (!) expression at the specified position.
 func NewNotExpr(p Pos) *NotExpr {
@@ -278,11 +501,28 @@ func (n *NotExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v}", n.p, n, n.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (n *NotExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (n *NotExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (n *NotExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // ZeroOrOneExpr is an expression that can be matched zero or one time.
 type ZeroOrOneExpr struct {
 	p    Pos
 	Expr Expression
 }
+
+var _ Expression = (*ZeroOrOneExpr)(nil)
 
 // NewZeroOrOneExpr creates a new zero or one expression at the specified
 // position.
@@ -298,11 +538,28 @@ func (z *ZeroOrOneExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v}", z.p, z, z.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (z *ZeroOrOneExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (z *ZeroOrOneExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (z *ZeroOrOneExpr) InitialNames() map[string]struct{} {
+	return z.Expr.InitialNames()
+}
+
 // ZeroOrMoreExpr is an expression that can be matched zero or more times.
 type ZeroOrMoreExpr struct {
 	p    Pos
 	Expr Expression
 }
+
+var _ Expression = (*ZeroOrMoreExpr)(nil)
 
 // NewZeroOrMoreExpr creates a new zero or more expression at the specified
 // position.
@@ -318,11 +575,28 @@ func (z *ZeroOrMoreExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v}", z.p, z, z.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (z *ZeroOrMoreExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (z *ZeroOrMoreExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (z *ZeroOrMoreExpr) InitialNames() map[string]struct{} {
+	return z.Expr.InitialNames()
+}
+
 // OneOrMoreExpr is an expression that can be matched one or more times.
 type OneOrMoreExpr struct {
 	p    Pos
 	Expr Expression
 }
+
+var _ Expression = (*OneOrMoreExpr)(nil)
 
 // NewOneOrMoreExpr creates a new one or more expression at the specified
 // position.
@@ -338,11 +612,30 @@ func (o *OneOrMoreExpr) String() string {
 	return fmt.Sprintf("%s: %T{Expr: %v}", o.p, o, o.Expr)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (o *OneOrMoreExpr) NullableVisit(rules map[string]*Rule) bool {
+	return false
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (o *OneOrMoreExpr) IsNullable() bool {
+	return false
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (o *OneOrMoreExpr) InitialNames() map[string]struct{} {
+	return o.Expr.InitialNames()
+}
+
 // RuleRefExpr is an expression that references a rule by name.
 type RuleRefExpr struct {
 	p    Pos
 	Name *Identifier
+
+	Nullable bool
 }
+
+var _ Expression = (*RuleRefExpr)(nil)
 
 // NewRuleRefExpr creates a new rule reference expression at the specified
 // position.
@@ -358,12 +651,36 @@ func (r *RuleRefExpr) String() string {
 	return fmt.Sprintf("%s: %T{Name: %v}", r.p, r, r.Name)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (r *RuleRefExpr) NullableVisit(rules map[string]*Rule) bool {
+	item, ok := rules[r.Name.Val]
+	if !ok {
+		// Token or unknown; never empty.
+		r.Nullable = false
+		return false
+	}
+	r.Nullable = item.NullableVisit(rules)
+	return r.Nullable
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (r *RuleRefExpr) IsNullable() bool {
+	return r.Nullable
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (r *RuleRefExpr) InitialNames() map[string]struct{} {
+	return map[string]struct{}{r.Name.Val: {}}
+}
+
 // StateCodeExpr is an expression which can modify the internal state of the parser.
 type StateCodeExpr struct {
 	p      Pos
 	Code   *CodeBlock
 	FuncIx int
 }
+
+var _ Expression = (*StateCodeExpr)(nil)
 
 // NewStateCodeExpr creates a new state (#) code expression at the specified
 // position.
@@ -379,6 +696,21 @@ func (s *StateCodeExpr) String() string {
 	return fmt.Sprintf("%s: %T{Code: %v}", s.p, s, s.Code)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (s *StateCodeExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (s *StateCodeExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (s *StateCodeExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // AndCodeExpr is a zero-length matcher that is considered a match if the
 // code block returns true.
 type AndCodeExpr struct {
@@ -386,6 +718,8 @@ type AndCodeExpr struct {
 	Code   *CodeBlock
 	FuncIx int
 }
+
+var _ Expression = (*AndCodeExpr)(nil)
 
 // NewAndCodeExpr creates a new and (&) code expression at the specified
 // position.
@@ -401,6 +735,21 @@ func (a *AndCodeExpr) String() string {
 	return fmt.Sprintf("%s: %T{Code: %v}", a.p, a, a.Code)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (a *AndCodeExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (a *AndCodeExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (a *AndCodeExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // NotCodeExpr is a zero-length matcher that is considered a match if the
 // code block returns false.
 type NotCodeExpr struct {
@@ -408,6 +757,8 @@ type NotCodeExpr struct {
 	Code   *CodeBlock
 	FuncIx int
 }
+
+var _ Expression = (*NotCodeExpr)(nil)
 
 // NewNotCodeExpr creates a new not (!) code expression at the specified
 // position.
@@ -423,6 +774,21 @@ func (n *NotCodeExpr) String() string {
 	return fmt.Sprintf("%s: %T{Code: %v}", n.p, n, n.Code)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (n *NotCodeExpr) NullableVisit(rules map[string]*Rule) bool {
+	return true
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (n *NotCodeExpr) IsNullable() bool {
+	return true
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (n *NotCodeExpr) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // LitMatcher is a string literal matcher. The value to match may be a
 // double-quoted string, a single-quoted single character, or a back-tick
 // quoted raw string.
@@ -430,6 +796,8 @@ type LitMatcher struct {
 	posValue   // can be str, rstr or char
 	IgnoreCase bool
 }
+
+var _ Expression = (*LitMatcher)(nil)
 
 // NewLitMatcher creates a new literal matcher at the specified position and
 // with the specified value.
@@ -445,6 +813,22 @@ func (l *LitMatcher) String() string {
 	return fmt.Sprintf("%s: %T{Val: %q, IgnoreCase: %t}", l.p, l, l.Val, l.IgnoreCase)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (l *LitMatcher) NullableVisit(rules map[string]*Rule) bool {
+	return l.IsNullable()
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (l *LitMatcher) IsNullable() bool {
+	// The string token '' is considered empty.
+	return len(l.Val) == 0
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (l *LitMatcher) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // CharClassMatcher is a character class matcher. The value to match must
 // be one of the specified characters, in a range of characters, or in the
 // Unicode classes of characters.
@@ -456,6 +840,8 @@ type CharClassMatcher struct {
 	Ranges         []rune // pairs of low/high range
 	UnicodeClasses []string
 }
+
+var _ Expression = (*CharClassMatcher)(nil)
 
 // NewCharClassMatcher creates a new character class matcher at the specified
 // position and with the specified raw value. It parses the raw value into
@@ -580,10 +966,27 @@ func (c *CharClassMatcher) String() string {
 		c.p, c, c.Val, c.IgnoreCase, c.Inverted)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (c *CharClassMatcher) NullableVisit(rules map[string]*Rule) bool {
+	return c.IsNullable()
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (c *CharClassMatcher) IsNullable() bool {
+	return len(c.Chars) == 0 && len(c.Ranges) == 0 && len(c.UnicodeClasses) == 0
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (c *CharClassMatcher) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // AnyMatcher is a matcher that matches any character except end-of-file.
 type AnyMatcher struct {
 	posValue
 }
+
+var _ Expression = (*AnyMatcher)(nil)
 
 // NewAnyMatcher creates a new any matcher at the specified position. The
 // value is provided for completeness' sake, but it is always the dot.
@@ -599,10 +1002,27 @@ func (a *AnyMatcher) String() string {
 	return fmt.Sprintf("%s: %T{Val: %q}", a.p, a, a.Val)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (a *AnyMatcher) NullableVisit(rules map[string]*Rule) bool {
+	return false
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (a *AnyMatcher) IsNullable() bool {
+	return false
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (a *AnyMatcher) InitialNames() map[string]struct{} {
+	return make(map[string]struct{})
+}
+
 // CodeBlock represents a code block.
 type CodeBlock struct {
 	posValue
 }
+
+var _ Expression = (*CodeBlock)(nil)
 
 // NewCodeBlock creates a new code block at the specified position and with
 // the specified value. The value includes the outer braces.
@@ -618,10 +1038,27 @@ func (c *CodeBlock) String() string {
 	return fmt.Sprintf("%s: %T{Val: %q}", c.p, c, c.Val)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (c *CodeBlock) NullableVisit(rules map[string]*Rule) bool {
+	panic("NullableVisit should not be called on the CodeBlock")
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (c *CodeBlock) IsNullable() bool {
+	panic("IsNullable should not be called on the CodeBlock")
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (c *CodeBlock) InitialNames() map[string]struct{} {
+	panic("InitialNames should not be called on the CodeBlock")
+}
+
 // Identifier represents an identifier.
 type Identifier struct {
 	posValue
 }
+
+var _ Expression = (*Identifier)(nil)
 
 // NewIdentifier creates a new identifier at the specified position and
 // with the specified name.
@@ -637,10 +1074,27 @@ func (i *Identifier) String() string {
 	return fmt.Sprintf("%s: %T{Val: %q}", i.p, i, i.Val)
 }
 
+// NullableVisit recursively determines whether an object is nullable.
+func (i *Identifier) NullableVisit(rules map[string]*Rule) bool {
+	panic("NullableVisit should not be called on the Identifier")
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (i *Identifier) IsNullable() bool {
+	panic("IsNullable should not be called on the Identifier")
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (i *Identifier) InitialNames() map[string]struct{} {
+	panic("InitialNames should not be called on the Identifier")
+}
+
 // StringLit represents a string literal.
 type StringLit struct {
 	posValue
 }
+
+var _ Expression = (*StringLit)(nil)
 
 // NewStringLit creates a new string literal at the specified position and
 // with the specified value.
@@ -654,6 +1108,21 @@ func (s *StringLit) Pos() Pos { return s.p }
 // String returns the textual representation of a node.
 func (s *StringLit) String() string {
 	return fmt.Sprintf("%s: %T{Val: %q}", s.p, s, s.Val)
+}
+
+// NullableVisit recursively determines whether an object is nullable.
+func (s *StringLit) NullableVisit(rules map[string]*Rule) bool {
+	panic("NullableVisit should not be called on the StringLit")
+}
+
+// IsNullable returns the nullable attribute of the node.
+func (s *StringLit) IsNullable() bool {
+	panic("IsNullable should not be called on the StringLit")
+}
+
+// InitialNames returns names of nodes with which an expression can begin.
+func (s *StringLit) InitialNames() map[string]struct{} {
+	panic("InitialNames should not be called on the StringLit")
 }
 
 type posValue struct {
