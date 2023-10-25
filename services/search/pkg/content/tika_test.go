@@ -35,6 +35,7 @@ var _ = Describe("Tika", func() {
 			body = ""
 			language = ""
 			version = ""
+			fullResponse = ""
 			srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 				out := ""
 				switch req.URL.Path {
