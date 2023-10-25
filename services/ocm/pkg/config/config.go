@@ -81,9 +81,9 @@ type OCMD struct {
 }
 
 type OCMInviteManager struct {
-	Driver   string                  `yaml:"driver" env:"SHARING_OCM_INVITE_MANAGER_DRIVER" desc:"Driver to be used to persist ocm invites. Supported values 'json'."`
+	Driver   string                  `yaml:"driver" env:"OCM_OCM_INVITE_MANAGER_DRIVER" desc:"Driver to be used to persist ocm invites. Supported values 'json'."`
 	Drivers  OCMInviteManagerDrivers `yaml:"drivers"`
-	Insecure bool                    `yaml:"insecure" env:"SHARING_OCM_INVITE_MANAGER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
+	Insecure bool                    `yaml:"insecure" env:"OCM_OCM_INVITE_MANAGER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
 }
 
 type OCMInviteManagerDrivers struct {
@@ -91,7 +91,7 @@ type OCMInviteManagerDrivers struct {
 }
 
 type OCMInviteManagerJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
+	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 }
 
 type OCMProviderAuthorizerDrivers struct {
@@ -99,12 +99,12 @@ type OCMProviderAuthorizerDrivers struct {
 }
 
 type OCMProviderAuthorizerJSONDriver struct {
-	Providers             string `yaml:"providers" env:"SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
-	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"`
+	Providers             string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
+	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"`
 }
 
 type OCMCore struct {
-	Driver  string         `yaml:"driver" env:"SHARING_OCM_CORE_DRIVER" desc:"Driver to be used for the ocm core. Supported values 'json'."`
+	Driver  string         `yaml:"driver" env:"OCM_OCM_CORE_DRIVER" desc:"Driver to be used for the ocm core. Supported values 'json'."`
 	Drivers OCMCoreDrivers `yaml:"drivers"`
 }
 
@@ -113,13 +113,13 @@ type OCMCoreDrivers struct {
 }
 
 type OCMCoreJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
+	File string `yaml:"file" env:"OCM_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 }
 
 type OCMShareProvider struct {
-	Driver   string                  `yaml:"driver" env:"SHARING_OCM_SHARE_PROVIDER_DRIVER" desc:"Driver to be used for the ocm share provider. Supported values 'json'."`
+	Driver   string                  `yaml:"driver" env:"OCM_OCM_SHARE_PROVIDER_DRIVER" desc:"Driver to be used for the ocm share provider. Supported values 'json'."`
 	Drivers  OCMShareProviderDrivers `yaml:"drivers"`
-	Insecure bool                    `yaml:"insecure" env:"SHARING_OCM_SHARE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
+	Insecure bool                    `yaml:"insecure" env:"OCM_OCM_SHARE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
 }
 
 type OCMShareProviderDrivers struct {
@@ -127,5 +127,5 @@ type OCMShareProviderDrivers struct {
 }
 
 type OCMShareProviderJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
+	File string `yaml:"file" env:"OCM_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 }
