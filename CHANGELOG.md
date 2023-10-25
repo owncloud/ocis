@@ -211,6 +211,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7410
    https://github.com/owncloud/ocis/pull/7476
    https://github.com/owncloud/ocis/pull/7551
+   https://github.com/owncloud/ocis/pull/7581
 
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 
