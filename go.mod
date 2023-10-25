@@ -41,7 +41,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/protobuf v1.5.3
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/go-tika v0.3.0
 	github.com/google/uuid v1.3.1
 	github.com/gookit/config/v2 v2.2.3
