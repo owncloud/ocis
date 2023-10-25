@@ -29,14 +29,14 @@
 | OCM_OCMD_PREFIX | string | ocm | URL path prefix for the OCMD service. Note that the string must not start with '/'.|
 | OCM_OCMD_EXPOSE_RECIPIENT_DISPLAY_NAME | bool | false | Expose the display name of OCM share recipients.|
 | OCM_SCIENCEMESH_PREFIX | string | sciencemesh | URL path prefix for the ScienceMesh service. Note that the string must not start with '/'.|
-| SHARING_OCM_INVITE_MANAGER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported values 'json'.|
-| SHARING_OCM_INVITE_MANAGER_JSON_FILE | string | ~/.ocis/storage/ocminvites.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
-| SHARING_OCM_INVITE_MANAGER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
+| OCM_OCM_INVITE_MANAGER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported values 'json'.|
+| OCM_OCM_INVITE_MANAGER_JSON_FILE | string | ~/.ocis/storage/ocminvites.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_INVITE_MANAGER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 | SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported values 'json'.|
-| SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | ~/.ocis/storage/ocmproviders.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
-| SHARING_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | bool | false | |
-| SHARING_OCM_SHARE_PROVIDER_DRIVER | string | json | Driver to be used for the ocm share provider. Supported values 'json'.|
-| SHARING_OCM_SHAREPROVIDER_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
-| SHARING_OCM_SHARE_PROVIDER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
-| SHARING_OCM_CORE_DRIVER | string | json | Driver to be used for the ocm core. Supported values 'json'.|
-| SHARING_OCM_CORE_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | ~/.ocis/storage/ocmproviders.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | bool | false | |
+| OCM_OCM_SHARE_PROVIDER_DRIVER | string | json | Driver to be used for the ocm share provider. Supported values 'json'.|
+| OCM_OCM_SHAREPROVIDER_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_SHARE_PROVIDER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
+| OCM_OCM_CORE_DRIVER | string | json | Driver to be used for the ocm core. Supported values 'json'.|
+| OCM_OCM_CORE_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
