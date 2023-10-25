@@ -339,6 +339,9 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectabl
 	if err != nil {
 		return false, err
 	}
+	if parentStatRes.Status.Code != rpc.Code_CODE_OK {
+		return false, errtypes.NewErrtypeFromStatus(parentStatRes.Status)
+	}
 	parentAuthCtx, err := authContextForUser(client, parentStatRes.Info.Owner, s.c.MachineAuthAPIKey)
 	if err != nil {
 		return false, err
