@@ -43,7 +43,7 @@ func Validate(cfg *config.Config) error {
 			logger.Warn().Msg("The smtp_encryption value 'tls' is deprecated. Please use the value 'starttls' instead.")
 		case "ssl":
 			logger.Warn().Msg("The smtp_encryption value 'ssl' is deprecated. Please use the value 'ssltls' instead.")
-		case "starttls", "ssltls", "none":
+		case "auto", "starttls", "ssltls", "none":
 			break
 		default:
 			return fmt.Errorf(
