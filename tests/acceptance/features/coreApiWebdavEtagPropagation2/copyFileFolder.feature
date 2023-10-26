@@ -153,7 +153,7 @@ Feature: propagation of etags when copying files or folders
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: sharee copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -189,7 +189,7 @@ Feature: propagation of etags when copying files or folders
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

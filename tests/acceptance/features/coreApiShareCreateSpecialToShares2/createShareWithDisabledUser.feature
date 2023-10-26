@@ -1,4 +1,4 @@
-@issue-1328
+@skipOnReva @issue-1328
 Feature: share resources with a disabled user
   As a user
   I want to share resources to disabled user

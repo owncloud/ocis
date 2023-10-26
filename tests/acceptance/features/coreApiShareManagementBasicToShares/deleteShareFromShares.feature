@@ -1,4 +1,4 @@
-@issue-1328 @issue-1289
+@skipOnReva @issue-1328 @issue-1289
 Feature: sharing
   As a user
   I want to delete shares

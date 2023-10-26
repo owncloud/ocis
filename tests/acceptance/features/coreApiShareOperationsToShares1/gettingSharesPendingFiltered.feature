@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: get the pending shares filtered by type (user, group etc)
   As a user
   I want to filter the pending shares that I have received of a particular type (user, group etc)

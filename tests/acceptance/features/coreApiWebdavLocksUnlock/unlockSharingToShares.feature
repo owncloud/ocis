@@ -1,4 +1,4 @@
-@issue-1284
+@issue-1284 @skipOnReva
 Feature: UNLOCK locked items (sharing)
   As a user
   I want to unlock a shared resource that has been locked by me to be restricted

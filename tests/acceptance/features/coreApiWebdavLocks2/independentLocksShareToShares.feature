@@ -1,4 +1,4 @@
-@issue-1284
+@issue-1284 @skipOnReva
 Feature: independent locks - make sure all locks are independent and don't interact with other items that have the same name
   As a user
   I want to independently lock resources shared with me

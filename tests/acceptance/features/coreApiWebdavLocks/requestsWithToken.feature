@@ -1,4 +1,4 @@
-@issue-1284
+@issue-1284 @skipOnReva
 Feature: actions on a locked item are possible if the token is sent with the request
   As a user
   I want to share the lock token of a resource

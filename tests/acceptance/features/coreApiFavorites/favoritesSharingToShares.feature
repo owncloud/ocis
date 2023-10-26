@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: favorite
   As a user
   I want to favorite the shared resources

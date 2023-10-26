@@ -1,4 +1,4 @@
-@issue-1328 @issues-1289
+@skipOnReva @issue-1328 @issues-1289
 Feature: sharing
 
   Background:

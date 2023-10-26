@@ -182,7 +182,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: checking file id after a move between received shares
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

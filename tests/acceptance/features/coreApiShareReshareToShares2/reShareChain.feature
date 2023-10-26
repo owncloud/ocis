@@ -1,4 +1,4 @@
-@issue-2141
+@issue-2141 @skipOnReva
 Feature: resharing can be done on a reshared resource
   As a user
   I want to re-share a resource

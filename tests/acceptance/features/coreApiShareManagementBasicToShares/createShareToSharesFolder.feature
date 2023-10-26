@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: sharing
   As a user
   I want to share resources to others

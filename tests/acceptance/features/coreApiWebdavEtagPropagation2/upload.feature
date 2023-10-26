@@ -52,7 +52,7 @@ Feature: propagation of etags when uploading data
       | dav-path-version |
       | spaces           |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharee uploading a file inside a received shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -76,7 +76,7 @@ Feature: propagation of etags when uploading data
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer uploading a file inside a shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -100,7 +100,7 @@ Feature: propagation of etags when uploading data
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharee overwriting a file inside a received shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -125,7 +125,7 @@ Feature: propagation of etags when uploading data
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharer overwriting a file inside a shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

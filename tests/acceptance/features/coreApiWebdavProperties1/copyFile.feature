@@ -250,7 +250,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -268,7 +268,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing file received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -285,7 +285,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into another folder at different level which is received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -307,7 +307,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -331,7 +331,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -354,7 +354,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -377,7 +377,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -403,7 +403,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing file received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -428,7 +428,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into another folder at different level which is received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -453,7 +453,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -480,7 +480,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -506,7 +506,7 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239
+  @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a group share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
