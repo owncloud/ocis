@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
 * Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
+* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
 * Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
 * Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
@@ -108,6 +109,13 @@ The following sections list the changes for unreleased.
    state of received shares to "pending".
 
    https://github.com/owncloud/ocis/issues/7319
+
+* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
+
+   When already having a share for a specific resource, auto accept would use custom mountpoints
+   which lead to other errors. Now auto-accept is using the existing mountpoint of a share.
+
+   https://github.com/owncloud/ocis/pull/7592
 
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
 
