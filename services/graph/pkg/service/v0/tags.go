@@ -120,7 +120,11 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("error setting tags")
+		g.logger.Error().Err(err).Interface("status", resp.GetStatus()).Msg("error setting tags")
+		if resp.GetStatus().GetCode() == rpc.Code_CODE_LOCKED {
+			errorcode.InvalidRequest.Render(w, r, http.StatusLocked, "file is locked")
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
