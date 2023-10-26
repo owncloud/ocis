@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
 * Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
@@ -51,6 +52,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
 
 ## Details
+
+* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
+
+   When a file is locked, return 423 status code instead 500 on tag create
+
+   https://github.com/owncloud/ocis/pull/7596
 
 * Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
 
