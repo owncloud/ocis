@@ -41,3 +41,28 @@ Feature: Preview file in project space
       | filesForUpload/example.gif    | example.gif    | 36    | 36     |
       | filesForUpload/example.gif    | example.gif    | 1200  | 1200   |
       | filesForUpload/example.gif    | example.gif    | 1280  | 1280   |
+
+
+  Scenario Outline: download preview of shared file inside project space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "previews of the files" using the WebDAV API
+    And user "Alice" has shared resource "<destination>" inside space "previews of the files" with user "Brian"
+    And user "Brian" has accepted share "/<destination>" offered by user "Alice"
+    When user "Brian" downloads the preview of shared resource "/Shares/<destination>" with width "32" and height "32" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded image should be "32" pixels wide and "32" pixels high
+    Examples:
+      | source                        | destination    |
+      | filesForUpload/testavatar.png | testavatar.png |
+      | filesForUpload/lorem.txt      | lorem.txt      |
+
+
+  Scenario: download preview of file inside shared folder in project space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a folder "folder" in space "previews of the files"
+    And user "Alice" has uploaded a file inside space "previews of the files" with content "test" to "/folder/lorem.txt"
+    And user "Alice" has shared resource "/folder" inside space "previews of the files" with user "Brian"
+    And user "Brian" has accepted share "/folder" offered by user "Alice"
+    When user "Brian" downloads the preview of shared resource "Shares/folder/lorem.txt" with width "32" and height "32" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded image should be "32" pixels wide and "32" pixels high

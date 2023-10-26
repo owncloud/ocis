@@ -3660,4 +3660,34 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given user :sharer has shared resource :path inside space :space with user :sharee
+	 *
+	 * @param $sharer string
+	 * @param $path string
+	 * @param $space string
+	 * @param $sharee string
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSharedResourceInsideSpaceWithUser(string $sharer, string $path, string $space, string $sharee): void {
+		$sharer = $this->featureContext->getActualUsername($sharer);
+		$resource_id = $this->getResourceId($sharer, $space, $path);
+		$response = $this->featureContext->createShare(
+			$sharer,
+			$path,
+			'0',
+			$this->featureContext->getActualUsername($sharee),
+			null,
+			null,
+			null,
+			null,
+			null,
+			$resource_id
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
+	}
 }
