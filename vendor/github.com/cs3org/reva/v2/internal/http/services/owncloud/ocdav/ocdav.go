@@ -339,14 +339,14 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectabl
 	if err != nil {
 		return false, err
 	}
-	if parentStatRes.Status.Code != rpc.Code_CODE_OK {
-		return false, errtypes.NewErrtypeFromStatus(parentStatRes.Status)
+	if parentStatRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return false, errtypes.NewErrtypeFromStatus(parentStatRes.GetStatus())
 	}
-	parentAuthCtx, err := authContextForUser(client, parentStatRes.Info.Owner, s.c.MachineAuthAPIKey)
+	parentAuthCtx, err := authContextForUser(client, parentStatRes.GetInfo().GetOwner(), s.c.MachineAuthAPIKey)
 	if err != nil {
 		return false, err
 	}
-	parentPathRes, err := client.GetPath(parentAuthCtx, &provider.GetPathRequest{ResourceId: parentStatRes.Info.Id})
+	parentPathRes, err := client.GetPath(parentAuthCtx, &provider.GetPathRequest{ResourceId: parentStatRes.GetInfo().GetId()})
 	if err != nil {
 		return false, err
 	}
@@ -355,7 +355,7 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectabl
 	if err != nil {
 		return false, err
 	}
-	if childStatRes.Status.Code == rpc.Code_CODE_NOT_FOUND && utils.IsRelativeReference(child) && child.Path != "." {
+	if childStatRes.GetStatus().GetCode() == rpc.Code_CODE_NOT_FOUND && utils.IsRelativeReference(child) && child.Path != "." {
 		childParentRef := &provider.Reference{
 			ResourceId: child.ResourceId,
 			Path:       utils.MakeRelativePath(path.Dir(child.Path)),
@@ -365,11 +365,15 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectabl
 			return false, err
 		}
 	}
-	childAuthCtx, err := authContextForUser(client, childStatRes.Info.Owner, s.c.MachineAuthAPIKey)
+	if childStatRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return false, errtypes.NewErrtypeFromStatus(parentStatRes.Status)
+	}
+	// TODO: this should use service accounts https://github.com/owncloud/ocis/issues/7597
+	childAuthCtx, err := authContextForUser(client, childStatRes.GetInfo().GetOwner(), s.c.MachineAuthAPIKey)
 	if err != nil {
 		return false, err
 	}
-	childPathRes, err := client.GetPath(childAuthCtx, &provider.GetPathRequest{ResourceId: childStatRes.Info.Id})
+	childPathRes, err := client.GetPath(childAuthCtx, &provider.GetPathRequest{ResourceId: childStatRes.GetInfo().GetId()})
 	if err != nil {
 		return false, err
 	}

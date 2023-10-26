@@ -989,6 +989,7 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data.State = mapState(rs.GetState())
+		data.Hidden = rs.Hidden
 
 		h.addFileInfo(ctx, data, info)
 		h.mapUserIds(r.Context(), client, data)
