@@ -610,7 +610,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 
 		$logMessage = "## $scenario ($scenarioLine)\n";
-	
+
 		// Delete previous scenario's log file
 		if (\file_exists(HttpLogger::getScenarioLogPath())) {
 			\unlink(HttpLogger::getScenarioLogPath());
