@@ -162,11 +162,19 @@ func getMountpoint(ctx context.Context, itemid *provider.ResourceId, uid *user.U
 	// we need to sort the received shares by mount point in order to make things easier to evaluate.
 	base := path.Base(info.GetPath())
 	mount := base
-	var mountedShares []*collaboration.ReceivedShare
+	mountedShares := make([]*collaboration.ReceivedShare, 0, len(lrs.Shares))
 	for _, s := range lrs.Shares {
-		if !utils.ResourceIDEqual(s.Share.ResourceId, itemid) && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			mountedShares = append(mountedShares, s)
+		if s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// we don't care about unaccepted shares
+			continue
 		}
+
+		if utils.ResourceIDEqual(s.Share.ResourceId, itemid) {
+			// a share to the same resource already exists and is mounted
+			return s.MountPoint.Path, nil
+		}
+
+		mountedShares = append(mountedShares, s)
 	}
 
 	sort.Slice(mountedShares, func(i, j int) bool {
