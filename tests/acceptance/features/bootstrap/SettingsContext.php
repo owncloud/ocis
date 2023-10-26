@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -22,7 +23,6 @@ require_once 'bootstrap.php';
  */
 class SettingsContext implements Context {
 	private FeatureContext $featureContext;
-	private SpacesContext $spacesContext;
 	private string $baseUrl;
 	private string $settingsUrl = '/api/v0/settings/';
 
@@ -41,8 +41,27 @@ class SettingsContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->spacesContext = $environment->getContext('SpacesContext');
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getRoles(string $user): ResponseInterface {
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "roles-list";
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			"{}"
+		);
 	}
 
 	/**
@@ -56,10 +75,8 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function getAllExistingRoles(string $user): void {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "roles-list";
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), "{}", $this->featureContext->getStepLineRef())
-		);
+		$response = $this->getRoles($user);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -67,17 +84,21 @@ class SettingsContext implements Context {
 	 * @param string $userId
 	 * @param string $roleId
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestToAssignRoleToUser(string $user, string $userId, string $roleId): void {
+	public function assignRoleToUser(string $user, string $userId, string $roleId): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-add";
 		$body = json_encode(["account_uuid" => $userId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
-
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			$body
 		);
 	}
 
@@ -90,14 +111,21 @@ class SettingsContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestAssignmentsList(string $user, string $userId): ResponseInterface {
+	public function getAssignmentsList(string $user, string $userId): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-list";
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
-		return $this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef());
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			$body
+		);
 	}
 
 	/**
-	 * @When /^the administrator has given "([^"]*)" the role "([^"]*)" using the settings api$/
+	 * @Given /^the administrator has given "([^"]*)" the role "([^"]*)" using the settings api$/
 	 *
 	 * @param string $user
 	 * @param string $role
@@ -108,9 +136,14 @@ class SettingsContext implements Context {
 	 */
 	public function theAdministratorHasGivenUserTheRole(string $user, string $role): void {
 		$admin = $this->featureContext->getAdminUserName();
-		$roleId = $this->userGetRoleIdByRoleName($admin, $role);
+		$roleId = $this->getRoleIdByRoleName($admin, $role);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
-		$this->setRoleToUser($admin, $userId, $roleId);
+		$response = $this->assignRoleToUser($admin, $userId, $roleId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
 	}
 
 	/**
@@ -119,21 +152,22 @@ class SettingsContext implements Context {
 	 *
 	 * @return string
 	 */
-	public function userGetRoleIdByRoleName(string $user, string $role): string {
-		$this->getAllExistingRoles($user);
+	public function getRoleIdByRoleName(string $user, string $role): string {
+		$response = $this->getRoles($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
 
-		if ($this->featureContext->getResponse()) {
-			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-			$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-			Assert::assertArrayHasKey(
-				'bundles',
-				$decodedBody,
-				__METHOD__ . " could not find bundles in body"
-			);
-			$bundles = $decodedBody["bundles"];
-		} else {
-			$bundles = [];
-		}
+		$rawBody =  $response->getBody()->getContents();
+		$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+		Assert::assertArrayHasKey(
+			'bundles',
+			$decodedBody,
+			__METHOD__ . " could not find bundles in body"
+		);
+		$bundles = $decodedBody["bundles"];
 
 		$roleToAssign = "";
 		foreach ($bundles as $value) {
@@ -148,34 +182,6 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string $userId
-	 * @param string $roleId
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setRoleToUser(string $user, string $userId, string $roleId): void {
-		$this->sendRequestToAssignRoleToUser($user, $userId, $roleId);
-
-		if ($this->featureContext->getResponse()) {
-			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-			$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-			Assert::assertArrayHasKey(
-				'assignment',
-				$decodedBody,
-				__METHOD__ . " could not find assignment in body"
-			);
-			$assignment = $decodedBody["assignment"];
-		} else {
-			$assignment = [];
-		}
-
-		Assert::assertEquals($userId, $assignment["accountUuid"]);
-		Assert::assertEquals($roleId, $assignment["roleId"]);
-	}
-
-	/**
 	 * @When /^user "([^"]*)" changes his own role to "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -186,9 +192,10 @@ class SettingsContext implements Context {
 	 */
 	public function userChangeOwnRole(string $user, string $role): void {
 		// we assume that the user knows uuid role.
-		$roleId = $this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role);
+		$roleId = $this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$this->sendRequestToAssignRoleToUser($user, $userId, $roleId);
+		$response = $this->assignRoleToUser($user, $userId, $roleId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -203,9 +210,10 @@ class SettingsContext implements Context {
 	 */
 	public function userChangeRoleAnotherUser(string $user, string $role, string $assignedUser): void {
 		// we assume that the user knows uuid role.
-		$roleId = $this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role);
+		$roleId = $this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($assignedUser, 'id');
-		$this->sendRequestToAssignRoleToUser($user, $userId, $roleId);
+		$response = $this->assignRoleToUser($user, $userId, $roleId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -220,7 +228,7 @@ class SettingsContext implements Context {
 	 */
 	public function userGetAssignmentsList(string $user): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$this->featureContext->setResponse($this->sendRequestAssignmentsList($user, $userId));
+		$this->featureContext->setResponse($this->getAssignmentsList($user, $userId));
 	}
 
 	/**
@@ -236,11 +244,11 @@ class SettingsContext implements Context {
 	 */
 	public function userShouldHaveRole(string $user, string $role): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$response = $this->sendRequestAssignmentsList($this->featureContext->getAdminUserName(), $userId);
+		$response = $this->getAssignmentsList($this->featureContext->getAdminUserName(), $userId);
 		$assignmentResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		if (isset($assignmentResponse->assignments[0]->roleId)) {
 			$actualRoleId = $assignmentResponse->assignments[0]->roleId;
-			Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $actualRoleId, "user $user has no role $role");
+			Assert::assertEquals($this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $actualRoleId, "user $user has no role $role");
 		} else {
 			Assert::fail("Response should contain user role but not found.\n" . json_encode($assignmentResponse));
 		}
@@ -257,26 +265,26 @@ class SettingsContext implements Context {
 	 */
 	public function theSettingApiResponseShouldHaveTheRole(string $role): void {
 		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())["assignments"][0]["roleId"];
-		Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user has no role $role");
+		Assert::assertEquals($this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user has no role $role");
 	}
 
 	/**
 	 * @param string $user
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestGetBundlesList(string $user): void {
+	public function sendRequestGetBundlesList(string $user): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "bundles-list";
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), '{}', $this->featureContext->getStepLineRef())
-		);
-
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201"
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			"{}"
 		);
 	}
 
@@ -290,8 +298,14 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function getBundlesList(string $user, string $bundleName): array {
-		$this->sendRequestGetBundlesList($user);
-		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		$response = $this->sendRequestGetBundlesList($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+
+		$body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 		foreach ($body["bundles"] as $value) {
 			if ($value["displayName"] === $bundleName) {
 				return $value;
@@ -303,22 +317,21 @@ class SettingsContext implements Context {
 	/**
 	 * @param string $user
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestGetSettingsValuesList(string $user): void {
+	public function sendRequestGetSettingsValuesList(string $user): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-list";
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(
-			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body, $this->featureContext->getStepLineRef())
-		);
-
-		Assert::assertEquals(
-			$this->featureContext->getResponse()->getStatusCode(),
-			201,
-			"Expected response status code should be 201"
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			$body
 		);
 	}
 
@@ -331,8 +344,14 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function getSettingLanguageValue(string $user): string {
-		$this->sendRequestGetSettingsValuesList($user);
-		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		$response = $this->sendRequestGetSettingsValuesList($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+
+		$body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 		// if no language is set, the request body is empty return English as the default language
 		if (empty($body)) {
@@ -371,31 +390,32 @@ class SettingsContext implements Context {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$body = json_encode(
 			[
-			"value" => [
-			"account_uuid" => "me",
-			"bundleId" => $profileBundlesList["id"],
-			"id" => $userId,
-			"listValue" => [
-			"values" => [
-			  [
-				"stringValue" => $language
-			  ]
-			]
-			],
-			"resource" => [
-			"type" => "TYPE_USER"
-			],
-			"settingId" => $settingId
-			]
+				"value" => [
+					"account_uuid" => "me",
+					"bundleId" => $profileBundlesList["id"],
+					"id" => $userId,
+					"listValue" => [
+						"values" => [
+							[
+								"stringValue" => $language
+							]
+						]
+					],
+					"resource" => [
+						"type" => "TYPE_USER"
+					],
+					"settingId" => $settingId
+				]
 			],
 			JSON_THROW_ON_ERROR
 		);
-		return $this->spacesContext->sendPostRequestToUrl(
+		return HttpRequestHelper::post(
 			$fullUrl,
+			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$this->featureContext->getStepLineRef()
+			null,
+			$body
 		);
 	}
 
@@ -431,24 +451,26 @@ class SettingsContext implements Context {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-save";
 		$body = json_encode(
 			[
-			"value" => [
-			"account_uuid" => "me",
-			"bundleId" => "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
-			"settingId" => "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9",
-			"resource" => [
-			"type" => "TYPE_USER"
-			],
-			"boolValue" => false
-			]
+				"value" => [
+					"account_uuid" => "me",
+					"bundleId" => "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
+					"settingId" => "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9",
+					"resource" => [
+						"type" => "TYPE_USER"
+					],
+					"boolValue" => false
+				]
 			],
 			JSON_THROW_ON_ERROR
 		);
-		return $this->spacesContext->sendPostRequestToUrl(
+
+		return HttpRequestHelper::post(
 			$fullUrl,
+			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$this->featureContext->getStepLineRef()
+			[],
+			$body
 		);
 	}
 
