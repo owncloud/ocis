@@ -27,7 +27,7 @@ Feature: content search
       | spaces           |
 
 
-  Scenario Outline: search files by characters
+  Scenario Outline: search files by different content types
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "Using k6, you can test the reliability and performance of your systems" to "wordWithNumber.md"
     And user "Alice" has uploaded file with content "see our web site https://owncloud.com/infinite-scale-4-0" to "findByWebSite.txt"
@@ -51,7 +51,7 @@ Feature: content search
       | spaces           |
 
 
-  Scenario Outline: search files by stop words when cleaning stop words is enabled by default
+  Scenario Outline: search files by stop words when clean_stop_words is enabled (default)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "He has expirience, we must to have, I have to find ...." to "fileWithStopWords.txt"
     When user "Alice" searches for 'Content:"he has"' using the WebDAV API
@@ -65,15 +65,15 @@ Feature: content search
       | spaces           |
 
   @env-config
-  Scenario Outline: search files by stop words when cleaning stop words is disabled
+  Scenario Outline: search files by stop words when clean_stop_words is disabled
     Given using <dav-path-version> DAV path
     And the config "SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS" has been set to "false"
     And user "Alice" has uploaded file with content "He has expirience, we must to have, I have to find ...." to "fileWithStopWords.txt"
-    And user "Alice" searches for 'Content:"he has"' using the WebDAV API
+    When user "Alice" searches for 'Content:"he has"' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | fileWithStopWords.txt |
-    And user "Alice" searches for 'Content:"I have"' using the WebDAV API
+    When user "Alice" searches for 'Content:"I have"' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | fileWithStopWords.txt |
