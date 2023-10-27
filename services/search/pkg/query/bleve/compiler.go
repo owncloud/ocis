@@ -95,7 +95,18 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				v = strings.ToLower(v)
 			}
 
-			q := bleveQuery.NewQueryStringQuery(k + ":" + v)
+			var q bleveQuery.Query
+			var group bool
+			switch k {
+			case "MimeType":
+				q, group = mimeType(k, v)
+				if prev == nil {
+					isGroup = group
+				}
+			default:
+				q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+			}
+
 			if prev == nil {
 				prev = q
 			} else {
@@ -232,8 +243,20 @@ func mapBinary(operator *ast.OperatorNode, ln, rn bleveQuery.Query, leftIsGroup 
 	}
 	if operator.Value == kql.BoolOR {
 		if left, ok := ln.(*bleveQuery.DisjunctionQuery); ok {
+			// if both are DisjunctionQuery then merge
+			if right, ok := rn.(*bleveQuery.DisjunctionQuery); ok {
+				left.AddQuery(right.Disjuncts...)
+				return left
+			}
 			left.AddQuery(rn)
 			return left
+		}
+		if _, ok := ln.(*bleveQuery.ConjunctionQuery); !ok {
+			if right, ok := rn.(*bleveQuery.DisjunctionQuery); ok {
+				left := bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln})
+				left.AddQuery(right.Disjuncts...)
+				return left
+			}
 		}
 		return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{
 			ln,
@@ -263,4 +286,77 @@ func normalizeGroupingProperty(group *ast.GroupNode) *ast.GroupNode {
 		}
 	}
 	return group
+}
+
+func mimeType(k, v string) (bleveQuery.Query, bool) {
+	switch v {
+	case "file":
+		q := bleve.NewBooleanQuery()
+		q.AddMustNot(bleveQuery.NewQueryStringQuery(k + ":httpd/unix-directory"))
+		return q, false
+	case "folder":
+		return bleveQuery.NewQueryStringQuery(k + ":httpd/unix-directory"), false
+	case "documents":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/msword",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			"application/vnd.oasis.opendocument.text",
+			"text/plain",
+			"text/markdown",
+			"application/rtf",
+			"application/vnd.apple.pages",
+		)), true
+	case "spreadsheets":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/vnd.ms-excel",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"text/csv",
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			"application/vnd.oasis.opendocument.presentation",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"application/vnd.apple.numbers",
+		)), true
+	case "presentations":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/vnd.ms-excel",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"text/csv",
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			"application/vnd.oasis.opendocument.presentation",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"application/vnd.apple.numbers",
+		)), true
+	case "pdfs":
+		return bleveQuery.NewQueryStringQuery(k + ":application/pdf"), false
+	case "images":
+		return bleveQuery.NewQueryStringQuery(k + ":image/*"), false
+	case "videos":
+		return bleveQuery.NewQueryStringQuery(k + ":video/*"), false
+	case "audio":
+		return bleveQuery.NewQueryStringQuery(k + ":audio/*"), false
+	case "archives":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/zip",
+			"application/x-tar",
+			"application/x-gzip",
+			"application/x-7",
+			"z-compressed",
+			"application/x-rar-compressed",
+			"application/x-bzip2",
+			"application/x-bzip",
+			"application/x-tgz",
+		)), true
+	default:
+		return bleveQuery.NewQueryStringQuery(k + ":" + v), false
+	}
+}
+
+func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {
+	list := make([]bleveQuery.Query, len(v))
+	for i := 0; i < len(v); i++ {
+		list[i] = bleveQuery.NewQueryStringQuery(k + ":" + v[i])
+	}
+	return list
 }

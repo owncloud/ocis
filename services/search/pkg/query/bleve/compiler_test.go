@@ -121,6 +121,51 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: `a OR b AND c`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "a"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Value: "b"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Value: "c"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:a`),
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:b`),
+					query.NewQueryStringQuery(`Name:c`),
+				}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(a OR b OR c) AND d`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Value: "a"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Value: "b"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Value: "c"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Value: "d"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:a`),
+					query.NewQueryStringQuery(`Name:b`),
+					query.NewQueryStringQuery(`Name:c`),
+				}),
+				query.NewQueryStringQuery(`Name:d`),
+			}),
+			wantErr: false,
+		},
+		{
 			name: `(name:"moby di*" OR tag:bestseller) AND tag:book`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
@@ -338,6 +383,129 @@ func Test_compile(t *testing.T) {
 					q.FieldVal = "Mtime"
 					return q
 				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:documents`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mimetype", Value: "documents"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`MimeType:application/msword`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+				query.NewQueryStringQuery(`MimeType:text/plain`),
+				query.NewQueryStringQuery(`MimeType:text/markdown`),
+				query.NewQueryStringQuery(`MimeType:application/rtf`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:documents AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mimetype", Value: "documents"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:documents OR MimeType:pdfs AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mimetype", Value: "documents"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`MimeType:application/msword`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+				query.NewQueryStringQuery(`MimeType:text/plain`),
+				query.NewQueryStringQuery(`MimeType:text/markdown`),
+				query.NewQueryStringQuery(`MimeType:application/rtf`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+					query.NewQueryStringQuery(`Name:*tdd*`),
+				}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(MimeType:documents OR MimeType:pdfs) AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "mimetype", Value: "documents"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(MimeType:pdfs OR MimeType:documents) AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "mimetype", Value: "documents"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
 			}),
 			wantErr: false,
 		},
