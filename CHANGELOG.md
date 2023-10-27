@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
 * Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Update web to v7.1.1: [#7601](https://github.com/owncloud/ocis/pull/7601)
 
 ## Details
 
@@ -32,6 +33,19 @@ The following sections list the changes for unreleased.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Update web to v7.1.1: [#7601](https://github.com/owncloud/ocis/pull/7601)
+
+   Tags: web
+
+   We updated ownCloud Web to v7.1.1. Please refer to the changelog (linked) for details on the web
+   release.
+
+   ## Summary * Bugfix [owncloud/web#9833](https://github.com/owncloud/web/pull/9833):
+   Resolving external URLs
+
+   https://github.com/owncloud/ocis/pull/7601
+   https://github.com/owncloud/web/releases/tag/v7.1.1
 # Changelog for [4.0.2] (2023-09-28)
 
 The following sections list the changes for 4.0.2.
