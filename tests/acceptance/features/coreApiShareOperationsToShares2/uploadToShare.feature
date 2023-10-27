@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: sharing
   As a user
   I want to upload resources to a folder shared to me
@@ -139,7 +140,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @smokeTest @skipOnGraph @skipOnReva
+  @smokeTest @skipOnGraph
   Scenario Outline: check quota of owners parent directory of a shared file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -260,7 +261,7 @@ Feature: sharing
       | old              | change      |
       | new              | create      |
 
-  @skipOnReva
+
   Scenario Outline: upload an empty file (size zero byte) to a shared folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

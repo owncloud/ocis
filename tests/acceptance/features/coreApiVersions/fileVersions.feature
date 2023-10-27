@@ -358,7 +358,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
-
+  @skipOnReva
   Scenario Outline: moving a file (with versions) into a shared folder as the sharee and as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

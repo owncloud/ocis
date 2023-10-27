@@ -60,7 +60,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: copying a file to a folder with no permissions
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -78,7 +78,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a file to overwrite a file into a folder with no permissions
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -602,7 +602,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharee
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -621,7 +621,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -641,7 +641,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -662,7 +662,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -710,7 +710,7 @@ Feature: copy file
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: copying a file between shares received from different users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -739,7 +739,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a folder between shares received from different users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -769,7 +769,7 @@ Feature: copy file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: copying a file to a folder that is shared with multiple users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

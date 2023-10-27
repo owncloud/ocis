@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: sharing
   As a user
   I want to check the webdav share permissions

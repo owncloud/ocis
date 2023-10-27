@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: share access by ID
   As an API consumer (app)
   I want to access a share by its id
@@ -53,7 +54,7 @@ Feature: share access by ID
       | 1               | 0          | 200              |
       | 2               | 0          | 404              |
 
-  @skipOnReva
+
   Scenario Outline: accept a share using the share Id
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"

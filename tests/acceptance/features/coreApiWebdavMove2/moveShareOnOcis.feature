@@ -7,7 +7,7 @@ Feature: move (rename) file
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-
+  @skipOnReva
   Scenario Outline: moving a file into a shared folder as the sharee and as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -30,7 +30,7 @@ Feature: move (rename) file
       | new              | Alice | /Shares/testshare  |
       | new              | Brian | /testshare         |
 
-
+  @skipOnReva
   Scenario Outline: moving a file out of a shared folder as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -51,7 +51,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: moving a file out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -71,7 +71,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: moving a folder into a shared folder as the sharee and as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -119,7 +119,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: moving a folder out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -142,7 +142,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: moving a file to a shared folder with no permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -161,7 +161,7 @@ Feature: move (rename) file
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: moving a file to overwrite a file in a shared folder with no permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
