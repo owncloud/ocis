@@ -1965,8 +1965,15 @@ class SpacesContext implements Context {
 		} elseif ($actionType === 'renames') {
 			$fileDestination = $destinationFile;
 		}
-		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
-		$fullUrl = $this->featureContext->getBaseUrl() . $url;
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if ($toSpaceName === 'Shares') {
+			$sharesPath = $this->featureContext->getMountSharesPath($user, $fileDestination);
+			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
+			$headers['Destination'] = $baseUrl . $davPath . $sharesPath;
+		} else {
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
+		}
+		$fullUrl = $baseUrl . $url;
 		if ($actionType === 'copies') {
 			$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 		} elseif ($actionType === 'moves' || $actionType === 'renames') {
