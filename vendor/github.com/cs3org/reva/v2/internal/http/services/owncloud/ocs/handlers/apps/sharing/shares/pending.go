@@ -88,6 +88,7 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+				s.Hidden = h.getReceivedShareHideFlagFromShareID(r.Context(), shareID)
 				mountedShares = append(mountedShares, s)
 			}
 		}
@@ -127,7 +128,8 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 		Share: &collaboration.Share{
 			Id: &collaboration.ShareId{OpaqueId: shareID},
 		},
-		State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
+		State:  collaboration.ShareState_SHARE_STATE_ACCEPTED,
+		Hidden: h.getReceivedShareHideFlagFromShareID(r.Context(), shareID),
 		MountPoint: &provider.Reference{
 			Path: mount,
 		},
@@ -151,7 +153,8 @@ func (h *Handler) RejectReceivedShare(w http.ResponseWriter, r *http.Request) {
 		Share: &collaboration.Share{
 			Id: &collaboration.ShareId{OpaqueId: shareID},
 		},
-		State: collaboration.ShareState_SHARE_STATE_REJECTED,
+		State:  collaboration.ShareState_SHARE_STATE_REJECTED,
+		Hidden: h.getReceivedShareHideFlagFromShareID(r.Context(), shareID),
 	}
 	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "hidden"}}
 
@@ -238,7 +241,7 @@ func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, re
 	}
 
 	data.State = mapState(rs.GetState())
-	data.Hidden = rs.Hidden
+	data.Hidden = rs.GetHidden()
 
 	h.addFileInfo(ctx, data, info)
 	h.mapUserIds(r.Context(), client, data)
@@ -249,6 +252,19 @@ func (h *Handler) updateReceivedShare(w http.ResponseWriter, r *http.Request, re
 	}
 
 	return data
+}
+
+// getReceivedShareHideFlagFromShareId returns the hide flag of a received share based on its ID.
+func (h *Handler) getReceivedShareHideFlagFromShareID(ctx context.Context, shareID string) bool {
+	client, err := h.getClient()
+	if err != nil {
+		return false
+	}
+	rs, _ := getReceivedShareFromID(ctx, client, shareID)
+	if rs != nil {
+		return rs.GetShare().GetHidden()
+	}
+	return false
 }
 
 // getReceivedShareFromID uses a client to the gateway to fetch a share based on its ID.

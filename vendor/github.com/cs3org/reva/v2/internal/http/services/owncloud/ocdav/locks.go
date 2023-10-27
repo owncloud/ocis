@@ -506,10 +506,15 @@ func (s *svc) lockReference(ctx context.Context, w http.ResponseWriter, r *http.
 		//      this actually is a name based lock ... ugh
 		token, err = s.LockSystem.Create(ctx, now, ld)
 		if err != nil {
-			if _, ok := err.(errtypes.Aborted); ok {
+			switch err.(type) {
+			case errtypes.Aborted:
 				return http.StatusLocked, err
+			case errtypes.PermissionDenied:
+				return http.StatusForbidden, err
+			default:
+				return http.StatusInternalServerError, err
+
 			}
-			return http.StatusInternalServerError, err
 		}
 
 		defer func() {

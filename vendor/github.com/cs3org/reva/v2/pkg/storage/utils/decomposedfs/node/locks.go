@@ -276,36 +276,10 @@ func (n *Node) CheckLock(ctx context.Context) error {
 }
 
 func readLocksIntoOpaque(ctx context.Context, n *Node, ri *provider.ResourceInfo) error {
-
-	// ensure parent path exists
-	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
-		return errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
-	}
-	fileLock, err := filelocks.AcquireReadLock(n.InternalPath())
-
+	lock, err := n.ReadLock(ctx, false)
 	if err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not read lock")
 		return err
-	}
-
-	defer func() {
-		rerr := filelocks.ReleaseLock(fileLock)
-
-		// if err is non nil we do not overwrite that
-		if err == nil {
-			err = rerr
-		}
-	}()
-
-	f, err := os.Open(n.LockFilePath())
-	if err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not open lock file")
-		return err
-	}
-	defer f.Close()
-
-	lock := &provider.Lock{}
-	if err := json.NewDecoder(f).Decode(lock); err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not read lock file")
 	}
 
 	// reencode to ensure valid json
