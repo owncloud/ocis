@@ -23,13 +23,12 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\OcsApiHelper;
 use TestHelpers\WebDavHelper;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\OcisHelper;
 
 require_once 'bootstrap.php';
 
@@ -39,6 +38,7 @@ require_once 'bootstrap.php';
 class WebDavLockingContext implements Context {
 	private FeatureContext $featureContext;
 	private PublicWebDavContext $publicWebDavContext;
+	private SpacesContext $spacesContext;
 
 	/**
 	 *
@@ -76,10 +76,12 @@ class WebDavLockingContext implements Context {
 			= "<?xml version='1.0' encoding='UTF-8'?>" .
 			"<d:lockinfo xmlns:d='DAV:'> ";
 		$headers = [];
-		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'depth', 'timeout']);
+		// depth is only 0 or infinity. We don't need to set it more, as there is no lock for the folder
+		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'timeout']);
 		$propertiesRows = $properties->getRowsHash();
+
 		foreach ($propertiesRows as $property => $value) {
-			if ($property === "depth" || $property === "timeout") {
+			if ($property === "timeout") {
 				//properties that are set in the header not in the xml
 				$headers[$property] = $value;
 			} else {
@@ -113,7 +115,62 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user locks file/folder :file using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $fullUrl
+	 * @param TableNode $properties table with no heading with | property | value |
+	 * @param boolean $expectToSucceed
+	 *
+	 * @return void
+	 */
+	private function lockFileInSpace(
+		string $user,
+		string $fullUrl,
+		TableNode $properties,
+		bool $expectToSucceed = true
+	):ResponseInterface {
+		$body
+			= "<?xml version='1.0' encoding='UTF-8'?>" .
+			"<d:lockinfo xmlns:d='DAV:'> ";
+		$headers = [];
+		// depth is only 0 or infinity. We don't need to set it more, as there is no lock for the folder
+		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'timeout']);
+		$propertiesRows = $properties->getRowsHash();
+
+		foreach ($propertiesRows as $property => $value) {
+			if ($property === "timeout") {
+				//properties that are set in the header not in the xml
+				$headers[$property] = $value;
+			} else {
+				$body .= "<d:$property><d:$value/></d:$property>";
+			}
+		}
+		$body .= "</d:lockinfo>";
+
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			"LOCK",
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$headers,
+			$body
+		);
+		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
+		if (isset($xmlPart[0])) {
+			$this->tokenOfLastLock[$user] = (string) $xmlPart[0];
+		} else {
+			if ($expectToSucceed === true) {
+				Assert::fail("could not find lock token after the last lock");
+			}
+		}
+		return $response;
+	}
+
+	/**
+	 * @When user :user locks file :file using the WebDAV API setting the following properties
+	 * @When user :user tries to lock file :file using the WebDAV API setting the following properties
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -127,7 +184,39 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has locked file/folder :file setting the following properties
+	 * @When user :user locks file :file inside the space :space using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function lockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
+		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
+		$response = $this->lockFileInSpace($user, $fullUrl, $properties);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user locks file using file-id path :path using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $filePath
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function lockFileUsingFileIdUsingWebDavAPI(string $user, string $filePath, TableNode $properties) {
+		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+		$response = $this->lockFileInSpace($user, $fullUrl, $properties);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given user :user has locked file :file setting the following properties
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -221,7 +310,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user unlocks the last created lock of file/folder :file using the WebDAV API
+	 * @When user :user unlocks the last created lock of file :file using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -239,7 +328,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user unlocks file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf using the WebDAV API
+	 * @When user :user unlocks file :itemToUnlock with the last created lock of file :itemToUseLockOf using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $itemToUnlock
@@ -262,7 +351,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user unlocks file/folder :itemToUnlock with the last created public lock of file/folder :itemToUseLockOf using the WebDAV API
+	 * @When user :user unlocks file :itemToUnlock with the last created public lock of file :itemToUseLockOf using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $itemToUnlock
@@ -327,7 +416,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has unlocked file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf of user :lockOwner using the WebDAV API
+	 * @Given user :user has unlocked file :itemToUnlock with the last created lock of file :itemToUseLockOf of user :lockOwner using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $itemToUnlock
@@ -409,7 +498,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user unlocks file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf of user :lockOwner using the WebDAV API
+	 * @When user :user unlocks file :itemToUnlock with the last created lock of file :itemToUseLockOf of user :lockOwner using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $itemToUnlock
@@ -434,7 +523,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When the public unlocks file/folder :itemToUnlock with the last created lock of file/folder :itemToUseLockOf of user :lockOwner using the WebDAV API
+	 * @When the public unlocks file :itemToUnlock with the last created lock of file :itemToUseLockOf of user :lockOwner using the WebDAV API
 	 *
 	 * @param string $itemToUnlock
 	 * @param string $lockOwner
@@ -459,7 +548,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When the public unlocks file/folder :itemToUnlock using the WebDAV API
+	 * @When the public unlocks file :itemToUnlock using the WebDAV API
 	 *
 	 * @param string $itemToUnlock
 	 *
@@ -657,7 +746,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Then :count locks should be reported for file/folder :file of user :user by the WebDAV API
+	 * @Then :count locks should be reported for file :file of user :user by the WebDAV API
 	 *
 	 * @param int $count
 	 * @param string $file
@@ -676,57 +765,6 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Then group :expectedGroup should exist as a lock breaker group
-	 *
-	 * @param string $expectedGroup
-	 *
-	 * @return void
-	 *
-	 * @throws Exception
-	 */
-	public function groupShouldExistAsLockBreakerGroups(string $expectedGroup) {
-		$baseUrl = $this->featureContext->getBaseUrl();
-		$admin = $this->featureContext->getAdminUsername();
-		$password = $this->featureContext->getAdminPassword();
-		$ocsApiVersion = $this->featureContext->getOcsApiVersion();
-
-		$response = OcsApiHelper::sendRequest(
-			$baseUrl,
-			$admin,
-			$password,
-			'GET',
-			"/apps/testing/api/v1/app/core/lock-breaker-groups",
-			$this->featureContext->getStepLineRef(),
-			(string) $ocsApiVersion
-		);
-
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__)->data->element;
-		$lockbreakergroup = trim(\json_decode(\json_encode($responseXml), true)['value'], '\'[]"');
-		$actualgroup = explode("\",\"", $lockbreakergroup);
-		if (!\in_array($expectedGroup, $actualgroup)) {
-			Assert::fail("could not find group '$expectedGroup' in lock breakers group");
-		}
-	}
-
-	/**
-	 * @Then following groups should exist as lock breaker groups
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 *
-	 * @throws Exception
-	 */
-	public function followingGroupShouldExistAsLockBreakerGroups(TableNode $table) {
-		$this->featureContext->verifyTableNodeColumns($table, ["groups"]);
-		$paths = $table->getHash();
-
-		foreach ($paths as $group) {
-			$this->groupShouldExistAsLockBreakerGroups($group["groups"]);
-		}
-	}
-
-	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
 	 *
@@ -742,5 +780,8 @@ class WebDavLockingContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->publicWebDavContext = $environment->getContext('PublicWebDavContext');
+		if (!OcisHelper::isTestingOnReva()) {
+			$this->spacesContext = $environment->getContext('SpacesContext');
+		}
 	}
 }
