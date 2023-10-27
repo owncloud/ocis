@@ -245,7 +245,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnRevaMaster
+  @skipOnReva
   Scenario Outline: adding public upload to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -265,7 +265,7 @@ Feature: update a public link share
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnReva
   Scenario Outline:adding public upload to a shared folder as recipient is allowed with permissions using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -285,7 +285,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnRevaMaster
+  @skipOnReva
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -305,7 +305,7 @@ Feature: update a public link share
       | 1               | 200              |
       | 2               | 403              |
 
-
+  @skipOnReva
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files

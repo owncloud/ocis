@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: using trashbin together with sharing
   As a user
   I want the deletion of the resources that I shared to end up in my trashbin

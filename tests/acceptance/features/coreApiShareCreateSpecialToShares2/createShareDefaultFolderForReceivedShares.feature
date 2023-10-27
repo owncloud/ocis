@@ -1,4 +1,4 @@
-@issue-1327
+@skipOnReva @issue-1327
 Feature: shares are received in the default folder for received shares
   As a user
   I want to share the default Shares folder

@@ -83,7 +83,7 @@ Feature: propagation of etags when deleting a file or folder
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: sharee deleting a file changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -113,7 +113,7 @@ Feature: propagation of etags when deleting a file or folder
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharer deleting a file changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -143,7 +143,7 @@ Feature: propagation of etags when deleting a file or folder
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharee deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -173,7 +173,7 @@ Feature: propagation of etags when deleting a file or folder
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

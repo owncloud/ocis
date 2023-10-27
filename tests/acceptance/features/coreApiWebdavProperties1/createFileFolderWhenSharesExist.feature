@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: create file or folder named similar to Shares folder
   As a user
   I want to be able to create files and folders when the Shares folder exists

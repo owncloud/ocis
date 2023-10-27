@@ -1388,7 +1388,6 @@ class FeatureContext extends BehatVariablesContext {
 				$message
 			);
 		}
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**

@@ -1,4 +1,4 @@
-@issue-1328
+@issue-1328 @skipOnReva
 Feature: sharing
   As a user
   I want to re-share a resource

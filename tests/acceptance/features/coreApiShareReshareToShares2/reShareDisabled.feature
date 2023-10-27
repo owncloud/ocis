@@ -1,4 +1,4 @@
-@issue-1328
+@issue-1328 @skipOnReva
 Feature: resharing can be disabled
   As a user
   I want to share a resource without reshare permission

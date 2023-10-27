@@ -156,7 +156,7 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: sharee renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -182,7 +182,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharer renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -208,7 +208,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -240,7 +240,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharee moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -272,7 +272,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -304,7 +304,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-
+  @skipOnReva
   Scenario Outline: sharee moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

@@ -53,7 +53,7 @@ Feature: propagation of etags when creating folders
       | dav-path-version |
       | spaces           |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharee creating a folder inside a folder received as a share changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
@@ -78,7 +78,7 @@ Feature: propagation of etags when creating folders
       | old              |
       | new              |
 
-  @issue-4251
+  @issue-4251 @skipOnReva
   Scenario Outline: sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

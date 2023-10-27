@@ -134,7 +134,7 @@ Feature: previews of files downloaded through the webdav API
       | new              |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: download previews of shared files (to shares folder)
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -207,7 +207,7 @@ Feature: previews of files downloaded through the webdav API
       | new              |
       | spaces           |
 
-  @issue-2538
+  @issue-2538 @skipOnReva
   Scenario Outline: when owner updates a shared file, previews for sharee are also updated (to shared folder)
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -238,7 +238,7 @@ Feature: previews of files downloaded through the webdav API
       | new              |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: updates to a file should change the preview for both sharees and sharers
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -261,7 +261,7 @@ Feature: previews of files downloaded through the webdav API
       | new              |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: updates to a group shared file should change the preview for both sharees and sharers
     Given using <dav-path-version> DAV path
     And group "grp1" has been created

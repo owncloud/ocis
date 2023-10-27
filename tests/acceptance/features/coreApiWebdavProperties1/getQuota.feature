@@ -71,7 +71,7 @@ Feature: get quota
       | new              |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: retrieving folder quota when quota is set and a file was received
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

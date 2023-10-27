@@ -1,4 +1,4 @@
-@issue-1289 @issue-1328
+@skipOnReva @issue-1289 @issue-1328
 Feature: sharing
   As a user
   I want to move shares that I received

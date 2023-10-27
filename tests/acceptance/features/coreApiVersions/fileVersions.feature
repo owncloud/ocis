@@ -270,7 +270,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "0" element
 
-
+  @skipOnReva
   Scenario: sharer of a file can see the old version information when the sharee changes the content of the file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -281,7 +281,7 @@ Feature: dav-versions
     When user "Brian" gets the number of versions of file "/Shares/sharefile.txt"
     Then the HTTP status code should be "403"
 
-
+  @skipOnReva
   Scenario: sharer of a file can restore the original content of a shared file after the file has been modified by the sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -292,7 +292,7 @@ Feature: dav-versions
     And the content of file "/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharefile.txt" for user "Brian" should be "First content"
 
-
+  @skipOnReva
   Scenario: sharer can restore a file inside a shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -304,7 +304,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
-
+  @skipOnReva
   Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -316,7 +316,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "Second content"
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "Second content"
 
-
+  @skipOnReva
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -328,7 +328,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
-
+  @skipOnReva
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -340,7 +340,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "old content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "old content"
 
-
+  @skipOnReva
   Scenario: sharer can restore a file inside a group shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -358,7 +358,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
-
+  @skipOnReva
   Scenario Outline: moving a file (with versions) into a shared folder as the sharee and as the sharer
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -416,7 +416,7 @@ Feature: dav-versions
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
-  @skipOnStorage:ceph
+  @skipOnStorage:ceph @skipOnReva
   Scenario: receiver tries get file versions of shared file from the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -427,7 +427,7 @@ Feature: dav-versions
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
 
-
+  @skipOnReva
   Scenario: receiver tries get file versions of shared file before receiving it
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"

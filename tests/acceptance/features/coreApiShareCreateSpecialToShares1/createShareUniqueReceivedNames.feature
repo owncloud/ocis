@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: resources shared with the same name are received with unique names
   As a user
   I want to share resources with same name
