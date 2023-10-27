@@ -23,13 +23,12 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\OcsApiHelper;
 use TestHelpers\WebDavHelper;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\OcisHelper;
 
 require_once 'bootstrap.php';
 
@@ -118,22 +117,18 @@ class WebDavLockingContext implements Context {
 	/**
 	 *
 	 * @param string $user
-	 * @param string $file
-	 * @param string $space
+	 * @param string $fullUrl
 	 * @param TableNode $properties table with no heading with | property | value |
 	 * @param boolean $expectToSucceed
 	 *
 	 * @return void
 	 */
-	private function lockFileInProjectSpace(
+	private function lockFileInSpace(
 		string $user,
-		string $file,
-		string $space,
+		string $fullUrl,
 		TableNode $properties,
 		bool $expectToSucceed = true
 	):ResponseInterface {
-		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
-		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
 		$body
 			= "<?xml version='1.0' encoding='UTF-8'?>" .
 			"<d:lockinfo xmlns:d='DAV:'> ";
@@ -164,65 +159,10 @@ class WebDavLockingContext implements Context {
 		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
 		if (isset($xmlPart[0])) {
-			$this->tokenOfLastLock[$user][$file] = (string) $xmlPart[0];
+			$this->tokenOfLastLock[$user] = (string) $xmlPart[0];
 		} else {
 			if ($expectToSucceed === true) {
-				Assert::fail("could not find lock token after trying to lock '$file'");
-			}
-		}
-		return $response;
-	}
-
-	/**
-	 *
-	 * @param string $user
-	 * @param string $filePath
-	 * @param TableNode $properties table with no heading with | property | value |
-	 * @param boolean $expectToSucceed
-	 *
-	 * @return void
-	 */
-	private function lockFileUsingFileId(
-		string $user,
-		string $filePath,
-		TableNode $properties,
-		bool $expectToSucceed = true
-	):ResponseInterface {
-		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
-		$body
-			= "<?xml version='1.0' encoding='UTF-8'?>" .
-			"<d:lockinfo xmlns:d='DAV:'> ";
-		$headers = [];
-		// depth is only 0 or infinity. We don't need to set it more, as there is no lock for the folder
-		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'timeout']);
-		$propertiesRows = $properties->getRowsHash();
-
-		foreach ($propertiesRows as $property => $value) {
-			if ($property === "timeout") {
-				//properties that are set in the header not in the xml
-				$headers[$property] = $value;
-			} else {
-				$body .= "<d:$property><d:$value/></d:$property>";
-			}
-		}
-		$body .= "</d:lockinfo>";
-
-		$response = HttpRequestHelper::sendRequest(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
-			"LOCK",
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
-			$headers,
-			$body
-		);
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
-		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
-		if (isset($xmlPart[0])) {
-			$this->tokenOfLastLock[$user][$filePath] = (string) $xmlPart[0];
-		} else {
-			if ($expectToSucceed === true) {
-				Assert::fail("could not find lock token after trying to lock '$filePath'");
+				Assert::fail("could not find lock token after the last lock");
 			}
 		}
 		return $response;
@@ -254,7 +194,9 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function lockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
-		$response = $this->lockFileInProjectSpace($user, $file, $space, $properties, false, false);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
+		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
+		$response = $this->lockFileInSpace($user, $fullUrl, $properties, false, false);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -268,7 +210,8 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function lockFileUsingFileIdUsingWebDavAPI(string $user, string $filePath, TableNode $properties) {
-		$response = $this->lockFileUsingFileId($user, $filePath, $properties, false, false);
+		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+		$response = $this->lockFileInSpace($user, $fullUrl, $properties, false, false);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -837,6 +780,8 @@ class WebDavLockingContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->publicWebDavContext = $environment->getContext('PublicWebDavContext');
-		$this->spacesContext = $environment->getContext('SpacesContext');
+		if (!OcisHelper::isTestingOnReva()) {
+			$this->spacesContext = $environment->getContext('SpacesContext');
+		}
 	}
 }

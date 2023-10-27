@@ -9,7 +9,7 @@ Feature: lock files
       | Brian    |
 
 
-  Scenario Outline: locking a file
+  Scenario Outline: lock a file
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     When user "Alice" locks file "textfile.txt" using the WebDAV API setting the following properties
@@ -30,7 +30,7 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: locking a file with a set timeout
+  Scenario Outline: lock a file with a timeout
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     When user "Alice" locks file "textfile.txt" using the WebDAV API setting the following properties
@@ -52,7 +52,7 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: locking a file by file-id
+  Scenario Outline: lock a file using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
@@ -88,7 +88,7 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: locking a file in the project space
+  Scenario Outline: lock a file in the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
@@ -114,7 +114,7 @@ Feature: lock files
       | editor  |
 
 
-  Scenario Outline: locking a file in the project space by file-id
+  Scenario Outline: lock a file in the project space using file-id
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
@@ -158,10 +158,10 @@ Feature: lock files
     Then the HTTP status code should be "403"
 
 
-  Scenario Outline: locking a file in the shares
+  Scenario Outline: lock a file in the shares
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
-    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | editor       |
@@ -181,10 +181,10 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: locking a file in the shares using file-id
-    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+  Scenario Outline: lock a file in the shares using file-id
+    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | editor       |
@@ -205,9 +205,9 @@ Feature: lock files
 
     
    Scenario: viewer cannot lock a file in the shares using file-id
-    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | viewer       |
