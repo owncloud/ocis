@@ -100,7 +100,7 @@ type OCMProviderAuthorizerDrivers struct {
 
 type OCMProviderAuthorizerJSONDriver struct {
 	Providers             string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
-	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"`
+	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME" desc:"Verify the hostname of the incoming request against the hostname of the OCM provider."`
 }
 
 type OCMCore struct {
