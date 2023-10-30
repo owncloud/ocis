@@ -45,7 +45,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
-* Enhancement - Add config to enforce passwords on readable links: [#7547](https://github.com/owncloud/ocis/pull/7547)
+* Enhancement - Add config to enforce passwords on all public links: [#7547](https://github.com/owncloud/ocis/pull/7547)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
@@ -403,10 +403,10 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/5550
    https://github.com/owncloud/ocis/pull/7240
 
-* Enhancement - Add config to enforce passwords on readable links: [#7547](https://github.com/owncloud/ocis/pull/7547)
+* Enhancement - Add config to enforce passwords on all public links: [#7547](https://github.com/owncloud/ocis/pull/7547)
 
-   We added the config `OCIS_SHARING_PUBLIC_READABLE_SHARE_MUST_HAVE_PASSWORD` to enforce
-   passwords on "Viewer" public shares.
+   We added the config `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` to enforce passwords
+   on all public shares.
 
    https://github.com/owncloud/ocis/issues/7539
    https://github.com/owncloud/ocis/pull/7547
