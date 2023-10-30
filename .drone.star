@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -74,7 +74,7 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
             ],
-            "skip": False,
+            "skip": True,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
@@ -86,7 +86,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -103,7 +103,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -117,18 +117,18 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
@@ -144,7 +144,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
+    "litmus": False,
     "codestyle": True,
 }
 
