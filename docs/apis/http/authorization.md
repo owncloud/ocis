@@ -26,7 +26,7 @@ While selecting ownCloud client for authentication, take note of specific limita
 |iOS|oc://ios.owncloud.com|
 |Desktop|http://127.0.0.1 <br> http://localhost |
 
-In this documentation, desktop client `client_id` and `client_secret` is being used.
+In this documentation, desktop client `client_id` and `client_secret` are being used.
 ```bash
 client_id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
 client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
@@ -55,7 +55,7 @@ client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
 
 2. Requesting an access token
 
-   The next step in the  OIDC Code Flow involves an HTTP POST request
+   The next step in the OIDC Code Flow involves an HTTP POST request
    to the token endpoint of the **Infinite Scale Identity Server**.
 
     ```bash
@@ -125,7 +125,7 @@ After a successful authentication, the browser will redirect to a URL that looks
 http://path-to-redirect-uri#access_token=eyJhbGciOiJQUzI...&expires_in=300&id_token=eyJhbGciOiJ...&scope=email%20openid%20profile&session_state=c8a1019f5e054d...&state=&token_type=Bearer
 ```
 
-For the next step extract the access_token from the URL.
+For the next step, extract the access_token from the URL.
 ```bash
 access_token = 'eyJhbGciOiJQ...'
  ```
