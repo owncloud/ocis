@@ -55,7 +55,7 @@ Feature: lock files
   Scenario Outline: lock a file using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Alice" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -123,7 +123,7 @@ Feature: lock files
     And user "Alice" has shared a space "Project" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    When user "Brian" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -150,10 +150,10 @@ Feature: lock files
     And user "Alice" has shared a space "Project" with settings:
       | shareWith | Brian  |
       | role      | viewer |
-    When user "Brian" locks file "textfile.txt" inside the space "Project" using the WebDAV API setting the following properties
+    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
-    When user "Brian" locks file using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    When user "Brian" tries to lock file "textfile.txt" inside the space "Project" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
 
@@ -188,7 +188,7 @@ Feature: lock files
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | editor       |
-    When user "Brian" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -204,13 +204,55 @@ Feature: lock files
       | /dav/spaces/<<FILEID>>            |
 
 
-   Scenario: viewer cannot lock a file in the shares using file-id
+  Scenario: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has created a share inside of space "Alice Hansen" with settings:
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | viewer       |
-    When user "Brian" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
-      | lockscope | exclusive   |
+    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+      | lockscope | exclusive |
     Then the HTTP status code should be "403"
+
+
+  Scenario: sharee cannot lock a resource exclusively locked by a sharer
+    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
+      | path      | textfile.txt |
+      | shareWith | Brian        |
+      | role      | editor       |
+    And user "Alice" has locked file "textfile.txt" setting the following properties
+      | lockscope | exclusive |
+    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+      | lockscope | exclusive   |
+      | timeout   | Second-3600 |
+    Then the HTTP status code should be "423"
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
+      | key                                                  | value        |
+      | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
+      | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
+
+
+  Scenario: sharer cannot lock a resource exclusively locked by a sharee
+    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
+      | path      | textfile.txt |
+      | shareWith | Brian        |
+      | role      | editor       |
+    And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+      | lockscope | exclusive |
+    When user "Alice" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+      | lockscope | exclusive   |
+      | timeout   | Second-3600 |
+    Then the HTTP status code should be "423"
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
+      | key                                                  | value        |
+      | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
+      | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |

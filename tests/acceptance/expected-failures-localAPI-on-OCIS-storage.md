@@ -143,11 +143,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraph/addUserToGroup.feature:420](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L420)
 
-### [500 error if viewer tries to lock file](https://github.com/owncloud/ocis/issues/7600)
-
-- [apiSpaces/lockFiles.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L144)
-- [apiSpaces/lockFiles.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L207)
-
 ### [Shared file locking is not possible using different path](https://github.com/owncloud/ocis/issues/7599)
 
 - [apiSpaces/lockFiles.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L179)

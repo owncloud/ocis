@@ -51,6 +51,7 @@ class WebDavLockingContext implements Context {
 	 * @param string $user
 	 * @param string $file
 	 * @param TableNode $properties table with no heading with | property | value |
+	 * @param string $fullUrl
 	 * @param boolean $public if the file is in a public share or not
 	 * @param boolean $expectToSucceed
 	 *
@@ -60,6 +61,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		TableNode $properties,
+		string $fullUrl = null,
 		bool $public = false,
 		bool $expectToSucceed = true
 	):ResponseInterface {
@@ -88,20 +90,33 @@ class WebDavLockingContext implements Context {
 				$body .= "<d:$property><d:$value/></d:$property>";
 			}
 		}
-
 		$body .= "</d:lockinfo>";
-		$response = WebDavHelper::makeDavRequest(
-			$baseUrl,
-			$user,
-			$password,
-			"LOCK",
-			$file,
-			$headers,
-			$this->featureContext->getStepLineRef(),
-			$body,
-			$this->featureContext->getDavPathVersion(),
-			$type
-		);
+
+		if (isset($fullUrl)) {
+			$response = HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				"LOCK",
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				$headers,
+				$body
+			);
+		} else {
+			$response = WebDavHelper::makeDavRequest(
+				$baseUrl,
+				$user,
+				$password,
+				"LOCK",
+				$file,
+				$headers,
+				$this->featureContext->getStepLineRef(),
+				$body,
+				$this->featureContext->getDavPathVersion(),
+				$type
+			);
+		}
+
 		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
 		if (isset($xmlPart[0])) {
@@ -115,62 +130,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 *
-	 * @param string $user
-	 * @param string $fullUrl
-	 * @param TableNode $properties table with no heading with | property | value |
-	 * @param boolean $expectToSucceed
-	 *
-	 * @return void
-	 */
-	private function lockFileInSpace(
-		string $user,
-		string $fullUrl,
-		TableNode $properties,
-		bool $expectToSucceed = true
-	):ResponseInterface {
-		$body
-			= "<?xml version='1.0' encoding='UTF-8'?>" .
-			"<d:lockinfo xmlns:d='DAV:'> ";
-		$headers = [];
-		// depth is only 0 or infinity. We don't need to set it more, as there is no lock for the folder
-		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'timeout']);
-		$propertiesRows = $properties->getRowsHash();
-
-		foreach ($propertiesRows as $property => $value) {
-			if ($property === "timeout") {
-				//properties that are set in the header not in the xml
-				$headers[$property] = $value;
-			} else {
-				$body .= "<d:$property><d:$value/></d:$property>";
-			}
-		}
-		$body .= "</d:lockinfo>";
-
-		$response = HttpRequestHelper::sendRequest(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
-			"LOCK",
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
-			$headers,
-			$body
-		);
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
-		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
-		if (isset($xmlPart[0])) {
-			$this->tokenOfLastLock[$user] = (string) $xmlPart[0];
-		} else {
-			if ($expectToSucceed === true) {
-				Assert::fail("could not find lock token after the last lock");
-			}
-		}
-		return $response;
-	}
-
-	/**
 	 * @When user :user locks file :file using the WebDAV API setting the following properties
-	 * @When user :user tries to lock file :file using the WebDAV API setting the following properties
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -179,7 +139,21 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function lockFileUsingWebDavAPI(string $user, string $file, TableNode $properties) {
-		$response = $this->lockFile($user, $file, $properties, false, false);
+		$response = $this->lockFile($user, $file, $properties, null);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user tries to lock file :file using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function tryToLockFileUsingWebDavAPI(string $user, string $file, TableNode $properties) {
+		$response = $this->lockFile($user, $file, $properties, null, false, false);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -196,22 +170,56 @@ class WebDavLockingContext implements Context {
 	public function lockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
-		$response = $this->lockFileInSpace($user, $fullUrl, $properties);
+		$response = $this->lockFile($user, $file, $properties, $fullUrl);
 		$this->featureContext->setResponse($response);
 	}
 
 	/**
-	 * @When user :user locks file using file-id path :path using the WebDAV API setting the following properties
+	 * @When user :user tries to lock file :file inside the space :space using the WebDAV API setting the following properties
 	 *
 	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function triesTlockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
+		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
+		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user locks file :file using file-id path :path using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
 	 * @param string $filePath
 	 * @param TableNode $properties table with no heading with | property | value |
 	 *
 	 * @return void
 	 */
-	public function lockFileUsingFileIdUsingWebDavAPI(string $user, string $filePath, TableNode $properties) {
+	public function lockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
 		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
-		$response = $this->lockFileInSpace($user, $fullUrl, $properties);
+		$response = $this->lockFile($user, $file, $properties, $fullUrl);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user tries to lock file :file using file-id path :path using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $filePath
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function tryToLockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
+		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -230,6 +238,22 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has locked file :file using file-id path :path using the WebDAV API setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $filePath
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function userHasLockedFileUsingFileId(string $user, string $file, string $filePath, TableNode $properties) {
+		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+		$response = $this->lockFile($user, $file, $properties, $fullUrl);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+	}
+
+	/**
 	 * @Given the public has locked the last public link shared file/folder setting the following properties
 	 *
 	 * @param TableNode $properties
@@ -241,11 +265,12 @@ class WebDavLockingContext implements Context {
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			"/",
 			$properties,
+			null,
 			true
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
-
+  
 	/**
 	 * @When the public locks the last public link shared file/folder using the WebDAV API setting the following properties
 	 *
@@ -258,6 +283,7 @@ class WebDavLockingContext implements Context {
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			"/",
 			$properties,
+			null,
 			true,
 			false
 		);
@@ -280,6 +306,7 @@ class WebDavLockingContext implements Context {
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			$file,
 			$properties,
+			null,
 			true
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
@@ -303,6 +330,7 @@ class WebDavLockingContext implements Context {
 			$this->featureContext->getLastCreatedPublicShareToken(),
 			$file,
 			$properties,
+			null,
 			true,
 			false
 		);
