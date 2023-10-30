@@ -13,7 +13,7 @@ Feature: Tag
       | Brian    |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "use-tag" with the default quota using the GraphApi
+    And user "Alice" has created a space "use-tag" with the default quota using the Graph API
     And user "Alice" has created a folder "folderMain" in space "use-tag"
     And user "Alice" has uploaded a file inside space "use-tag" with content "some content" to "folderMain/insideTheFolder.txt"
 
@@ -39,13 +39,13 @@ Feature: Tag
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value   |
       | oc:tags | fileTag |
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
       | fileTag                        |
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | tag level#1                    |
@@ -74,7 +74,7 @@ Feature: Tag
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
       | key     | value                                 |
       | oc:tags | fileTag,tag with symbol @^$#^%$@%!_+) |
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | my tag                        |
@@ -91,7 +91,7 @@ Feature: Tag
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
     Then the HTTP status code should be "<code>"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response <shouldOrNot> contain following tags:
       | tag level#1                    |
@@ -111,7 +111,7 @@ Feature: Tag
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
-    When user "Brian" lists all available tags via the GraphApi
+    When user "Brian" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | folderTag |
@@ -127,7 +127,7 @@ Feature: Tag
       | tag in a shared resource |
       | second tag               |
     Then the HTTP status code should be "<code>"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response <shouldOrNot> contain following tags:
       | tag in a shared resource |
@@ -154,7 +154,7 @@ Feature: Tag
       | tag in a shared resource |
       | second tag               |
     Then the HTTP status code should be "<code>"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response <shouldOrNot> contain following tags:
       | tag in a shared resource |
@@ -193,7 +193,7 @@ Feature: Tag
       | folderTag |
       | marketing |
     Then the HTTP status code should be "200"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | development |
@@ -208,7 +208,7 @@ Feature: Tag
       | marketing |
     When user "Alice" removes the folder "folderMain" from space "use-tag"
     Then the HTTP status code should be "204"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should not contain following tags:
       | folderTag |
@@ -220,14 +220,14 @@ Feature: Tag
       | folderTag |
       | marketing |
     And user "Alice" has disabled a space "use-tag"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should not contain following tags:
       | folderTag |
       | marketing |
     When user "Alice" deletes a space "use-tag"
     Then the HTTP status code should be "204"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should not contain following tags:
       | folderTag |
@@ -241,7 +241,7 @@ Feature: Tag
     And user "Alice" has removed the folder "folderMain" from space "use-tag"
     When user "Alice" restores the folder "folderMain" from the trash of the space "use-tag" to "/folderMain"
     Then the HTTP status code should be "201"
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | folderTag |
@@ -268,7 +268,7 @@ Feature: Tag
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value          |
       | oc:tags | file,नेपाल,Tag |
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | finance |
@@ -288,7 +288,7 @@ Feature: Tag
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value                     |
       | oc:tags | engineering,finance,hr,qa |
-    When user "Alice" lists all available tags via the GraphApi
+    When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | engineering |

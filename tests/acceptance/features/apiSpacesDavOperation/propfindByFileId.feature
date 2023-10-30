@@ -53,7 +53,7 @@ Feature: propfind a file using file id
 
   Scenario Outline: send a PROPFIND request to a file of inside project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
@@ -70,7 +70,7 @@ Feature: propfind a file using file id
 
   Scenario Outline: send a PROPFIND request to a file inside a folder of project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "/folder/textfile.txt"
     And we save it into "FILEID"
@@ -89,7 +89,7 @@ Feature: propfind a file using file id
   Scenario Outline: send a PROPFIND request to a file inside project space owned by another user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"

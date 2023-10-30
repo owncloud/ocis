@@ -13,7 +13,7 @@ Feature: copy file
 
   Scenario Outline: copying a file within a same project space with role manager and editor
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/insideSpace.txt"
     And user "Alice" has shared a space "Project" with settings:
@@ -32,7 +32,7 @@ Feature: copy file
 
   Scenario: copying a file within a same project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
     And user "Alice" has shared a space "Project" with settings:
@@ -46,8 +46,8 @@ Feature: copy file
 
   Scenario Outline: user copies a file from a project space with a different role to a project space with the manager role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project1" with the default quota using the GraphApi
-    And user "Brian" has created a space "Project2" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project1" with the default quota using the Graph API
+    And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
     And user "Brian" has shared a space "Project2" with settings:
       | shareWith | Alice     |
@@ -70,8 +70,8 @@ Feature: copy file
 
   Scenario Outline: user copies a file from a project space with a different role to a project space with a viewer role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project1" with the default quota using the GraphApi
-    And user "Brian" has created a space "Project2" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project1" with the default quota using the Graph API
+    And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
     And user "Brian" has shared a space "Project2" with settings:
       | shareWith | Alice  |
@@ -91,7 +91,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from project space with different role to personal space
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
@@ -110,7 +110,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from project space with different role to share space with editor role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
     And user "Brian" has shared a space "Project" with settings:
@@ -131,7 +131,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from project space with different role to Shares with viewer role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
     And user "Brian" has shared a space "Project" with settings:
@@ -151,7 +151,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | <role> |
@@ -169,7 +169,7 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | viewer |
@@ -219,7 +219,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | <role> |
@@ -241,7 +241,7 @@ Feature: copy file
 
   Scenario Outline: user copies a file from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | viewer |
@@ -298,7 +298,7 @@ Feature: copy file
 
   Scenario Outline: copying a folder within the same project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/folder1" in space "Project"
     And user "Alice" has created a folder "/folder2" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/folder2/demo.txt"
@@ -318,8 +318,8 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from a project space with different role to a project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project1" with the default quota using the GraphApi
-    And user "Brian" has created a space "Project2" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project1" with the default quota using the Graph API
+    And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project1"
     And user "Brian" has uploaded a file inside space "Project1" with content "some content" to "/folder1/demo.txt"
     And user "Brian" has shared a space "Project2" with settings:
@@ -345,7 +345,7 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from project space with different role to personal space
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
     And user "Brian" has shared a space "Project" with settings:
@@ -364,7 +364,7 @@ Feature: copy file
 
   Scenario Outline: Uuer copies a folder from project space with different role to share space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
@@ -388,7 +388,7 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | <role> |
@@ -438,7 +438,7 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | <role> |
@@ -460,7 +460,7 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
       | role      | viewer |
@@ -709,7 +709,7 @@ Feature: copy file
 
   Scenario: copying a file with an option "keep both" inside of the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/insideSpace.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "new content" to "/insideSpace.txt"
@@ -723,7 +723,7 @@ Feature: copy file
   @issue-4797
   Scenario: copying a file with an option "replace" inside of the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/insideSpace.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/insideSpace.txt"
@@ -742,7 +742,7 @@ Feature: copy file
 
   Scenario: copying a file from Personal to Shares with an option "keep both"
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/personal.txt"
     And user "Alice" creates a share inside of space "Project" with settings:
@@ -763,7 +763,7 @@ Feature: copy file
 
   Scenario: copying a file from Personal to Shares with an option "replace"
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/personal.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/personal.txt"

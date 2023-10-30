@@ -794,7 +794,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using GraphApi$/
+	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
