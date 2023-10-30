@@ -217,6 +217,42 @@ Feature: Search
       | new              |
       | spaces           |
 
+  @issue-7114
+  Scenario Outline: search files inside the folder with white space character in its name
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/New Folder"
+    And user "Alice" has uploaded file with content "hello world inside folder" to "/New Folder/file.txt"
+    And user "Alice" has created folder "/New Folder/Sub Folder"
+    And user "Alice" has uploaded file with content "hello world inside sub folder" to "/New Folder/Sub Folder/file1.txt"
+    When user "Alice" searches for "*file*" inside folder "/New Folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | /New Folder/file.txt             |
+      | /New Folder/Sub Folder/file1.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-7114
+  Scenario Outline: search files with white space character in its name
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/New Folder"
+    And user "Alice" has uploaded file with content "hello world" to "/new file.txt"
+    And user "Alice" has created folder "/New Folder/New Sub Folder"
+    When user "Alice" searches for "*new*" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | /New Folder                |
+      | /New Folder/New Sub Folder |
+      | /new file.txt              |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
   @issue-enterprise-6000 @issue-7028 @issue-7092
   Scenario Outline: sharee cannot find resources that are not shared
     Given using <dav-path-version> DAV path
