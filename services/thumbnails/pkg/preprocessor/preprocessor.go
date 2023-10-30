@@ -7,7 +7,6 @@ import (
 	"image/draw"
 	"image/gif"
 	"io"
-	"log"
 	"math"
 	"mime"
 	"strings"
@@ -48,10 +47,13 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 type AudioDecoder struct{}
 
 func (i AudioDecoder) Convert(r io.Reader) (interface{}, error) {
-	readSeeker := NewLazyReadSeeker(r)
-	m, err := tag.ReadFrom(readSeeker)
+	b, err := io.ReadAll(r)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+	m, err := tag.ReadFrom(bytes.NewReader(b))
+	if err != nil {
+		return nil, err
 	}
 
 	picture := m.Picture()
