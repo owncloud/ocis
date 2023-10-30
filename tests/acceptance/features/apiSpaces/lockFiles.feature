@@ -91,7 +91,7 @@ Feature: lock files
   Scenario Outline: lock a file in the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And user "Alice" has shared a space "Project" with settings:
       | shareWith | Brian  |
@@ -117,7 +117,7 @@ Feature: lock files
   Scenario Outline: lock a file in the project space using file-id
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has shared a space "Project" with settings:
@@ -144,7 +144,7 @@ Feature: lock files
   Scenario: viewer cannot lock a file in the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
-    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has shared a space "Project" with settings:
@@ -203,7 +203,7 @@ Feature: lock files
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-    
+
    Scenario: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
@@ -214,4 +214,3 @@ Feature: lock files
     When user "Brian" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
     Then the HTTP status code should be "403"
-    

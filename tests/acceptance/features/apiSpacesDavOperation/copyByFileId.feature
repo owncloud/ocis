@@ -77,8 +77,6 @@ Feature: copying file using file id
   Scenario Outline: copy a file into a folder in project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has created a folder "/folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
@@ -96,8 +94,6 @@ Feature: copying file using file id
 
   Scenario Outline: copy a file into a sub-folder in project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder/sub-folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"

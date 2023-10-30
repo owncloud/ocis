@@ -339,7 +339,7 @@ Feature: Change data of space
     When user "<user>" uploads a file inside space "Project Jupiter" owned by the user "Alice" with content "new content" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<expectedContent>"
-    When user "<user>" lists all available spaces via the GraphApi
+    When user "<user>" lists all available spaces via the Graph API
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
     """
     {

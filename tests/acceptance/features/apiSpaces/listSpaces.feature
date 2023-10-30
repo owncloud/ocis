@@ -81,7 +81,7 @@ Feature: List and create spaces
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
-    When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
+    When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
     """
@@ -434,7 +434,7 @@ Feature: List and create spaces
     And user "Brian" has uploaded file with content "this is a test file." to "test.txt"
     And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     And user "Brian" has shared file "/test.txt" with user "Alice"
-    When user "Alice" lists all available spaces via the GraphApi
+    When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Shares" owned by "Alice" and match
     """
