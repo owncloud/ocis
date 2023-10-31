@@ -204,7 +204,7 @@ class SpacesTUSContext implements Context {
 				$mtime = date('Y-m-d', strtotime('-7 days'));
 				break;
 			case "lastMonth":
-				$mtime = date('Y-m' . '-01', strtotime('-1 month'));
+				$mtime = date('Y-m-d', strtotime('first day of previous month'));
 				break;
 			case "lastYear":
 				$mtime = date('Y-m' . '-01', strtotime('-1 year'));
