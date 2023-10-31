@@ -16,6 +16,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	ldapv3 "github.com/go-ldap/ldap/v3"
 	"github.com/jellydator/ttlcache/v3"
+	microstore "go-micro.dev/v4/store"
+
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -24,7 +26,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
-	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -95,10 +96,12 @@ type Service interface {
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
-	GetSharedByMe(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
+
+	GetSharedByMe(w http.ResponseWriter, r *http.Request)
+	ListSharedWithMe(w http.ResponseWriter, r *http.Request)
 
 	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
@@ -190,6 +193,7 @@ func NewService(opts ...Option) (Graph, error) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Get("/me/drive/sharedByMe", svc.GetSharedByMe)
+			r.Get("/me/drive/sharedWithMe", svc.ListSharedWithMe)
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
 				r.Get("/", svc.GetRoleDefinitions)
 				r.Get("/{roleID}", svc.GetRoleDefinition)
@@ -208,9 +212,7 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drive", svc.GetUserDrive)
-				r.Route("/drives", func(r chi.Router) {
-					r.Get("/", svc.GetDrives)
-				})
+				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})

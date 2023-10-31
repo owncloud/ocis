@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-// PatchTimeNow is here to path the package time now func,
-// this only exists for the tests context
+// PatchTimeNow is here to patch the package time now func,
+// which is used in the test suite
 func PatchTimeNow(t func() time.Time) {
 	timeNow = t
 }

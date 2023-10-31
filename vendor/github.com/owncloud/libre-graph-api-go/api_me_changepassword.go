@@ -63,7 +63,7 @@ func (a *MeChangepasswordApiService) ChangeOwnPasswordExecute(r ApiChangeOwnPass
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/changePassword"
+	localVarPath := localBasePath + "/v1.0/me/changePassword"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

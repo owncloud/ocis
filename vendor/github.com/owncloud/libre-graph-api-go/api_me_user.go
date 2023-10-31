@@ -65,7 +65,7 @@ func (a *MeUserApiService) GetOwnUserExecute(r ApiGetOwnUserRequest) (*User, *ht
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me"
+	localVarPath := localBasePath + "/v1.0/me"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

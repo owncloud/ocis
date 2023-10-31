@@ -93,11 +93,11 @@ func NewConfiguration() *Configuration {
 		Debug:         false,
 		Servers: ServerConfigurations{
 			{
-				URL:         "https://ocis.ocis-traefik.latest.owncloud.works/graph/v1.0",
+				URL:         "https://ocis.ocis-traefik.latest.owncloud.works/graph",
 				Description: "ownCloud Infinite Scale Latest",
 			},
 			{
-				URL:         "https://localhost:9200/graph/v1.0",
+				URL:         "https://localhost:9200/graph",
 				Description: "ownCloud Infinite Scale Development Setup",
 			},
 		},

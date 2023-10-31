@@ -13,12 +13,13 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"go-micro.dev/v4/selector"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
-	"go-micro.dev/v4/selector"
 )
 
 type cs3backend struct {
@@ -231,7 +232,7 @@ func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) 
 	lgconf := libregraph.NewConfiguration()
 	lgconf.Servers = libregraph.ServerConfigurations{
 		{
-			URL: fmt.Sprintf("%s://%s/graph/v1.0", node.Metadata["protocol"], node.Address),
+			URL: fmt.Sprintf("%s://%s/graph", node.Metadata["protocol"], node.Address),
 		},
 	}
 

@@ -58,7 +58,7 @@ func (a *MeDriveApiService) GetHomeExecute(r ApiGetHomeRequest) (*Drive, *http.R
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/drive"
+	localVarPath := localBasePath + "/v1.0/me/drive"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -166,7 +166,7 @@ func (a *MeDriveApiService) ListSharedByMeExecute(r ApiListSharedByMeRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/drive/sharedByMe"
+	localVarPath := localBasePath + "/v1beta1/me/drive/sharedByMe"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -274,7 +274,7 @@ func (a *MeDriveApiService) ListSharedWithMeExecute(r ApiListSharedWithMeRequest
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/drive/sharedWithMe"
+	localVarPath := localBasePath + "/v1beta1/me/drive/sharedWithMe"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

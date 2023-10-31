@@ -58,7 +58,7 @@ func (a *MeDriveRootApiService) HomeGetRootExecute(r ApiHomeGetRootRequest) (*Dr
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/drive/root"
+	localVarPath := localBasePath + "/v1.0/me/drive/root"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

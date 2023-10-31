@@ -62,7 +62,7 @@ func (a *TagsApiService) AssignTagsExecute(r ApiAssignTagsRequest) (*http.Respon
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/extensions/org.libregraph/tags"
+	localVarPath := localBasePath + "/v1.0/extensions/org.libregraph/tags"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -160,7 +160,7 @@ func (a *TagsApiService) GetTagsExecute(r ApiGetTagsRequest) (*CollectionOfTags,
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/extensions/org.libregraph/tags"
+	localVarPath := localBasePath + "/v1.0/extensions/org.libregraph/tags"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -269,7 +269,7 @@ func (a *TagsApiService) UnassignTagsExecute(r ApiUnassignTagsRequest) (*http.Re
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/extensions/org.libregraph/tags"
+	localVarPath := localBasePath + "/v1.0/extensions/org.libregraph/tags"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

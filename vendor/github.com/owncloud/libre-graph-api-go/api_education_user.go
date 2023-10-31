@@ -66,7 +66,7 @@ func (a *EducationUserApiService) CreateEducationUserExecute(r ApiCreateEducatio
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/users"
+	localVarPath := localBasePath + "/v1.0/education/users"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -177,7 +177,7 @@ func (a *EducationUserApiService) DeleteEducationUserExecute(r ApiDeleteEducatio
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/education/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -284,7 +284,7 @@ func (a *EducationUserApiService) GetEducationUserExecute(r ApiGetEducationUserR
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/education/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -407,7 +407,7 @@ func (a *EducationUserApiService) ListEducationUsersExecute(r ApiListEducationUs
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/users"
+	localVarPath := localBasePath + "/v1.0/education/users"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -528,7 +528,7 @@ func (a *EducationUserApiService) UpdateEducationUserExecute(r ApiUpdateEducatio
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/education/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)

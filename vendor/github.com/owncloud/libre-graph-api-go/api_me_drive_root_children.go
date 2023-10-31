@@ -58,7 +58,7 @@ func (a *MeDriveRootChildrenApiService) HomeGetChildrenExecute(r ApiHomeGetChild
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/me/drive/root/children"
+	localVarPath := localBasePath + "/v1.0/me/drive/root/children"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

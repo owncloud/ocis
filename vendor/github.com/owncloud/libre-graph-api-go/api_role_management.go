@@ -65,7 +65,7 @@ func (a *RoleManagementApiService) GetPermissionRoleDefinitionExecute(r ApiGetPe
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/roleManagement/permissions/roleDefinitions/{role-id}"
+	localVarPath := localBasePath + "/v1beta1/roleManagement/permissions/roleDefinitions/{role-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"role-id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -174,7 +174,7 @@ func (a *RoleManagementApiService) ListPermissionRoleDefinitionsExecute(r ApiLis
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/roleManagement/permissions/roleDefinitions"
+	localVarPath := localBasePath + "/v1beta1/roleManagement/permissions/roleDefinitions"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

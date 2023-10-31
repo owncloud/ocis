@@ -75,7 +75,7 @@ func (a *UserAppRoleAssignmentApiService) UserCreateAppRoleAssignmentsExecute(r 
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}/appRoleAssignments"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}/appRoleAssignments"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -197,7 +197,7 @@ func (a *UserAppRoleAssignmentApiService) UserDeleteAppRoleAssignmentsExecute(r 
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}/appRoleAssignments/{appRoleAssignment-id}"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}/appRoleAssignments/{appRoleAssignment-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"appRoleAssignment-id"+"}", url.PathEscape(parameterValueToString(r.appRoleAssignmentId, "appRoleAssignmentId")), -1)
 
@@ -303,7 +303,7 @@ func (a *UserAppRoleAssignmentApiService) UserListAppRoleAssignmentsExecute(r Ap
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}/appRoleAssignments"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}/appRoleAssignments"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)

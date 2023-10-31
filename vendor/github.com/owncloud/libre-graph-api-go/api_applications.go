@@ -62,7 +62,7 @@ func (a *ApplicationsApiService) GetApplicationExecute(r ApiGetApplicationReques
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/applications/{application-id}"
+	localVarPath := localBasePath + "/v1.0/applications/{application-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"application-id"+"}", url.PathEscape(parameterValueToString(r.applicationId, "applicationId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -168,7 +168,7 @@ func (a *ApplicationsApiService) ListApplicationsExecute(r ApiListApplicationsRe
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/applications"
+	localVarPath := localBasePath + "/v1.0/applications"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

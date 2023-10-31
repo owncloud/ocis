@@ -72,7 +72,7 @@ func (a *DrivesGetDrivesApiService) ListAllDrivesExecute(r ApiListAllDrivesReque
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives"
+	localVarPath := localBasePath + "/v1.0/drives"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

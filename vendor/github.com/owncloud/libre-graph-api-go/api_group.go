@@ -67,7 +67,7 @@ func (a *GroupApiService) AddMemberExecute(r ApiAddMemberRequest) (*http.Respons
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}/members/$ref"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}/members/$ref"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -177,7 +177,7 @@ func (a *GroupApiService) DeleteGroupExecute(r ApiDeleteGroupRequest) (*http.Res
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -288,7 +288,7 @@ func (a *GroupApiService) DeleteMemberExecute(r ApiDeleteMemberRequest) (*http.R
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}/members/{directory-object-id}/$ref"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}/members/{directory-object-id}/$ref"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"directory-object-id"+"}", url.PathEscape(parameterValueToString(r.directoryObjectId, "directoryObjectId")), -1)
 
@@ -406,7 +406,7 @@ func (a *GroupApiService) GetGroupExecute(r ApiGetGroupRequest) (*Group, *http.R
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -521,7 +521,7 @@ func (a *GroupApiService) ListMembersExecute(r ApiListMembersRequest) (*Collecti
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}/members"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}/members"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -635,7 +635,7 @@ func (a *GroupApiService) UpdateGroupExecute(r ApiUpdateGroupRequest) (*http.Res
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/groups/{group-id}"
+	localVarPath := localBasePath + "/v1.0/groups/{group-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"group-id"+"}", url.PathEscape(parameterValueToString(r.groupId, "groupId")), -1)
 
 	localVarHeaderParams := make(map[string]string)

@@ -67,7 +67,7 @@ func (a *EducationClassApiService) AddUserToClassExecute(r ApiAddUserToClassRequ
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}/members/$ref"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}/members/$ref"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -176,7 +176,7 @@ func (a *EducationClassApiService) CreateClassExecute(r ApiCreateClassRequest) (
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes"
+	localVarPath := localBasePath + "/v1.0/education/classes"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -287,7 +287,7 @@ func (a *EducationClassApiService) DeleteClassExecute(r ApiDeleteClassRequest) (
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -388,7 +388,7 @@ func (a *EducationClassApiService) DeleteUserFromClassExecute(r ApiDeleteUserFro
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}/members/{user-id}/$ref"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}/members/{user-id}/$ref"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
@@ -489,7 +489,7 @@ func (a *EducationClassApiService) GetClassExecute(r ApiGetClassRequest) (*Educa
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -598,7 +598,7 @@ func (a *EducationClassApiService) ListClassMembersExecute(r ApiListClassMembers
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}/members"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}/members"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -704,7 +704,7 @@ func (a *EducationClassApiService) ListClassesExecute(r ApiListClassesRequest) (
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes"
+	localVarPath := localBasePath + "/v1.0/education/classes"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -819,7 +819,7 @@ func (a *EducationClassApiService) UpdateClassExecute(r ApiUpdateClassRequest) (
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/education/classes/{class-id}"
+	localVarPath := localBasePath + "/v1.0/education/classes/{class-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"class-id"+"}", url.PathEscape(parameterValueToString(r.classId, "classId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
