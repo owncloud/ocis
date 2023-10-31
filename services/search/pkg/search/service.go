@@ -513,7 +513,7 @@ func (s *Service) UpsertItem(ref *provider.Reference, uID *user.UserId) {
 		},
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		s.logger.Error().Err(err).Msg("error storing metadata")
+		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
 		return
 	}
 }
