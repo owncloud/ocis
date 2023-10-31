@@ -57,7 +57,7 @@ func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns strin
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	if err := ValidateName(meta["filename"], s.nameValidators); err != nil {
+	if err := ValidateName(path.Base(meta["filename"]), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusPreconditionFailed)
 		return
 	}
@@ -81,7 +81,7 @@ func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceI
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	if err := ValidateName(meta["filename"], s.nameValidators); err != nil {
+	if err := ValidateName(path.Base(meta["filename"]), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusPreconditionFailed)
 		return
 	}

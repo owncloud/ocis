@@ -141,8 +141,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	fn := filepath.Base(ref.Path)
-	if err := ValidateName(fn, s.nameValidators); err != nil {
+	if err := ValidateName(filepath.Base(ref.Path), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
 		errors.HandleWebdavError(&log, w, b, err)
