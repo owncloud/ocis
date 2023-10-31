@@ -530,11 +530,18 @@ func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string
 	m, _ := source.ToMap()
 
 	for k, v := range m {
+		if v == nil {
+			continue
+		}
 		target[prefix+k] = valueToString(v)
 	}
 }
 
 func valueToString(value interface{}) string {
+	if value == nil {
+		return ""
+	}
+
 	switch v := value.(type) {
 	case *string:
 		return *v
