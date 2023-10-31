@@ -202,3 +202,45 @@ Feature: copying file using file id
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file from personal to share space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/folder"
+    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
+    And user "Brian" has accepted share "/folder" offered by user "Alice"
+    And user "Brian" has uploaded file with content "some data" to "/test.txt"
+    And we save it into "FILEID"
+    When user "Brian" copies a file "/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Brian" folder "folder" of the space "Shares" should contain these files:
+      | test.txt |
+    And for user "Brian" folder "/" of the space "Personal" should contain these files:
+      | test.txt |
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | test.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file from share to personal space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/folder"
+    And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
+    And we save it into "FILEID"
+    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
+    And user "Brian" has accepted share "/folder" offered by user "Alice"
+    When user "Brian" copies a file "/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Brian" folder "folder" of the space "Shares" should contain these files:
+      | test.txt |
+    And for user "Brian" folder "/" of the space "Personal" should contain these files:
+      | test.txt |
+    And for user "Alice" folder "folder" of the space "Personal" should contain these files:
+      | test.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
