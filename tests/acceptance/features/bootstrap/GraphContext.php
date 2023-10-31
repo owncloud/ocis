@@ -205,8 +205,8 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 */
 	public function theUserInformationShouldMatchTheJSON(string $user, PyStringNode $schemaString): void {
-		$this->adminHasRetrievedUserUsingTheGraphApi($user);
-		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString);
+		$response = $this->adminHasRetrievedUserUsingTheGraphApi($user);
+		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString, $response);
 	}
 
 	/**
@@ -219,11 +219,12 @@ class GraphContext implements Context {
 	 * @param string|null $email
 	 * @param string|null $displayName
 	 * @param bool|true $accountEnabled
+	 * @param string $method
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true): ResponseInterface {
+	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true, string $method="PATCH"): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$userId = $userId ?? $user;
@@ -233,6 +234,7 @@ class GraphContext implements Context {
 			$byUser,
 			$this->featureContext->getPasswordForUser($byUser),
 			$userId,
+			$method,
 			$userName,
 			$password,
 			$email,
@@ -244,23 +246,21 @@ class GraphContext implements Context {
 	/**
 	 * @param string $user
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
+	public function adminHasRetrievedUserUsingTheGraphApi(string $user): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$userId = $userId ?: $user;
-		$result = GraphHelper::getUser(
+		return GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
 			$userId
 		);
-		$this->featureContext->setResponse($result);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
 	/**
@@ -523,21 +523,21 @@ class GraphContext implements Context {
 		string $user,
 		string $password,
 		?string $byUser = null
-	): void {
+	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$userId = $userId ?? $user;
-		$response = GraphHelper::editUser(
+		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$userId,
-			null,
+			"PATCH",
+			$user,
 			$password
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -551,7 +551,8 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserResetsThePasswordOfUserToUsingTheGraphApi(string $byUser, string $user, string $password) {
-		$this->adminChangesPasswordOfUserToUsingTheGraphApi($user, $password, $byUser);
+		$response = $this->adminChangesPasswordOfUserToUsingTheGraphApi($user, $password, $byUser);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1415,7 +1416,7 @@ class GraphContext implements Context {
 	 * @param array $userIds
 	 * @param string $groupId
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
