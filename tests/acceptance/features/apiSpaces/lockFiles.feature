@@ -244,7 +244,7 @@ Feature: lock files
       | path      | textfile.txt |
       | shareWith | Brian        |
       | role      | editor       |
-    And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" setting the following properties
       | lockscope | exclusive |
     When user "Alice" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |

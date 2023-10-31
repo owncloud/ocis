@@ -138,8 +138,8 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function lockFileUsingWebDavAPI(string $user, string $file, TableNode $properties) {
-		$response = $this->lockFile($user, $file, $properties, null);
+	public function userLocksFileSettingPropertiesUsingWebDavAPI(string $user, string $file, TableNode $properties) {
+		$response = $this->lockFile($user, $file, $properties);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -152,7 +152,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function tryToLockFileUsingWebDavAPI(string $user, string $file, TableNode $properties) {
+	public function userTriesToLockFileSettingPropertiesUsingWebDavAPI(string $user, string $file, TableNode $properties) {
 		$response = $this->lockFile($user, $file, $properties, null, false, false);
 		$this->featureContext->setResponse($response);
 	}
@@ -167,7 +167,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function lockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+	public function userLocksFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
 		$response = $this->lockFile($user, $file, $properties, $fullUrl);
@@ -184,7 +184,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function triesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+	public function userTriesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
@@ -201,7 +201,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function lockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
+	public function userLocksFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
 		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
 		$response = $this->lockFile($user, $file, $properties, $fullUrl);
 		$this->featureContext->setResponse($response);
@@ -217,7 +217,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function tryToLockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
+	public function userTriesToLockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $filePath, TableNode $properties) {
 		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
 		$this->featureContext->setResponse($response);
@@ -238,7 +238,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has locked file :file using file-id path :path using the WebDAV API setting the following properties
+	 * @Given user :user has locked file :file using file-id path :path setting the following properties
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -270,7 +270,7 @@ class WebDavLockingContext implements Context {
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
-  
+
 	/**
 	 * @When the public locks the last public link shared file/folder using the WebDAV API setting the following properties
 	 *
