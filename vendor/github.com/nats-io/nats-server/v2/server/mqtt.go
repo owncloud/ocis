@@ -85,6 +85,7 @@ const (
 	mqttConnAckRCServerUnavailable           = byte(0x3)
 	mqttConnAckRCBadUserOrPassword           = byte(0x4)
 	mqttConnAckRCNotAuthorized               = byte(0x5)
+	mqttConnAckRCQoS2WillRejected            = byte(0x10)
 
 	// Maximum payload size of a control packet
 	mqttMaxPayloadSize = 0xFFFFFFF
@@ -345,6 +346,14 @@ type mqtt struct {
 	asm  *mqttAccountSessionManager // quick reference to account session manager, immutable after processConnect()
 	sess *mqttSession               // quick reference to session, immutable after processConnect()
 	cid  string                     // client ID
+
+	// rejectQoS2Pub tells the MQTT client to not accept QoS2 PUBLISH, instead
+	// error and terminate the connection.
+	rejectQoS2Pub bool
+
+	// downgradeQOS2Sub tells the MQTT client to downgrade QoS2 SUBSCRIBE
+	// requests to QoS1.
+	downgradeQoS2Sub bool
 }
 
 type mqttPending struct {
@@ -475,7 +484,11 @@ func (s *Server) createMQTTClient(conn net.Conn, ws *websocket) *client {
 	}
 	now := time.Now()
 
-	c := &client{srv: s, nc: conn, mpay: maxPay, msubs: maxSubs, start: now, last: now, mqtt: &mqtt{}, ws: ws}
+	mqtt := &mqtt{
+		rejectQoS2Pub:    opts.MQTT.rejectQoS2Pub,
+		downgradeQoS2Sub: opts.MQTT.downgradeQoS2Sub,
+	}
+	c := &client{srv: s, nc: conn, mpay: maxPay, msubs: maxSubs, start: now, last: now, mqtt: mqtt, ws: ws}
 	c.headers = true
 	c.mqtt.pp = &mqttPublish{}
 	// MQTT clients don't send NATS CONNECT protocols. So make it an "echo"
@@ -598,9 +611,9 @@ func validateMQTTOptions(o *Options) error {
 	if mo.Port == 0 {
 		return nil
 	}
-	// We have to force the server name to be explicitly set. There are conditions
-	// where we need a unique, repeatable name.
-	if o.ServerName == _EMPTY_ {
+	// We have to force the server name to be explicitly set and be unique when
+	// in cluster mode.
+	if o.ServerName == _EMPTY_ && (o.Cluster.Port != 0 || o.Gateway.Port != 0) {
 		return errMQTTServerNameMustBeSet
 	}
 	// If there is a NoAuthUser, we need to have Users defined and
@@ -2029,9 +2042,6 @@ func (as *mqttAccountSessionManager) sendJSAPIrequests(s *Server, c *client, acc
 // Add/Replace this message from the retained messages map.
 // If a message for this topic already existed, the existing record is updated
 // with the provided information.
-// This function will return the stream sequence of the record before its update,
-// or 0 if the record was added instead of updated.
-//
 // Lock not held on entry.
 func (as *mqttAccountSessionManager) handleRetainedMsg(key string, rm *mqttRetainedMsgRef) {
 	as.mu.Lock()
@@ -2040,7 +2050,7 @@ func (as *mqttAccountSessionManager) handleRetainedMsg(key string, rm *mqttRetai
 		as.retmsgs = make(map[string]*mqttRetainedMsgRef)
 		as.sl = NewSublistWithCache()
 	} else {
-		// Check if we already had one. If so, update the existing one.
+		// Check if we already had one retained message. If so, update the existing one.
 		if erm, exists := as.retmsgs[key]; exists {
 			// If the new sequence is below the floor or the existing one,
 			// then ignore the new one.
@@ -2057,6 +2067,7 @@ func (as *mqttAccountSessionManager) handleRetainedMsg(key string, rm *mqttRetai
 				erm.sub = &subscription{subject: []byte(key)}
 				as.sl.Insert(erm.sub)
 			}
+			return
 		}
 	}
 	rm.sub = &subscription{subject: []byte(key)}
@@ -2228,6 +2239,10 @@ func (as *mqttAccountSessionManager) processSubs(sess *mqttSession, c *client,
 		if f.qos > 2 {
 			f.qos = 2
 		}
+		if c.mqtt.downgradeQoS2Sub && f.qos == 2 {
+			c.Warnf("Downgrading subscription QoS2 to QoS1 for %q, as configured", f.filter)
+			f.qos = 1
+		}
 		subject := f.filter
 		sid := subject
 
@@ -2330,6 +2345,10 @@ func (as *mqttAccountSessionManager) serializeRetainedMsgsForSub(sess *mqttSessi
 		qos := mqttGetQoS(rm.Flags)
 		if qos > sub.mqtt.qos {
 			qos = sub.mqtt.qos
+		}
+		if c.mqtt.rejectQoS2Pub && qos == 2 {
+			c.Warnf("Rejecting retained message with QoS2 for subscription %q, as configured", sub.subject)
+			continue
 		}
 		if qos > 0 {
 			pi = sess.trackPublishRetained()
@@ -2891,10 +2910,11 @@ func (sess *mqttSession) trackAsPubRel(pi uint16, jsAckSubject string) {
 
 	sseq, _, _ := ackReplyInfo(jsAckSubject)
 
-	var sseqToPi map[uint64]uint16
 	if sess.cpending == nil {
 		sess.cpending = make(map[string]map[uint64]uint16)
-	} else if sseqToPi = sess.cpending[jsDur]; sseqToPi == nil {
+	}
+	sseqToPi := sess.cpending[jsDur]
+	if sseqToPi == nil {
 		sseqToPi = make(map[uint64]uint16)
 		sess.cpending[jsDur] = sseqToPi
 	}
@@ -3000,6 +3020,10 @@ func (c *client) mqttParseConnect(r *mqttReader, pl int, hasMappings bool) (byte
 			return 0, nil, fmt.Errorf("if Will flag is set to 1, Will QoS can be 0, 1 or 2, got %v", wqos)
 		}
 		hasWill = true
+	}
+
+	if c.mqtt.rejectQoS2Pub && hasWill && wqos == 2 {
+		return mqttConnAckRCQoS2WillRejected, nil, fmt.Errorf("server does not accept QoS2 for Will messages")
 	}
 
 	// Spec [MQTT-3.1.2-19]
@@ -3386,6 +3410,11 @@ func (c *client) mqttParsePub(r *mqttReader, pl int, pp *mqttPublish, hasMapping
 	if qos > 2 {
 		return fmt.Errorf("QoS=%v is invalid in MQTT", qos)
 	}
+
+	if c.mqtt.rejectQoS2Pub && qos == 2 {
+		return fmt.Errorf("QoS=2 is disabled for PUBLISH messages")
+	}
+
 	// Keep track of where we are when starting to read the variable header
 	start := r.pos
 

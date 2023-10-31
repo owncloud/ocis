@@ -141,6 +141,7 @@ const (
 	expectConnect                                 // Marks if this connection is expected to send a CONNECT
 	connectProcessFinished                        // Marks if this connection has finished the connect process.
 	compressionNegotiated                         // Marks if this connection has negotiated compression level with remote.
+	didTLSFirst                                   // Marks if this connection requested and was accepted doing the TLS handshake first (prior to INFO).
 )
 
 // set the flag (would be equivalent to set the boolean to true)
@@ -2800,6 +2801,11 @@ func (c *client) addShadowSubscriptions(acc *Account, sub *subscription) error {
 	)
 
 	acc.mu.RLock()
+	// If this is from a service import, ignore.
+	if sub.si {
+		acc.mu.RUnlock()
+		return nil
+	}
 	subj := string(sub.subject)
 	if len(acc.imports.streams) > 0 {
 		tokens = tokenizeSubjectIntoSlice(tsa[:0], subj)
@@ -5226,7 +5232,7 @@ func (c *client) reconnect() {
 
 	// Check for a solicited route. If it was, start up a reconnect unless
 	// we are already connected to the other end.
-	if c.isSolicitedRoute() || retryImplicit {
+	if didSolicit := c.isSolicitedRoute(); didSolicit || retryImplicit {
 		srv.mu.Lock()
 		defer srv.mu.Unlock()
 
@@ -5236,7 +5242,7 @@ func (c *client) reconnect() {
 		rtype := c.route.routeType
 		rurl := c.route.url
 		accName := string(c.route.accName)
-		checkRID := accName == _EMPTY_ && srv.routesPoolSize <= 1 && rid != _EMPTY_
+		checkRID := accName == _EMPTY_ && srv.getOpts().Cluster.PoolSize < 1 && rid != _EMPTY_
 		c.mu.Unlock()
 
 		// It is possible that the server is being shutdown.
@@ -5246,6 +5252,14 @@ func (c *client) reconnect() {
 		}
 
 		if checkRID && srv.routes[rid] != nil {
+			// This is the case of "no pool". Make sure that the registered one
+			// is upgraded to solicited if the connection trying to reconnect
+			// was a solicited one.
+			if didSolicit {
+				if remote := srv.routes[rid][0]; remote != nil {
+					upgradeRouteToSolicited(remote, rurl, rtype)
+				}
+			}
 			srv.Debugf("Not attempting reconnect for solicited route, already connected to %q", rid)
 			return
 		} else if rid == srv.info.ID {
@@ -5305,10 +5319,10 @@ func (c *client) getAccAndResultFromCache() (*Account, *SublistResult) {
 	// Check our cache.
 	if pac, ok = c.in.pacache[string(c.pa.pacache)]; ok {
 		// Check the genid to see if it's still valid.
-		// sl could be swapped out on reload so need to lock.
-		pac.acc.mu.RLock()
+		// Since v2.10.0, the config reload of accounts has been fixed
+		// and an account's sublist pointer should not change, so no need to
+		// lock to access it.
 		sl := pac.acc.sl
-		pac.acc.mu.RUnlock()
 
 		if genid := atomic.LoadUint64(&sl.genid); genid != pac.genid {
 			ok = false
@@ -5320,15 +5334,15 @@ func (c *client) getAccAndResultFromCache() (*Account, *SublistResult) {
 	}
 
 	if !ok {
-		// Match correct account and sublist.
-		if acc, _ = c.srv.LookupAccount(string(c.pa.account)); acc == nil {
-			return nil, nil
+		if c.kind == ROUTER && len(c.route.accName) > 0 {
+			acc = c.acc
+		} else {
+			// Match correct account and sublist.
+			if acc, _ = c.srv.LookupAccount(string(c.pa.account)); acc == nil {
+				return nil, nil
+			}
 		}
-
-		// sl could be swapped out on reload so need to lock.
-		acc.mu.RLock()
 		sl := acc.sl
-		acc.mu.RUnlock()
 
 		// Match against the account sublist.
 		r = sl.Match(string(c.pa.subject))

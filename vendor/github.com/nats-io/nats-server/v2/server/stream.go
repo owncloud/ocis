@@ -160,9 +160,10 @@ type StreamAlternate struct {
 // ClusterInfo shows information about the underlying set of servers
 // that make up the stream or consumer.
 type ClusterInfo struct {
-	Name     string      `json:"name,omitempty"`
-	Leader   string      `json:"leader,omitempty"`
-	Replicas []*PeerInfo `json:"replicas,omitempty"`
+	Name      string      `json:"name,omitempty"`
+	RaftGroup string      `json:"raft_group,omitempty"`
+	Leader    string      `json:"leader,omitempty"`
+	Replicas  []*PeerInfo `json:"replicas,omitempty"`
 }
 
 // PeerInfo shows information about all the peers in the cluster that
@@ -2125,6 +2126,14 @@ func (mset *stream) processMirrorMsgs(mirror *sourceInfo, ready *sync.WaitGroup)
 
 	// Signal the caller that we have captured the above fields.
 	ready.Done()
+
+	// Make sure we have valid ipq for msgs.
+	if msgs == nil {
+		mset.mu.Lock()
+		mset.cancelMirrorConsumer()
+		mset.mu.Unlock()
+		return
+	}
 
 	t := time.NewTicker(sourceHealthCheckInterval)
 	defer t.Stop()
@@ -5266,9 +5275,13 @@ func (mset *stream) Store() StreamStore {
 
 // Determines if the new proposed partition is unique amongst all consumers.
 // Lock should be held.
-func (mset *stream) partitionUnique(partitions []string) bool {
+func (mset *stream) partitionUnique(name string, partitions []string) bool {
 	for _, partition := range partitions {
-		for _, o := range mset.consumers {
+		for n, o := range mset.consumers {
+			// Skip the consumer being checked.
+			if n == name {
+				continue
+			}
 			if o.subjf == nil {
 				return false
 			}
