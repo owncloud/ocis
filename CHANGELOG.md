@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0...master
+
+## Summary
+
+* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
+
+## Details
+
+* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/7629
 # Changelog for [5.0.0] (2023-10-30)
 
 The following sections list the changes for 5.0.0.
