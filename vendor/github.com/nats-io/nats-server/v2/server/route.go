@@ -1071,9 +1071,30 @@ func (s *Server) processImplicitRoute(info *Info, routeNoPool bool) {
 // in the server's opts.Routes, false otherwise.
 // Server lock is assumed to be held by caller.
 func (s *Server) hasThisRouteConfigured(info *Info) bool {
-	urlToCheckExplicit := strings.ToLower(net.JoinHostPort(info.Host, strconv.Itoa(info.Port)))
-	for _, ri := range s.getOpts().Routes {
-		if strings.ToLower(ri.Host) == urlToCheckExplicit {
+	routes := s.getOpts().Routes
+	if len(routes) == 0 {
+		return false
+	}
+	// This could possibly be a 0.0.0.0 host so we will also construct a second
+	// url with the host section of the `info.IP` (if present).
+	sPort := strconv.Itoa(info.Port)
+	urlOne := strings.ToLower(net.JoinHostPort(info.Host, sPort))
+	var urlTwo string
+	if info.IP != _EMPTY_ {
+		if u, _ := url.Parse(info.IP); u != nil {
+			urlTwo = strings.ToLower(net.JoinHostPort(u.Hostname(), sPort))
+			// Ignore if same than the first
+			if urlTwo == urlOne {
+				urlTwo = _EMPTY_
+			}
+		}
+	}
+	for _, ri := range routes {
+		rHost := strings.ToLower(ri.Host)
+		if rHost == urlOne {
+			return true
+		}
+		if urlTwo != _EMPTY_ && rHost == urlTwo {
 			return true
 		}
 	}
@@ -1860,6 +1881,17 @@ const (
 func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string) bool {
 	id := info.ID
 
+	var acc *Account
+	if accName != _EMPTY_ {
+		var err error
+		acc, err = s.LookupAccount(accName)
+		if err != nil {
+			c.sendErrAndErr(fmt.Sprintf("Unable to lookup account %q: %v", accName, err))
+			c.closeConnection(MissingAccount)
+			return false
+		}
+	}
+
 	s.mu.Lock()
 	if !s.isRunning() || s.routesReject {
 		s.mu.Unlock()
@@ -1935,6 +1967,9 @@ func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string
 			if c.last.IsZero() {
 				c.last = time.Now()
 			}
+			if acc != nil {
+				c.acc = acc
+			}
 			c.mu.Unlock()
 
 			// Store this route with key being the route id hash + account name
@@ -1983,6 +2018,21 @@ func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string
 				handleDuplicateRoute(remote, c, false)
 				s.mu.Unlock()
 				return false
+			}
+			// Look if there is a solicited route in the pool. If there is one,
+			// they should all be, so stop at the first.
+			if url, rtype, hasSolicited := hasSolicitedRoute(conns); hasSolicited {
+				upgradeRouteToSolicited(c, url, rtype)
+			}
+		} else {
+			// If we solicit, upgrade to solicited all non-solicited routes that
+			// we may have registered.
+			c.mu.Lock()
+			url := c.route.url
+			rtype := c.route.routeType
+			c.mu.Unlock()
+			for _, r := range conns {
+				upgradeRouteToSolicited(r, url, rtype)
 			}
 		}
 		// For all cases (solicited and not) we need to count how many connections
@@ -2107,6 +2157,41 @@ func (s *Server) addRoute(c *client, didSolicit bool, info *Info, accName string
 	}
 
 	return !exists
+}
+
+func hasSolicitedRoute(conns []*client) (*url.URL, RouteType, bool) {
+	var url *url.URL
+	var rtype RouteType
+	for _, r := range conns {
+		if r == nil {
+			continue
+		}
+		r.mu.Lock()
+		if r.route.didSolicit {
+			url = r.route.url
+			rtype = r.route.routeType
+		}
+		r.mu.Unlock()
+		if url != nil {
+			return url, rtype, true
+		}
+	}
+	return nil, 0, false
+}
+
+func upgradeRouteToSolicited(r *client, url *url.URL, rtype RouteType) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	if !r.route.didSolicit {
+		r.route.didSolicit = true
+		r.route.url = url
+	}
+	if rtype == Explicit {
+		r.route.routeType = Explicit
+	}
+	r.mu.Unlock()
 }
 
 func handleDuplicateRoute(remote, c *client, setNoReconnect bool) {

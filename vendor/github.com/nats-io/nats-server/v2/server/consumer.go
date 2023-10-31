@@ -272,6 +272,10 @@ var (
 	AckNext = []byte("+NXT")
 	// Terminate delivery of the message.
 	AckTerm = []byte("+TERM")
+
+	// reasons to supply when terminating messages using limits
+	ackTermLimitsReason        = "Message deleted by stream limits"
+	ackTermUnackedLimitsReason = "Unacknowledged message was deleted"
 )
 
 // Calculate accurate replicas for the consumer config with the parent stream config.
@@ -292,6 +296,7 @@ type consumer struct {
 	// This will be checked in checkPending to abort processing
 	// and let ack be processed in priority.
 	awl               int64
+	leader            atomic.Bool
 	mu                sync.RWMutex
 	js                *jetStream
 	mset              *stream
@@ -767,6 +772,13 @@ func (mset *stream) addConsumerWithAssignment(config *ConsumerConfig, oname stri
 			if action == ActionCreate && !reflect.DeepEqual(*config, eo.config()) {
 				return nil, NewJSConsumerAlreadyExistsError()
 			}
+			// Check for overlapping subjects.
+			if mset.cfg.Retention == WorkQueuePolicy {
+				subjects := gatherSubjectFilters(config.FilterSubject, config.FilterSubjects)
+				if !mset.partitionUnique(cName, subjects) {
+					return nil, NewJSConsumerWQConsumerNotUniqueError()
+				}
+			}
 			err := eo.updateConfig(config)
 			if err == nil {
 				return eo, nil
@@ -805,7 +817,7 @@ func (mset *stream) addConsumerWithAssignment(config *ConsumerConfig, oname stri
 			if len(subjects) == 0 {
 				mset.mu.Unlock()
 				return nil, NewJSConsumerWQMultipleUnfilteredError()
-			} else if !mset.partitionUnique(subjects) {
+			} else if !mset.partitionUnique(cName, subjects) {
 				// Prior to v2.9.7, on a stream with WorkQueue policy, the servers
 				// were not catching the error of having multiple consumers with
 				// overlapping filter subjects depending on the scope, for instance
@@ -1124,19 +1136,21 @@ func (o *consumer) isLeader() bool {
 
 func (o *consumer) setLeader(isLeader bool) {
 	o.mu.RLock()
-	mset := o.mset
-	isRunning := o.ackSub != nil
+	mset, closed := o.mset, o.closed
+	movingToClustered := o.node != nil && o.pch == nil
+	wasLeader := o.leader.Swap(isLeader)
 	o.mu.RUnlock()
 
 	// If we are here we have a change in leader status.
 	if isLeader {
-		if mset == nil {
+		if closed || mset == nil {
 			return
 		}
-		if isRunning {
+
+		if wasLeader {
 			// If we detect we are scaling up, make sure to create clustered routines and channels.
-			o.mu.Lock()
-			if o.node != nil && o.pch == nil {
+			if movingToClustered {
+				o.mu.Lock()
 				// We are moving from R1 to clustered.
 				o.pch = make(chan struct{}, 1)
 				go o.loopAndForwardProposals(o.qch)
@@ -1146,8 +1160,8 @@ func (o *consumer) setLeader(isLeader bool) {
 					default:
 					}
 				}
+				o.mu.Unlock()
 			}
-			o.mu.Unlock()
 			return
 		}
 
@@ -1981,8 +1995,12 @@ func (o *consumer) processAck(subject, reply string, hdr int, rmsg []byte) {
 		o.processNak(sseq, dseq, dc, msg)
 	case bytes.Equal(msg, AckProgress):
 		o.progressUpdate(sseq)
-	case bytes.Equal(msg, AckTerm):
-		o.processTerm(sseq, dseq, dc)
+	case bytes.HasPrefix(msg, AckTerm):
+		var reason string
+		if buf := msg[len(AckTerm):]; len(buf) > 0 {
+			reason = string(bytes.TrimSpace(buf))
+		}
+		o.processTerm(sseq, dseq, dc, reason)
 	}
 
 	// Ack the ack if requested.
@@ -2309,7 +2327,7 @@ func (o *consumer) processNak(sseq, dseq, dc uint64, nak []byte) {
 }
 
 // Process a TERM
-func (o *consumer) processTerm(sseq, dseq, dc uint64) {
+func (o *consumer) processTerm(sseq, dseq, dc uint64, reason string) {
 	// Treat like an ack to suppress redelivery.
 	o.processAckMsg(sseq, dseq, dc, false)
 
@@ -2328,6 +2346,7 @@ func (o *consumer) processTerm(sseq, dseq, dc uint64) {
 		ConsumerSeq: dseq,
 		StreamSeq:   sseq,
 		Deliveries:  dc,
+		Reason:      reason,
 		Domain:      o.srv.getOpts().JetStreamDomain,
 	}
 
@@ -2536,7 +2555,11 @@ func (o *consumer) infoWithSnapAndReply(snap bool, reply string) *ConsumerInfo {
 
 	// If we are replicated and we are not the leader we need to pull certain data from our store.
 	if rg != nil && rg.node != nil && !o.isLeader() && o.store != nil {
-		state, _ := o.store.BorrowState()
+		state, err := o.store.BorrowState()
+		if err != nil {
+			o.mu.Unlock()
+			return nil
+		}
 		info.Delivered.Consumer, info.Delivered.Stream = state.Delivered.Consumer, state.Delivered.Stream
 		info.AckFloor.Consumer, info.AckFloor.Stream = state.AckFloor.Consumer, state.AckFloor.Stream
 		info.NumAckPending = len(state.Pending)
@@ -3636,7 +3659,7 @@ func (o *consumer) checkAckFloor() {
 			o.mu.RUnlock()
 			// If it was pending for us, get rid of it.
 			if isPending {
-				o.processTerm(seq, p.Sequence, rdc)
+				o.processTerm(seq, p.Sequence, rdc, ackTermLimitsReason)
 			}
 		}
 	} else if numPending > 0 {
@@ -3661,7 +3684,7 @@ func (o *consumer) checkAckFloor() {
 
 		for i := 0; i < len(toTerm); i += 3 {
 			seq, dseq, rdc := toTerm[i], toTerm[i+1], toTerm[i+2]
-			o.processTerm(seq, dseq, rdc)
+			o.processTerm(seq, dseq, rdc, ackTermLimitsReason)
 		}
 	}
 
@@ -4634,16 +4657,6 @@ type lastSeqSkipList struct {
 	seqs   []uint64
 }
 
-// Will create a skip list for us from a store's subjects state.
-func createLastSeqSkipList(mss map[string]SimpleState) []uint64 {
-	seqs := make([]uint64, 0, len(mss))
-	for _, ss := range mss {
-		seqs = append(seqs, ss.Last)
-	}
-	sort.Slice(seqs, func(i, j int) bool { return seqs[i] < seqs[j] })
-	return seqs
-}
-
 // Let's us know we have a skip list, which is for deliver last per subject and we are just starting.
 // Lock should be held.
 func (o *consumer) hasSkipListPending() bool {
@@ -4674,37 +4687,49 @@ func (o *consumer) selectStartingSeqNo() {
 					}
 				}
 			} else if o.cfg.DeliverPolicy == DeliverLastPerSubject {
-				if o.subjf == nil {
-					if mss := o.mset.store.SubjectsState(o.cfg.FilterSubject); len(mss) > 0 {
-						o.lss = &lastSeqSkipList{
-							resume: state.LastSeq,
-							seqs:   createLastSeqSkipList(mss),
-						}
-						o.sseq = o.lss.seqs[0]
+				// If our parent stream is set to max msgs per subject of 1 this is just
+				// a normal consumer at this point. We can avoid any heavy lifting.
+				if o.mset.cfg.MaxMsgsPer == 1 {
+					o.sseq = state.FirstSeq
+				} else {
+					// A threshold for when we switch from get last msg to subjects state.
+					const numSubjectsThresh = 256
+					lss := &lastSeqSkipList{resume: state.LastSeq}
+					var filters []string
+					if o.subjf == nil {
+						filters = append(filters, o.cfg.FilterSubject)
 					} else {
-						// If no mapping info just set to last.
+						for _, filter := range o.subjf {
+							filters = append(filters, filter.subject)
+						}
+					}
+					for _, filter := range filters {
+						if st := o.mset.store.SubjectsTotals(filter); len(st) < numSubjectsThresh {
+							var smv StoreMsg
+							for subj := range st {
+								if sm, err := o.mset.store.LoadLastMsg(subj, &smv); err == nil {
+									lss.seqs = append(lss.seqs, sm.seq)
+								}
+							}
+						} else if mss := o.mset.store.SubjectsState(filter); len(mss) > 0 {
+							for _, ss := range mss {
+								lss.seqs = append(lss.seqs, ss.Last)
+							}
+						}
+					}
+					// Sort the skip list if needed.
+					if len(lss.seqs) > 1 {
+						sort.Slice(lss.seqs, func(i, j int) bool {
+							return lss.seqs[j] > lss.seqs[i]
+						})
+					}
+					if len(lss.seqs) == 0 {
 						o.sseq = state.LastSeq
+					} else {
+						o.sseq = lss.seqs[0]
 					}
-					return
-				}
-				lss := &lastSeqSkipList{
-					resume: state.LastSeq,
-				}
-				for _, filter := range o.subjf {
-					if mss := o.mset.store.SubjectsState(filter.subject); len(mss) > 0 {
-						lss.seqs = append(lss.seqs, createLastSeqSkipList(mss)...)
-					}
-				}
-				if len(lss.seqs) == 0 {
-					o.sseq = state.LastSeq
-				}
-				// Sort the skip list
-				sort.Slice(lss.seqs, func(i, j int) bool {
-					return lss.seqs[j] > lss.seqs[i]
-				})
-				o.lss = lss
-				if len(o.lss.seqs) != 0 {
-					o.sseq = o.lss.seqs[0]
+					// Assign skip list.
+					o.lss = lss
 				}
 			} else if o.cfg.OptStartTime != nil {
 				// If we are here we are time based.
@@ -5137,11 +5162,10 @@ func (o *consumer) decStreamPending(sseq uint64, subj string) {
 	o.mu.Unlock()
 
 	// If it was pending process it like an ack.
-	// TODO(dlc) - we could do a term here instead with a reason to generate the advisory.
 	if wasPending {
 		// We could have lock for stream so do this in a go routine.
 		// TODO(dlc) - We should do this with ipq vs naked go routines.
-		go o.processTerm(sseq, p.Sequence, rdc)
+		go o.processTerm(sseq, p.Sequence, rdc, ackTermUnackedLimitsReason)
 	}
 }
 
