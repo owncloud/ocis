@@ -184,7 +184,7 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function triesTlockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+	public function triesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
