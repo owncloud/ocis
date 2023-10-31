@@ -762,6 +762,7 @@ class GraphContext implements Context {
 
 	/**
 	 * adds a user to a group
+	 * NOTE: If you want to make a request with non-existing user or group,provide "nonexistent" as their name
 	 *
 	 * @param string $group
 	 * @param string $user
@@ -772,8 +773,16 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		if ($group === "nonexistent") {
+			$groupId = WebDavHelper::generateUUIDv4();
+		} else {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		}
+		if ($user === "nonexistent") {
+			$userId = WebDavHelper::generateUUIDv4();
+		} else {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		}
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -800,10 +809,8 @@ class GraphContext implements Context {
 		string $group,
 		bool $checkResult = true
 	): void {
-		$result = $this->addUserToGroup($group, $user);
-		if ($checkResult && ($result->getStatusCode() !== 204)) {
-			$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
-		}
+		$response = $this->addUserToGroup($group, $user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
 	}
 
 	/**
@@ -824,15 +831,14 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator tries to add user :user to group :group using the Graph API
+	 * @When the administrator tries to add nonexistent user to group :group using the Graph API
 	 *
-	 * @param string $user
 	 * @param string $group
 	 *
 	 * @return void
 	 */
-	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
-		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent"));
 	}
 
 	/**
@@ -847,19 +853,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException | Exception
 	 */
 	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
-		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = WebDavHelper::generateUUIDv4();
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$this->featureContext->setResponse(
-			GraphHelper::addUserToGroup(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials['username'],
-				$credentials['password'],
-				$userId,
-				$groupId
-			)
-		);
+		$this->featureContext->setResponse($this->addUserToGroup("nonexistent", $user, $byUser));
 	}
 
 	/**
@@ -1423,25 +1417,21 @@ class GraphContext implements Context {
 	 * @param string $user
 	 * @param array $userIds
 	 * @param string $groupId
-	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function addMultipleUsersToGroup(string $user, array $userIds, string $groupId, TableNode $table): void {
+	public function addMultipleUsersToGroup(string $user, array $userIds, string $groupId): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$this->featureContext->verifyTableNodeColumns($table, ['username']);
 
-		$this->featureContext->setResponse(
-			GraphHelper::addUsersToGroup(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials["username"],
-				$credentials["password"],
-				$groupId,
-				$userIds
-			)
+		return GraphHelper::addUsersToGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$groupId,
+			$userIds
 		);
 	}
 
@@ -1462,7 +1452,9 @@ class GraphContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
-		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$response = $this->addMultipleUsersToGroup($user, $userIds, $groupId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1552,7 +1544,9 @@ class GraphContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
-		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$response = $this->addMultipleUsersToGroup($user, $userIds, $groupId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1572,7 +1566,9 @@ class GraphContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$userIds[] = WebDavHelper::generateUUIDv4();
 		}
-		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$response = $this->addMultipleUsersToGroup($user, $userIds, $groupId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1594,7 +1590,9 @@ class GraphContext implements Context {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 			$userIds[] = $userId ?: WebDavHelper::generateUUIDv4();
 		}
-		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$response = $this->addMultipleUsersToGroup($user, $userIds, $groupId);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1987,12 +1985,9 @@ class GraphContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
-		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
-		$response = $this->featureContext->getResponse();
-		if ($response->getStatusCode() !== 204) {
-			$this->throwHttpException($response, "Cannot add users to group '$group'");
-		}
-		$this->featureContext->emptyLastHTTPStatusCodesArray();
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$response = $this->addMultipleUsersToGroup($user, $userIds, $groupId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
 	}
 
 	/**
