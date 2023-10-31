@@ -10,7 +10,7 @@ geekdocCollapseSection: true
 
 Infinite Scale has implemented OpenID Connect (OIDC) for authentication.
 OIDC defines a discovery mechanism, called OpenID Connect Discovery,
-where an OpenID server publishes its metadata at a well-known URL, typically
+where an OpenID server publishes its metadata at a well-known URL, typically:
 
 `https://ocis.test/.well-known/openid-configuration`
 

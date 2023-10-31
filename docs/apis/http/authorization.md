@@ -12,27 +12,28 @@ In its default configuration, Infinite Scale supports three authentication metho
 3. Hybrid Flow
 
 For detailed information on Infinite Scale's support for OpenID Connect (OIDC), please consult the [OIDC section](../../ocis/identity-provider/oidc.md).
-To authenticate using OIDC, both `client_id` and `client_secret` are essential.
-Infinite Scale doesn't offer dynamic registration. We have to use one from the default ownCloud client.
-By default, [ownCloud clients](https://doc.owncloud.com/server/next/admin_manual/configuration/user/oidc/oidc.html#client-ids-secrets-and-redirect-uris) are:
+To authenticate a client app using OIDC, both `client_id` and `client_secret` are essential. Infinite Scale does not offer dynamic registration. The required data for the default [ownCloud clients](https://doc.owncloud.com/server/next/admin_manual/configuration/user/oidc/oidc.html#client-ids-secrets-and-redirect-uris) can be found in the link and are availble for the following apps:
 - Desktop
 - Android
 - iOS
 
-While selecting ownCloud client for authentication, take note of specific limitations such as `Redirect URI`
+While selecting an ownCloud client for authentication, take note of specific limitations such as the `Redirect URI`:
+
 | Source | Redirect URI |
 |------|--------|
 |Android|oc://android.owncloud.com|
 |iOS|oc://ios.owncloud.com|
 |Desktop|http://127.0.0.1 <br> http://localhost |
 
-In this documentation, desktop client `client_id` and `client_secret` are being used.
+In this example, the desktop app's `client_id` and `client_secret` are being used.
+
 ```bash
 client_id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
 client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
 ```
 
 ## Authorization Code Flow
+
 1. Requesting authorization
 
    To initiate the OIDC Code Flow, you can use tools like curl and a web browser.
@@ -100,8 +101,10 @@ client_secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
     ```
 
 ## Implicit Code Flow
+
 When using the implicit flow, tokens are provided in a URI fragment of the redirect URL.
-Valid values for the `response_type` request parameter:
+Valid values for the `response_type` request parameter are:
+
 - token
 - id_token token
 
