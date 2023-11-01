@@ -46,6 +46,7 @@ default:
         - SpacesTUSContext:
         - GraphContext:
         - OcisConfigContext:
+        - WebDavLockingContext:
 
     apiSpacesShares:
       paths:
