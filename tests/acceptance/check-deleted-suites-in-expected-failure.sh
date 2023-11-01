@@ -19,7 +19,6 @@ log_success() {
 SCRIPT_PATH=$(dirname "$0")
 PATH_TO_SUITES="${SCRIPT_PATH}/features"
 EXPECTED_FAILURE_FILES=("expected-failures-localAPI-on-OCIS-storage.md" "expected-failures-API-on-OCIS-storage.md")
-#PATH_TO_EXPECTED_FAILURE_FILE="${SCRIPT_PATH}/expected-failures-localAPI-on-OCIS-storage.md"
 # contains all the suites names inside tests/acceptance/features
 AVAILABLE_SUITES=($(ls -l "$PATH_TO_SUITES" | grep '^d' | awk '{print $NF}'))
 

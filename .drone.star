@@ -232,6 +232,7 @@ def main(ctx):
 
     test_pipelines = \
         codestyle(ctx) + \
+        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
@@ -633,6 +634,27 @@ def vendorbinCodesniffer(phpVersion):
         "commands": [
             "make vendor-bin-codesniffer",
         ],
+    }]
+
+def checkTestSuitesInExpectedFailures(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "check-suites-in-expected-failures",
+        "steps": [
+            {
+                "name": "check-suites",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "%s/tests/acceptance/check-deleted-suites-in-expected-failure.sh" % dirs["base"],
+                ],
+            },
+        ],
+        "trigger": {
+            "ref": [
+                "refs/pull/**",
+            ],
+        },
     }]
 
 def codestyle(ctx):
