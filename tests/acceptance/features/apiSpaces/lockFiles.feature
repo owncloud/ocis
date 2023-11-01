@@ -22,7 +22,7 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Infinity     |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |  no "oc:ownername" property in stable-4.0
     Examples:
       | dav-path-version |
       | old              |
@@ -44,7 +44,7 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Second-5000  |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |  no "oc:ownername" property in stable-4.0
     Examples:
       | dav-path-version |
       | old              |
@@ -66,7 +66,7 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |  no "oc:ownername" property in stable-4.0
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -107,7 +107,7 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |  no "oc:ownername" property in stable-4.0
     Examples:
       | role    |
       | manager |
@@ -134,7 +134,7 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |  no "oc:ownername" property in stable-4.0
     Examples:
       | role    | dav-path                          |
       | manager | /remote.php/dav/spaces/<<FILEID>> |
@@ -173,7 +173,7 @@ Feature: lock files
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |  no "oc:ownername" property in stable-4.0
     Examples:
       | dav-path-version |
       | old              |
@@ -197,13 +197,13 @@ Feature: lock files
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
-      | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
+      # | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |  no "oc:ownername" property in stable-4.0
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-    
+
    Scenario: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
@@ -214,4 +214,3 @@ Feature: lock files
     When user "Brian" locks file using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
     Then the HTTP status code should be "403"
-    
