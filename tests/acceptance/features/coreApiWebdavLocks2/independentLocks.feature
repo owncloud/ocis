@@ -7,7 +7,7 @@ Feature: independent locks - make sure all locks are independent and don't inter
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-
+  @issue-7638
   Scenario Outline: locking a file does not lock other items with the same name in other parts of the file system
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked"
@@ -33,7 +33,7 @@ Feature: independent locks - make sure all locks are independent and don't inter
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-
+  @issue-7641
   Scenario Outline: locking a file/folder with git specific names does not lock other items with the same name in other parts of the file system
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "locked/"
