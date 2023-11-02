@@ -241,3 +241,23 @@ Feature: copying file using file id
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file between two project spaces
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
+    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "first-project-space" with content "data from first project space" to "firstProjectSpacetextfile.txt"
+    And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" copies a file "/secondProjectSpacetextfile.txt" into "/" inside space "first-project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
+      | firstProjectSpacetextfile.txt  |
+      | secondProjectSpacetextfile.txt |
+    And for user "Alice" folder "/" of the space "second-project-space" should contain these files:
+      | secondProjectSpacetextfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
