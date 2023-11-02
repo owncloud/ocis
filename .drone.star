@@ -73,6 +73,7 @@ config = {
                 "apiReshare",
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
+                "apiLocks",
             ],
             "skip": False,
         },

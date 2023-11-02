@@ -241,6 +241,16 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
 
+    apiLocks:
+      paths:
+        - '%paths.base%/../features/apiLocks'
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - WebDavLockingContext:
+        - PublicWebDavContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 
