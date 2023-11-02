@@ -145,9 +145,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Shared file locking is not possible using different path](https://github.com/owncloud/ocis/issues/7599)
 
-- [apiSpaces/lockFiles.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L179)
-- [apiSpaces/lockFiles.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L180)
-- [apiSpaces/lockFiles.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockFiles.feature#L181)
+- [apiLocks/lockFiles.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L179)
+- [apiLocks/lockFiles.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L180)
+- [apiLocks/lockFiles.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L181)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
