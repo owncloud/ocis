@@ -444,7 +444,80 @@
       ]
     }
   },
-  "groups": [],
+  "groups": [
+    {
+      "id": "4dc7b34d-8364-49cc-ac6a-0e009f8a83bd",
+      "name": "users",
+      "path": "/users",
+      "attributes": {},
+      "realmRoles": ["ocisUser", "default-roles-ocis"],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "52b00345-ea08-44e2-a432-fa258a02b489",
+      "name": "sailing-lovers",
+      "path": "/sailing-lovers",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "b7880647-5564-4190-9e30-9596b3b3b38f",
+      "name": "violin-haters",
+      "path": "/violin-haters",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "fa42df34-c2fb-491a-aedd-a7817bf4b65c",
+      "name": "radium-lovers",
+      "path": "/radium-lovers",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "2979bdbc-9c7d-42ff-9279-c4e600c72552",
+      "name": "polonium-lovers",
+      "path": "/polonium-lovers",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "79ed8c31-b0d6-4630-b811-6d362384b64d",
+      "name": "quantum-lovers",
+      "path": "/quantum-lovers",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "153e7b0a-e235-47da-a108-d5a20b353b8c",
+      "name": "philosophy-haters",
+      "path": "/philosophy-haters",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "3409de17-b103-4cec-b259-7cafd096363a",
+      "name": "physics-lovers",
+      "path": "/physics-lovers",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ],
   "defaultRole": {
     "id": "82e13ea7-aac4-4d2c-9fc7-cff8333dbe19",
     "name": "default-roles-ocis",
@@ -526,7 +599,7 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": ["/users"]
     },
     {
       "id": "0a9f434c-4864-49cf-ac15-46ed0f49d59b",
@@ -561,7 +634,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/users",
+        "/sailing-lovers",
+        "/violin-haters",
+        "/physics-lovers"
+      ]
     },
     {
       "id": "b44a81e2-e3ed-4241-a9ce-44604f7ac9eb",
@@ -590,7 +668,7 @@
         "default-roles-ocis"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": ["/users"]
     },
     {
       "id": "48016357-346a-443e-bf7a-945c9448a99b",
@@ -625,7 +703,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/users",
+        "/radium-lovers",
+        "/polonium-lovers",
+        "/physics-lovers"
+      ]
     },
     {
       "id": "d18c3689-b816-455a-9728-cd8c9797f315",
@@ -660,7 +743,7 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": ["/users"]
     },
     {
       "id": "373be4c5-7f65-4e91-ba0e-bfb618c96046",
@@ -695,7 +778,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/users",
+        "/quantum-lovers",
+        "/philosophy-haters",
+        "/physics-lovers"
+      ]
     }
   ],
   "scopeMappings": [
