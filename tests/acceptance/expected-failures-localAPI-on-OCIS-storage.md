@@ -151,17 +151,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:280](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L280)
 - [apiLocks/lockFiles.feature:281](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L281)
 - [apiLocks/lockFiles.feature:282](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L282)
-
-#### [Trying to upload to a locked file gives 500](https://github.com/owncloud/ocis/issues/7638)
-- [apiLocks/lockFiles.feature:299](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L299)
-- [apiLocks/lockFiles.feature:300](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L300)
-- [apiLocks/lockFiles.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L301)
-- [apiLocks/lockFiles.feature:302](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L302)
-- [apiLocks/lockFiles.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L303)
-- [apiLocks/lockFiles.feature:304](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L304)
-
-#### [Trying to upload to a locked file gives 500](https://github.com/owncloud/ocis/issues/7638)
-#### [Shared file locking is not possible using different path](https://github.com/owncloud/ocis/issues/7599)
 - [apiLocks/lockFiles.feature:323](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L323)
 - [apiLocks/lockFiles.feature:324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L324)
 - [apiLocks/lockFiles.feature:325](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L325)
@@ -174,6 +163,15 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:349](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L349)
 - [apiLocks/lockFiles.feature:350](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L350)
 - [apiLocks/lockFiles.feature:351](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L351)
+
+#### [Trying to upload to a locked file gives 500](https://github.com/owncloud/ocis/issues/7638)
+
+- [apiLocks/lockFiles.feature:299](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L299)
+- [apiLocks/lockFiles.feature:300](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L300)
+- [apiLocks/lockFiles.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L301)
+- [apiLocks/lockFiles.feature:302](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L302)
+- [apiLocks/lockFiles.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L303)
+- [apiLocks/lockFiles.feature:304](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L304)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
