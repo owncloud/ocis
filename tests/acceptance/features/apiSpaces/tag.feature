@@ -117,7 +117,7 @@ Feature: Tag
       | folderTag |
       | marketing |
     When user "Brian" accepts share "/folderMain" offered by user "Alice" using the sharing API
-    And user "Brian" lists all available tags via the GraphApi
+    And user "Brian" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
       | folderTag |
