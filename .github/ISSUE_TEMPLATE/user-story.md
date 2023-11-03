@@ -35,3 +35,5 @@ assignees: ''
   - [ ] Critical code received unit tests by the developer
 - Non-functional requirements
   - [ ] No sonar cloud issues
+- Configuration changes
+  - [ ] The next branch of the ocis charts is compatible
