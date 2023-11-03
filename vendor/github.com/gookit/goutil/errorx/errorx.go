@@ -71,7 +71,7 @@ func (e *ErrorX) Unwrap() error {
 	return e.prev
 }
 
-// Format error
+// Format error, will output stack information.
 func (e *ErrorX) Format(s fmt.State, verb rune) {
 	// format current error: only output on have msg
 	if len(e.msg) > 0 {
@@ -103,7 +103,7 @@ func (e *ErrorX) GoString() string {
 	return buf.String()
 }
 
-// Error to string, not contains stack information.
+// Error msg string, not contains stack information.
 func (e *ErrorX) Error() string {
 	var buf bytes.Buffer
 	e.writeMsgTo(&buf)
@@ -265,6 +265,7 @@ func WithStack(err error) error {
 	if err == nil {
 		return nil
 	}
+
 	return &ErrorX{
 		msg: err.Error(),
 		// prev:  err,
@@ -277,6 +278,7 @@ func Traced(err error) error {
 	if err == nil {
 		return nil
 	}
+
 	return &ErrorX{
 		msg:   err.Error(),
 		stack: callersStack(stdOpt.SkipDepth, stdOpt.TraceDepth),
@@ -288,6 +290,7 @@ func Stacked(err error) error {
 	if err == nil {
 		return nil
 	}
+
 	return &ErrorX{
 		msg:   err.Error(),
 		stack: callersStack(stdOpt.SkipDepth, stdOpt.TraceDepth),

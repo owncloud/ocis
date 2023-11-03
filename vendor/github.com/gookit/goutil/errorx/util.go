@@ -68,10 +68,25 @@ func Unwrap(err error) error {
 // Previous alias of Unwrap()
 func Previous(err error) error { return Unwrap(err) }
 
+// IsErrorX check
+func IsErrorX(err error) (ok bool) {
+	_, ok = err.(*ErrorX)
+	return
+}
+
 // ToErrorX convert check
 func ToErrorX(err error) (ex *ErrorX, ok bool) {
 	ex, ok = err.(*ErrorX)
 	return
+}
+
+// MustEX convert error to *ErrorX, panic if err check failed.
+func MustEX(err error) *ErrorX {
+	ex, ok := err.(*ErrorX)
+	if !ok {
+		panic("errorx: error is not *ErrorX")
+	}
+	return ex
 }
 
 // Has contains target error, or err is eq target.

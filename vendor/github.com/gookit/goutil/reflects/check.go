@@ -27,8 +27,13 @@ func IsSimpleKind(k reflect.Kind) bool {
 	return k > reflect.Invalid && k <= reflect.Float64
 }
 
-// IsAnyInt check is intX or uintX type
+// IsAnyInt check is intX or uintX type. alias of the IsIntLike()
 func IsAnyInt(k reflect.Kind) bool {
+	return k >= reflect.Int && k <= reflect.Uintptr
+}
+
+// IsIntLike reports whether the type is int-like(intX, uintX).
+func IsIntLike(k reflect.Kind) bool {
 	return k >= reflect.Int && k <= reflect.Uintptr
 }
 
@@ -50,6 +55,17 @@ func IsNil(v reflect.Value) bool {
 	default:
 		return false
 	}
+}
+
+// CanBeNil reports whether an untyped nil can be assigned to the type. See reflect.Zero.
+func CanBeNil(typ reflect.Type) bool {
+	switch typ.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return true
+	case reflect.Struct:
+		return typ == reflectValueType
+	}
+	return false
 }
 
 // IsFunc value
@@ -84,6 +100,9 @@ func IsEqual(src, dst any) bool {
 	return bytes.Equal(bs1, bs2)
 }
 
+// IsZero reflect value check, alias of the IsEmpty()
+var IsZero = IsEmpty
+
 // IsEmpty reflect value check
 func IsEmpty(v reflect.Value) bool {
 	switch v.Kind() {
@@ -108,11 +127,17 @@ func IsEmpty(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
-// IsEmptyValue reflect value check.
-// Difference the IsEmpty(), if value is ptr, will check real elem.
+// IsEmptyValue reflect value check, alias of the IsEmptyReal()
+var IsEmptyValue = IsEmptyReal
+
+// IsEmptyReal reflect value check.
+//
+// Note:
+//
+//	Difference the IsEmpty(), if value is ptr or interface, will check real elem.
 //
 // From src/pkg/encoding/json/encode.go.
-func IsEmptyValue(v reflect.Value) bool {
+func IsEmptyReal(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
 		return v.Len() == 0
@@ -128,11 +153,12 @@ func IsEmptyValue(v reflect.Value) bool {
 		if v.IsNil() {
 			return true
 		}
-		return IsEmptyValue(v.Elem())
+		return IsEmptyReal(v.Elem())
 	case reflect.Func:
 		return v.IsNil()
 	case reflect.Invalid:
 		return true
 	}
-	return false
+
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }

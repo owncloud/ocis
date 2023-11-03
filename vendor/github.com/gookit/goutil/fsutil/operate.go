@@ -39,7 +39,7 @@ func MkSubDirs(perm os.FileMode, parentDir string, subDirs ...string) error {
 	return nil
 }
 
-// MkParentDir quick create parent dir
+// MkParentDir quick create parent dir for given path.
 func MkParentDir(fpath string) error {
 	dirPath := filepath.Dir(fpath)
 	if !IsDir(dirPath) {
@@ -49,14 +49,69 @@ func MkParentDir(fpath string) error {
 }
 
 // ************************************************************
+//	options for open file
+// ************************************************************
+
+// OpenOption for open file
+type OpenOption struct {
+	// file open flag. see FsCWTFlags
+	Flag int
+	// file perm. see DefaultFilePerm
+	Perm os.FileMode
+}
+
+// OpenOptionFunc for open/write file
+type OpenOptionFunc func(*OpenOption)
+
+// NewOpenOption create a new OpenOption instance
+//
+// Defaults:
+//   - open flags: FsCWTFlags (override write)
+//   - file Perm: DefaultFilePerm
+func NewOpenOption(optFns ...OpenOptionFunc) *OpenOption {
+	opt := &OpenOption{
+		Flag: FsCWTFlags,
+		Perm: DefaultFilePerm,
+	}
+
+	for _, fn := range optFns {
+		fn(opt)
+	}
+	return opt
+}
+
+// OpenOptOrNew create a new OpenOption instance if opt is nil
+func OpenOptOrNew(opt *OpenOption) *OpenOption {
+	if opt == nil {
+		return NewOpenOption()
+	}
+	return opt
+}
+
+// WithFlag set file open flag
+func WithFlag(flag int) OpenOptionFunc {
+	return func(opt *OpenOption) {
+		opt.Flag = flag
+	}
+}
+
+// WithPerm set file perm
+func WithPerm(perm os.FileMode) OpenOptionFunc {
+	return func(opt *OpenOption) {
+		opt.Perm = perm
+	}
+}
+
+// ************************************************************
 //	open/create files
 // ************************************************************
 
-// some commonly flag consts for open file
+// some commonly flag consts for open file.
 const (
 	FsCWAFlags = os.O_CREATE | os.O_WRONLY | os.O_APPEND // create, append write-only
 	FsCWTFlags = os.O_CREATE | os.O_WRONLY | os.O_TRUNC  // create, override write-only
 	FsCWFlags  = os.O_CREATE | os.O_WRONLY               // create, write-only
+	FsRWFlags  = os.O_RDWR                               // read-write, dont create.
 	FsRFlags   = os.O_RDONLY                             // read-only
 )
 
@@ -65,13 +120,13 @@ const (
 // Usage:
 //
 //	file, err := OpenFile("path/to/file.txt", FsCWFlags, 0666)
-func OpenFile(filepath string, flag int, perm os.FileMode) (*os.File, error) {
-	fileDir := path.Dir(filepath)
+func OpenFile(filePath string, flag int, perm os.FileMode) (*os.File, error) {
+	fileDir := path.Dir(filePath)
 	if err := os.MkdirAll(fileDir, DefaultDirPerm); err != nil {
 		return nil, err
 	}
 
-	file, err := os.OpenFile(filepath, flag, perm)
+	file, err := os.OpenFile(filePath, flag, perm)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +138,8 @@ func OpenFile(filepath string, flag int, perm os.FileMode) (*os.File, error) {
 // Usage:
 //
 //	file := MustOpenFile("path/to/file.txt", FsCWFlags, 0666)
-func MustOpenFile(filepath string, flag int, perm os.FileMode) *os.File {
-	file, err := OpenFile(filepath, flag, perm)
+func MustOpenFile(filePath string, flag int, perm os.FileMode) *os.File {
+	file, err := OpenFile(filePath, flag, perm)
 	if err != nil {
 		panic(err)
 	}
@@ -173,6 +228,11 @@ func MustRemove(fPath string) {
 // NOTICE: will ignore error
 func QuietRemove(fPath string) { _ = os.Remove(fPath) }
 
+// SafeRemoveAll removes path and any children it contains. will ignore error
+func SafeRemoveAll(path string) {
+	_ = os.RemoveAll(path)
+}
+
 // RmIfExist removes the named file or (empty) directory on exists.
 func RmIfExist(fPath string) error { return DeleteIfExist(fPath) }
 
@@ -201,6 +261,11 @@ func RemoveSub(dirPath string, fns ...FilterFunc) error {
 		if ent.IsDir() {
 			if err := RemoveSub(fPath, fns...); err != nil {
 				return err
+			}
+
+			// skip rm not empty subdir
+			if !IsEmptyDir(fPath) {
+				return nil
 			}
 		}
 		return os.Remove(fPath)
