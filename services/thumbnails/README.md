@@ -52,16 +52,14 @@ Returned: 15x10
 ## Thumbnail Processors
 
 Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative 
-impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by 
-defining on how the preview image generation will be done. The following processors are available:
+impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by defining on how the preview image generation will be done. The following processors are available:
 
 *   `resize`
 *   `fit`
 *   `fill`
 *   `thumbnail`
 
-To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor 
-is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
+To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
 
 ## Deleting Thumbnails
 
