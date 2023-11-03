@@ -44,7 +44,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-tika v0.3.0
 	github.com/google/uuid v1.4.0
-	github.com/gookit/config/v2 v2.2.3
+	github.com/gookit/config/v2 v2.2.4
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
@@ -204,7 +204,7 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.0.4 // indirect
-	github.com/goccy/go-yaml v1.11.0 // indirect
+	github.com/goccy/go-yaml v1.11.2 // indirect
 	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -217,8 +217,8 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
-	github.com/gookit/color v1.5.3 // indirect
-	github.com/gookit/goutil v0.6.10 // indirect
+	github.com/gookit/color v1.5.4 // indirect
+	github.com/gookit/goutil v0.6.14 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect

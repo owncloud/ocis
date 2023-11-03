@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"text/scanner"
+
+	"github.com/gookit/goutil/basefn"
 )
 
 // NewIOReader instance by input file path or io.Reader
@@ -70,20 +72,27 @@ func ReadStringOrErr(in any) (string, error) {
 }
 
 // ReadAll read contents from path or io.Reader, will panic on in type error
-func ReadAll(in any) []byte { return GetContents(in) }
+func ReadAll(in any) []byte { return MustRead(in) }
 
 // GetContents read contents from path or io.Reader, will panic on in type error
-func GetContents(in any) []byte {
-	r, err := NewIOReader(in)
-	if err != nil {
-		panic(err)
-	}
-	return MustReadReader(r)
+func GetContents(in any) []byte { return MustRead(in) }
+
+// MustRead read contents from path or io.Reader, will panic on in type error
+func MustRead(in any) []byte {
+	return basefn.Must(ReadOrErr(in))
 }
 
 // ReadOrErr read contents from path or io.Reader, will panic on in type error
 func ReadOrErr(in any) ([]byte, error) {
 	r, err := NewIOReader(in)
+	defer func() {
+		if r != nil {
+			if file, ok := r.(*os.File); ok {
+				err = file.Close()
+			}
+		}
+	}()
+
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +111,8 @@ func ReadExistFile(filePath string) []byte {
 	return nil
 }
 
-// TextScanner from filepath or io.Reader, will panic on in type error
+// TextScanner from filepath or io.Reader, will panic on in type error.
+// Will scan parse text to tokens: Ident, Int, Float, Char, String, RawString, Comment, etc.
 //
 // Usage:
 //
@@ -122,7 +132,8 @@ func TextScanner(in any) *scanner.Scanner {
 	return &s
 }
 
-// LineScanner create from filepath or io.Reader
+// LineScanner create from filepath or io.Reader, will panic on in type error.
+// Will scan and parse text to lines.
 //
 //	s := fsutil.LineScanner("/path/to/file")
 //	for s.Scan() {

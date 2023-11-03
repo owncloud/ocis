@@ -1004,8 +1004,8 @@ github.com/gobwas/pool/pbytes
 ## explicit
 github.com/gobwas/ws
 github.com/gobwas/ws/wsutil
-# github.com/goccy/go-yaml v1.11.0
-## explicit; go 1.18
+# github.com/goccy/go-yaml v1.11.2
+## explicit; go 1.19
 github.com/goccy/go-yaml
 github.com/goccy/go-yaml/ast
 github.com/goccy/go-yaml/internal/errors
@@ -1086,34 +1086,38 @@ github.com/google/renameio/v2
 # github.com/google/uuid v1.4.0
 ## explicit
 github.com/google/uuid
-# github.com/gookit/color v1.5.3
+# github.com/gookit/color v1.5.4
 ## explicit; go 1.18
 github.com/gookit/color
-# github.com/gookit/config/v2 v2.2.3
-## explicit; go 1.18
+# github.com/gookit/config/v2 v2.2.4
+## explicit; go 1.19
 github.com/gookit/config/v2
 github.com/gookit/config/v2/yaml
-# github.com/gookit/goutil v0.6.10
-## explicit; go 1.18
+# github.com/gookit/goutil v0.6.14
+## explicit; go 1.19
 github.com/gookit/goutil
 github.com/gookit/goutil/arrutil
 github.com/gookit/goutil/basefn
 github.com/gookit/goutil/byteutil
 github.com/gookit/goutil/cliutil/cmdline
 github.com/gookit/goutil/comdef
+github.com/gookit/goutil/encodes
 github.com/gookit/goutil/envutil
 github.com/gookit/goutil/errorx
 github.com/gookit/goutil/fsutil
+github.com/gookit/goutil/goinfo
+github.com/gookit/goutil/internal/checkfn
 github.com/gookit/goutil/internal/comfunc
+github.com/gookit/goutil/internal/varexpr
 github.com/gookit/goutil/jsonutil
 github.com/gookit/goutil/maputil
 github.com/gookit/goutil/mathutil
 github.com/gookit/goutil/reflects
 github.com/gookit/goutil/stdio
-github.com/gookit/goutil/stdutil
 github.com/gookit/goutil/structs
 github.com/gookit/goutil/strutil
 github.com/gookit/goutil/strutil/textutil
+github.com/gookit/goutil/syncs
 github.com/gookit/goutil/sysutil
 github.com/gookit/goutil/sysutil/cmdr
 # github.com/gorilla/handlers v1.5.1

@@ -7,28 +7,82 @@ import (
 	"unsafe"
 )
 
+// loopIndirect returns the item at the end of indirection, and a bool to indicate
+// if it's nil. If the returned bool is true, the returned value's kind will be
+// either a pointer or interface.
+func loopIndirect(v reflect.Value) (rv reflect.Value, isNil bool) {
+	for ; v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface; v = v.Elem() {
+		if v.IsNil() {
+			return v, true
+		}
+	}
+	return v, false
+}
+
+// indirectInterface returns the concrete value in an interface value,
+// or else the zero reflect.Value.
+// That is, if v represents the interface value x, the result is the same as reflect.ValueOf(x):
+// the fact that x was an interface value is forgotten.
+func indirectInterface(v reflect.Value) reflect.Value {
+	if v.Kind() != reflect.Interface {
+		return v
+	}
+	if v.IsNil() {
+		return emptyValue
+	}
+	return v.Elem()
+}
+
 // Elem returns the value that the interface v contains
-// or that the pointer v points to.
+// or that the pointer v points to. otherwise, will return self
 func Elem(v reflect.Value) reflect.Value {
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
 		return v.Elem()
 	}
-
-	// otherwise, will return self
 	return v
 }
 
-// Indirect like reflect.Indirect(), but can also indirect reflect.Interface
+// Indirect like reflect.Indirect(), but can also indirect reflect.Interface. otherwise, will return self
 func Indirect(v reflect.Value) reflect.Value {
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
 		return v.Elem()
 	}
-
-	// otherwise, will return self
 	return v
 }
 
-// Len get reflect value length
+// UnwrapAny unwrap reflect.Interface value. otherwise, will return self
+func UnwrapAny(v reflect.Value) reflect.Value {
+	if v.Kind() == reflect.Interface {
+		return v.Elem()
+	}
+
+	if v.IsNil() {
+		return emptyValue
+	}
+	return v
+}
+
+// TypeReal returns a ptr type's real type. otherwise, will return self.
+func TypeReal(t reflect.Type) reflect.Type {
+	if t.Kind() == reflect.Pointer {
+		return t.Elem()
+	}
+	return t
+}
+
+// TypeElem returns the array, slice, chan, map type's element type. otherwise, will return self.
+func TypeElem(t reflect.Type) reflect.Type {
+	switch t.Kind() {
+	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice:
+		return t.Elem()
+	default:
+		return t
+	}
+}
+
+// Len get reflect value length. allow: intX, uintX, floatX, string, map, array, chan, slice.
+//
+// Note: (u)intX use width. float to string then calc len.
 func Len(v reflect.Value) int {
 	v = reflect.Indirect(v)
 
@@ -127,81 +181,4 @@ func SetRValue(rv, val reflect.Value) {
 	}
 
 	rv.Set(val)
-}
-
-// EachMap process any map data
-func EachMap(mp reflect.Value, fn func(key, val reflect.Value)) {
-	if fn == nil {
-		return
-	}
-	if mp.Kind() != reflect.Map {
-		panic("only allow map value data")
-	}
-
-	for _, key := range mp.MapKeys() {
-		fn(key, mp.MapIndex(key))
-	}
-}
-
-// EachStrAnyMap process any map data as string key and any value
-func EachStrAnyMap(mp reflect.Value, fn func(key string, val any)) {
-	EachMap(mp, func(key, val reflect.Value) {
-		fn(String(key), val.Interface())
-	})
-}
-
-// FlatFunc custom collect handle func
-type FlatFunc func(path string, val reflect.Value)
-
-// FlatMap process tree map to flat key-value map.
-//
-// Examples:
-//
-//	{"top": {"sub": "value", "sub2": "value2"} }
-//	->
-//	{"top.sub": "value", "top.sub2": "value2" }
-func FlatMap(rv reflect.Value, fn FlatFunc) {
-	if fn == nil {
-		return
-	}
-
-	if rv.Kind() != reflect.Map {
-		panic("only allow flat map data")
-	}
-	flatMap(rv, fn, "")
-}
-
-func flatMap(rv reflect.Value, fn FlatFunc, parent string) {
-	for _, key := range rv.MapKeys() {
-		path := String(key)
-		if parent != "" {
-			path = parent + "." + path
-		}
-
-		fv := Indirect(rv.MapIndex(key))
-		switch fv.Kind() {
-		case reflect.Map:
-			flatMap(fv, fn, path)
-		case reflect.Array, reflect.Slice:
-			flatSlice(fv, fn, path)
-		default:
-			fn(path, fv)
-		}
-	}
-}
-
-func flatSlice(rv reflect.Value, fn FlatFunc, parent string) {
-	for i := 0; i < rv.Len(); i++ {
-		path := parent + "[" + strconv.Itoa(i) + "]"
-		fv := Indirect(rv.Index(i))
-
-		switch fv.Kind() {
-		case reflect.Map:
-			flatMap(fv, fn, path)
-		case reflect.Array, reflect.Slice:
-			flatSlice(fv, fn, path)
-		default:
-			fn(path, fv)
-		}
-	}
 }

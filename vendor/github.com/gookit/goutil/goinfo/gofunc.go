@@ -1,20 +1,21 @@
-package stdutil
+package goinfo
 
 import (
 	"reflect"
 	"runtime"
 	"strings"
+	"unicode"
 
 	"github.com/gookit/goutil/strutil"
 )
 
 // FullFcName struct.
 type FullFcName struct {
-	// FullName eg: github.com/gookit/goutil/stdutil.PanicIf
+	// FullName eg: "github.com/gookit/goutil/goinfo.PanicIf"
 	FullName string
-	pkgPath  string
-	pkgName  string
-	funcName string
+	pkgPath  string // "github.com/gookit/goutil/goinfo"
+	pkgName  string // "goinfo"
+	funcName string // "PanicIf"
 }
 
 // Parse the full func name.
@@ -28,17 +29,16 @@ func (ffn *FullFcName) Parse() {
 	ffn.pkgPath = ffn.FullName[:i+1]
 	// spilt get pkg and func name
 	ffn.pkgName, ffn.funcName = strutil.MustCut(ffn.FullName[i+1:], ".")
-
 	ffn.pkgPath += ffn.pkgName
 }
 
-// PkgPath string get. eg: github.com/gookit/goutil/stdutil
+// PkgPath string get. eg: github.com/gookit/goutil/goinfo
 func (ffn *FullFcName) PkgPath() string {
 	ffn.Parse()
 	return ffn.pkgPath
 }
 
-// PkgName string get. eg: stdutil
+// PkgName string get. eg: goinfo
 func (ffn *FullFcName) PkgName() string {
 	ffn.Parse()
 	return ffn.pkgName
@@ -50,7 +50,7 @@ func (ffn *FullFcName) FuncName() string {
 	return ffn.funcName
 }
 
-// String get full func name string.
+// String get full func name string, pkg path and func name.
 func (ffn *FullFcName) String() string {
 	return ffn.FullName
 }
@@ -59,13 +59,16 @@ func (ffn *FullFcName) String() string {
 //
 // eg:
 //
-//	// OUTPUT: github.com/gookit/goutil/stdutil.PanicIf
-//	stdutil.FuncName(stdutil.PkgName)
+//	// OUTPUT: github.com/gookit/goutil/goinfo.PkgName
+//	goinfo.FuncName(goinfo.PkgName)
 func FuncName(fn any) string {
 	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 }
 
 // CutFuncName get pkg path and short func name
+// eg:
+//
+//	"github.com/gookit/goutil/goinfo.FuncName" => [github.com/gookit/goutil/goinfo, FuncName]
 func CutFuncName(fullFcName string) (pkgPath, shortFnName string) {
 	ffn := FullFcName{FullName: fullFcName}
 	return ffn.PkgPath(), ffn.FuncName()
@@ -75,12 +78,13 @@ func CutFuncName(fullFcName string) (pkgPath, shortFnName string) {
 //
 // Usage:
 //
-//	fullFcName := stdutil.FuncName(fn)
-//	pgkName := stdutil.PkgName(fullFcName)
+//	fullFcName := goinfo.FuncName(fn)
+//	pgkName := goinfo.PkgName(fullFcName)
 func PkgName(fullFcName string) string {
 	for {
 		lastPeriod := strings.LastIndex(fullFcName, ".")
 		lastSlash := strings.LastIndex(fullFcName, "/")
+
 		if lastPeriod > lastSlash {
 			fullFcName = fullFcName[:lastPeriod]
 		} else {
@@ -88,4 +92,22 @@ func PkgName(fullFcName string) string {
 		}
 	}
 	return fullFcName
+}
+
+// GoodFuncName reports whether the function name is a valid identifier.
+func GoodFuncName(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	for i, r := range name {
+		switch {
+		case r == '_':
+		case i == 0 && !unicode.IsLetter(r):
+			return false
+		case !unicode.IsLetter(r) && !unicode.IsDigit(r):
+			return false
+		}
+	}
+	return true
 }

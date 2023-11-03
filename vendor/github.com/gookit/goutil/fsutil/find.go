@@ -7,9 +7,65 @@ import (
 	"path/filepath"
 
 	"github.com/gookit/goutil/arrutil"
-	"github.com/gookit/goutil/comdef"
+	"github.com/gookit/goutil/internal/comfunc"
 	"github.com/gookit/goutil/strutil"
 )
+
+// FilePathInDirs get full file path in dirs.
+//
+// Params:
+//   - file: can be relative path, file name, full path.
+//   - dirs: dir paths
+func FilePathInDirs(file string, dirs ...string) string {
+	file = comfunc.ExpandHome(file)
+	if FileExists(file) {
+		return file
+	}
+
+	for _, dirPath := range dirs {
+		fPath := JoinSubPaths(dirPath, file)
+		if FileExists(fPath) {
+			return fPath
+		}
+	}
+	return "" // not found
+}
+
+// FirstExists check multi paths and return first exists path.
+func FirstExists(paths ...string) string {
+	return MatchFirst(paths, PathExists, "")
+}
+
+// FirstExistsDir check multi paths and return first exists dir.
+func FirstExistsDir(paths ...string) string {
+	return MatchFirst(paths, IsDir, "")
+}
+
+// FirstExistsFile check multi paths and return first exists file.
+func FirstExistsFile(paths ...string) string {
+	return MatchFirst(paths, IsFile, "")
+}
+
+// MatchPaths given paths by custom mather func.
+func MatchPaths(paths []string, matcher PathMatchFunc) []string {
+	var ret []string
+	for _, p := range paths {
+		if matcher(p) {
+			ret = append(ret, p)
+		}
+	}
+	return ret
+}
+
+// MatchFirst filter paths by filter func and return first match path.
+func MatchFirst(paths []string, matcher PathMatchFunc, defaultPath string) string {
+	for _, p := range paths {
+		if matcher(p) {
+			return p
+		}
+	}
+	return defaultPath
+}
 
 // SearchNameUp find file/dir name in dirPath or parent dirs,
 // return the name of directory path
@@ -57,7 +113,7 @@ func WalkDir(dir string, fn fs.WalkDirFunc) error {
 // Usage:
 //
 //	files := fsutil.Glob("/path/to/dir/*.go")
-func Glob(pattern string, fls ...comdef.StringMatchFunc) []string {
+func Glob(pattern string, fls ...NameMatchFunc) []string {
 	files, _ := filepath.Glob(pattern)
 	if len(fls) == 0 || len(files) == 0 {
 		return files

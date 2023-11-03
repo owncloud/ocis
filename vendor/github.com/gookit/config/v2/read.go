@@ -99,6 +99,21 @@ func (c *Config) Data() map[string]any {
 	return c.data
 }
 
+// Sub return sub config data by key
+func Sub(key string) map[string]any { return dc.Sub(key) }
+
+// Sub get sub config data by key
+//
+// Note: will don't apply any options, like ParseEnv
+func (c *Config) Sub(key string) map[string]any {
+	if mp, ok := c.GetValue(key); ok {
+		if mmp, ok := mp.(map[string]any); ok {
+			return mmp
+		}
+	}
+	return nil
+}
+
 // Keys return all config data
 func Keys() []string { return dc.Keys() }
 
