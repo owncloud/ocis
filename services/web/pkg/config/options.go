@@ -24,10 +24,9 @@ type Options struct {
 	ImprintURL               string           `json:"imprintUrl,omitempty" yaml:"imprintUrl" env:"WEB_OPTION_IMPRINT_URL" desc:"Specifies the target URL for the imprint link valid for the ocis instance in the account menu."`
 	PrivacyURL               string           `json:"privacyUrl,omitempty" yaml:"privacyUrl" env:"WEB_OPTION_PRIVACY_URL" desc:"Specifies the target URL for the privacy link valid for the ocis instance in the account menu."`
 	AccessDeniedHelpURL      string           `json:"accessDeniedHelpUrl,omitempty" yaml:"accessDeniedHelpUrl" env:"WEB_OPTION_ACCESS_DENIED_HELP_URL" desc:"Specifies the target URL valid for the ocis instance for the generic logged out / access denied page."`
-	TokenStorageLocal        bool             `json:"tokenStorageLocal" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'."`
-	DisabledExtensions       []string         `json:"disabledExtensions,omitempty" yaml:"disabledExtensions" env:"WEB_OPTION_DISABLED_EXTENSIONS" desc:"Allows disabling specific Web extensions via their id."`
+	TokenStorageLocal        bool             `json:"tokenStorageLocal" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'."`
+	DisabledExtensions       []string         `json:"disabledExtensions,omitempty" yaml:"disabledExtensions" env:"WEB_OPTION_DISABLED_EXTENSIONS" desc:"Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types documentation for details."`
 }
-
 // AccountEditLink are the AccountEditLink options
 type AccountEditLink struct {
 	Href string `json:"href,omitempty" yaml:"href" env:"WEB_OPTION_ACCOUNT_EDIT_LINK_HREF" desc:"Set a different target URL for the edit link. Make sure to prepend it with 'http(s)://'."`
