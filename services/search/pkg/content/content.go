@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/bbalet/stopwords"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 func init() {
@@ -20,6 +21,7 @@ type Document struct {
 	Mtime    string
 	MimeType string
 	Tags     []string
+	Audio    *libregraph.Audio `json:"audio,omitempty"`
 }
 
 func CleanString(content, langCode string) string {

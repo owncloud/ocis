@@ -240,38 +240,113 @@ var _ = Describe("Driveitems", func() {
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
 
-		It("succeeds", func() {
-			mtime := time.Now()
-			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
-				Status: status.NewOK(ctx),
-				Infos: []*provider.ResourceInfo{
-					{
-						Type:  provider.ResourceType_RESOURCE_TYPE_FILE,
-						Id:    &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
-						Etag:  "etag",
-						Mtime: utils.TimeToTS(mtime),
+		Context("it succeeds", func() {
+			var (
+				r     *http.Request
+				mtime = time.Now()
+			)
+
+			BeforeEach(func() {
+				r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/storageid$spaceid/items/storageid$spaceid!nodeid/children", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("driveID", "storageid$spaceid")
+				rctx.URLParams.Add("driveItemID", "storageid$spaceid!nodeid")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			})
+
+			assertItemsList := func(length int) itemsList {
+				svc.GetDriveItemChildren(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				res := itemsList{}
+
+				err = json.Unmarshal(data, &res)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(res.Value)).To(Equal(1))
+				Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
+				Expect(res.Value[0].GetETag()).To(Equal("etag"))
+				Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+				Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+
+				return res
+			}
+
+			It("returns a generic file", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:              provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:                &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:              "etag",
+							Mtime:             utils.TimeToTS(mtime),
+							ArbitraryMetadata: nil,
+						},
 					},
-				},
-			}, nil)
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/storageid$spaceid/items/storageid$spaceid!nodeid/children", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "storageid$spaceid")
-			rctx.URLParams.Add("driveItemID", "storageid$spaceid!nodeid")
-			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetDriveItemChildren(rr, r)
-			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := io.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
+				}, nil)
 
-			res := itemsList{}
+				res := assertItemsList(1)
+				Expect(res.Value[0].Audio).To(BeNil())
+			})
 
-			err = json.Unmarshal(data, &res)
-			Expect(err).ToNot(HaveOccurred())
+			It("returns the audio facet if metadata is available", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "audio/mpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.audio.album":             "Some Album",
+									"libre.graph.audio.albumArtist":       "Some AlbumArtist",
+									"libre.graph.audio.artist":            "Some Artist",
+									"libre.graph.audio.bitrate":           "192",
+									"libre.graph.audio.composers":         "Some Composers",
+									"libre.graph.audio.copyright":         "Some Copyright",
+									"libre.graph.audio.disc":              "2",
+									"libre.graph.audio.discCount":         "5",
+									"libre.graph.audio.duration":          "225000",
+									"libre.graph.audio.genre":             "Some Genre",
+									"libre.graph.audio.hasDrm":            "false",
+									"libre.graph.audio.isVariableBitrate": "true",
+									"libre.graph.audio.title":             "Some Title",
+									"libre.graph.audio.track":             "6",
+									"libre.graph.audio.trackCount":        "9",
+									"libre.graph.audio.year":              "1994",
+								},
+							},
+						},
+					},
+				}, nil)
 
-			Expect(len(res.Value)).To(Equal(1))
-			Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
-			Expect(res.Value[0].GetETag()).To(Equal("etag"))
-			Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+				res := assertItemsList(1)
+				audio := res.Value[0].Audio
+
+				Expect(audio).ToNot(BeNil())
+				Expect(audio.Album).To(Equal(libregraph.PtrString("Some Album")))
+				Expect(audio.AlbumArtist).To(Equal(libregraph.PtrString("Some AlbumArtist")))
+				Expect(audio.Artist).To(Equal(libregraph.PtrString("Some Artist")))
+				Expect(audio.Bitrate).To(Equal(libregraph.PtrInt64(192)))
+				Expect(audio.Composers).To(Equal(libregraph.PtrString("Some Composers")))
+				Expect(audio.Copyright).To(Equal(libregraph.PtrString("Some Copyright")))
+				Expect(audio.Disc).To(Equal(libregraph.PtrInt32(2)))
+				Expect(audio.DiscCount).To(Equal(libregraph.PtrInt32(5)))
+				Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225000)))
+				Expect(audio.Genre).To(Equal(libregraph.PtrString("Some Genre")))
+				Expect(audio.HasDrm).To(Equal(libregraph.PtrBool(false)))
+				Expect(audio.IsVariableBitrate).To(Equal(libregraph.PtrBool(true)))
+				Expect(audio.Title).To(Equal(libregraph.PtrString("Some Title")))
+				Expect(audio.Track).To(Equal(libregraph.PtrInt32(6)))
+				Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(9)))
+				Expect(audio.Year).To(Equal(libregraph.PtrInt32(1994)))
+			})
 		})
 	})
 })

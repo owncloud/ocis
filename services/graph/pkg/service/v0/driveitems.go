@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"reflect"
+	"strconv"
+	"strings"
 	"time"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -17,6 +20,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"golang.org/x/crypto/sha3"
 )
@@ -87,7 +91,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files, err := formatDriveItems(lRes.Infos)
+	files, err := formatDriveItems(g.logger, lRes.Infos)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -152,7 +156,7 @@ func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
-	driveItem, err := cs3ResourceToDriveItem(res.Info)
+	driveItem, err := cs3ResourceToDriveItem(g.logger, res.Info)
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
@@ -220,7 +224,7 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files, err := formatDriveItems(res.Infos)
+	files, err := formatDriveItems(g.logger, res.Infos)
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
@@ -244,7 +248,7 @@ func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) 
 		refStr, _ := storagespace.FormatReference(&ref)
 		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.Status.Message)
 	}
-	return cs3ResourceToDriveItem(res.Info)
+	return cs3ResourceToDriveItem(g.logger, res.Info)
 }
 
 func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
@@ -285,10 +289,10 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 	return item, nil
 }
 
-func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
+func formatDriveItems(logger *log.Logger, mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
 	responses := make([]*libregraph.DriveItem, 0, len(mds))
 	for i := range mds {
-		res, err := cs3ResourceToDriveItem(mds[i])
+		res, err := cs3ResourceToDriveItem(logger, mds[i])
 		if err != nil {
 			return nil, err
 		}
@@ -302,7 +306,7 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 	return time.Unix(int64(t.Seconds), int64(t.Nanos))
 }
 
-func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
+func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 	size := new(int64)
 	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
 
@@ -330,7 +334,77 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		driveItem.Folder = &libregraph.Folder{}
 	}
+
+	driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
+
 	return driveItem, nil
+}
+
+func cs3ResourceToDriveItemAudioFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.Audio {
+	if !strings.HasPrefix(res.MimeType, "audio/") {
+		return nil
+	}
+
+	k := res.ArbitraryMetadata.Metadata
+	if k == nil {
+		return nil
+	}
+
+	var audio = &libregraph.Audio{}
+	if ok := unmarshalStringMap(logger, audio, k, "libre.graph.audio."); ok {
+		return audio
+	}
+
+	return nil
+}
+
+func getFieldName(structField reflect.StructField) string {
+	tag := structField.Tag.Get("json")
+	if tag == "" {
+		return structField.Name
+	}
+
+	return strings.Split(tag, ",")[0]
+}
+
+func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, prefix string) bool {
+	nonEmpty := false
+	obj := reflect.ValueOf(out).Elem()
+	for i := 0; i < obj.NumField(); i++ {
+		field := obj.Field(i)
+		structField := obj.Type().Field(i)
+		mapKey := prefix + getFieldName(structField)
+
+		if value, ok := flatMap[mapKey]; ok {
+			if field.Kind() == reflect.Ptr {
+				newValue := reflect.New(field.Type().Elem())
+				var tmp any
+				var err error
+				switch t := newValue.Type().Elem().Kind(); t {
+				case reflect.String:
+					tmp = value
+				case reflect.Int32:
+					tmp, err = strconv.ParseInt(value, 10, 32)
+				case reflect.Int64:
+					tmp, err = strconv.ParseInt(value, 10, 64)
+				case reflect.Bool:
+					tmp, err = strconv.ParseBool(value)
+				default:
+					err = errors.New("unsupported type")
+					logger.Error().Err(err).Str("type", t.String()).Str("mapKey", mapKey).Msg("target field type for value of mapKey is not supported")
+				}
+				if err != nil {
+					logger.Error().Err(err).Str("mapKey", mapKey).Msg("unmarshalling failed")
+					continue
+				}
+				newValue.Elem().Set(reflect.ValueOf(tmp).Convert(field.Type().Elem()))
+				field.Set(newValue)
+				nonEmpty = true
+			}
+		}
+	}
+
+	return nonEmpty
 }
 
 func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.RemoteItem, error) {

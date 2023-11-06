@@ -17,6 +17,25 @@ message Reference {
 	string path = 2;
 }
 
+message Audio {
+	optional string album = 1;
+	optional string albumArtist = 2;
+	optional string artist = 3;
+	optional int64 bitrate = 4;
+	optional string composers = 5;
+	optional string copyright = 6;
+	optional int32 disc = 7;
+	optional int32 discCount = 8;
+	optional int64 duration = 9;
+	optional string genre = 10;
+	optional bool hasDrm = 11;
+	optional bool isVariableBitrate = 12;
+	optional string title = 13;
+	optional int32 track = 14;
+	optional int32 trackCount = 15;
+	optional int32 year = 16;
+}
+
 message Entity {
 	Reference ref = 1;
 	ResourceID id = 2;
@@ -32,6 +51,7 @@ message Entity {
 	ResourceID parent_id = 12;
 	repeated string tags = 13;
 	string highlights = 14;
+	Audio audio = 15;
 }
 
 message Match {

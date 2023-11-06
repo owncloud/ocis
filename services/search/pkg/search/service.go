@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -22,6 +24,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -486,6 +489,70 @@ func (s *Service) UpsertItem(ref *provider.Reference, uID *user.UserId) {
 		s.logger.Error().Err(err).Msg("error adding updating the resource in the index")
 	} else {
 		logDocCount(s.engine, s.logger)
+	}
+
+	// determine if metadata needs to be stored in storage as well
+	metadata := map[string]string{}
+	addAudioMetadata(metadata, doc.Audio)
+	if len(metadata) == 0 {
+		return
+	}
+
+	s.logger.Trace().Str("name", doc.Name).Interface("metadata", metadata).Msg("Storing metadata")
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Msg("could not retrieve client to store metadata")
+		return
+	}
+
+	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+		Ref: ref,
+		ArbitraryMetadata: &provider.ArbitraryMetadata{
+			Metadata: metadata,
+		},
+	})
+	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
+		return
+	}
+}
+
+func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {
+	if audio == nil {
+		return
+	}
+	marshalToStringMap(audio, metadata, "libre.graph.audio.")
+}
+
+func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string]string, prefix string) {
+	// ToMap never returns a non-nil error ...
+	m, _ := source.ToMap()
+
+	for k, v := range m {
+		if v == nil {
+			continue
+		}
+		target[prefix+k] = valueToString(v)
+	}
+}
+
+func valueToString(value interface{}) string {
+	if value == nil {
+		return ""
+	}
+
+	switch v := value.(type) {
+	case *string:
+		return *v
+	case *int32:
+		return strconv.FormatInt(int64(*v), 10)
+	case *int64:
+		return strconv.FormatInt(*v, 10)
+	case *bool:
+		return strconv.FormatBool(*v)
+	default:
+		return fmt.Sprintf("%v", v)
 	}
 }
 
