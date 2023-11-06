@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
+* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 
 ## Details
 
@@ -15,6 +16,13 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/7629
+
+* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
+
+   Audio metadata is now extracted and stored by the search service. It is available for
+   driveItems in a folder listing using the Graph API.
+
+   https://github.com/owncloud/ocis/pull/7490
 # Changelog for [5.0.0] (2023-10-30)
 
 The following sections list the changes for 5.0.0.
