@@ -1,5 +1,5 @@
 ---
-title: "tus upload"
+title: "tus Upload"
 date: 2023-10-10T00:00:00+00:00
 weight: 21
 geekdocRepo: https://github.com/owncloud/ocis
@@ -8,14 +8,16 @@ geekdocFilePath: tus_upload.md
 geekdocCollapseSection: true
 ---
 
-Infinite Scale supports tus resumable-upload protocol.
+Infinite Scale supports the tus resumable-upload protocol.
 tus is a robust, modular, and open protocol designed to resume large file uploads reliably over HTTP.
 In situations where file uploads might be interrupted due to network issues, browser crashes, or other unforeseen interruptions,
 tus ensures that uploads can be resumed from the point of failure without losing data.
 This documentation shows some basic examples, refer [tus official site](https://tus.io/protocols/resumable-upload) for more details.
 
 ## Upload in Chunks
+
 ### Create an Upload URL
+
 The client must send a POST request against a known upload creation URL to request a new upload resource.
 The filename has to be provided in base64-encoded format.
 
@@ -68,6 +70,7 @@ The server will return a temporary upload URL in the location header of the resp
 ```
 
 ### Upload the First Chunk
+
 Once a temporary upload URL has been created, a client can send a PATCH request to upload a file. The file content should be sent in the body of the request:
 {{< tabs "upload-the-first-chunk" >}}
 {{< tab "Request" >}}
@@ -98,6 +101,7 @@ curl -ks -XPATCH https://temporary-upload-url \
 {{< /tabs >}}
 
 ### Upload Further Chunks
+
 After the first chunk is uploaded, the second chunk can be uploaded by pointing `Upload-Offset` to exact position that was returned in the first response.
 Upload process will not be marked as complete until the total uploaded content size matches the `Upload-Length` specified during the creation of the temporary URL.
 
@@ -134,6 +138,7 @@ It ensures data integrity and order during the upload process.
 {{< /hint >}}
 
 ## Creation with Upload
+
 {{< tabs "creation-with-upload" >}}
 {{< tab "Request" >}}
 ```shell
