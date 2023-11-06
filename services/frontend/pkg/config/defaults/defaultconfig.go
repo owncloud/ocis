@@ -113,6 +113,7 @@ func DefaultConfig() *config.Config {
 			StatCacheType:           "noop",
 			StatCacheDatabase:       "ocis",
 			StatCacheTTL:            300 * time.Second,
+			ListOCMShares:           true,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{

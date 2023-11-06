@@ -169,6 +169,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
 					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
 					"enable_denials":            cfg.OCS.EnableDenials,
+					"list_ocm_shares":           cfg.OCS.ListOCMShares,
 					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
