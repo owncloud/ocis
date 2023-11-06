@@ -21,6 +21,9 @@ var (
 		"image/x-ms-bmp": {},
 		"image/tiff":     {},
 		"text/plain":     {},
+		"audio/flac":     {},
+		"audio/mpeg":     {},
+		"audio/ogg":      {},
 	}
 )
 

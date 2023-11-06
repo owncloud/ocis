@@ -733,6 +733,9 @@ github.com/dgraph-io/ristretto/z/simd
 # github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
 ## explicit
 github.com/dgryski/go-rendezvous
+# github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
+## explicit; go 1.18
+github.com/dhowden/tag
 # github.com/disintegration/imaging v1.6.2
 ## explicit
 github.com/disintegration/imaging
