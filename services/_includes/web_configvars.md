@@ -52,7 +52,7 @@
 | WEB_OPTION_IMPRINT_URL | string |  | Specifies the target URL for the imprint link valid for the ocis instance in the account menu.|
 | WEB_OPTION_PRIVACY_URL | string |  | Specifies the target URL for the privacy link valid for the ocis instance in the account menu.|
 | WEB_OPTION_ACCESS_DENIED_HELP_URL | string |  | Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.|
-| WEB_OPTION_TOKEN_STORAGE_LOCAL | bool | true | Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.|
-| WEB_OPTION_DISABLED_EXTENSIONS | []string | [] | Allows disabling specific Web extensions via their id.|
+| WEB_OPTION_TOKEN_STORAGE_LOCAL | bool | true | Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.|
+| WEB_OPTION_DISABLED_EXTENSIONS | []string | [] | Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types documentation for details.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | WEB_GATEWAY_GRPC_ADDR | string | com.owncloud.api.gateway | The bind address of the GRPC service.|

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-06-08-59-33]
+[#deprecation-note-2023-11-06-09-23-09]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -501,7 +501,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false''. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.
+Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.
 
 a|`WEB_OPTION_DISABLED_EXTENSIONS` +
 
@@ -510,7 +510,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-Allows disabling specific Web extensions via their id.
+Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types documentation for details.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +
