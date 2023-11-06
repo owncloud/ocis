@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
+* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 
 ## Details
@@ -16,6 +17,13 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/7629
+
+* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
+
+   The thumbnails service can now extract artwork from audio files (mp3, ogg, flac) and render it
+   just like any other image.
+
+   https://github.com/owncloud/ocis/pull/7491
 
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 
