@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.search.v0"
 url: /apis/grpc_apis/ocis_messages_search_v0
-date: 2023-11-06T06:51:57Z
+date: 2023-11-06T07:58:30Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -11,6 +11,29 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 
 ## ocis/messages/search/v0/search.proto
+
+### Audio
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| album | [string](#string) | optional |  |
+| albumArtist | [string](#string) | optional |  |
+| artist | [string](#string) | optional |  |
+| bitrate | [int64](#int64) | optional |  |
+| composers | [string](#string) | optional |  |
+| copyright | [string](#string) | optional |  |
+| disc | [int32](#int32) | optional |  |
+| discCount | [int32](#int32) | optional |  |
+| duration | [int64](#int64) | optional |  |
+| genre | [string](#string) | optional |  |
+| hasDrm | [bool](#bool) | optional |  |
+| isVariableBitrate | [bool](#bool) | optional |  |
+| title | [string](#string) | optional |  |
+| track | [int32](#int32) | optional |  |
+| trackCount | [int32](#int32) | optional |  |
+| year | [int32](#int32) | optional |  |
 
 ### Entity
 
@@ -32,6 +55,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | parent_id | [ResourceID](#resourceid) |  |  |
 | tags | [string](#string) | repeated |  |
 | highlights | [string](#string) |  |  |
+| audio | [Audio](#audio) |  |  |
 
 ### Match
 
