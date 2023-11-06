@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-06-08-21-46]
+[#deprecation-note-2023-11-06-08-25-46]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -326,14 +326,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
-a|`OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
+a|`OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-
+Verify the hostname of the incoming request against the hostname of the OCM provider.
 
 a|`OCM_OCM_SHARE_PROVIDER_DRIVER` +
 
