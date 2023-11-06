@@ -6,7 +6,7 @@ import (
 	"go-micro.dev/v4/store"
 )
 
-// setStoreOption returns a function to setup a context with given value
+// setStoreOption returns a function to setup a context with given value.
 func setStoreOption(k, v interface{}) store.Option {
 	return func(o *store.Options) {
 		if o.Context == nil {

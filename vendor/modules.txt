@@ -932,7 +932,7 @@ github.com/go-micro/plugins/v4/server/grpc
 # github.com/go-micro/plugins/v4/server/http v1.2.2
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/http
-# github.com/go-micro/plugins/v4/store/nats-js v1.1.0
+# github.com/go-micro/plugins/v4/store/nats-js v1.2.1-0.20230807070816-bc05fb076ce7 => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/store/nats-js
 # github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230510195111-07cd57e1bc9d
@@ -2262,3 +2262,4 @@ stash.kopano.io/kgol/oidc-go
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
+# github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
