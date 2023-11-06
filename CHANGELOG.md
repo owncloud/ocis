@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
 * Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
+* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
 
 ## Details
 
@@ -31,6 +32,13 @@ The following sections list the changes for unreleased.
    driveItems in a folder listing using the Graph API.
 
    https://github.com/owncloud/ocis/pull/7490
+
+* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
+
+   Introduce a registry based on the natsjs object store
+
+   https://github.com/owncloud/ocis/issues/7272
+   https://github.com/owncloud/ocis/pull/7487
 # Changelog for [5.0.0] (2023-10-30)
 
 The following sections list the changes for 5.0.0.
