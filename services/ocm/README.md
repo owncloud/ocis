@@ -13,7 +13,7 @@ Internal GRPC APIs:
 * ocmcore: used for creating federated shares on the receiver side
 * authprovider: authenticates webdav requests using the ocm share tokens
 
-## Trust between instances
+## Trust Between Instances
 
 The `ocm` services implements an invitation workflow which needs to be followed before creating federated shares. Invitations are limited to trusted instances, however.
 
@@ -47,7 +47,7 @@ Example `providers.json` file:
 ]
 ```
 
-## Invitation workflow
+## Invitation Workflow
 
 Before sharing a resource with a remote user this user has to be invited by the sharer.
 
@@ -55,7 +55,7 @@ In order to do so a POST request is sent to the `generate-invite` endpoint of th
 
 The data backend of the `ocminvitemanager` is configurable. The only supported backend currently is `json` which stores the data in a json file on disk.
 
-## Creating shares
+## Creating Shares
 
 OCM Shares are currently created using the ocs API, just like regular shares. The difference is the share type, which is 6 (ShareTypeFederatedCloudShare) in this case, and a few additional parameters required for identifying the remote user.
 
