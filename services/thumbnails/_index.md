@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2023-11-06T09:23:12.389799054Z
+date: 2023-11-06T10:30:40.184707988Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
@@ -71,20 +71,21 @@ Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can
 
 Example:
 
-Requested: 18x12
-Available: 30x20, 15x10, 9x6
-Returned: 15x10
+Requested: 18x12  
+Available: 30x20, 15x10, 9x6  
+Returned: 15x10  
 
 ## Thumbnail Processors
 
-Image generation can be configured by defining different processors, following processors are available:
+Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative 
+impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by defining on how the preview image generation will be done. The following processors are available:
 
 *   `resize`
 *   `fit`
 *   `fill`
 *   `thumbnail`
 
-To apply one of those, a query parameter has to be added to the request, e.g. `?processor=fit`
+To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
 
 ## Deleting Thumbnails
 
