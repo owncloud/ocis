@@ -23,7 +23,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
-	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -780,28 +779,16 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 		tmp := id
 		var identitySet libregraph.IdentitySet
 		if _, ok := groupsMap[id]; ok {
-			var group libregraph.Group
-			if item := g.groupsCache.Get(id); item == nil {
-				if requestedGroup, err := g.identityBackend.GetGroup(ctx, id, url.Values{}); err == nil {
-					group = *requestedGroup
-					g.groupsCache.Set(id, group, ttlcache.DefaultTTL)
-				}
-			} else {
-				group = item.Value()
+			group, err := g.identityCache.GetGroup(ctx, tmp)
+			if err != nil {
+				g.logger.Warn().Str("groupid", tmp).Msg("Group not found by id")
 			}
-
 			identitySet = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp, DisplayName: group.GetDisplayName()}}
 		} else {
-			var user libregraph.User
-			if item := g.usersCache.Get(id); item == nil {
-				if requestedUser, err := g.identityBackend.GetUser(ctx, id, &godata.GoDataRequest{}); err == nil {
-					user = *requestedUser
-					g.usersCache.Set(id, user, ttlcache.DefaultTTL)
-				}
-			} else {
-				user = item.Value()
+			user, err := g.identityCache.GetUser(ctx, tmp)
+			if err != nil {
+				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}
-
 			identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
 		}
 

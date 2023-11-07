@@ -15,7 +15,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -71,8 +70,7 @@ type Graph struct {
 	roleService              RoleService
 	permissionsService       Permissions
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
-	usersCache               *ttlcache.Cache[string, libregraph.User]
-	groupsCache              *ttlcache.Cache[string, libregraph.Group]
+	identityCache            identity.IdentityCache
 	eventsPublisher          events.Publisher
 	searchService            searchsvc.SearchProviderService
 	keycloakClient           keycloak.Client
