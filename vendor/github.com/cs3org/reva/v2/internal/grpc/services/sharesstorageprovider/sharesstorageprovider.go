@@ -643,9 +643,10 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 			Status: rpcStatus,
 		}, nil
 	}
-	if srcReceivedShare.Share.ResourceId.SpaceId != dstReceivedShare.Share.ResourceId.SpaceId {
+
+	if dstReceivedShare.Share.Id.OpaqueId != srcReceivedShare.Share.Id.OpaqueId {
 		return &provider.MoveResponse{
-			Status: status.NewInvalid(ctx, "sharesstorageprovider: can not move between shares on different storages"),
+			Status: status.NewUnimplemented(ctx, nil, "sharesstorageprovider: can not move between shares"),
 		}, nil
 	}
 

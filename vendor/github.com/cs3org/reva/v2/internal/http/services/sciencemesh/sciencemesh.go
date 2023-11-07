@@ -105,7 +105,7 @@ func (s *svc) routerInit() error {
 		return err
 	}
 
-	s.router.Get("/generate-invite", tokenHandler.Generate)
+	s.router.Post("/generate-invite", tokenHandler.Generate)
 	s.router.Get("/list-invite", tokenHandler.ListInvite)
 	s.router.Post("/accept-invite", tokenHandler.AcceptInvite)
 	s.router.Get("/find-accepted-users", tokenHandler.FindAccepted)
