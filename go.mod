@@ -14,6 +14,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.7.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
 	github.com/cs3org/reva/v2 v2.16.1-0.20231031092154-9f40f0453b34
+	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -96,7 +97,7 @@ require (
 	golang.org/x/image v0.13.0
 	golang.org/x/net v0.17.0
 	golang.org/x/oauth2 v0.13.0
-	golang.org/x/sync v0.4.0
+	golang.org/x/sync v0.5.0
 	golang.org/x/term v0.13.0
 	golang.org/x/text v0.13.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d
@@ -168,7 +169,6 @@ require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
