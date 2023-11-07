@@ -387,10 +387,10 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: `MimeType:documents`,
+			name: `MimeType:document`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "documents"},
+					&ast.StringNode{Key: "mimetype", Value: "document"},
 				},
 			},
 			want: query.NewDisjunctionQuery([]query.Query{
@@ -405,10 +405,10 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: `MimeType:documents AND *tdd*`,
+			name: `MimeType:document AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "documents"},
+					&ast.StringNode{Key: "mimetype", Value: "document"},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
 				},
@@ -428,12 +428,12 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: `MimeType:documents OR MimeType:pdfs AND *tdd*`,
+			name: `MimeType:document OR MimeType:pdf AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "documents"},
+					&ast.StringNode{Key: "mimetype", Value: "document"},
 					&ast.OperatorNode{Value: "OR"},
-					&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+					&ast.StringNode{Key: "mimetype", Value: "pdf"},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
 				},
@@ -454,13 +454,13 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: `(MimeType:documents OR MimeType:pdfs) AND *tdd*`,
+			name: `(MimeType:document OR MimeType:pdf) AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
-						&ast.StringNode{Key: "mimetype", Value: "documents"},
+						&ast.StringNode{Key: "mimetype", Value: "document"},
 						&ast.OperatorNode{Value: "OR"},
-						&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+						&ast.StringNode{Key: "mimetype", Value: "pdf"},
 					}},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
@@ -482,13 +482,13 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: `(MimeType:pdfs OR MimeType:documents) AND *tdd*`,
+			name: `(MimeType:pdf OR MimeType:document) AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
-						&ast.StringNode{Key: "mimetype", Value: "pdfs"},
+						&ast.StringNode{Key: "mimetype", Value: "pdf"},
 						&ast.OperatorNode{Value: "OR"},
-						&ast.StringNode{Key: "mimetype", Value: "documents"},
+						&ast.StringNode{Key: "mimetype", Value: "document"},
 					}},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},

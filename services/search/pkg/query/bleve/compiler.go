@@ -296,7 +296,7 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 		return q, false
 	case "folder":
 		return bleveQuery.NewQueryStringQuery(k + ":httpd/unix-directory"), false
-	case "documents":
+	case "document":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/msword",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -306,7 +306,7 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 			"application/rtf",
 			"application/vnd.apple.pages",
 		)), true
-	case "spreadsheets":
+	case "spreadsheet":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/vnd.ms-excel",
 			"application/vnd.oasis.opendocument.spreadsheet",
@@ -317,7 +317,7 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 			"application/vnd.oasis.opendocument.spreadsheet",
 			"application/vnd.apple.numbers",
 		)), true
-	case "presentations":
+	case "presentation":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/vnd.ms-excel",
 			"application/vnd.oasis.opendocument.spreadsheet",
@@ -328,15 +328,15 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 			"application/vnd.oasis.opendocument.spreadsheet",
 			"application/vnd.apple.numbers",
 		)), true
-	case "pdfs":
+	case "pdf":
 		return bleveQuery.NewQueryStringQuery(k + ":application/pdf"), false
-	case "images":
+	case "image":
 		return bleveQuery.NewQueryStringQuery(k + ":image/*"), false
-	case "videos":
+	case "video":
 		return bleveQuery.NewQueryStringQuery(k + ":video/*"), false
 	case "audio":
 		return bleveQuery.NewQueryStringQuery(k + ":audio/*"), false
-	case "archives":
+	case "archive":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/zip",
 			"application/x-tar",
