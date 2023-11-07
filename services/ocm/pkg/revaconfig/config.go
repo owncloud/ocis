@@ -51,6 +51,30 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"gatewaysvc":                    cfg.Reva.Address,
 					"expose_recipient_display_name": cfg.OCMD.ExposeRecipientDisplayName,
 				},
+				"dataprovider": map[string]interface{}{
+					"prefix": "data",
+					"driver": "ocmreceived",
+					"drivers": map[string]interface{}{
+						"ocmreceived": map[string]interface{}{},
+					},
+					"data_txs": map[string]interface{}{
+						"simple": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"spaces": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"tus": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+					},
+				},
 			},
 		},
 		"grpc": map[string]interface{}{
