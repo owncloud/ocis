@@ -185,6 +185,18 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				},
 			},
 		},
+		cfg.OCMEndpoint: {
+			"providerid": utils.OCMStorageProviderID,
+			"spaces": map[string]interface{}{
+				"grant": map[string]interface{}{
+					"mount_point": ".",
+				},
+				"mountpoint": map[string]interface{}{
+					"mount_point":   "/ocm",
+					"path_template": "/ocm/{{.Space.Root.OpaqueId}}",
+				},
+			},
+		},
 		// medatada storage not part of the global namespace
 	}
 }

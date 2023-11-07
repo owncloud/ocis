@@ -101,6 +101,10 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 						},
 					},
 				},
+				"storageprovider": map[string]interface{}{
+					"driver":          "ocmreceived",
+					"data_server_url": "http://" + cfg.HTTP.Addr + "/data",
+				},
 				"authprovider": map[string]interface{}{
 					"auth_manager": "ocmshares",
 					"auth_managers": map[string]interface{}{
