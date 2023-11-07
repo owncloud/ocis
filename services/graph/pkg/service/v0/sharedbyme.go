@@ -2,20 +2,20 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"path"
 
-	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	revautils "github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
@@ -124,53 +124,35 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 		perm.SetRoles([]string{})
 		perm.SetId(s.Id.OpaqueId)
 		grantedTo := libregraph.SharePointIdentitySet{}
+		var li libregraph.Identity
 		switch s.Grantee.Type {
 		case storageprovider.GranteeType_GRANTEE_TYPE_USER:
-			gatewayClient, err := g.gatewaySelector.Next()
-			if err != nil {
-				g.logger.Error().Err(err).Msg("could not select next gateway client")
-				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
-			}
-			user := libregraph.NewIdentityWithDefaults()
-			user.SetId(s.Grantee.GetUserId().GetOpaqueId())
-			cs3User, err := revautils.GetUser(s.GetGrantee().GetUserId(), gatewayClient)
+			user, err := g.identityCache.GetUser(ctx, s.Grantee.GetUserId().GetOpaqueId())
 			switch {
-			case revautils.IsErrNotFound(err):
+			case errors.Is(err, identity.ErrNotFound):
 				g.logger.Warn().Str("userid", s.Grantee.GetUserId().GetOpaqueId()).Msg("User not found by id")
 				// User does not seem to exist anymore, don't add a permission for this
 				continue
 			case err != nil:
 				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 			default:
-				user.SetDisplayName(cs3User.GetDisplayName())
-				grantedTo.SetUser(*user)
+				li.SetDisplayName(user.GetDisplayName())
+				li.SetId(user.GetId())
+				grantedTo.SetUser(li)
 			}
 		case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
-			gatewayClient, err := g.gatewaySelector.Next()
-			if err != nil {
-				g.logger.Error().Err(err).Msg("could not select next gateway client")
-				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
-			}
-			req := group.GetGroupRequest{
-				GroupId: s.Grantee.GetGroupId(),
-			}
-			res, err := gatewayClient.GetGroup(ctx, &req)
-			if err != nil {
-				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
-			}
-			grp := libregraph.NewIdentityWithDefaults()
-			grp.SetId(s.Grantee.GetGroupId().GetOpaqueId())
-			switch res.Status.Code {
-			case rpc.Code_CODE_OK:
-				cs3Group := res.GetGroup()
-				grp.SetDisplayName(cs3Group.GetDisplayName())
-				grantedTo.SetGroup(*grp)
-			case rpc.Code_CODE_NOT_FOUND:
+			group, err := g.identityCache.GetGroup(ctx, s.Grantee.GetGroupId().GetOpaqueId())
+			switch {
+			case errors.Is(err, identity.ErrNotFound):
 				g.logger.Warn().Str("groupid", s.Grantee.GetGroupId().GetOpaqueId()).Msg("Group not found by id")
-				// Group does not seem to exist anymore, don't add a permission for this
+				// Group not seem to exist anymore, don't add a permission for this
 				continue
+			case err != nil:
+				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 			default:
-				return driveItems, errorcode.New(errorcode.GeneralException, res.Status.Message)
+				li.SetDisplayName(group.GetDisplayName())
+				li.SetId(group.GetId())
+				grantedTo.SetGroup(li)
 			}
 		}
 
