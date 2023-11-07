@@ -5,7 +5,8 @@ import (
 	"net/url"
 
 	"github.com/CiscoM31/godata"
-	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
+	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
@@ -103,14 +104,26 @@ type EducationBackend interface {
 	RemoveTeacherFromEducationClass(ctx context.Context, classID string, teacherID string) error
 }
 
-func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
+// CreateUserModelFromCS3 converts a cs3 User object into a libregraph.User
+func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 	if u.Id == nil {
-		u.Id = &cs3.UserId{}
+		u.Id = &cs3user.UserId{}
 	}
 	return &libregraph.User{
 		DisplayName:              &u.DisplayName,
 		Mail:                     &u.Mail,
 		OnPremisesSamAccountName: &u.Username,
 		Id:                       &u.Id.OpaqueId,
+	}
+}
+
+// CreateGroupModelFromCS3 converts a cs3 Group object into a libregraph.Group
+func CreateGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
+	if g.Id == nil {
+		g.Id = &cs3group.GroupId{}
+	}
+	return &libregraph.Group{
+		Id:          &g.Id.OpaqueId,
+		DisplayName: &g.GroupName,
 	}
 }

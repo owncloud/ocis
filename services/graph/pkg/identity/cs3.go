@@ -147,7 +147,7 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 	groups := make([]*libregraph.Group, 0, len(res.Groups))
 
 	for _, group := range res.Groups {
-		groups = append(groups, createGroupModelFromCS3(group))
+		groups = append(groups, CreateGroupModelFromCS3(group))
 	}
 
 	return groups, nil
@@ -185,7 +185,7 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Value
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	return createGroupModelFromCS3(res.Group), nil
+	return CreateGroupModelFromCS3(res.Group), nil
 }
 
 // DeleteGroup implements the Backend Interface. It's currently not supported for the CS3 backend
@@ -211,15 +211,4 @@ func (i *CS3) AddMembersToGroup(ctx context.Context, groupID string, memberID []
 // RemoveMemberFromGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
 	return errorcode.New(errorcode.NotSupported, "not implemented")
-}
-
-func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
-	if g.Id == nil {
-		g.Id = &cs3group.GroupId{}
-	}
-	return &libregraph.Group{
-		Id:          &g.Id.OpaqueId,
-		DisplayName: &g.GroupName,
-		// TODO when to fetch and expand memberof, usernames or ids?
-	}
 }
