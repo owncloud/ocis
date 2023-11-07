@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 * Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
+* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
 
@@ -39,6 +40,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7272
    https://github.com/owncloud/ocis/pull/7487
+
+* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
+
+   Two new configs for the Web embed mode have been added:
+
+  * `mode` Defines the mode in which Web will be running.
+  * `embedTarget` Defines how Web is being integrated when running in embed mode.
+
+   https://github.com/owncloud/web/issues/9768
+   https://github.com/owncloud/ocis/pull/7670
 # Changelog for [5.0.0] (2023-10-30)
 
 The following sections list the changes for 5.0.0.
