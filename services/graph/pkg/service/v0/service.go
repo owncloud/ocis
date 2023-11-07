@@ -16,7 +16,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	ldapv3 "github.com/go-ldap/ldap/v3"
 	"github.com/jellydator/ttlcache/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -125,29 +124,18 @@ func NewService(opts ...Option) (Graph, error) {
 	)
 	go spacePropertiesCache.Start()
 
-	usersCache := ttlcache.New(
-		ttlcache.WithTTL[string, libregraph.User](
-			time.Duration(options.Config.Spaces.UsersCacheTTL),
-		),
-		ttlcache.WithDisableTouchOnHit[string, libregraph.User](),
+	identityCache := identity.NewIdentityCache(
+		identity.IdentityCacheWithGatewaySelector(options.GatewaySelector),
+		identity.IdentityCacheWithUsersTTL(time.Duration(options.Config.Spaces.UsersCacheTTL)),
+		identity.IdentityCacheWithGroupsTTL(time.Duration(options.Config.Spaces.GroupsCacheTTL)),
 	)
-	go usersCache.Start()
-
-	groupsCache := ttlcache.New(
-		ttlcache.WithTTL[string, libregraph.Group](
-			time.Duration(options.Config.Spaces.GroupsCacheTTL),
-		),
-		ttlcache.WithDisableTouchOnHit[string, libregraph.Group](),
-	)
-	go groupsCache.Start()
 
 	svc := Graph{
 		config:                   options.Config,
 		mux:                      m,
 		logger:                   &options.Logger,
 		specialDriveItemsCache:   spacePropertiesCache,
-		usersCache:               usersCache,
-		groupsCache:              groupsCache,
+		identityCache:            identityCache,
 		eventsPublisher:          options.EventsPublisher,
 		gatewaySelector:          options.GatewaySelector,
 		searchService:            options.SearchService,
