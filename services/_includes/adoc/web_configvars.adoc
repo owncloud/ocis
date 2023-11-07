@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-07-08-13-45]
+[#deprecation-note-2023-11-07-11-05-04]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -511,6 +511,24 @@ a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
 Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types documentation for details.
+
+a|`WEB_OPTION_MODE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines the mode in which Web will be running. Currently, the only supported options are '' (empty) and 'embed'. With '' which is the default, Web will run as usual with all functionality enabled. 'embed' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. See the documnetation for more details.
+
+a|`WEB_OPTION_EMBED_TARGET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'.  With '' which is the default, Web will run regular as defined via the 'mode' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the documnetation for more details.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

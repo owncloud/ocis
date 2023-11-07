@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2023-11-07T08:13:48.543754498Z
+date: 2023-11-07T11:05:07.88774452Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
@@ -25,6 +25,7 @@ The web service also provides a minimal API for branding functionality like chan
 * [Web UI Configuration](#web-ui-configuration)
   * [Web UI Options](#web-ui-options)
   * [Web UI Config File](#web-ui-config-file)
+  * [Embedding Web](#embedding-web)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Custom Compiled Web Assets
@@ -42,6 +43,10 @@ Beside theming, the behavior of the web UI can be configured via options. See th
 ### Web UI Config File
 
 When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuration of the web UI can be made with a [json based](https://github.com/owncloud/web/tree/master/config) file.
+
+### Embedding Web
+
+Web can be consumed by another application in a stripped down version called “Embed mode”. This mode is supposed to be used in the context of selecting or sharing resources. For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/). See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
 ## Example Yaml Config
 {{< include file="services/_includes/web-config-example.yaml"  language="yaml" >}}
 

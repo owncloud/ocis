@@ -132,6 +132,8 @@ web:
       accessDeniedHelpUrl: ""
       tokenStorageLocal: true
       disabledExtensions: []
+      mode: ""
+      embedTarget: ""
     styles: []
     scripts: []
     custom_translations: []
