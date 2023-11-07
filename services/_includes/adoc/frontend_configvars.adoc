@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-07-11-05-04]
+[#deprecation-note-2023-11-07-15-29-19]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -336,7 +336,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++tus ++
 a| [subs=-attributes]
-The default upload protocol to use in the clients (e.g. tus).
+The default upload protocol to use in clients. Currently only 'tus' is avaliable. See the developer API documentation for more details about TUS.
 
 a|`OCIS_ENABLE_RESHARING` +
 `FRONTEND_ENABLE_RESHARING` +
