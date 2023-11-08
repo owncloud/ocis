@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
 * Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
+* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 * Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
@@ -26,6 +27,24 @@ The following sections list the changes for unreleased.
    just like any other image.
 
    https://github.com/owncloud/ocis/pull/7491
+
+* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
+
+   We've added new sharing ng endpoints to the graph beta api. The following endpoints are added:
+
+  * /v1beta1/me/drive/sharedByMe
+  * /v1beta1/me/drive/sharedWithMe
+  * /v1beta1/roleManagement/permissions/roleDefinitions
+  * /v1beta1/roleManagement/permissions/roleDefinitions/{roleID}
+
+   https://github.com/owncloud/ocis/issues/7436
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7633
+   https://github.com/owncloud/ocis/pull/7686
+   https://github.com/owncloud/ocis/pull/7684
+   https://github.com/owncloud/ocis/pull/7683
+   https://github.com/owncloud/ocis/pull/7239
+   https://github.com/owncloud/libre-graph-api/pull/112
 
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 
