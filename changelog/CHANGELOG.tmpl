@@ -1,6 +1,11 @@
+# Table of Contents
+
+{{ range . -}}
+  * [Changelog for {{ .Version }}](#changelog-for-{{ .Version | replace "." ""}}-{{ .Date -}})
+{{ end -}}
 {{ $allVersions := . }}
 {{- range $index, $changes := . }}{{ with $changes -}}
-{{ if gt (len $allVersions) 1 -}}
+{{ if gt (len $allVersions) 1 }}
 # Changelog for [{{ .Version }}] ({{ .Date }})
 
 The following sections list the changes for {{ .Version}}.
