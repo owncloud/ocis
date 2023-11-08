@@ -10,13 +10,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	ldapv3 "github.com/go-ldap/ldap/v3"
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
+
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/store"
 
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -107,6 +108,8 @@ type Service interface {
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
 	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)
 
+	Invite(w http.ResponseWriter, r *http.Request)
+
 	GetTags(w http.ResponseWriter, r *http.Request)
 	AssignTags(w http.ResponseWriter, r *http.Request)
 	UnassignTags(w http.ResponseWriter, r *http.Request)
@@ -195,6 +198,7 @@ func NewService(opts ...Option) (Graph, error) {
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Get("/me/drive/sharedByMe", svc.GetSharedByMe)
 			r.Get("/me/drive/sharedWithMe", svc.ListSharedWithMe)
+			r.Post("/drives/{driveID}/items/{itemID}/invite", svc.Invite)
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
 				r.Get("/", svc.GetRoleDefinitions)
 				r.Get("/{roleID}", svc.GetRoleDefinition)

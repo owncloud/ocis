@@ -2,6 +2,7 @@
 package errorcode
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"time"
@@ -91,20 +92,24 @@ func New(e ErrorCode, msg string) Error {
 
 // Render writes an Graph ErrorCode	object to the response writer
 func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
+	render.Status(r, status)
+	render.JSON(w, r, e.CreateOdataError(r.Context(), msg))
+}
+
+// CreateOdataError creates and populates a Graph ErrorCode object
+func (e ErrorCode) CreateOdataError(ctx context.Context, msg string) *libregraph.OdataError {
 	innererror := map[string]interface{}{
 		"date": time.Now().UTC().Format(time.RFC3339),
 	}
 
-	innererror["request-id"] = middleware.GetReqID(r.Context())
-	resp := &libregraph.OdataError{
+	innererror["request-id"] = middleware.GetReqID(ctx)
+	return &libregraph.OdataError{
 		Error: libregraph.OdataErrorMain{
 			Code:       e.String(),
 			Message:    msg,
 			Innererror: innererror,
 		},
 	}
-	render.Status(r, status)
-	render.JSON(w, r, resp)
 }
 
 // Render writes an Graph Error object to the response writer

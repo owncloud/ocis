@@ -1,7 +1,7 @@
 Package validator
-================
-<img align="right" src="https://raw.githubusercontent.com/go-playground/validator/v9/logo.png">[![Join the chat at https://gitter.im/go-playground/validator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/go-playground/validator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![Project status](https://img.shields.io/badge/version-10.4.1-green.svg)
+=================
+<img align="right" src="logo.png">[![Join the chat at https://gitter.im/go-playground/validator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/go-playground/validator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Project status](https://img.shields.io/badge/version-10.16.0-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/validator.svg?branch=master)](https://travis-ci.org/go-playground/validator)
 [![Coverage Status](https://coveralls.io/repos/go-playground/validator/badge.svg?branch=master&service=github)](https://coveralls.io/github/go-playground/validator?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/validator)](https://goreportcard.com/report/github.com/go-playground/validator)
@@ -43,7 +43,7 @@ They return type error to avoid the issue discussed in the following, where err 
 * http://stackoverflow.com/a/29138676/3158232
 * https://github.com/go-playground/validator/issues/134
 
-Validator only InvalidValidationError for bad validation input, nil or ValidationErrors as type error; so, in your code all you need to do is check if the error returned is not nil, and if it's not check if error is InvalidValidationError ( if necessary, most of the time it isn't ) type cast it to type ValidationErrors like so:
+Validator returns only InvalidValidationError for bad validation input, nil or ValidationErrors as type error; so, in your code all you need to do is check if the error returned is not nil, and if it's not check if error is InvalidValidationError ( if necessary, most of the time it isn't ) type cast it to type ValidationErrors like so:
 
 ```go
 err := validate.Struct(mystruct)
@@ -53,7 +53,7 @@ validationErrors := err.(validator.ValidationErrors)
 Usage and documentation
 ------
 
-Please see https://godoc.org/github.com/go-playground/validator for detailed usage docs.
+Please see https://pkg.go.dev/github.com/go-playground/validator/v10 for detailed usage docs.
 
 ##### Examples:
 
@@ -67,14 +67,20 @@ Please see https://godoc.org/github.com/go-playground/validator for detailed usa
 Baked-in Validations
 ------
 
+### Special Notes:
+- If new to using validator it is highly recommended to initialize it using the `WithRequiredStructEnabled` option which is opt-in to new behaviour that will become the default behaviour in v11+. See documentation for more details.
+```go
+validate := validator.New(validator.WithRequiredStructEnabled())
+```
+
 ### Fields:
 
 | Tag | Description |
 | - | - |
 | eqcsfield | Field Equals Another Field (relative)|
 | eqfield | Field Equals Another Field |
-| fieldcontains | NOT DOCUMENTED IN doc.go |
-| fieldexcludes | NOT DOCUMENTED IN doc.go |
+| fieldcontains | Check the indicated characters are present in the Field |
+| fieldexcludes | Check the indicated characters are not present in the field |
 | gtcsfield | Field Greater Than Another Relative Field |
 | gtecsfield | Field Greater Than or Equal To Another Relative Field |
 | gtefield | Field Greater Than or Equal To Another Field |
@@ -100,7 +106,7 @@ Baked-in Validations
 | hostname_rfc1123 | Hostname RFC 1123 |
 | ip | Internet Protocol Address IP |
 | ip4_addr | Internet Protocol Address IPv4 |
-| ip6_addr |Internet Protocol Address IPv6 |
+| ip6_addr | Internet Protocol Address IPv6 |
 | ip_addr | Internet Protocol Address IP |
 | ipv4 | Internet Protocol Address IPv4 |
 | ipv6 | Internet Protocol Address IPv6 |
@@ -114,6 +120,7 @@ Baked-in Validations
 | unix_addr | Unix domain socket end point Address |
 | uri | URI String |
 | url | URL String |
+| http_url | HTTP URL String |
 | url_encoded | URL Encoded |
 | urn_rfc2141 | Urn RFC 2141 String |
 
@@ -126,15 +133,21 @@ Baked-in Validations
 | alphanumunicode | Alphanumeric Unicode |
 | alphaunicode | Alpha Unicode |
 | ascii | ASCII |
+| boolean | Boolean |
 | contains | Contains |
 | containsany | Contains Any |
 | containsrune | Contains Rune |
+| endsnotwith | Ends Not With |
 | endswith | Ends With |
+| excludes | Excludes |
+| excludesall | Excludes All |
+| excludesrune | Excludes Rune |
 | lowercase | Lowercase |
 | multibyte | Multi-Byte Characters |
-| number | NOT DOCUMENTED IN doc.go |
+| number | Number |
 | numeric | Numeric |
 | printascii | Printable ASCII |
+| startsnotwith | Starts Not With |
 | startswith | Starts With |
 | uppercase | Uppercase |
 
@@ -143,8 +156,15 @@ Baked-in Validations
 | - | - |
 | base64 | Base64 String |
 | base64url | Base64URL String |
+| base64rawurl | Base64RawURL String |
+| bic | Business Identifier Code (ISO 9362) |
+| bcp47_language_tag | Language tag (BCP 47) |
 | btc_addr | Bitcoin Address |
 | btc_addr_bech32 | Bitcoin Bech32 Address (segwit) |
+| credit_card | Credit Card Number |
+| mongodb | MongoDB ObjectID |
+| cron | Cron |
+| spicedb | SpiceDb ObjectID/Permission/Type |
 | datetime | Datetime |
 | e164 | e164 formatted phone number |
 | email | E-mail String
@@ -158,12 +178,23 @@ Baked-in Validations
 | isbn | International Standard Book Number |
 | isbn10 | International Standard Book Number 10 |
 | isbn13 | International Standard Book Number 13 |
+| issn | International Standard Serial Number |
+| iso3166_1_alpha2 | Two-letter country code (ISO 3166-1 alpha-2) |
+| iso3166_1_alpha3 | Three-letter country code (ISO 3166-1 alpha-3) |
+| iso3166_1_alpha_numeric | Numeric country code (ISO 3166-1 numeric) |
+| iso3166_2 | Country subdivision code (ISO 3166-2) |
+| iso4217 | Currency code (ISO 4217) |
 | json | JSON |
+| jwt | JSON Web Token (JWT) |
 | latitude | Latitude |
 | longitude | Longitude |
+| luhn_checksum | Luhn Algorithm Checksum (for strings and (u)int) |
+| postcode_iso3166_alpha2 | Postcode |
+| postcode_iso3166_alpha2_field | Postcode |
 | rgb | RGB String |
 | rgba | RGBA String |
 | ssn | Social Security Number SSN |
+| timezone | Timezone |
 | uuid | Universally Unique Identifier UUID |
 | uuid3 | Universally Unique Identifier UUID v3 |
 | uuid3_rfc4122 | Universally Unique Identifier UUID v3 RFC4122 |
@@ -172,26 +203,40 @@ Baked-in Validations
 | uuid5 | Universally Unique Identifier UUID v5 |
 | uuid5_rfc4122 | Universally Unique Identifier UUID v5 RFC4122 |
 | uuid_rfc4122 | Universally Unique Identifier UUID RFC4122 |
+| md4 | MD4 hash |
+| md5 | MD5 hash |
+| sha256 | SHA256 hash |
+| sha384 | SHA384 hash |
+| sha512 | SHA512 hash |
+| ripemd128 | RIPEMD-128 hash |
+| ripemd128 | RIPEMD-160 hash |
+| tiger128 | TIGER128 hash |
+| tiger160 | TIGER160 hash |
+| tiger192 | TIGER192 hash |
+| semver | Semantic Versioning 2.0.0 |
+| ulid | Universally Unique Lexicographically Sortable Identifier ULID |
+| cve | Common Vulnerabilities and Exposures Identifier (CVE id) |
 
 ### Comparisons:
 | Tag | Description |
 | - | - |
 | eq | Equals |
+| eq_ignore_case | Equals ignoring case |
 | gt | Greater than|
-| gte |Greater than or equal |
+| gte | Greater than or equal |
 | lt | Less Than |
 | lte | Less Than or Equal |
 | ne | Not Equal |
+| ne_ignore_case | Not Equal ignoring case |
 
 ### Other:
 | Tag | Description |
 | - | - |
-| dir | Directory |
-| endswith | Ends With |
-| excludes | Excludes |
-| excludesall | Excludes All |
-| excludesrune | Excludes Rune |
-| file | File path |
+| dir | Existing Directory |
+| dirpath | Directory Path |
+| file | Existing File |
+| filepath | File Path |
+| image | Image |
 | isdefault | Is Default |
 | len | Length |
 | max | Maximum |
@@ -204,81 +249,90 @@ Baked-in Validations
 | required_with_all | Required With All |
 | required_without | Required Without |
 | required_without_all | Required Without All |
+| excluded_if | Excluded If |
+| excluded_unless | Excluded Unless |
 | excluded_with | Excluded With |
 | excluded_with_all | Excluded With All |
 | excluded_without | Excluded Without |
 | excluded_without_all | Excluded Without All |
 | unique | Unique |
 
+#### Aliases:
+| Tag | Description |
+| - | - |
+| iscolor | hexcolor\|rgb\|rgba\|hsl\|hsla |
+| country_code | iso3166_1_alpha2\|iso3166_1_alpha3\|iso3166_1_alpha_numeric |
+
 Benchmarks
 ------
 ###### Run on MacBook Pro (15-inch, 2017) go version go1.10.2 darwin/amd64
 ```go
+go version go1.21.0 darwin/arm64
 goos: darwin
-goarch: amd64
-pkg: github.com/go-playground/validator
-BenchmarkFieldSuccess-8                                         20000000                83.6 ns/op             0 B/op          0 allocs/op
-BenchmarkFieldSuccessParallel-8                                 50000000                26.8 ns/op             0 B/op          0 allocs/op
-BenchmarkFieldFailure-8                                          5000000               291 ns/op             208 B/op          4 allocs/op
-BenchmarkFieldFailureParallel-8                                 20000000               107 ns/op             208 B/op          4 allocs/op
-BenchmarkFieldArrayDiveSuccess-8                                 2000000               623 ns/op             201 B/op         11 allocs/op
-BenchmarkFieldArrayDiveSuccessParallel-8                        10000000               237 ns/op             201 B/op         11 allocs/op
-BenchmarkFieldArrayDiveFailure-8                                 2000000               859 ns/op             412 B/op         16 allocs/op
-BenchmarkFieldArrayDiveFailureParallel-8                         5000000               335 ns/op             413 B/op         16 allocs/op
-BenchmarkFieldMapDiveSuccess-8                                   1000000              1292 ns/op             432 B/op         18 allocs/op
-BenchmarkFieldMapDiveSuccessParallel-8                           3000000               467 ns/op             432 B/op         18 allocs/op
-BenchmarkFieldMapDiveFailure-8                                   1000000              1082 ns/op             512 B/op         16 allocs/op
-BenchmarkFieldMapDiveFailureParallel-8                           5000000               425 ns/op             512 B/op         16 allocs/op
-BenchmarkFieldMapDiveWithKeysSuccess-8                           1000000              1539 ns/op             480 B/op         21 allocs/op
-BenchmarkFieldMapDiveWithKeysSuccessParallel-8                   3000000               613 ns/op             480 B/op         21 allocs/op
-BenchmarkFieldMapDiveWithKeysFailure-8                           1000000              1413 ns/op             721 B/op         21 allocs/op
-BenchmarkFieldMapDiveWithKeysFailureParallel-8                   3000000               575 ns/op             721 B/op         21 allocs/op
-BenchmarkFieldCustomTypeSuccess-8                               10000000               216 ns/op              32 B/op          2 allocs/op
-BenchmarkFieldCustomTypeSuccessParallel-8                       20000000                82.2 ns/op            32 B/op          2 allocs/op
-BenchmarkFieldCustomTypeFailure-8                                5000000               274 ns/op             208 B/op          4 allocs/op
-BenchmarkFieldCustomTypeFailureParallel-8                       20000000               116 ns/op             208 B/op          4 allocs/op
-BenchmarkFieldOrTagSuccess-8                                     2000000               740 ns/op              16 B/op          1 allocs/op
-BenchmarkFieldOrTagSuccessParallel-8                             3000000               474 ns/op              16 B/op          1 allocs/op
-BenchmarkFieldOrTagFailure-8                                     3000000               471 ns/op             224 B/op          5 allocs/op
-BenchmarkFieldOrTagFailureParallel-8                             3000000               414 ns/op             224 B/op          5 allocs/op
-BenchmarkStructLevelValidationSuccess-8                         10000000               213 ns/op              32 B/op          2 allocs/op
-BenchmarkStructLevelValidationSuccessParallel-8                 20000000                91.8 ns/op            32 B/op          2 allocs/op
-BenchmarkStructLevelValidationFailure-8                          3000000               473 ns/op             304 B/op          8 allocs/op
-BenchmarkStructLevelValidationFailureParallel-8                 10000000               234 ns/op             304 B/op          8 allocs/op
-BenchmarkStructSimpleCustomTypeSuccess-8                         5000000               385 ns/op              32 B/op          2 allocs/op
-BenchmarkStructSimpleCustomTypeSuccessParallel-8                10000000               161 ns/op              32 B/op          2 allocs/op
-BenchmarkStructSimpleCustomTypeFailure-8                         2000000               640 ns/op             424 B/op          9 allocs/op
-BenchmarkStructSimpleCustomTypeFailureParallel-8                 5000000               318 ns/op             440 B/op         10 allocs/op
-BenchmarkStructFilteredSuccess-8                                 2000000               597 ns/op             288 B/op          9 allocs/op
-BenchmarkStructFilteredSuccessParallel-8                        10000000               266 ns/op             288 B/op          9 allocs/op
-BenchmarkStructFilteredFailure-8                                 3000000               454 ns/op             256 B/op          7 allocs/op
-BenchmarkStructFilteredFailureParallel-8                        10000000               214 ns/op             256 B/op          7 allocs/op
-BenchmarkStructPartialSuccess-8                                  3000000               502 ns/op             256 B/op          6 allocs/op
-BenchmarkStructPartialSuccessParallel-8                         10000000               225 ns/op             256 B/op          6 allocs/op
-BenchmarkStructPartialFailure-8                                  2000000               702 ns/op             480 B/op         11 allocs/op
-BenchmarkStructPartialFailureParallel-8                          5000000               329 ns/op             480 B/op         11 allocs/op
-BenchmarkStructExceptSuccess-8                                   2000000               793 ns/op             496 B/op         12 allocs/op
-BenchmarkStructExceptSuccessParallel-8                          10000000               193 ns/op             240 B/op          5 allocs/op
-BenchmarkStructExceptFailure-8                                   2000000               639 ns/op             464 B/op         10 allocs/op
-BenchmarkStructExceptFailureParallel-8                           5000000               300 ns/op             464 B/op         10 allocs/op
-BenchmarkStructSimpleCrossFieldSuccess-8                         3000000               417 ns/op              72 B/op          3 allocs/op
-BenchmarkStructSimpleCrossFieldSuccessParallel-8                10000000               163 ns/op              72 B/op          3 allocs/op
-BenchmarkStructSimpleCrossFieldFailure-8                         2000000               645 ns/op             304 B/op          8 allocs/op
-BenchmarkStructSimpleCrossFieldFailureParallel-8                 5000000               285 ns/op             304 B/op          8 allocs/op
-BenchmarkStructSimpleCrossStructCrossFieldSuccess-8              3000000               588 ns/op              80 B/op          4 allocs/op
-BenchmarkStructSimpleCrossStructCrossFieldSuccessParallel-8     10000000               221 ns/op              80 B/op          4 allocs/op
-BenchmarkStructSimpleCrossStructCrossFieldFailure-8              2000000               868 ns/op             320 B/op          9 allocs/op
-BenchmarkStructSimpleCrossStructCrossFieldFailureParallel-8      5000000               337 ns/op             320 B/op          9 allocs/op
-BenchmarkStructSimpleSuccess-8                                   5000000               260 ns/op               0 B/op          0 allocs/op
-BenchmarkStructSimpleSuccessParallel-8                          20000000                90.6 ns/op             0 B/op          0 allocs/op
-BenchmarkStructSimpleFailure-8                                   2000000               619 ns/op             424 B/op          9 allocs/op
-BenchmarkStructSimpleFailureParallel-8                           5000000               296 ns/op             424 B/op          9 allocs/op
-BenchmarkStructComplexSuccess-8                                  1000000              1454 ns/op             128 B/op          8 allocs/op
-BenchmarkStructComplexSuccessParallel-8                          3000000               579 ns/op             128 B/op          8 allocs/op
-BenchmarkStructComplexFailure-8                                   300000              4140 ns/op            3041 B/op         53 allocs/op
-BenchmarkStructComplexFailureParallel-8                          1000000              2127 ns/op            3041 B/op         53 allocs/op
-BenchmarkOneof-8                                                10000000               140 ns/op               0 B/op          0 allocs/op
-BenchmarkOneofParallel-8                                        20000000                70.1 ns/op             0 B/op          0 allocs/op
+goarch: arm64
+pkg: github.com/go-playground/validator/v10
+BenchmarkFieldSuccess-8                                         33142266                35.94 ns/op            0 B/op          0 allocs/op
+BenchmarkFieldSuccessParallel-8                                 200816191                6.568 ns/op           0 B/op          0 allocs/op
+BenchmarkFieldFailure-8                                          6779707               175.1 ns/op           200 B/op          4 allocs/op
+BenchmarkFieldFailureParallel-8                                 11044147               108.4 ns/op           200 B/op          4 allocs/op
+BenchmarkFieldArrayDiveSuccess-8                                 6054232               194.4 ns/op            97 B/op          5 allocs/op
+BenchmarkFieldArrayDiveSuccessParallel-8                        12523388                94.07 ns/op           97 B/op          5 allocs/op
+BenchmarkFieldArrayDiveFailure-8                                 3587043               334.3 ns/op           300 B/op         10 allocs/op
+BenchmarkFieldArrayDiveFailureParallel-8                         5816665               200.8 ns/op           300 B/op         10 allocs/op
+BenchmarkFieldMapDiveSuccess-8                                   2217910               540.1 ns/op           288 B/op         14 allocs/op
+BenchmarkFieldMapDiveSuccessParallel-8                           4446698               258.7 ns/op           288 B/op         14 allocs/op
+BenchmarkFieldMapDiveFailure-8                                   2392759               504.6 ns/op           376 B/op         13 allocs/op
+BenchmarkFieldMapDiveFailureParallel-8                           4244199               286.9 ns/op           376 B/op         13 allocs/op
+BenchmarkFieldMapDiveWithKeysSuccess-8                           2005857               592.1 ns/op           288 B/op         14 allocs/op
+BenchmarkFieldMapDiveWithKeysSuccessParallel-8                   4400850               296.9 ns/op           288 B/op         14 allocs/op
+BenchmarkFieldMapDiveWithKeysFailure-8                           1850227               643.8 ns/op           553 B/op         16 allocs/op
+BenchmarkFieldMapDiveWithKeysFailureParallel-8                   3293233               375.1 ns/op           553 B/op         16 allocs/op
+BenchmarkFieldCustomTypeSuccess-8                               12174412                98.25 ns/op           32 B/op          2 allocs/op
+BenchmarkFieldCustomTypeSuccessParallel-8                       34389907                35.49 ns/op           32 B/op          2 allocs/op
+BenchmarkFieldCustomTypeFailure-8                                7582524               156.6 ns/op           184 B/op          3 allocs/op
+BenchmarkFieldCustomTypeFailureParallel-8                       13019902                92.79 ns/op          184 B/op          3 allocs/op
+BenchmarkFieldOrTagSuccess-8                                     3427260               349.4 ns/op            16 B/op          1 allocs/op
+BenchmarkFieldOrTagSuccessParallel-8                            15144128                81.25 ns/op           16 B/op          1 allocs/op
+BenchmarkFieldOrTagFailure-8                                     5913546               201.9 ns/op           216 B/op          5 allocs/op
+BenchmarkFieldOrTagFailureParallel-8                             9810212               113.7 ns/op           216 B/op          5 allocs/op
+BenchmarkStructLevelValidationSuccess-8                         13456327                87.66 ns/op           16 B/op          1 allocs/op
+BenchmarkStructLevelValidationSuccessParallel-8                 41818888                27.77 ns/op           16 B/op          1 allocs/op
+BenchmarkStructLevelValidationFailure-8                          4166284               272.6 ns/op           264 B/op          7 allocs/op
+BenchmarkStructLevelValidationFailureParallel-8                  7594581               152.1 ns/op           264 B/op          7 allocs/op
+BenchmarkStructSimpleCustomTypeSuccess-8                         6508082               182.6 ns/op            32 B/op          2 allocs/op
+BenchmarkStructSimpleCustomTypeSuccessParallel-8                23078605                54.78 ns/op           32 B/op          2 allocs/op
+BenchmarkStructSimpleCustomTypeFailure-8                         3118352               381.0 ns/op           416 B/op          9 allocs/op
+BenchmarkStructSimpleCustomTypeFailureParallel-8                 5300738               224.1 ns/op           432 B/op         10 allocs/op
+BenchmarkStructFilteredSuccess-8                                 4761807               251.1 ns/op           216 B/op          5 allocs/op
+BenchmarkStructFilteredSuccessParallel-8                         8792598               128.6 ns/op           216 B/op          5 allocs/op
+BenchmarkStructFilteredFailure-8                                 5202573               232.1 ns/op           216 B/op          5 allocs/op
+BenchmarkStructFilteredFailureParallel-8                         9591267               121.4 ns/op           216 B/op          5 allocs/op
+BenchmarkStructPartialSuccess-8                                  5188512               231.6 ns/op           224 B/op          4 allocs/op
+BenchmarkStructPartialSuccessParallel-8                          9179776               123.1 ns/op           224 B/op          4 allocs/op
+BenchmarkStructPartialFailure-8                                  3071212               392.5 ns/op           440 B/op          9 allocs/op
+BenchmarkStructPartialFailureParallel-8                          5344261               223.7 ns/op           440 B/op          9 allocs/op
+BenchmarkStructExceptSuccess-8                                   3184230               375.0 ns/op           424 B/op          8 allocs/op
+BenchmarkStructExceptSuccessParallel-8                          10090130               108.9 ns/op           208 B/op          3 allocs/op
+BenchmarkStructExceptFailure-8                                   3347226               357.7 ns/op           424 B/op          8 allocs/op
+BenchmarkStructExceptFailureParallel-8                           5654923               209.5 ns/op           424 B/op          8 allocs/op
+BenchmarkStructSimpleCrossFieldSuccess-8                         5232265               229.1 ns/op            56 B/op          3 allocs/op
+BenchmarkStructSimpleCrossFieldSuccessParallel-8                17436674                64.75 ns/op           56 B/op          3 allocs/op
+BenchmarkStructSimpleCrossFieldFailure-8                         3128613               383.6 ns/op           272 B/op          8 allocs/op
+BenchmarkStructSimpleCrossFieldFailureParallel-8                 6994113               168.8 ns/op           272 B/op          8 allocs/op
+BenchmarkStructSimpleCrossStructCrossFieldSuccess-8              3506487               340.9 ns/op            64 B/op          4 allocs/op
+BenchmarkStructSimpleCrossStructCrossFieldSuccessParallel-8     13431300                91.77 ns/op           64 B/op          4 allocs/op
+BenchmarkStructSimpleCrossStructCrossFieldFailure-8              2410566               500.9 ns/op           288 B/op          9 allocs/op
+BenchmarkStructSimpleCrossStructCrossFieldFailureParallel-8      6344510               188.2 ns/op           288 B/op          9 allocs/op
+BenchmarkStructSimpleSuccess-8                                   8922726               133.8 ns/op             0 B/op          0 allocs/op
+BenchmarkStructSimpleSuccessParallel-8                          55291153                23.63 ns/op            0 B/op          0 allocs/op
+BenchmarkStructSimpleFailure-8                                   3171553               378.4 ns/op           416 B/op          9 allocs/op
+BenchmarkStructSimpleFailureParallel-8                           5571692               212.0 ns/op           416 B/op          9 allocs/op
+BenchmarkStructComplexSuccess-8                                  1683750               714.5 ns/op           224 B/op          5 allocs/op
+BenchmarkStructComplexSuccessParallel-8                          4578046               257.0 ns/op           224 B/op          5 allocs/op
+BenchmarkStructComplexFailure-8                                   481585              2547 ns/op            3041 B/op         48 allocs/op
+BenchmarkStructComplexFailureParallel-8                           965764              1577 ns/op            3040 B/op         48 allocs/op
+BenchmarkOneof-8                                                17380881                68.50 ns/op            0 B/op          0 allocs/op
+BenchmarkOneofParallel-8                                         8084733               153.5 ns/op             0 B/op          0 allocs/op
 ```
 
 Complementary Software
@@ -295,5 +349,10 @@ How to Contribute
 Make a pull request...
 
 License
-------
+-------
 Distributed under MIT License, please see license file within the code for more details.
+
+Maintainers
+-----------
+This project has grown large enough that more than one person is required to properly support the community.
+If you are interested in becoming a maintainer please reach out to me https://github.com/deankarn
