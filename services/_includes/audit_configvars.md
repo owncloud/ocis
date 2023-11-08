@@ -19,7 +19,7 @@
 | OCIS_INSECURE<br/>AUDIT_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>AUDIT_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| AUDIT_LOG_TO_CONSOLE | bool | true | Logs to Stdout if true. Independent of the log to file option.|
-| AUDIT_LOG_TO_FILE | bool | false | Logs to file if true. Independent of the log to Stdout file option.|
-| AUDIT_FILEPATH | string |  | Filepath to the logfile. Mandatory if LogToFile is true.|
-| AUDIT_FORMAT | string | json | Log format. Using json is advised.|
+| AUDIT_LOG_TO_CONSOLE | bool | true | Logs to stdout if set to 'true'. Independent of the LOG_TO_FILE option.|
+| AUDIT_LOG_TO_FILE | bool | false | Logs to file if set to 'true'. Independent of the LOG_TO_CONSOLE option.|
+| AUDIT_FILEPATH | string |  | Filepath of the logfile. Mandatory if LOG_TO_FILE is set to 'true'.|
+| AUDIT_FORMAT | string | json | Log format. Supported values are '' (empty) and 'json'. Using 'json' is advised, '' (empty) renders the 'minimal' format. See the text description for more details.|
