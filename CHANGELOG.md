@@ -6,27 +6,9 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
-* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
-* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
-* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
-* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
-
-* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/7629
-
-* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
-
-   The thumbnails service can now extract artwork from audio files (mp3, ogg, flac) and render it
-   just like any other image.
-
-   https://github.com/owncloud/ocis/pull/7491
 
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 
@@ -45,31 +27,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7683
    https://github.com/owncloud/ocis/pull/7239
    https://github.com/owncloud/libre-graph-api/pull/112
-
-* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
-
-   Audio metadata is now extracted and stored by the search service. It is available for
-   driveItems in a folder listing using the Graph API.
-
-   https://github.com/owncloud/ocis/pull/7490
-
-* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
-
-   Introduce a registry based on the natsjs object store
-
-   https://github.com/owncloud/ocis/issues/7272
-   https://github.com/owncloud/ocis/pull/7487
-
-* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
-
-   Two new configs for the Web embed mode have been added:
-
-  * `mode` Defines the mode in which Web will be running.
-  * `embedTarget` Defines how Web is being integrated when running in embed mode.
-
-   https://github.com/owncloud/web/issues/9768
-   https://github.com/owncloud/ocis/pull/7670
-# Changelog for [5.0.0] (2023-10-30)
+# Changelog for [5.0.0] (2023-11-08)
 
 The following sections list the changes for 5.0.0.
 
@@ -99,20 +57,23 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
-* Enhancement - Bump Reva: [#7611](https://github.com/owncloud/ocis/pull/7611)
+* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
 * Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
 * Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
+* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
 * Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
 * Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
 * Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
 * Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
@@ -122,6 +83,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
 * Enhancement - Update web to v8.0.0: [#7673](https://github.com/owncloud/ocis/pull/7673)
+* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
 
@@ -285,10 +247,11 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/pull/7194
    https://github.com/cs3org/reva/pull/4147
 
-* Enhancement - Bump Reva: [#7611](https://github.com/owncloud/ocis/pull/7611)
+* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/7629
    https://github.com/owncloud/ocis/pull/7611
    https://github.com/owncloud/ocis/pull/7540
    https://github.com/owncloud/ocis/pull/7526
@@ -341,6 +304,13 @@ The following sections list the changes for 5.0.0.
 
    https://github.com/owncloud/ocis/pull/7317
 
+* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
+
+   The thumbnails service can now extract artwork from audio files (mp3, ogg, flac) and render it
+   just like any other image.
+
+   https://github.com/owncloud/ocis/pull/7491
+
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 
    This cause the notifications service to automatically pick a suitable authentication method
@@ -375,6 +345,13 @@ The following sections list the changes for 5.0.0.
   * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
+
+* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
+
+   Audio metadata is now extracted and stored by the search service. It is available for
+   driveItems in a folder listing using the Graph API.
+
+   https://github.com/owncloud/ocis/pull/7490
 
 * Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
 
@@ -450,6 +427,13 @@ The following sections list the changes for 5.0.0.
    replacement for it is `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`.
 
    https://github.com/owncloud/ocis/issues/7176
+
+* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
+
+   Introduce a registry based on the natsjs object store
+
+   https://github.com/owncloud/ocis/issues/7272
+   https://github.com/owncloud/ocis/pull/7487
 
 * Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
 
@@ -648,6 +632,16 @@ The following sections list the changes for 5.0.0.
 
    https://github.com/owncloud/ocis/pull/7673
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
+
+* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
+
+   Two new configs for the Web embed mode have been added:
+
+  * `mode` Defines the mode in which Web will be running.
+  * `embedTarget` Defines how Web is being integrated when running in embed mode.
+
+   https://github.com/owncloud/web/issues/9768
+   https://github.com/owncloud/ocis/pull/7670
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
