@@ -201,7 +201,7 @@ func NewService(opts ...Option) (Graph, error) {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1beta1", func(r chi.Router) {
-			r.Get("/me/drives/sharedByMe", svc.GetSharedByMe)
+			r.Get("/me/drive/sharedByMe", svc.GetSharedByMe)
 		})
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/extensions/org.libregraph", func(r chi.Router) {
