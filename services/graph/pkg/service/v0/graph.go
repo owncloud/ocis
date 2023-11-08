@@ -15,6 +15,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
+	"go-micro.dev/v4/client"
+	mevents "go-micro.dev/v4/events"
+	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -23,10 +28,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	"go-micro.dev/v4/client"
-	mevents "go-micro.dev/v4/events"
-	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 //go:generate make -C ../../.. generate

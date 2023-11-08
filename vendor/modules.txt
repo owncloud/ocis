@@ -1555,7 +1555,7 @@ github.com/opentracing/opentracing-go/log
 # github.com/orcaman/concurrent-map v1.0.0
 ## explicit
 github.com/orcaman/concurrent-map
-# github.com/owncloud/libre-graph-api-go v1.0.5-0.20231019070917-17ae03ef40e4
+# github.com/owncloud/libre-graph-api-go v1.0.5-0.20231107135330-011e9d4c45e3
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
@@ -1704,6 +1704,15 @@ github.com/tchap/go-patricia/v2/patricia
 # github.com/thejerf/suture/v4 v4.0.2
 ## explicit; go 1.9
 github.com/thejerf/suture/v4
+# github.com/tidwall/gjson v1.17.0
+## explicit; go 1.12
+github.com/tidwall/gjson
+# github.com/tidwall/match v1.1.1
+## explicit; go 1.15
+github.com/tidwall/match
+# github.com/tidwall/pretty v1.2.1
+## explicit; go 1.16
+github.com/tidwall/pretty
 # github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208
 ## explicit
 github.com/toorop/go-dkim

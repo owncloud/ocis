@@ -67,7 +67,7 @@ require (
 	github.com/onsi/gomega v1.29.0
 	github.com/open-policy-agent/opa v0.51.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v1.0.5-0.20231019070917-17ae03ef40e4
+	github.com/owncloud/libre-graph-api-go v1.0.5-0.20231107135330-011e9d4c45e3
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/client_golang v1.17.0
@@ -80,6 +80,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	github.com/thejerf/suture/v4 v4.0.2
+	github.com/tidwall/gjson v1.17.0
 	github.com/tus/tusd v1.13.0
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/xhit/go-simple-mail/v2 v2.16.0
@@ -305,6 +306,8 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/studio-b12/gowebdav v0.0.0-20221015232716-17255f2e7423 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
 	github.com/wk8/go-ordered-map v1.0.0 // indirect

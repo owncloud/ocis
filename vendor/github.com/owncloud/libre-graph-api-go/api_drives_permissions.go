@@ -89,7 +89,7 @@ func (a *DrivesPermissionsApiService) CreateLinkExecute(r ApiCreateLinkRequest) 
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/createLink"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/createLink"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 
@@ -174,7 +174,7 @@ func (r ApiDeletePermissionRequest) Execute() (*http.Response, error) {
 }
 
 /*
-DeletePermission Delete entity from groups
+DeletePermission Remove access to a DriveItem
 
 Remove access to a DriveItem.
 
@@ -210,7 +210,7 @@ func (a *DrivesPermissionsApiService) DeletePermissionExecute(r ApiDeletePermiss
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"perm-id"+"}", url.PathEscape(parameterValueToString(r.permId, "permId")), -1)
@@ -321,7 +321,7 @@ func (a *DrivesPermissionsApiService) GetPermissionExecute(r ApiGetPermissionReq
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"perm-id"+"}", url.PathEscape(parameterValueToString(r.permId, "permId")), -1)
@@ -451,7 +451,7 @@ func (a *DrivesPermissionsApiService) InviteExecute(r ApiInviteRequest) (*Permis
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/invite"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/invite"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 
@@ -588,7 +588,7 @@ func (a *DrivesPermissionsApiService) ListPermissionsExecute(r ApiListPermission
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/permissions"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/permissions"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 
@@ -716,7 +716,7 @@ func (a *DrivesPermissionsApiService) UpdatePermissionExecute(r ApiUpdatePermiss
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
+	localVarPath := localBasePath + "/v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"drive-id"+"}", url.PathEscape(parameterValueToString(r.driveId, "driveId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"item-id"+"}", url.PathEscape(parameterValueToString(r.itemId, "itemId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"perm-id"+"}", url.PathEscape(parameterValueToString(r.permId, "permId")), -1)

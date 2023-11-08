@@ -67,7 +67,7 @@ func (a *UserApiService) DeleteUserExecute(r ApiDeleteUserRequest) (*http.Respon
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -175,7 +175,7 @@ func (a *UserApiService) ExportPersonalDataExecute(r ApiExportPersonalDataReques
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}/exportPersonalData"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}/exportPersonalData"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -291,7 +291,7 @@ func (a *UserApiService) GetUserExecute(r ApiGetUserRequest) (*User, *http.Respo
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -413,7 +413,7 @@ func (a *UserApiService) UpdateUserExecute(r ApiUpdateUserRequest) (*User, *http
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/users/{user-id}"
+	localVarPath := localBasePath + "/v1.0/users/{user-id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"user-id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
