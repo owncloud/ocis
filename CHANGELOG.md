@@ -102,7 +102,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
-* Enhancement - Update web to v8.0.0: [#7622](https://github.com/owncloud/ocis/pull/7622)
+* Enhancement - Update web to v8.0.0: [#7673](https://github.com/owncloud/ocis/pull/7673)
 
 ## Details
 
@@ -512,7 +512,7 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/web/issues/7728
    https://github.com/owncloud/ocis/pull/7409
 
-* Enhancement - Update web to v8.0.0: [#7622](https://github.com/owncloud/ocis/pull/7622)
+* Enhancement - Update web to v8.0.0: [#7673](https://github.com/owncloud/ocis/pull/7673)
 
    Tags: web
 
@@ -539,6 +539,8 @@ The following sections list the changes for 5.0.0.
    characters in username * Bugfix
    [owncloud/web#9788](https://github.com/owncloud/web/issues/9788) - Create .space
    folder if it does not exist * Bugfix
+   [owncloud/web#9799](https://github.com/owncloud/web/issues/9799) - Link resolving
+   into default app * Bugfix
    [owncloud/web#9832](https://github.com/owncloud/web/pull/9832) - Copy quicklinks for
    webkit navigator * Bugfix
    [owncloud/web#9843](https://github.com/owncloud/web/pull/9843) - Fix display path on
@@ -620,10 +622,13 @@ The following sections list the changes for 5.0.0.
    [owncloud/web#9864](https://github.com/owncloud/web/pull/9864) - Search tags filter
    chips style aligned * Enhancement
    [owncloud/web#9884](https://github.com/owncloud/web/pull/9884) - Enable dark theme on
-   importer
+   importer * Enhancement
+   [owncloud/web#9906](https://github.com/owncloud/web/pull/9906) - Reorganize "New"
+   menu * Enhancement [owncloud/web#9911](https://github.com/owncloud/web/pull/9911) -
+   Provide vendor neutral file icons
 
-   https://github.com/owncloud/ocis/pull/7622
-   https://github.com/owncloud/web/releases/tag/v8.0.0
+   https://github.com/owncloud/ocis/pull/7673
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
