@@ -65,4 +65,4 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 
 
 https://github.com/owncloud/ocis/pull/7673
-https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.6
+https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
