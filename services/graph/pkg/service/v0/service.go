@@ -202,6 +202,10 @@ func NewService(opts ...Option) (Graph, error) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Get("/me/drive/sharedByMe", svc.GetSharedByMe)
+			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
+				r.Get("/", svc.GetRoleDefinitions)
+				r.Get("/{roleID}", svc.GetRoleDefinition)
+			})
 		})
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/extensions/org.libregraph", func(r chi.Router) {
@@ -315,10 +319,6 @@ func NewService(opts ...Option) (Graph, error) {
 						})
 					})
 				})
-			})
-			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
-				r.Get("/", svc.GetRoleDefinitions)
-				r.Get("/{roleID}", svc.GetRoleDefinition)
 			})
 		})
 	})
