@@ -16,6 +16,7 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 * Bugfix [owncloud/web#9670](https://github.com/owncloud/web/pull/9670) - Tiles view accessibility
 * Bugfix [owncloud/web#9694](https://github.com/owncloud/web/issues/9694) - Special characters in username
 * Bugfix [owncloud/web#9788](https://github.com/owncloud/web/issues/9788) - Create .space folder if it does not exist
+* Bugfix [owncloud/web#9799](https://github.com/owncloud/web/issues/9799) - Link resolving into default app
 * Bugfix [owncloud/web#9832](https://github.com/owncloud/web/pull/9832) - Copy quicklinks for webkit navigator
 * Bugfix [owncloud/web#9843](https://github.com/owncloud/web/pull/9843) - Fix display path on resources
 * Bugfix [owncloud/web#9844](https://github.com/owncloud/web/pull/9844) - Upload space image
@@ -59,6 +60,9 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 * Enhancement [owncloud/web#9863](https://github.com/owncloud/web/pull/9863) - Location picker in embed mode
 * Enhancement [owncloud/web#9864](https://github.com/owncloud/web/pull/9864) - Search tags filter chips style aligned
 * Enhancement [owncloud/web#9884](https://github.com/owncloud/web/pull/9884) - Enable dark theme on importer
+* Enhancement [owncloud/web#9906](https://github.com/owncloud/web/pull/9906) - Reorganize "New" menu
+* Enhancement [owncloud/web#9911](https://github.com/owncloud/web/pull/9911) - Provide vendor neutral file icons
 
-https://github.com/owncloud/ocis/pull/7622
-https://github.com/owncloud/web/releases/tag/v8.0.0
+
+https://github.com/owncloud/ocis/pull/7673
+https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
