@@ -82,13 +82,13 @@ type CapabilitiesSearchProperties struct {
 
 // CapabilitiesSearchProperty represents the default search property
 type CapabilitiesSearchProperty struct {
-	Enabled bool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
+	Enabled ocsBool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
 }
 
 // CapabilitiesSearchPropertyExtended represents the extended search property
 type CapabilitiesSearchPropertyExtended struct {
-	CapabilitiesSearchProperty
-	Keywords []string `json:"keywords,omitempty" xml:"keywords,omitempty" mapstructure:"keywords"`
+	CapabilitiesSearchProperty `mapstructure:",squash"`
+	Keywords                   []string `json:"keywords,omitempty" xml:"keywords,omitempty" mapstructure:"keywords"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.
