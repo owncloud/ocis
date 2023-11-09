@@ -212,7 +212,13 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drive", svc.GetUserDrive)
-				r.Get("/drives", svc.GetDrives)
+				r.Route("/drives", func(r chi.Router) {
+					r.Get("/", svc.GetDrives)
+				})
+				r.Route("/language", func(r chi.Router) {
+					r.Get("/", svc.GetOwnLanguage)
+					r.Post("/{language}", svc.SetOwnLanguage)
+				})
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
