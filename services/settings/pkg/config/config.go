@@ -58,7 +58,7 @@ type Metadata struct {
 // Cache configures the cache of the Metadata store
 type Cache struct {
 	Store          string        `yaml:"store" env:"OCIS_CACHE_STORE;SETTINGS_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	Nodes          []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Nodes          []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
 	Database       string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	FileTable      string        `yaml:"files_table" env:"SETTINGS_FILE_CACHE_TABLE" desc:"The database table the store should use for the file cache."`
 	DirectoryTable string        `yaml:"directories_table" env:"SETTINGS_DIRECTORY_CACHE_TABLE" desc:"The database table the store should use for the directory cache."`
