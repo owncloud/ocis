@@ -72,7 +72,8 @@ type GRPCConfig struct {
 }
 
 type ScienceMesh struct {
-	Prefix string `yaml:"prefix" env:"OCM_SCIENCEMESH_PREFIX" desc:"URL path prefix for the ScienceMesh service. Note that the string must not start with '/'."`
+	Prefix           string `yaml:"prefix" env:"OCM_SCIENCEMESH_PREFIX" desc:"URL path prefix for the ScienceMesh service. Note that the string must not start with '/'."`
+	MeshDirectoryURL string `yaml:"science_mesh_directory_url" env:"OCM_MESH_DIRECTORY_URL" desc:"URL of the mesh directory service."`
 }
 
 type OCMD struct {

@@ -43,7 +43,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"prefix":             cfg.ScienceMesh.Prefix,
 					"smtp_credentials":   map[string]string{},
 					"gatewaysvc":         cfg.Reva.Address,
-					"mesh_directory_url": cfg.Commons.OcisURL,
+					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
 					"provider_domain":    cfg.Commons.OcisURL,
 				},
 				"ocmd": map[string]interface{}{
