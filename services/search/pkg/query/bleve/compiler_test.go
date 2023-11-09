@@ -390,7 +390,7 @@ func Test_compile(t *testing.T) {
 			name: `MimeType:document`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "document"},
+					&ast.StringNode{Key: "mediatype", Value: "document"},
 				},
 			},
 			want: query.NewDisjunctionQuery([]query.Query{
@@ -408,7 +408,7 @@ func Test_compile(t *testing.T) {
 			name: `MimeType:document AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "document"},
+					&ast.StringNode{Key: "mediatype", Value: "document"},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
 				},
@@ -431,9 +431,9 @@ func Test_compile(t *testing.T) {
 			name: `MimeType:document OR MimeType:pdf AND *tdd*`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
-					&ast.StringNode{Key: "mimetype", Value: "document"},
+					&ast.StringNode{Key: "mediatype", Value: "document"},
 					&ast.OperatorNode{Value: "OR"},
-					&ast.StringNode{Key: "mimetype", Value: "pdf"},
+					&ast.StringNode{Key: "mediatype", Value: "pdf"},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
 				},
@@ -458,9 +458,9 @@ func Test_compile(t *testing.T) {
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
-						&ast.StringNode{Key: "mimetype", Value: "document"},
+						&ast.StringNode{Key: "mediatype", Value: "document"},
 						&ast.OperatorNode{Value: "OR"},
-						&ast.StringNode{Key: "mimetype", Value: "pdf"},
+						&ast.StringNode{Key: "mediatype", Value: "pdf"},
 					}},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},
@@ -486,9 +486,9 @@ func Test_compile(t *testing.T) {
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.GroupNode{Nodes: []ast.Node{
-						&ast.StringNode{Key: "mimetype", Value: "pdf"},
+						&ast.StringNode{Key: "mediatype", Value: "pdf"},
 						&ast.OperatorNode{Value: "OR"},
-						&ast.StringNode{Key: "mimetype", Value: "document"},
+						&ast.StringNode{Key: "mediatype", Value: "document"},
 					}},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.StringNode{Key: "name", Value: "*tdd*"},

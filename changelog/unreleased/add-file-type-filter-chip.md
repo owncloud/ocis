@@ -1,7 +1,7 @@
-Enhancement: Add search mimetype filter
+Enhancement: Add search MediaType filter
 
-Add filter MimeType filter shortcuts to search for specific document types.
-For example, a search query MimeType:documents will search for files with the following mimetypes:
+Add filter MediaType filter shortcuts to search for specific document types.
+For example, a search query mediatype:documents will search for files with the following mimetypes:
 
 application/msword
 MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document
@@ -43,8 +43,6 @@ application/vnd.apple.pages
 application/vnd.ms-excel
 application/vnd.oasis.opendocument.spreadsheet
 text/csv
-application/vnd.openxmlformats-officedocument.presentationml.presentation
-application/vnd.oasis.opendocument.presentation
 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 application/vnd.oasis.opendocument.spreadsheet
 application/vnd.apple.numbers
@@ -55,7 +53,6 @@ application/vnd.ms-powerpoint
 application/vnd.openxmlformats-officedocument.presentationml.presentation
 application/vnd.oasis.opendocument.presentation
 application/vnd.apple.keynote
-application/vnd.ms-excel
 
 ## PDF
 

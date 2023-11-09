@@ -69,15 +69,15 @@ type CapabilitiesSearch struct {
 
 // CapabilitiesSearchProperties holds the search property capabilities
 type CapabilitiesSearchProperties struct {
-	Name     *CapabilitiesSearchProperty         `json:"name" xml:"name" mapstructure:"name"`
-	Mtime    *CapabilitiesSearchPropertyExtended `json:"mtime" xml:"mtime" mapstructure:"mtime"`
-	Size     *CapabilitiesSearchProperty         `json:"size" xml:"size" mapstructure:"size"`
-	Mimetype *CapabilitiesSearchPropertyExtended `json:"mimetype" xml:"mimetype" mapstructure:"mimetype"`
-	Type     *CapabilitiesSearchProperty         `json:"type" xml:"type" mapstructure:"type"`
-	Tag      *CapabilitiesSearchProperty         `json:"tag" xml:"tag" mapstructure:"tag"`
-	Tags     *CapabilitiesSearchProperty         `json:"tags" xml:"tags" mapstructure:"tags"`
-	Content  *CapabilitiesSearchProperty         `json:"content" xml:"content" mapstructure:"content"`
-	Scope    *CapabilitiesSearchProperty         `json:"scope" xml:"scope" mapstructure:"scope"`
+	Name      *CapabilitiesSearchProperty         `json:"name" xml:"name" mapstructure:"name"`
+	Mtime     *CapabilitiesSearchPropertyExtended `json:"mtime" xml:"mtime" mapstructure:"mtime"`
+	Size      *CapabilitiesSearchProperty         `json:"size" xml:"size" mapstructure:"size"`
+	MediaType *CapabilitiesSearchPropertyExtended `json:"mediatype" xml:"mediatype" mapstructure:"mediatype"`
+	Type      *CapabilitiesSearchProperty         `json:"type" xml:"type" mapstructure:"type"`
+	Tag       *CapabilitiesSearchProperty         `json:"tag" xml:"tag" mapstructure:"tag"`
+	Tags      *CapabilitiesSearchProperty         `json:"tags" xml:"tags" mapstructure:"tags"`
+	Content   *CapabilitiesSearchProperty         `json:"content" xml:"content" mapstructure:"content"`
+	Scope     *CapabilitiesSearchProperty         `json:"scope" xml:"scope" mapstructure:"scope"`
 }
 
 // CapabilitiesSearchProperty represents the default search property

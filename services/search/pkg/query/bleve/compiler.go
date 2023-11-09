@@ -6,24 +6,23 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
-
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 var _fields = map[string]string{
-	"rootid":   "RootID",
-	"path":     "Path",
-	"id":       "ID",
-	"name":     "Name",
-	"size":     "Size",
-	"mtime":    "Mtime",
-	"mimetype": "MimeType",
-	"type":     "Type",
-	"tag":      "Tags",
-	"tags":     "Tags",
-	"content":  "Content",
-	"hidden":   "Hidden",
+	"rootid":    "RootID",
+	"path":      "Path",
+	"id":        "ID",
+	"name":      "Name",
+	"size":      "Size",
+	"mtime":     "Mtime",
+	"mediatype": "MimeType",
+	"type":      "Type",
+	"tag":       "Tags",
+	"tags":      "Tags",
+	"content":   "Content",
+	"hidden":    "Hidden",
 }
 
 // The following quoted string enumerates the characters which may be escaped: "+-=&|><!(){}[]^\"~*?:\\/ "
@@ -311,22 +310,16 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 			"application/vnd.ms-excel",
 			"application/vnd.oasis.opendocument.spreadsheet",
 			"text/csv",
-			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
-			"application/vnd.oasis.opendocument.presentation",
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 			"application/vnd.oasis.opendocument.spreadsheet",
 			"application/vnd.apple.numbers",
 		)), true
 	case "presentation":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
-			"application/vnd.ms-excel",
-			"application/vnd.oasis.opendocument.spreadsheet",
-			"text/csv",
 			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
 			"application/vnd.oasis.opendocument.presentation",
-			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-			"application/vnd.oasis.opendocument.spreadsheet",
-			"application/vnd.apple.numbers",
+			"application/vnd.ms-powerpoint",
+			"application/vnd.apple.keynote",
 		)), true
 	case "pdf":
 		return bleveQuery.NewQueryStringQuery(k + ":application/pdf"), false
@@ -341,8 +334,7 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 			"application/zip",
 			"application/x-tar",
 			"application/x-gzip",
-			"application/x-7",
-			"z-compressed",
+			"application/x-7z-compressed",
 			"application/x-rar-compressed",
 			"application/x-bzip2",
 			"application/x-bzip",
