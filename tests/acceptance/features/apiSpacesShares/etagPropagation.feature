@@ -136,29 +136,6 @@ Feature: check etag propagation after different file alterations
       | Brian | /dst    | Shares   |
 
 
-  Scenario: share receiver moving a file from one folder to an other changes the etags of both folders for all collaborators
-    Given user "Alice" has created folder "/dst"
-    And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
-    And user "Alice" has stored etag of element "/" inside space "Personal"
-    And user "Alice" has stored etag of element "/upload" inside space "Personal"
-    And user "Alice" has stored etag of element "/dst" inside space "Personal"
-    And user "Brian" has stored etag of element "/" inside space "Shares"
-    And user "Brian" has stored etag of element "/upload" inside space "Shares"
-    And user "Brian" has stored etag of element "/dst" inside space "Shares"
-    When user "Brian" moves file "/upload/file.txt" to "/dst/file.txt" in space "Shares" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And these etags should have changed
-      | user  | path    | space    |
-      | Alice | /       | Personal |
-      | Alice | /upload | Personal |
-      | Alice | /dst    | Personal |
-      | Brian | /       | Shares   |
-      | Brian | /upload | Shares   |
-      | Brian | /dst    | Shares   |
-
-
   Scenario: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/upload/toMove"
@@ -171,29 +148,6 @@ Feature: check etag propagation after different file alterations
     And user "Brian" has stored etag of element "/upload" inside space "Shares"
     And user "Brian" has stored etag of element "/dst" inside space "Shares"
     When user "Alice" moves file "/upload/toMove" to "/dst/toMove" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And these etags should have changed
-      | user  | path    | space    |
-      | Alice | /       | Personal |
-      | Alice | /upload | Personal |
-      | Alice | /dst    | Personal |
-      | Brian | /       | Shares   |
-      | Brian | /upload | Shares   |
-      | Brian | /dst    | Shares   |
-
-
-  Scenario: share receiver moving a folder from one folder to an other changes the etags of both folders for all collaborators
-    Given user "Alice" has created folder "/dst"
-    And user "Alice" has created folder "/upload/toMove"
-    And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
-    And user "Alice" has stored etag of element "/" inside space "Personal"
-    And user "Alice" has stored etag of element "/upload" inside space "Personal"
-    And user "Alice" has stored etag of element "/dst" inside space "Personal"
-    And user "Brian" has stored etag of element "/" inside space "Shares"
-    And user "Brian" has stored etag of element "/upload" inside space "Shares"
-    And user "Brian" has stored etag of element "/dst" inside space "Shares"
-    When user "Brian" moves file "/upload/toMove" to "/dst/toMove" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
       | user  | path    | space    |

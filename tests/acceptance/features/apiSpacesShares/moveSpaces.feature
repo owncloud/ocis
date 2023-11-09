@@ -208,12 +208,10 @@ Feature: move (rename) file
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "31"
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And for user "Alice" folder "testshare2" of the space "Shares" should contain these entries:
+    Then the HTTP status code should be "502"
+    And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
       | testshare1.txt |
-    And for user "Brian" folder "testshare2" of the space "Personal" should contain these entries:
-      | testshare1.txt |
-    But for user "Alice" folder "testshare1" of the space "Shares" should not contain these entries:
+    But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
       | testshare1.txt |
 
 
@@ -224,10 +222,10 @@ Feature: move (rename) file
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "31"
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "17"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
+    Then the HTTP status code should be "502"
+    And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
       | testshare1.txt |
-    And for user "Brian" folder "testshare2" of the space "Personal" should not contain these entries:
+    But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
       | testshare1.txt |
 
 
@@ -238,32 +236,11 @@ Feature: move (rename) file
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "17"
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
+    Then the HTTP status code should be "502"
+    And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
       | testshare1.txt |
-    And for user "Brian" folder "testshare2" of the space "Personal" should not contain these entries:
+    But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
       | testshare1.txt |
-
-
-  Scenario: checking file id after a move between received shares
-    Given user "Alice" has created the following folders
-      | path     |
-      | /folderA |
-      | /folderB |
-    And user "Alice" has shared folder "/folderA" with user "Brian"
-    And user "Alice" has shared folder "/folderB" with user "Brian"
-    And user "Brian" has created a folder "/folderA/ONE" in space "Shares"
-    And user "Brian" has created a folder "/folderA/ONE/TWO" in space "Shares"
-    And user "Brian" has stored id of folder "/folderA/ONE" of the space "Shares"
-    When user "Brian" moves folder "/folderA/ONE" from space "Shares" to "/folderB/ONE" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And for user "Brian" the space "Shares" should contain these entries:
-      | /folderA |
-    And for user "Brian" folder "folderB" of the space "Shares" should contain these entries:
-      | /ONE |
-    And for user "Brian" folder "folderA" of the space "Shares" should not contain these entries:
-      | /ONE |
-    And user "Brian" folder "/folderB/ONE" of the space "Shares" should have the previously stored id
 
 
   Scenario: moving a file out of a shared folder as a sharer

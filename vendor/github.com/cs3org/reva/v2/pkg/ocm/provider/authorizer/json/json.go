@@ -163,7 +163,11 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	if hostIPs, ok := a.providerIPs.Load(ocmHost); ok {
 		ipList = hostIPs.([]string)
 	} else {
-		addr, err := net.LookupIP(ocmHost)
+		host, _, err := net.SplitHostPort(ocmHost)
+		if err != nil {
+			return errors.Wrap(err, "json: error looking up client IP")
+		}
+		addr, err := net.LookupIP(host)
 		if err != nil {
 			return errors.Wrap(err, "json: error looking up client IP")
 		}

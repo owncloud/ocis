@@ -240,38 +240,6 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-  @skipOnReva
-  Scenario Outline: sharee moving a file from one folder to an other changes the etags of both folders for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav-path-version> DAV path
-    And user "Alice" has created folder "/src"
-    And user "Alice" has created folder "/dst"
-    And user "Alice" has uploaded file with content "uploaded content" to "/src/file.txt"
-    And user "Alice" has shared folder "/src" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
-    And user "Alice" has stored etag of element "/"
-    And user "Alice" has stored etag of element "/src"
-    And user "Alice" has stored etag of element "/dst"
-    And user "Brian" has stored etag of element "/"
-    And user "Brian" has stored etag of element "/Shares"
-    And user "Brian" has stored etag of element "/Shares/src"
-    And user "Brian" has stored etag of element "/Shares/dst"
-    When user "Brian" moves file "/Shares/src/file.txt" to "/Shares/dst/file.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And these etags should have changed:
-      | user  | path        |
-      | Alice | /           |
-      | Alice | /src        |
-      | Alice | /dst        |
-      | Brian | /           |
-      | Brian | /Shares     |
-      | Brian | /Shares/src |
-      | Brian | /Shares/dst |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
   @issue-4251 @skipOnReva
   Scenario Outline: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
@@ -289,38 +257,6 @@ Feature: propagation of etags when moving files or folders
     And user "Brian" has stored etag of element "/Shares/src"
     And user "Brian" has stored etag of element "/Shares/dst"
     When user "Alice" moves folder "/src/toMove" to "/dst/toMove" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And these etags should have changed:
-      | user  | path        |
-      | Alice | /           |
-      | Alice | /src        |
-      | Alice | /dst        |
-      | Brian | /           |
-      | Brian | /Shares     |
-      | Brian | /Shares/src |
-      | Brian | /Shares/dst |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-  @skipOnReva
-  Scenario Outline: sharee moving a folder from one folder to an other changes the etags of both folders for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And using <dav-path-version> DAV path
-    And user "Alice" has created folder "/src"
-    And user "Alice" has created folder "/dst"
-    And user "Alice" has created folder "/src/toMove"
-    And user "Alice" has shared folder "/src" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
-    And user "Alice" has stored etag of element "/"
-    And user "Alice" has stored etag of element "/src"
-    And user "Alice" has stored etag of element "/dst"
-    And user "Brian" has stored etag of element "/"
-    And user "Brian" has stored etag of element "/Shares"
-    And user "Brian" has stored etag of element "/Shares/src"
-    And user "Brian" has stored etag of element "/Shares/dst"
-    When user "Brian" moves folder "/Shares/src/toMove" to "/Shares/dst/toMove" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path        |

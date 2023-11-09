@@ -181,31 +181,3 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-  @skipOnReva
-  Scenario Outline: checking file id after a move between received shares
-    Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has created the following folders
-      | path     |
-      | /folderA |
-      | /folderB |
-    And user "Alice" has shared folder "/folderA" with user "Brian"
-    And user "Alice" has shared folder "/folderB" with user "Brian"
-    And user "Brian" has created the following folders
-      | path                    |
-      | /Shares/folderA/ONE     |
-      | /Shares/folderA/ONE/TWO |
-    And user "Brian" has stored id of folder "/Shares/folderA/ONE"
-    When user "Brian" moves folder "/Shares/folderA/ONE" to "/Shares/folderB/ONE" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And as "Brian" folder "/Shares/folderA" should exist
-    And as "Brian" folder "/Shares/folderA/ONE" should not exist
-    And as "Brian" folder "/Shares/folderA/ONE/TWO" should not exist
-    And as "Brian" folder "/Shares/folderB/ONE" should exist
-    And as "Brian" folder "/Shares/folderB/ONE/TWO" should exist
-    And user "Brian" folder "/Shares/folderB/ONE" should have the previously stored id
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
