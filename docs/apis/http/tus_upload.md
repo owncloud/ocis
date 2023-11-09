@@ -1,5 +1,5 @@
 ---
-title: "Tus Upload"
+title: "Resumable Upload"
 date: 2023-10-10T00:00:00+00:00
 weight: 21
 geekdocRepo: https://github.com/owncloud/ocis
@@ -9,7 +9,7 @@ geekdocCollapseSection: true
 ---
 
 Infinite Scale supports the tus resumable-upload protocol.
-Tus is a robust, modular, and open protocol designed to resume large file uploads reliably over HTTP.
+which is a robust, modular, and open protocol designed to resume large file uploads reliably over HTTP.
 In situations where file uploads might be interrupted due to network issues, browser crashes, or other unforeseen interruptions,
 tus ensures that uploads can be resumed from the point of failure without losing data.
 This documentation shows some basic examples, refer [Tus Official Site](https://tus.io/protocols/resumable-upload) for more details.
