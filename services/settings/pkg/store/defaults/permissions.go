@@ -67,6 +67,44 @@ func ChangeLogoPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Sett
 	}
 }
 
+// CreatePublicLinkPermission is the permission to create public links
+func CreatePublicLinkPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "11516bbd-7157-49e1-b6ac-d00c820f980b",
+		Name:        "PublicLink.Write",
+		DisplayName: "Write publiclink",
+		Description: "This permission allows creating public links.",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SHARE,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_WRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// CreateSharePermission is the permission to create shares
+func CreateSharePermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "069c08b1-e31f-4799-9ed6-194b310e7244",
+		Name:        "Shares.Write",
+		DisplayName: "Write share",
+		Description: "This permission allows creating shares.",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SHARE,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_WRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
 // CreateSpacesPermission is the permission to create spaces
 func CreateSpacesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{
@@ -195,6 +233,25 @@ func LanguageManagementPermission(c settingsmsg.Permission_Constraint) *settings
 		Value: &settingsmsg.Setting_PermissionValue{
 			PermissionValue: &settingsmsg.Permission{
 				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ListFavoritesPermission is the permission to list favorites
+func ListFavoritesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "4ebaa725-bfaa-43c5-9817-78bc9994bde4",
+		Name:        "Favorites.List",
+		DisplayName: "List Favorites",
+		Description: "This permission allows listing favorites.",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READ,
 				Constraint: c,
 			},
 		},
@@ -356,15 +413,15 @@ func SpaceAbilityPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Se
 	}
 }
 
-// WritePublicLinkPermission is the permission to write public links
-func WritePublicLinkPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+// WriteFavoritesPermission is the permission to mark/unmark files as favorites
+func WriteFavoritesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{
-		Id:          "11516bbd-7157-49e1-b6ac-d00c820f980b",
-		Name:        "PublicLink.Write",
-		DisplayName: "Write publiclink",
-		Description: "This permission allows creating public links.",
+		Id:          "a54778fd-1c45-47f0-892d-655caf5236f2",
+		Name:        "Favorites.Write",
+		DisplayName: "Write Favorites",
+		Description: "This permission allows marking files as favorites.",
 		Resource: &settingsmsg.Resource{
-			Type: settingsmsg.Resource_TYPE_SHARE,
+			Type: settingsmsg.Resource_TYPE_FILE,
 		},
 		Value: &settingsmsg.Setting_PermissionValue{
 			PermissionValue: &settingsmsg.Permission{
