@@ -265,6 +265,50 @@ func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (
 	return actions
 }
 
+// CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
+// CS3 ResourcePermissions and constraints.
+func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string, resharing bool) *libregraph.UnifiedRoleDefinition {
+	actionSet := map[string]struct{}{}
+	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
+		actionSet[action] = struct{}{}
+	}
+
+	var res *libregraph.UnifiedRoleDefinition
+	for _, uRole := range GetBuiltinRoleDefinitionList(resharing) {
+		matchFound := false
+		for _, uPerm := range uRole.GetRolePermissions() {
+			if uPerm.GetCondition() != constraints {
+				// the requested constraints don't match, this isn't our role
+				continue
+			}
+
+			// if the actions converted from the ResourcePermissions equal the action the defined for the role, we have match
+			if resourceActionsEqual(actionSet, uPerm.GetAllowedResourceActions()) {
+				matchFound = true
+				break
+			}
+		}
+		if matchFound {
+			res = uRole
+			break
+		}
+	}
+	return res
+}
+
+func resourceActionsEqual(targetActionSet map[string]struct{}, actions []string) bool {
+	if len(targetActionSet) != len(actions) {
+		return false
+	}
+
+	for _, action := range actions {
+		if _, ok := targetActionSet[action]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 func displayName(role *conversions.Role) *string {
 	if role == nil {
 		return nil

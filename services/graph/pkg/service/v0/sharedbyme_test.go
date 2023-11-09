@@ -15,6 +15,7 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -28,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )
@@ -45,6 +47,8 @@ var _ = Describe("sharedbyme", func() {
 		rr *httptest.ResponseRecorder
 	)
 	expiration := time.Now()
+
+	editorResourcePermissions := conversions.NewEditorRole(true).CS3ResourcePermissions()
 	userShare := collaboration.Share{
 		Id: &collaboration.ShareId{
 			OpaqueId: "share-id",
@@ -61,6 +65,9 @@ var _ = Describe("sharedbyme", func() {
 					OpaqueId: "user-id",
 				},
 			},
+		},
+		Permissions: &collaboration.SharePermissions{
+			Permissions: editorResourcePermissions,
 		},
 	}
 	groupShare := collaboration.Share{
@@ -80,6 +87,9 @@ var _ = Describe("sharedbyme", func() {
 				},
 			},
 		},
+		Permissions: &collaboration.SharePermissions{
+			Permissions: editorResourcePermissions,
+		},
 	}
 	userShareWithExpiration := collaboration.Share{
 		Id: &collaboration.ShareId{
@@ -97,6 +107,9 @@ var _ = Describe("sharedbyme", func() {
 					OpaqueId: "user-id",
 				},
 			},
+		},
+		Permissions: &collaboration.SharePermissions{
+			Permissions: editorResourcePermissions,
 		},
 		Expiration: utils.TimeToTS(expiration),
 	}
@@ -218,6 +231,7 @@ var _ = Describe("sharedbyme", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		cfg.FilesSharing.EnableResharing = true
 
 		svc, _ = service.NewService(
 			service.Config(cfg),
@@ -323,6 +337,10 @@ var _ = Describe("sharedbyme", func() {
 			Expect(user.GetId()).To(Equal(userShare.GetGrantee().GetUserId().GetOpaqueId()))
 			_, ok = perm[0].GetLinkOk()
 			Expect(ok).To(BeFalse())
+			roles, ok := perm[0].GetRolesOk()
+			Expect(ok).To(BeTrue())
+			Expect(len(roles)).To(Equal(1))
+			Expect(roles[0]).To(Equal(unifiedrole.UnifiedRoleEditorID))
 		})
 
 		It("returns a proper driveItem, when a single group share is returned", func() {
@@ -363,6 +381,10 @@ var _ = Describe("sharedbyme", func() {
 			Expect(group.GetId()).To(Equal(groupShare.GetGrantee().GetGroupId().GetOpaqueId()))
 			_, ok = perm[0].GetLinkOk()
 			Expect(ok).To(BeFalse())
+			roles, ok := perm[0].GetRolesOk()
+			Expect(ok).To(BeTrue())
+			Expect(len(roles)).To(Equal(1))
+			Expect(roles[0]).To(Equal(unifiedrole.UnifiedRoleEditorID))
 		})
 
 		It("returns a single driveItem, when a mulitple shares for the same resource are returned", func() {
