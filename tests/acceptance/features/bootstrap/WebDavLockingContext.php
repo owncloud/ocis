@@ -238,6 +238,22 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has locked file :file inside space :spaceName setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $spaceName
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 */
+	public function userHasLockedFileInsideSpaceSettingTheFollowingProperties(string $user, string $file, string $spaceName, TableNode $properties) {
+		$this->spacesContext->setSpaceIDByName($this->featureContext->getActualUsername($user), $spaceName);
+		$response = $this->lockFile($user, $file, $properties);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+	}
+
+	/**
 	 * @Given user :user has locked file :file using file-id path :path setting the following properties
 	 *
 	 * @param string $user
@@ -346,6 +362,26 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function unlockLastLockUsingWebDavAPI(string $user, string $file) {
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+			$user,
+			$file,
+			$user,
+			$file
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user unlocks the last created lock of file :file inside space :spaceName using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $file
+	 *
+	 * @return void
+	 */
+	public function userUnlocksTheLastCreatedLockOfFileInsideSpaceUsingTheWebdavApi(string $user, string $spaceName, string $file) {
+		$this->spacesContext->setSpaceIDByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$file,
