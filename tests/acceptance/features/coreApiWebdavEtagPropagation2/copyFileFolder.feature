@@ -120,9 +120,10 @@ Feature: propagation of etags when copying files or folders
       | dav-path-version |
       | spaces           |
 
-  @issue-4251
+  @env-config @issue-4251
   Scenario Outline: copying a file inside a publicly shared folder by public changes etag for the sharer
-    Given using <dav-path-version> DAV path
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has created a public link share with settings

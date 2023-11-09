@@ -278,11 +278,12 @@ Feature: propagation of etags when moving files or folders
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | change |
+      | path        | upload   |
+      | permissions | change   |
+      | password    | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public renames file "file.txt" to "renamed.txt" from the last public link share using the new public WebDAV API
+    When the public renames file "file.txt" to "renamed.txt" from the last public link share using the password "%public%" and the new public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path    |
@@ -304,11 +305,12 @@ Feature: propagation of etags when moving files or folders
     And user "Alice" has created folder "/upload"
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | change |
+      | path        | upload   |
+      | permissions | change   |
+      | password    | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public renames folder "sub" to "renamed" from the last public link share using the new public WebDAV API
+    When the public renames folder "sub" to "renamed" from the last public link share using the password "%public%" and the new public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path    |

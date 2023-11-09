@@ -494,7 +494,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alt4UserPassword = "ThisIsThe4thAlternatePwd";
 		$this->subAdminPassword = "IamAJuniorAdmin42";
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
-		$this->publicLinkSharePassword = "publicPwd1";
+		$this->publicLinkSharePassword = "publicPwd:1";
 
 		// in case of CI deployment we take the server url from the environment
 		$testServerUrl = \getenv('TEST_SERVER_URL');

@@ -2234,7 +2234,7 @@ class SpacesContext implements Context {
 		$rows["path"] = \array_key_exists("path", $rows) ? $rows["path"] : null;
 		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 3;
 		$rows["permissions"] = \array_key_exists("permissions", $rows) ? $rows["permissions"] : null;
-		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
+		$rows['password'] = \array_key_exists('password', $rows) ? $this->featureContext->getActualPassword($rows['password']) : null;
 		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
 
@@ -3197,7 +3197,7 @@ class SpacesContext implements Context {
 
 		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 3;
 		$rows["permissions"] = \array_key_exists("permissions", $rows) ? $rows["permissions"] : null;
-		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
+		$rows['password'] = \array_key_exists('password', $rows) ? $this->featureContext->getActualPassword($rows['password']) : null;
 		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
 

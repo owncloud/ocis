@@ -56,7 +56,7 @@ class OcisConfigHelper {
 		try {
 			return $client->send($request);
 		} catch (ConnectException $e) {
-			throw new Error("Cannot connect to the ociswrapper at the moment, make sure that ociswrapper is running before proceeding with the test run.\n" . $e->getMessage());
+			throw new \Error("Cannot connect to the ociswrapper at the moment, make sure that ociswrapper is running before proceeding with the test run.\n" . $e->getMessage());
 		}
 	}
 

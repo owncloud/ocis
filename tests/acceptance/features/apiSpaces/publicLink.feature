@@ -1,7 +1,9 @@
+@env-config
 Feature: public link for a space
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
     And using spaces DAV path

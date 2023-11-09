@@ -18,7 +18,7 @@ Feature: A manager of the space can edit public link
     And user "Alice" has created a space "edit space" with the default quota using the Graph API
     And user "Alice" has created a public link share of the space "edit space" with settings:
       | permissions | 1                        |
-      | password    | qwerty                   |
+      | password    | %public%                 |
       | expireDate  | 2040-01-01T23:59:59+0100 |
       | name        | someName                 |
     And user "Alice" has uploaded a file inside space "edit space" with content "some content" to "test.txt"
@@ -46,9 +46,9 @@ Feature: A manager of the space can edit public link
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | permissions | expectedPermissions       | password | linkName |
-      | 5           | read,create               | newPass  |          |
-      | 15          | read,update,create,delete |          | newName  |
+      | permissions | expectedPermissions       | password   | linkName |
+      | 5           | read,create               | newPass:12 |          |
+      | 15          | read,update,create,delete | newPass:12 | newName  |
 
 
   Scenario Outline: members can see a created public link

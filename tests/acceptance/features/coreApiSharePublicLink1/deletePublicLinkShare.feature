@@ -11,8 +11,9 @@ Feature: delete a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     And user "Alice" has created a public link share with settings
-      | path | test-file.txt |
-      | name | sharedlink    |
+      | path     | test-file.txt |
+      | name     | sharedlink    |
+      | password | %public%      |
     When user "Alice" deletes public link share named "sharedlink" in file "test-file.txt" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs_status_code>"
@@ -27,8 +28,9 @@ Feature: delete a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     And user "Alice" has created a public link share with settings
-      | path | test-file.txt |
-      | name | sharedlink    |
+      | path     | test-file.txt |
+      | name     | sharedlink    |
+      | password | %public%      |
     When user "Alice" moves file "/test-file.txt" to "/renamed-test-file.txt" using the WebDAV API
     And user "Alice" deletes public link share named "sharedlink" in file "renamed-test-file.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
@@ -44,8 +46,9 @@ Feature: delete a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "test-folder"
     And user "Alice" has created a public link share with settings
-      | path | /test-folder |
-      | name | sharedlink   |
+      | path     | /test-folder |
+      | name     | sharedlink   |
+      | password | %public%     |
     When user "Alice" deletes public link share named "sharedlink" in folder "test-folder" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs_status_code>"
@@ -61,8 +64,9 @@ Feature: delete a public link share
     And user "Alice" has created folder "test-folder"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/test-folder/testfile.txt" using the WebDAV API
     And user "Alice" has created a public link share with settings
-      | path | /test-folder/testfile.txt |
-      | name | sharedlink                |
+      | path     | /test-folder/testfile.txt |
+      | name     | sharedlink                |
+      | password | %public%                  |
     And user "Alice" deletes public link share named "sharedlink" in file "/test-folder/testfile.txt" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs_status_code>"

@@ -25,10 +25,12 @@ Feature: get the received shares filtered by type (user, group etc)
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
+      | password    | %public%                 |
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
+      | password    | %public%                   |
     When user "Brian" gets the user shares shared with him using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -45,10 +47,12 @@ Feature: get the received shares filtered by type (user, group etc)
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
+      | password    | %public%                 |
     And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
+      | password    | %public%                   |
     When user "Brian" gets the group shares shared with him using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -69,11 +73,13 @@ Feature: get the received shares filtered by type (user, group etc)
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
       | permissions | read                     |
+      | password    | %public%                 |
     And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
+      | password    | %public%                   |
     When user "Brian" gets the public link shares shared with him using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

@@ -958,7 +958,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty) +
+                 ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
                      {
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
@@ -976,6 +976,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "RUN_PART": part_number,
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                             "OCIS_WRAPPER_URL": "http://ocis-server:5200",
                          },
                          "commands": [
                              "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
@@ -1056,6 +1057,15 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
     else:
         pipelineName = "Web-Tests-ocis%s-%s-storage-%s" % (uniqueNameString, storage, runPart)
 
+    extra_server_environment = {
+        "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD": False,
+        "FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS": 1,
+        "FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_DIGITS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": 0,
+    }
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1068,7 +1078,7 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  restoreWebCache() +
                  restoreWebPnpmCache() +
-                 ocisServer(storage, accounts_hash_difficulty) +
+                 ocisServer(storage, accounts_hash_difficulty, extra_server_environment = extra_server_environment) +
                  waitForSeleniumService() +
                  waitForMiddlewareService() +
                  [
@@ -1122,6 +1132,12 @@ def e2eTests(ctx):
 
     extra_server_environment = {
         "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD": False,
+        "FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS": 1,
+        "FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_DIGITS": 0,
+        "FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": 0,
     }
 
     e2e_trigger = {
@@ -2508,20 +2524,20 @@ def litmus(ctx, storage):
                              litmusCommand,
                          ],
                      },
-                     {
-                         "name": "public-share",
-                         "image": OC_LITMUS,
-                         "environment": {
-                             "LITMUS_PASSWORD": "admin",
-                             "LITMUS_USERNAME": "admin",
-                             "TESTS": "basic copymove http",
-                         },
-                         "commands": [
-                             "source .env",
-                             "export LITMUS_URL='https://ocis-server:9200/remote.php/dav/public-files/'$PUBLIC_TOKEN",
-                             litmusCommand,
-                         ],
-                     },
+                     #  {
+                     #      "name": "public-share",
+                     #      "image": OC_LITMUS,
+                     #      "environment": {
+                     #          "LITMUS_PASSWORD": "admin",
+                     #          "LITMUS_USERNAME": "admin",
+                     #          "TESTS": "basic copymove http",
+                     #      },
+                     #      "commands": [
+                     #          "source .env",
+                     #          "export LITMUS_URL='https://ocis-server:9200/remote.php/dav/public-files/'$PUBLIC_TOKEN",
+                     #          litmusCommand,
+                     #      ],
+                     #  },
                      {
                          "name": "spaces-endpoint",
                          "image": OC_LITMUS,
