@@ -38,7 +38,7 @@ func (g Graph) GetOwnLanguage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: make sure that this actually returns the stored language
-	lang, ok := me.GetLanguageOk()
+	lang, ok := me.GetPreferredLanguageOk()
 	if !ok {
 		render.Status(r, http.StatusNotFound)
 		render.JSON(w, r, nil)
@@ -77,7 +77,7 @@ func (g Graph) SetOwnLanguage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lang := chi.URLParam(r, "language")
-	me.SetLanguage(lang)
+	me.SetPreferredLanguage(lang)
 	// TODO: persist this change
 	render.Status(r, http.StatusNoContent)
 }
@@ -102,7 +102,7 @@ func (g Graph) SetUserLanguage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lang := chi.URLParam(r, "language")
-	user.SetLanguage(lang)
+	user.SetPreferredLanguage(lang)
 	// TODO: persist this change
 	render.Status(r, http.StatusNoContent)
 }

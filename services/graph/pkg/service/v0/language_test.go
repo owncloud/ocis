@@ -69,10 +69,10 @@ var _ = Describe("Language", func() {
 		user := libregraph.NewUser()
 		user.SetId("disallowed")
 		user.SetDisplayName("foobar")
-		user.SetLanguage("en-EN")
+		user.SetPreferredLanguage("en-EN")
 
 		r := httptest.NewRequest("GET", "/graph/v1.0/me/language", nil)
-		svc.(*service.Gradddddddddddph).GetOwnLanguage(rr, r)
+		svc.(*service.Graph).GetOwnLanguage(rr, r)
 		Expect(rr.Code).To(Equal(200))
 		Expect(rr.Body.String()).To(Equal("en-EN"))
 
