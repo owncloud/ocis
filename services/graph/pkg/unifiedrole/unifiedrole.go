@@ -31,6 +31,26 @@ const (
 	UnifiedRoleConditionOwner = "@Subject.objectId Any_of @Resource.owners"
 	// UnifiedRoleConditionGrantee does not exist in MS Graph, but we use it to express permissions on shared resources
 	UnifiedRoleConditionGrantee = "@Subject.objectId Any_of @Resource.grantee"
+
+	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
+	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
+	DriveItemStandardDelete    = "libre.graph/driveItem/standard/delete"
+	DriveItemPathRead          = "libre.graph/driveItem/path/read"
+	DriveItemQuotaRead         = "libre.graph/driveItem/quota/read"
+	DriveItemContentRead       = "libre.graph/driveItem/content/read"
+	DriveItemUploadCreate      = "libre.graph/driveItem/upload/create"
+	DriveItemPermissionsRead   = "libre.graph/driveItem/permissions/read"
+	DriveItemChildrenRead      = "libre.graph/driveItem/children/read"
+	DriveItemVersionsRead      = "libre.graph/driveItem/versions/read"
+	DriveItemDeletedRead       = "libre.graph/driveItem/deleted/read"
+	DriveItemPathUpdate        = "libre.graph/driveItem/path/update"
+	DriveItemPermissionsDelete = "libre.graph/driveItem/permissions/delete"
+	DriveItemDeletedDelete     = "libre.graph/driveItem/deleted/delete"
+	DriveItemVersionsUpdate    = "libre.graph/driveItem/versions/update"
+	DriveItemDeletedUpdate     = "libre.graph/driveItem/deleted/update"
+	DriveItemBasicRead         = "libre.graph/driveItem/basic/read"
+	DriveItemPermissionsUpdate = "libre.graph/driveItem/permissions/update"
+	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
 )
 
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
@@ -186,61 +206,61 @@ func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefin
 // libregraph actions
 func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {
 	if p.AddGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/create")
+		actions = append(actions, DriveItemPermissionsCreate)
 	}
 	if p.CreateContainer {
-		actions = append(actions, "libre.graph/driveItem/children/create")
+		actions = append(actions, DriveItemChildrenCreate)
 	}
 	if p.Delete {
-		actions = append(actions, "libre.graph/driveItem/standard/delete")
+		actions = append(actions, DriveItemStandardDelete)
 	}
 	if p.GetPath {
-		actions = append(actions, "libre.graph/driveItem/path/read")
+		actions = append(actions, DriveItemPathRead)
 	}
 	if p.GetQuota {
-		actions = append(actions, "libre.graph/driveItem/quota/read")
+		actions = append(actions, DriveItemQuotaRead)
 	}
 	if p.InitiateFileDownload {
-		actions = append(actions, "libre.graph/driveItem/content/read")
+		actions = append(actions, DriveItemContentRead)
 	}
 	if p.InitiateFileUpload {
-		actions = append(actions, "libre.graph/driveItem/upload/create")
+		actions = append(actions, DriveItemUploadCreate)
 	}
 	if p.ListGrants {
-		actions = append(actions, "libre.graph/driveItem/permissions/read")
+		actions = append(actions, DriveItemPermissionsRead)
 	}
 	if p.ListContainer {
-		actions = append(actions, "libre.graph/driveItem/children/read")
+		actions = append(actions, DriveItemChildrenRead)
 	}
 	if p.ListFileVersions {
-		actions = append(actions, "libre.graph/driveItem/versions/read")
+		actions = append(actions, DriveItemVersionsRead)
 	}
 	if p.ListRecycle {
-		actions = append(actions, "libre.graph/driveItem/deleted/read")
+		actions = append(actions, DriveItemDeletedRead)
 	}
 	if p.Move {
-		actions = append(actions, "libre.graph/driveItem/path/update")
+		actions = append(actions, DriveItemPathUpdate)
 	}
 	if p.RemoveGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/delete")
+		actions = append(actions, DriveItemPermissionsDelete)
 	}
 	if p.PurgeRecycle {
-		actions = append(actions, "libre.graph/driveItem/deleted/delete")
+		actions = append(actions, DriveItemDeletedDelete)
 	}
 	if p.RestoreFileVersion {
-		actions = append(actions, "libre.graph/driveItem/versions/update")
+		actions = append(actions, DriveItemVersionsUpdate)
 	}
 	if p.RestoreRecycleItem {
-		actions = append(actions, "libre.graph/driveItem/deleted/update")
+		actions = append(actions, DriveItemDeletedUpdate)
 	}
 	if p.Stat {
-		actions = append(actions, "libre.graph/driveItem/basic/read")
+		actions = append(actions, DriveItemBasicRead)
 	}
 	if p.UpdateGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/update")
+		actions = append(actions, DriveItemPermissionsUpdate)
 	}
 	if p.DenyGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/deny")
+		actions = append(actions, DriveItemPermissionsDeny)
 	}
 	return actions
 }
