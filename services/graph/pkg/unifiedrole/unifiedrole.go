@@ -1,6 +1,7 @@
 package unifiedrole
 
 import (
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/proto"
@@ -168,40 +169,9 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-func displayName(role *conversions.Role) *string {
-	if role == nil {
-		return nil
-	}
-	var displayName string
-	switch role.Name {
-	case conversions.RoleViewer:
-		displayName = "Viewer"
-	case conversions.RoleSpaceViewer:
-		displayName = "Space Viewer"
-	case conversions.RoleEditor:
-		displayName = "Editor"
-	case conversions.RoleSpaceEditor:
-		displayName = "Space Editor"
-	case conversions.RoleFileEditor:
-		displayName = "File Editor"
-	case conversions.RoleCoowner:
-		displayName = "Co Owner"
-	case conversions.RoleUploader:
-		displayName = "Uploader"
-	case conversions.RoleManager:
-		displayName = "Manager"
-	default:
-		return nil
-	}
-	return proto.String(displayName)
-}
-
-func convert(role *conversions.Role) []string {
-	actions := make([]string, 0, 8)
-	if role == nil && role.CS3ResourcePermissions() == nil {
-		return actions
-	}
-	p := role.CS3ResourcePermissions()
+// CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
+// libregraph actions
+func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {
 	if p.AddGrant {
 		actions = append(actions, "libre.graph/driveItem/permissions/create")
 	}
@@ -260,4 +230,40 @@ func convert(role *conversions.Role) []string {
 		actions = append(actions, "libre.graph/driveItem/permissions/deny")
 	}
 	return actions
+}
+
+func displayName(role *conversions.Role) *string {
+	if role == nil {
+		return nil
+	}
+	var displayName string
+	switch role.Name {
+	case conversions.RoleViewer:
+		displayName = "Viewer"
+	case conversions.RoleSpaceViewer:
+		displayName = "Space Viewer"
+	case conversions.RoleEditor:
+		displayName = "Editor"
+	case conversions.RoleSpaceEditor:
+		displayName = "Space Editor"
+	case conversions.RoleFileEditor:
+		displayName = "File Editor"
+	case conversions.RoleCoowner:
+		displayName = "Co Owner"
+	case conversions.RoleUploader:
+		displayName = "Uploader"
+	case conversions.RoleManager:
+		displayName = "Manager"
+	default:
+		return nil
+	}
+	return proto.String(displayName)
+}
+
+func convert(role *conversions.Role) []string {
+	actions := make([]string, 0, 8)
+	if role == nil && role.CS3ResourcePermissions() == nil {
+		return actions
+	}
+	return CS3ResourcePermissionsToLibregraphActions(*role.CS3ResourcePermissions())
 }
