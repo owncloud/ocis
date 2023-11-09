@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-UNRELEASED)
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0](#changelog-for-500-2023-11-08)
 * [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
