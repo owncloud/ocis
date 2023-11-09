@@ -9,7 +9,7 @@ type Options struct {
 	AccountEditLink          *AccountEditLink `json:"accountEditLink,omitempty" yaml:"accountEditLink"`
 	DisableFeedbackLink      bool             `json:"disableFeedbackLink,omitempty" yaml:"disableFeedbackLink" env:"WEB_OPTION_DISABLE_FEEDBACK_LINK" desc:"Set this option to 'true' to disable the feedback link in the topbar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website."`
 	FeedbackLink             *FeedbackLink    `json:"feedbackLink,omitempty" yaml:"feedbackLink"`
-	SharingRecipientsPerPage int              `json:"sharingRecipientsPerPage,omitempty" yaml:"sharingRecipientsPerPage" env:"WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE" desc:"Sets the amount of users shown as recipients in the dropdown menu when sharing resources."`
+	SharingRecipientsPerPage int              `json:"sharingRecipientsPerPage,omitempty" yaml:"sharingRecipientsPerPage" env:"WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE" desc:"Sets the number of users shown as recipients in the dropdown menu when sharing resources."`
 	Sidebar                  Sidebar          `json:"sidebar" yaml:"sidebar"`
 	RunningOnEOS             bool             `json:"runningOnEos,omitempty" yaml:"runningOnEos" env:"WEB_OPTION_RUNNING_ON_EOS" desc:"Set this option to 'true' if running on an EOS storage backend (https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'."`
 	CernFeatures             bool             `json:"cernFeatures,omitempty" yaml:"cernFeatures"`
