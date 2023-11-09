@@ -62,6 +62,6 @@ type Cache struct {
 	Database       string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	FileTable      string        `yaml:"files_table" env:"SETTINGS_FILE_CACHE_TABLE" desc:"The database table the store should use for the file cache."`
 	DirectoryTable string        `yaml:"directories_table" env:"SETTINGS_DIRECTORY_CACHE_TABLE" desc:"The database table the store should use for the directory cache."`
-	TTL            time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;SETTINGS_CACHE_TTL" desc:"Default time to live for entries in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10m' (10 minutes)."`
-	Size           int           `yaml:"size" env:"OCIS_CACHE_SIZE;SETTINGS_CACHE_SIZE" desc:"The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
+	TTL            time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;SETTINGS_CACHE_TTL" desc:"Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
+	Size           int           `yaml:"size" env:"OCIS_CACHE_SIZE;SETTINGS_CACHE_SIZE" desc:"The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default."`
 }
