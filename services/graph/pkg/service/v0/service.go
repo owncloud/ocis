@@ -225,6 +225,7 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
+					r.With(requireAdmin).Patch("/language/{language}", svc.SetUserLanguage)
 					if svc.roleService != nil {
 						r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
 							r.Get("/", svc.ListAppRoleAssignments)
