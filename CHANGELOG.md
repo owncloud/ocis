@@ -1,3 +1,33 @@
+# Table of Contents
+
+* [Changelog for unreleased](#changelog-for-unreleased-UNRELEASED)
+* [Changelog for 5.0.0](#changelog-for-500-2023-11-08)
+* [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
+* [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
+* [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
+* [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
+* [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
+* [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
+* [Changelog for 1.15.0](#changelog-for-1150-2021-11-19)
+* [Changelog for 1.14.0](#changelog-for-1140-2021-10-27)
+* [Changelog for 1.13.0](#changelog-for-1130-2021-10-13)
+* [Changelog for 1.12.0](#changelog-for-1120-2021-09-14)
+* [Changelog for 1.11.0](#changelog-for-1110-2021-08-24)
+* [Changelog for 1.10.0](#changelog-for-1100-2021-08-06)
+* [Changelog for 1.9.0](#changelog-for-190-2021-07-13)
+* [Changelog for 1.8.0](#changelog-for-180-2021-06-28)
+* [Changelog for 1.7.0](#changelog-for-170-2021-06-04)
+* [Changelog for 1.6.0](#changelog-for-160-2021-05-12)
+* [Changelog for 1.5.0](#changelog-for-150-2021-04-21)
+* [Changelog for 1.4.0](#changelog-for-140-2021-03-30)
+* [Changelog for 1.3.0](#changelog-for-130-2021-03-09)
+* [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
+* [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
+* [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
 # Changelog for [unreleased] (UNRELEASED)
 
 The following sections list the changes for unreleased.
@@ -27,6 +57,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7683
    https://github.com/owncloud/ocis/pull/7239
    https://github.com/owncloud/libre-graph-api/pull/112
+
 # Changelog for [5.0.0] (2023-11-08)
 
 The following sections list the changes for 5.0.0.
@@ -642,6 +673,7 @@ The following sections list the changes for 5.0.0.
 
    https://github.com/owncloud/web/issues/9768
    https://github.com/owncloud/ocis/pull/7670
+
 # Changelog for [4.0.0] (2023-08-21)
 
 The following sections list the changes for 4.0.0.
@@ -1473,6 +1505,7 @@ The following sections list the changes for 4.0.0.
    Add a configreva for the new reva disable-chat feature
 
    https://github.com/owncloud/ocis/pull/6544
+
 # Changelog for [3.0.0] (2023-06-06)
 
 The following sections list the changes for 3.0.0.
@@ -3190,6 +3223,7 @@ The following sections list the changes for 3.0.0.
    Hardcode web options instead of using a generic `map[string]interface{}`
 
    https://github.com/owncloud/ocis/pull/6188
+
 # Changelog for [2.0.0] (2022-11-30)
 
 The following sections list the changes for 2.0.0.
@@ -5627,6 +5661,7 @@ The following sections list the changes for 2.0.0.
    list.
 
    https://github.com/owncloud/ocis/pull/4716
+
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
@@ -5799,6 +5834,7 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
+
 # Changelog for [1.19.1] (2022-03-29)
 
 The following sections list the changes for 1.19.1.
@@ -5816,6 +5852,7 @@ The following sections list the changes for 1.19.1.
    URLs for Special items (space image, readme) were broken.
 
    https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
@@ -5989,6 +6026,7 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
@@ -6200,6 +6238,7 @@ The following sections list the changes for 1.18.0.
    https://github.com/owncloud/web/pull/6506
    https://github.com/owncloud/ocis/pull/3202
    https://github.com/owncloud/web/releases/tag/v5.2.0
+
 # Changelog for [1.17.0] (2022-02-16)
 
 The following sections list the changes for 1.17.0.
@@ -6504,6 +6543,7 @@ The following sections list the changes for 1.17.0.
    https://github.com/owncloud/ocis/pull/3157
    https://github.com/owncloud/web/releases/tag/v4.8.0
    https://github.com/owncloud/web/releases/tag/v5.0.0
+
 # Changelog for [1.16.0] (2021-12-10)
 
 The following sections list the changes for 1.16.0.
@@ -6631,6 +6671,7 @@ The following sections list the changes for 1.16.0.
 
    https://github.com/owncloud/ocis/pull/2846
    https://github.com/owncloud/web/releases/tag/v4.6.1
+
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
@@ -6792,6 +6833,7 @@ The following sections list the changes for 1.15.0.
    https://github.com/owncloud/ocis/pull/2726
    https://github.com/owncloud/ocis/pull/2790
    https://github.com/owncloud/ocis/pull/2797
+
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
@@ -6992,6 +7034,7 @@ The following sections list the changes for 1.14.0.
    https://github.com/owncloud/ocis/pull/2536
    https://github.com/owncloud/ocis/pull/2650
    https://github.com/owncloud/ocis/pull/2680
+
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.
@@ -7281,6 +7324,7 @@ The following sections list the changes for 1.13.0.
    https://github.com/owncloud/ocis/pull/2615
    https://github.com/owncloud/ocis/pull/2566
    https://github.com/owncloud/ocis/pull/2520
+
 # Changelog for [1.12.0] (2021-09-14)
 
 The following sections list the changes for 1.12.0.
@@ -7411,6 +7455,7 @@ The following sections list the changes for 1.12.0.
   * Enhancement [cs3org/reva#2029](https://github.com/cs3org/reva/pull/2029): Tracing agent configuration
 
    https://github.com/owncloud/ocis/pull/2477
+
 # Changelog for [1.11.0] (2021-08-24)
 
 The following sections list the changes for 1.11.0.
@@ -7504,6 +7549,7 @@ The following sections list the changes for 1.11.0.
   * Bugfix cs3org/reva#1993: fix owncloudsql GetMD
 
    https://github.com/owncloud/ocis/pull/2423
+
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
@@ -7641,6 +7687,7 @@ The following sections list the changes for 1.10.0.
    extension.
 
    https://github.com/owncloud/ocis/pull/2344
+
 # Changelog for [1.9.0] (2021-07-13)
 
 The following sections list the changes for 1.9.0.
@@ -7745,6 +7792,7 @@ The following sections list the changes for 1.9.0.
   * Enh cs3org/reva#1827: Support trashbin sub paths in the recycle API
 
    https://github.com/owncloud/ocis/pull/2280
+
 # Changelog for [1.8.0] (2021-06-28)
 
 The following sections list the changes for 1.8.0.
@@ -7831,6 +7879,7 @@ The following sections list the changes for 1.8.0.
 
    https://github.com/owncloud/ocis/pull/2205
    https://github.com/owncloud/ocis/pull/2210
+
 # Changelog for [1.7.0] (2021-06-04)
 
 The following sections list the changes for 1.7.0.
@@ -7897,6 +7946,7 @@ The following sections list the changes for 1.7.0.
 
    https://github.com/owncloud/ocis/issues/2102
    https://github.com/owncloud/ocis/pull/2104
+
 # Changelog for [1.6.0] (2021-05-12)
 
 The following sections list the changes for 1.6.0.
@@ -8007,6 +8057,7 @@ The following sections list the changes for 1.6.0.
    Changed SameSite settings to Strict for Web to prevent warnings in Firefox
 
    https://github.com/owncloud/ocis/pull/2019
+
 # Changelog for [1.5.0] (2021-04-21)
 
 The following sections list the changes for 1.5.0.
@@ -8101,6 +8152,7 @@ The following sections list the changes for 1.5.0.
   * implement checksums in the owncloud storage driver (https://github.com/cs3org/reva/pull/1629)
 
    https://github.com/owncloud/ocis/pull/1872
+
 # Changelog for [1.4.0] (2021-03-30)
 
 The following sections list the changes for 1.4.0.
@@ -8228,6 +8280,7 @@ The following sections list the changes for 1.4.0.
    https://github.com/owncloud/ocis/pull/1683
    https://github.com/cs3org/reva/pull/1405
    https://github.com/owncloud/ocis/pull/1861
+
 # Changelog for [1.3.0] (2021-03-09)
 
 The following sections list the changes for 1.3.0.
@@ -8349,6 +8402,7 @@ The following sections list the changes for 1.3.0.
    be given with `MICRO_REGISTRY_ADDRESS=1.2.3.4,5.6.7.8,9.10.11.12`.
 
    https://github.com/owncloud/ocis/pull/1697
+
 # Changelog for [1.2.0] (2021-02-17)
 
 The following sections list the changes for 1.2.0.
@@ -8508,6 +8562,7 @@ The following sections list the changes for 1.2.0.
    https://github.com/cs3org/reva/pull/1416
    https://github.com/cs3org/reva/pull/1415
    https://github.com/cs3org/reva/pull/1408
+
 # Changelog for [1.1.0] (2021-01-22)
 
 The following sections list the changes for 1.1.0.
@@ -8733,6 +8788,7 @@ The following sections list the changes for 1.1.0.
    https://github.com/owncloud/ocis/pull/1194
    https://github.com/cs3org/reva/pull/1368
    https://github.com/cs3org/reva/pull/1388
+
 # Changelog for [1.0.0] (2020-12-17)
 
 The following sections list the changes for 1.0.0.
