@@ -162,7 +162,6 @@ File and sync features in a shared scenario
 - [coreApiShareManagementToShares/mergeShare.feature:112](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L112)
 - [coreApiShareManagementToShares/mergeShare.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L132)
 
-
 #### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
 
 - [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L58)
@@ -587,23 +586,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 - [coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L22)
 - [coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L23)
-
-### [Disallow moves between spaces and shares](https://github.com/owncloud/ocis/issues/4087)
-
--   [coreApiShareOperationsToShares1/changingFilesShare.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L48)
--   [coreApiShareOperationsToShares1/changingFilesShare.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L49)
--   [coreApiWebdavEtagPropagation1/moveFileFolder.feature:272](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavEtagPropagation1/moveFileFolder.feature#L278)
--   [coreApiWebdavEtagPropagation1/moveFileFolder.feature:273](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavEtagPropagation1/moveFileFolder.feature#L279)
--   [coreApiWebdavEtagPropagation1/moveFileFolder.feature:336](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavEtagPropagation1/moveFileFolder.feature#L346)
--   [coreApiWebdavEtagPropagation1/moveFileFolder.feature:337](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavEtagPropagation1/moveFileFolder.feature#L347)
--   [coreApiWebdavMove2/moveShareOnOcis.feature:210](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L220)
--   [coreApiWebdavMove2/moveShareOnOcis.feature:211](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L221)
--   [apiSpacesShares/etagPropagation.feature:139](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L139)
--   [apiSpacesShares/etagPropagation.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L185)
--   [apiSpacesShares/moveSpaces.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L204)
--   [apiSpacesShares/moveSpaces.feature:220](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L220)
--   [apiSpacesShares/moveSpaces.feature:234](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L234)
--   [apiSpacesShares/moveSpaces.feature:248](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/etagPropagation.feature#L248)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
