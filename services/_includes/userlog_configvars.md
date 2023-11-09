@@ -36,8 +36,8 @@
 | OCIS_PERSISTENT_STORE_NODES<br/>USERLOG_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | USERLOG_STORE_DATABASE | string | userlog | The database name the configured store should use.|
 | USERLOG_STORE_TABLE | string | events | The database table the store should use.|
-| OCIS_PERSISTENT_STORE_TTL<br/>USERLOG_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
-| OCIS_PERSISTENT_STORE_SIZE<br/>USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_PERSISTENT_STORE_TTL<br/>USERLOG_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
+| OCIS_PERSISTENT_STORE_SIZE<br/>USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE | bool | false | Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.|
 | USERLOG_GLOBAL_NOTIFICATIONS_SECRET | string |  | The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>USERLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|

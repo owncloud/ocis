@@ -30,8 +30,8 @@
 | OCIS_CACHE_STORE_NODES<br/>PROXY_OIDC_USERINFO_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | PROXY_OIDC_USERINFO_CACHE_TABLE | string | userinfo | The database table the store should use.|
-| OCIS_CACHE_TTL<br/>PROXY_OIDC_USERINFO_CACHE_TTL | Duration | 10s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|
-| OCIS_CACHE_SIZE<br/>PROXY_OIDC_USERINFO_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>PROXY_OIDC_USERINFO_CACHE_TTL | Duration | 10s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
+| OCIS_CACHE_SIZE<br/>PROXY_OIDC_USERINFO_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | PROXY_OIDC_JWKS_REFRESH_INTERVAL | uint64 | 60 | The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.|
 | PROXY_OIDC_JWKS_REFRESH_TIMEOUT | uint64 | 10 | The timeout in seconds for an outgoing JWKS request.|
 | PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT | uint64 | 60 | Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.|

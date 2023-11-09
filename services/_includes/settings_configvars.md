@@ -36,8 +36,8 @@
 | OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | SETTINGS_FILE_CACHE_TABLE | string | settings_files | The database table the store should use for the file cache.|
 | SETTINGS_DIRECTORY_CACHE_TABLE | string | settings_dirs | The database table the store should use for the directory cache.|
-| OCIS_CACHE_TTL<br/>SETTINGS_CACHE_TTL | Duration | 10m0s | Default time to live for entries in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10m' (10 minutes).|
-| OCIS_CACHE_SIZE<br/>SETTINGS_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>SETTINGS_CACHE_TTL | Duration | 10m0s | Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
+| OCIS_CACHE_SIZE<br/>SETTINGS_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | SETTINGS_BUNDLES_PATH | string |  | The path to a JSON file with a list of bundles. If not defined, the default bundles will be loaded.|
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.|
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|

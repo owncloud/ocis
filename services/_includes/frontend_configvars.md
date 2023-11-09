@@ -55,7 +55,7 @@
 | OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | FRONTEND_OCS_STAT_CACHE_TABLE | string |  | The database table the store should use.|
-| OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).|
+| OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|

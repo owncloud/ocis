@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-08-16-32]
+[#deprecation-note-2023-11-09-08-30-39]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -157,7 +157,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++336h0m0s ++
 a| [subs=-attributes]
-Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `GRAPH_CACHE_SIZE` +
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`GRAPH_DEBUG_ADDR` +
 
@@ -379,7 +379,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ownCloud Infinite Scale ++
 a| [subs=-attributes]
-The oCIS application name
+The ocis application name.
 
 a|`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE` +
@@ -488,7 +488,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-11-09-08-16-32[Deprecation Note]
+xref:deprecation-note-2023-11-09-08-30-39[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

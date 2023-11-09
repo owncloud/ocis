@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-08-16-32]
+[#deprecation-note-2023-11-09-08-30-39]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -288,7 +288,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_STAT_CACHE_SIZE` +
@@ -298,7 +298,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_PROVIDER_CACHE_STORE` +
@@ -337,7 +337,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_PROVIDER_CACHE_SIZE` +
@@ -347,7 +347,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_CREATE_HOME_CACHE_STORE` +
@@ -386,7 +386,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_CREATE_HOME_CACHE_SIZE` +
@@ -396,7 +396,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL` +

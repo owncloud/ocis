@@ -14,8 +14,8 @@
 | OCIS_CACHE_STORE_NODES<br/>GRAPH_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | GRAPH_CACHE_STORE_DATABASE | string | ocis | The database name the configured store should use.|
 | GRAPH_CACHE_STORE_TABLE | string | roles | The database table the store should use.|
-| OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
-| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
+| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
@@ -38,7 +38,7 @@
 | OCIS_GRPC_CLIENT_TLS_CACERT | string |  | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.|
 | OCIS_JWT_SECRET<br/>GRAPH_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | GRAPH_APPLICATION_ID | string |  | The ocis application ID shown in the graph. All app roles are tied to this ID.|
-| GRAPH_APPLICATION_DISPLAYNAME | string | ownCloud Infinite Scale | The oCIS application name|
+| GRAPH_APPLICATION_DISPLAYNAME | string | ownCloud Infinite Scale | The ocis application name.|
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | The public facing URL of WebDAV.|
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | The WebDAV subpath for spaces.|
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | The default quota in bytes.|

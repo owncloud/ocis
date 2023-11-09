@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-08-16-32]
+[#deprecation-note-2023-11-09-08-30-39]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -269,7 +269,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
-The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
+The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
@@ -399,7 +399,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
-The delay in seconds between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one.
+The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details.
 
 a|`STORAGE_USERS_S3NG_ROOT` +
 
@@ -741,7 +741,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_STAT_CACHE_SIZE` +
@@ -751,7 +751,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_STORE` +
@@ -790,7 +790,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++24m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '24h' (24 hours).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_SIZE` +
@@ -800,7 +800,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_ID_CACHE_STORE` +
@@ -839,7 +839,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens have no expiration. Defaults to 300s which is derived from the underlaying package though not explicitely set as default. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_ID_CACHE_SIZE` +
@@ -849,7 +849,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 
 a|`STORAGE_USERS_MOUNT_ID` +
 
@@ -904,7 +904,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++720h0m0s ++
 a| [subs=-attributes]
-Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.
+Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. See the Environment Variable Types description for more details.
 
 a|`STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` +
 
@@ -913,7 +913,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++720h0m0s ++
 a| [subs=-attributes]
-Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.
+Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. See the Environment Variable Types description for more details.
 
 a|`OCIS_SERVICE_ACCOUNT_ID` +
 `STORAGE_USERS_SERVICE_ACCOUNT_ID` +

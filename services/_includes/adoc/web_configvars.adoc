@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-08-16-32]
+[#deprecation-note-2023-11-09-08-30-39]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -375,7 +375,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp] ++
 a| [subs=-attributes]
-Specifies which mimeTypes will be previewed in the UI. For example to only preview jpg and text files, set this option to ['image/jpeg', 'text/plain'].
+Specifies which mimeTypes will be previewed in the UI. For example to only preview jpg and text files, set this option to 'image/jpeg,text/plain'.
 
 a|`WEB_OPTION_DISABLE_FEEDBACK_LINK` +
 
@@ -456,7 +456,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: '\https://www.myidp.com/login'.
+Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: \https://www.myidp.com/login.
 
 a|`WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` +
 
@@ -465,7 +465,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.
+Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details.
 
 a|`WEB_OPTION_IMPRINT_URL` +
 
@@ -501,7 +501,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required. Defaults to 'true'.
+Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required.
 
 a|`WEB_OPTION_DISABLED_EXTENSIONS` +
 
@@ -510,7 +510,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types documentation for details.
+Disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Multiple ID's can be written as comma separated list like: 'com.github.owncloud.web.files.search','com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details.
 
 a|`WEB_OPTION_MODE` +
 
@@ -519,7 +519,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Defines the mode in which Web will be running. Currently, the only supported options are '' (empty) and 'embed'. With '' which is the default, Web will run as usual with all functionality enabled. 'embed' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. See the documnetation for more details.
+Defines the mode in which Web will be running. Currently, the only supported options are '' (empty) and 'embed'. With '' which is the default, Web will run as usual with all functionality enabled. 'embed' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. See the text description for more details.
 
 a|`WEB_OPTION_EMBED_TARGET` +
 
@@ -528,7 +528,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'.  With '' which is the default, Web will run regular as defined via the 'mode' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the documnetation for more details.
+Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'.  With '' which is the default, Web will run regular as defined via the 'mode' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the text description for more details.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

@@ -20,7 +20,7 @@
 | OCIS_LOG_PRETTY<br/>POLICIES_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>POLICIES_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>POLICIES_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
-| POLICIES_ENGINE_TIMEOUT | Duration | 10s | Sets the timeout the rego expression evaluation can take. The timeout can be set as number followed by a unit identifier like ms, s, etc. Rules default to deny if the timeout was reached.|
+| POLICIES_ENGINE_TIMEOUT | Duration | 10s | Sets the timeout the rego expression evaluation can take. Rules default to deny if the timeout was reached. See the Environment Variable Types description for more details.|
 | POLICIES_ENGINE_MIMES | string |  | Sets the mimes file path which maps mimetypes to associated file extensions. See the text description for details.|
 | POLICIES_POSTPROCESSING_QUERY | string |  | Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Defaults to deny if the variable was not found.|
 | OCIS_TRACING_ENABLED<br/>POLICIES_TRACING_ENABLED | bool | false | Activates tracing.|

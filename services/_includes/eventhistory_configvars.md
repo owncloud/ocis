@@ -18,11 +18,11 @@
 | OCIS_EVENTS_ENDPOINT<br/>EVENTHISTORY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>EVENTHISTORY_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>EVENTHISTORY_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
-| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>EVENTHISTORY_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>EVENTHISTORY_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. Will be seen as empty if NOTIFICATIONS_EVENTS_TLS_INSECURE is provided.|
 | OCIS_EVENTS_ENABLE_TLS<br/>EVENTHISTORY_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | OCIS_PERSISTENT_STORE<br/>EVENTHISTORY_STORE | string | memory | The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
 | OCIS_PERSISTENT_STORE_NODES<br/>EVENTHISTORY_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | EVENTHISTORY_STORE_DATABASE | string | eventhistory | The database name the configured store should use.|
 | EVENTHISTORY_STORE_TABLE | string | events | The database table the store should use.|
-| OCIS_PERSISTENT_STORE_TTL<br/>EVENTHISTORY_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
-| OCIS_PERSISTENT_STORE_SIZE<br/>EVENTHISTORY_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_PERSISTENT_STORE_TTL<br/>EVENTHISTORY_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
+| OCIS_PERSISTENT_STORE_SIZE<br/>EVENTHISTORY_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.|
