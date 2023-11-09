@@ -25,12 +25,12 @@ const (
 	// UnifiedRoleManagerID Unified role manager id.
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 
-	// UnifiedRoleConditionSelf TODO defines constraints
-	UnifiedRoleConditionSelf = "Self: @Subject.objectId == @Resource.objectId"
+	// UnifiedRoleConditionSelf defines constraint where the principal matches the target resource
+	UnifiedRoleConditionSelf = "@Subject.objectId == @Resource.objectId"
 	// UnifiedRoleConditionOwner defines constraints when the principal is the owner of the target resource
-	UnifiedRoleConditionOwner = "Owner: @Subject.objectId Any_of @Resource.owners"
+	UnifiedRoleConditionOwner = "@Subject.objectId Any_of @Resource.owners"
 	// UnifiedRoleConditionGrantee does not exist in MS Graph, but we use it to express permissions on shared resources
-	UnifiedRoleConditionGrantee = "Grantee: @Subject.objectId Any_of @Resource.grantee"
+	UnifiedRoleConditionGrantee = "@Subject.objectId Any_of @Resource.grantee"
 )
 
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
