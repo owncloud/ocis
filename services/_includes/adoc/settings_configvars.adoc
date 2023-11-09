@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-11-55-28]
+[#deprecation-note-2023-11-09-13-08-16]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -195,7 +195,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[*] ++
 a| [subs=-attributes]
-A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_METHODS` +
 `SETTINGS_CORS_ALLOW_METHODS` +
@@ -205,7 +205,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[GET POST PUT PATCH DELETE OPTIONS] ++
 a| [subs=-attributes]
-A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_HEADERS` +
 `SETTINGS_CORS_ALLOW_HEADERS` +
@@ -215,7 +215,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id] ++
 a| [subs=-attributes]
-A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `SETTINGS_CORS_ALLOW_CREDENTIALS` +
@@ -319,7 +319,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DATABASE` +
 

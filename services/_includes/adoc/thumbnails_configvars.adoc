@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-11-55-28]
+[#deprecation-note-2023-11-09-13-08-16]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -203,7 +203,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[16x16 32x32 64x64 128x128 1080x1920 1920x1080 2160x3840 3840x2160 4320x7680 7680x4320] ++
 a| [subs=-attributes]
-The supported target resolutions in the format WidthxHeight e.g. 32x32. You can define any resolution as required and separate multiple resolutions by blank or comma.
+The supported list of target resolutions in the format WidthxHeight like 32x32. You can define any resolution as required. See the Environment Variable Types description for more details.
 
 a|`THUMBNAILS_FILESYSTEMSTORAGE_ROOT` +
 

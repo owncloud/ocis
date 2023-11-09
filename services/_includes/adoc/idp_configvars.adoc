@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-09-11-55-28]
+[#deprecation-note-2023-11-09-13-08-16]
 [caption=]
 .Deprecation notes for the idp service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -365,7 +365,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[~/.ocis/idp/private-key.pem] ++
 a| [subs=-attributes]
-Private key files for signing IDP requests. Separate multiple keys by blank or comma. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
+A list of private key files for signing IDP requests. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp. See the Environment Variable Types description for more details.
 
 a|`IDP_VALIDATION_KEYS_PATH` +
 
@@ -445,7 +445,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `IDP_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-11-09-11-55-28[Deprecation Note]
+xref:deprecation-note-2023-11-09-13-08-16[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

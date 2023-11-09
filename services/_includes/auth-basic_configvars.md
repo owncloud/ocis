@@ -35,7 +35,7 @@
 | OCIS_LDAP_GROUP_FILTER<br/>AUTH_BASIC_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | OCIS_LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | OCIS_LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames').|
-| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES | []string | [uid] | The user object attributes, that can be used for login.|
+| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES | []string | [uid] | A list of user object attributes that can be used for login. See the Environment Variable Types description for more details.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | OCIS_LDAP_DISABLE_USER_MECHANISM<br/>AUTH_BASIC_DISABLE_USER_MECHANISM | string | attribute | An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.|
 | OCIS_LDAP_DISABLED_USERS_GROUP_DN<br/>AUTH_BASIC_DISABLED_USERS_GROUP_DN | string | cn=DisabledUsersGroup,ou=groups,o=libregraph-idm | The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.|
