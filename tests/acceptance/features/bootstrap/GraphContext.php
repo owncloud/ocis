@@ -916,7 +916,7 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string) $response->getStatusCode());
 
-		if ($response->getStatusCode() === 200) {
+		if ($response->getStatusCode() === 201) {
 			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
 			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
 		}
@@ -936,7 +936,7 @@ class GraphContext implements Context {
 	public function userHasCreatedGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$response = $this->createGroup($group, $user);
 
-		if ($response->getStatusCode() === 200) {
+		if ($response->getStatusCode() === 201) {
 			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
 			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
 		} else {
@@ -955,7 +955,7 @@ class GraphContext implements Context {
 	 */
 	public function adminHasCreatedGroupUsingTheGraphApi(string $group): array {
 		$result = $this->createGroup($group);
-		if ($result->getStatusCode() === 200) {
+		if ($result->getStatusCode() === 201) {
 			return $this->featureContext->getJsonDecodedResponse($result);
 		} else {
 			$this->throwHttpException($result, "Could not create group '$group'.");

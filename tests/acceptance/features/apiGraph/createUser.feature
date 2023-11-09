@@ -22,18 +22,18 @@ Feature: create user
     And user "<userName>" <shouldOrNot> exist
     Examples:
       | userName                     | displayName                             | email                   | password                     | code | enable | shouldOrNot |
-      | SameDisplayName              | Alice Hansen                            | new@example.org         | containsCharacters(*:!;_+-&) | 200  | true   | should      |
-      | withoutPassSameEmail         | without pass                            | alice@example.org       |                              | 200  | true   | should      |
-      | name                         | pass with space                         | example@example.org     | my pass                      | 200  | true   | should      |
-      | user1                        | user names must not start with a number | example@example.org     | my pass                      | 200  | true   | should      |
+      | SameDisplayName              | Alice Hansen                            | new@example.org         | containsCharacters(*:!;_+-&) | 201  | true   | should      |
+      | withoutPassSameEmail         | without pass                            | alice@example.org       |                              | 201  | true   | should      |
+      | name                         | pass with space                         | example@example.org     | my pass                      | 201  | true   | should      |
+      | user1                        | user names must not start with a number | example@example.org     | my pass                      | 201  | true   | should      |
       | nameWithCharacters(*:!;_+-&) | user                                    | new@example.org         | 123                          | 400  | true   | should not  |
       | name with space              | name with space                         | example@example.org     | 123                          | 400  | true   | should not  |
-      | createDisabledUser           | disabled user                           | example@example.org     | 123                          | 200  | false  | should      |
-      | nameWithNumbers0123456       | user                                    | name0123456@example.org | 123                          | 200  | true   | should      |
-      | name.with.dots               | user                                    | name.w.dots@example.org | 123                          | 200  | true   | should      |
+      | createDisabledUser           | disabled user                           | example@example.org     | 123                          | 201  | false  | should      |
+      | nameWithNumbers0123456       | user                                    | name0123456@example.org | 123                          | 201  | true   | should      |
+      | name.with.dots               | user                                    | name.w.dots@example.org | 123                          | 201  | true   | should      |
       | 123456789                    | user                                    | 123456789@example.org   | 123                          | 400  | true   | should not  |
       | 0.0                          | user                                    | float@example.org       | 123                          | 400  | true   | should not  |
-      | withoutEmail                 | without email                           |                         | 123                          | 200  | true   | should      |
+      | withoutEmail                 | without email                           |                         | 123                          | 201  | true   | should      |
       | Alice                        | same userName                           | new@example.org         | 123                          | 409  | true   | should      |
 
 
@@ -88,7 +88,7 @@ Feature: create user
       | email          | brian@example.com     |
       | password       | 123                   |
       | accountEnabled | true                  |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And user "Brian" should exist
 
 
@@ -102,7 +102,7 @@ Feature: create user
       | email          | new@example.org |
       | password       | 123             |
       | accountEnabled | true            |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And user "<userName>" should exist
     Examples:
       | userName          | description                                 |
@@ -119,7 +119,7 @@ Feature: create user
       | email          | new@example.org |
       | password       | 123             |
       | accountEnabled | true            |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And user "sam" should exist
     When the administrator retrieves the assigned role of user "sam" using the Graph API
     Then the HTTP status code should be "200"
@@ -135,7 +135,7 @@ Feature: create user
       | email          | new@example.org |
       | password       | 123             |
       | accountEnabled | true            |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And user "sam" should exist
     And user "sam" should have the role "User" assigned
 
@@ -147,6 +147,6 @@ Feature: create user
       | email          | new@example.org |
       | password       | 123             |
       | accountEnabled | true            |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And user "sam" should exist
     And user "sam" should have the role "User" assigned

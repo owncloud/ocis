@@ -10,7 +10,7 @@ Feature: create group
 
   Scenario Outline: admin user creates a group
     When user "Alice" creates a group "<groupname>" using the Graph API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "201"
     And group "<groupname>" should exist
     Examples:
     | groupname       |

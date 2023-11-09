@@ -617,7 +617,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -642,7 +642,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -667,7 +667,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -728,7 +728,7 @@ var _ = Describe("Users", func() {
 				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 				newSvc("none").PostUser(rr, r)
 
-				Expect(rr.Code).To(Equal(http.StatusOK))
+				Expect(rr.Code).To(Equal(http.StatusCreated))
 			})
 		})
 

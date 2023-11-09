@@ -2647,7 +2647,7 @@ trait Provisioning {
 				$displayName,
 			);
 			Assert::assertEquals(
-				200,
+				201,
 				$response->getStatusCode(),
 				__METHOD__ . " cannot create user '$user' using Graph API.\nResponse:" .
 				json_encode($this->getJsonDecodedResponse($response))
