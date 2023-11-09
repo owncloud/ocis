@@ -169,6 +169,19 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
+func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
+	return []*libregraph.UnifiedRoleDefinition{
+		NewViewerUnifiedRole(resharing),
+		NewSpaceViewerUnifiedRole(),
+		NewEditorUnifiedRole(resharing),
+		NewSpaceEditorUnifiedRole(),
+		NewFileEditorUnifiedRole(resharing),
+		NewCoownerUnifiedRole(),
+		NewUploaderUnifiedRole(),
+		NewManagerUnifiedRole(),
+	}
+}
+
 // CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
 // libregraph actions
 func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {

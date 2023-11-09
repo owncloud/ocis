@@ -15,7 +15,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, getRoleDefinitionList(g.config.FilesSharing.EnableResharing))
+	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList(g.config.FilesSharing.EnableResharing))
 }
 
 // GetRoleDefinition a permission role than can be used when sharing with users or groups
@@ -37,21 +37,8 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, role)
 }
 
-func getRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
-	return []*libregraph.UnifiedRoleDefinition{
-		unifiedrole.NewViewerUnifiedRole(resharing),
-		unifiedrole.NewSpaceViewerUnifiedRole(),
-		unifiedrole.NewEditorUnifiedRole(resharing),
-		unifiedrole.NewSpaceEditorUnifiedRole(),
-		unifiedrole.NewFileEditorUnifiedRole(resharing),
-		unifiedrole.NewCoownerUnifiedRole(),
-		unifiedrole.NewUploaderUnifiedRole(),
-		unifiedrole.NewManagerUnifiedRole(),
-	}
-}
-
 func getRoleDefinition(roleID string, resharing bool) (*libregraph.UnifiedRoleDefinition, error) {
-	roleList := getRoleDefinitionList(resharing)
+	roleList := unifiedrole.GetBuiltinRoleDefinitionList(resharing)
 	for _, role := range roleList {
 		if role != nil && role.Id != nil && *role.Id == roleID {
 			return role, nil
