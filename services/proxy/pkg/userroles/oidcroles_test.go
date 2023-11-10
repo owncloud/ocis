@@ -25,3 +25,21 @@ func TestExtractRolesArray(t *testing.T) {
 		t.Fatal("must contain 'b'")
 	}
 }
+
+func TestExtractRolesString(t *testing.T) {
+	byt := []byte(`{"roles":"a"}`)
+
+	claims := map[string]interface{}{}
+	err := json.Unmarshal(byt, &claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	roles, err := extractRoles("roles", claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := roles["a"]; !ok {
+		t.Fatal("must contain 'a'")
+	}
+}
