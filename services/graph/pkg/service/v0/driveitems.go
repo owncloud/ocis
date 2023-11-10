@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -39,6 +41,111 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
+
+// From https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
+// CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
+// An upload session allows your app to upload ranges of the file in sequential API requests, which allows the
+// transfer to be resumed if a connection is dropped while the upload is in progress.
+// ```json
+//
+//	{
+//	  "@microsoft.graph.conflictBehavior": "fail (default) | replace | rename",
+//	  "description": "description",
+//	  "fileSize": 1234,
+//	  "name": "filename.txt"
+//	}
+//
+// ```
+func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling CreateUploadSession")
+
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	driveItemID, err := parseIDParam(r, "driveItemID")
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
+		return
+	}
+
+	var cusr createUploadSessionRequest
+	err = json.NewDecoder(r.Body).Decode(&cusr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
+
+	ref := &storageprovider.Reference{
+		ResourceId: &driveItemID,
+	}
+	if cusr.Item.Name != "" {
+		ref.Path = utils.MakeRelativePath(cusr.Item.Name)
+	}
+	// TODO size?
+
+	ctx := r.Context()
+	res, err := gatewayClient.InitiateFileUpload(ctx, &storageprovider.InitiateFileUploadRequest{Ref: ref})
+	switch {
+	case err != nil:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_OK:
+		// ok
+	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+		return
+	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+		return
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+	uploadSession := uploadSession{
+		CS3Protocols: res.Protocols,
+	}
+	for _, p := range res.Protocols {
+		if p.Protocol == "simple" {
+			uploadSession.UploadUrl = p.UploadEndpoint + "/" + p.Token
+		}
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &uploadSession)
+}
+
+type createUploadSessionRequest struct {
+	DeferCommit bool
+	Item        driveItemUploadableProperties
+}
+type driveItemUploadableProperties struct {
+	// ConflictBehavior "@microsoft.graph.conflictBehavior"
+	//Description string
+	FileSize int64
+	// fileSystemInfo
+	Name string
+}
+type uploadSession struct {
+	UploadUrl string
+	//"expirationDateTime": "2015-01-29T09:21:55.523Z",
+	//"nextExpectedRanges": ["0-"]
+	CS3Protocols []*gateway.FileUploadProtocol
+}
 
 // GetRootDriveChildren implements the Service interface.
 func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
