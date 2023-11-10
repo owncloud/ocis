@@ -115,6 +115,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"gatewaysvc":      cfg.Reva.Address,
 					"provider_domain": cfg.Commons.OcisURL,
 					"webdav_endpoint": cfg.Commons.OcisURL,
+					"webapp_template": cfg.OCMShareProvider.WebappTemplate,
 					"client_insecure": cfg.OCMShareProvider.Insecure,
 				},
 				"ocmcore": map[string]interface{}{
