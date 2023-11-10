@@ -29,6 +29,25 @@ func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 	}
 }
 
+func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]struct{}, error) {
+	claimRolesRaw, ok := claims[rolesClaim].([]interface{})
+	if !ok {
+		return nil, errors.New("no roles in user claims")
+	}
+
+	claimRoles := map[string]struct{}{}
+	for _, cri := range claimRolesRaw {
+		cr, ok := cri.(string)
+		if !ok {
+			err := errors.New("invalid role in claims")
+			return nil, err
+		}
+
+		claimRoles[cr] = struct{}{}
+	}
+	return claimRoles, nil
+}
+
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3.User, claims map[string]interface{}) (*cs3.User, error) {
@@ -39,23 +58,10 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 
-	claimRolesRaw, ok := claims[ra.rolesClaim].([]interface{})
-	if !ok {
-		logger.Error().Str("rolesClaim", ra.rolesClaim).Msg("No roles in user claims")
-		return nil, errors.New("no roles in user claims")
-	}
-
-	logger.Debug().Str("rolesClaim", ra.rolesClaim).Interface("rolesInClaim", claims[ra.rolesClaim]).Msg("got roles in claim")
-	claimRoles := map[string]struct{}{}
-	for _, cri := range claimRolesRaw {
-		cr, ok := cri.(string)
-		if !ok {
-			err := errors.New("invalid role in claims")
-			logger.Error().Err(err).Interface("claimValue", cri).Msg("Is not a valid string.")
-			return nil, err
-		}
-
-		claimRoles[cr] = struct{}{}
+	claimRoles, err := extractRoles(ra.rolesClaim, claims)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error mapping role names to role ids")
+		return nil, err
 	}
 
 	if len(claimRoles) == 0 {
