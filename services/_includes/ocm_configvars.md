@@ -16,10 +16,10 @@
 | OCM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCM_HTTP_ADDR | string | 127.0.0.1:9280 | The bind address of the HTTP service.|
 | OCM_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
-| OCM_HTTP_PREFIX | string |  | The Path prefix where the OCM can be accessed (defaults to /).|
-| OCIS_CORS_ALLOW_ORIGINS<br/>OCM_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
-| OCIS_CORS_ALLOW_METHODS<br/>OCM_CORS_ALLOW_METHODS | []string | [OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
-| OCIS_CORS_ALLOW_HEADERS<br/>OCM_CORS_ALLOW_HEADERS | []string | [Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] | A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCM_HTTP_PREFIX | string |  | The path prefix where OCM can be accessed (defaults to /).|
+| OCIS_CORS_ALLOW_ORIGINS<br/>OCM_CORS_ALLOW_ORIGINS | []string | [*] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
+| OCIS_CORS_ALLOW_METHODS<br/>OCM_CORS_ALLOW_METHODS | []string | [OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] | A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.|
+| OCIS_CORS_ALLOW_HEADERS<br/>OCM_CORS_ALLOW_HEADERS | []string | [Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] | A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>OCM_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCM_GRPC_ADDR | string | 127.0.0.1:9282 | The bind address of the GRPC service.|
 | OCM_GRPC_PROTOCOL | string |  | The transport protocol of the GRPC service.|
@@ -29,14 +29,14 @@
 | OCM_OCMD_PREFIX | string | ocm | URL path prefix for the OCMD service. Note that the string must not start with '/'.|
 | OCM_OCMD_EXPOSE_RECIPIENT_DISPLAY_NAME | bool | false | Expose the display name of OCM share recipients.|
 | OCM_SCIENCEMESH_PREFIX | string | sciencemesh | URL path prefix for the ScienceMesh service. Note that the string must not start with '/'.|
-| OCM_OCM_INVITE_MANAGER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported values 'json'.|
-| OCM_OCM_INVITE_MANAGER_JSON_FILE | string | ~/.ocis/storage/ocminvites.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_INVITE_MANAGER_DRIVER | string | json | Driver to be used to persist OCM invites. Supported value is only 'json'.|
+| OCM_OCM_INVITE_MANAGER_JSON_FILE | string | ~/.ocis/storage/ocminvites.json | Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
 | OCM_OCM_INVITE_MANAGER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
-| SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported values 'json'.|
-| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | ~/.ocis/storage/ocmproviders.json | Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported value is only 'json'.|
+| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | ~/.ocis/storage/ocmproviders.json | Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
 | OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME | bool | false | Verify the hostname of the incoming request against the hostname of the OCM provider.|
-| OCM_OCM_SHARE_PROVIDER_DRIVER | string | json | Driver to be used for the ocm share provider. Supported values 'json'.|
-| OCM_OCM_SHAREPROVIDER_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_SHARE_PROVIDER_DRIVER | string | json | Driver to be used for the OCM share provider. Supported value is only 'json'.|
+| OCM_OCM_SHAREPROVIDER_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
 | OCM_OCM_SHARE_PROVIDER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
-| OCM_OCM_CORE_DRIVER | string | json | Driver to be used for the ocm core. Supported values 'json'.|
-| OCM_OCM_CORE_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_CORE_DRIVER | string | json | Driver to be used for the OCM core. Supported value is only 'json'.|
+| OCM_OCM_CORE_JSON_FILE | string | ~/.ocis/storage/ocmshares.json | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|

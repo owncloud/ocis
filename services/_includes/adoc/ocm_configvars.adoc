@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-10-00-37-47]
+[#deprecation-note-2023-11-10-15-06-46]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The Path prefix where the OCM can be accessed (defaults to /).
+The path prefix where OCM can be accessed (defaults to /).
 
 a|`OCIS_CORS_ALLOW_ORIGINS` +
 `OCM_CORS_ALLOW_ORIGINS` +
@@ -177,7 +177,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[*] ++
 a| [subs=-attributes]
-A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_METHODS` +
 `OCM_CORS_ALLOW_METHODS` +
@@ -187,7 +187,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 a| [subs=-attributes]
-A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_HEADERS` +
 `OCM_CORS_ALLOW_HEADERS` +
@@ -197,7 +197,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 a| [subs=-attributes]
-A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
 
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `OCM_CORS_ALLOW_CREDENTIALS` +
@@ -288,7 +288,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++json ++
 a| [subs=-attributes]
-Driver to be used to persist ocm invites. Supported values 'json'.
+Driver to be used to persist OCM invites. Supported value is only 'json'.
 
 a|`OCM_OCM_INVITE_MANAGER_JSON_FILE` +
 
@@ -297,7 +297,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/ocminvites.json ++
 a| [subs=-attributes]
-Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`OCM_OCM_INVITE_MANAGER_INSECURE` +
 
@@ -315,7 +315,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++json ++
 a| [subs=-attributes]
-Driver to be used to persist ocm invites. Supported values 'json'.
+Driver to be used to persist ocm invites. Supported value is only 'json'.
 
 a|`OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 
@@ -324,7 +324,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/ocmproviders.json ++
 a| [subs=-attributes]
-Path to the JSON file where ocm invites data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME` +
 
@@ -342,7 +342,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++json ++
 a| [subs=-attributes]
-Driver to be used for the ocm share provider. Supported values 'json'.
+Driver to be used for the OCM share provider. Supported value is only 'json'.
 
 a|`OCM_OCM_SHAREPROVIDER_JSON_FILE` +
 
@@ -351,7 +351,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/ocmshares.json ++
 a| [subs=-attributes]
-Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`OCM_OCM_SHARE_PROVIDER_INSECURE` +
 
@@ -369,7 +369,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++json ++
 a| [subs=-attributes]
-Driver to be used for the ocm core. Supported values 'json'.
+Driver to be used for the OCM core. Supported value is only 'json'.
 
 a|`OCM_OCM_CORE_JSON_FILE` +
 
@@ -378,6 +378,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/ocmshares.json ++
 a| [subs=-attributes]
-Path to the JSON file where ocm share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 |===
 
