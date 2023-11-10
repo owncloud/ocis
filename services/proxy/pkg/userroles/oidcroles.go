@@ -3,12 +3,14 @@ package userroles
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4/metadata"
 )
@@ -30,21 +32,54 @@ func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 }
 
 func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]struct{}, error) {
-	claimRolesRaw, ok := claims[rolesClaim].([]interface{})
-	if !ok {
-		return nil, errors.New("no roles in user claims")
-	}
 
 	claimRoles := map[string]struct{}{}
-	for _, cri := range claimRolesRaw {
-		cr, ok := cri.(string)
-		if !ok {
-			err := errors.New("invalid role in claims")
-			return nil, err
-		}
-
-		claimRoles[cr] = struct{}{}
+	// happy path
+	value, _ := claims[rolesClaim].(string)
+	if value != "" {
+		claimRoles[value] = struct{}{}
+		return claimRoles, nil
 	}
+
+	// try splitting path at .
+	segments := oidc.SplitWithEscaping(rolesClaim, ".", "\\")
+
+	subclaims := claims
+	lastSegment := len(segments) - 1
+	for i := range segments {
+		if i < lastSegment {
+			if castedClaims, ok := subclaims[segments[i]].(map[string]interface{}); ok {
+				subclaims = castedClaims
+			} else if castedClaims, ok := subclaims[segments[i]].(map[interface{}]interface{}); ok {
+				subclaims = make(map[string]interface{}, len(castedClaims))
+				for k, v := range castedClaims {
+					if s, ok := k.(string); ok {
+						subclaims[s] = v
+					} else {
+						return nil, fmt.Errorf("could not walk claims path, key '%v' is not a string", k)
+					}
+				}
+			}
+		} else {
+			switch v := subclaims[segments[i]].(type) {
+			case []interface{}:
+				for _, cri := range v {
+					cr, ok := cri.(string)
+					if !ok {
+						err := errors.New("invalid role in claims")
+						return nil, err
+					}
+
+					claimRoles[cr] = struct{}{}
+				}
+			case string:
+				claimRoles[v] = struct{}{}
+			default:
+				return nil, errors.New("no roles in user claims")
+			}
+		}
+	}
+
 	return claimRoles, nil
 }
 

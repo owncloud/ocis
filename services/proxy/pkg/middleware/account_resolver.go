@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
@@ -43,19 +42,6 @@ type accountResolver struct {
 	userCS3Claim          string
 }
 
-// from https://codereview.stackexchange.com/a/280193
-func splitWithEscaping(s string, separator string, escapeString string) []string {
-	a := strings.Split(s, separator)
-
-	for i := len(a) - 2; i >= 0; i-- {
-		if strings.HasSuffix(a[i], escapeString) {
-			a[i] = a[i][:len(a[i])-len(escapeString)] + separator + a[i+1]
-			a = append(a[:i+1], a[i+2:]...)
-		}
-	}
-	return a
-}
-
 func readUserIDClaim(path string, claims map[string]interface{}) (string, error) {
 	// happy path
 	value, _ := claims[path].(string)
@@ -64,7 +50,7 @@ func readUserIDClaim(path string, claims map[string]interface{}) (string, error)
 	}
 
 	// try splitting path at .
-	segments := splitWithEscaping(path, ".", "\\")
+	segments := oidc.SplitWithEscaping(path, ".", "\\")
 	subclaims := claims
 	lastSegment := len(segments) - 1
 	for i := range segments {
