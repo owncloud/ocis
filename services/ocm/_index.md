@@ -1,6 +1,6 @@
 ---
 title: OCM
-date: 2023-11-13T00:33:56.149790983Z
+date: 2023-11-13T09:06:39.852839472Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocm
@@ -48,7 +48,7 @@ Example `providers.json` file:
         "full_name": "Example provider",
         "organization": "Owncloud",
         "domain": "example.com",
-        "homepage": "https://example.com.com",
+        "homepage": "https://example.com",
         "services": [
             {
                 "endpoint": {
