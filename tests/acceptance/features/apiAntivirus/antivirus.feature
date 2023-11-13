@@ -14,11 +14,11 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And as "Alice" file "/normalfile.txt" should exist
     And the content of file "/normalfile.txt" for user "Alice" should be:
-    """
-    This is a testfile.
+      """
+      This is a testfile.
 
-    Cheers.
-    """
+      Cheers.
+      """
     Examples:
       | dav-path-version |
       | old              |
@@ -55,11 +55,11 @@ Feature: antivirus
     And as "Alice" file "/aFileWithVirus.txt" should not exist
     But as "Alice" file "/normalfile.txt" should exist
     And the content of file "/normalfile.txt" for user "Alice" should be:
-    """
-    This is a testfile.
+      """
+      This is a testfile.
 
-    Cheers.
-    """
+      Cheers.
+      """
     Examples:
       | dav-path-version |
       | old              |
@@ -94,6 +94,7 @@ Feature: antivirus
       | name        | sharedlink               |
       | permissions | change                   |
       | expireDate  | 2040-01-01T23:59:59+0100 |
+      | password    | %public%                 |
     When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
@@ -119,6 +120,7 @@ Feature: antivirus
       | permissions | change                   |
       | password    | newpasswd                |
       | expireDate  | 2040-01-01T23:59:59+0100 |
+      | password    | %public%                 |
     When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
@@ -345,9 +347,10 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-
+  @env-config
   Scenario Outline: try to overwrite a file with the virus content in a public link share
-    Given using <dav-path-version> DAV path
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "hello" to "test.txt"
     And user "Alice" has created a public link share with settings
       | path        | /test.txt  |

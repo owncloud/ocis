@@ -57,13 +57,13 @@ Feature: Share a file or folder that is inside a space via public link
     Examples:
       | entity          | file_target | permissions | password | name | expireDate               | item_type | mimetype             |
       | folder          | /folder     | 0           |          | link |                          | folder    | httpd/unix-directory |
-      | folder          | /folder     | 1           | 123      | link | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
-      | folder          | /folder     | 4           |          |      |                          | folder    | httpd/unix-directory |
-      | folder          | /folder     | 5           | 200      |      | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
-      | folder          | /folder     | 15          |          | link |                          | folder    | httpd/unix-directory |
-      | folder/file.txt | /file.txt   | 0           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
-      | folder/file.txt | /file.txt   | 1           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
-      | folder/file.txt | /file.txt   | 3           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
+      | folder          | /folder     | 1           | %public% | link | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
+      | folder          | /folder     | 4           | %public% |      |                          | folder    | httpd/unix-directory |
+      | folder          | /folder     | 5           | %public% |      | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
+      | folder          | /folder     | 15          | %public% | link |                          | folder    | httpd/unix-directory |
+      | folder/file.txt | /file.txt   | 0           |          | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
+      | folder/file.txt | /file.txt   | 1           | %public% | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
+      | folder/file.txt | /file.txt   | 3           | %public% | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
 
   @issue-5139
   Scenario Outline: user participant of the project space with space manager role can share an entity inside project space via public link
@@ -74,7 +74,7 @@ Feature: Share a file or folder that is inside a space via public link
       | path        | <entity>                 |
       | shareType   | 3                        |
       | permissions | 1                        |
-      | password    | 123                      |
+      | password    | %public%                 |
       | name        | public link              |
       | expireDate  | 2042-03-25T23:59:59+0100 |
     Then the HTTP status code should be "200"
@@ -104,7 +104,7 @@ Feature: Share a file or folder that is inside a space via public link
       | path        | <entity>                 |
       | shareType   | 3                        |
       | permissions | 1                        |
-      | password    | 123                      |
+      | password    | %public%                 |
       | name        | public link              |
       | expireDate  | 2042-03-25T23:59:59+0100 |
     Then the HTTP status code should be "403"
@@ -124,6 +124,7 @@ Feature: Share a file or folder that is inside a space via public link
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | file.txt    |
       | permissions | read,update |
+      | password    | %public%    |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
@@ -137,8 +138,8 @@ Feature: Share a file or folder that is inside a space via public link
       | displayname_owner      | %displayname% |
       | uid_file_owner         | %username%    |
       | uid_owner              | %username%    |
-    And the public should be able to download the last publicly shared file using the new public WebDAV API without a password and the content should be "Random data"
-    And the public upload to the last publicly shared file using the new public WebDAV API should pass with HTTP status code "204"
+    And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
+    And the public upload to the last publicly shared file using the new public WebDAV API with password "%public%" should pass with HTTP status code "204"
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -153,6 +154,7 @@ Feature: Share a file or folder that is inside a space via public link
       | path        | folder/file.txt |
       | shareType   | 3               |
       | permissions | 1               |
+      | password    | %public%        |
     Then the fields of the last response to user "Alice" and space "share sub-item" should include
       | item_type              | file             |
       | mimetype               | text/plain       |

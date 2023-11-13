@@ -12,7 +12,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs_status_code>"
@@ -52,7 +53,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has updated the last public link share with
       | expireDate | 2033-01-31T23:59:59+0100 |
     When user "Alice" gets the info of the last public link share using the sharing API
@@ -122,7 +124,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has updated the last public link share with
       | password | %public% |
     When user "Alice" gets the info of the last public link share using the sharing API
@@ -154,7 +157,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
     When user "Alice" gets the info of the last public link share using the sharing API
@@ -186,7 +190,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
     When user "Alice" gets the info of the last public link share using the sharing API
@@ -218,7 +223,8 @@ Feature: update a public link share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has updated the last public link share with
       | publicUpload | true |
     When user "Alice" gets the info of the last public link share using the sharing API
@@ -254,6 +260,7 @@ Feature: update a public link share
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test |
       | publicUpload | false        |
+      | password     | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | publicUpload | true |
     Then the OCS status code should be "403"
@@ -274,12 +281,13 @@ Feature: update a public link share
     And user "Brian" has created a public link share with settings
       | path         | /Shares/test |
       | publicUpload | false        |
+      | password     | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | publicUpload | true |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And uploading a file should work using the old public WebDAV API
-    And uploading a file should work using the new public WebDAV API
+    And uploading a file with password "%public%" should work using the old public WebDAV API
+    And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -294,6 +302,7 @@ Feature: update a public link share
     And user "Brian" has created a public link share with settings
       | path        | /Shares/test |
       | permissions | read         |
+      | password    | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | read,update,create,delete |
     Then the OCS status code should be "403"
@@ -314,12 +323,12 @@ Feature: update a public link share
     And user "Brian" has created a public link share with settings
       | path        | /Shares/test |
       | permissions | read         |
+      | password    | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | read,update,create,delete |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And uploading a file should work using the old public WebDAV API
-    And uploading a file should work using the new public WebDAV API
+    And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -334,10 +343,10 @@ Feature: update a public link share
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
       | permissions | read,update,create,delete |
+      | password    | %public%                  |
     And user "Alice" has updated the last public link share with
       | permissions | read |
-    When the public deletes file "CHILD/child.txt" from the last public link share using the old public WebDAV API
-    And the public deletes file "CHILD/child.txt" from the last public link share using the new public WebDAV API
+    And the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
     And the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
     Examples:
@@ -353,12 +362,13 @@ Feature: update a public link share
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/parent.txt"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/CHILD/child.txt"
     And user "Alice" has created a public link share with settings
-      | path        | /PARENT |
-      | permissions | read    |
+      | path        | /PARENT  |
+      | permissions | read     |
+      | password    | %public% |
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
-    When the public deletes file "CHILD/child.txt" from the last public link share using the new public WebDAV API
-    And the public deletes file "parent.txt" from the last public link share using the new public WebDAV API
+    When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    And the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
     And as "Alice" file "PARENT/CHILD/child.txt" should not exist
     And as "Alice" file "PARENT/parent.txt" should not exist
@@ -373,7 +383,8 @@ Feature: update a public link share
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path | FOLDER |
+      | path     | FOLDER   |
+      | password | %public% |
     And user "Alice" has moved folder "/FOLDER" to "/RENAMED_FOLDER"
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
@@ -419,7 +430,8 @@ Feature: update a public link share
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
     And user "Alice" has created a public link share with settings
-      | path | lorem.txt |
+      | path     | lorem.txt |
+      | password | %public%  |
     And user "Alice" has moved file "/lorem.txt" to "/new-lorem.txt"
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
@@ -467,6 +479,7 @@ Feature: update a public link share
     And user "Alice" has created a public link share with settings
       | path        | /textfile.txt |
       | permissions | read          |
+      | password    | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 0 |
     Then the OCS status code should be "<ocs_status_code>"

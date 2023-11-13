@@ -713,8 +713,9 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created a public link share with settings
-      | path | /folderMain |
-      | name | sharedlink  |
+      | path     | /folderMain |
+      | name     | sharedlink  |
+      | password | %public%    |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
@@ -751,7 +752,7 @@ Feature: user GDPR (General Data Protection Regulation) report
             },
             "PasswordProtected": {
               "type": "boolean",
-              "enum": [false]
+              "enum": [true]
             },
             "Permissions": {
               "type": "object",

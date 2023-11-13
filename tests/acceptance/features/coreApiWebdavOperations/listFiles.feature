@@ -124,9 +124,10 @@ Feature: list files
       | dav-path-version |
       | spaces           |
 
-
+  @env-config
   Scenario: get the list of resources in a folder shared through public link with depth 0
     Given using new DAV path
+    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
@@ -150,6 +151,7 @@ Feature: list files
 
   Scenario: get the list of resources in a folder shared through public link with depth 1
     Given using new DAV path
+    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |

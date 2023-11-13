@@ -224,8 +224,9 @@ Feature: get file properties
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/test"
     And user "Alice" has created a public link share with settings
-      | path        | test |
-      | permissions | all  |
+      | path        | test     |
+      | permissions | all      |
+      | password    | %public% |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |
@@ -259,8 +260,9 @@ Feature: get file properties
       | permissions | all   |
       | shareWith   | grp1  |
     And user "Alice" has created a public link share with settings
-      | path        | test |
-      | permissions | all  |
+      | path        | test     |
+      | permissions | all      |
+      | password    | %public% |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |

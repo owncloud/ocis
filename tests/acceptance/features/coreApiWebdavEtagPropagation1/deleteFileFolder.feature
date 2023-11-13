@@ -208,11 +208,12 @@ Feature: propagation of etags when deleting a file or folder
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | change |
+      | path        | upload   |
+      | permissions | change   |
+      | password    | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public deletes file "file.txt" from the last public link share using the new public WebDAV API
+    When the public deletes file "file.txt" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code should be "204"
     And these etags should have changed:
       | user  | path    |
@@ -233,11 +234,12 @@ Feature: propagation of etags when deleting a file or folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | change |
+      | path        | upload   |
+      | permissions | change   |
+      | password    | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public deletes folder "sub" from the last public link share using the new public WebDAV API
+    When the public deletes folder "sub" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code should be "204"
     And these etags should have changed:
       | user  | path    |

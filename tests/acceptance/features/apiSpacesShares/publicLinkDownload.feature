@@ -12,9 +12,10 @@ Feature: Public can download folders from project space public link
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
 
-
+  @env-config
   Scenario: download a folder from public link of a space
-    Given user "Alice" has created a folder "NewFolder" in space "new-space"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/test.txt"
     And user "Alice" has created a public link share of the space "new-space" with settings:
       | permissions | 1        |
@@ -25,9 +26,10 @@ Feature: Public can download folders from project space public link
       | name               | content      |
       | NewFolder/test.txt | some content |
 
-  @issue-5229
+  @env-config @issue-5229
   Scenario: download a folder from public link of a folder inside a space
-    Given user "Alice" has created a folder "NewFolder" in space "new-space"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has created a folder "NewFolder/folder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/folder/test.txt"
     And user "Alice" has created a public link share inside of space "new-space" with settings:

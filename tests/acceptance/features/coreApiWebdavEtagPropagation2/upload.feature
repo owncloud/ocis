@@ -154,11 +154,12 @@ Feature: propagation of etags when uploading data
   Scenario Outline: uploading a file into a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | create |
+      | path        | upload   |
+      | permissions | create   |
+      | password    | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public uploads file "file.txt" with content "new content" using the new public WebDAV API
+    When the public uploads file "file.txt" with password "%public%" and content "new content" using the new public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path    |
