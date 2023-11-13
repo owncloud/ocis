@@ -368,7 +368,7 @@ func (upload *Upload) Finalize() (err error) {
 	err = upload.tp.WriteBlob(n, upload.binPath)
 	subspan.End()
 	if err != nil {
-		return errors.Wrap(err, "failed to upload file to blostore")
+		return errors.Wrap(err, "failed to upload file to blobstore")
 	}
 
 	return nil

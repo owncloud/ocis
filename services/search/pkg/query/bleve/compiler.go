@@ -6,24 +6,23 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
-
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 var _fields = map[string]string{
-	"rootid":   "RootID",
-	"path":     "Path",
-	"id":       "ID",
-	"name":     "Name",
-	"size":     "Size",
-	"mtime":    "Mtime",
-	"mimetype": "MimeType",
-	"type":     "Type",
-	"tag":      "Tags",
-	"tags":     "Tags",
-	"content":  "Content",
-	"hidden":   "Hidden",
+	"rootid":    "RootID",
+	"path":      "Path",
+	"id":        "ID",
+	"name":      "Name",
+	"size":      "Size",
+	"mtime":     "Mtime",
+	"mediatype": "MimeType",
+	"type":      "Type",
+	"tag":       "Tags",
+	"tags":      "Tags",
+	"content":   "Content",
+	"hidden":    "Hidden",
 }
 
 // The following quoted string enumerates the characters which may be escaped: "+-=&|><!(){}[]^\"~*?:\\/ "
@@ -95,7 +94,18 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				v = strings.ToLower(v)
 			}
 
-			q := bleveQuery.NewQueryStringQuery(k + ":" + v)
+			var q bleveQuery.Query
+			var group bool
+			switch k {
+			case "MimeType":
+				q, group = mimeType(k, v)
+				if prev == nil {
+					isGroup = group
+				}
+			default:
+				q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+			}
+
 			if prev == nil {
 				prev = q
 			} else {
@@ -210,35 +220,44 @@ func nextNode(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 }
 
 func mapBinary(operator *ast.OperatorNode, ln, rn bleveQuery.Query, leftIsGroup bool) bleveQuery.Query {
-	if operator.Value == kql.BoolAND {
-		if left, ok := ln.(*bleveQuery.ConjunctionQuery); ok {
-			left.AddQuery(rn)
-			return left
-		}
-		if left, ok := ln.(*bleveQuery.DisjunctionQuery); ok && !leftIsGroup {
-			last := left.Disjuncts[len(left.Disjuncts)-1]
-			rn = bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
-				last,
-				rn,
-			})
-			dj := bleveQuery.NewDisjunctionQuery(left.Disjuncts[:len(left.Disjuncts)-1])
-			dj.AddQuery(rn)
-			return dj
-		}
-		return bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
-			ln,
-			rn,
-		})
-	}
 	if operator.Value == kql.BoolOR {
-		if left, ok := ln.(*bleveQuery.DisjunctionQuery); ok {
+		right, ok := rn.(*bleveQuery.DisjunctionQuery)
+		switch left := ln.(type) {
+		case *bleveQuery.DisjunctionQuery:
+			if ok {
+				left.AddQuery(right.Disjuncts...)
+			} else {
+				left.AddQuery(rn)
+			}
+			return left
+		case *bleveQuery.ConjunctionQuery:
+			return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln, rn})
+		default:
+			if ok {
+				left := bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln})
+				left.AddQuery(right.Disjuncts...)
+				return left
+			}
+			return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln, rn})
+		}
+	}
+	if operator.Value == kql.BoolAND {
+		switch left := ln.(type) {
+		case *bleveQuery.ConjunctionQuery:
 			left.AddQuery(rn)
 			return left
+		case *bleveQuery.DisjunctionQuery:
+			if !leftIsGroup {
+				last := left.Disjuncts[len(left.Disjuncts)-1]
+				rn = bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
+					last,
+					rn,
+				})
+				dj := bleveQuery.NewDisjunctionQuery(left.Disjuncts[:len(left.Disjuncts)-1])
+				dj.AddQuery(rn)
+				return dj
+			}
 		}
-		return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{
-			ln,
-			rn,
-		})
 	}
 	return bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
 		ln,
@@ -263,4 +282,70 @@ func normalizeGroupingProperty(group *ast.GroupNode) *ast.GroupNode {
 		}
 	}
 	return group
+}
+
+func mimeType(k, v string) (bleveQuery.Query, bool) {
+	switch v {
+	case "file":
+		q := bleve.NewBooleanQuery()
+		q.AddMustNot(bleveQuery.NewQueryStringQuery(k + ":httpd/unix-directory"))
+		return q, false
+	case "folder":
+		return bleveQuery.NewQueryStringQuery(k + ":httpd/unix-directory"), false
+	case "document":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/msword",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			"application/vnd.oasis.opendocument.text",
+			"text/plain",
+			"text/markdown",
+			"application/rtf",
+			"application/vnd.apple.pages",
+		)), true
+	case "spreadsheet":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/vnd.ms-excel",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"text/csv",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			"application/vnd.oasis.opendocument.spreadsheet",
+			"application/vnd.apple.numbers",
+		)), true
+	case "presentation":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			"application/vnd.oasis.opendocument.presentation",
+			"application/vnd.ms-powerpoint",
+			"application/vnd.apple.keynote",
+		)), true
+	case "pdf":
+		return bleveQuery.NewQueryStringQuery(k + ":application/pdf"), false
+	case "image":
+		return bleveQuery.NewQueryStringQuery(k + ":image/*"), false
+	case "video":
+		return bleveQuery.NewQueryStringQuery(k + ":video/*"), false
+	case "audio":
+		return bleveQuery.NewQueryStringQuery(k + ":audio/*"), false
+	case "archive":
+		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
+			"application/zip",
+			"application/x-tar",
+			"application/x-gzip",
+			"application/x-7z-compressed",
+			"application/x-rar-compressed",
+			"application/x-bzip2",
+			"application/x-bzip",
+			"application/x-tgz",
+		)), true
+	default:
+		return bleveQuery.NewQueryStringQuery(k + ":" + v), false
+	}
+}
+
+func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {
+	list := make([]bleveQuery.Query, len(v))
+	for i := 0; i < len(v); i++ {
+		list[i] = bleveQuery.NewQueryStringQuery(k + ":" + v[i])
+	}
+	return list
 }
