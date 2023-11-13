@@ -329,7 +329,6 @@ Feature: update a public link share
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And uploading a file with password "%public%" should work using the new public WebDAV API
-    And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
