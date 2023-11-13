@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-13-17-06-20]
+[#deprecation-note-2023-11-13-22-45-09]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -570,7 +570,7 @@ a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++false ++
+++true ++
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords on all public shares.
 
@@ -714,7 +714,7 @@ a|`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++8 ++
 a| [subs=-attributes]
 Define the minimum password length. Defaults to 0 if not set.
 
@@ -723,7 +723,7 @@ a|`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++1 ++
 a| [subs=-attributes]
 Define the minimum number of uppercase letters. Defaults to 0 if not set.
 
@@ -732,7 +732,7 @@ a|`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++1 ++
 a| [subs=-attributes]
 Define the minimum number of lowercase letters. Defaults to 0 if not set.
 
@@ -741,7 +741,7 @@ a|`FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++1 ++
 a| [subs=-attributes]
 Define the minimum number of digits. Defaults to 0 if not set.
 
@@ -750,7 +750,7 @@ a|`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++1 ++
 a| [subs=-attributes]
 Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.
 

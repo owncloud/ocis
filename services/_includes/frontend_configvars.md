@@ -59,7 +59,7 @@
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|
-| OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on all public shares.|
+| OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | A list of checksum types that indicate to clients which hashes the server can use to verify upload integrity. Supported types are 'sha1', 'md5' and 'adler32'. See the Environment Variable Types description for more details.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE | string | sha1 | The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.|
@@ -74,9 +74,9 @@
 | FRONTEND_AUTO_ACCEPT_SHARES | bool | true | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>FRONTEND_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>FRONTEND_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 0 | Define the minimum password length. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 0 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 0 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 0 | Define the minimum number of digits. Defaults to 0 if not set.|
-| FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 0 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 0 if not set.|
+| FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
 | FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|

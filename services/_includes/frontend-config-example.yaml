@@ -107,7 +107,7 @@ ocs:
   stat_cache_size: 0
   enable_denials: false
   list_ocm_shares: true
-  public_sharing_share_must_have_password: false
+  public_sharing_share_must_have_password: true
   public_sharing_writeableshare_must_have_password: false
 checksums:
   supported_types:
@@ -133,8 +133,9 @@ service_account:
   service_account_id: ""
   service_account_secret: ""
 password_policy:
-  min_lowercase_characters: 0
-  min_uppercase_characters: 0
-  min_digits: 0
-  min_special_characters: 0
+  min_characters: 8
+  min_lowercase_characters: 1
+  min_uppercase_characters: 1
+  min_digits: 1
+  min_special_characters: 1
   banned_passwords_list: ""
