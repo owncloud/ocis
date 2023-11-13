@@ -37,6 +37,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
+* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 
 ## Details
 
@@ -57,6 +58,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7683
    https://github.com/owncloud/ocis/pull/7239
    https://github.com/owncloud/libre-graph-api/pull/112
+
+* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
+
+   Adds new permissions to admin/spaceadmin/user roles - Favorites.List allows / denies the
+   Favorites Listing Request - Favorites.Write is implemented to be enforced on marking/unmark
+   files as favouritesShare - Shares.Write permission denies / allows sharing completely for a
+   user on all share CUD requests. (User, Group)
+
+   https://github.com/owncloud/ocis/pull/7700
 
 # Changelog for [5.0.0] (2023-11-08)
 
