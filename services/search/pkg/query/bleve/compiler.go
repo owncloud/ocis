@@ -220,47 +220,44 @@ func nextNode(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 }
 
 func mapBinary(operator *ast.OperatorNode, ln, rn bleveQuery.Query, leftIsGroup bool) bleveQuery.Query {
-	if operator.Value == kql.BoolAND {
-		if left, ok := ln.(*bleveQuery.ConjunctionQuery); ok {
-			left.AddQuery(rn)
-			return left
-		}
-		if left, ok := ln.(*bleveQuery.DisjunctionQuery); ok && !leftIsGroup {
-			last := left.Disjuncts[len(left.Disjuncts)-1]
-			rn = bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
-				last,
-				rn,
-			})
-			dj := bleveQuery.NewDisjunctionQuery(left.Disjuncts[:len(left.Disjuncts)-1])
-			dj.AddQuery(rn)
-			return dj
-		}
-		return bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
-			ln,
-			rn,
-		})
-	}
 	if operator.Value == kql.BoolOR {
-		if left, ok := ln.(*bleveQuery.DisjunctionQuery); ok {
-			// if both are DisjunctionQuery then merge
-			if right, ok := rn.(*bleveQuery.DisjunctionQuery); ok {
+		right, ok := rn.(*bleveQuery.DisjunctionQuery)
+		switch left := ln.(type) {
+		case *bleveQuery.DisjunctionQuery:
+			if ok {
 				left.AddQuery(right.Disjuncts...)
-				return left
+			} else {
+				left.AddQuery(rn)
 			}
-			left.AddQuery(rn)
 			return left
-		}
-		if _, ok := ln.(*bleveQuery.ConjunctionQuery); !ok {
-			if right, ok := rn.(*bleveQuery.DisjunctionQuery); ok {
+		case *bleveQuery.ConjunctionQuery:
+			return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln, rn})
+		default:
+			if ok {
 				left := bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln})
 				left.AddQuery(right.Disjuncts...)
 				return left
 			}
+			return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{ln, rn})
 		}
-		return bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{
-			ln,
-			rn,
-		})
+	}
+	if operator.Value == kql.BoolAND {
+		switch left := ln.(type) {
+		case *bleveQuery.ConjunctionQuery:
+			left.AddQuery(rn)
+			return left
+		case *bleveQuery.DisjunctionQuery:
+			if !leftIsGroup {
+				last := left.Disjuncts[len(left.Disjuncts)-1]
+				rn = bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
+					last,
+					rn,
+				})
+				dj := bleveQuery.NewDisjunctionQuery(left.Disjuncts[:len(left.Disjuncts)-1])
+				dj.AddQuery(rn)
+				return dj
+			}
+		}
 	}
 	return bleveQuery.NewConjunctionQuery([]bleveQuery.Query{
 		ln,
