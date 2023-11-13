@@ -27,7 +27,7 @@ Example `providers.json` file:
         "full_name": "Example provider",
         "organization": "Owncloud",
         "domain": "example.com",
-        "homepage": "https://example.com.com",
+        "homepage": "https://example.com",
         "services": [
             {
                 "endpoint": {
