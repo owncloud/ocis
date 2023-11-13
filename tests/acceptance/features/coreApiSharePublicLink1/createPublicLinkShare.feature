@@ -296,25 +296,25 @@ Feature: create a public link share
     Then the value of the item "//s:message" in the response should be "File not found: parent.txt"
     And the HTTP status code should be "404"
 
-
+  @env-config
   Scenario: get the size of a file shared by public link
-    Given user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     And user "Alice" has created a public link share with settings
       | path        | test-file.txt |
       | permissions | read          |
-      | password    | %public%      |
     When the public gets the size of the last shared public link using the WebDAV API
     Then the HTTP status code should be "207"
     And the size of the file should be "19"
 
-
+  @env-config
   Scenario Outline: get the mtime of a file shared by public link
-    Given using <dav-path-version> DAV path
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | file.txt |
       | permissions | read     |
-      | password    | %public% |
     Then the HTTP status code should be "200"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
     Examples:
@@ -322,15 +322,15 @@ Feature: create a public link share
       | old              |
       | new              |
 
-
+  @env-config
   Scenario Outline: get the mtime of a file inside a folder shared by public link
-    Given using <dav-path-version> DAV path
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testFolder |
       | permissions | read        |
-      | password    | %public%    |
     Then the HTTP status code should be "200"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
     Examples:
@@ -338,21 +338,22 @@ Feature: create a public link share
       | old              |
       | new              |
 
-
+  @env-config
   Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
-    Given user "Alice" has created folder "testFolder"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And user "Alice" has created folder "testFolder"
     And user "Alice" has created a public link share with settings
       | path        | /testFolder               |
       | permissions | read,update,create,delete |
-      | password    | %public%                  |
     When the public uploads file "file.txt" to the last public link shared folder with password "%public%" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the new public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "testFolder/file.txt" should exist
     And as "Alice" the mtime of the file "testFolder/file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
 
-
+  @env-config
   Scenario: overwriting a file changes its mtime (new public webDAV API)
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     Given user "Alice" has created folder "testFolder"
     When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "testFolder/file.txt" using the WebDAV API
     And user "Alice" creates a public link share using the sharing API with settings

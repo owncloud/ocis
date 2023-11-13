@@ -100,7 +100,7 @@ Feature: multi-link sharing
       | permissions  | change      |
       | name         | sharedlink2 |
     When user "Alice" updates the last public link share using the sharing API with
-      | password | %alt1% |
+      | password | New-StronPass1 |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And as user "Alice" the public shares of folder "/FOLDER" should be

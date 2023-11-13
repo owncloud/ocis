@@ -11,7 +11,8 @@ Feature: create a public link share when share_folder is set to Shares
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
-      | path | randomfile.txt |
+      | path     | randomfile.txt |
+      | password | %public%       |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
