@@ -146,6 +146,7 @@ func NewService(opts ...Option) (Graph, error) {
 		keycloakClient:           options.KeycloakClient,
 		historyClient:            options.EventHistoryClient,
 		traceProvider:            options.TraceProvider,
+		valueService:             options.ValueService,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {
@@ -215,12 +216,9 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Route("/drives", func(r chi.Router) {
 					r.Get("/", svc.GetDrives)
 				})
-				r.Route("/language", func(r chi.Router) {
-					r.Get("/", svc.GetOwnLanguage)
-					r.Post("/{language}", svc.SetOwnLanguage)
-				})
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
+				r.Patch("/", svc.PatchMe)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.With(requireAdmin).Get("/", svc.GetUsers)
@@ -231,7 +229,6 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
-					r.With(requireAdmin).Patch("/language/{language}", svc.SetUserLanguage)
 					if svc.roleService != nil {
 						r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
 							r.Get("/", svc.ListAppRoleAssignments)

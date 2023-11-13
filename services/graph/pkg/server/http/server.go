@@ -83,6 +83,7 @@ func Server(opts ...Option) (http.Service, error) {
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
+	var valueService settingssvc.ValueService
 	var gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(options.TraceProvider))...)
 	if err != nil {
@@ -95,6 +96,7 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
+		valueService = settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
 		gatewaySelector, err = pool.GatewaySelector(
 			options.Config.Reva.Address,
 			append(
@@ -133,6 +135,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(middlewares...),
 		svc.EventsPublisher(publisher),
 		svc.WithRoleService(roleService),
+		svc.WithValueService(valueService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewaySelector(gatewaySelector),
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
