@@ -220,7 +220,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 
 func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
 	pr, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
-		PermissionId: settingsServiceExt.CreateSpacePermissionID,
+		PermissionId: settingsServiceExt.CreateSpacesPermission(0).Id,
 	})
 	if err != nil || pr.Permission == nil {
 		return false
@@ -586,13 +586,13 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpcClient)
 
 	_, err = s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
-		PermissionId: settingsServiceExt.ListAllSpacesPermissionID,
+		PermissionId: settingsServiceExt.ListSpacesPermission(0).Id,
 	})
 
 	permissions := make(map[string]struct{}, 1)
 	// No error means the user has the permission
 	if err == nil {
-		permissions[settingsServiceExt.ListAllSpacesPermissionName] = struct{}{}
+		permissions[settingsServiceExt.ListSpacesPermission(0).Name] = struct{}{}
 	}
 	value, err := json.Marshal(permissions)
 	if err != nil {
@@ -930,10 +930,10 @@ func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quo
 	}
 }
 
-func (g Graph) canSetSpaceQuota(ctx context.Context, user *userv1beta1.User, typ string) (bool, error) {
-	permID := settingsServiceExt.SetPersonalSpaceQuotaPermissionID
+func (g Graph) canSetSpaceQuota(ctx context.Context, _ *userv1beta1.User, typ string) (bool, error) {
+	permID := settingsServiceExt.SetPersonalSpaceQuotaPermission(0).Id
 	if typ == _spaceTypeProject {
-		permID = settingsServiceExt.SetProjectSpaceQuotaPermissionID
+		permID = settingsServiceExt.SetProjectSpaceQuotaPermission(0).Id
 	}
 	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: permID})
 	if err != nil {
