@@ -3,7 +3,6 @@ package userroles
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -41,43 +40,30 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 		return claimRoles, nil
 	}
 
-	// try splitting path at .
-	segments := oidc.SplitWithEscaping(rolesClaim, ".", "\\")
+	claim, err := oidc.WalkSegments(oidc.SplitWithEscaping(rolesClaim, ".", "\\"), claims)
+	if err != nil {
+		return nil, err
+	}
 
-	subclaims := claims
-	lastSegment := len(segments) - 1
-	for i := range segments {
-		if i < lastSegment {
-			if castedClaims, ok := subclaims[segments[i]].(map[string]interface{}); ok {
-				subclaims = castedClaims
-			} else if castedClaims, ok := subclaims[segments[i]].(map[interface{}]interface{}); ok {
-				subclaims = make(map[string]interface{}, len(castedClaims))
-				for k, v := range castedClaims {
-					if s, ok := k.(string); ok {
-						subclaims[s] = v
-					} else {
-						return nil, fmt.Errorf("could not walk claims path, key '%v' is not a string", k)
-					}
-				}
-			}
-		} else {
-			switch v := subclaims[segments[i]].(type) {
-			case []interface{}:
-				for _, cri := range v {
-					cr, ok := cri.(string)
-					if !ok {
-						err := errors.New("invalid role in claims")
-						return nil, err
-					}
-
-					claimRoles[cr] = struct{}{}
-				}
-			case string:
-				claimRoles[v] = struct{}{}
-			default:
-				return nil, errors.New("no roles in user claims")
-			}
+	switch v := claim.(type) {
+	case []string:
+		for _, cr := range v {
+			claimRoles[cr] = struct{}{}
 		}
+	case []interface{}:
+		for _, cri := range v {
+			cr, ok := cri.(string)
+			if !ok {
+				err := errors.New("invalid role in claims")
+				return nil, err
+			}
+
+			claimRoles[cr] = struct{}{}
+		}
+	case string:
+		claimRoles[v] = struct{}{}
+	default:
+		return nil, errors.New("no roles in user claims")
 	}
 
 	return claimRoles, nil

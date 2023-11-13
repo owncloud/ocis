@@ -82,3 +82,39 @@ func TestExtractRolesPathString(t *testing.T) {
 		t.Fatal("must contain 'a'")
 	}
 }
+
+func TestExtractEscapedRolesPathString(t *testing.T) {
+	byt := []byte(`{"sub.roles":"a"}`)
+
+	claims := map[string]interface{}{}
+	err := json.Unmarshal(byt, &claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	roles, err := extractRoles("sub\\.roles", claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := roles["a"]; !ok {
+		t.Fatal("must contain 'a'")
+	}
+}
+
+func TestNoRoles(t *testing.T) {
+	byt := []byte(`{"sub":{"foo":"a"}}`)
+
+	claims := map[string]interface{}{}
+	err := json.Unmarshal(byt, &claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	roles, err := extractRoles("sub.roles", claims)
+	if err == nil {
+		t.Fatal("must not find a role")
+	}
+	if len(roles) != 0 {
+		t.Fatal("length of roles mut be 0")
+	}
+}
