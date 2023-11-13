@@ -592,7 +592,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	permissions := make(map[string]struct{}, 1)
 	// No error means the user has the permission
 	if err == nil {
-		permissions[settingsServiceExt.ListSpacesPermission(0).Id] = struct{}{}
+		permissions[settingsServiceExt.ListSpacesPermission(0).Name] = struct{}{}
 	}
 	value, err := json.Marshal(permissions)
 	if err != nil {
