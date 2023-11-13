@@ -36,10 +36,83 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 
 ## Details
+
+* Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
+
+   Add filter MediaType filter shortcuts to search for specific document types. For example, a
+   search query mediatype:documents will search for files with the following mimetypes:
+
+   Application/msword
+   MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document
+   MimeType:application/vnd.oasis.opendocument.text MimeType:text/plain
+   MimeType:text/markdown MimeType:application/rtf
+   MimeType:application/vnd.apple.pages
+
+   Besides the document shorthand, it also contains following:
+
+  * file
+  * folder
+  * document
+  * spreadsheet
+  * presentation
+  * pdf
+  * image
+  * video
+  * audio
+  * archive
+
+   ## File
+
+   ## Folder
+
+   ## Document:
+
+   Application/msword
+   application/vnd.openxmlformats-officedocument.wordprocessingml.document
+   application/vnd.oasis.opendocument.text text/plain text/markdown application/rtf
+   application/vnd.apple.pages
+
+   ## Spreadsheet:
+
+   Application/vnd.ms-excel application/vnd.oasis.opendocument.spreadsheet text/csv
+   application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+   application/vnd.oasis.opendocument.spreadsheet application/vnd.apple.numbers
+
+   ## Presentations:
+
+   Application/vnd.ms-powerpoint
+   application/vnd.openxmlformats-officedocument.presentationml.presentation
+   application/vnd.oasis.opendocument.presentation application/vnd.apple.keynote
+
+   ## PDF
+
+   Application/pdf
+
+   ## Image:
+
+   Image/*
+
+   ## Video:
+
+   Video/*
+
+   ## Audio:
+
+   Audio/*
+
+   ## Archive (zip ...):
+
+   Application/zip application/x-tar application/x-gzip application/x-7z-compressed
+   application/x-rar-compressed application/x-bzip2 application/x-bzip
+   application/x-tgz
+
+   https://github.com/owncloud/ocis/issues/7432
+   https://github.com/owncloud/ocis/pull/7602
 
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 
