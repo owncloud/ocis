@@ -72,15 +72,14 @@ type LDAP struct {
 }
 
 type userAttributeMap struct {
-	displayName       string
-	id                string
-	mail              string
-	userName          string
-	givenName         string
-	surname           string
-	accountEnabled    string
-	userType          string
-	preferredLanguage string
+	displayName    string
+	id             string
+	mail           string
+	userName       string
+	givenName      string
+	surname        string
+	accountEnabled string
+	userType       string
 }
 
 type ldapAttributeValues map[string][]string
@@ -301,12 +300,11 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	mr := ldap.ModifyRequest{DN: e.DN}
 	properties := map[string]string{
-		i.userAttributeMap.displayName:       user.GetDisplayName(),
-		i.userAttributeMap.mail:              user.GetMail(),
-		i.userAttributeMap.surname:           user.GetSurname(),
-		i.userAttributeMap.givenName:         user.GetGivenName(),
-		i.userAttributeMap.userType:          user.GetUserType(),
-		i.userAttributeMap.preferredLanguage: user.GetPreferredLanguage(),
+		i.userAttributeMap.displayName: user.GetDisplayName(),
+		i.userAttributeMap.mail:        user.GetMail(),
+		i.userAttributeMap.surname:     user.GetSurname(),
+		i.userAttributeMap.givenName:   user.GetGivenName(),
+		i.userAttributeMap.userType:    user.GetUserType(),
 	}
 
 	for attribute, value := range properties {
@@ -396,7 +394,6 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
-		i.userAttributeMap.preferredLanguage,
 	}
 
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
@@ -524,7 +521,6 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
-		i.userAttributeMap.preferredLanguage,
 	}
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
@@ -604,7 +600,6 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 			i.userAttributeMap.givenName,
 			i.userAttributeMap.accountEnabled,
 			i.userAttributeMap.userType,
-			i.userAttributeMap.preferredLanguage,
 		},
 		nil,
 	)
@@ -861,7 +856,6 @@ func (i *LDAP) getUserAttrTypes() []string {
 		"userPassword",
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
-		i.userAttributeMap.preferredLanguage,
 	}
 }
 
