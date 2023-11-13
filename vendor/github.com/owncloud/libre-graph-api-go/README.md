@@ -134,6 +134,7 @@ Class | Method | HTTP request | Description
 *MeDriveRootChildrenApi* | [**HomeGetChildren**](docs/MeDriveRootChildrenApi.md#homegetchildren) | **Get** /v1.0/me/drive/root/children | Get children from drive
 *MeDrivesApi* | [**ListMyDrives**](docs/MeDrivesApi.md#listmydrives) | **Get** /v1.0/me/drives | Get all drives where the current user is a regular member of
 *MeUserApi* | [**GetOwnUser**](docs/MeUserApi.md#getownuser) | **Get** /v1.0/me | Get current user
+*MeUserApi* | [**UpdateOwnUser**](docs/MeUserApi.md#updateownuser) | **Patch** /v1.0/me | Update the current user
 *RoleManagementApi* | [**GetPermissionRoleDefinition**](docs/RoleManagementApi.md#getpermissionroledefinition) | **Get** /v1beta1/roleManagement/permissions/roleDefinitions/{role-id} | Get unifiedRoleDefinition
 *RoleManagementApi* | [**ListPermissionRoleDefinitions**](docs/RoleManagementApi.md#listpermissionroledefinitions) | **Get** /v1beta1/roleManagement/permissions/roleDefinitions | List roleDefinitions
 *TagsApi* | [**AssignTags**](docs/TagsApi.md#assigntags) | **Put** /v1.0/extensions/org.libregraph/tags | Assign tags to a resource

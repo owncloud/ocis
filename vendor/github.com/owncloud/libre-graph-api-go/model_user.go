@@ -45,6 +45,8 @@ type User struct {
 	GivenName *string `json:"givenName,omitempty"`
 	// The user`s type. This can be either \"Member\" for regular user, or \"Guest\" for guest users.
 	UserType *string `json:"userType,omitempty"`
+	// Represents the users language setting, ISO-639-1 Code
+	PreferredLanguage *string `json:"preferredLanguage,omitempty"`
 }
 
 // NewUser instantiates a new User object
@@ -512,6 +514,38 @@ func (o *User) SetUserType(v string) {
 	o.UserType = &v
 }
 
+// GetPreferredLanguage returns the PreferredLanguage field value if set, zero value otherwise.
+func (o *User) GetPreferredLanguage() string {
+	if o == nil || IsNil(o.PreferredLanguage) {
+		var ret string
+		return ret
+	}
+	return *o.PreferredLanguage
+}
+
+// GetPreferredLanguageOk returns a tuple with the PreferredLanguage field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *User) GetPreferredLanguageOk() (*string, bool) {
+	if o == nil || IsNil(o.PreferredLanguage) {
+		return nil, false
+	}
+	return o.PreferredLanguage, true
+}
+
+// HasPreferredLanguage returns a boolean if a field has been set.
+func (o *User) HasPreferredLanguage() bool {
+	if o != nil && !IsNil(o.PreferredLanguage) {
+		return true
+	}
+
+	return false
+}
+
+// SetPreferredLanguage gets a reference to the given string and assigns it to the PreferredLanguage field.
+func (o *User) SetPreferredLanguage(v string) {
+	o.PreferredLanguage = &v
+}
+
 func (o User) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -563,6 +597,9 @@ func (o User) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UserType) {
 		toSerialize["userType"] = o.UserType
+	}
+	if !IsNil(o.PreferredLanguage) {
+		toSerialize["preferredLanguage"] = o.PreferredLanguage
 	}
 	return toSerialize, nil
 }
