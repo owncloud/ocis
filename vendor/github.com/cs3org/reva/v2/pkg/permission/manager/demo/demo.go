@@ -47,6 +47,15 @@ func (m manager) CheckPermission(perm string, subject string, ref *provider.Refe
 	case permission.ListAllSpaces:
 		// TODO introduce an admin role to allow listing all spaces
 		return false
+	case permission.WriteShare:
+		// TODO guest accounts cannot share
+		return true
+	case permission.ListFavorites:
+		// TODO guest accounts cannot list favorites
+		return true
+	case permission.WriteFavorites:
+		// TODO guest accounts cannot write favorites
+		return true
 	default:
 		// We can currently return false all the time.
 		// Once we beginn testing roles we need to somehow check the roles of the users here

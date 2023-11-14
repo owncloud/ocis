@@ -26,13 +26,14 @@ import (
 	"strconv"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	permissionsv1beta1 "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
+	"github.com/cs3org/reva/v2/pkg/permission"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/huandu/xstrings"
 	"github.com/rs/zerolog/log"
 
@@ -69,15 +70,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 
 	// NOTE: one is allowed to create an internal link without the `Publink.Write` permission
 	if permKey != nil && *permKey != 0 {
-		user := ctxpkg.ContextMustGetUser(ctx)
-		resp, err := c.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
-			SubjectRef: &permissionsv1beta1.SubjectReference{
-				Spec: &permissionsv1beta1.SubjectReference_UserId{
-					UserId: user.Id,
-				},
-			},
-			Permission: "PublicLink.Write",
-		})
+		ok, err := utils.CheckPermission(ctx, permission.WritePublicLink, c)
 		if err != nil {
 			return nil, &ocsError{
 				Code:    response.MetaServerError.StatusCode,
@@ -85,8 +78,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 				Error:   err,
 			}
 		}
-
-		if resp.Status.Code != rpc.Code_CODE_OK {
+		if !ok {
 			return nil, &ocsError{
 				Code:    response.MetaForbidden.StatusCode,
 				Message: "user is not allowed to create a public link",
@@ -335,20 +327,12 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 
 	// NOTE: you are allowed to update a link TO a public link without the `PublicLink.Write` permission if you created it yourself
 	if (permKey != nil && *permKey != 0) || !createdByUser {
-		resp, err := gwC.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
-			SubjectRef: &permissionsv1beta1.SubjectReference{
-				Spec: &permissionsv1beta1.SubjectReference_UserId{
-					UserId: user.Id,
-				},
-			},
-			Permission: "PublicLink.Write",
-		})
+		ok, err := utils.CheckPermission(ctx, permission.WritePublicLink, gwC)
 		if err != nil {
 			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check user permission", err)
 			return
 		}
-
-		if resp.Status.Code != rpc.Code_CODE_OK {
+		if !ok {
 			response.WriteOCSError(w, r, response.MetaForbidden.StatusCode, "user is not allowed to update the public link", nil)
 			return
 		}
@@ -710,20 +694,12 @@ func (h *Handler) checkPasswordEnforcement(ctx context.Context, user *userv1beta
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not check permission", err)
 		return errors.New("could not check permission")
 	}
-	resp, err := gwC.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
-		SubjectRef: &permissionsv1beta1.SubjectReference{
-			Spec: &permissionsv1beta1.SubjectReference_UserId{
-				UserId: user.Id,
-			},
-		},
-		Permission: "ReadOnlyPublicLinkPassword.Delete",
-	})
+	ok, err := utils.CheckPermission(ctx, permission.DeleteReadOnlyPassword, gwC)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check user permission", err)
 		return errors.New("failed to check user permission")
 	}
-
-	if resp.Status.Code != rpc.Code_CODE_OK {
+	if !ok {
 		response.WriteOCSError(w, r, response.MetaForbidden.StatusCode, "user is not allowed to delete the password from the public link", nil)
 		return errors.New("user is not allowed to delete the password from the public link")
 	}

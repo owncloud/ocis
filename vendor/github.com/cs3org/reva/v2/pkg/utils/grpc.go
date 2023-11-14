@@ -9,8 +9,10 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 
 	"google.golang.org/grpc/metadata"
@@ -162,6 +164,20 @@ func GetResource(ctx context.Context, ref *storageprovider.Reference, gwc gatewa
 	}
 
 	return res.GetInfo(), nil
+}
+
+// CheckPermission checks if the user role contains the given permission
+func CheckPermission(ctx context.Context, perm string, gwc gateway.GatewayAPIClient) (bool, error) {
+	user := ctxpkg.ContextMustGetUser(ctx)
+	resp, err := gwc.CheckPermission(ctx, &permissions.CheckPermissionRequest{
+		SubjectRef: &permissions.SubjectReference{
+			Spec: &permissions.SubjectReference_UserId{
+				UserId: user.Id,
+			},
+		},
+		Permission: perm,
+	})
+	return resp.GetStatus().GetCode() == rpc.Code_CODE_OK, err
 }
 
 // IsStatusCodeError returns true if `err` was caused because of status code `code`

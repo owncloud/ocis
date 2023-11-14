@@ -30,6 +30,8 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/permission"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 const (
@@ -73,7 +75,24 @@ func (s *svc) doFilterFiles(w http.ResponseWriter, r *http.Request, ff *reportFi
 
 	if ff.Rules.Favorite {
 		// List the users favorite resources.
+		client, err := s.gatewaySelector.Next()
+		if err != nil {
+			log.Error().Err(err).Msg("error selecting next gateway client")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		currentUser := ctxpkg.ContextMustGetUser(ctx)
+		ok, err := utils.CheckPermission(ctx, permission.ListFavorites, client)
+		if err != nil {
+			log.Error().Err(err).Msg("error checking permission")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if !ok {
+			log.Info().Interface("user", currentUser).Msg("user not allowed to list favorites")
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
 		favorites, err := s.favoritesManager.ListFavorites(ctx, currentUser.Id)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting favorites")
@@ -81,12 +100,6 @@ func (s *svc) doFilterFiles(w http.ResponseWriter, r *http.Request, ff *reportFi
 			return
 		}
 
-		client, err := s.gatewaySelector.Next()
-		if err != nil {
-			log.Error().Err(err).Msg("error selecting next gateway client")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
 		infos := make([]*provider.ResourceInfo, 0, len(favorites))
 		for i := range favorites {
 			statRes, err := client.Stat(ctx, &providerv1beta1.StatRequest{Ref: &providerv1beta1.Reference{ResourceId: favorites[i]}})
