@@ -21,6 +21,7 @@ package conversions
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -507,4 +508,34 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 	// at this point other ocs permissions may have been mapped.
 	// TODO what about even more granular cs3 permissions?, eg. only stat
 	return r
+}
+
+// SufficientCS3Permissions returns true if the `existing` permissions contain the `requested` permissions
+func SufficientCS3Permissions(existing, requested *provider.ResourcePermissions) bool {
+	if existing == nil || requested == nil {
+		return false
+	}
+	// empty permissions represent a denial
+	if grants.PermissionsEqual(requested, &provider.ResourcePermissions{}) {
+		return existing.DenyGrant
+	}
+	requestedPermissionsType := reflect.TypeOf(provider.ResourcePermissions{})
+	numFields := requestedPermissionsType.NumField()
+	requestedPermissionsValues := reflect.ValueOf(requested)
+	existingPermissionsValues := reflect.ValueOf(existing)
+
+	for i := 0; i < numFields; i++ {
+		permissionName := requestedPermissionsType.Field(i).Name
+		// filter out irrelevant fields
+		if strings.Contains(permissionName, "XXX") {
+			continue
+		}
+		existingPermission := reflect.Indirect(existingPermissionsValues).FieldByName(permissionName).Bool()
+		requestedPermission := requestedPermissionsValues.Elem().Field(i).Bool()
+		// every requested permission needs to exist for the creator
+		if requestedPermission && !existingPermission {
+			return false
+		}
+	}
+	return true
 }

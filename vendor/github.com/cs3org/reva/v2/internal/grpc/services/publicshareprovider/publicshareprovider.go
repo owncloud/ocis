@@ -25,6 +25,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
@@ -44,6 +45,7 @@ type config struct {
 	Driver                         string                            `mapstructure:"driver"`
 	Drivers                        map[string]map[string]interface{} `mapstructure:"drivers"`
 	AllowedPathsForShares          []string                          `mapstructure:"allowed_paths_for_shares"`
+	EnableExpiredSharesCleanup     bool                              `mapstructure:"enable_expired_shares_cleanup"`
 	WriteableShareMustHavePassword bool                              `mapstructure:"writeable_share_must_have_password"`
 }
 
@@ -135,6 +137,12 @@ func (s *service) isPathAllowed(path string) bool {
 func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicShareRequest) (*link.CreatePublicShareResponse, error) {
 	log := appctx.GetLogger(ctx)
 	log.Info().Str("publicshareprovider", "create").Msg("create public share")
+
+	if !conversions.SufficientCS3Permissions(req.GetResourceInfo().GetPermissionSet(), req.GetGrant().GetPermissions().GetPermissions()) {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewInvalid(ctx, "insufficient permissions to create that kind of share"),
+		}, nil
+	}
 
 	if !s.isPathAllowed(req.ResourceInfo.Path) {
 		return &link.CreatePublicShareResponse{
