@@ -47,6 +47,7 @@ var _ = Describe("Users", func() {
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
+		valueService    *mocks.ValueService
 		identityBackend *identitymocks.Backend
 
 		rr *httptest.ResponseRecorder
@@ -73,6 +74,7 @@ var _ = Describe("Users", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
+		valueService = &mocks.ValueService{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -90,6 +92,7 @@ var _ = Describe("Users", func() {
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),
+			service.WithValueService(valueService),
 		)
 	})
 
@@ -102,6 +105,14 @@ var _ = Describe("Users", func() {
 		})
 
 		It("gets the information", func() {
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{
+				Value: &settingsmsg.ValueWithIdentifier{
+					Value: &settingsmsg.Value{
+						: &settingsmsg.ListOptionValue{},
+					}
+				},
+			}, nil)
+
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
@@ -117,6 +128,7 @@ var _ = Describe("Users", func() {
 				},
 			}
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=memberOf", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
@@ -145,6 +157,7 @@ var _ = Describe("Users", func() {
 				},
 			}
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=appRoleAssignments", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
@@ -413,6 +426,8 @@ var _ = Describe("Users", func() {
 			user.SetId("user1")
 
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
+
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
@@ -455,6 +470,7 @@ var _ = Describe("Users", func() {
 					},
 				},
 			}, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drive", nil)
 			rctx := chi.NewRouteContext()
@@ -490,6 +506,7 @@ var _ = Describe("Users", func() {
 					},
 				},
 			}, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drives", nil)
 			rctx := chi.NewRouteContext()
@@ -521,6 +538,7 @@ var _ = Describe("Users", func() {
 				},
 			}
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/user1?$expand=appRoleAssignments", nil)
 			rctx := chi.NewRouteContext()
