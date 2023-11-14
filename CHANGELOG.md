@@ -37,6 +37,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
+* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 
@@ -113,6 +114,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7432
    https://github.com/owncloud/ocis/pull/7602
+
+* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/7721
 
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 
