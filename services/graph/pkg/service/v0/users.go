@@ -639,7 +639,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// PatchMe implements the Service Interface. Updates the specified attributes of the
+// PatchMe implements the Service Interface. Updates the specified attributes of the current user
 func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("calling patch me")
