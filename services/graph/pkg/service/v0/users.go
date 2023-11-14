@@ -649,7 +649,25 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
-	g.patchUser(w, r, userID)
+	changes := libregraph.NewUser()
+	err := StrictJSONUnmarshal(r.Body, changes)
+	if err != nil {
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+	if _, ok := changes.GetDisplayNameOk(); ok {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own displayname")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own displayname")
+		return
+	}
+	if _, ok := changes.GetMailOk(); ok {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own mail")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own mail")
+		return
+	}
+	g.patchUser(w, r, userID, changes)
 }
 
 // PatchUser implements the Service Interface. Updates the specified attributes of an
@@ -663,10 +681,18 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
-	g.patchUser(w, r, nameOrID)
+	changes := libregraph.NewUser()
+	err = StrictJSONUnmarshal(r.Body, changes)
+	if err != nil {
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+	g.patchUser(w, r, nameOrID, changes)
 }
 
-func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string) {
+func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string, changes *libregraph.User) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("calling patch user")
 
@@ -689,14 +715,6 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 	if nameOrID == "" {
 		logger.Debug().Msg("could not update user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
-		return
-	}
-	changes := libregraph.NewUser()
-	err = StrictJSONUnmarshal(r.Body, changes)
-	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
 
