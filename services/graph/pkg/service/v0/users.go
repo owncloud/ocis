@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"net/http"
 	"net/url"
@@ -88,7 +89,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService)
+	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService, me.GetId())
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get user language")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get user language")
@@ -318,6 +319,8 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		u.SetUserType("Member")
 	}
 
+	userLang := u.GetPreferredLanguage()
+
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		logger.Error().Err(err).Msg("could not create user: backend error")
@@ -338,6 +341,35 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
+	}
+
+	if userLang != "" {
+		langUUID, err := uuid.NewUUID()
+		if err != nil {
+			logger.Error().Err(err).Msg("could not create user: error generating uuid")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "error generating uuid")
+			return
+		}
+		_, err = g.valueService.SaveValue(r.Context(), &settings.SaveValueRequest{
+			Value: &settingsmsg.Value{
+				Id:          langUUID.String(),
+				BundleId:    defaults.BundleUUIDProfile,
+				SettingId:   defaults.SettingUUIDProfileLanguage,
+				AccountUuid: u.GetId(),
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Value_ListValue{
+					ListValue: &settingsmsg.ListValue{Values: []*settingsmsg.ListOptionValue{
+						{
+							Option: &settingsmsg.ListOptionValue_StringValue{
+								StringValue: userLang,
+							},
+						},
+					}},
+				},
+			},
+		})
 	}
 
 	e := events.UserCreated{UserID: *u.Id}
@@ -487,7 +519,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService)
+	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService, user.GetId())
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get user language")
 		render.Status(r, http.StatusInternalServerError)
@@ -502,9 +534,9 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // getUserLanguage returns the language of the user in the context.
-func getUserLanguage(ctx context.Context, valueService settingssvc.ValueService) (string, string, error) {
+func getUserLanguage(ctx context.Context, valueService settingssvc.ValueService, userID string) (string, string, error) {
 	gvr, err := valueService.GetValueByUniqueIdentifiers(ctx, &settingssvc.GetValueByUniqueIdentifiersRequest{
-		AccountUuid: revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId(),
+		AccountUuid: userID,
 		SettingId:   defaults.SettingUUIDProfileLanguage,
 	})
 	if err != nil {
@@ -734,11 +766,16 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 
 	preferredLanguage, ok := changes.GetPreferredLanguageOk()
 	if ok {
-		_, vID, err := getUserLanguage(r.Context(), g.valueService)
+		_, vID, err := getUserLanguage(r.Context(), g.valueService, oldUserValues.GetId())
 		if err != nil {
 			logger.Error().Err(err).Msg("could not get user language")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get user language")
-			return
+			tvID, err := uuid.NewUUID()
+			if err != nil {
+				logger.Error().Err(err).Msg("could not create user: error generating uuid")
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "error generating uuid")
+				return
+			}
+			vID = tvID.String()
 		}
 		_, err = g.valueService.SaveValue(r.Context(), &settings.SaveValueRequest{
 			Value: &settingsmsg.Value{
