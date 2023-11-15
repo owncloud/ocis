@@ -344,15 +344,8 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userLang != "" {
-		langUUID, err := uuid.NewUUID()
-		if err != nil {
-			logger.Error().Err(err).Msg("could not create user: error generating uuid")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "error generating uuid")
-			return
-		}
 		_, err = g.valueService.SaveValue(r.Context(), &settings.SaveValueRequest{
 			Value: &settingsmsg.Value{
-				Id:          langUUID.String(),
 				BundleId:    defaults.BundleUUIDProfile,
 				SettingId:   defaults.SettingUUIDProfileLanguage,
 				AccountUuid: u.GetId(),
@@ -782,7 +775,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 				Id:          vID,
 				BundleId:    defaults.BundleUUIDProfile,
 				SettingId:   defaults.SettingUUIDProfileLanguage,
-				AccountUuid: nameOrID,
+				AccountUuid: oldUserValues.GetId(),
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
