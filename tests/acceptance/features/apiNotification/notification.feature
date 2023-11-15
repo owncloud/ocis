@@ -199,7 +199,7 @@ Feature: Notification
                 },
                 "id": {
                   "type": "string",
-                  "enim": ["%user_id%"]
+                  "enum": ["%user_id%"]
                 },
                 "name": {
                   "type": "string",
