@@ -259,7 +259,7 @@ var _ = Describe("Groups", func() {
 
 			svc.PostGroup(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 		})
 	})
 	Describe("PatchGroup", func() {

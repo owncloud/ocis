@@ -11,7 +11,7 @@ Feature: user GDPR (General Data Protection Regulation) report
   Scenario: generate a GDPR report and check user data in the downloaded report
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain key 'user' and match
     """
     {
@@ -74,7 +74,7 @@ Feature: user GDPR (General Data Protection Regulation) report
   Scenario: generate a GDPR report and check events when a user is created
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.UserCreated" in item 'events' and should match
     """
     {
@@ -183,7 +183,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.BytesReceived" in item 'events' and should match
     """
     {
@@ -309,7 +309,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     And user "Alice" has been added to group "tea-lover"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.GroupMemberAdded" in item 'events' and should match
     """
     {
@@ -413,7 +413,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.SpaceUpdated" in item 'events' and should match
     """
     {
@@ -523,7 +523,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Alice" has created folder "/folderMain"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.ContainerCreated" in item 'events' and should match
     """
     {
@@ -589,7 +589,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     And user "Alice" has shared entry "/folderMain" with user "Brian"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.ShareCreated" in item 'events' and should match
     """
     {
@@ -718,7 +718,7 @@ Feature: user GDPR (General Data Protection Regulation) report
       | password | %public%    |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.LinkCreated" in item 'events' and should match
     """
     {
@@ -815,7 +815,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     And user "Alice" has deleted folder "/folderMain"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.ItemTrashed" in item 'events' and should match
     """
     {
@@ -862,7 +862,7 @@ Feature: user GDPR (General Data Protection Regulation) report
       | role      | viewer |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.SpaceShared" in item 'events' and should match
     """
     {
@@ -962,7 +962,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     And user "Alice" has created a space "GDPR Space" with the default quota using the Graph API
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
-    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
     And the downloaded JSON content should contain event type "events.SpaceCreated" for "project" space and should match
     """
     {
