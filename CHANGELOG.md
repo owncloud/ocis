@@ -40,6 +40,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
+* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 
 ## Details
 
@@ -147,6 +148,14 @@ The following sections list the changes for unreleased.
    user on all share CUD requests. (User, Group)
 
    https://github.com/owncloud/ocis/pull/7700
+
+* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
+
+   We have added the preferred language to the libre-graph api & added endpoints for that to ocis.
+
+   https://github.com/owncloud/ocis/issues/5455
+   https://github.com/owncloud/ocis/pull/7720
+   https://github.com/owncloud/libre-graph-api/pull/130
 
 # Changelog for [5.0.0] (2023-11-08)
 
