@@ -319,8 +319,6 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		u.SetUserType("Member")
 	}
 
-	userLang := u.GetPreferredLanguage()
-
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		logger.Error().Err(err).Msg("could not create user: backend error")
@@ -341,28 +339,6 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
-	}
-
-	if userLang != "" {
-		_, err = g.valueService.SaveValue(r.Context(), &settings.SaveValueRequest{
-			Value: &settingsmsg.Value{
-				BundleId:    defaults.BundleUUIDProfile,
-				SettingId:   defaults.SettingUUIDProfileLanguage,
-				AccountUuid: u.GetId(),
-				Resource: &settingsmsg.Resource{
-					Type: settingsmsg.Resource_TYPE_USER,
-				},
-				Value: &settingsmsg.Value_ListValue{
-					ListValue: &settingsmsg.ListValue{Values: []*settingsmsg.ListOptionValue{
-						{
-							Option: &settingsmsg.ListOptionValue_StringValue{
-								StringValue: userLang,
-							},
-						},
-					}},
-				},
-			},
-		})
 	}
 
 	e := events.UserCreated{UserID: *u.Id}
@@ -713,6 +689,12 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
+	if _, ok := changes.GetPreferredLanguageOk(); ok {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change other users language")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change other users language")
+		return
+	}
+
 	g.patchUser(w, r, nameOrID, changes)
 }
 

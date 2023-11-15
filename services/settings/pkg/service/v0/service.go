@@ -274,8 +274,7 @@ func (g Service) RemoveSettingFromBundle(ctx context.Context, req *settingssvc.R
 // SaveValue implements the ValueServiceHandler interface
 func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueRequest, res *settingssvc.SaveValueResponse) error {
 	req.Value.AccountUuid = getValidatedAccountUUID(ctx, req.Value.AccountUuid)
-	ctxUser, _ := metadata.Get(ctx, middleware.AccountID)
-	if !g.isCurrentUser(ctx, req.Value.AccountUuid) && !g.isAdmin(ctxUser) {
+	if !g.isCurrentUser(ctx, req.Value.AccountUuid) {
 		return merrors.Forbidden(g.id, "can't save value for another user")
 	}
 
@@ -294,20 +293,6 @@ func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueReques
 	}
 	res.Value = valueWithIdentifier
 	return nil
-}
-
-func (g Service) isAdmin(userId string) bool {
-	assignedRoles, err := g.manager.ListRoleAssignments(userId)
-	if err != nil {
-		return false
-	}
-	for _, role := range assignedRoles {
-		if role.RoleId == defaults.BundleUUIDRoleAdmin {
-			return true
-		}
-	}
-	return false
-
 }
 
 // GetValue implements the ValueServiceHandler interface
@@ -330,8 +315,7 @@ func (g Service) GetValue(ctx context.Context, req *settingssvc.GetValueRequest,
 // GetValueByUniqueIdentifiers implements the ValueService interface
 func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, res *settingssvc.GetValueResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
-	ctxUser, _ := metadata.Get(ctx, middleware.AccountID)
-	if !g.isCurrentUser(ctx, req.AccountUuid) && !g.isAdmin(ctxUser) {
+	if !g.isCurrentUser(ctx, req.AccountUuid) {
 		return merrors.Forbidden(g.id, "can't get value of another user")
 	}
 	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
