@@ -650,7 +650,7 @@ func (fs *owncloudsqlfs) readPermissions(ctx context.Context, ip string) (p *pro
 	if err != nil {
 		return nil, err
 	}
-	return conversions.RoleFromOCSPermissions(perms).CS3ResourcePermissions(), nil
+	return conversions.RoleFromOCSPermissions(perms, nil).CS3ResourcePermissions(), nil
 }
 
 // The os not exists error is buried inside the xattr error,

@@ -362,7 +362,7 @@ func (c *Cache) Permissions(ctx context.Context, storage interface{}, p string) 
 		return nil, err
 	}
 
-	return conversions.RoleFromOCSPermissions(perms).CS3ResourcePermissions(), nil
+	return conversions.RoleFromOCSPermissions(perms, nil).CS3ResourcePermissions(), nil
 }
 
 // InsertOrUpdate creates or updates a cache entry
