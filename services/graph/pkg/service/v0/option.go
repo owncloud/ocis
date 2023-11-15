@@ -31,6 +31,7 @@ type Options struct {
 	IdentityEducationBackend identity.EducationBackend
 	RoleService              RoleService
 	PermissionService        Permissions
+	ValueService             settingssvc.ValueService
 	RoleManager              *roles.Manager
 	EventsPublisher          events.Publisher
 	SearchService            searchsvc.SearchProviderService
@@ -103,6 +104,13 @@ func WithIdentityEducationBackend(val identity.EducationBackend) Option {
 func WithRoleService(val RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
+	}
+}
+
+// WithValueService provides a function to set the ValueService option.
+func WithValueService(val settingssvc.ValueService) Option {
+	return func(o *Options) {
+		o.ValueService = val
 	}
 }
 

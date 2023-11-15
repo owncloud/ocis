@@ -70,6 +70,7 @@ type Graph struct {
 	gatewaySelector          pool.Selectable[gateway.GatewayAPIClient]
 	roleService              RoleService
 	permissionsService       Permissions
+	valueService             settingssvc.ValueService
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
 	identityCache            identity.IdentityCache
 	eventsPublisher          events.Publisher
