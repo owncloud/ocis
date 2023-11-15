@@ -36,6 +36,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
@@ -43,6 +44,20 @@ The following sections list the changes for unreleased.
 * Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 
 ## Details
+
+* Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
+
+   Creating group: https://owncloud.dev/libre-graph-api/#/groups/CreateGroup changed:
+   200 -> 201
+
+   Creating users: https://owncloud.dev/libre-graph-api/#/users/CreateUser changed: 200
+   -> 201
+
+   Export GDPR: https://owncloud.dev/libre-graph-api/#/user/ExportPersonalData
+   changed: 201 -> 202
+
+   https://github.com/owncloud/ocis/issues/7678
+   https://github.com/owncloud/ocis/pull/7705
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
