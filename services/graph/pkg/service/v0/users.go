@@ -488,16 +488,6 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService, user.GetId())
-	if err != nil {
-		logger.Error().Err(err).Msg("could not get user language")
-		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, user)
-		return
-	}
-
-	user.PreferredLanguage = &preferedLanguage
-
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, user)
 }
