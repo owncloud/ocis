@@ -23,7 +23,10 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 * Bugfix [owncloud/web#9861](https://github.com/owncloud/web/pull/9861) - Duplicated file search request
 * Bugfix [owncloud/web#9873](https://github.com/owncloud/web/pull/9873) - Tags are no longer editable for a locked file
 * Bugfix [owncloud/web#9881](https://github.com/owncloud/web/pull/9881) - Prevent rendering of old/wrong set of resources in search list
+* Bugfix [owncloud/web#9913](https://github.com/owncloud/web/pull/9913) - Private link resolving via share jail ID
+* Bugfix [owncloud/web#9915](https://github.com/owncloud/web/pull/9915) - Keep both folders conflict in same-named folders
 * Enhancement [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317) - Make login url configurable
+* Enhancement [owncloud/web#7497](https://github.com/owncloud/ocis/issues/7497) - Permission checks for shares and favorites
 * Enhancement [owncloud/web#7600](https://github.com/owncloud/web/issues/7600) - Scroll to newly created folder
 * Enhancement [owncloud/web#9302](https://github.com/owncloud/web/issues/9302) - Application unification
 * Enhancement [owncloud/web#9423](https://github.com/owncloud/web/pull/9423) - Show local loading spinner in sharing button
@@ -60,9 +63,12 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 * Enhancement [owncloud/web#9863](https://github.com/owncloud/web/pull/9863) - Location picker in embed mode
 * Enhancement [owncloud/web#9864](https://github.com/owncloud/web/pull/9864) - Search tags filter chips style aligned
 * Enhancement [owncloud/web#9884](https://github.com/owncloud/web/pull/9884) - Enable dark theme on importer
+* Enhancement [owncloud/web#9890](https://github.com/owncloud/web/pull/9890) - Create shortcuts
+* Enhancement [owncloud/web#9905](https://github.com/owncloud/web/pull/9905) - Manage tags in details panel
 * Enhancement [owncloud/web#9906](https://github.com/owncloud/web/pull/9906) - Reorganize "New" menu
 * Enhancement [owncloud/web#9911](https://github.com/owncloud/web/pull/9911) - Provide vendor neutral file icons
+* Enhancement [owncloud/web#9912](https://github.com/owncloud/web/pull/9912) - Add media type filter chip
 
 
-https://github.com/owncloud/ocis/pull/7673
-https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
+https://github.com/owncloud/ocis/pull/7734
+https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.8
