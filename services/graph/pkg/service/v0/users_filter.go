@@ -32,9 +32,87 @@ func (g Graph) applyUserFilter(ctx context.Context, req *godata.GoDataRequest, r
 		return g.applyFilterLambda(ctx, req, root.Children)
 	case godata.ExpressionTokenLogical:
 		return g.applyFilterLogical(ctx, req, root)
+	case godata.ExpressionTokenFunc:
+		return g.applyFilterFunction(ctx, req, root)
 	}
 	logger.Debug().Str("filter", req.Query.Filter.RawValue).Msg("filter is not supported")
 	return users, unsupportedFilterError()
+}
+
+func (g Graph) applyFilterFunction(ctx context.Context, req *godata.GoDataRequest, root *godata.ParseNode) (users []*libregraph.User, err error) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	if root.Token.Type != godata.ExpressionTokenFunc {
+		return users, invalidFilterError()
+	}
+
+	switch root.Token.Value {
+	case "startswith":
+		// 'startswith' needs 2 operands
+		if len(root.Children) != 2 {
+			return users, invalidFilterError()
+		}
+		return g.applyFilterFunctionStartsWith(ctx, req, root.Children[0], root.Children[1]), nil
+	case "contains":
+		// 'contains' needs 2 operands
+		if len(root.Children) != 2 {
+			return users, invalidFilterError()
+		}
+		return g.applyFilterFunctionContains(ctx, req, root.Children[0], root.Children[1]), nil
+	}
+	logger.Debug().Str("Token", root.Token.Value).Msg("unsupported function filter")
+	return users, unsupportedFilterError()
+}
+
+func (g Graph) applyFilterFunctionStartsWith(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	if operand1.Token.Type != godata.ExpressionTokenLiteral {
+		logger.Debug().Str("Token", operand1.Token.Value).Msg("unsupported function filter")
+		return users
+	}
+
+	switch operand1.Token.Value {
+	case "displayName":
+		var retUsers []*libregraph.User
+		filterValue := operand2.Token.Value
+		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by startsWith")
+		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
+			for _, user := range users {
+				if strings.HasPrefix(user.GetDisplayName(), filterValue) {
+					retUsers = append(retUsers, user)
+				}
+			}
+		}
+		return retUsers
+	default:
+		logger.Warn().Str("Token", operand1.Token.Value).Msg("unsupported function filter")
+		return nil
+	}
+}
+
+func (g Graph) applyFilterFunctionContains(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	if operand1.Token.Type != godata.ExpressionTokenLiteral {
+		logger.Debug().Str("Token", operand1.Token.Value).Msg("unsupported function filter")
+		return users
+	}
+
+	switch operand1.Token.Value {
+	case "displayName":
+		var retUsers []*libregraph.User
+		filterValue := operand2.Token.Value
+		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by contains")
+		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
+			for _, user := range users {
+				if strings.Contains(user.GetDisplayName(), filterValue) {
+					retUsers = append(retUsers, user)
+				}
+			}
+		}
+		return retUsers
+	default:
+		logger.Warn().Str("Token", operand1.Token.Value).Msg("unsupported function filter")
+		return nil
+	}
 }
 
 func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest, root *godata.ParseNode) (users []*libregraph.User, err error) {
