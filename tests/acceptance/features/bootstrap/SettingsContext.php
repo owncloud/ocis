@@ -171,7 +171,7 @@ class SettingsContext implements Context {
 			} catch (Exception $e) {
 				$tryAgain = $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
 
-				if (!$tryAgain){
+				if (!$tryAgain) {
 					throw $e;
 				}
 			}
