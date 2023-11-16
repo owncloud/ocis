@@ -227,7 +227,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
-* Enhancement - Update web to v8.0.0: [#7673](https://github.com/owncloud/ocis/pull/7673)
+* Enhancement - Update web to v8.0.0: [#7734](https://github.com/owncloud/ocis/pull/7734)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
@@ -660,7 +660,7 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/web/issues/7728
    https://github.com/owncloud/ocis/pull/7409
 
-* Enhancement - Update web to v8.0.0: [#7673](https://github.com/owncloud/ocis/pull/7673)
+* Enhancement - Update web to v8.0.0: [#7734](https://github.com/owncloud/ocis/pull/7734)
 
    Tags: web
 
@@ -699,9 +699,15 @@ The following sections list the changes for 5.0.0.
    [owncloud/web#9873](https://github.com/owncloud/web/pull/9873) - Tags are no longer
    editable for a locked file * Bugfix
    [owncloud/web#9881](https://github.com/owncloud/web/pull/9881) - Prevent rendering
-   of old/wrong set of resources in search list * Enhancement
+   of old/wrong set of resources in search list * Bugfix
+   [owncloud/web#9913](https://github.com/owncloud/web/pull/9913) - Private link
+   resolving via share jail ID * Bugfix
+   [owncloud/web#9915](https://github.com/owncloud/web/pull/9915) - Keep both folders
+   conflict in same-named folders * Enhancement
    [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317) - Make login url
    configurable * Enhancement
+   [owncloud/web#7497](https://github.com/owncloud/ocis/issues/7497) - Permission
+   checks for shares and favorites * Enhancement
    [owncloud/web#7600](https://github.com/owncloud/web/issues/7600) - Scroll to newly
    created folder * Enhancement
    [owncloud/web#9302](https://github.com/owncloud/web/issues/9302) - Application
@@ -771,12 +777,17 @@ The following sections list the changes for 5.0.0.
    chips style aligned * Enhancement
    [owncloud/web#9884](https://github.com/owncloud/web/pull/9884) - Enable dark theme on
    importer * Enhancement
+   [owncloud/web#9890](https://github.com/owncloud/web/pull/9890) - Create shortcuts *
+   Enhancement [owncloud/web#9905](https://github.com/owncloud/web/pull/9905) - Manage
+   tags in details panel * Enhancement
    [owncloud/web#9906](https://github.com/owncloud/web/pull/9906) - Reorganize "New"
    menu * Enhancement [owncloud/web#9911](https://github.com/owncloud/web/pull/9911) -
-   Provide vendor neutral file icons
+   Provide vendor neutral file icons * Enhancement
+   [owncloud/web#9912](https://github.com/owncloud/web/pull/9912) - Add media type
+   filter chip
 
-   https://github.com/owncloud/ocis/pull/7673
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.7
+   https://github.com/owncloud/ocis/pull/7734
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.8
 
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
