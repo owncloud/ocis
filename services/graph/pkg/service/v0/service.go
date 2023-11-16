@@ -146,6 +146,7 @@ func NewService(opts ...Option) (Graph, error) {
 		keycloakClient:           options.KeycloakClient,
 		historyClient:            options.EventHistoryClient,
 		traceProvider:            options.TraceProvider,
+		valueService:             options.ValueService,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {
@@ -212,9 +213,12 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drive", svc.GetUserDrive)
-				r.Get("/drives", svc.GetDrives)
+				r.Route("/drives", func(r chi.Router) {
+					r.Get("/", svc.GetDrives)
+				})
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
+				r.Patch("/", svc.PatchMe)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.With(requireAdmin).Get("/", svc.GetUsers)

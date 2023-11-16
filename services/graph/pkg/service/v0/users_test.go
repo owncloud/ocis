@@ -13,14 +13,18 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
+	"google.golang.org/grpc"
+
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -29,9 +33,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/stretchr/testify/mock"
-	"go-micro.dev/v4/client"
-	"google.golang.org/grpc"
 )
 
 type userList struct {
@@ -47,6 +48,7 @@ var _ = Describe("Users", func() {
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
+		valueService    *mocks.ValueService
 		identityBackend *identitymocks.Backend
 
 		rr *httptest.ResponseRecorder
@@ -73,6 +75,7 @@ var _ = Describe("Users", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
+		valueService = &mocks.ValueService{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -90,6 +93,7 @@ var _ = Describe("Users", func() {
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),
+			service.WithValueService(valueService),
 		)
 	})
 
@@ -102,6 +106,25 @@ var _ = Describe("Users", func() {
 		})
 
 		It("gets the information", func() {
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
+
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
@@ -117,7 +140,24 @@ var _ = Describe("Users", func() {
 				},
 			}
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
-
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=memberOf", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
@@ -145,7 +185,24 @@ var _ = Describe("Users", func() {
 				},
 			}
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
-
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=appRoleAssignments", nil)
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
@@ -413,6 +470,24 @@ var _ = Describe("Users", func() {
 			user.SetId("user1")
 
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
@@ -455,7 +530,24 @@ var _ = Describe("Users", func() {
 					},
 				},
 			}, nil)
-
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drive", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
@@ -490,7 +582,24 @@ var _ = Describe("Users", func() {
 					},
 				},
 			}, nil)
-
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drives", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
@@ -521,7 +630,24 @@ var _ = Describe("Users", func() {
 				},
 			}
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
-
+			valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+				Return(&settings.GetValueResponse{
+					Value: &settingsmsg.ValueWithIdentifier{
+						Value: &settingsmsg.Value{
+							Value: &settingsmsg.Value_ListValue{
+								ListValue: &settingsmsg.ListValue{
+									Values: []*settingsmsg.ListOptionValue{
+										{
+											Option: &settingsmsg.ListOptionValue_StringValue{
+												StringValue: "it",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/user1?$expand=appRoleAssignments", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
