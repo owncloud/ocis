@@ -26,6 +26,7 @@ type Config struct {
 
 	RoleQuotas            map[string]uint64  `yaml:"role_quotas"`
 	Policies              []Policy           `yaml:"policies"`
+	AdditionalPolicies    []Policy           `yaml:"additional_policies"`
 	OIDC                  OIDC               `yaml:"oidc"`
 	ServiceAccount        ServiceAccount     `yaml:"service_account"`
 	RoleAssignment        RoleAssignment     `yaml:"role_assignment"`

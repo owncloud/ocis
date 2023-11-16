@@ -292,7 +292,7 @@ func EnsureDefaults(cfg *config.Config) {
 // Sanitize sanitizes the configuration
 func Sanitize(cfg *config.Config) {
 	if cfg.Policies == nil {
-		cfg.Policies = DefaultPolicies()
+		cfg.Policies = mergePolicies(DefaultPolicies(), cfg.AdditionalPolicies)
 	}
 
 	if cfg.PolicySelector == nil {
@@ -306,4 +306,22 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
+}
+
+func mergePolicies(policies []config.Policy, additionalPolicies []config.Policy) []config.Policy {
+	for _, p := range additionalPolicies {
+		found := false
+		for i, po := range policies {
+			if po.Name == p.Name {
+				po.Routes = append(po.Routes, p.Routes...)
+				policies[i] = po
+				found = true
+				break
+			}
+		}
+		if !found {
+			policies = append(policies, p)
+		}
+	}
+	return policies
 }
