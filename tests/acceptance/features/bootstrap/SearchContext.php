@@ -59,8 +59,9 @@ class SearchContext implements Context {
 		?string   $spaceName = null,
 		TableNode $properties = null
 	): void {
-		// Because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously, a short wait is necessary before searching files or folders.
-		sleep(4);
+		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
+		// short wait is necessary before searching
+		sleep(5);
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
