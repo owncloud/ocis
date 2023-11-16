@@ -153,15 +153,37 @@ class SettingsContext implements Context {
 	 * @return string
 	 */
 	public function getRoleIdByRoleName(string $user, string $role): string {
-		$response = $this->getRoles($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201",
-			$response
-		);
+		// Sometimes the response body is not complete and results invalid json.
+		// so we try again until we get a valid json.
+		$tryAgain = false;
+		$retried = 0;
+		do {
+			$response = $this->getRoles($user);
+			$this->featureContext->theHTTPStatusCodeShouldBe(
+				201,
+				"Expected response status code should be 201",
+				$response
+			);
 
-		$rawBody =  $response->getBody()->getContents();
-		$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+			$rawBody =  $response->getBody()->getContents();
+			try {
+				$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+			} catch (Exception $e) {
+				$tryAgain = $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+
+				if (!$tryAgain){
+					throw $e;
+				}
+			}
+
+			if ($tryAgain) {
+				$retried += 1;
+				echo "Invalid json body, retrying ($retried)...\n";
+				// wait 500ms and try again
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
+
 		Assert::assertArrayHasKey(
 			'bundles',
 			$decodedBody,
