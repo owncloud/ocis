@@ -73,7 +73,10 @@ Feature: PROPFIND with depth:infinity
 
   Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using new DAV path
-    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And the following configs have been set:
+      | config                                       | value |
+      | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has created a public link share of folder "simple-folder"
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
