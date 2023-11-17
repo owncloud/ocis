@@ -115,7 +115,7 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 		from = n.BeginningOfMonth()
 		to = n.EndOfMonth()
 	case "last month":
-		lastMonth := n.With(n.AddDate(0, -1, 0))
+		lastMonth := n.With(n.BeginningOfMonth().AddDate(0, 0, -1))
 		from = lastMonth.BeginningOfMonth()
 		to = lastMonth.EndOfMonth()
 	case "last 30 days":

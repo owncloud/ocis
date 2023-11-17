@@ -695,6 +695,72 @@ func TestParse_DateTimeRestrictionNode(t *testing.T) {
 			},
 		},
 		{
+			name:  "NaturalLanguage DateTimeNode - last month - edge case when last day of the month",
+			patch: setWorldClock(t, "2023-10-31"),
+			query: join([]string{
+				`Mtime:"last month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-09-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-09-30 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last month - edge case when last day of the month",
+			patch: setWorldClock(t, "2023-03-31"),
+			query: join([]string{
+				`Mtime:"last month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2023-02-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2023-02-28 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
+			name:  "NaturalLanguage DateTimeNode - last month - edge case when last day of the month",
+			patch: setWorldClock(t, "2024-03-31"),
+			query: join([]string{
+				`Mtime:"last month"`,
+			}),
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    mustParseTime(t, "2024-02-01"),
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    mustParseTime(t, "2024-02-29 23:59:59.999999999"),
+					},
+				},
+			},
+		},
+		{
 			name:  "NaturalLanguage DateTimeNode - last month - the beginning of the year",
 			patch: setWorldClock(t, "2023-01-01"),
 			query: join([]string{
