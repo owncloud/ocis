@@ -1,6 +1,7 @@
 package unifiedrole
 
 import (
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/proto"
@@ -24,12 +25,32 @@ const (
 	// UnifiedRoleManagerID Unified role manager id.
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 
-	// UnifiedRoleConditionSelf TODO defines constraints
-	UnifiedRoleConditionSelf = "Self: @Subject.objectId == @Resource.objectId"
+	// UnifiedRoleConditionSelf defines constraint where the principal matches the target resource
+	UnifiedRoleConditionSelf = "@Subject.objectId == @Resource.objectId"
 	// UnifiedRoleConditionOwner defines constraints when the principal is the owner of the target resource
-	UnifiedRoleConditionOwner = "Owner: @Subject.objectId Any_of @Resource.owners"
+	UnifiedRoleConditionOwner = "@Subject.objectId Any_of @Resource.owners"
 	// UnifiedRoleConditionGrantee does not exist in MS Graph, but we use it to express permissions on shared resources
-	UnifiedRoleConditionGrantee = "Grantee: @Subject.objectId Any_of @Resource.grantee"
+	UnifiedRoleConditionGrantee = "@Subject.objectId Any_of @Resource.grantee"
+
+	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
+	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
+	DriveItemStandardDelete    = "libre.graph/driveItem/standard/delete"
+	DriveItemPathRead          = "libre.graph/driveItem/path/read"
+	DriveItemQuotaRead         = "libre.graph/driveItem/quota/read"
+	DriveItemContentRead       = "libre.graph/driveItem/content/read"
+	DriveItemUploadCreate      = "libre.graph/driveItem/upload/create"
+	DriveItemPermissionsRead   = "libre.graph/driveItem/permissions/read"
+	DriveItemChildrenRead      = "libre.graph/driveItem/children/read"
+	DriveItemVersionsRead      = "libre.graph/driveItem/versions/read"
+	DriveItemDeletedRead       = "libre.graph/driveItem/deleted/read"
+	DriveItemPathUpdate        = "libre.graph/driveItem/path/update"
+	DriveItemPermissionsDelete = "libre.graph/driveItem/permissions/delete"
+	DriveItemDeletedDelete     = "libre.graph/driveItem/deleted/delete"
+	DriveItemVersionsUpdate    = "libre.graph/driveItem/versions/update"
+	DriveItemDeletedUpdate     = "libre.graph/driveItem/deleted/update"
+	DriveItemBasicRead         = "libre.graph/driveItem/basic/read"
+	DriveItemPermissionsUpdate = "libre.graph/driveItem/permissions/update"
+	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
 )
 
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
@@ -168,6 +189,126 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
+func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
+	return []*libregraph.UnifiedRoleDefinition{
+		NewViewerUnifiedRole(resharing),
+		NewSpaceViewerUnifiedRole(),
+		NewEditorUnifiedRole(resharing),
+		NewSpaceEditorUnifiedRole(),
+		NewFileEditorUnifiedRole(resharing),
+		NewCoownerUnifiedRole(),
+		NewUploaderUnifiedRole(),
+		NewManagerUnifiedRole(),
+	}
+}
+
+// CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
+// libregraph actions
+func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {
+	if p.AddGrant {
+		actions = append(actions, DriveItemPermissionsCreate)
+	}
+	if p.CreateContainer {
+		actions = append(actions, DriveItemChildrenCreate)
+	}
+	if p.Delete {
+		actions = append(actions, DriveItemStandardDelete)
+	}
+	if p.GetPath {
+		actions = append(actions, DriveItemPathRead)
+	}
+	if p.GetQuota {
+		actions = append(actions, DriveItemQuotaRead)
+	}
+	if p.InitiateFileDownload {
+		actions = append(actions, DriveItemContentRead)
+	}
+	if p.InitiateFileUpload {
+		actions = append(actions, DriveItemUploadCreate)
+	}
+	if p.ListGrants {
+		actions = append(actions, DriveItemPermissionsRead)
+	}
+	if p.ListContainer {
+		actions = append(actions, DriveItemChildrenRead)
+	}
+	if p.ListFileVersions {
+		actions = append(actions, DriveItemVersionsRead)
+	}
+	if p.ListRecycle {
+		actions = append(actions, DriveItemDeletedRead)
+	}
+	if p.Move {
+		actions = append(actions, DriveItemPathUpdate)
+	}
+	if p.RemoveGrant {
+		actions = append(actions, DriveItemPermissionsDelete)
+	}
+	if p.PurgeRecycle {
+		actions = append(actions, DriveItemDeletedDelete)
+	}
+	if p.RestoreFileVersion {
+		actions = append(actions, DriveItemVersionsUpdate)
+	}
+	if p.RestoreRecycleItem {
+		actions = append(actions, DriveItemDeletedUpdate)
+	}
+	if p.Stat {
+		actions = append(actions, DriveItemBasicRead)
+	}
+	if p.UpdateGrant {
+		actions = append(actions, DriveItemPermissionsUpdate)
+	}
+	if p.DenyGrant {
+		actions = append(actions, DriveItemPermissionsDeny)
+	}
+	return actions
+}
+
+// CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
+// CS3 ResourcePermissions and constraints.
+func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string, resharing bool) *libregraph.UnifiedRoleDefinition {
+	actionSet := map[string]struct{}{}
+	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
+		actionSet[action] = struct{}{}
+	}
+
+	var res *libregraph.UnifiedRoleDefinition
+	for _, uRole := range GetBuiltinRoleDefinitionList(resharing) {
+		matchFound := false
+		for _, uPerm := range uRole.GetRolePermissions() {
+			if uPerm.GetCondition() != constraints {
+				// the requested constraints don't match, this isn't our role
+				continue
+			}
+
+			// if the actions converted from the ResourcePermissions equal the action the defined for the role, we have match
+			if resourceActionsEqual(actionSet, uPerm.GetAllowedResourceActions()) {
+				matchFound = true
+				break
+			}
+		}
+		if matchFound {
+			res = uRole
+			break
+		}
+	}
+	return res
+}
+
+func resourceActionsEqual(targetActionSet map[string]struct{}, actions []string) bool {
+	if len(targetActionSet) != len(actions) {
+		return false
+	}
+
+	for _, action := range actions {
+		if _, ok := targetActionSet[action]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 func displayName(role *conversions.Role) *string {
 	if role == nil {
 		return nil
@@ -201,63 +342,5 @@ func convert(role *conversions.Role) []string {
 	if role == nil && role.CS3ResourcePermissions() == nil {
 		return actions
 	}
-	p := role.CS3ResourcePermissions()
-	if p.AddGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/create")
-	}
-	if p.CreateContainer {
-		actions = append(actions, "libre.graph/driveItem/children/create")
-	}
-	if p.Delete {
-		actions = append(actions, "libre.graph/driveItem/standard/delete")
-	}
-	if p.GetPath {
-		actions = append(actions, "libre.graph/driveItem/path/read")
-	}
-	if p.GetQuota {
-		actions = append(actions, "libre.graph/driveItem/quota/read")
-	}
-	if p.InitiateFileDownload {
-		actions = append(actions, "libre.graph/driveItem/content/read")
-	}
-	if p.InitiateFileUpload {
-		actions = append(actions, "libre.graph/driveItem/upload/create")
-	}
-	if p.ListGrants {
-		actions = append(actions, "libre.graph/driveItem/permissions/read")
-	}
-	if p.ListContainer {
-		actions = append(actions, "libre.graph/driveItem/children/read")
-	}
-	if p.ListFileVersions {
-		actions = append(actions, "libre.graph/driveItem/versions/read")
-	}
-	if p.ListRecycle {
-		actions = append(actions, "libre.graph/driveItem/deleted/read")
-	}
-	if p.Move {
-		actions = append(actions, "libre.graph/driveItem/path/update")
-	}
-	if p.RemoveGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/delete")
-	}
-	if p.PurgeRecycle {
-		actions = append(actions, "libre.graph/driveItem/deleted/delete")
-	}
-	if p.RestoreFileVersion {
-		actions = append(actions, "libre.graph/driveItem/versions/update")
-	}
-	if p.RestoreRecycleItem {
-		actions = append(actions, "libre.graph/driveItem/deleted/update")
-	}
-	if p.Stat {
-		actions = append(actions, "libre.graph/driveItem/basic/read")
-	}
-	if p.UpdateGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/update")
-	}
-	if p.DenyGrant {
-		actions = append(actions, "libre.graph/driveItem/permissions/deny")
-	}
-	return actions
+	return CS3ResourcePermissionsToLibregraphActions(*role.CS3ResourcePermissions())
 }

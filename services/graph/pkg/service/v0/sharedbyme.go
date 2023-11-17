@@ -17,6 +17,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 type driveItemsByResourceID map[string]libregraph.DriveItem
@@ -160,7 +161,18 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 		if s.GetExpiration() != nil {
 			perm.SetExpirationDateTime(cs3TimestampToTime(s.GetExpiration()))
 		}
-
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+			*s.GetPermissions().GetPermissions(),
+			unifiedrole.UnifiedRoleConditionGrantee,
+			g.config.FilesSharing.EnableResharing,
+		)
+		if role != nil {
+			perm.SetRoles([]string{role.GetId()})
+		} else {
+			actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*s.GetPermissions().GetPermissions())
+			perm.SetLibreGraphPermissionsActions(actions)
+			perm.SetRoles(nil)
+		}
 		perm.SetGrantedToV2(grantedTo)
 		item.Permissions = append(item.Permissions, perm)
 		driveItems[resIDStr] = item
