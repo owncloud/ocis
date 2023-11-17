@@ -21,6 +21,7 @@ package conversions
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -153,7 +154,7 @@ func RoleFromName(name string, sharing bool) *Role {
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
 	case RoleFileEditor:
-		return NewFileEditorRole()
+		return NewFileEditorRole(sharing)
 	case RoleUploader:
 		return NewUploaderRole()
 	case RoleManager:
@@ -270,10 +271,15 @@ func NewSpaceEditorRole() *Role {
 }
 
 // NewFileEditorRole creates a file-editor role
-func NewFileEditorRole() *Role {
+func NewFileEditorRole(sharing bool) *Role {
+	p := PermissionRead | PermissionWrite
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleEditor,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
+			AddGrant:             sharing,
 			GetPath:              true,
 			GetQuota:             true,
 			InitiateFileDownload: true,
@@ -284,7 +290,7 @@ func NewFileEditorRole() *Role {
 			InitiateFileUpload:   true,
 			RestoreRecycleItem:   true,
 		},
-		ocsPermissions: PermissionRead | PermissionWrite,
+		ocsPermissions: p,
 	}
 }
 
@@ -372,8 +378,7 @@ func NewManagerRole() *Role {
 
 // RoleFromOCSPermissions tries to map ocs permissions to a role
 // TODO: rethink using this. ocs permissions cannot be assigned 1:1 to roles
-// NOTE: If resharing=false in the system this function will return SpaceViewerRole instead ViewerRole
-func RoleFromOCSPermissions(p Permissions) *Role {
+func RoleFromOCSPermissions(p Permissions, ri *provider.ResourceInfo) *Role {
 	if p == PermissionInvalid {
 		return NewNoneRole()
 	}
@@ -384,13 +389,17 @@ func RoleFromOCSPermissions(p Permissions) *Role {
 				return NewEditorRole(true)
 			}
 
-			return NewSpaceEditorRole()
+			if isSpaceRoot(ri) {
+				return NewSpaceEditorRole()
+			}
 		}
-		if p == PermissionRead|PermissionShare {
-			return NewViewerRole(true)
-		}
-		if p == PermissionRead {
+
+		if p == PermissionRead && isSpaceRoot(ri) {
 			return NewSpaceViewerRole()
+		}
+
+		if p == PermissionRead|PermissionShare && !isSpaceRoot(ri) {
+			return NewViewerRole(true)
 		}
 	}
 	if p == PermissionCreate {
@@ -398,6 +407,22 @@ func RoleFromOCSPermissions(p Permissions) *Role {
 	}
 	// legacy
 	return NewLegacyRoleFromOCSPermissions(p)
+}
+
+func isSpaceRoot(ri *provider.ResourceInfo) bool {
+	if ri == nil {
+		return false
+	}
+	if ri.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		return false
+	}
+
+	if ri.GetId().GetOpaqueId() != ri.GetSpace().GetRoot().GetOpaqueId() ||
+		ri.GetId().GetSpaceId() != ri.GetSpace().GetRoot().GetSpaceId() ||
+		ri.GetId().GetStorageId() != ri.GetSpace().GetRoot().GetStorageId() {
+		return false
+	}
+	return true
 }
 
 // NewLegacyRoleFromOCSPermissions tries to map a legacy combination of ocs permissions to cs3 resource permissions as a legacy role
@@ -507,4 +532,34 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 	// at this point other ocs permissions may have been mapped.
 	// TODO what about even more granular cs3 permissions?, eg. only stat
 	return r
+}
+
+// SufficientCS3Permissions returns true if the `existing` permissions contain the `requested` permissions
+func SufficientCS3Permissions(existing, requested *provider.ResourcePermissions) bool {
+	if existing == nil || requested == nil {
+		return false
+	}
+	// empty permissions represent a denial
+	if grants.PermissionsEqual(requested, &provider.ResourcePermissions{}) {
+		return existing.DenyGrant
+	}
+	requestedPermissionsType := reflect.TypeOf(provider.ResourcePermissions{})
+	numFields := requestedPermissionsType.NumField()
+	requestedPermissionsValues := reflect.ValueOf(requested)
+	existingPermissionsValues := reflect.ValueOf(existing)
+
+	for i := 0; i < numFields; i++ {
+		permissionName := requestedPermissionsType.Field(i).Name
+		// filter out irrelevant fields
+		if strings.Contains(permissionName, "XXX") {
+			continue
+		}
+		existingPermission := reflect.Indirect(existingPermissionsValues).FieldByName(permissionName).Bool()
+		requestedPermission := requestedPermissionsValues.Elem().Field(i).Bool()
+		// every requested permission needs to exist for the creator
+		if requestedPermission && !existingPermission {
+			return false
+		}
+	}
+	return true
 }

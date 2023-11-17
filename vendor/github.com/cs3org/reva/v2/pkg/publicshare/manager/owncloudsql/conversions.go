@@ -162,7 +162,7 @@ func intTosharePerm(p int) (*provider.ResourcePermissions, error) {
 		return nil, err
 	}
 
-	return conversions.RoleFromOCSPermissions(perms).CS3ResourcePermissions(), nil
+	return conversions.RoleFromOCSPermissions(perms, nil).CS3ResourcePermissions(), nil
 }
 
 func formatUserID(u *userpb.UserId) string {

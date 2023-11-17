@@ -86,7 +86,7 @@ func (h *SpacesHandler) Handler(s *svc, trashbinHandler *TrashbinHandler) http.H
 		case MethodLock:
 			status, err = s.handleSpacesLock(w, r, spaceID)
 		case MethodUnlock:
-			status, err = s.handleUnlock(w, r, spaceID)
+			status, err = s.handleSpaceUnlock(w, r, spaceID)
 		case MethodMkcol:
 			status, err = s.handleSpacesMkCol(w, r, spaceID)
 		case MethodMove:

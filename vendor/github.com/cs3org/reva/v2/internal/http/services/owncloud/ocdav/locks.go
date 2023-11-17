@@ -614,6 +614,24 @@ func (s *svc) handleUnlock(w http.ResponseWriter, r *http.Request, ns string) (s
 		return http.StatusInternalServerError, errtypes.NewErrtypeFromStatus(cs3Status)
 	}
 
+	return s.unlockReference(ctx, w, r, ref)
+}
+
+func (s *svc) handleSpaceUnlock(w http.ResponseWriter, r *http.Request, spaceID string) (status int, err error) {
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), fmt.Sprintf("%s %v", r.Method, r.URL.Path))
+	defer span.End()
+
+	span.SetAttributes(attribute.String("component", "ocdav"))
+
+	ref, err := spacelookup.MakeStorageSpaceReference(spaceID, r.URL.Path)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("invalid space id")
+	}
+
+	return s.unlockReference(ctx, w, r, &ref)
+}
+
+func (s *svc) unlockReference(ctx context.Context, _ http.ResponseWriter, r *http.Request, ref *provider.Reference) (retStatus int, retErr error) {
 	// http://www.webdav.org/specs/rfc4918.html#HEADER_Lock-Token says that the
 	// Lock-Token value should be a Coded-URL OR a token. We strip its angle brackets.
 	t := r.Header.Get(net.HeaderLockToken)
@@ -621,7 +639,7 @@ func (s *svc) handleUnlock(w http.ResponseWriter, r *http.Request, ns string) (s
 		t = t[1 : len(t)-1]
 	}
 
-	switch err = s.LockSystem.Unlock(r.Context(), time.Now(), ref, t); err {
+	switch err := s.LockSystem.Unlock(ctx, time.Now(), ref, t); err {
 	case nil:
 		return http.StatusNoContent, err
 	case errors.ErrForbidden:

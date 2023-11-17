@@ -25,7 +25,12 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
@@ -33,9 +38,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-	"google.golang.org/grpc"
 )
 
 func init() {
@@ -135,31 +137,45 @@ func (s *service) isPathAllowed(path string) bool {
 }
 
 func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
-	u := ctxpkg.ContextMustGetUser(ctx)
-	if req.Grant.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER && req.Grant.Grantee.GetUserId().Idp == "" {
+	user := ctxpkg.ContextMustGetUser(ctx)
+
+	if req.GetGrant().GetGrantee().GetType() == provider.GranteeType_GRANTEE_TYPE_USER && req.GetGrant().GetGrantee().GetUserId().GetIdp() == "" {
 		// use logged in user Idp as default.
-		g := &userpb.UserId{OpaqueId: req.Grant.Grantee.GetUserId().OpaqueId, Idp: u.Id.Idp, Type: userpb.UserType_USER_TYPE_PRIMARY}
-		req.Grant.Grantee.Id = &provider.Grantee_UserId{UserId: g}
+		req.GetGrant().GetGrantee().Id = &provider.Grantee_UserId{
+			UserId: &userpb.UserId{
+				OpaqueId: req.GetGrant().GetGrantee().GetUserId().GetOpaqueId(),
+				Idp:      user.GetId().GetIdp(),
+				Type:     userpb.UserType_USER_TYPE_PRIMARY},
+		}
 	}
 
-	if !s.isPathAllowed(req.ResourceInfo.Path) {
+	// check if the requested share creation has sufficient permissions to do so.
+	if shareCreationAllowed := conversions.SufficientCS3Permissions(
+		req.GetResourceInfo().GetPermissionSet(),
+		req.GetGrant().GetPermissions().GetPermissions(),
+	); !shareCreationAllowed {
+		return &collaboration.CreateShareResponse{
+			Status: status.NewInvalid(ctx, "insufficient permissions to create that kind of share"),
+		}, nil
+	}
+
+	if !s.isPathAllowed(req.GetResourceInfo().GetPath()) {
 		return &collaboration.CreateShareResponse{
 			Status: status.NewInvalid(ctx, "share creation is not allowed for the specified path"),
 		}, nil
 	}
 
-	share, err := s.sm.Share(ctx, req.ResourceInfo, req.Grant)
+	createdShare, err := s.sm.Share(ctx, req.GetResourceInfo(), req.GetGrant())
 	if err != nil {
 		return &collaboration.CreateShareResponse{
 			Status: status.NewStatusFromErrType(ctx, "error creating share", err),
 		}, nil
 	}
 
-	res := &collaboration.CreateShareResponse{
+	return &collaboration.CreateShareResponse{
 		Status: status.NewOK(ctx),
-		Share:  share,
-	}
-	return res, nil
+		Share:  createdShare,
+	}, nil
 }
 
 func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShareRequest) (*collaboration.RemoveShareResponse, error) {

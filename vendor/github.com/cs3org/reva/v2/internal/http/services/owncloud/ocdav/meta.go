@@ -158,7 +158,7 @@ func (h *MetaHandler) handlePathForUser(w http.ResponseWriter, r *http.Request, 
 			prop.Escaped("oc:meta-path-for-user", pathRes.Path),
 			prop.Escaped("oc:id", id),
 			prop.Escaped("oc:fileid", id),
-			prop.Escaped("oc:spaceid", rid.GetStorageId()),
+			prop.Escaped("oc:spaceid", storagespace.FormatStorageID(rid.GetStorageId(), rid.GetSpaceId())),
 		},
 	}
 	baseURI := ctx.Value(net.CtxKeyBaseURI).(string)

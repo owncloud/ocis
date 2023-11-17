@@ -1,6 +1,7 @@
-package conversions
+package unifiedrole
 
 import (
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/proto"
 )
@@ -33,7 +34,7 @@ const (
 
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
 func NewViewerUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
-	r := NewViewerRole(sharing)
+	r := conversions.NewViewerRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleViewerID),
 		Description: proto.String("Allows reading the shared file or folder"),
@@ -50,7 +51,7 @@ func NewViewerUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 
 // NewSpaceViewerUnifiedRole creates a spaceviewer role
 func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewSpaceViewerRole()
+	r := conversions.NewSpaceViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceViewerID),
 		Description: proto.String("Allows reading the shared space"),
@@ -67,7 +68,7 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewEditorUnifiedRole creates an editor role. `sharing` indicates if sharing permission should be added
 func NewEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
-	r := NewEditorRole(sharing)
+	r := conversions.NewEditorRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleEditorID),
 		Description: proto.String("Allows creating, reading, updating and deleting the shared file or folder"),
@@ -84,7 +85,7 @@ func NewEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 
 // NewSpaceEditorUnifiedRole creates an editor role
 func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewSpaceEditorRole()
+	r := conversions.NewSpaceEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceEditorID),
 		Description: proto.String("Allows creating, reading, updating and deleting file or folder in the shared space"),
@@ -100,8 +101,8 @@ func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 }
 
 // NewFileEditorUnifiedRole creates a file-editor role
-func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewFileEditorRole()
+func NewFileEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewFileEditorRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleFileEditorID),
 		Description: proto.String("Allows reading and updating file"),
@@ -118,7 +119,7 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewCoownerUnifiedRole creates a coowner role.
 func NewCoownerUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewCoownerRole()
+	r := conversions.NewCoownerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleCoownerID),
 		Description: proto.String("Grants co-owner permissions on a resource"),
@@ -135,7 +136,7 @@ func NewCoownerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewUploaderUnifiedRole creates an uploader role
 func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewUploaderRole()
+	r := conversions.NewUploaderRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleUploaderID),
 		Description: proto.String("Allows upload file or folder"),
@@ -152,7 +153,7 @@ func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewManagerUnifiedRole creates a manager role
 func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := NewManagerRole()
+	r := conversions.NewManagerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleManagerID),
 		Description: proto.String("Grants manager permissions on a resource. Semantically equivalent to co-owner"),
@@ -167,27 +168,27 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-func displayName(role *Role) *string {
+func displayName(role *conversions.Role) *string {
 	if role == nil {
 		return nil
 	}
 	var displayName string
 	switch role.Name {
-	case RoleViewer:
+	case conversions.RoleViewer:
 		displayName = "Viewer"
-	case RoleSpaceViewer:
+	case conversions.RoleSpaceViewer:
 		displayName = "Space Viewer"
-	case RoleEditor:
+	case conversions.RoleEditor:
 		displayName = "Editor"
-	case RoleSpaceEditor:
+	case conversions.RoleSpaceEditor:
 		displayName = "Space Editor"
-	case RoleFileEditor:
+	case conversions.RoleFileEditor:
 		displayName = "File Editor"
-	case RoleCoowner:
+	case conversions.RoleCoowner:
 		displayName = "Co Owner"
-	case RoleUploader:
+	case conversions.RoleUploader:
 		displayName = "Uploader"
-	case RoleManager:
+	case conversions.RoleManager:
 		displayName = "Manager"
 	default:
 		return nil
@@ -195,9 +196,9 @@ func displayName(role *Role) *string {
 	return proto.String(displayName)
 }
 
-func convert(role *Role) []string {
+func convert(role *conversions.Role) []string {
 	actions := make([]string, 0, 8)
-	if role == nil && role.cS3ResourcePermissions == nil {
+	if role == nil && role.CS3ResourcePermissions() == nil {
 		return actions
 	}
 	p := role.CS3ResourcePermissions()

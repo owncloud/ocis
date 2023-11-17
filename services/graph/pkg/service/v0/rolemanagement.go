@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
@@ -39,14 +39,14 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 
 func getRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
 	return []*libregraph.UnifiedRoleDefinition{
-		conversions.NewViewerUnifiedRole(resharing),
-		conversions.NewSpaceViewerUnifiedRole(),
-		conversions.NewEditorUnifiedRole(resharing),
-		conversions.NewSpaceEditorUnifiedRole(),
-		conversions.NewFileEditorUnifiedRole(),
-		conversions.NewCoownerUnifiedRole(),
-		conversions.NewUploaderUnifiedRole(),
-		conversions.NewManagerUnifiedRole(),
+		unifiedrole.NewViewerUnifiedRole(resharing),
+		unifiedrole.NewSpaceViewerUnifiedRole(),
+		unifiedrole.NewEditorUnifiedRole(resharing),
+		unifiedrole.NewSpaceEditorUnifiedRole(),
+		unifiedrole.NewFileEditorUnifiedRole(resharing),
+		unifiedrole.NewCoownerUnifiedRole(),
+		unifiedrole.NewUploaderUnifiedRole(),
+		unifiedrole.NewManagerUnifiedRole(),
 	}
 }
 
