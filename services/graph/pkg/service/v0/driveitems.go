@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,19 +11,28 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
+	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"golang.org/x/crypto/sha3"
+	"golang.org/x/sync/errgroup"
+
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	"golang.org/x/crypto/sha3"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
 // GetRootDriveChildren implements the Service interface.
@@ -232,6 +242,207 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &ListResponse{Value: files})
+}
+
+// Invite invites a user to a storage drive (space).
+func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse driveID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		return
+	}
+
+	itemID, err := parseIDParam(r, "itemID")
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse itemID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
+		return
+	}
+
+	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
+		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "driveID and itemID do not match")
+		return
+	}
+
+	driveItemInvite := &libregraph.DriveItemInvite{}
+	if err := StrictJSONUnmarshal(r.Body, driveItemInvite); err != nil {
+		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("failed unmarshalling request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	ctx := r.Context()
+
+	if err = validate.StructCtx(ctx, driveItemInvite); err != nil {
+		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	switch {
+	case err != nil:
+		fallthrough
+	case statResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		g.logger.Debug().Err(err).Interface("itemID", itemID).Interface("Stat", statResponse).Msg("stat failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	role := conversions.RoleFromName(driveItemInvite.GetRoles()[0], g.config.FilesSharing.EnableResharing)
+	roleJson, err := json.Marshal(role)
+	if err != nil {
+		g.logger.Debug().Err(err).Interface("role", role).Msg("stat marshaling failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	createShareErrors := sync.Map{}
+	createShareSuccesses := sync.Map{}
+
+	shareCreateGroup, ctx := errgroup.WithContext(ctx)
+
+	for _, driveRecipient := range driveItemInvite.GetRecipients() {
+		// not needed anymore with go 1.22 and higher
+		driveRecipient := driveRecipient // https://golang.org/doc/faq#closures_and_goroutines,
+
+		shareCreateGroup.Go(func() error {
+			objectId := driveRecipient.GetObjectId()
+
+			if objectId == "" {
+				return nil
+			}
+
+			createShareRequest := &collaboration.CreateShareRequest{
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{
+						"role": {
+							Decoder: "json",
+							Value:   roleJson,
+						},
+					},
+				},
+				ResourceInfo: statResponse.GetInfo(),
+				Grant: &collaboration.ShareGrant{
+					Permissions: &collaboration.SharePermissions{
+						Permissions: role.CS3ResourcePermissions(),
+					},
+				},
+			}
+
+			permission := &libregraph.Permission{
+				Roles: []string{role.Name},
+			}
+
+			switch driveRecipient.GetLibreGraphRecipientType() {
+			case "group":
+				group, err := g.identityCache.GetGroup(ctx, objectId)
+				if err != nil {
+					g.logger.Debug().Err(err).Interface("groupId", objectId).Msg("failed group lookup")
+					createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
+					return nil
+				}
+				createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
+					Type: storageprovider.GranteeType_GRANTEE_TYPE_GROUP,
+					Id: &storageprovider.Grantee_GroupId{GroupId: &grouppb.GroupId{
+						OpaqueId: group.GetId(),
+					}},
+				}
+				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
+					Group: &libregraph.Identity{
+						DisplayName: group.GetDisplayName(),
+						Id:          libregraph.PtrString(group.GetId()),
+					},
+				}
+			default:
+				user, err := g.identityCache.GetUser(ctx, objectId)
+				if err != nil {
+					g.logger.Debug().Err(err).Interface("userId", objectId).Msg("failed user lookup")
+					createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
+					return nil
+				}
+				createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
+					Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
+					Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
+						OpaqueId: user.GetId(),
+					}},
+				}
+				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
+					User: &libregraph.Identity{
+						DisplayName: user.GetDisplayName(),
+						Id:          libregraph.PtrString(user.GetId()),
+					},
+				}
+			}
+
+			if driveItemInvite.ExpirationDateTime != nil {
+				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*driveItemInvite.ExpirationDateTime)
+			}
+
+			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
+			switch {
+			case err != nil:
+				fallthrough
+			case createShareResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+				g.logger.Debug().Err(err).Msg("share creation failed")
+				createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
+				return nil
+			}
+
+			if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
+				permission.Id = libregraph.PtrString(id)
+			}
+
+			if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
+				permission.ExpirationDateTime = libregraph.PtrTime(utils.TSToTime(expiration))
+			}
+
+			createShareSuccesses.Store(objectId, permission)
+
+			return nil
+		})
+	}
+
+	if err := shareCreateGroup.Wait(); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	value := make([]interface{}, 0, len(driveItemInvite.Recipients))
+
+	hasSuccesses := false
+	createShareSuccesses.Range(func(key, permission interface{}) bool {
+		value = append(value, permission)
+		hasSuccesses = true
+		return true
+	})
+
+	hasErrors := false
+	createShareErrors.Range(func(key, err interface{}) bool {
+		value = append(value, err)
+		hasErrors = true
+		return true
+	})
+
+	switch {
+	case hasErrors && hasSuccesses:
+		render.Status(r, http.StatusMultiStatus)
+	case hasSuccesses:
+		render.Status(r, http.StatusCreated)
+	default:
+		render.Status(r, http.StatusInternalServerError)
+	}
+
+	render.JSON(w, r, &ListResponse{Value: value})
 }
 
 func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
@@ -531,14 +742,14 @@ func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode stri
 	if id == nil {
 		return ""
 	}
-	sha3 := sha3.NewShake256()
-	_, _ = sha3.Write([]byte(id.GetStorageId()))
-	_, _ = sha3.Write([]byte(id.GetSpaceId()))
-	_, _ = sha3.Write([]byte(id.GetOpaqueId()))
-	_, _ = sha3.Write([]byte(imagenode))
-	_, _ = sha3.Write([]byte(readmeNode))
+	shakeHash := sha3.NewShake256()
+	_, _ = shakeHash.Write([]byte(id.GetStorageId()))
+	_, _ = shakeHash.Write([]byte(id.GetSpaceId()))
+	_, _ = shakeHash.Write([]byte(id.GetOpaqueId()))
+	_, _ = shakeHash.Write([]byte(imagenode))
+	_, _ = shakeHash.Write([]byte(readmeNode))
 	h := make([]byte, 64)
-	_, _ = sha3.Read(h)
+	_, _ = shakeHash.Read(h)
 	return fmt.Sprintf("%x", h)
 }
 

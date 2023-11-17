@@ -8,6 +8,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/pkg/errors"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/events"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
@@ -21,9 +25,6 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/pkg/errors"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/events"
 )
 
 // Server initializes the http service and server.
