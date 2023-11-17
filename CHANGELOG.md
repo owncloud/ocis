@@ -37,6 +37,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
+* Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
@@ -58,6 +59,24 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7678
    https://github.com/owncloud/ocis/pull/7705
+
+* Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
+
+   We've fixed the last month search edge case when currently is 31-th.
+
+   Https://github.com/owncloud/ocis/issues/7629
+   https://github.com/owncloud/ocis/pull/7742
+
+   https://github.com/golang/go/issues/31145
+   The
+   issue
+   is
+   related
+   to
+   the
+   build-in
+   package
+   behavior
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
