@@ -173,5 +173,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L303)
 - [apiLocks/lockFiles.feature:304](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L304)
 
+#### [Folders can be locked and locking works partially](https://github.com/owncloud/ocis/issues/7641)
+
+- [apiLocks/lockFiles.feature:364](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L364)
+- [apiLocks/lockFiles.feature:365](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L365)
+- [apiLocks/lockFiles.feature:366](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L366)
+- [apiLocks/lockFiles.feature:367](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L367)
+- [apiLocks/lockFiles.feature:368](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L368)
+- [apiLocks/lockFiles.feature:369](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L369)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

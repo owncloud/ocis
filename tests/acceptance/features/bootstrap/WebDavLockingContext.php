@@ -144,7 +144,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to lock file :file using the WebDAV API setting the following properties
+	 * @When user :user tries to lock file/folder :file using the WebDAV API setting the following properties
 	 *
 	 * @param string $user
 	 * @param string $file

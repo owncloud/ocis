@@ -349,3 +349,21 @@ Feature: lock files
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
+
+  @issue-7641
+  Scenario Outline: try to lock a folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "locked/"
+    When user "Alice" tries to lock folder "locked/" using the WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "403"
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "locked/textfile0.txt"
+    And user "Alice" should be able to create folder "/locked/sub-folder"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
