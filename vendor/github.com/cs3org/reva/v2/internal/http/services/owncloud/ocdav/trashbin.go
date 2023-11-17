@@ -36,6 +36,7 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"go.opentelemetry.io/otel/codes"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -44,17 +45,20 @@ import (
 	rstatus "github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
 
 // TrashbinHandler handles trashbin requests
 type TrashbinHandler struct {
-	gatewaySvc string
-	namespace  string
+	gatewaySvc                  string
+	namespace                   string
+	allowPropfindDepthInfinitiy bool
 }
 
 func (h *TrashbinHandler) init(c *config.Config) error {
 	h.gatewaySvc = c.GatewaySvc
 	h.namespace = path.Join("/", c.FilesNamespace)
+	h.allowPropfindDepthInfinitiy = c.AllowPropfindDepthInfinitiy
 	return nil
 }
 
@@ -186,8 +190,26 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 	dh := r.Header.Get(net.HeaderDepth)
 	depth, err := net.ParseDepth(dh)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid Depth header value")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
+	if depth == net.DepthInfinity && !h.allowPropfindDepthInfinitiy {
+		span.RecordError(errors.ErrInvalidDepth)
+		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
 
