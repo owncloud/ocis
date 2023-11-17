@@ -190,6 +190,33 @@ func (p *Handler) HandlePathPropfind(w http.ResponseWriter, r *http.Request, ns 
 	fn := path.Join(ns, r.URL.Path) // TODO do we still need to jail if we query the registry about the spaces?
 
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
+	dh := r.Header.Get(net.HeaderDepth)
+
+	depth, err := net.ParseDepth(dh)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid Depth header value")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
+	if depth == net.DepthInfinity && !p.c.AllowPropfindDepthInfinitiy {
+		span.RecordError(errors.ErrInvalidDepth)
+		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
 	pf, status, err := ReadPropfind(r.Body)
 	if err != nil {
 		sublog.Debug().Err(err).Msg("error reading propfind request")
@@ -218,7 +245,7 @@ func (p *Handler) HandlePathPropfind(w http.ResponseWriter, r *http.Request, ns 
 		return
 	}
 
-	resourceInfos, sendTusHeaders, ok := p.getResourceInfos(ctx, w, r, pf, spaces, fn, sublog)
+	resourceInfos, sendTusHeaders, ok := p.getResourceInfos(ctx, w, r, pf, spaces, fn, depth, sublog)
 	if !ok {
 		// getResourceInfos handles responses in case of an error so we can just return here.
 		return
@@ -462,21 +489,11 @@ func (p *Handler) statSpace(ctx context.Context, client gateway.GatewayAPIClient
 	return res.GetInfo(), res.GetStatus(), nil
 }
 
-func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r *http.Request, pf XML, spaces []*provider.StorageSpace, requestPath string, log zerolog.Logger) ([]*provider.ResourceInfo, bool, bool) {
+func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r *http.Request, pf XML, spaces []*provider.StorageSpace, requestPath string, depth net.Depth, log zerolog.Logger) ([]*provider.ResourceInfo, bool, bool) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "get_resource_infos")
 	span.SetAttributes(attribute.KeyValue{Key: "requestPath", Value: attribute.StringValue(requestPath)})
-	defer span.End()
-
-	dh := r.Header.Get(net.HeaderDepth)
-	depth, err := net.ParseDepth(dh)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
-		errors.HandleWebdavError(&log, w, b, err)
-		return nil, false, false
-	}
 	span.SetAttributes(attribute.KeyValue{Key: "depth", Value: attribute.StringValue(depth.String())})
+	defer span.End()
 
 	client, err := p.selector.Next()
 	if err != nil {

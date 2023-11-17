@@ -20,15 +20,19 @@ package ocdav
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"path"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
+	"go.opentelemetry.io/otel/codes"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
 
 // PublicFileHandler handles requests on a shared file. it needs to be wrapped in a collection
@@ -99,8 +103,26 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 	dh := r.Header.Get(net.HeaderDepth)
 	depth, err := net.ParseDepth(dh)
 	if err != nil {
-		sublog.Debug().Msg(err.Error())
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid Depth header value")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
+	if depth == net.DepthInfinity && !s.c.AllowPropfindDepthInfinitiy {
+		span.RecordError(errors.ErrInvalidDepth)
+		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
+		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
 
