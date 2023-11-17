@@ -38,6 +38,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
+* Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
@@ -77,6 +78,15 @@ The following sections list the changes for unreleased.
    build-in
    package
    behavior
+
+* Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
+
+   We fixed a bug that caused Error 500 when user try to unlock file using fileid The
+   handleSpaceUnlock has been added
+
+   https://github.com/owncloud/ocis/issues/7708
+   https://github.com/owncloud/ocis/pull/7726
+   https://github.com/cs3org/reva/pull/4338
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
