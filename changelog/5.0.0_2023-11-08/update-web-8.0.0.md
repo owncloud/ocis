@@ -70,5 +70,5 @@ We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for de
 * Enhancement [owncloud/web#9912](https://github.com/owncloud/web/pull/9912) - Add media type filter chip
 
 
-https://github.com/owncloud/ocis/pull/7734
-https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.8
+https://github.com/owncloud/ocis/pull/7748
+https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.9
