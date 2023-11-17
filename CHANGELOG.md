@@ -40,6 +40,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
+* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
@@ -159,6 +160,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7432
    https://github.com/owncloud/ocis/pull/7602
+
+* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+
+   Allows adding custom routes to the ocis proxy. This enables customs ocis extensions
+
+   https://github.com/owncloud/ocis/pull/7740
 
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 
