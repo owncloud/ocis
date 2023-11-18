@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -25,13 +24,13 @@ import (
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
@@ -298,12 +297,16 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role := conversions.RoleFromName(driveItemInvite.GetRoles()[0], g.config.FilesSharing.EnableResharing)
-	roleJson, err := json.Marshal(role)
-	if err != nil {
-		g.logger.Debug().Err(err).Interface("role", role).Msg("stat marshaling failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
+	unifiedRolePermissions := []libregraph.UnifiedRolePermission{{AllowedResourceActions: driveItemInvite.LibreGraphPermissionsActions}}
+	for _, roleId := range driveItemInvite.GetRoles() {
+		role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
+		if err != nil {
+			g.logger.Debug().Err(err).Interface("role", driveItemInvite.GetRoles()[0]).Msg("unable to convert requested role")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+			return
+		}
+
+		unifiedRolePermissions = append(unifiedRolePermissions, role.GetRolePermissions()...)
 	}
 
 	createShareErrors := sync.Map{}
@@ -322,25 +325,24 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 				return nil
 			}
 
+			cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
+
 			createShareRequest := &collaboration.CreateShareRequest{
-				Opaque: &types.Opaque{
-					Map: map[string]*types.OpaqueEntry{
-						"role": {
-							Decoder: "json",
-							Value:   roleJson,
-						},
-					},
-				},
 				ResourceInfo: statResponse.GetInfo(),
 				Grant: &collaboration.ShareGrant{
 					Permissions: &collaboration.SharePermissions{
-						Permissions: role.CS3ResourcePermissions(),
+						Permissions: cs3ResourcePermissions,
 					},
 				},
 			}
 
-			permission := &libregraph.Permission{
-				Roles: []string{role.Name},
+			permission := &libregraph.Permission{}
+			if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, unifiedrole.UnifiedRoleConditionGrantee, g.config.FilesSharing.EnableResharing); role != nil {
+				permission.Roles = []string{role.GetId()}
+			}
+
+			if len(permission.GetRoles()) == 0 {
+				permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(*cs3ResourcePermissions)
 			}
 
 			switch driveRecipient.GetLibreGraphRecipientType() {

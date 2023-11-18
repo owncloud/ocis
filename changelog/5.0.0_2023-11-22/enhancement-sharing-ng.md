@@ -15,6 +15,7 @@ https://github.com/owncloud/ocis/pull/7684
 https://github.com/owncloud/ocis/pull/7683
 https://github.com/owncloud/ocis/pull/7239
 https://github.com/owncloud/ocis/pull/7687
+https://github.com/owncloud/ocis/pull/7751
 https://github.com/owncloud/libre-graph-api/pull/112
 https://github.com/owncloud/ocis/issues/7436
 https://github.com/owncloud/ocis/issues/6993

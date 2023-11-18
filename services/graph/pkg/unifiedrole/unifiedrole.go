@@ -1,6 +1,8 @@
 package unifiedrole
 
 import (
+	"errors"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -189,6 +191,19 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
+// NewUnifiedRoleFromID returns a unified role definition from the provided id
+func NewUnifiedRoleFromID(id string, resharing bool) (*libregraph.UnifiedRoleDefinition, error) {
+	for _, definition := range GetBuiltinRoleDefinitionList(resharing) {
+		if definition.GetId() != id {
+			continue
+		}
+
+		return definition, nil
+	}
+
+	return nil, errors.New("role not found")
+}
+
 func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
 	return []*libregraph.UnifiedRoleDefinition{
 		NewViewerUnifiedRole(resharing),
@@ -200,6 +215,58 @@ func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefin
 		NewUploaderUnifiedRole(),
 		NewManagerUnifiedRole(),
 	}
+}
+
+// PermissionsToCS3ResourcePermissions converts the provided libregraph UnifiedRolePermissions to a cs3 ResourcePermissions
+func PermissionsToCS3ResourcePermissions(unifiedRolePermissions []libregraph.UnifiedRolePermission) *provider.ResourcePermissions {
+	p := &provider.ResourcePermissions{}
+
+	for _, permission := range unifiedRolePermissions {
+		for _, allowedResourceAction := range permission.AllowedResourceActions {
+			switch allowedResourceAction {
+			case DriveItemPermissionsCreate:
+				p.AddGrant = true
+			case DriveItemChildrenCreate:
+				p.CreateContainer = true
+			case DriveItemStandardDelete:
+				p.Delete = true
+			case DriveItemPathRead:
+				p.GetPath = true
+			case DriveItemQuotaRead:
+				p.GetQuota = true
+			case DriveItemContentRead:
+				p.InitiateFileDownload = true
+			case DriveItemUploadCreate:
+				p.InitiateFileUpload = true
+			case DriveItemPermissionsRead:
+				p.ListGrants = true
+			case DriveItemChildrenRead:
+				p.ListContainer = true
+			case DriveItemVersionsRead:
+				p.ListFileVersions = true
+			case DriveItemDeletedRead:
+				p.ListRecycle = true
+			case DriveItemPathUpdate:
+				p.Move = true
+			case DriveItemPermissionsDelete:
+				p.RemoveGrant = true
+			case DriveItemDeletedDelete:
+				p.PurgeRecycle = true
+			case DriveItemVersionsUpdate:
+				p.RestoreFileVersion = true
+			case DriveItemDeletedUpdate:
+				p.RestoreRecycleItem = true
+			case DriveItemBasicRead:
+				p.Stat = true
+			case DriveItemPermissionsUpdate:
+				p.UpdateGrant = true
+			case DriveItemPermissionsDeny:
+				p.DenyGrant = true
+			}
+		}
+	}
+
+	return p
 }
 
 // CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
