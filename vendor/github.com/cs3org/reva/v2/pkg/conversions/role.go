@@ -283,7 +283,6 @@ func NewFileEditorRole(sharing bool) *Role {
 			GetPath:              true,
 			GetQuota:             true,
 			InitiateFileDownload: true,
-			ListGrants:           true,
 			ListContainer:        true,
 			ListRecycle:          true,
 			Stat:                 true,
