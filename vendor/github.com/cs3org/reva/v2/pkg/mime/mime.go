@@ -957,6 +957,7 @@ var mimeTypes = map[string]string{
 	"uoml":                     "application/vnd.uoml+xml",
 	"uri":                      "text/uri-list",
 	"uris":                     "text/uri-list",
+	"url":                      "text/uri-list",
 	"urls":                     "text/uri-list",
 	"ustar":                    "application/x-ustar",
 	"utz":                      "application/vnd.uiq.theme",
