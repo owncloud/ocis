@@ -13,6 +13,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -27,13 +28,13 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 
 	driveItems := make(driveItemsByResourceID)
 	var err error
-	driveItems, err = g.listUserShares(ctx, driveItems)
+	driveItems, err = g.listUserShares(ctx, nil, driveItems)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
 	}
 
-	driveItems, err = g.listPublicShares(ctx, driveItems)
+	driveItems, err = g.listPublicShares(ctx, nil, driveItems)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -48,19 +49,21 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: res})
 }
 
-func (g Graph) listUserShares(ctx context.Context, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
+func (g Graph) listUserShares(ctx context.Context, filters []*collaboration.Filter, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not select next gateway client")
 		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
-	filters := []*collaboration.Filter{
+	concreteFilters := []*collaboration.Filter{
 		share.UserGranteeFilter(),
 		share.GroupGranteeFilter(),
 	}
+	concreteFilters = append(concreteFilters, filters...)
+
 	lsUserSharesRequest := collaboration.ListSharesRequest{
-		Filters: filters,
+		Filters: concreteFilters,
 	}
 
 	lsUserSharesResponse, err := gatewayClient.ListShares(ctx, &lsUserSharesRequest)
@@ -77,7 +80,7 @@ func (g Graph) listUserShares(ctx context.Context, driveItems driveItemsByResour
 	return driveItems, nil
 }
 
-func (g Graph) listPublicShares(ctx context.Context, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
+func (g Graph) listPublicShares(ctx context.Context, filters []*link.ListPublicSharesRequest_Filter, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
 
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
@@ -85,10 +88,11 @@ func (g Graph) listPublicShares(ctx context.Context, driveItems driveItemsByReso
 		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
-	filters := []*link.ListPublicSharesRequest_Filter{}
+	var concreteFilters []*link.ListPublicSharesRequest_Filter
+	concreteFilters = append(concreteFilters, filters...)
 
 	req := link.ListPublicSharesRequest{
-		Filters: filters,
+		Filters: concreteFilters,
 	}
 
 	lsPublicSharesResponse, err := gatewayClient.ListPublicShares(ctx, &req)

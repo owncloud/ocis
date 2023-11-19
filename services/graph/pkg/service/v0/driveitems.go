@@ -17,9 +17,12 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
+	"github.com/cs3org/reva/v2/pkg/publicshare"
+	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/crypto/sha3"
@@ -29,6 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -244,18 +248,92 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: files})
 }
 
-// Invite invites a user to a storage drive (space).
-func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+// ListPermissions lists the permissions of a driveItem
+func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, ok := g.GetGatewayClient(w, r)
+	if !ok {
+		return
+	}
+
+	_, itemID, ok := g.GetDriveAndItemIDParam(w, r)
+	if !ok {
+		return
+	}
+
+	ctx := r.Context()
+
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	fmt.Println(1)
+	switch {
+	case err != nil:
+		fallthrough
+	case statResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		g.logger.Debug().Err(err).Interface("itemID", itemID).Interface("Stat", statResponse).Msg("stat failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	case statResponse.GetInfo().GetPermissionSet() == nil:
+		fallthrough
+	case statResponse.GetInfo().GetOwner() == nil:
+		g.logger.Debug().Interface("Stat", statResponse).Msg("incomplete stat response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
 	}
 
-	_, itemID, err := g.extractDriveAndDriveItem(r)
+	permissionSet := *statResponse.GetInfo().GetPermissionSet()
+	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
+
+	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{
+		LibreGraphPermissionsActionsAllowedValues: allowedActions,
+		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
+			unifiedrole.GetApplicableRoleDefinitionsForActions(
+				allowedActions,
+				unifiedrole.UnifiedRoleConditionGrantee,
+				g.config.FilesSharing.EnableResharing,
+				false,
+			),
+		),
+	}
+
+	for i, definition := range collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues {
+		// the openapi spec defines that the rolePermissions should not be part of the response
+		definition.RolePermissions = nil
+		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues[i] = definition
+	}
+
+	driveItems := make(driveItemsByResourceID)
+	driveItems, err = g.listUserShares(ctx, []*collaboration.Filter{
+		share.ResourceIDFilter(conversions.ToPointer(itemID)),
+	}, driveItems)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	driveItems, err = g.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
+		publicshare.ResourceIDFilter(conversions.ToPointer(itemID)),
+	}, driveItems)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	for _, driveItem := range driveItems {
+		collectionOfPermissions.Value = append(collectionOfPermissions.Value, driveItem.Permissions...)
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, collectionOfPermissions)
+}
+
+// Invite invites a user to a storage drive (space).
+func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, ok := g.GetGatewayClient(w, r)
+	if !ok {
+		return
+	}
+
+	_, itemID, ok := g.GetDriveAndItemIDParam(w, r)
+	if !ok {
 		return
 	}
 
@@ -268,10 +346,22 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	if err = validate.StructCtx(ctx, driveItemInvite); err != nil {
+	if err := validate.StructCtx(ctx, driveItemInvite); err != nil {
 		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: driveItemInvite.LibreGraphPermissionsActions}}
+	for _, roleId := range driveItemInvite.GetRoles() {
+		role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
+		if err != nil {
+			g.logger.Debug().Err(err).Interface("role", driveItemInvite.GetRoles()[0]).Msg("unable to convert requested role")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+			return
+		}
+
+		unifiedRolePermissions = append(unifiedRolePermissions, conversions.ToPointerSlice(role.GetRolePermissions())...)
 	}
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
@@ -282,18 +372,6 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		g.logger.Debug().Err(err).Interface("itemID", itemID).Interface("Stat", statResponse).Msg("stat failed")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
-	}
-
-	unifiedRolePermissions := []libregraph.UnifiedRolePermission{{AllowedResourceActions: driveItemInvite.LibreGraphPermissionsActions}}
-	for _, roleId := range driveItemInvite.GetRoles() {
-		role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
-		if err != nil {
-			g.logger.Debug().Err(err).Interface("role", driveItemInvite.GetRoles()[0]).Msg("unable to convert requested role")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-			return
-		}
-
-		unifiedRolePermissions = append(unifiedRolePermissions, role.GetRolePermissions()...)
 	}
 
 	createShareErrors := sync.Map{}
@@ -349,7 +427,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 					Group: &libregraph.Identity{
 						DisplayName: group.GetDisplayName(),
-						Id:          libregraph.PtrString(group.GetId()),
+						Id:          conversions.ToPointer(group.GetId()),
 					},
 				}
 			default:
@@ -368,7 +446,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 					User: &libregraph.Identity{
 						DisplayName: user.GetDisplayName(),
-						Id:          libregraph.PtrString(user.GetId()),
+						Id:          conversions.ToPointer(user.GetId()),
 					},
 				}
 			}
@@ -388,7 +466,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
-				permission.Id = libregraph.PtrString(id)
+				permission.Id = conversions.ToPointer(id)
 			}
 
 			if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {

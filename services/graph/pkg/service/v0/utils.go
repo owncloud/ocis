@@ -5,7 +5,9 @@ import (
 	"io"
 	"net/http"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
@@ -14,6 +16,18 @@ func StrictJSONUnmarshal(r io.Reader, v interface{}) error {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
 	return dec.Decode(v)
+}
+
+// IsSpaceRoot returns true if the resourceID is a space root.
+func IsSpaceRoot(rid *storageprovider.ResourceId) bool {
+	if rid == nil {
+		return false
+	}
+	if rid.GetSpaceId() == "" || rid.GetOpaqueId() == "" {
+		return false
+	}
+
+	return rid.GetSpaceId() == rid.GetOpaqueId()
 }
 
 // GetDriveAndItemIDParam parses the driveID and itemID from the request,
@@ -43,9 +57,21 @@ func (g Graph) GetDriveAndItemIDParam(w http.ResponseWriter, r *http.Request) (s
 
 	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
 		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "driveID and itemID do not match")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "driveID and itemID do not match")
 		return empty, empty, false
 	}
 
 	return driveID, itemID, true
+}
+
+// GetGatewayClient returns a gateway client from the gatewaySelector.
+func (g Graph) GetGatewayClient(w http.ResponseWriter, r *http.Request) (gateway.GatewayAPIClient, bool) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return nil, false
+	}
+
+	return gatewayClient, true
 }
