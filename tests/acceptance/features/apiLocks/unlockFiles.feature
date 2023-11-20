@@ -21,7 +21,7 @@ Feature: unlock locked items
       | new              |
       | spaces           |
 
-
+  @issue-7761
   Scenario Outline: public tries to unlock a file in a share that was locked by the file owner
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
@@ -33,8 +33,8 @@ Feature: unlock locked items
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When the public unlocks file "/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And 0 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    Then the HTTP status code should be "403"
+    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
     Examples:
       | dav-path-version | lock-scope |
       | old              | shared     |
