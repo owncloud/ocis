@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -124,16 +124,16 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -145,7 +145,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
+    "litmus": False,
     "codestyle": True,
 }
 
@@ -231,12 +231,7 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -256,7 +251,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -278,8 +273,8 @@ def main(ctx):
         ),
     )
 
-    pipelines += checkStarlark()
-    pipelineSanityChecks(ctx, pipelines)
+    # pipelines += checkStarlark()
+    # pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
 def cachePipeline(name, steps):

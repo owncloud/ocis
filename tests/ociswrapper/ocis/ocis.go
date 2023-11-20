@@ -85,8 +85,10 @@ func Start(envMap map[string]any) {
 }
 
 func Stop() {
-	err := cmd.Process.Kill()
+	err := cmd.Process.Signal(syscall.SIGINT)
 	if err != nil {
+		log.Println("here......")
+		log.Println(err.Error())
 		if !strings.HasSuffix(err.Error(), "process already finished") {
 			log.Fatalln(err)
 		}
@@ -133,11 +135,16 @@ func WaitForConnection() bool {
 }
 
 func Restart(envMap map[string]any) bool {
-	log.Println("Restarting oCIS server...")
+	log.Println("Stopping oCIS server...")
 	Stop()
+
+	time.Sleep(5 * time.Second)
 
 	common.Wg.Add(1)
 	go Start(envMap)
+	log.Println("Restarting oCIS server...")
+
+	time.Sleep(5 * time.Second)
 
 	return WaitForConnection()
 }
