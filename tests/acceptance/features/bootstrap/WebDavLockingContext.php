@@ -531,8 +531,8 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		if ($public === true) {
-			$type = "public-files";
-			$password = null;
+			$type = "public-files-new";
+			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";
 			$password = $this->featureContext->getPasswordForUser($user);
