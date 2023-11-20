@@ -1161,7 +1161,7 @@ def e2eTests(ctx):
     for name, suite in test_suites.items():
         steps = \
             skipIfUnchanged(ctx, "e2e-tests") + \
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if suite["tikaNeeded"] else []) + \
