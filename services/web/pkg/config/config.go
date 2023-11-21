@@ -71,7 +71,6 @@ type OIDC struct {
 	ResponseType          string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"The OIDC response type to use for authentication."`
 	Scope                 string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc."`
 	PostLogoutRedirectURI string `json:"post_logout_redirect_uri,omitempty" yaml:"post_logout_redirect_uri" env:"WEB_OIDC_POST_LOGOUT_REDIRECT_URI" desc:"This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page."`
-	LoadUserInfo          bool   `json:"loadUserInfo" yaml:"load_userinfo" env:"WEB_OIDC_LOAD_USERINFO" desc:"Make a call to the oidc userinfo endpoint of the idp. For on premise AD FS this must be set to 'false'. The default is 'true'."`
 }
 
 // Application defines an application for the Web app switcher.
