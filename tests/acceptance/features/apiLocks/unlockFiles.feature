@@ -89,6 +89,116 @@ Feature: unlock locked items
       | spaces           | shared     |
       | spaces           | exclusive  |
 
+  @issue-7767
+  Scenario Outline: trying to unlock a shared file that has been locked by the file owner
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
+      | lockscope | <lock-scope> |
+    When user "Brian" unlocks file "Shares/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    And 1 locks should be reported for file "Shares/parent.txt" of user "Brian" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+
+  Scenario Outline: trying to unlock a file inside the shared folder that has been locked by the file owner
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
+      | lockscope | <lock-scope> |
+    And user "Alice" has shared folder "PARENT" with user "Brian"
+    When user "Brian" unlocks file "Shares/PARENT/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    And 1 locks should be reported for file "Shares/PARENT/parent.txt" of user "Brian" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+  @issue-7599
+  Scenario Outline: sharee unlocks a shared file
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Brian" has locked file "Shares/parent.txt" setting the following properties
+      | lockscope | <lock-scope> |
+    When user "Brian" unlocks the last created lock of file "Shares/parent.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And 0 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    And 0 locks should be reported for file "Shares/parent.txt" of user "Brian" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+  @issue-7599
+  Scenario Outline: try to unlock a shared file locked by the receiver
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Brian" has locked file "Shares/parent.txt" setting the following properties
+      | lockscope | <lock-scope> |
+    When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/parent.txt" of user "Brian" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    And 1 locks should be reported for file "Shares/parent.txt" of user "Brian" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+  @issue-7599
+  Scenario Outline: try to unlock a file in a shared folder, which was locked by the sharee as the owner
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared folder "PARENT" with user "Brian"
+    And user "Brian" has locked file "Shares/PARENT/parent.txt" setting the following properties
+      | lockscope | <lock-scope> |
+    When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/PARENT/parent.txt" of user "Brian" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
+    And 1 locks should be reported for file "Shares/PARENT/parent.txt" of user "Brian" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
   @issue-7696
   Scenario Outline: unlock a locked file in project space
     Given using spaces DAV path
