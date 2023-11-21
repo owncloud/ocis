@@ -61,7 +61,7 @@ class SearchContext implements Context {
 	): void {
 		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
 		// short wait is necessary before searching
-		// sleep(5);
+		sleep(5);
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
