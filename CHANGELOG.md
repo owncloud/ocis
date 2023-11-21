@@ -831,10 +831,11 @@ The following sections list the changes for 5.0.0.
 
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
-   Two new configs for the Web embed mode have been added:
+   New configs for the Web embed mode have been added:
 
-  * `mode` Defines the mode in which Web will be running.
-  * `embedTarget` Defines how Web is being integrated when running in embed mode.
+  * `enabled` Defines if embed mode is enabled.
+  * `target` Defines how Web is being integrated when running in embed mode.
+  * `messagesOrigin` Defines a URL under which Web can be integrated via iFrame.
 
    https://github.com/owncloud/web/issues/9768
    https://github.com/owncloud/ocis/pull/7670
