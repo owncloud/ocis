@@ -26,8 +26,7 @@ type Options struct {
 	AccessDeniedHelpURL      string           `json:"accessDeniedHelpUrl,omitempty" yaml:"accessDeniedHelpUrl" env:"WEB_OPTION_ACCESS_DENIED_HELP_URL" desc:"Specifies the target URL valid for the ocis instance for the generic logged out / access denied page."`
 	TokenStorageLocal        bool             `json:"tokenStorageLocal" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required."`
 	DisabledExtensions       []string         `json:"disabledExtensions,omitempty" yaml:"disabledExtensions" env:"WEB_OPTION_DISABLED_EXTENSIONS" desc:"A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details."`
-	Mode                     string           `json:"mode,omitempty" yaml:"mode" env:"WEB_OPTION_MODE" desc:"Defines the mode in which Web will be running. Currently, the only supported options are '' (empty) and 'embed'. With '' which is the default, Web will run as usual with all functionality enabled. 'embed' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. See the text description for more details."`
-	EmbedTarget              string           `json:"embedTarget,omitempty" yaml:"embedTarget" env:"WEB_OPTION_EMBED_TARGET" desc:"Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'.  With '' which is the default, Web will run regular as defined via the 'mode' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the text description for more details."`
+	Embed                    *Embed           `json:"embed,omitempty" yaml:"embed"`
 }
 
 // AccountEditLink are the AccountEditLink options
@@ -72,4 +71,11 @@ type XHR struct {
 type Editor struct {
 	AutosaveEnabled  bool `json:"autosaveEnabled,omitempty" yaml:"autosaveEnabled" env:"WEB_OPTION_EDITOR_AUTOSAVE_ENABLED" desc:"Specifies if the autosave for the editor apps is enabled."`
 	AutosaveInterval int  `json:"autosaveInterval,omitempty" yaml:"autosaveInterval" env:"WEB_OPTION_EDITOR_AUTOSAVE_INTERVAL" desc:"Specifies the time interval for the autosave of editor apps in seconds. Has no effect when WEB_OPTION_EDITOR_AUTOSAVE_ENABLED is set to 'false'."`
+}
+
+// Embed are the Embed options
+type Embed struct {
+	Enabled        string `json:"enabled,omitempty" yaml:"enabled" env:"WEB_OPTION_EMBED_ENABLED" desc:"Defines whether Web should be running in 'embed' mode. Setting this to 'true' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. Setting it to 'false' or not setting it (default) will run Web as usual with all functionality enabled. See the text description for more details."`
+	Target         string `json:"target,omitempty" yaml:"target" env:"WEB_OPTION_EMBED_TARGET" desc:"Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'.  With '' which is the default, Web will run regular as defined via the 'mode' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the text description for more details."`
+	MessagesOrigin string `json:"messagesOrigin,omitempty" yaml:"messagesOrigin" env:"WEB_OPTION_EMBED_MESSAGES_ORIGIN" desc:"Defines a URL under which Web can be integrated via iFrame in 'embed' mode. Note that setting this is mandatory when running Web in 'embed' mode. Use '*' as value to allow running the iFrame under any URL, although this is not recommended for security resons. See the text description for more details."`
 }
