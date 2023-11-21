@@ -55,7 +55,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"prefix": "data",
 					"driver": "ocmreceived",
 					"drivers": map[string]interface{}{
-						"ocmreceived": map[string]interface{}{},
+						"ocmreceived": map[string]interface{}{
+							"insecure": cfg.OCMStorageProvider.Insecure,
+						},
 					},
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
@@ -127,7 +129,12 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 				},
 				"storageprovider": map[string]interface{}{
-					"driver":          "ocmreceived",
+					"driver": "ocmreceived",
+					"drivers": map[string]interface{}{
+						"ocmreceived": map[string]interface{}{
+							"insecure": cfg.OCMStorageProvider.Insecure,
+						},
+					},
 					"data_server_url": "http://" + cfg.HTTP.Addr + "/data",
 				},
 				"authprovider": map[string]interface{}{

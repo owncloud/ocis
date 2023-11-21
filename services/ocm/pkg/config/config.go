@@ -31,6 +31,7 @@ type Config struct {
 	OCMProviderAuthorizerDrivers OCMProviderAuthorizerDrivers `yaml:"ocm_provider_authorizer_drivers"`
 	OCMShareProvider             OCMShareProvider             `yaml:"ocm_share_provider"`
 	OCMCore                      OCMCore                      `yaml:"ocm_core"`
+	OCMStorageProvider           OCMStorageProvider           `yaml:"ocm_storage_provider"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -108,6 +109,9 @@ type OCMCore struct {
 	Driver  string         `yaml:"driver" env:"OCM_OCM_CORE_DRIVER" desc:"Driver to be used for the OCM core. Supported value is only 'json'."`
 	Drivers OCMCoreDrivers `yaml:"drivers"`
 }
+type OCMStorageProvider struct {
+	Insecure bool `yaml:"insecure" env:"OCM_OCM_STORAGE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
+}
 
 type OCMCoreDrivers struct {
 	JSON OCMCoreJSONDriver `yaml:"json"`
@@ -118,9 +122,9 @@ type OCMCoreJSONDriver struct {
 }
 
 type OCMShareProvider struct {
-	Driver   string                        `yaml:"driver" env:"OCM_OCM_SHARE_PROVIDER_DRIVER" desc:"Driver to be used for the OCM share provider. Supported value is only 'json'."`
-	Drivers  OCMShareProviderDrivers       `yaml:"drivers"`
-	Insecure bool                          `yaml:"insecure" env:"OCM_OCM_SHARE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
+	Driver         string                  `yaml:"driver" env:"OCM_OCM_SHARE_PROVIDER_DRIVER" desc:"Driver to be used for the OCM share provider. Supported value is only 'json'."`
+	Drivers        OCMShareProviderDrivers `yaml:"drivers"`
+	Insecure       bool                    `yaml:"insecure" env:"OCM_OCM_SHARE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
 	WebappTemplate string                  `yaml:"webapp_template" env:"OCM_WEBAPP_TEMPLATE" desc:"Template for the webapp url."`
 }
 
