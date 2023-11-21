@@ -95,7 +95,6 @@ func DefaultConfig() *config.Config {
 					ClientID:     "web",
 					ResponseType: "code",
 					Scope:        "openid profile email",
-					LoadUserInfo: true,
 				},
 				Apps: []string{"files", "search", "text-editor", "pdf-viewer", "external", "admin-settings"},
 				ExternalApps: []config.ExternalApp{
