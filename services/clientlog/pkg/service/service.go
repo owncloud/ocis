@@ -103,7 +103,8 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 
 		evType = "postprocessing-finished"
 		data = FileReadyEvent{
-			ItemID: storagespace.FormatResourceID(*info.GetId()),
+			ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
+			ItemID:       storagespace.FormatResourceID(*info.GetId()),
 		}
 
 		users, err = utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
