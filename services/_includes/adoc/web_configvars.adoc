@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-21-06-35-25]
+[#deprecation-note-2023-11-21-08-11-09]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -339,15 +339,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page.
-
-a|`WEB_OIDC_LOAD_USERINFO` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++true ++
-a| [subs=-attributes]
-Make a call to the oidc userinfo endpoint of the idp. For on premise AD FS this must be set to 'false'. The default is 'true'.
 
 a|`WEB_OPTION_HOME_FOLDER` +
 

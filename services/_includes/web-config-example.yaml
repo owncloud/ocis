@@ -81,7 +81,6 @@ web:
       response_type: code
       scope: openid profile email
       post_logout_redirect_uri: ""
-      load_userinfo: true
     apps:
     - files
     - search
