@@ -921,6 +921,7 @@ var mimeTypes = map[string]string{
 	"tfm":                      "application/x-tex-tfm",
 	"tfx":                      "image/tiff-fx",
 	"tga":                      "image/x-tga",
+	"tgz":                      "application/gzip",
 	"thmx":                     "application/vnd.ms-officetheme",
 	"tif":                      "image/tiff",
 	"tiff":                     "image/tiff",

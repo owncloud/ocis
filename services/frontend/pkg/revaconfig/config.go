@@ -303,7 +303,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 										"enabled": false,
 									},
 									"mediatype": map[string]interface{}{
-										"keywords": []string{"file", "folder", "document", "spreadsheet", "presentation", "pdf", "image", "video", "audio", "archive"},
+										"keywords": []string{"document", "spreadsheet", "presentation", "pdf", "image", "video", "audio", "folder", "archive"},
 										"enabled":  true,
 									},
 									"type": map[string]interface{}{

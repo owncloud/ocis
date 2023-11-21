@@ -135,8 +135,15 @@ func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user
 		getUserResponse, err := gwConn.GetUser(ctx, &userprovider.GetUserRequest{
 			UserId: publicShareResponse.GetShare().GetCreator(),
 		})
-		if err != nil {
+		switch {
+		case err != nil:
 			return nil, nil, err
+		case getUserResponse.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND:
+			return nil, nil, errtypes.NotFound(getUserResponse.GetStatus().GetMessage())
+		case getUserResponse.GetStatus().GetCode() == rpcv1beta1.Code_CODE_PERMISSION_DENIED:
+			return nil, nil, errtypes.InvalidCredentials(getUserResponse.GetStatus().GetMessage())
+		case getUserResponse.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK:
+			return nil, nil, errtypes.InternalError(getUserResponse.GetStatus().GetMessage())
 		}
 		owner = getUserResponse.GetUser()
 	}
