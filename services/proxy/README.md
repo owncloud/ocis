@@ -13,6 +13,43 @@ The following request authentication schemes are implemented:
 -   Signed URL
 -   Public Share Token
 
+## Configuring Routes
+
+The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.com/owncloud/ocis/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
+
+Due to the complexity when defining routes, these can only be defined in the yaml file but not via environment variables.
+
+For _overwriting_ default routes, use the following yaml example:
+
+```yaml
+policies:
+  - name: ocis
+    routes:
+      - endpoint: /
+        service: com.owncloud.web.web
+      - endpoint: /dav/
+        service: com.owncloud.web.ocdav
+```
+
+For adding _additional_ routes to the default routes use:
+
+```yaml
+additional_policies:
+  - name: ocis
+    routes:
+      - endpoint: /custom/endpoint
+        service: com.owncloud.custom.custom
+```
+
+A route has the following configurable parameters:
+
+```yaml
+endpoint: ""       # the url that should be routed
+service: ""        # the service the url should be routed to
+unprotected: false # with false (default), calling the endpoint requires authorization.
+                   # with true, anyone can call the endpoint without authorisation.
+```
+
 ## Automatic Quota Assignments
 
 It is possible to automatically assign a specific quota to new users depending on their role.
