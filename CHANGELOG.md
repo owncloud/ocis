@@ -275,7 +275,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
-* Enhancement - Update web to v8.0.0: [#7748](https://github.com/owncloud/ocis/pull/7748)
+* Enhancement - Update web to v8.0.0: [#7773](https://github.com/owncloud/ocis/pull/7773)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
@@ -708,7 +708,7 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/web/issues/7728
    https://github.com/owncloud/ocis/pull/7409
 
-* Enhancement - Update web to v8.0.0: [#7748](https://github.com/owncloud/ocis/pull/7748)
+* Enhancement - Update web to v8.0.0: [#7773](https://github.com/owncloud/ocis/pull/7773)
 
    Tags: web
 
@@ -834,8 +834,8 @@ The following sections list the changes for 5.0.0.
    [owncloud/web#9912](https://github.com/owncloud/web/pull/9912) - Add media type
    filter chip
 
-   https://github.com/owncloud/ocis/pull/7748
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.9
+   https://github.com/owncloud/ocis/pull/7773
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.10
 
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
