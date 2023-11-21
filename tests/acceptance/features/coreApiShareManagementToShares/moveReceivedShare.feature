@@ -21,7 +21,7 @@ Feature: sharing
     And user "Brian" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
     And the administrator deletes user "Carol" using the provisioning API
     Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on all endpoints should be "200"
+    And the HTTP status code of responses on each endpoint should be "200,200,200,201,204" respectively
     And user "Brian" should see the following elements
       | /Shares/new/|
 
