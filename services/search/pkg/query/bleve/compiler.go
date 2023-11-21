@@ -329,10 +329,11 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 	case "archive":
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/zip",
-			"application/x-tar",
+			"application/gzip",
 			"application/x-gzip",
 			"application/x-7z-compressed",
 			"application/x-rar-compressed",
+			"application/x-tar",
 			"application/x-bzip2",
 			"application/x-bzip",
 			"application/x-tgz",
