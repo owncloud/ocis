@@ -39,6 +39,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
+* Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
@@ -88,6 +89,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7708
    https://github.com/owncloud/ocis/pull/7726
    https://github.com/cs3org/reva/pull/4338
+
+* Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
+
+   We have fixed a bug when the tgz mime type was not "application/gzip"
+
+   https://github.com/owncloud/ocis/issues/7744
+   https://github.com/owncloud/ocis/pull/7772
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
