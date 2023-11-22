@@ -32,6 +32,7 @@ func SplitWithEscaping(s string, separator string, escapeString string) []string
 	return a
 }
 
+// WalkSegments uses the given array of segments to walk the claims and return whatever interface was found
 func WalkSegments(segments []string, claims map[string]interface{}) (interface{}, error) {
 	i := 0
 	for ; i < len(segments)-1; i++ {
@@ -47,6 +48,8 @@ func WalkSegments(segments []string, claims map[string]interface{}) (interface{}
 					return nil, fmt.Errorf("could not walk claims path, key '%v' is not a string", k)
 				}
 			}
+		default:
+			return nil, fmt.Errorf("unsupported type '%v'", castedClaims)
 		}
 	}
 	return claims[segments[i]], nil
