@@ -22,173 +22,33 @@ import (
 	"context"
 	"encoding/json"
 	stderrors "errors"
-	"fmt"
 	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/logger"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rogpeppe/go-internal/lockedfile"
 	tusd "github.com/tus/tusd/pkg/handler"
 )
-
-var defaultFilePerm = os.FileMode(0664)
 
 // PermissionsChecker defines an interface for checking permissions on a Node
 type PermissionsChecker interface {
 	AssemblePermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
 }
 
-// New returns a new processing instance
-func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p PermissionsChecker, fsRoot string, pub events.Publisher, async bool, tknopts options.TokenOptions) (upload *Upload, err error) {
-
-	log := appctx.GetLogger(ctx)
-	log.Debug().Interface("info", info).Msg("Decomposedfs: NewUpload")
-
-	if info.MetaData["filename"] == "" {
-		return nil, errors.New("Decomposedfs: missing filename in metadata")
-	}
-	if info.MetaData["dir"] == "" {
-		return nil, errors.New("Decomposedfs: missing dir in metadata")
-	}
-
-	n, err := lu.NodeFromSpaceID(ctx, info.Storage["SpaceRoot"])
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error getting space root node")
-	}
-
-	n, err = lookupNode(ctx, n, filepath.Join(info.MetaData["dir"], info.MetaData["filename"]), lu)
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error walking path")
-	}
-
-	log.Debug().Interface("info", info).Interface("node", n).Msg("Decomposedfs: resolved filename")
-
-	// the parent owner will become the new owner
-	parent, perr := n.Parent(ctx)
-	if perr != nil {
-		return nil, errors.Wrap(perr, "Decomposedfs: error getting parent "+n.ParentID)
-	}
-
-	// check permissions
-	var (
-		checkNode *node.Node
-		path      string
-	)
-	if n.Exists {
-		// check permissions of file to be overwritten
-		checkNode = n
-		path, _ = storagespace.FormatReference(&provider.Reference{ResourceId: &provider.ResourceId{
-			SpaceId:  checkNode.SpaceID,
-			OpaqueId: checkNode.ID,
-		}})
-	} else {
-		// check permissions of parent
-		checkNode = parent
-		path, _ = storagespace.FormatReference(&provider.Reference{ResourceId: &provider.ResourceId{
-			SpaceId:  checkNode.SpaceID,
-			OpaqueId: checkNode.ID,
-		}, Path: n.Name})
-	}
-	rp, err := p.AssemblePermissions(ctx, checkNode)
-	switch {
-	case err != nil:
-		return nil, err
-	case !rp.InitiateFileUpload:
-		return nil, errtypes.PermissionDenied(path)
-	}
-
-	// are we trying to overwriting a folder with a file?
-	if n.Exists && n.IsDir(ctx) {
-		return nil, errtypes.PreconditionFailed("resource is not a file")
-	}
-
-	// check lock
-	if info.MetaData["lockid"] != "" {
-		ctx = ctxpkg.ContextSetLockID(ctx, info.MetaData["lockid"])
-	}
-	if err := n.CheckLock(ctx); err != nil {
-		return nil, err
-	}
-
-	info.ID = uuid.New().String()
-
-	binPath := filepath.Join(fsRoot, "uploads", info.ID)
-	usr := ctxpkg.ContextMustGetUser(ctx)
-
-	var (
-		spaceRoot string
-		ok        bool
-	)
-	if info.Storage != nil {
-		if spaceRoot, ok = info.Storage["SpaceRoot"]; !ok {
-			spaceRoot = n.SpaceRoot.ID
-		}
-	} else {
-		spaceRoot = n.SpaceRoot.ID
-	}
-
-	info.Storage = map[string]string{
-		"Type":    "OCISStore",
-		"BinPath": binPath,
-
-		"NodeId":              n.ID,
-		"NodeExists":          "true",
-		"NodeParentId":        n.ParentID,
-		"NodeName":            n.Name,
-		"SpaceRoot":           spaceRoot,
-		"SpaceOwnerOrManager": info.Storage["SpaceOwnerOrManager"],
-
-		"Idp":      usr.Id.Idp,
-		"UserId":   usr.Id.OpaqueId,
-		"UserType": utils.UserTypeToString(usr.Id.Type),
-		"UserName": usr.Username,
-
-		"LogLevel": log.GetLevel().String(),
-	}
-	if !n.Exists {
-		// fill future node info
-		info.Storage["NodeId"] = uuid.New().String()
-		info.Storage["NodeExists"] = "false"
-	}
-	if info.MetaData["if-none-match"] == "*" && info.Storage["NodeExists"] == "true" {
-		return nil, errtypes.Aborted(fmt.Sprintf("parent %s already has a child %s", n.ID, n.Name))
-	}
-	// Create binary file in the upload folder with no content
-	log.Debug().Interface("info", info).Msg("Decomposedfs: built storage info")
-	file, err := os.OpenFile(binPath, os.O_CREATE|os.O_WRONLY, defaultFilePerm)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	u := buildUpload(ctx, info, binPath, filepath.Join(fsRoot, "uploads", info.ID+".info"), lu, tp, pub, async, tknopts)
-
-	// writeInfo creates the file by itself if necessary
-	err = u.writeInfo()
-	if err != nil {
-		return nil, err
-	}
-
-	return u, nil
+type Propagator interface {
+	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
 }
 
 // Get returns the Upload for the given upload id
@@ -250,253 +110,308 @@ func Get(ctx context.Context, id string, lu *lookup.Lookup, tp Tree, fsRoot stri
 func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node, error) {
 	ctx, span := tracer.Start(upload.Ctx, "CreateNodeForUpload")
 	defer span.End()
-	_, subspan := tracer.Start(ctx, "os.Stat")
-	fi, err := os.Stat(upload.binPath)
-	subspan.End()
-	if err != nil {
-		return nil, err
-	}
-
-	fsize := fi.Size()
-	spaceID := upload.Info.Storage["SpaceRoot"]
-	n := node.New(
-		spaceID,
-		upload.Info.Storage["NodeId"],
-		upload.Info.Storage["NodeParentId"],
-		upload.Info.Storage["NodeName"],
-		fsize,
-		upload.Info.ID,
-		provider.ResourceType_RESOURCE_TYPE_FILE,
-		nil,
-		upload.lu,
-	)
-	n.SpaceRoot, err = node.ReadNode(ctx, upload.lu, spaceID, spaceID, false, nil, false)
-	if err != nil {
-		return nil, err
-	}
-
-	// check lock
-	if err := n.CheckLock(ctx); err != nil {
-		return nil, err
-	}
-
-	var f *lockedfile.File
-	switch upload.Info.Storage["NodeExists"] {
-	case "false":
-		f, err = initNewNode(upload, n, uint64(fsize))
-		if f != nil {
-			appctx.GetLogger(upload.Ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from initNewNode")
-		}
-	default:
-		f, err = updateExistingNode(upload, n, spaceID, uint64(fsize))
-		if f != nil {
-			appctx.GetLogger(upload.Ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from updateExistingNode")
-		}
-	}
-	defer func() {
-		if f == nil {
-			return
-		}
-		if err := f.Close(); err != nil {
-			appctx.GetLogger(upload.Ctx).Error().Err(err).Str("nodeid", n.ID).Str("parentid", n.ParentID).Msg("could not close lock")
-		}
-	}()
-	if err != nil {
-		return nil, err
-	}
-
-	mtime := time.Now()
-	if upload.Info.MetaData["mtime"] != "" {
-		// overwrite mtime if requested
-		mtime, err = utils.MTimeToTime(upload.Info.MetaData["mtime"])
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// overwrite technical information
-	initAttrs.SetString(prefixes.MTimeAttr, mtime.UTC().Format(time.RFC3339Nano))
-	initAttrs.SetInt64(prefixes.TypeAttr, int64(provider.ResourceType_RESOURCE_TYPE_FILE))
-	initAttrs.SetString(prefixes.ParentidAttr, n.ParentID)
-	initAttrs.SetString(prefixes.NameAttr, n.Name)
-	initAttrs.SetString(prefixes.BlobIDAttr, n.BlobID)
-	initAttrs.SetInt64(prefixes.BlobsizeAttr, n.Blobsize)
-	initAttrs.SetString(prefixes.StatusPrefix, node.ProcessingStatus+upload.Info.ID)
-
-	// update node metadata with new blobid etc
-	err = n.SetXattrsWithContext(ctx, initAttrs, false)
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: could not write metadata")
-	}
-
-	// add etag to metadata
-	upload.Info.MetaData["etag"], _ = node.CalculateEtag(n, mtime)
-
-	// update nodeid for later
-	upload.Info.Storage["NodeId"] = n.ID
-	if err := upload.writeInfo(); err != nil {
-		return nil, err
-	}
-
-	return n, nil
-}
-
-func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, error) {
-	// create folder structure (if needed)
-	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
-		return nil, err
-	}
-
-	// create and write lock new node metadata
-	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, err
-	}
-
-	// we also need to touch the actual node file here it stores the mtime of the resource
-	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
-	if err != nil {
-		return f, err
-	}
-	h.Close()
-
-	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, false, 0, fsize); err != nil {
-		return f, err
-	}
-
-	// link child name to parent if it is new
-	childNameLink := filepath.Join(n.ParentPath(), n.Name)
-	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
-	log := appctx.GetLogger(upload.Ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
-	log.Info().Msg("initNewNode: creating symlink")
-
-	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
-		log.Info().Err(err).Msg("initNewNode: symlink failed")
-		if errors.Is(err, iofs.ErrExist) {
-			log.Info().Err(err).Msg("initNewNode: symlink already exists")
-			return f, errtypes.AlreadyExists(n.Name)
-		}
-		return f, errors.Wrap(err, "Decomposedfs: could not symlink child entry")
-	}
-	log.Info().Msg("initNewNode: symlink created")
-
-	// on a new file the sizeDiff is the fileSize
-	upload.SizeDiff = int64(fsize)
-	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.SizeDiff))
-	return f, nil
-}
-
-func updateExistingNode(upload *Upload, n *node.Node, spaceID string, fsize uint64) (*lockedfile.File, error) {
-	targetPath := n.InternalPath()
-
-	// write lock existing node before reading any metadata
-	f, err := lockedfile.OpenFile(upload.lu.MetadataBackend().LockfilePath(targetPath), os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, err
-	}
-
-	old, _ := node.ReadNode(upload.Ctx, upload.lu, spaceID, n.ID, false, nil, false)
-	if _, err := node.CheckQuota(upload.Ctx, n.SpaceRoot, true, uint64(old.Blobsize), fsize); err != nil {
-		return f, err
-	}
-
-	oldNodeMtime, err := old.GetMTime(upload.Ctx)
-	if err != nil {
-		return f, err
-	}
-	oldNodeEtag, err := node.CalculateEtag(old, oldNodeMtime)
-	if err != nil {
-		return f, err
-	}
-
-	// When the if-match header was set we need to check if the
-	// etag still matches before finishing the upload.
-	if ifMatch, ok := upload.Info.MetaData["if-match"]; ok {
-		if ifMatch != oldNodeEtag {
-			return f, errtypes.Aborted("etag mismatch")
-		}
-	}
-
-	// When the if-none-match header was set we need to check if any of the
-	// etags matches before finishing the upload.
-	if ifNoneMatch, ok := upload.Info.MetaData["if-none-match"]; ok {
-		if ifNoneMatch == "*" {
-			return f, errtypes.Aborted("etag mismatch, resource exists")
-		}
-		for _, ifNoneMatchTag := range strings.Split(ifNoneMatch, ",") {
-			if ifNoneMatchTag == oldNodeEtag {
-				return f, errtypes.Aborted("etag mismatch")
+	log := logger.New()
+	for event := range ch {
+		switch ev := event.Event.(type) {
+		case events.PostprocessingFinished:
+			up, err := tusDataStore.GetUpload(ctx, ev.UploadID)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+				continue // NOTE: since we can't get the upload, we can't delete the blob
 			}
+			info, err := up.GetInfo(ctx)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload info")
+				continue // NOTE: since we can't get the upload, we can't delete the blob
+			}
+			uploadMetadata, err := ReadMetadata(ctx, lu, info.ID)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload metadata")
+				continue // NOTE: since we can't get the upload, we can't delete the blob
+			}
+
+			var (
+				failed     bool
+				keepUpload bool
+			)
+
+			var sizeDiff int64
+			// propagate sizeDiff after failed postprocessing
+
+			n, err := ReadNode(ctx, lu, uploadMetadata)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("metadata", uploadMetadata).Msg("could not read revision node on postprocessing finished")
+				continue
+			}
+
+			switch ev.Outcome {
+			default:
+				log.Error().Str("outcome", string(ev.Outcome)).Str("uploadID", ev.UploadID).Msg("unknown postprocessing outcome - aborting")
+				fallthrough
+			case events.PPOutcomeAbort:
+				failed = true
+				keepUpload = true
+			case events.PPOutcomeContinue:
+				if err := Finalize(ctx, blobstore, uploadMetadata.MTime, info, n, uploadMetadata.BlobID); err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
+					keepUpload = true // should we keep the upload when assembling failed?
+					failed = true
+				}
+				sizeDiff, err = SetNodeToUpload(ctx, lu, n, uploadMetadata)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could set node to revision upload")
+					keepUpload = true // should we keep the upload when assembling failed?
+					failed = true
+				}
+			case events.PPOutcomeDelete:
+				failed = true
+			}
+
+			getParent := func() *node.Node {
+				p, err := n.Parent(ctx)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read parent")
+					return nil
+				}
+				return p
+			}
+
+			now := time.Now()
+			if failed {
+				// propagate sizeDiff after failed postprocessing
+				if err := propagator.Propagate(ctx, n, -sizeDiff); err != nil { // FIXME revert sizediff .,.. and write an issue that condemns this
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate tree size change")
+				}
+
+			} else if p := getParent(); p != nil {
+				// update parent tmtime to propagate etag change after successful postprocessing
+				_ = p.SetTMTime(ctx, &now)
+				if err := propagator.Propagate(ctx, p, 0); err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate etag change")
+				}
+			}
+
+			previousRevisionTime, err := n.GetMTime(ctx)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not get mtime")
+			}
+			revision := previousRevisionTime.UTC().Format(time.RFC3339Nano)
+			Cleanup(ctx, lu, n, info.ID, revision, failed)
+			if !keepUpload {
+				if tup, ok := up.(tusd.TerminatableUpload); ok {
+					terr := tup.Terminate(ctx)
+					if terr != nil {
+						log.Error().Err(terr).Interface("info", info).Msg("failed to terminate upload")
+					}
+				}
+			}
+
+			// remove cache entry in gateway
+			cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+
+			if err := events.Publish(
+				ctx,
+				es,
+				events.UploadReady{
+					UploadID: ev.UploadID,
+					Failed:   failed,
+					ExecutingUser: &user.User{
+						Id: &user.UserId{
+							Type:     user.UserType(user.UserType_value[uploadMetadata.ExecutantType]),
+							Idp:      uploadMetadata.ExecutantIdp,
+							OpaqueId: uploadMetadata.ExecutantID,
+						},
+						Username: uploadMetadata.ExecutantUserName,
+					},
+					Filename: ev.Filename,
+					FileRef: &provider.Reference{
+						ResourceId: &provider.ResourceId{
+							StorageId: uploadMetadata.ProviderID,
+							SpaceId:   uploadMetadata.SpaceRoot,
+							OpaqueId:  uploadMetadata.SpaceRoot,
+						},
+						// FIXME this seems wrong, path is not really relative to space root
+						// actually it is: InitiateUpload calls fs.lu.Path to get the path relative to the root so soarch can index the path
+						// hm is that robust? what if the file is moved? shouldn't we store the parent id, then?
+						Path: utils.MakeRelativePath(filepath.Join(uploadMetadata.Dir, uploadMetadata.Filename)),
+					},
+					Timestamp:  utils.TimeToTS(now),
+					SpaceOwner: n.SpaceOwnerOrManager(ctx),
+				},
+			); err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish UploadReady event")
+			}
+		case events.RestartPostprocessing:
+			up, err := tusDataStore.GetUpload(ctx, ev.UploadID)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+				continue // NOTE: since we can't get the upload, we can't restart postprocessing
+			}
+			info, err := up.GetInfo(ctx)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload info")
+				continue // NOTE: since we can't get the upload, we can't restart postprocessing
+			}
+			uploadMetadata, err := ReadMetadata(ctx, lu, info.ID)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload metadata")
+				continue // NOTE: since we can't get the upload, we can't delete the blob
+			}
+
+			n, err := ReadNode(ctx, lu, uploadMetadata)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("metadata", uploadMetadata).Msg("could not read revision node on restart postprocessing")
+				continue
+			}
+
+			s, err := downloadURLfunc(ctx, ev.UploadID)
+			if err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not create url")
+				continue
+			}
+			// restart postprocessing
+			if err := events.Publish(ctx, es, events.BytesReceived{
+				UploadID:      info.ID,
+				URL:           s,
+				SpaceOwner:    n.SpaceOwnerOrManager(ctx),
+				ExecutingUser: &user.User{Id: &user.UserId{OpaqueId: "postprocessing-restart"}}, // send nil instead?
+				ResourceID:    &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
+				Filename:      uploadMetadata.Filename,
+				Filesize:      uint64(info.Size),
+			}); err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish BytesReceived event")
+			}
+		case events.PostprocessingStepFinished:
+			if ev.FinishedStep != events.PPStepAntivirus {
+				// atm we are only interested in antivirus results
+				continue
+			}
+
+			res := ev.Result.(events.VirusscanResult)
+			if res.ErrorMsg != "" {
+				// scan failed somehow
+				// Should we handle this here?
+				continue
+			}
+
+			var n *node.Node
+			switch ev.UploadID {
+			case "":
+				// uploadid is empty -> this was an on-demand scan
+				/* ON DEMAND SCANNING NOT SUPPORTED ATM
+				ctx := ctxpkg.ContextSetUser(context.Background(), ev.ExecutingUser)
+				ref := &provider.Reference{ResourceId: ev.ResourceID}
+
+				no, err := fs.lu.NodeFromResource(ctx, ref)
+				if err != nil {
+					log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to get node after scan")
+					continue
+
+				}
+				n = no
+				if ev.Outcome == events.PPOutcomeDelete {
+					// antivir wants us to delete the file. We must obey and need to
+
+					// check if there a previous versions existing
+					revs, err := fs.ListRevisions(ctx, ref)
+					if len(revs) == 0 {
+						if err != nil {
+							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to list revisions. Fallback to delete file")
+						}
+
+						// no versions -> trash file
+						err := fs.Delete(ctx, ref)
+						if err != nil {
+							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to delete infected resource")
+							continue
+						}
+
+						// now purge it from the recycle bin
+						if err := fs.PurgeRecycleItem(ctx, &provider.Reference{ResourceId: &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.SpaceID}}, n.ID, "/"); err != nil {
+							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to purge infected resource from trash")
+						}
+
+						// remove cache entry in gateway
+						fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+						continue
+					}
+
+					// we have versions - find the newest
+					versions := make(map[uint64]string) // remember all versions - we need them later
+					var nv uint64
+					for _, v := range revs {
+						versions[v.Mtime] = v.Key
+						if v.Mtime > nv {
+							nv = v.Mtime
+						}
+					}
+
+					// restore newest version
+					if err := fs.RestoreRevision(ctx, ref, versions[nv]); err != nil {
+						log.Error().Err(err).Interface("resourceID", ev.ResourceID).Str("revision", versions[nv]).Msg("Failed to restore revision")
+						continue
+					}
+
+					// now find infected version
+					revs, err = fs.ListRevisions(ctx, ref)
+					if err != nil {
+						log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Error listing revisions after restore")
+					}
+
+					for _, v := range revs {
+						// we looking for a version that was previously not there
+						if _, ok := versions[v.Mtime]; ok {
+							continue
+						}
+
+						if err := fs.DeleteRevision(ctx, ref, v.Key); err != nil {
+							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Str("revision", v.Key).Msg("Failed to delete revision")
+						}
+					}
+
+					// remove cache entry in gateway
+					fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+					continue
+				}
+				*/
+			default:
+				// uploadid is not empty -> this is an async upload
+				up, err := tusDataStore.GetUpload(ctx, ev.UploadID)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+					continue
+				}
+				info, err := up.GetInfo(ctx)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload info")
+					continue
+				}
+				uploadMetadata, err := ReadMetadata(ctx, lu, info.ID)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload metadata")
+					continue // NOTE: since we can't get the upload, we can't delete the blob
+				}
+
+				// scan data should be set on the node revision not the node ... then when postprocessing finishes we need to copy the state to the node
+
+				n, err = ReadNode(ctx, lu, uploadMetadata)
+				if err != nil {
+					log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("metadata", uploadMetadata).Msg("could not read revision node on default event")
+					continue
+				}
+			}
+
+			if err := n.SetScanData(ctx, res.Description, res.Scandate); err != nil {
+				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("resourceID", res.ResourceID).Msg("Failed to set scan results")
+				continue
+			}
+
+			// remove cache entry in gateway
+			cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
+		default:
+			log.Error().Interface("event", ev).Msg("Unknown event")
 		}
 	}
-
-	// When the if-unmodified-since header was set we need to check if the
-	// etag still matches before finishing the upload.
-	if ifUnmodifiedSince, ok := upload.Info.MetaData["if-unmodified-since"]; ok {
-		if err != nil {
-			return f, errtypes.InternalError(fmt.Sprintf("failed to read mtime of node: %s", err))
-		}
-		ifUnmodifiedSince, err := time.Parse(time.RFC3339Nano, ifUnmodifiedSince)
-		if err != nil {
-			return f, errtypes.InternalError(fmt.Sprintf("failed to parse if-unmodified-since time: %s", err))
-		}
-
-		if oldNodeMtime.After(ifUnmodifiedSince) {
-			return f, errtypes.Aborted("if-unmodified-since mismatch")
-		}
-	}
-
-	upload.versionsPath = upload.lu.InternalPath(spaceID, n.ID+node.RevisionIDDelimiter+oldNodeMtime.UTC().Format(time.RFC3339Nano))
-	upload.SizeDiff = int64(fsize) - old.Blobsize
-	upload.Info.MetaData["versionsPath"] = upload.versionsPath
-	upload.Info.MetaData["sizeDiff"] = strconv.Itoa(int(upload.SizeDiff))
-
-	// create version node
-	if _, err := os.Create(upload.versionsPath); err != nil {
-		return f, err
-	}
-
-	// copy blob metadata to version node
-	if err := upload.lu.CopyMetadataWithSourceLock(upload.Ctx, targetPath, upload.versionsPath, func(attributeName string, value []byte) (newValue []byte, copy bool) {
-		return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
-			attributeName == prefixes.TypeAttr ||
-			attributeName == prefixes.BlobIDAttr ||
-			attributeName == prefixes.BlobsizeAttr ||
-			attributeName == prefixes.MTimeAttr
-	}, f, true); err != nil {
-		return f, err
-	}
-
-	// keep mtime from previous version
-	if err := os.Chtimes(upload.versionsPath, oldNodeMtime, oldNodeMtime); err != nil {
-		return f, errtypes.InternalError(fmt.Sprintf("failed to change mtime of version node: %s", err))
-	}
-
-	return f, nil
-}
-
-// lookupNode looks up nodes by path.
-// This method can also handle lookups for paths which contain chunking information.
-func lookupNode(ctx context.Context, spaceRoot *node.Node, path string, lu *lookup.Lookup) (*node.Node, error) {
-	p := path
-	isChunked := chunking.IsChunked(path)
-	if isChunked {
-		chunkInfo, err := chunking.GetChunkBLOBInfo(path)
-		if err != nil {
-			return nil, err
-		}
-		p = chunkInfo.Path
-	}
-
-	n, err := lu.WalkPath(ctx, spaceRoot, p, true, func(ctx context.Context, n *node.Node) error { return nil })
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error walking path")
-	}
-
-	if isChunked {
-		n.Name = filepath.Base(path)
-	}
-	return n, nil
 }
 
 // Progress adapts the persisted upload metadata for the UploadSessionLister interface

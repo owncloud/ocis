@@ -21,11 +21,16 @@ package s3ng
 import (
 	"fmt"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs"
+	"github.com/tus/tusd/pkg/s3store"
 )
 
 func init() {
@@ -49,5 +54,17 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 		return nil, err
 	}
 
-	return decomposedfs.NewDefault(m, bs, stream)
+	s3Config := aws.NewConfig()
+	s3Config.WithCredentials(credentials.NewStaticCredentials(o.S3AccessKey, o.S3SecretKey, "")).
+		WithEndpoint(o.S3Endpoint).
+		WithRegion(o.S3Region).
+		WithS3ForcePathStyle(o.S3ForcePathStyle).
+		WithDisableSSL(o.S3DisableSSL)
+
+	tusDataStore := s3store.New(o.S3Bucket, s3.New(session.Must(session.NewSession()), s3Config))
+	tusDataStore.ObjectPrefix = o.S3UploadObjectPrefix
+	tusDataStore.MetadataObjectPrefix = o.S3UploadMetadataPrefix
+	tusDataStore.TemporaryDirectory = o.S3UploadTemporaryDirectory
+
+	return decomposedfs.NewDefault(m, bs, tusDataStore, stream)
 }

@@ -19,10 +19,7 @@
 package tree
 
 import (
-	"bytes"
 	"context"
-	"fmt"
-	"io"
 	"io/fs"
 	iofs "io/fs"
 	"os"
@@ -53,15 +50,6 @@ var tracer trace.Tracer
 
 func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/tree")
-}
-
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=Blobstore
-
-// Blobstore defines an interface for storing blobs in a blobstore
-type Blobstore interface {
-	Upload(node *node.Node, source string) error
-	Download(node *node.Node) (io.ReadCloser, error)
-	Delete(node *node.Node) error
 }
 
 // Tree manages a hierarchical tree
@@ -391,7 +379,7 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 
 				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n.SpaceRoot, true)
 				if err != nil {
-					return err
+					continue
 				}
 
 				// prevent listing denied resources
@@ -662,16 +650,16 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 
 	// delete blob from blobstore
 	if n.BlobID != "" {
-		if err := t.DeleteBlob(n); err != nil {
+		if err := t.blobstore.Delete(n); err != nil {
 			log.Error().Err(err).Str("blobID", n.BlobID).Msg("error purging nodes blob")
 			return err
 		}
 	}
 
 	// delete revisions
-	revs, err := filepath.Glob(n.InternalPath() + node.RevisionIDDelimiter + "*")
+	revs, err := filepath.Glob(node.JoinRevisionKey(n.InternalPath(), "*"))
 	if err != nil {
-		log.Error().Err(err).Str("path", n.InternalPath()+node.RevisionIDDelimiter+"*").Msg("glob failed badly")
+		log.Error().Err(err).Str("node", n.ID).Msg("glob failed badly")
 		return err
 	}
 	for _, rev := range revs {
@@ -691,7 +679,7 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 		}
 
 		if bID != "" {
-			if err := t.DeleteBlob(&node.Node{SpaceID: n.SpaceID, BlobID: bID}); err != nil {
+			if err := t.blobstore.Delete(&node.Node{SpaceID: n.SpaceID, BlobID: bID}); err != nil {
 				log.Error().Err(err).Str("revision", rev).Str("blobID", bID).Msg("error removing revision node blob")
 				return err
 			}
@@ -705,32 +693,6 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 // Propagate propagates changes to the root of the tree
 func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err error) {
 	return t.propagator.Propagate(ctx, n, sizeDiff)
-}
-
-// WriteBlob writes a blob to the blobstore
-func (t *Tree) WriteBlob(node *node.Node, source string) error {
-	return t.blobstore.Upload(node, source)
-}
-
-// ReadBlob reads a blob from the blobstore
-func (t *Tree) ReadBlob(node *node.Node) (io.ReadCloser, error) {
-	if node.BlobID == "" {
-		// there is no blob yet - we are dealing with a 0 byte file
-		return io.NopCloser(bytes.NewReader([]byte{})), nil
-	}
-	return t.blobstore.Download(node)
-}
-
-// DeleteBlob deletes a blob from the blobstore
-func (t *Tree) DeleteBlob(node *node.Node) error {
-	if node == nil {
-		return fmt.Errorf("could not delete blob, nil node was given")
-	}
-	if node.BlobID == "" {
-		return fmt.Errorf("could not delete blob, node with empty blob id was given")
-	}
-
-	return t.blobstore.Delete(node)
 }
 
 // TODO check if node exists?

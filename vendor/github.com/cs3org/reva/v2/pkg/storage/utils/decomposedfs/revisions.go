@@ -46,10 +46,13 @@ import (
 
 // ListRevisions lists the revisions of the given resource
 func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Reference) (revisions []*provider.FileVersion, err error) {
+
 	var n *node.Node
 	if n, err = fs.lu.NodeFromResource(ctx, ref); err != nil {
 		return
 	}
+	sublog := appctx.GetLogger(ctx).With().Str("node", n.ID).Logger()
+
 	if !n.Exists {
 		err = errtypes.NotFound(filepath.Join(n.ParentID, n.Name))
 		return
@@ -69,35 +72,49 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 
 	revisions = []*provider.FileVersion{}
 	np := n.InternalPath()
-	if items, err := filepath.Glob(np + node.RevisionIDDelimiter + "*"); err == nil {
+	if items, err := filepath.Glob(node.JoinRevisionKey(np, "*")); err == nil {
 		for i := range items {
-			if fs.lu.MetadataBackend().IsMetaFile(items[i]) || strings.HasSuffix(items[i], ".mlock") {
+			if fs.lu.MetadataBackend().IsMetaFile(items[i]) {
 				continue
 			}
-
-			if fi, err := os.Stat(items[i]); err == nil {
-				parts := strings.SplitN(fi.Name(), node.RevisionIDDelimiter, 2)
-				if len(parts) != 2 {
-					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("invalid revision name, skipping")
+			_, revision := node.SplitRevisionKey(items[i])
+			if revision == "" {
+				sublog.Err(err).Str("revisionKey", items[i]).Msg("invalid revision key, skipping")
+				continue
+			}
+			sublog = sublog.With().Str("revision", revision).Logger()
+			rn, err := n.ReadRevision(ctx, revision)
+			if err != nil {
+				sublog.Error().Err(err).Msg("could not read revision, skipping")
+				continue
+			}
+			if !rn.Exists {
+				sublog.Error().Msg("revision does not exist, skipping")
+				continue
+			}
+			/*
+				if currentRevision == revisionTime {
 					continue
 				}
-				mtime := fi.ModTime()
-				rev := &provider.FileVersion{
-					Key:   n.ID + node.RevisionIDDelimiter + parts[1],
-					Mtime: uint64(mtime.Unix()),
-				}
-				blobSize, err := fs.lu.ReadBlobSizeAttr(ctx, items[i])
-				if err != nil {
-					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("error reading blobsize xattr, using 0")
-				}
-				rev.Size = uint64(blobSize)
-				etag, err := node.CalculateEtag(n, mtime)
-				if err != nil {
-					return nil, errors.Wrapf(err, "error calculating etag")
-				}
-				rev.Etag = etag
-				revisions = append(revisions, rev)
+			*/
+
+			rmtime, err := rn.GetMTime(ctx)
+			if err != nil {
+				sublog.Error().Err(err).Msg("could not get revision mtime, skipping")
+				continue
 			}
+			etag, err := node.CalculateEtag(rn, rmtime)
+			if err != nil {
+				sublog.Error().Err(err).Msg("could not calculate etag, skipping")
+				continue
+			}
+			rev := &provider.FileVersion{
+				Key:   rn.ID,
+				Mtime: uint64(rmtime.Unix()),
+				Size:  uint64(rn.Blobsize),
+				Etag:  etag,
+			}
+			revisions = append(revisions, rev)
 		}
 	}
 	// maybe we need to sort the list by key
@@ -113,19 +130,16 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 // DownloadRevision returns a reader for the specified revision
 // FIXME the CS3 api should explicitly allow initiating revision and trash download, a related issue is https://github.com/cs3org/reva/issues/1813
 func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
-	log := appctx.GetLogger(ctx)
-
-	// verify revision key format
-	kp := strings.SplitN(revisionKey, node.RevisionIDDelimiter, 2)
-	if len(kp) != 2 {
-		log.Error().Str("revisionKey", revisionKey).Msg("malformed revisionKey")
+	nodeID, revision := node.SplitRevisionKey(revisionKey)
+	if revision == "" {
 		return nil, errtypes.NotFound(revisionKey)
 	}
-	log.Debug().Str("revisionKey", revisionKey).Msg("DownloadRevision")
+	sublog := appctx.GetLogger(ctx).With().Str("node", nodeID).Str("revision", revision).Logger()
+	sublog.Debug().Msg("DownloadRevision")
 
 	spaceID := ref.ResourceId.SpaceId
 	// check if the node is available and has not been deleted
-	n, err := node.ReadNode(ctx, fs.lu, spaceID, kp[0], false, nil, false)
+	n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, false, nil, false)
 	if err != nil {
 		return nil, err
 	}
@@ -146,40 +160,29 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 		return nil, errtypes.NotFound(f)
 	}
 
-	contentPath := fs.lu.InternalPath(spaceID, revisionKey)
-
-	blobid, err := fs.lu.ReadBlobIDAttr(ctx, contentPath)
+	revisionNode, err := n.ReadRevision(ctx, revision)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob id of revision '%s' for node '%s'", n.ID, revisionKey)
+		return nil, errors.Wrapf(err, "Decomposedfs: could not read revision '%s' for node '%s'", revision, n.ID)
 	}
-	blobsize, err := fs.lu.ReadBlobSizeAttr(ctx, contentPath)
+	reader, err := fs.blobstore.Download(revisionNode)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob size of revision '%s' for node '%s'", n.ID, revisionKey)
-	}
-
-	revisionNode := node.Node{SpaceID: spaceID, BlobID: blobid, Blobsize: blobsize} // blobsize is needed for the s3ng blobstore
-
-	reader, err := fs.tp.ReadBlob(&revisionNode)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Decomposedfs: could not download blob of revision '%s' for node '%s'", n.ID, revisionKey)
+		return nil, errors.Wrapf(err, "Decomposedfs: could not download blob of revision '%s' for node '%s'", revision, n.ID)
 	}
 	return reader, nil
 }
 
 // RestoreRevision restores the specified revision of the resource
 func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (returnErr error) {
-	log := appctx.GetLogger(ctx)
-
-	// verify revision key format
-	kp := strings.SplitN(revisionKey, node.RevisionIDDelimiter, 2)
-	if len(kp) != 2 {
-		log.Error().Str("revisionKey", revisionKey).Msg("malformed revisionKey")
+	nodeID, revision := node.SplitRevisionKey(revisionKey)
+	if revision == "" {
 		return errtypes.NotFound(revisionKey)
 	}
+	sublog := appctx.GetLogger(ctx).With().Str("node", nodeID).Str("revision", revision).Logger()
+	sublog.Debug().Msg("RestoreRevision")
 
 	spaceID := ref.ResourceId.SpaceId
 	// check if the node is available and has not been deleted
-	n, err := node.ReadNode(ctx, fs.lu, spaceID, kp[0], false, nil, false)
+	n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, false, nil, false)
 	if err != nil {
 		return err
 	}
@@ -215,16 +218,15 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	}
 	defer f.Close()
 
-	// move current version to new revision
-	nodePath := fs.lu.InternalPath(spaceID, kp[0])
+	nodePath := fs.lu.InternalPath(spaceID, nodeID)
 	mtime, err := n.GetMTime(ctx)
 	if err != nil {
-		log.Error().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("cannot read mtime")
+		sublog.Error().Err(err).Interface("ref", ref).Msg("cannot read mtime")
 		return err
 	}
 
 	// revisions are stored alongside the actual file, so a rename can be efficient and does not cross storage / partition boundaries
-	newRevisionPath := fs.lu.InternalPath(spaceID, kp[0]+node.RevisionIDDelimiter+mtime.UTC().Format(time.RFC3339Nano))
+	newRevisionPath := fs.lu.InternalPath(spaceID, node.JoinRevisionKey(nodeID, mtime.Format(time.RFC3339Nano)))
 
 	// touch new revision
 	if _, err := os.Create(newRevisionPath); err != nil {
@@ -233,10 +235,10 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	defer func() {
 		if returnErr != nil {
 			if err := os.Remove(newRevisionPath); err != nil {
-				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
+				sublog.Error().Err(err).Str("newRevision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
 			}
 			if err := fs.lu.MetadataBackend().Purge(newRevisionPath); err != nil {
-				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
+				sublog.Error().Err(err).Str("newRevision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
 			}
 		}
 	}()
@@ -283,16 +285,16 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 
 	// drop old revision
 	if err := os.Remove(restoredRevisionPath); err != nil {
-		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision, continuing")
+		sublog.Warn().Err(err).Interface("ref", ref).Msg("could not delete old revision, continuing")
 	}
 	if err := os.Remove(fs.lu.MetadataBackend().MetadataPath(restoredRevisionPath)); err != nil {
-		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision metadata, continuing")
+		sublog.Warn().Err(err).Interface("ref", ref).Msg("could not delete old revision metadata, continuing")
 	}
 	if err := os.Remove(fs.lu.MetadataBackend().LockfilePath(restoredRevisionPath)); err != nil {
-		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision metadata lockfile, continuing")
+		sublog.Warn().Err(err).Interface("ref", ref).Msg("could not delete old revision metadata lockfile, continuing")
 	}
 	if err := fs.lu.MetadataBackend().Purge(restoredRevisionPath); err != nil {
-		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not purge old revision from cache, continuing")
+		sublog.Warn().Err(err).Interface("ref", ref).Msg("could not purge old revision from cache, continuing")
 	}
 
 	// revision 5, current 10 (restore a smaller blob) -> 5-10 = -5
@@ -315,23 +317,20 @@ func (fs *Decomposedfs) DeleteRevision(ctx context.Context, ref *provider.Refere
 		return err
 	}
 
-	return fs.tp.DeleteBlob(n)
+	return fs.blobstore.Delete(n)
 }
 
 func (fs *Decomposedfs) getRevisionNode(ctx context.Context, ref *provider.Reference, revisionKey string, hasPermission func(*provider.ResourcePermissions) bool) (*node.Node, error) {
-	log := appctx.GetLogger(ctx)
-
-	// verify revision key format
-	kp := strings.SplitN(revisionKey, node.RevisionIDDelimiter, 2)
-	if len(kp) != 2 {
-		log.Error().Str("revisionKey", revisionKey).Msg("malformed revisionKey")
+	nodeID, revision := node.SplitRevisionKey(revisionKey)
+	if revision == "" {
 		return nil, errtypes.NotFound(revisionKey)
 	}
-	log.Debug().Str("revisionKey", revisionKey).Msg("DownloadRevision")
+	sublog := appctx.GetLogger(ctx).With().Str("node", nodeID).Str("revision", revision).Logger()
+	sublog.Debug().Msg("getRevisionNode")
 
 	spaceID := ref.ResourceId.SpaceId
 	// check if the node is available and has not been deleted
-	n, err := node.ReadNode(ctx, fs.lu, spaceID, kp[0], false, nil, false)
+	n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, false, nil, false)
 	if err != nil {
 		return nil, err
 	}

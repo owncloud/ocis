@@ -20,6 +20,7 @@ package ocis
 
 import (
 	"path"
+	"path/filepath"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
@@ -27,6 +28,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/tus/tusd/pkg/filestore"
 )
 
 func init() {
@@ -46,5 +48,7 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 		return nil, err
 	}
 
-	return decomposedfs.NewDefault(m, bs, stream)
+	tusDataStore := filestore.New(filepath.Join(o.Root, "uploads"))
+
+	return decomposedfs.NewDefault(m, bs, tusDataStore, stream)
 }

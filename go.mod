@@ -346,3 +346,5 @@ require (
 )
 
 replace github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
+
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20231122115417-ad2132099fc6

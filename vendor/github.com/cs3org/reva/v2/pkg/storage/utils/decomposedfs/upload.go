@@ -27,17 +27,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	tusd "github.com/tus/tusd/pkg/handler"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 )
@@ -124,10 +130,12 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 }
 
 // InitiateUpload returns upload ids corresponding to different protocols it supports
+// It creates a node for new files to persist the fileid for the new child.
 // TODO read optional content for small files in this request
 // TODO InitiateUpload (and Upload) needs a way to receive the expected checksum. Maybe in metadata as 'checksum' => 'sha1 aeosvp45w5xaeoe' = lowercase, space separated?
-func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
-	log := appctx.GetLogger(ctx)
+// TODO needs a way to handle unknown filesize, currently uses the context
+// FIXME headers is actually used to carry all kinds of headers
+func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, headers map[string]string) (map[string]string, error) {
 
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	switch err.(type) {
@@ -139,6 +147,8 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		return nil, err
 	}
 
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Int64("uploadLength", uploadLength).Interface("headers", headers).Logger()
+
 	// permissions are checked in NewUpload below
 
 	relative, err := fs.lu.Path(ctx, n, node.NoCheck)
@@ -146,74 +156,170 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		return nil, err
 	}
 
-	lockID, _ := ctxpkg.ContextGetLockID(ctx)
+	usr := ctxpkg.ContextMustGetUser(ctx)
+	uploadMetadata := upload.Metadata{
+		Filename:            n.Name,
+		SpaceRoot:           n.SpaceRoot.ID,
+		SpaceOwnerOrManager: n.SpaceOwnerOrManager(ctx).GetOpaqueId(),
+		ProviderID:          headers["providerID"],
+		MTime:               time.Now().UTC().Format(time.RFC3339Nano),
+		NodeID:              n.ID,
+		NodeParentID:        n.ParentID,
+		ExecutantIdp:        usr.Id.Idp,
+		ExecutantID:         usr.Id.OpaqueId,
+		ExecutantType:       utils.UserTypeToString(usr.Id.Type),
+		ExecutantUserName:   usr.Username,
+		LogLevel:            sublog.GetLevel().String(),
+	}
+
+	tusMetadata := tusd.MetaData{}
+
+	// checksum is sent as tus Upload-Checksum header and should not magically become a metadata property
+	if checksum, ok := headers["checksum"]; ok {
+		parts := strings.SplitN(checksum, " ", 2)
+		if len(parts) != 2 {
+			return nil, errtypes.BadRequest("invalid checksum format. must be '[algorithm] [checksum]'")
+		}
+		switch parts[0] {
+		case "sha1", "md5", "adler32":
+			uploadMetadata.Checksum = checksum
+		default:
+			return nil, errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
+		}
+	}
+
+	// if mtime has been set via tus metadata, expose it as tus metadata
+	if ocmtime, ok := headers["mtime"]; ok {
+		if ocmtime != "null" {
+			tusMetadata["mtime"] = ocmtime
+			// overwrite mtime if requested
+			mtime, err := utils.MTimeToTime(ocmtime)
+			if err != nil {
+				return nil, err
+			}
+			uploadMetadata.MTime = mtime.UTC().Format(time.RFC3339Nano)
+		}
+	}
+
+	_, err = node.CheckQuota(ctx, n.SpaceRoot, n.Exists, uint64(n.Blobsize), uint64(uploadLength))
+	if err != nil {
+		return nil, err
+	}
+
+	// check permissions
+	var (
+		checkNode *node.Node
+		path      string
+	)
+	if n.Exists {
+		// check permissions of file to be overwritten
+		checkNode = n
+		path, _ = storagespace.FormatReference(&provider.Reference{ResourceId: &provider.ResourceId{
+			SpaceId:  checkNode.SpaceID,
+			OpaqueId: checkNode.ID,
+		}})
+	} else {
+		// check permissions of parent
+		parent, perr := n.Parent(ctx)
+		if perr != nil {
+			return nil, errors.Wrap(perr, "Decomposedfs: error getting parent "+n.ParentID)
+		}
+		checkNode = parent
+		path, _ = storagespace.FormatReference(&provider.Reference{ResourceId: &provider.ResourceId{
+			SpaceId:  checkNode.SpaceID,
+			OpaqueId: checkNode.ID,
+		}, Path: n.Name})
+	}
+	rp, err := fs.p.AssemblePermissions(ctx, checkNode) // context does not have a user?
+	switch {
+	case err != nil:
+		return nil, err
+	case !rp.InitiateFileUpload:
+		return nil, errtypes.PermissionDenied(path)
+	}
+
+	// are we trying to overwrite a folder with a file?
+	if n.Exists && n.IsDir(ctx) {
+		return nil, errtypes.PreconditionFailed("resource is not a file")
+	}
+
+	// check lock
+	// FIXME we cannot check the lock of a new file, because it would have to use the name ...
+	if err := n.CheckLock(ctx); err != nil {
+		return nil, err
+	}
+
+	// treat 0 length uploads as deferred
+	sizeIsDeferred := false
+	if uploadLength == 0 {
+		sizeIsDeferred = true
+	}
 
 	info := tusd.FileInfo{
-		MetaData: tusd.MetaData{
-			"filename": filepath.Base(relative),
-			"dir":      filepath.Dir(relative),
-			"lockid":   lockID,
-		},
-		Size: uploadLength,
-		Storage: map[string]string{
-			"SpaceRoot":           n.SpaceRoot.ID,
-			"SpaceOwnerOrManager": n.SpaceOwnerOrManager(ctx).GetOpaqueId(),
-		},
+		MetaData:       tusMetadata,
+		Size:           uploadLength,
+		SizeIsDeferred: sizeIsDeferred,
+	}
+	if lockID, ok := ctxpkg.ContextGetLockID(ctx); ok {
+		uploadMetadata.LockID = lockID
+	}
+	uploadMetadata.Dir = filepath.Dir(relative)
+
+	// rewrite filename for old chunking v1
+	if chunking.IsChunked(n.Name) {
+		uploadMetadata.Chunk = n.Name
+		bi, err := chunking.GetChunkBLOBInfo(n.Name)
+		if err != nil {
+			return nil, err
+		}
+		n.Name = bi.Path
 	}
 
-	if metadata != nil {
-		info.MetaData["providerID"] = metadata["providerID"]
-		if mtime, ok := metadata["mtime"]; ok {
-			if mtime != "null" {
-				info.MetaData["mtime"] = mtime
-			}
-		}
-		if expiration, ok := metadata["expires"]; ok {
-			if expiration != "null" {
-				info.MetaData["expires"] = expiration
-			}
-		}
-		if _, ok := metadata["sizedeferred"]; ok {
-			info.SizeIsDeferred = true
-		}
-		if checksum, ok := metadata["checksum"]; ok {
-			parts := strings.SplitN(checksum, " ", 2)
-			if len(parts) != 2 {
-				return nil, errtypes.BadRequest("invalid checksum format. must be '[algorithm] [checksum]'")
-			}
-			switch parts[0] {
-			case "sha1", "md5", "adler32":
-				info.MetaData["checksum"] = checksum
-			default:
-				return nil, errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
-			}
-		}
+	// TODO at this point we have no way to figure out the output or mode of the logger. we need that to reinitialize a logger in PreFinishResponseCallback
+	// or better create a config option for the log level during PreFinishResponseCallback? might be easier for now
 
-		// only check preconditions if they are not empty // TODO or is this a bad request?
-		if metadata["if-match"] != "" {
-			info.MetaData["if-match"] = metadata["if-match"]
-		}
-		if metadata["if-none-match"] != "" {
-			info.MetaData["if-none-match"] = metadata["if-none-match"]
-		}
-		if metadata["if-unmodified-since"] != "" {
-			info.MetaData["if-unmodified-since"] = metadata["if-unmodified-since"]
+	// expires has been set by the storageprovider, do not expose as metadata. It is sent as a tus Upload-Expires header
+	if expiration, ok := headers["expires"]; ok {
+		if expiration != "null" { // TODO this is set by the storageprovider ... it cannot be set by cliensts, so it can never be the string 'null' ... or can it???
+			uploadMetadata.Expires = expiration
 		}
 	}
+	// only check preconditions if they are not empty
+	// do not expose as metadata
+	if headers["if-match"] != "" {
+		uploadMetadata.HeaderIfMatch = headers["if-match"] // TODO drop?
+	}
+	if headers["if-none-match"] != "" {
+		uploadMetadata.HeaderIfNoneMatch = headers["if-none-match"]
+	}
+	if headers["if-unmodified-since"] != "" {
+		uploadMetadata.HeaderIfUnmodifiedSince = headers["if-unmodified-since"]
+	}
 
-	log.Debug().Interface("info", info).Interface("node", n).Interface("metadata", metadata).Msg("Decomposedfs: resolved filename")
+	if uploadMetadata.HeaderIfNoneMatch == "*" && n.Exists {
+		return nil, errtypes.Aborted(fmt.Sprintf("parent %s already has a child %s", n.ID, n.Name))
+	}
 
-	_, err = node.CheckQuota(ctx, n.SpaceRoot, n.Exists, uint64(n.Blobsize), uint64(info.Size))
+	// create the upload
+	u, err := fs.tusDataStore.NewUpload(ctx, info)
 	if err != nil {
 		return nil, err
 	}
 
-	upload, err := fs.NewUpload(ctx, info)
+	info, err = u.GetInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	info, _ = upload.GetInfo(ctx)
+	uploadMetadata.ID = info.ID
+
+	// keep track of upload
+	err = upload.WriteMetadata(ctx, fs.lu, info.ID, uploadMetadata)
+	if err != nil {
+		return nil, err
+	}
+
+	sublog.Debug().Interface("info", info).Msg("Decomposedfs: initiated upload")
 
 	return map[string]string{
 		"simple": info.ID,
@@ -221,17 +327,17 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	}, nil
 }
 
-// UseIn tells the tus upload middleware which extensions it supports.
-func (fs *Decomposedfs) UseIn(composer *tusd.StoreComposer) {
-	composer.UseCore(fs)
-	composer.UseTerminater(fs)
-	composer.UseConcater(fs)
-	composer.UseLengthDeferrer(fs)
+// GetDataStore returns the initialized Datastore
+func (fs *Decomposedfs) GetDataStore() tusd.DataStore {
+	return fs.tusDataStore
 }
 
-// To implement the core tus.io protocol as specified in https://tus.io/protocols/resumable-upload.html#core-protocol
-// - the storage needs to implement NewUpload and GetUpload
-// - the upload needs to implement the tusd.Upload interface: WriteChunk, GetInfo, GetReader and FinishUpload
+// PreFinishResponseCallback is called by the tus datatx, after all bytes have been transferred
+func (fs *Decomposedfs) PreFinishResponseCallback(hook tusd.HookEvent) error {
+	ctx := context.TODO()
+	appctx.GetLogger(ctx).Debug().Interface("hook", hook).Msg("got PreFinishResponseCallback")
+	ctx, span := tracer.Start(ctx, "PreFinishResponseCallback")
+	defer span.End()
 
 // NewUpload returns a new tus Upload instance
 func (fs *Decomposedfs) NewUpload(ctx context.Context, info tusd.FileInfo) (tusd.Upload, error) {

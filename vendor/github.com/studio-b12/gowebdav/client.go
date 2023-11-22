@@ -174,12 +174,6 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 	err := c.propfind(path, false,
 		`<d:propfind xmlns:d='DAV:'>
 			<d:prop>
-				<d:displayname/>
-				<d:resourcetype/>
-				<d:getcontentlength/>
-				<d:getcontenttype/>
-				<d:getetag/>
-				<d:getlastmodified/>
 			</d:prop>
 		</d:propfind>`,
 		&response{},
@@ -226,12 +220,6 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 	err := c.propfind(path, true,
 		`<d:propfind xmlns:d='DAV:'>
 			<d:prop>
-				<d:displayname/>
-				<d:resourcetype/>
-				<d:getcontentlength/>
-				<d:getcontenttype/>
-				<d:getetag/>
-				<d:getlastmodified/>
 			</d:prop>
 		</d:propfind>`,
 		&response{},

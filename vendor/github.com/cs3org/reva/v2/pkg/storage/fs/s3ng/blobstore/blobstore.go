@@ -63,6 +63,22 @@ func New(endpoint, region, bucket, accessKey, secretKey string) (*Blobstore, err
 	}, nil
 }
 
+func (bs *Blobstore) MoveBlob(node *node.Node, source, bucket, key string) error {
+
+	_, err := bs.client.CopyObject(context.Background(), minio.CopyDestOptions{
+		Bucket: bs.bucket,
+		Object: bs.path(node),
+	}, minio.CopySrcOptions{
+		Bucket: bucket,
+		Object: key,
+	})
+
+	if err != nil {
+		return errors.Wrapf(err, "could not copy object bucket:'%s' key:'%s' to bucket:'%s' key'%s'", bs.bucket, bs.path(node), bucket, key)
+	}
+	return nil
+}
+
 // Upload stores some data in the blobstore under the given key
 func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	reader, err := os.Open(source)

@@ -43,6 +43,21 @@ type Options struct {
 
 	// Secret key for the s3 blobstore
 	S3SecretKey string `mapstructure:"s3.secret_key"`
+
+	// UploadObjectPrefix for the s3 blobstore
+	S3UploadObjectPrefix string `mapstructure:"s3.upload_object_prefix"`
+
+	// UploadMetadataPrefix for the s3 blobstore
+	S3UploadMetadataPrefix string `mapstructure:"s3.upload_metadata_prefix"`
+
+	// UploadTemporaryDirectory for the s3 blobstore
+	S3UploadTemporaryDirectory string `mapstructure:"s3.upload_temporary_directory"`
+
+	// DisableSSL for the s3 blobstore
+	S3DisableSSL bool `mapstructure:"s3.disable_ssl"`
+
+	// ForcePathStyle for the s3 blobstore
+	S3ForcePathStyle bool `mapstructure:"s3.force_path_style"`
 }
 
 // S3ConfigComplete return true if all required s3 fields are set

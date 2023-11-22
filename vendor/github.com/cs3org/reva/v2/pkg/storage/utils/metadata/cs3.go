@@ -181,6 +181,9 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 		ifuReq.Opaque = utils.AppendPlainToOpaque(ifuReq.Opaque, "X-OC-Mtime", strconv.Itoa(int(req.MTime.Unix()))+"."+strconv.Itoa(req.MTime.Nanosecond()))
 	}
 
+	// FIXME ... we need a better way to transport filesize
+	// ifuReq.Opaque = utils.AppendPlainToOpaque(ifuReq.Opaque, net.HeaderUploadLength, strconv.FormatInt(int64(len(req.Content)), 10))
+
 	res, err := client.InitiateFileUpload(ctx, ifuReq)
 	if err != nil {
 		return nil, err
