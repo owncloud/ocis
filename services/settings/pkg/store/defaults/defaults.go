@@ -196,6 +196,14 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 			{
 				Value: &settingsmsg.ListOptionValue{
 					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "bg",
+					},
+				},
+				DisplayValue: "български",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "cs",
 					},
 				},
@@ -248,6 +256,46 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 					},
 				},
 				DisplayValue: "Italiano",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "nl",
+					},
+				},
+				DisplayValue: "Nederlands",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "ko",
+					},
+				},
+				DisplayValue: "한국어",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "sq",
+					},
+				},
+				DisplayValue: "Shqipja",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "sv",
+					},
+				},
+				DisplayValue: "Svenska",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "tr",
+					},
+				},
+				DisplayValue: "Türkçe",
 			},
 		},
 	},
