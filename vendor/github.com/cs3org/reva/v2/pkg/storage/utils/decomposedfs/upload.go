@@ -249,16 +249,10 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		return nil, err
 	}
 
-	// treat 0 length uploads as deferred
-	sizeIsDeferred := false
-	if uploadLength == 0 {
-		sizeIsDeferred = true
-	}
-
 	info := tusd.FileInfo{
 		MetaData:       tusMetadata,
 		Size:           uploadLength,
-		SizeIsDeferred: sizeIsDeferred,
+		SizeIsDeferred: uploadLength == 0, // treat 0 length uploads as deferred
 	}
 	if lockID, ok := ctxpkg.ContextGetLockID(ctx); ok {
 		uploadMetadata.LockID = lockID

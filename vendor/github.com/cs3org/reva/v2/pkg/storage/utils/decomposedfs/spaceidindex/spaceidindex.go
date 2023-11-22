@@ -2,6 +2,7 @@ package spaceidindex
 
 import (
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -44,6 +45,9 @@ func (i *Index) Load(index string) (map[string]string, error) {
 	indexPath := filepath.Join(i.root, i.name, index+".mpk")
 	fi, err := os.Stat(indexPath)
 	if err != nil {
+		if _, ok := err.(*fs.PathError); ok {
+			return map[string]string{}, nil
+		}
 		return nil, err
 	}
 	return i.readSpaceIndex(indexPath, i.name+":"+index, fi.ModTime())

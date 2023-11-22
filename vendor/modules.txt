@@ -358,10 +358,14 @@ github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
 <<<<<<< HEAD
+<<<<<<< HEAD
 # github.com/cs3org/reva/v2 v2.16.1-0.20231201122033-a389ddc645c4
 =======
 # github.com/cs3org/reva/v2 v2.16.1-0.20231127154323-1e3027b83df5 => github.com/butonic/reva/v2 v2.0.0-20231122115417-ad2132099fc6
 >>>>>>> 2f54e2201a (use correct reva branch)
+=======
+# github.com/cs3org/reva/v2 v2.16.1-0.20231127154323-1e3027b83df5 => github.com/butonic/reva/v2 v2.0.0-20231124115243-b9e0f3e09f08
+>>>>>>> 4cff293b13 (bump reva)
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -2283,4 +2287,4 @@ stash.kopano.io/kgol/oidc-go
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
 # github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
-# github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20231122115417-ad2132099fc6
+# github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20231124115243-b9e0f3e09f08

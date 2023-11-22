@@ -302,11 +302,13 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 
 	httpReq, err := rhttp.NewRequest(ctx, http.MethodPut, ep, r.Body)
 	if err != nil {
+		log.Error().Err(err).Msg("error creating new request to data service")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 	httpReq.Header.Set(datagateway.TokenTransportHeader, token)
+	httpReq.ContentLength = r.ContentLength
 
 	httpRes, err := s.client.Do(httpReq)
 	if err != nil {
