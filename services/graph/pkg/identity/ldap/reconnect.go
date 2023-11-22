@@ -4,6 +4,7 @@ package ldap
 // https://gist.github.com/emsearcy/cba3295d1a06d4c432ab4f6173b65e4f#file-ldap_snippet-go
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -336,6 +337,12 @@ func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, p
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// SearchAsync implements the ldap.Client interface
+func (c ConnWithReconnect) SearchAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int) ldap.Response {
+	// unimplemented
+	return nil
+}
+
 // NTLMUnauthenticatedBind implements the ldap.Client interface
 func (c ConnWithReconnect) NTLMUnauthenticatedBind(domain, username string) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
@@ -354,4 +361,16 @@ func (c ConnWithReconnect) Unbind() error {
 // DirSync implements the ldap.Client interface
 func (c ConnWithReconnect) DirSync(searchRequest *ldap.SearchRequest, flags, maxAttrCount int64, cookie []byte) (*ldap.SearchResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+// DirSyncAsync implements the ldap.Client interface
+func (c ConnWithReconnect) DirSyncAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, flags, maxAttrCount int64, cookie []byte) ldap.Response {
+	// unimplemented
+	return nil
+}
+
+// Syncrepl implements the ldap.Client interface
+func (c ConnWithReconnect) Syncrepl(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, mode ldap.ControlSyncRequestMode, cookie []byte, reloadHint bool) ldap.Response {
+	// unimplemented
+	return nil
 }

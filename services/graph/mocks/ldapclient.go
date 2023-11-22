@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	ldap "github.com/go-ldap/ldap/v3"
 	mock "github.com/stretchr/testify/mock"
 
@@ -120,6 +122,22 @@ func (_m *Client) DirSync(searchRequest *ldap.SearchRequest, flags int64, maxAtt
 	}
 
 	return r0, r1
+}
+
+// DirSyncAsync provides a mock function with given fields: ctx, searchRequest, bufferSize, flags, maxAttrCount, cookie
+func (_m *Client) DirSyncAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, flags int64, maxAttrCount int64, cookie []byte) ldap.Response {
+	ret := _m.Called(ctx, searchRequest, bufferSize, flags, maxAttrCount, cookie)
+
+	var r0 ldap.Response
+	if rf, ok := ret.Get(0).(func(context.Context, *ldap.SearchRequest, int, int64, int64, []byte) ldap.Response); ok {
+		r0 = rf(ctx, searchRequest, bufferSize, flags, maxAttrCount, cookie)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(ldap.Response)
+		}
+	}
+
+	return r0
 }
 
 // ExternalBind provides a mock function with given fields:
@@ -284,6 +302,22 @@ func (_m *Client) Search(_a0 *ldap.SearchRequest) (*ldap.SearchResult, error) {
 	return r0, r1
 }
 
+// SearchAsync provides a mock function with given fields: ctx, searchRequest, bufferSize
+func (_m *Client) SearchAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int) ldap.Response {
+	ret := _m.Called(ctx, searchRequest, bufferSize)
+
+	var r0 ldap.Response
+	if rf, ok := ret.Get(0).(func(context.Context, *ldap.SearchRequest, int) ldap.Response); ok {
+		r0 = rf(ctx, searchRequest, bufferSize)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(ldap.Response)
+		}
+	}
+
+	return r0
+}
+
 // SearchWithPaging provides a mock function with given fields: searchRequest, pagingSize
 func (_m *Client) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
 	ret := _m.Called(searchRequest, pagingSize)
@@ -355,6 +389,22 @@ func (_m *Client) StartTLS(_a0 *tls.Config) error {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Syncrepl provides a mock function with given fields: ctx, searchRequest, bufferSize, mode, cookie, reloadHint
+func (_m *Client) Syncrepl(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, mode ldap.ControlSyncRequestMode, cookie []byte, reloadHint bool) ldap.Response {
+	ret := _m.Called(ctx, searchRequest, bufferSize, mode, cookie, reloadHint)
+
+	var r0 ldap.Response
+	if rf, ok := ret.Get(0).(func(context.Context, *ldap.SearchRequest, int, ldap.ControlSyncRequestMode, []byte, bool) ldap.Response); ok {
+		r0 = rf(ctx, searchRequest, bufferSize, mode, cookie, reloadHint)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(ldap.Response)
+		}
 	}
 
 	return r0
