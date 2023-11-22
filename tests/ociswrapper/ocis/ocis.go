@@ -51,6 +51,8 @@ func Start(envMap map[string]any) {
 		log.Panic(err)
 	}
 
+	readConfigFile()
+
 	// Read and print the logs when the 'ocis server' command is running
 	logScanner := bufio.NewScanner(logs)
 	for logScanner.Scan() {
@@ -84,6 +86,14 @@ func Start(envMap map[string]any) {
 			}
 		}
 	}
+}
+
+func readConfigFile() {
+	config, err := os.ReadFile(os.Getenv("OCIS_CONFIG_DIR") + "/ocis.yaml")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	fmt.Println(string(config))
 }
 
 func Stop() {
