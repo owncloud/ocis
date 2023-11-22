@@ -249,3 +249,28 @@ Feature: unlock locked items
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: unlock a file in the shares using file-id
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
+      | path      | textfile.txt |
+      | shareWith | Brian        |
+      | role      | editor       |
+    And user "Brian" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
+      | lockscope | exclusive   |
+      | timeout   | Second-3600 |
+    When user "Brian" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And 0 locks should be reported for file "textfile.txt" inside the space "Personal" of user "Alice" by the WebDAV API
+    And 0 locks should be reported for file "textfile.txt" inside the space "Shares" of user "Brian" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
+    And using new DAV path
+    And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/textfile.txt"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |

@@ -548,8 +548,11 @@ class WebDavLockingContext implements Context {
 	 * @param string $lockOwner
 	 * @param string $itemToUseLockOf
 	 * @param boolean $public
+	 * @param string|null $fullUrl
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 		string $user,
