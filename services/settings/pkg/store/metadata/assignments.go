@@ -41,6 +41,7 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 		a := &settingsmsg.UserRoleAssignment{}
 		err = json.Unmarshal(b, a)
 		if err != nil {
+			s.Logger.Error().Err(err).Str("data", string(b)).Msg("could not parse json")
 			return nil, err
 		}
 
