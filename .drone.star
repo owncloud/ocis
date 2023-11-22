@@ -792,6 +792,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+        "STOP_ON_FAILURE": True,
     }
 
     for item in extra_environment:
