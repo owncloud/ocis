@@ -53,7 +53,7 @@ func WalkSegments(segments []string, claims map[string]interface{}) (interface{}
 }
 
 func ReadStringClaim(path string, claims map[string]interface{}) (string, error) {
-	// happy path
+	// check the simple case first
 	value, _ := claims[path].(string)
 	if value != "" {
 		return value, nil
