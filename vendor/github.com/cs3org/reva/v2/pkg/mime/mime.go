@@ -215,6 +215,7 @@ var mimeTypes = map[string]string{
 	"doc":                      "application/msword",
 	"docm":                     "application/vnd.ms-word.document.macroenabled.12",
 	"docx":                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"docxf":                    "application/vnd.openxmlformats-officedocument.wordprocessingml.form",
 	"dot":                      "application/msword",
 	"dotm":                     "application/vnd.ms-word.template.macroenabled.12",
 	"dotx":                     "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
