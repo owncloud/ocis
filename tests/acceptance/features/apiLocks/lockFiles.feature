@@ -367,3 +367,22 @@ Feature: lock files
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
+
+
+  Scenario Outline: lock expiration
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
+    And user "Alice" has locked file "textfile0.txt" setting the following properties
+      | lockscope | <lock-scope> |
+      | timeout   | Second-5     |
+    When the user waits for "5" seconds to expire the lock
+    Then user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
+    And 0 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |

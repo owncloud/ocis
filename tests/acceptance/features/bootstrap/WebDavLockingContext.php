@@ -829,6 +829,17 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
+	 * @When the user waits for :time seconds to expire the lock
+	 *
+	 * @param int $time
+	 *
+	 * @return void
+	 */
+	public function waitForCertainSecondsToExpireTheLock(int $time): void {
+		\sleep($time);
+	}
+
+	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
 	 *
