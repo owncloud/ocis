@@ -87,6 +87,7 @@ func DefaultConfig() *config.Config {
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
 		EnableResharing:          true,
+		DefaultLinkPermissions:   1,
 		SearchMinLength:          3,
 		Edition:                  "Community",
 		Checksums: config.Checksums{

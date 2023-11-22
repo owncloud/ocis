@@ -247,6 +247,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"upload":                     true,
 									"multiple":                   true,
 									"supports_upload_only":       true,
+									"default_permissions":        cfg.DefaultLinkPermissions,
 									"password": map[string]interface{}{
 										"enforced": false,
 										"enforced_for": map[string]interface{}{
