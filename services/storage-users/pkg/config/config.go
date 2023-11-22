@@ -135,8 +135,8 @@ type S3NGDriver struct {
 	SecretKey                string `yaml:"secret_key" env:"STORAGE_USERS_S3NG_SECRET_KEY" desc:"Secret key for the S3 bucket."`
 	Endpoint                 string `yaml:"endpoint" env:"STORAGE_USERS_S3NG_ENDPOINT" desc:"Endpoint for the S3 bucket."`
 	Bucket                   string `yaml:"bucket" env:"STORAGE_USERS_S3NG_BUCKET" desc:"Name of the S3 bucket."`
-	UploadObjectPrefix       string `yaml:"upload_object_prefix" env:"STORAGE_USERS_S3NG_UPLOAD_OBJECT_PREFIX" desc:"Object prefix is prepended to the name of each S3 object that is created to store uploaded files. It can be used to create a pseudo-directory structure in the bucket, e.g. 'path/to/my/uploads'."`
-	UploadMetadataPrefix     string `yaml:"upload_metadata_prefix" env:"STORAGE_USERS_S3NG_UPLOAD_METADATA_PREFIX" desc:"Metadata object prefix is prepended to the name of each .info and .part S3 object that is created. If it is not set, then object prefix is used."`
+	UploadObjectPrefix       string `yaml:"upload_object_prefix" env:"STORAGE_USERS_S3NG_UPLOAD_OBJECT_PREFIX" desc:"This object prefix is prepended to the name of each S3 object that is created to store uploaded files. It can be used to create a pseudo-directory structure in the bucket, like 'path/to/my/uploads'."`
+	UploadMetadataPrefix     string `yaml:"upload_metadata_prefix" env:"STORAGE_USERS_S3NG_UPLOAD_METADATA_PREFIX" desc:"The metadata object prefix is prepended to the name of each .info and .part S3 object that is created. If it is not set, then object prefix is used."`
 	UploadTemporaryDirectory string `yaml:"upload_temporary_directory" env:"STORAGE_USERS_S3NG_UPLOAD_TEMPORARY_DIRECTORY" desc:"Path where temporary files will be stored on disk during the upload."`
 	DisableSSL               bool   `yaml:"disable_ssl" env:"STORAGE_USERS_S3NG_DISABLE_SSL" desc:"Disable SSL when accessing the S3 bucket."`
 	ForcePathStyle           bool   `yaml:"force_path_style" env:"STORAGE_USERS_S3NG_FORCE_PATH_STYLE" desc:"Force path style S3 requests."`
