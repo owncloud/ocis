@@ -64,6 +64,13 @@ app_registry:
     icon: ""
     default_app: ""
     allow_creation: true
+  - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.form
+    extension: docxf
+    name: Form Document
+    description: Form Document
+    icon: ""
+    default_app: ""
+    allow_creation: true
   - mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     extension: xlsx
     name: Microsoft Excel
