@@ -1,6 +1,8 @@
 package grpc
 
 import (
+	"fmt"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -40,7 +42,13 @@ func Server(opts ...Option) (grpc.Service, func(), error) {
 	if err != nil {
 		options.Logger.Error().
 			Err(err).
+			Msg(options.JWTSecret)
+		options.Logger.Error().
+			Err(err).
 			Msg("Error initializing search service")
+		options.Logger.Error().
+			Err(err).
+			Msg(fmt.Sprintf("%+v", options))
 		return grpc.Service{}, teardown, err
 	}
 
