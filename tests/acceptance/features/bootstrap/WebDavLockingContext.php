@@ -391,7 +391,24 @@ class WebDavLockingContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
-	/**
+    /**
+     * @When user :user unlocks the last created lock of file :itemToUnlock using file-id path :filePath using the WebDAV API
+     *
+     * @param string $user
+     * @param string $itemToUnlock
+     * @param string $filePath
+     *
+     * @return void
+     */
+    public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(string $user, string $itemToUnlock, string $filePath)
+    {
+        $fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+        $response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI($user, $itemToUnlock, $user,$itemToUnlock, false, $fullUrl);
+        $this->featureContext->setResponse($response);
+    }
+
+
+    /**
 	 * @When user :user unlocks file :itemToUnlock with the last created lock of file :itemToUseLockOf using the WebDAV API
 	 *
 	 * @param string $user
@@ -526,7 +543,8 @@ class WebDavLockingContext implements Context {
 		string $itemToUnlock,
 		string $lockOwner,
 		string $itemToUseLockOf,
-		bool $public = false
+		bool $public = false,
+        string $fullUrl = null
 	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
@@ -547,18 +565,30 @@ class WebDavLockingContext implements Context {
 		$headers = [
 			"Lock-Token" => $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf]
 		];
-		return WebDavHelper::makeDavRequest(
-			$baseUrl,
-			$user,
-			$password,
-			"UNLOCK",
-			$itemToUnlock,
-			$headers,
-			$this->featureContext->getStepLineRef(),
-			null,
-			$this->featureContext->getDavPathVersion(),
-			$type
-		);
+        if(isset($fullUrl)){
+            $response = HttpRequestHelper::sendRequest(
+                $fullUrl,
+                $this->featureContext->getStepLineRef(),
+                "UNLOCK",
+                $this->featureContext->getActualUsername($user),
+                $this->featureContext->getPasswordForUser($user),
+                $headers
+            );
+        } else {
+            $response = WebDavHelper::makeDavRequest(
+                $baseUrl,
+                $user,
+                $password,
+                "UNLOCK",
+                $itemToUnlock,
+                $headers,
+                $this->featureContext->getStepLineRef(),
+                null,
+                $this->featureContext->getDavPathVersion(),
+                $type
+            );
+        }
+        return $response;
 	}
 
 	/**
