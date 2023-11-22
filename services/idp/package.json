@@ -113,7 +113,7 @@
     "babel-plugin-named-asset-import": "^0.3.8",
     "babel-preset-react-app": "^10.0.1",
     "case-sensitive-paths-webpack-plugin": "2.4.0",
-    "cldr": "^7.4.1",
+    "cldr": "^7.5.0",
     "css-loader": "5.2.7",
     "dotenv": "16.3.1",
     "dotenv-expand": "10.0.0",

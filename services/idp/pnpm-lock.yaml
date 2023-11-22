@@ -128,8 +128,8 @@ devDependencies:
     specifier: 2.4.0
     version: 2.4.0
   cldr:
-    specifier: ^7.4.1
-    version: 7.4.1
+    specifier: ^7.5.0
+    version: 7.5.0
   css-loader:
     specifier: 5.2.7
     version: 5.2.7(webpack@4.47.0)
@@ -4492,8 +4492,8 @@ packages:
       xpath: 0.0.32
     dev: false
 
-  /cldr@7.4.1:
-    resolution: {integrity: sha512-601BYwyfYS09UV/TbjiYSG814+kcYHRPCY7JQRbKmIucOYVKKRO/3SVwXlRBQmu9cDsTOhpHSJtLE/u8UIz57w==}
+  /cldr@7.5.0:
+    resolution: {integrity: sha512-2qy3ASYFbNToTujNnk5Y8ak++B4TH/G+S8AEOrN1xUFZhxhmqWDPUGnOFGyId61vD2Trf+yE65wVzIcdE/bpPg==}
     dependencies:
       '@xmldom/xmldom': 0.8.10
       escodegen: 2.1.0
@@ -4503,7 +4503,7 @@ packages:
       pegjs: 0.10.0
       seq: 0.3.5
       unicoderegexp: 0.4.1
-      xpath: 0.0.32
+      xpath: 0.0.33
     dev: true
 
   /clean-css@4.2.4:
@@ -12471,6 +12471,12 @@ packages:
   /xpath@0.0.32:
     resolution: {integrity: sha512-rxMJhSIoiO8vXcWvSifKqhvV96GjiD5wYb8/QHdoRyQvraTpp4IEv944nhGausZZ3u7dhQXteZuZbaqfpB7uYw==}
     engines: {node: '>=0.6.0'}
+    dev: false
+
+  /xpath@0.0.33:
+    resolution: {integrity: sha512-NNXnzrkDrAzalLhIUc01jO2mOzXGXh1JwPgkihcLLzw98c0WgYDmmjSh1Kl3wzaxSVWMuA+fe0WTWOBDWCBmNA==}
+    engines: {node: '>=0.6.0'}
+    dev: true
 
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
