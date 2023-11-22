@@ -1,7 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0](#changelog-for-500-2023-11-08)
+* [Changelog for 5.0.0](#changelog-for-500-2023-11-22)
 * [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
@@ -36,19 +36,137 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
-* Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
-* Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
-* Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
-* Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
-* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
-* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
-* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
-* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
-* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 
 ## Details
+
+* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
+
+   We add two new filters to the user list endpoint. The `startswith` filter allows to filter users
+   by the beginning of their name. The `contains` filter allows to filter users by a substring of
+   their name.
+
+   https://github.com/owncloud/ocis/issues/5486
+   https://github.com/owncloud/ocis/pull/7739
+
+# Changelog for [5.0.0] (2023-11-22)
+
+The following sections list the changes for 5.0.0.
+
+[5.0.0]: https://github.com/owncloud/ocis/compare/v4.0.0...v5.0.0
+
+## Summary
+
+* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
+* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
+* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
+* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
+* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
+* Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
+* Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
+* Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
+* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
+* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+* Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
+* Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
+* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
+* Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
+* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
+* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
+* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
+* Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
+* Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
+* Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
+* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
+* Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
+* Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
+* Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
+* Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
+* Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
+* Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
+* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
+* Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
+* Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
+* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
+* Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
+* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
+* Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
+* Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
+* Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
+* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
+* Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
+* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
+* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
+* Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
+* Enhancement - Add config to enforce passwords on all public links: [#7547](https://github.com/owncloud/ocis/pull/7547)
+* Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
+* Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
+* Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
+* Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
+* Enhancement - Update web to v8.0.0: [#7773](https://github.com/owncloud/ocis/pull/7773)
+* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
+
+## Details
+
+* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
+
+   When a file is locked, return 423 status code instead 500 on tag create
+
+   https://github.com/owncloud/ocis/pull/7596
+
+* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
+
+   Userlog will now delete events when the user has no longer access to the underlying resource
+
+   https://github.com/owncloud/ocis/pull/7410
+
+* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
+
+   When requesting `config.json` file from the server, web service would reload the file if a path
+   is set. This will remove config entries set via Envvar. Since we want to have the possiblity to
+   set configuration from both sources we removed the reading from file. The file will still be
+   loaded on service startup.
+
+   https://github.com/owncloud/ocis/pull/7369
+
+* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
+
+   We the auth service env variable to the service specific name. Before it was configurable via
+   `AUTH_MACHINE_JWT_SECRET` and now is configurable via `AUTH_SERVICE_JWT_SECRET`.
+
+   https://github.com/owncloud/ocis/pull/7523
+
+* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+
+   We fixed the issue when 500 on searches that contain ":". Added the characters escaping
+   according to https://blevesearch.com/docs/Query-String-Query/
+
+   https://github.com/owncloud/ocis/issues/7282
+   https://github.com/owncloud/ocis/pull/7290
+
+* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
+
+   Add the default language for the webui, the settings, userlog and notification service.
+
+   https://github.com/owncloud/ocis/issues/7465
+
+* Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
+
+   Docs pipeline was not routed through our proxies which could lead to requests being
+   blacklisted
+
+   https://github.com/owncloud/ocis/issues/7509
+   https://github.com/owncloud/ocis/pull/7511
 
 * Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
 
@@ -63,6 +181,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7678
    https://github.com/owncloud/ocis/pull/7705
+
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+
+   We fixed an issue that allowed to create two schools with the same school number
+
+   https://github.com/owncloud/enterprise/issues/6051
+   https://github.com/owncloud/ocis/pull/7351
+
+* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
+
+   We fixed a problem with the "ocis migrate rebuild-jsoncs3-indexes" command which reset the
+   state of received shares to "pending".
+
+   https://github.com/owncloud/ocis/issues/7319
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -82,6 +214,21 @@ The following sections list the changes for unreleased.
    package
    behavior
 
+* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
+
+   When already having a share for a specific resource, auto accept would use custom mountpoints
+   which lead to other errors. Now auto-accept is using the existing mountpoint of a share.
+
+   https://github.com/owncloud/ocis/pull/7592
+
+* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+
+   The values `tls` and `ssl` for the `smtp_encryption` configuration setting are duplicates of
+   `starttls` and `ssltls`. They have been marked as deprecated. A warning will be logged when
+   they are still used. Please use `starttls` instead for `tls` and `ssltls` instead of `ssl.
+
+   https://github.com/owncloud/ocis/issues/7345
+
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 
    We fixed a bug that caused Error 500 when user try to unlock file using fileid The
@@ -97,6 +244,64 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7744
    https://github.com/owncloud/ocis/pull/7772
+
+* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
+
+   The token storage config in the config.json for web was missing when it was set to `false`.
+
+   https://github.com/owncloud/ocis/issues/7462
+   https://github.com/owncloud/ocis/pull/7528
+
+* Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
+
+   Fix the status code and message when a thumbnail request is made too early.
+
+   https://github.com/owncloud/ocis/issues/7502
+   https://github.com/owncloud/ocis/pull/7507
+
+* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
+
+   The reva ldap backend for the users and groups service did not hex escape binary uuids in LDAP
+   filter correctly this could cause problems in Active Directory setups for services using the
+   GetUserByClaim CS3 request with claim "userid".
+
+   https://github.com/owncloud/ocis/issues/7469
+   https://github.com/owncloud/ocis/pull/7476
+
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+
+   We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently removed from
+   the users service with the 4.0.0 release.
+
+   https://github.com/owncloud/ocis/issues/7312
+   https://github.com/owncloud/ocis-charts/issues/397
+
+* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
+
+   On shares auto accept set a mountpoint with same logic as ocs handler
+
+   https://github.com/owncloud/ocis/pull/7460
+
+* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
+
+   Automatically accepts shares. This feature is active by default and can be deactivated via the
+   environment variable `FRONTEND_AUTO_ACCEPT_SHARES`.
+
+   https://github.com/owncloud/ocis/pull/7097
+
+* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
+
+   We changed the default TUS chunk size from 100MB to 10MB. You can still use the old value by
+   configuring it in your deployment.
+
+   https://github.com/owncloud/ocis/pull/7273
+
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+
+   AD FS `/adfs/.well-known/openid-configuration` has an optional `access_token_issuer`
+   which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
+
+   https://github.com/owncloud/ocis/pull/7138
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
@@ -170,263 +375,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7432
    https://github.com/owncloud/ocis/pull/7602
 
-* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
-
-   We add two new filters to the user list endpoint. The `startswith` filter allows to filter users
-   by the beginning of their name. The `contains` filter allows to filter users by a substring of
-   their name.
-
-   https://github.com/owncloud/ocis/issues/5486
-   https://github.com/owncloud/ocis/pull/7739
-
-* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
-
-   Allows adding custom routes to the ocis proxy. This enables customs ocis extensions
-
-   https://github.com/owncloud/ocis/pull/7740
-
-* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/7721
-   https://github.com/owncloud/ocis/pull/7727
-   https://github.com/owncloud/ocis/pull/7752
-
-* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
-
-   We've added new sharing ng endpoints to the graph beta api. The following endpoints are added:
-
-  * /v1beta1/me/drive/sharedByMe
-  * /v1beta1/me/drive/sharedWithMe
-  * /v1beta1/roleManagement/permissions/roleDefinitions
-  * /v1beta1/roleManagement/permissions/roleDefinitions/{roleID}
-  * /v1beta1/drives/{drive-id}/items/{item-id}/createLink (create a sharing link)
-
-   https://github.com/owncloud/ocis/issues/7436
-   https://github.com/owncloud/ocis/issues/6993
-   https://github.com/owncloud/ocis/pull/7633
-   https://github.com/owncloud/ocis/pull/7686
-   https://github.com/owncloud/ocis/pull/7684
-   https://github.com/owncloud/ocis/pull/7683
-   https://github.com/owncloud/ocis/pull/7239
-   https://github.com/owncloud/ocis/pull/7687
-   https://github.com/owncloud/libre-graph-api/pull/112
-
-* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
-
-   Adds new permissions to admin/spaceadmin/user roles - Favorites.List allows / denies the
-   Favorites Listing Request - Favorites.Write is implemented to be enforced on marking/unmark
-   files as favouritesShare - Shares.Write permission denies / allows sharing completely for a
-   user on all share CUD requests. (User, Group)
-
-   https://github.com/owncloud/ocis/pull/7700
-
-* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
-
-   We have added the preferred language to the libre-graph api & added endpoints for that to ocis.
-
-   https://github.com/owncloud/ocis/issues/5455
-   https://github.com/owncloud/ocis/pull/7720
-   https://github.com/owncloud/libre-graph-api/pull/130
-
-# Changelog for [5.0.0] (2023-11-08)
-
-The following sections list the changes for 5.0.0.
-
-[5.0.0]: https://github.com/owncloud/ocis/compare/v4.0.0...v5.0.0
-
-## Summary
-
-* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
-* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
-* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
-* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
-* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
-* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
-* Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
-* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
-* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
-* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
-* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
-* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
-* Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
-* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
-* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
-* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
-* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
-* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
-* Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
-* Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
-* Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
-* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
-* Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
-* Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
-* Enhancement - Set default for Async Uploads to true: [#7416](https://github.com/owncloud/ocis/pull/7416)
-* Enhancement - The default language added: [#7417](https://github.com/owncloud/ocis/pull/7417)
-* Enhancement - Config for disabling Web extensions: [#7486](https://github.com/owncloud/ocis/pull/7486)
-* Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
-* Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
-* Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
-* Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
-* Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
-* Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
-* Enhancement - Implement sharing roles: [#7524](https://github.com/owncloud/ocis/pull/7524)
-* Enhancement - Improve SSE format: [#7325](https://github.com/owncloud/ocis/pull/7325)
-* Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
-* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
-* Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
-* Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
-* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
-* Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
-* Enhancement - Add config to enforce passwords on all public links: [#7547](https://github.com/owncloud/ocis/pull/7547)
-* Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
-* Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
-* Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
-* Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
-* Enhancement - Update web to v8.0.0: [#7773](https://github.com/owncloud/ocis/pull/7773)
-* Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
-
-## Details
-
-* Bugfix - Return 423 status code on tag create: [#7596](https://github.com/owncloud/ocis/pull/7596)
-
-   When a file is locked, return 423 status code instead 500 on tag create
-
-   https://github.com/owncloud/ocis/pull/7596
-
-* Bugfix - Delete outdated userlog events: [#7410](https://github.com/owncloud/ocis/pull/7410)
-
-   Userlog will now delete events when the user has no longer access to the underlying resource
-
-   https://github.com/owncloud/ocis/pull/7410
-
-* Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
-
-   When requesting `config.json` file from the server, web service would reload the file if a path
-   is set. This will remove config entries set via Envvar. Since we want to have the possiblity to
-   set configuration from both sources we removed the reading from file. The file will still be
-   loaded on service startup.
-
-   https://github.com/owncloud/ocis/pull/7369
-
-* Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
-
-   We the auth service env variable to the service specific name. Before it was configurable via
-   `AUTH_MACHINE_JWT_SECRET` and now is configurable via `AUTH_SERVICE_JWT_SECRET`.
-
-   https://github.com/owncloud/ocis/pull/7523
-
-* Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
-
-   We fixed the issue when 500 on searches that contain ":". Added the characters escaping
-   according to https://blevesearch.com/docs/Query-String-Query/
-
-   https://github.com/owncloud/ocis/issues/7282
-   https://github.com/owncloud/ocis/pull/7290
-
-* Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
-
-   Add the default language for the webui, the settings, userlog and notification service.
-
-   https://github.com/owncloud/ocis/issues/7465
-
-* Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
-
-   Docs pipeline was not routed through our proxies which could lead to requests being
-   blacklisted
-
-   https://github.com/owncloud/ocis/issues/7509
-   https://github.com/owncloud/ocis/pull/7511
-
-* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
-
-   We fixed an issue that allowed to create two schools with the same school number
-
-   https://github.com/owncloud/enterprise/issues/6051
-   https://github.com/owncloud/ocis/pull/7351
-
-* Bugfix - Do not reset state of received shares when rebuilding the jsoncs3 index: [#7319](https://github.com/owncloud/ocis/issues/7319)
-
-   We fixed a problem with the "ocis migrate rebuild-jsoncs3-indexes" command which reset the
-   state of received shares to "pending".
-
-   https://github.com/owncloud/ocis/issues/7319
-
-* Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
-
-   When already having a share for a specific resource, auto accept would use custom mountpoints
-   which lead to other errors. Now auto-accept is using the existing mountpoint of a share.
-
-   https://github.com/owncloud/ocis/pull/7592
-
-* Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
-
-   The values `tls` and `ssl` for the `smtp_encryption` configuration setting are duplicates of
-   `starttls` and `ssltls`. They have been marked as deprecated. A warning will be logged when
-   they are still used. Please use `starttls` instead for `tls` and `ssltls` instead of `ssl.
-
-   https://github.com/owncloud/ocis/issues/7345
-
-* Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
-
-   The token storage config in the config.json for web was missing when it was set to `false`.
-
-   https://github.com/owncloud/ocis/issues/7462
-   https://github.com/owncloud/ocis/pull/7528
-
-* Bugfix - Fix preview request 500 error when made too early: [#7502](https://github.com/owncloud/ocis/issues/7502)
-
-   Fix the status code and message when a thumbnail request is made too early.
-
-   https://github.com/owncloud/ocis/issues/7502
-   https://github.com/owncloud/ocis/pull/7507
-
-* Bugfix - GetUserByClaim fixed for Active Directory: [#7476](https://github.com/owncloud/ocis/pull/7476)
-
-   The reva ldap backend for the users and groups service did not hex escape binary uuids in LDAP
-   filter correctly this could cause problems in Active Directory setups for services using the
-   GetUserByClaim CS3 request with claim "userid".
-
-   https://github.com/owncloud/ocis/issues/7469
-   https://github.com/owncloud/ocis/pull/7476
-
-* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
-
-   We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently removed from
-   the users service with the 4.0.0 release.
-
-   https://github.com/owncloud/ocis/issues/7312
-   https://github.com/owncloud/ocis-charts/issues/397
-
-* Bugfix - Set the mountpoint on auto accept: [#7460](https://github.com/owncloud/ocis/pull/7460)
-
-   On shares auto accept set a mountpoint with same logic as ocs handler
-
-   https://github.com/owncloud/ocis/pull/7460
-
-* Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
-
-   Automatically accepts shares. This feature is active by default and can be deactivated via the
-   environment variable `FRONTEND_AUTO_ACCEPT_SHARES`.
-
-   https://github.com/owncloud/ocis/pull/7097
-
-* Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
-
-   We changed the default TUS chunk size from 100MB to 10MB. You can still use the old value by
-   configuring it in your deployment.
-
-   https://github.com/owncloud/ocis/pull/7273
-
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
-
-   AD FS `/adfs/.well-known/openid-configuration` has an optional `access_token_issuer`
-   which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
-
-   https://github.com/owncloud/ocis/pull/7138
-
 * Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 
    Add "Last modified" filter Chip
@@ -450,22 +398,19 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/pull/7194
    https://github.com/cs3org/reva/pull/4147
 
-* Enhancement - Bump reva: [#7629](https://github.com/owncloud/ocis/pull/7629)
+* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+
+   Allows adding custom routes to the ocis proxy. This enables customs ocis extensions
+
+   https://github.com/owncloud/ocis/pull/7740
+
+* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 
    Bumps reva version
 
-   https://github.com/owncloud/ocis/pull/7629
-   https://github.com/owncloud/ocis/pull/7611
-   https://github.com/owncloud/ocis/pull/7540
-   https://github.com/owncloud/ocis/pull/7526
-   https://github.com/owncloud/ocis/pull/7138
-   https://github.com/owncloud/ocis/pull/6427
-   https://github.com/owncloud/ocis/pull/7178
-   https://github.com/owncloud/ocis/pull/7217
-   https://github.com/owncloud/ocis/pull/7410
-   https://github.com/owncloud/ocis/pull/7476
-   https://github.com/owncloud/ocis/pull/7551
-   https://github.com/owncloud/ocis/pull/7581
+   https://github.com/owncloud/ocis/pull/7721
+   https://github.com/owncloud/ocis/pull/7727
+   https://github.com/owncloud/ocis/pull/7752
 
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 
@@ -536,6 +481,26 @@ The following sections list the changes for 5.0.0.
 
    https://github.com/owncloud/ocis/issues/6674
    https://github.com/owncloud/ocis/pull/7553
+
+* Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
+
+   We've added new sharing ng endpoints to the graph beta api. The following endpoints are added:
+
+  * /v1beta1/me/drive/sharedByMe
+  * /v1beta1/me/drive/sharedWithMe
+  * /v1beta1/roleManagement/permissions/roleDefinitions
+  * /v1beta1/roleManagement/permissions/roleDefinitions/{roleID}
+  * /v1beta1/drives/{drive-id}/items/{item-id}/createLink (create a sharing link)
+
+   https://github.com/owncloud/ocis/issues/7436
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7633
+   https://github.com/owncloud/ocis/pull/7686
+   https://github.com/owncloud/ocis/pull/7684
+   https://github.com/owncloud/ocis/pull/7683
+   https://github.com/owncloud/ocis/pull/7239
+   https://github.com/owncloud/ocis/pull/7687
+   https://github.com/owncloud/libre-graph-api/pull/112
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 
@@ -638,6 +603,15 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/issues/7272
    https://github.com/owncloud/ocis/pull/7487
 
+* Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
+
+   Adds new permissions to admin/spaceadmin/user roles - Favorites.List allows / denies the
+   Favorites Listing Request - Favorites.Write is implemented to be enforced on marking/unmark
+   files as favouritesShare - Shares.Write permission denies / allows sharing completely for a
+   user on all share CUD requests. (User, Group)
+
+   https://github.com/owncloud/ocis/pull/7700
+
 * Enhancement - Add new permission to delete public link password: [#7538](https://github.com/owncloud/ocis/pull/7538)
 
    Users with this new permission can now delete passwords on read-only public links. The
@@ -652,6 +626,14 @@ The following sections list the changes for 5.0.0.
    The variables renaming OCIS-3767
 
    https://github.com/cs3org/reva/pull/7264
+
+* Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
+
+   We have added the preferred language to the libre-graph api & added endpoints for that to ocis.
+
+   https://github.com/owncloud/ocis/issues/5455
+   https://github.com/owncloud/ocis/pull/7720
+   https://github.com/owncloud/libre-graph-api/pull/130
 
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
 
