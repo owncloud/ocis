@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 * Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
+* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
@@ -168,6 +169,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7432
    https://github.com/owncloud/ocis/pull/7602
+
+* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
+
+   We add two new filters to the user list endpoint. The `startswith` filter allows to filter users
+   by the beginning of their name. The `contains` filter allows to filter users by a substring of
+   their name.
+
+   https://github.com/owncloud/ocis/issues/5486
+   https://github.com/owncloud/ocis/pull/7739
 
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 
