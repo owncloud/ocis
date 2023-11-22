@@ -216,7 +216,8 @@ Feature: unlock locked items
 
 
   Scenario Outline: unlock a file using file-id
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
       | lockscope | exclusive   |
@@ -224,6 +225,25 @@ Feature: unlock locked items
     When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
     Then the HTTP status code should be "204"
     And 0 locks should be reported for file "textfile.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: unlock a file in project space using file-id
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "Project" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has locked file "textfile.txt" inside the space "Project" setting the following properties
+      | lockscope | exclusive   |
+      | timeout   | Second-3600 |
+    When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And 0 locks should be reported for file "textfile.txt" inside the space "Project" of user "Alice" by the WebDAV API
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
     Examples:
       | dav-path                          |
