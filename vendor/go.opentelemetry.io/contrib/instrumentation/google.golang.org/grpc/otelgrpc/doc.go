@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package semconv implements OpenTelemetry semantic conventions.
-//
-// OpenTelemetry semantic conventions are agreed standardized naming
-// patterns for OpenTelemetry things. This package represents the conventions
-// as of the v1.12.0 version of the OpenTelemetry specification.
-package semconv // import "go.opentelemetry.io/otel/semconv/v1.12.0"
+/*
+Package otelgrpc is the instrumentation library for [google.golang.org/grpc].
+
+Use [NewClientHandler] with [grpc.WithStatsHandler] to instrument a gRPC client.
+
+Use [NewServerHandler] with [grpc.StatsHandler] to instrument a gRPC server.
+*/
+package otelgrpc // import "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"

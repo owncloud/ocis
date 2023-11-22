@@ -20,6 +20,8 @@ import (
 	"context"
 	"io"
 	"net"
+	"strconv"
+	"time"
 
 	"google.golang.org/grpc"
 	grpc_codes "google.golang.org/grpc/codes"
@@ -31,31 +33,24 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/internal"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	"go.opentelemetry.io/otel/metric"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type messageType attribute.KeyValue
 
 // Event adds an event of the messageType to the span associated with the
-// passed context with id and size (if message is a proto message).
-func (m messageType) Event(ctx context.Context, id int, message interface{}) {
+// passed context with a message id.
+func (m messageType) Event(ctx context.Context, id int, _ interface{}) {
 	span := trace.SpanFromContext(ctx)
 	if !span.IsRecording() {
 		return
 	}
-	if p, ok := message.(proto.Message); ok {
-		span.AddEvent("message", trace.WithAttributes(
-			attribute.KeyValue(m),
-			RPCMessageIDKey.Int(id),
-			RPCMessageUncompressedSizeKey.Int(proto.Size(p)),
-		))
-	} else {
-		span.AddEvent("message", trace.WithAttributes(
-			attribute.KeyValue(m),
-			RPCMessageIDKey.Int(id),
-		))
-	}
+	span.AddEvent("message", trace.WithAttributes(
+		attribute.KeyValue(m),
+		RPCMessageIDKey.Int(id),
+	))
 }
 
 var (
@@ -65,11 +60,13 @@ var (
 
 // UnaryClientInterceptor returns a grpc.UnaryClientInterceptor suitable
 // for use in a grpc.Dial call.
+//
+// Deprecated: Use [NewClientHandler] instead.
 func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
-	cfg := newConfig(opts)
+	cfg := newConfig(opts, "client")
 	tracer := cfg.TracerProvider.Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(SemVersion()),
+		ScopeName,
+		trace.WithInstrumentationVersion(Version()),
 	)
 
 	return func(
@@ -88,23 +85,33 @@ func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
 			return invoker(ctx, method, req, reply, cc, callOpts...)
 		}
 
-		name, attr := spanInfo(method, cc.Target())
-		var span trace.Span
-		ctx, span = tracer.Start(
-			ctx,
-			name,
+		name, attr, _ := telemetryAttributes(method, cc.Target())
+
+		startOpts := append([]trace.SpanStartOption{
 			trace.WithSpanKind(trace.SpanKindClient),
 			trace.WithAttributes(attr...),
+		},
+			cfg.SpanStartOptions...,
+		)
+
+		ctx, span := tracer.Start(
+			ctx,
+			name,
+			startOpts...,
 		)
 		defer span.End()
 
 		ctx = inject(ctx, cfg.Propagators)
 
-		messageSent.Event(ctx, 1, req)
+		if cfg.SentEvent {
+			messageSent.Event(ctx, 1, req)
+		}
 
 		err := invoker(ctx, method, req, reply, cc, callOpts...)
 
-		messageReceived.Event(ctx, 1, reply)
+		if cfg.ReceivedEvent {
+			messageReceived.Event(ctx, 1, reply)
+		}
 
 		if err != nil {
 			s, _ := status.FromError(err)
@@ -140,6 +147,9 @@ type clientStream struct {
 	eventsDone chan struct{}
 	finished   chan error
 
+	receivedEvent bool
+	sentEvent     bool
+
 	receivedMessageID int
 	sentMessageID     int
 }
@@ -157,7 +167,10 @@ func (w *clientStream) RecvMsg(m interface{}) error {
 		w.sendStreamEvent(errorEvent, err)
 	} else {
 		w.receivedMessageID++
-		messageReceived.Event(w.Context(), w.receivedMessageID, m)
+
+		if w.receivedEvent {
+			messageReceived.Event(w.Context(), w.receivedMessageID, m)
+		}
 	}
 
 	return err
@@ -167,7 +180,10 @@ func (w *clientStream) SendMsg(m interface{}) error {
 	err := w.ClientStream.SendMsg(m)
 
 	w.sentMessageID++
-	messageSent.Event(w.Context(), w.sentMessageID, m)
+
+	if w.sentEvent {
+		messageSent.Event(w.Context(), w.sentMessageID, m)
+	}
 
 	if err != nil {
 		w.sendStreamEvent(errorEvent, err)
@@ -178,7 +194,6 @@ func (w *clientStream) SendMsg(m interface{}) error {
 
 func (w *clientStream) Header() (metadata.MD, error) {
 	md, err := w.ClientStream.Header()
-
 	if err != nil {
 		w.sendStreamEvent(errorEvent, err)
 	}
@@ -188,7 +203,6 @@ func (w *clientStream) Header() (metadata.MD, error) {
 
 func (w *clientStream) CloseSend() error {
 	err := w.ClientStream.CloseSend()
-
 	if err != nil {
 		w.sendStreamEvent(errorEvent, err)
 	}
@@ -196,7 +210,7 @@ func (w *clientStream) CloseSend() error {
 	return err
 }
 
-func wrapClientStream(ctx context.Context, s grpc.ClientStream, desc *grpc.StreamDesc) *clientStream {
+func wrapClientStream(ctx context.Context, s grpc.ClientStream, desc *grpc.StreamDesc, cfg *config) *clientStream {
 	events := make(chan streamEvent)
 	eventsDone := make(chan struct{})
 	finished := make(chan error)
@@ -223,11 +237,13 @@ func wrapClientStream(ctx context.Context, s grpc.ClientStream, desc *grpc.Strea
 	}()
 
 	return &clientStream{
-		ClientStream: s,
-		desc:         desc,
-		events:       events,
-		eventsDone:   eventsDone,
-		finished:     finished,
+		ClientStream:  s,
+		desc:          desc,
+		events:        events,
+		eventsDone:    eventsDone,
+		finished:      finished,
+		receivedEvent: cfg.ReceivedEvent,
+		sentEvent:     cfg.SentEvent,
 	}
 }
 
@@ -240,11 +256,13 @@ func (w *clientStream) sendStreamEvent(eventType streamEventType, err error) {
 
 // StreamClientInterceptor returns a grpc.StreamClientInterceptor suitable
 // for use in a grpc.Dial call.
+//
+// Deprecated: Use [NewClientHandler] instead.
 func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
-	cfg := newConfig(opts)
+	cfg := newConfig(opts, "client")
 	tracer := cfg.TracerProvider.Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(SemVersion()),
+		ScopeName,
+		trace.WithInstrumentationVersion(Version()),
 	)
 
 	return func(
@@ -263,13 +281,19 @@ func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
 			return streamer(ctx, desc, cc, method, callOpts...)
 		}
 
-		name, attr := spanInfo(method, cc.Target())
-		var span trace.Span
-		ctx, span = tracer.Start(
-			ctx,
-			name,
+		name, attr, _ := telemetryAttributes(method, cc.Target())
+
+		startOpts := append([]trace.SpanStartOption{
 			trace.WithSpanKind(trace.SpanKindClient),
 			trace.WithAttributes(attr...),
+		},
+			cfg.SpanStartOptions...,
+		)
+
+		ctx, span := tracer.Start(
+			ctx,
+			name,
+			startOpts...,
 		)
 
 		ctx = inject(ctx, cfg.Propagators)
@@ -282,7 +306,7 @@ func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
 			span.End()
 			return s, err
 		}
-		stream := wrapClientStream(ctx, s, desc)
+		stream := wrapClientStream(ctx, s, desc, cfg)
 
 		go func() {
 			err := <-stream.finished
@@ -304,11 +328,13 @@ func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
 
 // UnaryServerInterceptor returns a grpc.UnaryServerInterceptor suitable
 // for use in a grpc.NewServer call.
+//
+// Deprecated: Use [NewServerHandler] instead.
 func UnaryServerInterceptor(opts ...Option) grpc.UnaryServerInterceptor {
-	cfg := newConfig(opts)
+	cfg := newConfig(opts, "server")
 	tracer := cfg.TracerProvider.Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(SemVersion()),
+		ScopeName,
+		trace.WithInstrumentationVersion(Version()),
 	)
 
 	return func(
@@ -326,28 +352,48 @@ func UnaryServerInterceptor(opts ...Option) grpc.UnaryServerInterceptor {
 		}
 
 		ctx = extract(ctx, cfg.Propagators)
+		name, attr, metricAttrs := telemetryAttributes(info.FullMethod, peerFromCtx(ctx))
 
-		name, attr := spanInfo(info.FullMethod, peerFromCtx(ctx))
+		startOpts := append([]trace.SpanStartOption{
+			trace.WithSpanKind(trace.SpanKindServer),
+			trace.WithAttributes(attr...),
+		},
+			cfg.SpanStartOptions...,
+		)
+
 		ctx, span := tracer.Start(
 			trace.ContextWithRemoteSpanContext(ctx, trace.SpanContextFromContext(ctx)),
 			name,
-			trace.WithSpanKind(trace.SpanKindServer),
-			trace.WithAttributes(attr...),
+			startOpts...,
 		)
 		defer span.End()
 
-		messageReceived.Event(ctx, 1, req)
+		if cfg.ReceivedEvent {
+			messageReceived.Event(ctx, 1, req)
+		}
+
+		before := time.Now()
 
 		resp, err := handler(ctx, req)
+
+		s, _ := status.FromError(err)
 		if err != nil {
-			s, _ := status.FromError(err)
-			span.SetStatus(codes.Error, s.Message())
-			span.SetAttributes(statusCodeAttr(s.Code()))
-			messageSent.Event(ctx, 1, s.Proto())
+			statusCode, msg := serverStatus(s)
+			span.SetStatus(statusCode, msg)
+			if cfg.SentEvent {
+				messageSent.Event(ctx, 1, s.Proto())
+			}
 		} else {
-			span.SetAttributes(statusCodeAttr(grpc_codes.OK))
-			messageSent.Event(ctx, 1, resp)
+			if cfg.SentEvent {
+				messageSent.Event(ctx, 1, resp)
+			}
 		}
+		grpcStatusCodeAttr := statusCodeAttr(s.Code())
+		span.SetAttributes(grpcStatusCodeAttr)
+
+		elapsedTime := time.Since(before).Milliseconds()
+		metricAttrs = append(metricAttrs, grpcStatusCodeAttr)
+		cfg.rpcDuration.Record(ctx, float64(elapsedTime), metric.WithAttributes(metricAttrs...))
 
 		return resp, err
 	}
@@ -361,6 +407,9 @@ type serverStream struct {
 
 	receivedMessageID int
 	sentMessageID     int
+
+	receivedEvent bool
+	sentEvent     bool
 }
 
 func (w *serverStream) Context() context.Context {
@@ -372,7 +421,9 @@ func (w *serverStream) RecvMsg(m interface{}) error {
 
 	if err == nil {
 		w.receivedMessageID++
-		messageReceived.Event(w.Context(), w.receivedMessageID, m)
+		if w.receivedEvent {
+			messageReceived.Event(w.Context(), w.receivedMessageID, m)
+		}
 	}
 
 	return err
@@ -382,25 +433,31 @@ func (w *serverStream) SendMsg(m interface{}) error {
 	err := w.ServerStream.SendMsg(m)
 
 	w.sentMessageID++
-	messageSent.Event(w.Context(), w.sentMessageID, m)
+	if w.sentEvent {
+		messageSent.Event(w.Context(), w.sentMessageID, m)
+	}
 
 	return err
 }
 
-func wrapServerStream(ctx context.Context, ss grpc.ServerStream) *serverStream {
+func wrapServerStream(ctx context.Context, ss grpc.ServerStream, cfg *config) *serverStream {
 	return &serverStream{
-		ServerStream: ss,
-		ctx:          ctx,
+		ServerStream:  ss,
+		ctx:           ctx,
+		receivedEvent: cfg.ReceivedEvent,
+		sentEvent:     cfg.SentEvent,
 	}
 }
 
 // StreamServerInterceptor returns a grpc.StreamServerInterceptor suitable
 // for use in a grpc.NewServer call.
+//
+// Deprecated: Use [NewServerHandler] instead.
 func StreamServerInterceptor(opts ...Option) grpc.StreamServerInterceptor {
-	cfg := newConfig(opts)
+	cfg := newConfig(opts, "server")
 	tracer := cfg.TracerProvider.Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(SemVersion()),
+		ScopeName,
+		trace.WithInstrumentationVersion(Version()),
 	)
 
 	return func(
@@ -415,25 +472,31 @@ func StreamServerInterceptor(opts ...Option) grpc.StreamServerInterceptor {
 			Type:             StreamServer,
 		}
 		if cfg.Filter != nil && !cfg.Filter(i) {
-			return handler(srv, wrapServerStream(ctx, ss))
+			return handler(srv, wrapServerStream(ctx, ss, cfg))
 		}
 
 		ctx = extract(ctx, cfg.Propagators)
+		name, attr, _ := telemetryAttributes(info.FullMethod, peerFromCtx(ctx))
 
-		name, attr := spanInfo(info.FullMethod, peerFromCtx(ctx))
+		startOpts := append([]trace.SpanStartOption{
+			trace.WithSpanKind(trace.SpanKindServer),
+			trace.WithAttributes(attr...),
+		},
+			cfg.SpanStartOptions...,
+		)
+
 		ctx, span := tracer.Start(
 			trace.ContextWithRemoteSpanContext(ctx, trace.SpanContextFromContext(ctx)),
 			name,
-			trace.WithSpanKind(trace.SpanKindServer),
-			trace.WithAttributes(attr...),
+			startOpts...,
 		)
 		defer span.End()
 
-		err := handler(srv, wrapServerStream(ctx, ss))
-
+		err := handler(srv, wrapServerStream(ctx, ss, cfg))
 		if err != nil {
 			s, _ := status.FromError(err)
-			span.SetStatus(codes.Error, s.Message())
+			statusCode, msg := serverStatus(s)
+			span.SetStatus(statusCode, msg)
 			span.SetAttributes(statusCodeAttr(s.Code()))
 		} else {
 			span.SetAttributes(statusCodeAttr(grpc_codes.OK))
@@ -443,31 +506,49 @@ func StreamServerInterceptor(opts ...Option) grpc.StreamServerInterceptor {
 	}
 }
 
-// spanInfo returns a span name and all appropriate attributes from the gRPC
-// method and peer address.
-func spanInfo(fullMethod, peerAddress string) (string, []attribute.KeyValue) {
-	attrs := []attribute.KeyValue{RPCSystemGRPC}
-	name, mAttrs := internal.ParseFullMethod(fullMethod)
-	attrs = append(attrs, mAttrs...)
-	attrs = append(attrs, peerAttr(peerAddress)...)
-	return name, attrs
+// telemetryAttributes returns a span name and span and metric attributes from
+// the gRPC method and peer address.
+func telemetryAttributes(fullMethod, peerAddress string) (string, []attribute.KeyValue, []attribute.KeyValue) {
+	name, methodAttrs := internal.ParseFullMethod(fullMethod)
+	peerAttrs := peerAttr(peerAddress)
+
+	attrs := make([]attribute.KeyValue, 0, 1+len(methodAttrs)+len(peerAttrs))
+	attrs = append(attrs, RPCSystemGRPC)
+	attrs = append(attrs, methodAttrs...)
+	metricAttrs := attrs[:1+len(methodAttrs)]
+	attrs = append(attrs, peerAttrs...)
+	return name, attrs, metricAttrs
 }
 
 // peerAttr returns attributes about the peer address.
 func peerAttr(addr string) []attribute.KeyValue {
-	host, port, err := net.SplitHostPort(addr)
+	host, p, err := net.SplitHostPort(addr)
 	if err != nil {
-		return []attribute.KeyValue(nil)
+		return nil
 	}
 
 	if host == "" {
 		host = "127.0.0.1"
 	}
-
-	return []attribute.KeyValue{
-		semconv.NetPeerIPKey.String(host),
-		semconv.NetPeerPortKey.String(port),
+	port, err := strconv.Atoi(p)
+	if err != nil {
+		return nil
 	}
+
+	var attr []attribute.KeyValue
+	if ip := net.ParseIP(host); ip != nil {
+		attr = []attribute.KeyValue{
+			semconv.NetSockPeerAddr(host),
+			semconv.NetSockPeerPort(port),
+		}
+	} else {
+		attr = []attribute.KeyValue{
+			semconv.NetPeerName(host),
+			semconv.NetPeerPort(port),
+		}
+	}
+
+	return attr
 }
 
 // peerFromCtx returns a peer address from a context, if one exists.
@@ -482,4 +563,27 @@ func peerFromCtx(ctx context.Context) string {
 // statusCodeAttr returns status code attribute based on given gRPC code.
 func statusCodeAttr(c grpc_codes.Code) attribute.KeyValue {
 	return GRPCStatusCodeKey.Int64(int64(c))
+}
+
+// serverStatus returns a span status code and message for a given gRPC
+// status code. It maps specific gRPC status codes to a corresponding span
+// status code and message. This function is intended for use on the server
+// side of a gRPC connection.
+//
+// If the gRPC status code is Unknown, DeadlineExceeded, Unimplemented,
+// Internal, Unavailable, or DataLoss, it returns a span status code of Error
+// and the message from the gRPC status. Otherwise, it returns a span status
+// code of Unset and an empty message.
+func serverStatus(grpcStatus *status.Status) (codes.Code, string) {
+	switch grpcStatus.Code() {
+	case grpc_codes.Unknown,
+		grpc_codes.DeadlineExceeded,
+		grpc_codes.Unimplemented,
+		grpc_codes.Internal,
+		grpc_codes.Unavailable,
+		grpc_codes.DataLoss:
+		return codes.Error, grpcStatus.Message()
+	default:
+		return codes.Unset, ""
+	}
 }
