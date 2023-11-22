@@ -296,6 +296,7 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 		return bleveQuery.NewDisjunctionQuery(newQueryStringQueryList(k,
 			"application/msword",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.form",
 			"application/vnd.oasis.opendocument.text",
 			"text/plain",
 			"text/markdown",

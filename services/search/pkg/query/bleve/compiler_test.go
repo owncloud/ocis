@@ -396,6 +396,7 @@ func Test_compile(t *testing.T) {
 			want: query.NewDisjunctionQuery([]query.Query{
 				query.NewQueryStringQuery(`MimeType:application/msword`),
 				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
 				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
 				query.NewQueryStringQuery(`MimeType:text/plain`),
 				query.NewQueryStringQuery(`MimeType:text/markdown`),
@@ -417,6 +418,7 @@ func Test_compile(t *testing.T) {
 				query.NewDisjunctionQuery([]query.Query{
 					query.NewQueryStringQuery(`MimeType:application/msword`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
 					query.NewQueryStringQuery(`MimeType:text/plain`),
 					query.NewQueryStringQuery(`MimeType:text/markdown`),
@@ -441,6 +443,7 @@ func Test_compile(t *testing.T) {
 			want: query.NewDisjunctionQuery([]query.Query{
 				query.NewQueryStringQuery(`MimeType:application/msword`),
 				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
 				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
 				query.NewQueryStringQuery(`MimeType:text/plain`),
 				query.NewQueryStringQuery(`MimeType:text/markdown`),
@@ -470,6 +473,7 @@ func Test_compile(t *testing.T) {
 				query.NewDisjunctionQuery([]query.Query{
 					query.NewQueryStringQuery(`MimeType:application/msword`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
 					query.NewQueryStringQuery(`MimeType:text/plain`),
 					query.NewQueryStringQuery(`MimeType:text/markdown`),
@@ -499,6 +503,7 @@ func Test_compile(t *testing.T) {
 					query.NewQueryStringQuery(`MimeType:application/pdf`),
 					query.NewQueryStringQuery(`MimeType:application/msword`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
 					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
 					query.NewQueryStringQuery(`MimeType:text/plain`),
 					query.NewQueryStringQuery(`MimeType:text/markdown`),
