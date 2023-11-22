@@ -1,6 +1,7 @@
 package ldap
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -377,6 +378,28 @@ func (s *SearchResult) appendTo(r *SearchResult) {
 	r.Controls = append(r.Controls, s.Controls...)
 }
 
+// SearchSingleResult holds the server's single entry response to a search request
+type SearchSingleResult struct {
+	// Entry is the returned entry
+	Entry *Entry
+	// Referral is the returned referral
+	Referral string
+	// Controls are the returned controls
+	Controls []Control
+	// Error is set when the search request was failed
+	Error error
+}
+
+// Print outputs a human-readable description
+func (s *SearchSingleResult) Print() {
+	s.Entry.Print()
+}
+
+// PrettyPrint outputs a human-readable description with indenting
+func (s *SearchSingleResult) PrettyPrint(indent int) {
+	s.Entry.PrettyPrint(indent)
+}
+
 // SearchRequest represents a search request to send to the server
 type SearchRequest struct {
 	BaseDN       string
@@ -561,6 +584,32 @@ func (l *Conn) Search(searchRequest *SearchRequest) (*SearchResult, error) {
 	}
 }
 
+// SearchAsync performs a search request and returns all search results asynchronously.
+// This means you get all results until an error happens (or the search successfully finished),
+// e.g. for size / time limited requests all are recieved until the limit is reached.
+// To stop the search, call cancel function of the context.
+func (l *Conn) SearchAsync(
+	ctx context.Context, searchRequest *SearchRequest, bufferSize int) Response {
+	r := newSearchResponse(l, bufferSize)
+	r.start(ctx, searchRequest)
+	return r
+}
+
+// Syncrepl is a short name for LDAP Sync Replication engine that works on the
+// consumer-side. This can perform a persistent search and returns an entry
+// when the entry is updated on the server side.
+// To stop the search, call cancel function of the context.
+func (l *Conn) Syncrepl(
+	ctx context.Context, searchRequest *SearchRequest, bufferSize int,
+	mode ControlSyncRequestMode, cookie []byte, reloadHint bool,
+) Response {
+	control := NewControlSyncRequest(mode, cookie, reloadHint)
+	searchRequest.Controls = append(searchRequest.Controls, control)
+	r := newSearchResponse(l, bufferSize)
+	r.start(ctx, searchRequest)
+	return r
+}
+
 // unpackAttributes will extract all given LDAP attributes and it's values
 // from the ber.Packet
 func unpackAttributes(children []*ber.Packet) []*EntryAttribute {
@@ -586,55 +635,56 @@ func unpackAttributes(children []*ber.Packet) []*EntryAttribute {
 }
 
 // DirSync does a Search with dirSync Control.
-func (l *Conn) DirSync(searchRequest *SearchRequest, flags int64, maxAttrCount int64, cookie []byte) (*SearchResult, error) {
-	var dirSyncControl *ControlDirSync
-
+func (l *Conn) DirSync(
+	searchRequest *SearchRequest, flags int64, maxAttrCount int64, cookie []byte,
+) (*SearchResult, error) {
 	control := FindControl(searchRequest.Controls, ControlTypeDirSync)
 	if control == nil {
-		dirSyncControl = NewControlDirSync(flags, maxAttrCount, cookie)
-		searchRequest.Controls = append(searchRequest.Controls, dirSyncControl)
+		c := NewRequestControlDirSync(flags, maxAttrCount, cookie)
+		searchRequest.Controls = append(searchRequest.Controls, c)
 	} else {
-		castControl, ok := control.(*ControlDirSync)
-		if !ok {
-			return nil, fmt.Errorf("Expected DirSync control to be of type *ControlDirSync, got %v", control)
+		c := control.(*ControlDirSync)
+		if c.Flags != flags {
+			return nil, fmt.Errorf("flags given in search request (%d) conflicts with flags given in search call (%d)", c.Flags, flags)
 		}
-		if castControl.Flags != flags {
-			return nil, fmt.Errorf("flags given in search request (%d) conflicts with flags given in search call (%d)", castControl.Flags, flags)
+		if c.MaxAttrCount != maxAttrCount {
+			return nil, fmt.Errorf("MaxAttrCnt given in search request (%d) conflicts with maxAttrCount given in search call (%d)", c.MaxAttrCount, maxAttrCount)
 		}
-		if castControl.MaxAttrCnt != maxAttrCount {
-			return nil, fmt.Errorf("MaxAttrCnt given in search request (%d) conflicts with maxAttrCount given in search call (%d)", castControl.MaxAttrCnt, maxAttrCount)
-		}
-		dirSyncControl = castControl
 	}
-	searchResult := new(SearchResult)
-	result, err := l.Search(searchRequest)
+	searchResult, err := l.Search(searchRequest)
 	l.Debug.Printf("Looking for result...")
 	if err != nil {
-		return searchResult, err
+		return nil, err
 	}
-	if result == nil {
-		return searchResult, NewError(ErrorNetwork, errors.New("ldap: packet not received"))
+	if searchResult == nil {
+		return nil, NewError(ErrorNetwork, errors.New("ldap: packet not received"))
 	}
-
-	searchResult.Entries = append(searchResult.Entries, result.Entries...)
-	searchResult.Referrals = append(searchResult.Referrals, result.Referrals...)
-	searchResult.Controls = append(searchResult.Controls, result.Controls...)
 
 	l.Debug.Printf("Looking for DirSync Control...")
-	dirSyncResult := FindControl(result.Controls, ControlTypeDirSync)
-	if dirSyncResult == nil {
-		dirSyncControl = nil
+	resultControl := FindControl(searchResult.Controls, ControlTypeDirSync)
+	if resultControl == nil {
 		l.Debug.Printf("Could not find dirSyncControl control.  Breaking...")
 		return searchResult, nil
 	}
 
-	cookie = dirSyncResult.(*ControlDirSync).Cookie
+	cookie = resultControl.(*ControlDirSync).Cookie
 	if len(cookie) == 0 {
-		dirSyncControl = nil
 		l.Debug.Printf("Could not find cookie.  Breaking...")
 		return searchResult, nil
 	}
-	dirSyncControl.SetCookie(cookie)
 
 	return searchResult, nil
+}
+
+// DirSyncDirSyncAsync performs a search request and returns all search results
+// asynchronously. This is efficient when the server returns lots of entries.
+func (l *Conn) DirSyncAsync(
+	ctx context.Context, searchRequest *SearchRequest, bufferSize int,
+	flags, maxAttrCount int64, cookie []byte,
+) Response {
+	control := NewRequestControlDirSync(flags, maxAttrCount, cookie)
+	searchRequest.Controls = append(searchRequest.Controls, control)
+	r := newSearchResponse(l, bufferSize)
+	r.start(ctx, searchRequest)
+	return r
 }

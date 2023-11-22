@@ -800,7 +800,7 @@ github.com/ghodss/yaml
 ## explicit; go 1.15
 github.com/go-acme/lego/v4/acme
 github.com/go-acme/lego/v4/challenge
-# github.com/go-asn1-ber/asn1-ber v1.5.4
+# github.com/go-asn1-ber/asn1-ber v1.5.5
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
 # github.com/go-chi/chi/v5 v5.0.10
@@ -880,7 +880,7 @@ github.com/go-jose/go-jose/v3/json
 ## explicit; go 1.17
 github.com/go-kit/log
 github.com/go-kit/log/level
-# github.com/go-ldap/ldap/v3 v3.4.5
+# github.com/go-ldap/ldap/v3 v3.4.6
 ## explicit; go 1.14
 github.com/go-ldap/ldap/v3
 # github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
