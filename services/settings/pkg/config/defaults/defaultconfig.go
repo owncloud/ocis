@@ -57,8 +57,8 @@ func DefaultConfig() *config.Config {
 			StorageAddress: "com.owncloud.api.storage-system",
 			SystemUserIDP:  "internal",
 			Cache: &config.Cache{
-				Store:          "memory",
-				Database:       "ocis",
+				Store:          "nats-js-kv",
+				Database:       "settings-cache",
 				FileTable:      "settings_files",
 				DirectoryTable: "settings_dirs",
 				TTL:            time.Minute * 10,

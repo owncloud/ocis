@@ -99,13 +99,13 @@ func DefaultConfig() *config.Config {
 			TTL:      300 * time.Second,
 		},
 		FilemetadataCache: config.FilemetadataCache{
-			Store:    "memory",
-			Database: "ocis",
+			Store:    "nats-js-kv",
+			Database: "cache-filemetadata",
 			TTL:      24 * 60 * time.Second,
 		},
 		IDCache: config.IDCache{
 			Store:    "nats-js-kv",
-			Database: "ocis",
+			Database: "ids-storage-users",
 			TTL:      24 * 60 * time.Second,
 		},
 		Tasks: config.Tasks{

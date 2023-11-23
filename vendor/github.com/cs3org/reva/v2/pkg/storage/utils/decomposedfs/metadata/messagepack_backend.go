@@ -275,7 +275,9 @@ func (MessagePackBackend) IsMetaFile(path string) bool {
 
 // Purge purges the data of a given path
 func (b MessagePackBackend) Purge(path string) error {
-	_ = b.metaCache.RemoveMetadata(b.cacheKey(path))
+	if err := b.metaCache.RemoveMetadata(b.cacheKey(path)); err != nil {
+		return err
+	}
 	return os.Remove(b.MetadataPath(path))
 }
 
@@ -289,7 +291,10 @@ func (b MessagePackBackend) Rename(oldPath, newPath string) error {
 			return err
 		}
 	}
-	_ = b.metaCache.RemoveMetadata(b.cacheKey(oldPath))
+	err = b.metaCache.RemoveMetadata(b.cacheKey(oldPath))
+	if err != nil {
+		return err
+	}
 
 	return os.Rename(b.MetadataPath(oldPath), b.MetadataPath(newPath))
 }

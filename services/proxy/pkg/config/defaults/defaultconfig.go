@@ -43,8 +43,8 @@ func DefaultConfig() *config.Config {
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			SkipUserInfo:            false,
 			UserinfoCache: &config.Cache{
-				Store:    "memory",
-				Database: "ocis",
+				Store:    "nats-js-kv",
+				Database: "cache-userinfo",
 				Table:    "userinfo",
 				TTL:      time.Second * 10,
 			},

@@ -937,8 +937,8 @@ github.com/go-micro/plugins/v4/server/grpc
 # github.com/go-micro/plugins/v4/server/http v1.2.2
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/http
-# github.com/go-micro/plugins/v4/store/nats-js v1.2.1-0.20230807070816-bc05fb076ce7 => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
-## explicit; go 1.17
+# github.com/go-micro/plugins/v4/store/nats-js v1.2.1-0.20231129143103-d72facc652f0
+## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js
 # github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-00010101000000-000000000000 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
 ## explicit; go 1.21
@@ -2297,5 +2297,4 @@ stash.kopano.io/kgol/oidc-go
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
-# github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348

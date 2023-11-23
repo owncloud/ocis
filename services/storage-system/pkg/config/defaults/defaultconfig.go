@@ -52,8 +52,8 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		FileMetadataCache: config.Cache{
-			Store:    "memory",
-			Database: "ocis",
+			Store:    "nats-js-kv",
+			Database: "cache-filemetadata",
 			TTL:      24 * 60 * time.Second,
 		},
 	}

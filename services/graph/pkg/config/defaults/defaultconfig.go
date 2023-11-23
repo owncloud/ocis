@@ -96,8 +96,8 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		Cache: &config.Cache{
-			Store:    "memory",
-			Database: "ocis",
+			Store:    "nats-js-kv",
+			Database: "cache-roles",
 			Table:    "roles",
 			TTL:      time.Hour * 336,
 		},
