@@ -166,12 +166,26 @@ class WebDavLockingContext implements Context {
 	 * @param TableNode $properties table with no heading with | property | value |
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userLocksFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+		$this->featureContext->setResponse($this->userLocksFileInProjectSpace($user, $file, $space, $properties));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param TableNode $properties
+	 *
+	 * @return ResponseInterface|null
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
-		$response = $this->lockFile($user, $file, $properties, $fullUrl);
-		$this->featureContext->setResponse($response);
+		return $this->lockFile($user, $file, $properties, $fullUrl);
 	}
 
 	/**
@@ -183,10 +197,11 @@ class WebDavLockingContext implements Context {
 	 * @param TableNode $properties table with no heading with | property | value |
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userHasLockedFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties): void {
-		$this->userLocksFileInProjectSpaceUsingWebDavAPI($user, $file, $space, $properties);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, '');
+		$response = $this->userLocksFileInProjectSpace($user, $file, $space, $properties);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
@@ -886,7 +901,7 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @Then :count locks should be reported for file :file inside the space :space of user :user by the WebDAV API
+	 * @Then :count locks should be reported for file :file inside the space :space of user :user
 	 *
 	 * @param int $count
 	 * @param string $file

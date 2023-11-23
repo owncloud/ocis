@@ -243,7 +243,7 @@ Feature: unlock locked items
       | timeout   | Second-3600 |
     When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
     Then the HTTP status code should be "204"
-    And 0 locks should be reported for file "textfile.txt" inside the space "Project" of user "Alice" by the WebDAV API
+    And 0 locks should be reported for file "textfile.txt" inside the space "Project" of user "Alice"
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
     Examples:
       | dav-path                          |
@@ -265,8 +265,8 @@ Feature: unlock locked items
       | timeout   | Second-3600 |
     When user "Brian" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
     Then the HTTP status code should be "204"
-    And 0 locks should be reported for file "textfile.txt" inside the space "Personal" of user "Alice" by the WebDAV API
-    And 0 locks should be reported for file "textfile.txt" inside the space "Shares" of user "Brian" by the WebDAV API
+    And 0 locks should be reported for file "textfile.txt" inside the space "Personal" of user "Alice"
+    And 0 locks should be reported for file "textfile.txt" inside the space "Shares" of user "Brian"
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
     And using new DAV path
     And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/textfile.txt"
