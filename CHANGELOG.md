@@ -509,6 +509,7 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/pull/7683
    https://github.com/owncloud/ocis/pull/7239
    https://github.com/owncloud/ocis/pull/7687
+   https://github.com/owncloud/ocis/pull/7751
    https://github.com/owncloud/libre-graph-api/pull/112
 
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
