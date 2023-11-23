@@ -106,6 +106,7 @@ func DefaultConfig() *config.Config {
 								"image/tiff",
 								"image/bmp",
 								"image/x-ms-bmp",
+								"application/vnd.geogebra.slides",
 							},
 						},
 					},

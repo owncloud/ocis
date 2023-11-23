@@ -13,17 +13,18 @@ import (
 var (
 	// SupportedMimeTypes contains a all mimetypes which are supported by the thumbnailer.
 	SupportedMimeTypes = map[string]struct{}{
-		"image/png":      {},
-		"image/jpg":      {},
-		"image/jpeg":     {},
-		"image/gif":      {},
-		"image/bmp":      {},
-		"image/x-ms-bmp": {},
-		"image/tiff":     {},
-		"text/plain":     {},
-		"audio/flac":     {},
-		"audio/mpeg":     {},
-		"audio/ogg":      {},
+		"image/png":                       {},
+		"image/jpg":                       {},
+		"image/jpeg":                      {},
+		"image/gif":                       {},
+		"image/bmp":                       {},
+		"image/x-ms-bmp":                  {},
+		"image/tiff":                      {},
+		"text/plain":                      {},
+		"audio/flac":                      {},
+		"audio/mpeg":                      {},
+		"audio/ogg":                       {},
+		"application/vnd.geogebra.slides": {},
 	}
 )
 
