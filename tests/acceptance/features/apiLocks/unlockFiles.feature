@@ -274,3 +274,27 @@ Feature: unlock locked items
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: unlock a file as an anonymous user
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | PARENT   |
+      | permissions | change   |
+      | password    | %public% |
+    And the public has locked "textfile0.txt" in the last public link shared folder setting the following properties
+      | lockscope | <lock-scope> |
+    When the public unlocks file "textfile0.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And 0 locks should be reported for file "PARENT/textfile0.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
