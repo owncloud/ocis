@@ -19,6 +19,7 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/crypto/sha3"
@@ -252,23 +253,9 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driveID, err := parseIDParam(r, "driveID")
+	_, itemID, err := g.extractDriveAndDriveItem(r)
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse driveID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
-		return
-	}
-
-	itemID, err := parseIDParam(r, "itemID")
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse itemID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
-		return
-	}
-
-	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
-		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "driveID and itemID do not match")
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -445,6 +432,104 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, &ListResponse{Value: value})
+}
+
+// DeletePermission removes a Permission from a Drive item
+func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	_, itemID, err := g.extractDriveAndDriveItem(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse driveID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		return
+	}
+
+	ctx := r.Context()
+	getShareResp, err := gatewayClient.GetShare(ctx,
+		&collaboration.GetShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Id{
+					Id: &collaboration.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	switch {
+	case err != nil:
+		fallthrough
+	case getShareResp.Status.GetCode() != cs3rpc.Code_CODE_OK:
+		g.logger.Debug().Err(err).Interface("permissionID", permissionID).Interface("GetShare", getShareResp).Msg("GetShare failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	sharedResourceId := getShareResp.GetShare().GetResourceId()
+	// The resourceID of the shared resource need to matched the item ID from the Request Path
+	// otherwise this is an invalid Request.
+	if sharedResourceId.GetStorageId() != itemID.GetStorageId() ||
+		sharedResourceId.GetSpaceId() != itemID.GetSpaceId() ||
+		sharedResourceId.GetOpaqueId() != itemID.GetOpaqueId() {
+		g.logger.Debug().Msg("resourceID of shared does not match itemID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
+		return
+	}
+
+	removeShareResp, err := gatewayClient.RemoveShare(ctx,
+		&collaboration.RemoveShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Id{
+					Id: &collaboration.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	switch {
+	case err != nil:
+		fallthrough
+	case removeShareResp.Status.GetCode() != cs3rpc.Code_CODE_OK:
+		g.logger.Debug().Err(err).Interface("permissionID", permissionID).Interface("GetShare", getShareResp).Msg("GetShare failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+
+	return
+}
+
+func (g Graph) extractDriveAndDriveItem(r *http.Request) (driveID storageprovider.ResourceId, itemID storageprovider.ResourceId, err error) {
+	driveID, err = parseIDParam(r, "driveID")
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse driveID")
+		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "invalid driveID")
+	}
+
+	itemID, err = parseIDParam(r, "itemID")
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse itemID")
+		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
+	}
+
+	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
+		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
+		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "driveID and itemID do not match")
+	}
+	return driveID, itemID, nil
 }
 
 func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
