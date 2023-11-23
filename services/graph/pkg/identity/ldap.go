@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -13,10 +14,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	"golang.org/x/exp/slices"
 )
 
 const (

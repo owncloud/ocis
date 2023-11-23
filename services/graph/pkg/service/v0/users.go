@@ -4,15 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
+
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 
 	"github.com/CiscoM31/godata"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -24,13 +27,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	ocissettingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	"golang.org/x/exp/slices"
 )
 
 // GetMe implements the Service interface.
