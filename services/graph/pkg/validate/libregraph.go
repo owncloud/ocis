@@ -1,10 +1,10 @@
 package validate
 
 import (
+	"slices"
+
 	"github.com/go-playground/validator/v10"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )

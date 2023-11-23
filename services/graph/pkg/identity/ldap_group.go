@@ -5,15 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
-	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
+	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	"golang.org/x/exp/slices"
 )
 
 type groupAttributeMap struct {
