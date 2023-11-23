@@ -76,7 +76,7 @@ func DefaultConfig() *Config {
 		Postprocessing:    postprocessing.DefaultConfig(),
 		Policies:          policies.DefaultConfig(),
 		Proxy:             proxy.DefaultConfig(),
-		Search:            search.FullDefaultConfig(),
+		Search:            search.DefaultConfig(),
 		Settings:          settings.DefaultConfig(),
 		Sharing:           sharing.DefaultConfig(),
 		SSE:               sse.DefaultConfig(),
