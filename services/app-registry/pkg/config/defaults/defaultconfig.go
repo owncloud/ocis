@@ -111,6 +111,12 @@ func defaultMimeTypeConfig() []config.MimeTypeConfig {
 			Name:        "Compressed markdown file",
 			Description: "Compressed markdown file",
 		},
+		{
+			MimeType:    "application/vnd.geogebra.slides",
+			Extension:   "ggs",
+			Name:        "GeoGebra Slides",
+			Description: "GeoGebra Slides",
+		},
 	}
 }
 

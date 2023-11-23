@@ -15,6 +15,7 @@ const (
 	typeJpg  = "jpg"
 	typeJpeg = "jpeg"
 	typeGif  = "gif"
+	typeGgs  = "ggs"
 )
 
 var (
@@ -119,6 +120,8 @@ func GetExtForMime(fileType string) string {
 	switch ext {
 	case typeJpg, typeJpeg, typePng, typeGif:
 		return ext
+	case "application/vnd.geogebra.slides":
+		return typeGgs
 	default:
 		return ""
 	}
