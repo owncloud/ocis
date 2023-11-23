@@ -85,7 +85,7 @@ type StorageRegistry struct {
 
 // Cache holds cache config
 type Cache struct {
-	StatCacheStore          string        `yaml:"stat_cache_store" env:"OCIS_CACHE_STORE;GATEWAY_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	StatCacheStore          string        // TODO: enable configuring this again  // `yaml:"stat_cache_store" env:"OCIS_CACHE_STORE;GATEWAY_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	StatCacheNodes          []string      `yaml:"stat_cache_nodes" env:"OCIS_CACHE_STORE_NODES;GATEWAY_STAT_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
 	StatCacheDatabase       string        `yaml:"stat_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	StatCacheTTL            time.Duration `yaml:"stat_cache_ttl" env:"OCIS_CACHE_TTL;GATEWAY_STAT_CACHE_TTL" desc:"Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`

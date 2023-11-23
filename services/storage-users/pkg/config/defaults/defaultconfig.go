@@ -103,6 +103,11 @@ func DefaultConfig() *config.Config {
 			Database: "ocis",
 			TTL:      24 * 60 * time.Second,
 		},
+		IDCache: config.IDCache{
+			Store:    "nats-js-kv",
+			Database: "ocis",
+			TTL:      24 * 60 * time.Second,
+		},
 		Tasks: config.Tasks{
 			PurgeTrashBin: config.PurgeTrashBin{
 				ProjectDeleteBefore:  30 * 24 * time.Hour,
