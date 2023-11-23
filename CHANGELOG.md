@@ -36,9 +36,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 
 ## Details
+
+* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
+
+   A new config for default link permissions that is being announced via capabilities has been
+   added. It defaults to 1 (= public link with viewer permissions).
+
+   https://github.com/owncloud/web/issues/9919
+   https://github.com/owncloud/ocis/pull/7783
 
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 
