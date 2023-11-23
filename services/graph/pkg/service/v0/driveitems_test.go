@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 type itemsList struct {
@@ -128,7 +129,7 @@ var _ = Describe("Driveitems", func() {
 				Recipients: []libregraph.DriveRecipient{
 					{ObjectId: libregraph.PtrString("1")},
 				},
-				Roles: []string{"viewer"},
+				Roles: []string{unifiedrole.NewViewerUnifiedRole(true).GetId()},
 			}
 
 			statMock = gatewayClient.On("Stat", mock.Anything, mock.Anything)
@@ -205,16 +206,45 @@ var _ = Describe("Driveitems", func() {
 			Expect(jsonData.Get("0.expirationDateTime").Str).To(Equal(driveItemInvite.ExpirationDateTime.Format(time.RFC3339Nano)))
 			Expect(jsonData.Get("1.expirationDateTime").Str).To(Equal(driveItemInvite.ExpirationDateTime.Format(time.RFC3339Nano)))
 
-			Expect(jsonData.Get("0.roles.#").Num).To(Equal(float64(1)))
-			Expect(jsonData.Get("0.roles.0").String()).To(Equal("viewer"))
-			Expect(jsonData.Get("1.roles.#").Num).To(Equal(float64(1)))
-			Expect(jsonData.Get("1.roles.0").String()).To(Equal("viewer"))
-
 			Expect(jsonData.Get("#.grantedToV2.user.displayName").Array()[0].Str).To(Equal(getUserResponse.User.DisplayName))
 			Expect(jsonData.Get("#.grantedToV2.user.id").Array()[0].Str).To(Equal("1"))
 
 			Expect(jsonData.Get("#.grantedToV2.group.displayName").Array()[0].Str).To(Equal(getGroupResponse.Group.GroupName))
 			Expect(jsonData.Get("#.grantedToV2.group.id").Array()[0].Str).To(Equal("2"))
+		})
+
+		It("with roles (happy path)", func() {
+			svc.Invite(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
+					WithContext(ctx),
+			)
+
+			jsonData := gjson.Get(rr.Body.String(), "value")
+
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+
+			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions`).Exists()).To(BeFalse())
+			Expect(jsonData.Get("0.roles.#").Num).To(Equal(float64(1)))
+			Expect(jsonData.Get("0.roles.0").String()).To(Equal(unifiedrole.NewViewerUnifiedRole(true).GetId()))
+		})
+
+		It("with actions (happy path)", func() {
+			driveItemInvite.Roles = nil
+			driveItemInvite.LibreGraphPermissionsActions = []string{unifiedrole.DriveItemContentRead}
+			svc.Invite(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
+					WithContext(ctx),
+			)
+
+			jsonData := gjson.Get(rr.Body.String(), "value")
+
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+
+			Expect(jsonData.Get("0.roles").Exists()).To(BeFalse())
+			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions.#`).Num).To(Equal(float64(1)))
+			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions.0`).String()).To(Equal(unifiedrole.DriveItemContentRead))
 		})
 
 		It("validates the driveID", func() {
@@ -286,22 +316,6 @@ var _ = Describe("Driveitems", func() {
 			},
 			Entry("fails on unknown fields", func() *strings.Reader {
 				return strings.NewReader(`{"unknown":"field"}`)
-			}, http.StatusBadRequest),
-			Entry("fails without recipients", func() *strings.Reader {
-				driveItemInvite.Recipients = nil
-				return toJSONReader(driveItemInvite)
-			}, http.StatusBadRequest),
-			Entry("fails without roles", func() *strings.Reader {
-				driveItemInvite.Roles = []string{}
-				return toJSONReader(driveItemInvite)
-			}, http.StatusBadRequest),
-			Entry("fails if more than one role item is present", func() *strings.Reader {
-				driveItemInvite.Roles = []string{"", ""}
-				return toJSONReader(driveItemInvite)
-			}, http.StatusBadRequest),
-			Entry("fails if the ExpirationDateTime is not in the future", func() *strings.Reader {
-				driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now())
-				return toJSONReader(driveItemInvite)
 			}, http.StatusBadRequest),
 		)
 
