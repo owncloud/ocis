@@ -41,6 +41,7 @@
 | FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|
 | OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | |
 | OCIS_DISABLE_SSE<br/>FRONTEND_DISABLE_SSE | bool | false | When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.|
+| FRONTEND_DEFAULT_LINK_PERMISSIONS | int | 1 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-23-01-16-50]
+[#deprecation-note-2023-11-23-07-01-38]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -394,6 +394,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.
+
+a|`FRONTEND_DEFAULT_LINK_PERMISSIONS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.
 
 a|`OCIS_URL` +
 `FRONTEND_PUBLIC_URL` +
