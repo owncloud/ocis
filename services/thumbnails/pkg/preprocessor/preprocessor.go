@@ -1,8 +1,10 @@
 package preprocessor
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
+	"fmt"
 	"image"
 	"image/draw"
 	"image/gif"
@@ -42,6 +44,36 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
 	return img, nil
+}
+
+type GgsDecoder struct{}
+
+func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
+	geogebraThumbnail := "_slide0/geogebra_thumbnail.png"
+	var buf bytes.Buffer
+	_, err := io.Copy(&buf, r)
+	if err != nil {
+		return nil, err
+	}
+	zipReader, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range zipReader.File {
+		if file.Name == geogebraThumbnail {
+			thumbnail, err := file.Open()
+			if err != nil {
+				return nil, err
+			}
+
+			img, err := imaging.Decode(thumbnail, imaging.AutoOrientation(true))
+			if err != nil {
+				return nil, errors.Wrap(err, `could not decode the image`)
+			}
+			return img, nil
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("%s not found", geogebraThumbnail))
 }
 
 type AudioDecoder struct{}
@@ -223,6 +255,8 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 		return TxtToImageConverter{
 			fontLoader: fontLoader,
 		}
+	case "application/vnd.geogebra.slides":
+		return GgsDecoder{}
 	case "image/gif":
 		return GifDecoder{}
 	case "audio/flac":

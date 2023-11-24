@@ -71,24 +71,14 @@ func (g GifGenerator) imageToPaletted(img image.Image, p color.Palette) *image.P
 	return pm
 }
 
-// GgsGenerator is used to create a web friendly version of the provided ggs image.
-type GgsGenerator struct{}
-
-func (g GgsGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
-	// TODO: write zip extractor, get image from zip, process image, return image
-	return nil, nil
-}
-
 // GeneratorForType returns the generator for a given file type
 // or nil if the type is not supported.
 func GeneratorForType(fileType string) (Generator, error) {
 	switch strings.ToLower(fileType) {
-	case typePng, typeJpg, typeJpeg:
+	case typePng, typeJpg, typeJpeg, typeGgs:
 		return SimpleGenerator{}, nil
 	case typeGif:
 		return GifGenerator{}, nil
-	case typeGgs:
-		return GgsGenerator{}, nil
 	default:
 		return nil, ErrNoEncoderForType
 	}

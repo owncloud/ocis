@@ -103,7 +103,7 @@ func (e GifEncoder) MimeType() string {
 // or nil if the type is not supported.
 func EncoderForType(fileType string) (Encoder, error) {
 	switch strings.ToLower(fileType) {
-	case typePng:
+	case typePng, typeGgs:
 		return PngEncoder{}, nil
 	case typeJpg, typeJpeg:
 		return JpegEncoder{}, nil
