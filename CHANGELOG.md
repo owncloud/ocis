@@ -36,11 +36,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
 
 ## Details
+
+* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+
+   The `search` service would sometimes not start correctly because config values are
+   overwritten by default configuration.
+
+   https://github.com/owncloud/ocis/pull/7795
 
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 
