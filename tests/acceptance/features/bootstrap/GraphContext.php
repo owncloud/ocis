@@ -343,7 +343,7 @@ class GraphContext implements Context {
 	 * @param string $user username is used as the id
 	 * @param string|null $byUser
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): ResponseInterface {
