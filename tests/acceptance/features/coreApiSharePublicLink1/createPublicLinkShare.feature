@@ -8,7 +8,7 @@ Feature: create a public link share
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-  @smokeTest
+  @smokeTest @skipOnReva
   Scenario Outline: creating public link share of a file or a folder using the default permissions without password using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
