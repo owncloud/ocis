@@ -9,7 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
 * Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
-* Enhancement - Update web to v7.1.1: [#7601](https://github.com/owncloud/ocis/pull/7601)
+* Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
 ## Details
 
@@ -34,18 +34,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7138
 
-* Enhancement - Update web to v7.1.1: [#7601](https://github.com/owncloud/ocis/pull/7601)
+* Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
    Tags: web
 
-   We updated ownCloud Web to v7.1.1. Please refer to the changelog (linked) for details on the web
+   We updated ownCloud Web to v7.1.2. Please refer to the changelog (linked) for details on the web
    release.
 
    ## Summary * Bugfix [owncloud/web#9833](https://github.com/owncloud/web/pull/9833):
-   Resolving external URLs
+   Resolving external URLs * Bugfix
+   [owncloud/web#9868](https://github.com/owncloud/web/pull/9868): Respect
+   "details"-query on private links * Bugfix
+   [owncloud/web#9913](https://github.com/owncloud/web/pull/9913): Private link
+   resolving via share jail ID
 
-   https://github.com/owncloud/ocis/pull/7601
-   https://github.com/owncloud/web/releases/tag/v7.1.1
+   https://github.com/owncloud/ocis/pull/7798
+   https://github.com/owncloud/web/releases/tag/v7.1.2
 # Changelog for [4.0.2] (2023-09-28)
 
 The following sections list the changes for 4.0.2.
