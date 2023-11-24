@@ -2614,6 +2614,7 @@ def generateWebPnpmCache(ctx):
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
                 "cd %s" % dirs["web"],
+                'npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"',
                 "pnpm config set store-dir ./.pnpm-store",
                 "retry -t 3 'pnpm install'",
             ],
@@ -2705,6 +2706,7 @@ def restoreWebPnpmCache():
             "cd %s" % dirs["web"],
             "rm -rf .pnpm-store",
             "tar -xvf %s" % dirs["webPnpmZip"],
+            'npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"',
             "pnpm config set store-dir ./.pnpm-store",
             "retry -t 3 'pnpm install'",
         ],
