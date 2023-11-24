@@ -446,7 +446,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 			}
 		case "mountpoint":
 			for _, receivedShare := range receivedShares {
-				if receivedShare.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+				if receivedShare.State == collaboration.ShareState_SHARE_STATE_INVALID {
 					continue
 				}
 				root := &provider.ResourceId{
@@ -1124,8 +1124,7 @@ func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedSha
 
 	shareMetaData := make(map[string]*provider.ResourceInfo, len(lsRes.Shares))
 	for _, rs := range lsRes.Shares {
-		// only stat accepted shares
-		if rs.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+		if rs.State == collaboration.ShareState_SHARE_STATE_INVALID {
 			continue
 		}
 		if rs.Share.ResourceId.SpaceId == "" {
