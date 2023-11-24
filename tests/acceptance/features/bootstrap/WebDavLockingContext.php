@@ -166,12 +166,42 @@ class WebDavLockingContext implements Context {
 	 * @param TableNode $properties table with no heading with | property | value |
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userLocksFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+		$this->featureContext->setResponse($this->userLocksFileInProjectSpace($user, $file, $space, $properties));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param TableNode $properties
+	 *
+	 * @return ResponseInterface|null
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
-		$response = $this->lockFile($user, $file, $properties, $fullUrl);
-		$this->featureContext->setResponse($response);
+		return $this->lockFile($user, $file, $properties, $fullUrl);
+	}
+
+	/**
+	 * @Given user :user has locked file :file inside the space :space setting the following properties
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param TableNode $properties table with no heading with | property | value |
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasLockedFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties): void {
+		$response = $this->userLocksFileInProjectSpace($user, $file, $space, $properties);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
@@ -392,6 +422,21 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
+	 * @When user :user unlocks the last created lock of file :itemToUnlock using file-id path :filePath using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $itemToUnlock
+	 * @param string $filePath
+	 *
+	 * @return void
+	 */
+	public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(string $user, string $itemToUnlock, string $filePath) {
+		$fullUrl = $this->featureContext->getBaseUrl() . $filePath;
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI($user, $itemToUnlock, $user, $itemToUnlock, false, $fullUrl);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user unlocks file :itemToUnlock with the last created lock of file :itemToUseLockOf using the WebDAV API
 	 *
 	 * @param string $user
@@ -518,15 +563,19 @@ class WebDavLockingContext implements Context {
 	 * @param string $lockOwner
 	 * @param string $itemToUseLockOf
 	 * @param boolean $public
+	 * @param string|null $fullUrl
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 		string $user,
 		string $itemToUnlock,
 		string $lockOwner,
 		string $itemToUseLockOf,
-		bool $public = false
+		bool $public = false,
+		string $fullUrl = null
 	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
@@ -547,18 +596,30 @@ class WebDavLockingContext implements Context {
 		$headers = [
 			"Lock-Token" => $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf]
 		];
-		return WebDavHelper::makeDavRequest(
-			$baseUrl,
-			$user,
-			$password,
-			"UNLOCK",
-			$itemToUnlock,
-			$headers,
-			$this->featureContext->getStepLineRef(),
-			null,
-			$this->featureContext->getDavPathVersion(),
-			$type
-		);
+		if (isset($fullUrl)) {
+			$response = HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				"UNLOCK",
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				$headers
+			);
+		} else {
+			$response = WebDavHelper::makeDavRequest(
+				$baseUrl,
+				$user,
+				$password,
+				"UNLOCK",
+				$itemToUnlock,
+				$headers,
+				$this->featureContext->getStepLineRef(),
+				null,
+				$this->featureContext->getDavPathVersion(),
+				$type
+			);
+		}
+		return $response;
 	}
 
 	/**
@@ -837,6 +898,34 @@ class WebDavLockingContext implements Context {
 	 */
 	public function waitForCertainSecondsToExpireTheLock(int $time): void {
 		\sleep($time);
+	}
+
+	/**
+	 * @Then :count locks should be reported for file :file inside the space :space of user :user
+	 *
+	 * @param int $count
+	 * @param string $file
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function numberOfLockShouldBeReportedInProjectSpace(int $count, string $file, string $spaceName, string $user) {
+		$this->spacesContext->userSendsPropfindRequestToSpace($user, $spaceName, $file);
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, "");
+		$responseXml = $this->featureContext->getResponseXml();
+		$xmlPart = $responseXml->xpath("//d:response//d:lockdiscovery/d:activelock");
+		if (\is_array($xmlPart)) {
+			$lockCount = \count($xmlPart);
+		} else {
+			throw new Exception("xmlPart for 'd:activelock' was expected to be array but found: $xmlPart");
+		}
+		Assert::assertEquals(
+			$count,
+			$lockCount,
+			"Expected $count lock(s) for '$file' inside space '$spaceName' but found '$lockCount'"
+		);
 	}
 
 	/**
