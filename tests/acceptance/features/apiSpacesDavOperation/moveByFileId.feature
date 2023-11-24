@@ -208,6 +208,28 @@ Feature: moving/renaming file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
+  Scenario Outline: move a file between two project spaces
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
+    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "first-project-space" with content "data from first project space" to "firstProjectSpacetextfile.txt"
+    And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "/secondProjectSpacetextfile.txt" into "/" inside space "first-project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "502"
+    And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
+    And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
+      | firstProjectSpacetextfile.txt |
+    And for user "Alice" folder "/" of the space "second-project-space" should contain these files:
+      | secondProjectSpacetextfile.txt |
+    But for user "Alice" the space "first-project-space" should not contain these entries:
+      | secondProjectSpacetextfile.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
   Scenario Outline: rename a root file inside personal space
     Given user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
@@ -375,6 +397,28 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     But for user "Alice" folder "/" of the space "project-space" should not contain these files:
       | renamed.txt |
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: move a file to different name between project spaces
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
+    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "first-project-space" with content "data from first project space" to "firstProjectSpacetextfile.txt"
+    And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" renames a file "/secondProjectSpacetextfile.txt" into "/renamedSecondProjectSpacetextfile.txt" inside space "first-project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "502"
+    And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
+    And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
+      | firstProjectSpacetextfile.txt |
+    And for user "Alice" folder "/" of the space "second-project-space" should contain these files:
+      | secondProjectSpacetextfile.txt |
+    But for user "Alice" the space "first-project-space" should not contain these entries:
+      | renamedSecondProjectSpacetextfile.txt |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
