@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -184,7 +185,9 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	// FIXME ... we need a better way to transport filesize
 	ifuReq.Opaque = utils.AppendPlainToOpaque(ifuReq.Opaque, net.HeaderUploadLength, strconv.FormatInt(int64(len(req.Content)), 10))
 
+	fmt.Println("client.InitiateFileUpload")
 	res, err := client.InitiateFileUpload(ctx, ifuReq)
+	fmt.Printf("client.InitiateFileUpload err=%v\n", err)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +217,9 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 
 	md, _ := metadata.FromOutgoingContext(ctx)
 	httpReq.Header.Add(ctxpkg.TokenHeader, md.Get(ctxpkg.TokenHeader)[0])
+	fmt.Println("cs3.dataGatewayClient.Do")
 	resp, err := cs3.dataGatewayClient.Do(httpReq)
+	fmt.Printf("cs3.dataGatewayClient.Do err=%v\n", err)
 	if err != nil {
 		return nil, err
 	}

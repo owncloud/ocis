@@ -68,7 +68,7 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	reg := registry.GetRegistry()
 	var tlsConfig *tls.Config
 	cOpts := []client.Option{
-		client.RequestTimeout(60 * time.Second),
+		client.RequestTimeout(600 * time.Second),
 		client.Registry(reg),
 		client.Wrap(mbreaker.NewClientWrapper()),
 		client.Wrap(mtracer.NewClientWrapper(
