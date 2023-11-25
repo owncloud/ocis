@@ -23,11 +23,13 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/stretchr/testify/mock"
@@ -36,13 +38,15 @@ import (
 
 var _ = Describe("sharedbyme", func() {
 	var (
-		svc             service.Service
-		ctx             context.Context
-		cfg             *config.Config
-		gatewayClient   *cs3mocks.GatewayAPIClient
-		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		eventsPublisher mocks.Publisher
-		identityBackend *identitymocks.Backend
+		svc                 service.Service
+		ctx                 context.Context
+		cfg                 *config.Config
+		gatewayClient       *cs3mocks.GatewayAPIClient
+		gatewaySelector     pool.Selectable[gateway.GatewayAPIClient]
+		eventsPublisher     mocks.Publisher
+		identityBackend     *identitymocks.Backend
+		driveItemCreateLink *libregraph.DriveItemCreateLink
+		publicShare         link.PublicShare
 
 		rr *httptest.ResponseRecorder
 	)
@@ -113,21 +117,29 @@ var _ = Describe("sharedbyme", func() {
 		},
 		Expiration: utils.TimeToTS(expiration),
 	}
-
-	publicShare := link.PublicShare{
-		Id: &link.PublicShareId{
-			OpaqueId: "public-share-id",
-		},
-		Token: "public-share-token",
-		ResourceId: &provider.ResourceId{
-			StorageId: "storageid",
-			SpaceId:   "spaceid",
-			OpaqueId:  "public-share-opaqueid",
-		},
-	}
+	driveItemCreateLink = &libregraph.DriveItemCreateLink{}
 
 	BeforeEach(func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		linkType, err := libregraph.NewSharingLinkTypeFromValue("view")
+		Expect(err).To(BeNil())
+		driveItemCreateLink.Type = linkType
+		driveItemCreateLink.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+		permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(*driveItemCreateLink, provider.ResourceType_RESOURCE_TYPE_CONTAINER)
+		Expect(err).To(BeNil())
+
+		publicShare = link.PublicShare{
+			Id: &link.PublicShareId{
+				OpaqueId: "public-share-id",
+			},
+			Token: "public-share-token",
+			ResourceId: &provider.ResourceId{
+				StorageId: "storageid",
+				SpaceId:   "spaceid",
+				OpaqueId:  "public-share-opaqueid",
+			},
+			Permissions: &link.PublicSharePermissions{Permissions: permissions},
+		}
 
 		rr = httptest.NewRecorder()
 
