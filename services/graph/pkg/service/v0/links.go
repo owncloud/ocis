@@ -10,6 +10,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
@@ -21,12 +22,12 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	logger.Info().Msg("calling create link")
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		errorcode.RenderError(w, r, err)
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 	driveItemID, err := parseIDParam(r, "itemID")
 	if err != nil {
-		errorcode.RenderError(w, r, err)
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
@@ -93,6 +94,10 @@ func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.Reso
 			Password: createLink.GetPassword(),
 		},
 	}
+	if createLink.ExpirationDateTime != nil {
+		req.GetGrant().Expiration = utils.TimeToTS(createLink.GetExpirationDateTime())
+	}
+
 	// set displayname and password protected as arbitrary metadata
 	req.ResourceInfo.ArbitraryMetadata = &providerv1beta1.ArbitraryMetadata{
 		Metadata: map[string]string{
