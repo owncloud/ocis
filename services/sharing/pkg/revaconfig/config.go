@@ -103,6 +103,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"service_user_idp":                   cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
 							"machine_auth_apikey":                cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
 							"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
+							"enable_expired_shares_cleanup":      cfg.EnableExpiredSharesCleanup,
 						},
 					},
 				},
