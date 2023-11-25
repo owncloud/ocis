@@ -1789,8 +1789,8 @@ github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35uk
 github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HDbW65HOY=
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/owncloud/libre-graph-api-go v1.0.5-0.20231113143725-09bf34dc9afb h1:KFnmkGvHY+6k6IZ9I1w5Ia24VbALYms+Y6W7LrsUbsE=
-github.com/owncloud/libre-graph-api-go v1.0.5-0.20231113143725-09bf34dc9afb/go.mod h1:v2aAl5IwEI8t+GmcWvBd+bvJMYp9Vf1hekLuRf0UnEs=
+github.com/owncloud/libre-graph-api-go v1.0.5-0.20231116165004-6101db024810 h1:a7ojKQIyMTyqgS+R2w4UAk88RqZ1eIEjoTMoyRV9zU0=
+github.com/owncloud/libre-graph-api-go v1.0.5-0.20231116165004-6101db024810/go.mod h1:v2aAl5IwEI8t+GmcWvBd+bvJMYp9Vf1hekLuRf0UnEs=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=

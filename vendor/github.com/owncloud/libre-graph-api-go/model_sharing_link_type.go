@@ -15,11 +15,12 @@ import (
 	"fmt"
 )
 
-// SharingLinkType The type of the link created.  | Value          | Display name      | Description                                                     | | -------------- | ----------------- | --------------------------------------------------------------- | | view           | View              | Creates a read-only link to the driveItem.                      | | upload         | Upload            | Creates a read-write link to the folder driveItem.              | | edit           | Edit              | Creates a read-write link to the driveItem.                     | | createOnly     | File Drop         | Creates an upload-only link to the folder driveItem.            | | blocksDownload | Secure View       | Creates a read-only link that blocks download to the driveItem. |
+// SharingLinkType The type of the link created.  | Value          | Display name      | Description                                                     | | -------------- | ----------------- | --------------------------------------------------------------- | | internal       | Internal          | Creates an internal link without any permissions.               | | view           | View              | Creates a read-only link to the driveItem.                      | | upload         | Upload            | Creates a read-write link to the folder driveItem.              | | edit           | Edit              | Creates a read-write link to the driveItem.                     | | createOnly     | File Drop         | Creates an upload-only link to the folder driveItem.            | | blocksDownload | Secure View       | Creates a read-only link that blocks download to the driveItem. |
 type SharingLinkType string
 
 // List of sharingLinkType
 const (
+	INTERNAL        SharingLinkType = "internal"
 	VIEW            SharingLinkType = "view"
 	UPLOAD          SharingLinkType = "upload"
 	EDIT            SharingLinkType = "edit"
@@ -29,6 +30,7 @@ const (
 
 // All allowed values of SharingLinkType enum
 var AllowedSharingLinkTypeEnumValues = []SharingLinkType{
+	"internal",
 	"view",
 	"upload",
 	"edit",
