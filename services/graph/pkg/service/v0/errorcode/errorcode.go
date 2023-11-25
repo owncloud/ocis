@@ -59,6 +59,8 @@ const (
 	Unauthenticated
 	// PreconditionFailed the request cannot be made and this error response is sent back
 	PreconditionFailed
+	// ItemIsLocked The item is locked by another process. Try again later.
+	ItemIsLocked
 )
 
 var errorCodes = [...]string{
@@ -80,6 +82,7 @@ var errorCodes = [...]string{
 	"quotaLimitReached",
 	"unauthenticated",
 	"preconditionFailed",
+	"itemIsLocked",
 }
 
 // New constructs a new errorcode.Error
@@ -129,6 +132,8 @@ func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 		status = http.StatusConflict
 	case NotAllowed:
 		status = http.StatusMethodNotAllowed
+	case ItemIsLocked:
+		status = http.StatusLocked
 	default:
 		status = http.StatusInternalServerError
 	}
