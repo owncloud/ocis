@@ -26,6 +26,8 @@ type SharingLink struct {
 	WebUrl *string `json:"webUrl,omitempty"`
 	// Provides a user-visible display name of the link. Optional. Libregraph only.
 	LibreGraphDisplayName *string `json:"@libre.graph.displayName,omitempty"`
+	// The quicklink property can be assigned to only one link per resource. A quicklink can be used in the clients to provide a one-click copy to clipboard action. Optional. Libregraph only.
+	LibreGraphQuickLink *bool `json:"@libre.graph.quickLink,omitempty"`
 }
 
 // NewSharingLink instantiates a new SharingLink object
@@ -173,6 +175,38 @@ func (o *SharingLink) SetLibreGraphDisplayName(v string) {
 	o.LibreGraphDisplayName = &v
 }
 
+// GetLibreGraphQuickLink returns the LibreGraphQuickLink field value if set, zero value otherwise.
+func (o *SharingLink) GetLibreGraphQuickLink() bool {
+	if o == nil || IsNil(o.LibreGraphQuickLink) {
+		var ret bool
+		return ret
+	}
+	return *o.LibreGraphQuickLink
+}
+
+// GetLibreGraphQuickLinkOk returns a tuple with the LibreGraphQuickLink field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SharingLink) GetLibreGraphQuickLinkOk() (*bool, bool) {
+	if o == nil || IsNil(o.LibreGraphQuickLink) {
+		return nil, false
+	}
+	return o.LibreGraphQuickLink, true
+}
+
+// HasLibreGraphQuickLink returns a boolean if a field has been set.
+func (o *SharingLink) HasLibreGraphQuickLink() bool {
+	if o != nil && !IsNil(o.LibreGraphQuickLink) {
+		return true
+	}
+
+	return false
+}
+
+// SetLibreGraphQuickLink gets a reference to the given bool and assigns it to the LibreGraphQuickLink field.
+func (o *SharingLink) SetLibreGraphQuickLink(v bool) {
+	o.LibreGraphQuickLink = &v
+}
+
 func (o SharingLink) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -194,6 +228,9 @@ func (o SharingLink) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.LibreGraphDisplayName) {
 		toSerialize["@libre.graph.displayName"] = o.LibreGraphDisplayName
+	}
+	if !IsNil(o.LibreGraphQuickLink) {
+		toSerialize["@libre.graph.quickLink"] = o.LibreGraphQuickLink
 	}
 	return toSerialize, nil
 }
