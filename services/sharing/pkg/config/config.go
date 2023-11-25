@@ -26,9 +26,9 @@ type Config struct {
 	PublicSharingDriver            string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3'."`
 	PublicSharingDrivers           PublicSharingDrivers `yaml:"public_sharing_drivers"`
 	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service."`
-
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup"`
+	Supervised                     bool                 `yaml:"-"`
+	Context                        context.Context      `yaml:"-"`
 }
 
 type Log struct {

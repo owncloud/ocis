@@ -75,6 +75,7 @@ func DefaultConfig() *config.Config {
 			ClusterID: "ocis-cluster",
 			EnableTLS: false,
 		},
+		EnableExpiredSharesCleanup: true,
 	}
 }
 
