@@ -107,6 +107,7 @@ type Service interface {
 	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
 	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)
+	CreateLink(w http.ResponseWriter, r *http.Request)
 
 	Invite(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
@@ -201,6 +202,7 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Get("/me/drive/sharedWithMe", svc.ListSharedWithMe)
 			r.Route("/drives/{driveID}/items/{itemID}", func(r chi.Router) {
 				r.Post("/invite", svc.Invite)
+				r.Post("/createLink", svc.CreateLink)
 				r.Delete("/permissions/{permissionID}", svc.DeletePermission)
 			})
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {

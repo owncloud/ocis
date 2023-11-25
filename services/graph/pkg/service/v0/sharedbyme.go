@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"net/url"
-	"path"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -193,28 +191,13 @@ func (g Graph) cs3PublicSharesToDriveItems(ctx context.Context, shares []*link.P
 			}
 			item = *itemptr
 		}
-		perm := libregraph.Permission{}
-		perm.SetRoles([]string{})
-		perm.SetId(s.Id.OpaqueId)
-		link := libregraph.SharingLink{}
-		webURL, err := url.Parse(g.config.Spaces.WebDavBase)
+		perm, err := g.libreGraphPermissionFromCS3PublicShare(s)
 		if err != nil {
-			g.logger.Error().
-				Err(err).
-				Str("url", g.config.Spaces.WebDavBase).
-				Msg("failed to parse webURL base url")
+			g.logger.Error().Err(err).Interface("Link", s.ResourceId).Msg("could not convert link to libregraph")
 			return driveItems, err
 		}
 
-		webURL.Path = path.Join(webURL.Path, "s", s.GetToken())
-		link.SetWebUrl(webURL.String())
-		perm.SetLink(link)
-		// set expiration date
-		if s.GetExpiration() != nil {
-			perm.SetExpirationDateTime(cs3TimestampToTime(s.GetExpiration()))
-		}
-
-		item.Permissions = append(item.Permissions, perm)
+		item.Permissions = append(item.Permissions, *perm)
 		driveItems[resIDStr] = item
 	}
 
@@ -229,6 +212,8 @@ func cs3StatusToErrCode(code rpc.Code) (errcode errorcode.ErrorCode) {
 		errcode = errorcode.AccessDenied
 	case rpc.Code_CODE_NOT_FOUND:
 		errcode = errorcode.ItemNotFound
+	case rpc.Code_CODE_LOCKED:
+		errcode = errorcode.ItemIsLocked
 	default:
 		errcode = errorcode.GeneralException
 	}
