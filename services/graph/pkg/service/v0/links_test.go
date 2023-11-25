@@ -219,6 +219,56 @@ var _ = Describe("createLinkTests", func() {
 			Expect(getError.GetMessage()).To(Equal("can't split empty storage space ID: invalid storage space id"))
 		})
 
+		It("fails due to an empty itemID", func() {
+			driveItemCreateLink = libregraph.NewDriveItemCreateLink()
+
+			// use wrong storageID within itemID
+			itemID = ""
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
+			rctx.URLParams.Add("itemID", itemID)
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.CreateLink(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			var odataError libregraph.OdataError
+			err := json.Unmarshal(rr.Body.Bytes(), &odataError)
+			Expect(err).ToNot(HaveOccurred())
+			getError := odataError.GetError()
+			Expect(getError.GetCode()).To(Equal("generalException"))
+			Expect(getError.GetMessage()).To(Equal("can't split empty storage space ID: invalid storage space id"))
+		})
+
+		It("fails due to an itemID on a different storage", func() {
+			driveItemCreateLink = libregraph.NewDriveItemCreateLink()
+
+			// use wrong storageID within itemID
+			itemID = "f0042750-23c5-441c-9f2c-ff7c53e5bd2b$cd621428-dfbe-44c1-9393-65bf0dd440a6!1177add3-b4eb-434e-a2e8-1859b31b17bf"
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
+			rctx.URLParams.Add("itemID", itemID)
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.CreateLink(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusNotFound))
+			var odataError libregraph.OdataError
+			err := json.Unmarshal(rr.Body.Bytes(), &odataError)
+			Expect(err).ToNot(HaveOccurred())
+			getError := odataError.GetError()
+			Expect(getError.GetCode()).To(Equal("itemNotFound"))
+			Expect(getError.GetMessage()).To(Equal("Item does not exist"))
+		})
+
 		// Public Shares / "links" in graph terms
 		It("fails when creating a public link with an empty request body", func() {
 			svc.CreateLink(
