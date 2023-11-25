@@ -216,13 +216,12 @@ var _ = Describe("createLinkTests", func() {
 			Expect(err).ToNot(HaveOccurred())
 			getError := odataError.GetError()
 			Expect(getError.GetCode()).To(Equal("invalidRequest"))
-			Expect(getError.GetMessage()).To(Equal("can't split empty storage space ID: invalid storage space id"))
+			Expect(getError.GetMessage()).To(Equal("invalidRequest: can't split empty storage space ID: invalid storage space id"))
 		})
 
 		It("fails due to an empty itemID", func() {
 			driveItemCreateLink = libregraph.NewDriveItemCreateLink()
 
-			// use wrong storageID within itemID
 			itemID = ""
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
@@ -240,8 +239,8 @@ var _ = Describe("createLinkTests", func() {
 			err := json.Unmarshal(rr.Body.Bytes(), &odataError)
 			Expect(err).ToNot(HaveOccurred())
 			getError := odataError.GetError()
-			Expect(getError.GetCode()).To(Equal("generalException"))
-			Expect(getError.GetMessage()).To(Equal("can't split empty storage space ID: invalid storage space id"))
+			Expect(getError.GetCode()).To(Equal("invalidRequest"))
+			Expect(getError.GetMessage()).To(Equal("invalidRequest: can't split empty storage space ID: invalid storage space id"))
 		})
 
 		It("fails due to an itemID on a different storage", func() {
