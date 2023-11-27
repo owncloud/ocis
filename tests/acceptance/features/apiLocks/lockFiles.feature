@@ -368,6 +368,29 @@ Feature: lock files
       | spaces           | shared     |
       | spaces           | exclusive  |
 
+  @issue-7641
+  Scenario Outline: try to lock a folder as anonymous user
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | PARENT   |
+      | permissions | change   |
+      | password    | %public% |
+    When the public locks the last public link shared file using the WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "403"
+    And 0 locks should be reported for file "PARENT" of user "Alice" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
+    And user "Alice" should be able to create folder "/PARENT/sub-folder"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
 
   Scenario Outline: lock expiration
     Given using <dav-path-version> DAV path
@@ -378,6 +401,96 @@ Feature: lock files
     When the user waits for "5" seconds to expire the lock
     Then user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
     And 0 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+
+  Scenario Outline: lock a file inside a folder shared by a link as anonymous user with edit permission
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | PARENT   |
+      | permissions | change   |
+      | password    | %public% |
+    When the public locks "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "200"
+    And 1 locks should be reported for file "PARENT/textfile0.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+
+  Scenario Outline: try to lock a file inside a folder shared by a link as anonymous user with read permission
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | PARENT   |
+      | permissions | read     |
+      | password    | %public% |
+    When the public tries to lock "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "403"
+    And 0 locks should be reported for file "PARENT/textfile0.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+
+  Scenario Outline: lock a file shared by a link as anonymous user with edit permission
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | textfile0.txt |
+      | permissions | change        |
+      | password    | %public%      |
+    When the public locks the last public link shared file using the WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "200"
+    And 1 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
+    Examples:
+      | dav-path-version | lock-scope |
+      | old              | shared     |
+      | old              | exclusive  |
+      | new              | shared     |
+      | new              | exclusive  |
+      | spaces           | shared     |
+      | spaces           | exclusive  |
+
+
+  Scenario Outline: try to lock a file shared by a link as anonymous user with read permission
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | textfile0.txt |
+      | permissions | read          |
+      | password    | %public%      |
+    When the public tries to lock the last public link shared file using the WebDAV API setting the following properties
+      | lockscope | <lock-scope> |
+    Then the HTTP status code should be "403"
+    And 0 locks should be reported for file "textfile0.txt" of user "Alice" by the WebDAV API
+    And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
       | old              | shared     |

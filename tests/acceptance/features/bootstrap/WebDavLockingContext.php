@@ -68,8 +68,8 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if ($public === true) {
-			$type = "public-files";
-			$password = null;
+			$type = "public-files-new";
+			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";
 			$password = $this->featureContext->getPasswordForUser($user);
@@ -318,7 +318,8 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When the public locks the last public link shared file/folder using the WebDAV API setting the following properties
+	 * @When the public locks the last public link shared file using the WebDAV API setting the following properties
+	 * @When the public tries to lock the last public link shared file using the WebDAV API setting the following properties
 	 *
 	 * @param TableNode $properties
 	 *
@@ -360,6 +361,7 @@ class WebDavLockingContext implements Context {
 
 	/**
 	 * @When /^the public locks "([^"]*)" in the last public link shared folder using the (old|new) public WebDAV API setting the following properties$/
+	 * @When /^the public tries to lock "([^"]*)" in the last public link shared folder using the (old|new) public WebDAV API setting the following properties$/
 	 *
 	 * @param string $file
 	 * @param string $publicWebDAVAPIVersion
