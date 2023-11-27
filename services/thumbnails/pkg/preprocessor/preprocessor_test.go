@@ -1,11 +1,5 @@
 package preprocessor
 
-// implement tests for the following structs and functions using ginkgo and gomega:
-// ImageDecoder
-// GifDecoder
-// GgsDecoder
-// Convert
-
 import (
 	"bytes"
 	"golang.org/x/image/font"
@@ -101,8 +95,35 @@ var _ = Describe("ImageDecoder", func() {
 	})
 
 	Describe("should decode audio", func() {
-		//TODO: this needs test, but I have no idea what kind of audio
-		//      I can leave here without causing legal trouble
+		var fileReader io.Reader
+		It("should decode an audio", func() {
+			fileContent, err := os.ReadFile("test_assets/empty.mp3")
+			if err != nil {
+				panic(err)
+			}
+			fileReader = bytes.NewReader(fileContent)
+			decoder := AudioDecoder{}
+			img, err := decoder.Convert(fileReader)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(img).ToNot(BeNil())
+		})
+		It("should decode an audio", func() {
+			fileContent, err := os.ReadFile("test_assets/empty_no_image.mp3")
+			if err != nil {
+				panic(err)
+			}
+			fileReader = bytes.NewReader(fileContent)
+			decoder := AudioDecoder{}
+			img, err := decoder.Convert(fileReader)
+			Expect(err).To(HaveOccurred())
+			Expect(img).To(BeNil())
+		})
+		It("should return an error if the audio is invalid", func() {
+			decoder := AudioDecoder{}
+			img, err := decoder.Convert(bytes.NewReader([]byte("not an audio")))
+			Expect(err).To(HaveOccurred())
+			Expect(img).To(BeNil())
+		})
 	})
 
 	Describe("should decode text", func() {
