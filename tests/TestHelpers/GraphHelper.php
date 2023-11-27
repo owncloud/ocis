@@ -172,6 +172,7 @@ class GraphHelper {
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 * @param string $userId
+	 * @param string $method
 	 * @param string|null $userName
 	 * @param string|null $password
 	 * @param string|null $email
@@ -187,6 +188,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $userId,
+		?string $method = "PATCH",
 		?string $userName = null,
 		?string $password = null,
 		?string $email = null,
@@ -204,7 +206,7 @@ class GraphHelper {
 		return HttpRequestHelper::sendRequest(
 			$url,
 			$xRequestId,
-			"PATCH",
+			$method,
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
