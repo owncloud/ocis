@@ -33,7 +33,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_PASSWORD`
 
@@ -129,7 +129,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -150,7 +150,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -198,10 +198,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++5m0s ++
+++10s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -221,7 +221,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++false ++
+++true ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -244,7 +244,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 
 a| [subs=-attributes]
 A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -267,7 +267,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -618,7 +618,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Ignore untrusted SSL certificates when connecting to the webdav source.
 
 a| `OCIS_JWT_SECRET`
 
@@ -685,7 +685,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -760,7 +760,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=libregraph,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -799,7 +799,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
@@ -1050,7 +1050,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `OCIS_LDAP_USER_BASE_DN`
 
@@ -1121,7 +1121,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -1152,10 +1152,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownCloudUUID ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP User UUID attribute like 'uid'.
 
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1190,7 +1190,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
@@ -1205,10 +1205,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
@@ -1481,7 +1481,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The OIDC issuer URL to use.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -1582,7 +1582,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata
 
 a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
@@ -1875,7 +1875,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `OCIS_URL`
 
@@ -1906,7 +1906,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+The OIDC issuer URL to use.
 
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
