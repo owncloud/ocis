@@ -239,6 +239,7 @@ type stream struct {
 	ddindex   int
 	ddtmr     *time.Timer
 	qch       chan struct{}
+	mqch      chan struct{}
 	active    bool
 	ddloaded  bool
 	closed    bool
@@ -558,6 +559,7 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 		msgs:      newIPQueue[*inMsg](s, qpfx+"messages"),
 		gets:      newIPQueue[*directGetReq](s, qpfx+"direct gets"),
 		qch:       make(chan struct{}),
+		mqch:      make(chan struct{}),
 		uch:       make(chan struct{}, 4),
 		sch:       make(chan struct{}, 1),
 	}
@@ -785,6 +787,15 @@ func (mset *stream) setStreamAssignment(sa *streamAssignment) {
 	}
 }
 
+func (mset *stream) monitorQuitC() <-chan struct{} {
+	if mset == nil {
+		return nil
+	}
+	mset.mu.RLock()
+	defer mset.mu.RUnlock()
+	return mset.mqch
+}
+
 func (mset *stream) updateC() <-chan struct{} {
 	if mset == nil {
 		return nil
@@ -983,14 +994,6 @@ func (mset *stream) lastSeqAndCLFS() (uint64, uint64) {
 	mset.mu.RLock()
 	defer mset.mu.RUnlock()
 	return mset.lseq, mset.getCLFS()
-}
-
-func (mset *stream) clearCLFS() uint64 {
-	mset.clMu.Lock()
-	defer mset.clMu.Unlock()
-	clfs := mset.clfs
-	mset.clfs, mset.clseq = 0, 0
-	return clfs
 }
 
 func (mset *stream) getCLFS() uint64 {
@@ -4077,6 +4080,7 @@ func (mset *stream) processInboundJetStreamMsg(_ *subscription, c *client, _ *Ac
 var (
 	errLastSeqMismatch = errors.New("last sequence mismatch")
 	errMsgIdDuplicate  = errors.New("msgid is duplicate")
+	errStreamClosed    = errors.New("stream closed")
 )
 
 // processJetStreamMsg is where we try to actually process the stream msg.
@@ -4085,7 +4089,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 	c, s, store := mset.client, mset.srv, mset.store
 	if mset.closed || c == nil {
 		mset.mu.Unlock()
-		return nil
+		return errStreamClosed
 	}
 
 	// Apply the input subject transform if any
@@ -4415,7 +4419,6 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		// Make sure to take into account any message assignments that we had to skip (clfs).
 		seq = lseq + 1 - clfs
 		// Check for preAcks and the need to skip vs store.
-
 		if mset.hasAllPreAcks(seq, subject) {
 			mset.clearAllPreAcks(seq)
 			store.SkipMsg()
@@ -4907,9 +4910,28 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 	accName := jsa.account.Name
 	jsa.mu.Unlock()
 
-	// Clean up consumers.
+	// Mark as closed, kick monitor and collect consumers first.
 	mset.mu.Lock()
 	mset.closed = true
+	// Signal to the monitor loop.
+	// Can't use qch here.
+	if mset.mqch != nil {
+		close(mset.mqch)
+		mset.mqch = nil
+	}
+
+	// Stop responding to sync requests.
+	mset.stopClusterSubs()
+	// Unsubscribe from direct stream.
+	mset.unsubscribeToStream(true)
+
+	// Our info sub if we spun it up.
+	if mset.infoSub != nil {
+		mset.srv.sysUnsubscribe(mset.infoSub)
+		mset.infoSub = nil
+	}
+
+	// Clean up consumers.
 	var obs []*consumer
 	for _, o := range mset.consumers {
 		obs = append(obs, o)
@@ -4930,21 +4952,6 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 			mset.cancelSourceConsumer(si.iname)
 		}
 	}
-
-	// Cluster cleanup
-	var sa *streamAssignment
-	if n := mset.node; n != nil {
-		if deleteFlag {
-			n.Delete()
-			sa = mset.sa
-		} else {
-			if n.NeedSnapshot() {
-				// Attempt snapshot on clean exit.
-				n.InstallSnapshot(mset.stateSnapshotLocked())
-			}
-			n.Stop()
-		}
-	}
 	mset.mu.Unlock()
 
 	isShuttingDown := js.isShuttingDown()
@@ -4961,17 +4968,6 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 	}
 
 	mset.mu.Lock()
-	// Stop responding to sync requests.
-	mset.stopClusterSubs()
-	// Unsubscribe from direct stream.
-	mset.unsubscribeToStream(true)
-
-	// Our info sub if we spun it up.
-	if mset.infoSub != nil {
-		mset.srv.sysUnsubscribe(mset.infoSub)
-		mset.infoSub = nil
-	}
-
 	// Send stream delete advisory after the consumers.
 	if deleteFlag && advisory {
 		mset.sendDeleteAdvisoryLocked()
@@ -4983,11 +4979,17 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 		mset.qch = nil
 	}
 
-	c := mset.client
-	mset.client = nil
-	if c == nil {
-		mset.mu.Unlock()
-		return nil
+	// Cluster cleanup
+	var sa *streamAssignment
+	if n := mset.node; n != nil {
+		if deleteFlag {
+			n.Delete()
+			sa = mset.sa
+		} else {
+			// Always attempt snapshot on clean exit.
+			n.InstallSnapshot(mset.stateSnapshotLocked())
+			n.Stop()
+		}
 	}
 
 	// Cleanup duplicate timer if running.
@@ -5013,6 +5015,8 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 
 	// Snapshot store.
 	store := mset.store
+	c := mset.client
+	mset.client = nil
 
 	// Clustered cleanup.
 	mset.mu.Unlock()
@@ -5027,7 +5031,9 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 		js.mu.Unlock()
 	}
 
-	c.closeConnection(ClientClosed)
+	if c != nil {
+		c.closeConnection(ClientClosed)
+	}
 
 	if sysc != nil {
 		sysc.closeConnection(ClientClosed)
@@ -5042,9 +5048,12 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 		js.releaseStreamResources(&mset.cfg)
 		// cleanup directories after the stream
 		accDir := filepath.Join(js.config.StoreDir, accName)
-		// no op if not empty
-		os.Remove(filepath.Join(accDir, streamsDir))
-		os.Remove(accDir)
+		// Do cleanup in separate go routine similar to how fs will use purge here..
+		go func() {
+			// no op if not empty
+			os.Remove(filepath.Join(accDir, streamsDir))
+			os.Remove(accDir)
+		}()
 	} else if store != nil {
 		// Ignore errors.
 		store.Stop()

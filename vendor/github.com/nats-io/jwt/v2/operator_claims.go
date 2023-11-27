@@ -136,8 +136,12 @@ func ValidateOperatorServiceURL(v string) error {
 		return nil
 	case "tls":
 		return nil
+	case "ws":
+		return nil
+	case "wss":
+		return nil
 	default:
-		return fmt.Errorf("operator service url %q - protocol not supported (only 'nats' or 'tls' only)", v)
+		return fmt.Errorf("operator service url %q - protocol not supported (only 'nats', 'tls', 'ws', 'wss' only)", v)
 	}
 }
 
