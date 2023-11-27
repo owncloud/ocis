@@ -50,6 +50,11 @@ var _ = Describe("createLinkTests", func() {
 
 		rr *httptest.ResponseRecorder
 	)
+	const (
+		ViewerLinkString = "Viewer Link"
+		ItemID           = "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!1177add3-b4eb-434e-a2e8-1859b31b17bf"
+		DriveId          = "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6"
+	)
 
 	BeforeEach(func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -97,9 +102,9 @@ var _ = Describe("createLinkTests", func() {
 		)
 
 		BeforeEach(func() {
-			itemID = "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!1177add3-b4eb-434e-a2e8-1859b31b17bf"
+			itemID = ItemID
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
+			rctx.URLParams.Add("driveID", DriveId)
 			rctx.URLParams.Add("itemID", itemID)
 
 			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
@@ -135,7 +140,7 @@ var _ = Describe("createLinkTests", func() {
 				Id:                &link.PublicShareId{OpaqueId: "123"},
 				Expiration:        utils.TimeToTS(*driveItemCreateLink.ExpirationDateTime),
 				PasswordProtected: false,
-				DisplayName:       "Viewer Link",
+				DisplayName:       ViewerLinkString,
 				Token:             "SomeGOODCoffee",
 				Permissions:       &link.PublicSharePermissions{Permissions: permissions},
 			}
@@ -167,7 +172,7 @@ var _ = Describe("createLinkTests", func() {
 			Expect(createLinkResponseBody[0].GetId()).To(Equal("123"))
 			Expect(createLinkResponseBody[0].GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
 			Expect(createLinkResponseBody[0].GetHasPassword()).To(Equal(false))
-			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString("Viewer Link")))
+			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
 			link := createLinkResponseBody[0].GetLink()
 			respLinkType := link.GetType()
 			expected, err := libregraph.NewSharingLinkTypeFromValue("view")
@@ -224,7 +229,7 @@ var _ = Describe("createLinkTests", func() {
 
 			itemID = ""
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
+			rctx.URLParams.Add("driveID", DriveId)
 			rctx.URLParams.Add("itemID", itemID)
 
 			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
@@ -249,7 +254,7 @@ var _ = Describe("createLinkTests", func() {
 			// use wrong storageID within itemID
 			itemID = "f0042750-23c5-441c-9f2c-ff7c53e5bd2b$cd621428-dfbe-44c1-9393-65bf0dd440a6!1177add3-b4eb-434e-a2e8-1859b31b17bf"
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
+			rctx.URLParams.Add("driveID", DriveId)
 			rctx.URLParams.Add("itemID", itemID)
 
 			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
@@ -340,7 +345,7 @@ var _ = Describe("createLinkTests", func() {
 				Id:                &link.PublicShareId{OpaqueId: "123"},
 				Expiration:        utils.TimeToTS(*driveItemCreateLink.ExpirationDateTime),
 				PasswordProtected: false,
-				DisplayName:       "Viewer Link",
+				DisplayName:       ViewerLinkString,
 				Token:             "SomeGOODCoffee",
 				Permissions:       &link.PublicSharePermissions{Permissions: permissions},
 			}
@@ -359,7 +364,7 @@ var _ = Describe("createLinkTests", func() {
 			Expect(createLinkResponseBody[0].GetId()).To(Equal("123"))
 			Expect(createLinkResponseBody[0].GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
 			Expect(createLinkResponseBody[0].GetHasPassword()).To(Equal(false))
-			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString("Viewer Link")))
+			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
 			respLink := createLinkResponseBody[0].GetLink()
 			// some conversion gymnastics
 			respLinkType := respLink.GetType()
