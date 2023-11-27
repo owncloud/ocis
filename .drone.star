@@ -1911,6 +1911,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
+        "PROXY_LOG_LEVEL": "debug",
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
         "STORAGE_SYSTEM_LOG_LEVEL": "debug",
         "OCIS_LOG_LEVEL": "error",
