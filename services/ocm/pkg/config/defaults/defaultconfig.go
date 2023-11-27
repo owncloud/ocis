@@ -94,7 +94,7 @@ func DefaultConfig() *config.Config {
 			Driver: "json",
 			Drivers: config.OCMInviteManagerDrivers{
 				JSON: config.OCMInviteManagerJSONDriver{
-					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocminvites.json"),
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocminvites.json"),
 				},
 			},
 			Insecure: false,
@@ -102,14 +102,14 @@ func DefaultConfig() *config.Config {
 		OCMProviderAuthorizerDriver: "json",
 		OCMProviderAuthorizerDrivers: config.OCMProviderAuthorizerDrivers{
 			JSON: config.OCMProviderAuthorizerJSONDriver{
-				Providers: filepath.Join(defaults.BaseDataPath(), "storage", "ocmproviders.json"),
+				Providers: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocmproviders.json"),
 			},
 		},
 		OCMShareProvider: config.OCMShareProvider{
 			Driver: "json",
 			Drivers: config.OCMShareProviderDrivers{
 				JSON: config.OCMShareProviderJSONDriver{
-					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocmshares.json"),
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocmshares.json"),
 				},
 			},
 			Insecure: false,
@@ -118,9 +118,13 @@ func DefaultConfig() *config.Config {
 			Driver: "json",
 			Drivers: config.OCMCoreDrivers{
 				JSON: config.OCMCoreJSONDriver{
-					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocmshares.json"),
+					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocmshares.json"),
 				},
 			},
+		},
+		OCMStorageProvider: config.OCMStorageProvider{
+			Insecure:    false,
+			StorageRoot: filepath.Join(defaults.BaseDataPath(), "storage", "ocm"),
 		},
 	}
 }
