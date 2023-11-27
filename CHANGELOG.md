@@ -36,12 +36,31 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
+* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
 
 ## Details
+
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
+
+   We fixed that current date is always printed.
+
+   https://github.com/owncloud/ocis/issues/6124
+   https://github.com/owncloud/ocis/pull/6132
+
+* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
+
+   We fixed the Disabled DEPTH infinity in PROPFIND for: Personal /remote.php/dav/files/admin
+   Public link share /remote.php/dav/public-files/<token> Trashbin
+   /remote.php/dav/spaces/trash-bin/<personal-space-id>
+
+   https://github.com/owncloud/ocis/issues/7359
+   https://github.com/owncloud/ocis/pull/7746
+   https://github.com/cs3org/reva/pull/4278
 
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
 
