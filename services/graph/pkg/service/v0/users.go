@@ -333,10 +333,13 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	if g.roleService != nil && g.config.API.AssignDefaultUserRole {
 		// All users get the user role by default currently.
 		// to all new users for now, as create Account request does not have any role field
-		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+		logger.Info().Interface("user", u).Msg("calling AssignRoleToUser...")
+		_, err := g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
 			AccountUuid: *u.Id,
 			RoleId:      ocissettingssvc.BundleUUIDRoleUser,
-		}); err != nil {
+		})
+		logger.Info().Interface("user", u).Interface("err", err).Msg("calling AssignRoleToUser done")
+		if err != nil {
 			// log as error, admin eventually needs to do something
 			logger.Error().Err(err).Str("id", *u.Id).Str("role", ocissettingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
@@ -348,7 +351,9 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(r.Context(), e)
+	go func() {
+		g.publishEvent(r.Context(), e)
+	}()
 
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, u)

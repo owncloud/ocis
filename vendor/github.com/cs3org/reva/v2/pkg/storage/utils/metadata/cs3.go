@@ -35,6 +35,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -134,11 +135,13 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 		Path:    uploadpath,
 		Content: content,
 	})
+	appctx.GetLogger(ctx).Info().Msg("returning from cs3.SimpleUpload")
 	return err
 }
 
 // Upload uploads a file to the metadata storage
 func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse, error) {
+	log := appctx.GetLogger(ctx).With().Logger()
 	ctx, span := tracer.Start(ctx, "Upload")
 	defer span.End()
 
@@ -186,7 +189,9 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	ifuReq.Opaque = utils.AppendPlainToOpaque(ifuReq.Opaque, net.HeaderUploadLength, strconv.FormatInt(int64(len(req.Content)), 10))
 
 	fmt.Println("client.InitiateFileUpload")
+	log.Info().Str("path", req.Path).Msg("cs3.Upload InitiateFileUpload...")
 	res, err := client.InitiateFileUpload(ctx, ifuReq)
+	log.Info().Str("path", req.Path).Msg("cs3.Upload InitiateFileUpload done")
 	fmt.Printf("client.InitiateFileUpload err=%v\n", err)
 	if err != nil {
 		return nil, err
@@ -218,19 +223,32 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	md, _ := metadata.FromOutgoingContext(ctx)
 	httpReq.Header.Add(ctxpkg.TokenHeader, md.Get(ctxpkg.TokenHeader)[0])
 	fmt.Println("cs3.dataGatewayClient.Do")
+	log.Info().Str("path", req.Path).Msg("cs3.Upload dataGatewayClient.Do...")
 	resp, err := cs3.dataGatewayClient.Do(httpReq)
+	log.Info().Str("path", req.Path).Interface("err", err).Interface("resp", resp).Msg("cs3.Upload dataGatewayClient.Do done")
 	fmt.Printf("cs3.dataGatewayClient.Do err=%v\n", err)
 	if err != nil {
+		log.Info().Str("path", req.Path).Msg("cs3.Upload 0")
 		return nil, err
 	}
-	defer resp.Body.Close()
+	log.Info().Str("path", req.Path).Msg("cs3.Upload 1")
+	defer func() {
+		log.Info().Str("path", req.Path).Msg("cs3.Upload closing body")
+		resp.Body.Close()
+		log.Info().Str("path", req.Path).Msg("cs3.Upload closed body")
+	}()
+	log.Info().Str("path", req.Path).Msg("cs3.Upload 2")
 	if err := errtypes.NewErrtypeFromHTTPStatusCode(resp.StatusCode, httpReq.URL.Path); err != nil {
+		log.Info().Str("path", req.Path).Msg("cs3.Upload 2b")
 		return nil, err
 	}
+	log.Info().Str("path", req.Path).Msg("cs3.Upload 3")
 	etag := resp.Header.Get("Etag")
+	log.Info().Str("path", req.Path).Msg("cs3.Upload 4")
 	if ocEtag := resp.Header.Get("OC-ETag"); ocEtag != "" {
 		etag = ocEtag
 	}
+	log.Info().Str("path", req.Path).Err(err).Msg("cs3.Upload returning from cs3.Upload")
 	return &UploadResponse{
 		Etag: etag,
 	}, nil

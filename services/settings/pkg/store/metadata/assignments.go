@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -16,6 +17,7 @@ import (
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))
 	switch err.(type) {
 	case nil:
@@ -54,6 +56,7 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
 	err := s.mdc.Delete(ctx, accountPath(accountUUID))
 	switch err.(type) {
@@ -79,13 +82,17 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	if err != nil {
 		return nil, err
 	}
-	return ass, s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
+	s.Logger.Info().Err(err).Msg("calling SimpleUpload from store.WriteRoleAssignment...")
+	err = s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
+	s.Logger.Info().Err(err).Msg("returning from store.WriteRoleAssignment")
+	return ass, err
 }
 
 // RemoveRoleAssignment deletes the given role assignment from the existing assignments of the respective account.
 func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 	accounts, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
 	switch err.(type) {
 	case nil:

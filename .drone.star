@@ -1913,15 +1913,17 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "PROXY_ENABLE_BASIC_AUTH": True,
         "PROXY_LOG_LEVEL": "debug",
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+        "STORAGE_USERS_LOG_LEVEL": "debug",
         "STORAGE_SYSTEM_LOG_LEVEL": "debug",
+        "SETTINGS_LOG_LEVEL": "debug",
+        "GRAPH_LOG_LEVEL": "debug",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": True,
         "OCIS_EVENTS_ENABLE_TLS": False,
-        "MICRO_REGISTRY": "natsjs",
-        "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+        "MICRO_REGISTRY": "memory",
     }
 
     if deploy_type == "":
