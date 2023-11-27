@@ -78,6 +78,7 @@ type SettingsService struct {
 }
 
 type FrontendService struct {
+	AppHandler     InsecureService `yaml:"app_handler"`
 	Archiver       InsecureService
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
