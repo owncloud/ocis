@@ -75,8 +75,8 @@ dependencies:
     specifier: ^17.0.2
     version: 17.0.2(react@17.0.2)
   react-i18next:
-    specifier: ^12.3.1
-    version: 12.3.1(i18next@23.6.0)(react-dom@17.0.2)(react@17.0.2)
+    specifier: ^13.5.0
+    version: 13.5.0(i18next@23.6.0)(react-dom@17.0.2)(react@17.0.2)
   react-redux:
     specifier: ^8.1.2
     version: 8.1.2(@types/react-dom@17.0.20)(@types/react@17.0.65)(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1)
@@ -10245,10 +10245,10 @@ packages:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
     dev: true
 
-  /react-i18next@12.3.1(i18next@23.6.0)(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-5v8E2XjZDFzK7K87eSwC7AJcAkcLt5xYZ4+yTPDAW1i7C93oOY1dnr4BaQM7un4Hm+GmghuiPvevWwlca5PwDA==}
+  /react-i18next@13.5.0(i18next@23.6.0)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-CFJ5NDGJ2MUyBohEHxljOq/39NQ972rh1ajnadG9BjTk+UXbHLq4z5DKEbEQBDoIhUmmbuS/fIMJKo6VOax1HA==}
     peerDependencies:
-      i18next: '>= 19.0.0'
+      i18next: '>= 23.2.3'
       react: '>= 16.8.0'
       react-dom: '*'
       react-native: '*'
