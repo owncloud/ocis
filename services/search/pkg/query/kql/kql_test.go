@@ -3,6 +3,7 @@ package kql_test
 import (
 	"testing"
 
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -22,7 +23,7 @@ func TestNewAST(t *testing.T) {
 		{
 			name:       "error",
 			givenQuery: kql.BoolAND,
-			expectedError: kql.StartsWithBinaryOperatorError{
+			expectedError: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
