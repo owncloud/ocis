@@ -27,6 +27,7 @@ OCIS_MODULES = \
 	services/auth-bearer \
 	services/auth-machine \
 	services/auth-service \
+	services/caldav \
 	services/clientlog \
 	services/eventhistory \
 	services/frontend \
