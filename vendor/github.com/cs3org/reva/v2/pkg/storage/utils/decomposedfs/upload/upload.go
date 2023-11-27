@@ -153,9 +153,17 @@ func validateRequest(ctx context.Context, size int64, uploadMetadata Metadata, n
 }
 
 func openExistingNode(ctx context.Context, lu *lookup.Lookup, n *node.Node) (*lockedfile.File, error) {
+	nodePath := n.InternalPath()
+
 	// create and read lock existing node metadata
-	return lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDONLY, 0600)
+	log := appctx.GetLogger(ctx)
+	log.Info().Str("nodepath", nodePath).Msg("grabbing lock for node")
+	f, err := lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(nodePath), os.O_RDONLY, 0600)
+	log.Info().Str("nodepath", nodePath).Msg("got lock")
+
+	return f, err
 }
+
 func initNewNode(ctx context.Context, lu *lookup.Lookup, uploadID, mtime string, n *node.Node) (*lockedfile.File, error) {
 	nodePath := n.InternalPath()
 	// create folder structure (if needed)
@@ -163,8 +171,17 @@ func initNewNode(ctx context.Context, lu *lookup.Lookup, uploadID, mtime string,
 		return nil, err
 	}
 
+	// link child name to parent if it is new
+	childNameLink := filepath.Join(n.ParentPath(), n.Name)
+	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
+
+	log := appctx.GetLogger(ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
+	log.Info().Msg("initNewNode: creating symlink")
+
 	// create and write lock new node metadata
+	log.Info().Str("nodepath", nodePath).Msg("grabbing lock for node")
 	f, err := lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(nodePath), os.O_RDWR|os.O_CREATE, 0600)
+	log.Info().Str("nodepath", nodePath).Msg("got lock")
 	if err != nil {
 		return nil, err
 	}
@@ -176,12 +193,6 @@ func initNewNode(ctx context.Context, lu *lookup.Lookup, uploadID, mtime string,
 		return f, err
 	}
 	h.Close()
-
-	// link child name to parent if it is new
-	childNameLink := filepath.Join(n.ParentPath(), n.Name)
-	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
-	log := appctx.GetLogger(ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
-	log.Info().Msg("initNewNode: creating symlink")
 
 	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
 		log.Info().Err(err).Msg("initNewNode: symlink failed")
@@ -212,8 +223,12 @@ func initNewNode(ctx context.Context, lu *lookup.Lookup, uploadID, mtime string,
 
 func CreateRevisionNode(ctx context.Context, lu *lookup.Lookup, revisionNode *node.Node) (*lockedfile.File, error) {
 	revisionPath := revisionNode.InternalPath()
+	log := appctx.GetLogger(ctx)
+
 	// write lock existing node before reading any metadata
+	log.Info().Str("revisionPath", revisionPath).Msg("grabbing lock for node")
 	f, err := lockedfile.OpenFile(lu.MetadataBackend().LockfilePath(revisionPath), os.O_RDWR|os.O_CREATE, 0600)
+	log.Info().Str("revisionPath", revisionPath).Msg("got lock")
 	if err != nil {
 		return nil, err
 	}

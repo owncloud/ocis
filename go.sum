@@ -941,8 +941,8 @@ github.com/bombsimon/logrusr/v3 v3.1.0/go.mod h1:PksPPgSFEL2I52pla2glgCyyd2OqOHA
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
-github.com/butonic/reva/v2 v2.0.0-20231124212039-f3b262bce7ca h1:DT9+gsmisegxoaWeGtGytP9/cU6qkmE2BEyg50+PBAU=
-github.com/butonic/reva/v2 v2.0.0-20231124212039-f3b262bce7ca/go.mod h1:zcrrYVsBv/DwhpyO2/W5hoSZ/k6az6Z2EYQok65uqZY=
+github.com/butonic/reva/v2 v2.0.0-20231127094518-98250c7c3dd2 h1:COmbDOMv/lQ46jL5dXJgl8gCQphUCSVnJYMU24n07t4=
+github.com/butonic/reva/v2 v2.0.0-20231127094518-98250c7c3dd2/go.mod h1:zcrrYVsBv/DwhpyO2/W5hoSZ/k6az6Z2EYQok65uqZY=
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2 h1:3uZCA/BLTIu+DqCfguByNMJa2HVHpXvjfy0Dy7g6fuA=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2/go.mod h1:RnUjnIXxEJcL6BgCvNyzCCRzZcxCgsZCi+RNlvYor5Q=
