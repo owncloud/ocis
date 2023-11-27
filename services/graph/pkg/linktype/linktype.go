@@ -10,13 +10,17 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
+// NoPermissionMatchError is the message returned by a failed conversion
 const NoPermissionMatchError = "no matching permission set found"
 
+// LinkType contains cs3 permissions and a libregraph
+// linktype reference
 type LinkType struct {
 	Permissions *provider.ResourcePermissions
 	linkType    libregraph.SharingLinkType
 }
 
+// GetPermissions returns the cs3 permissions type
 func (l *LinkType) GetPermissions() *provider.ResourcePermissions {
 	if l != nil {
 		return l.Permissions
@@ -36,6 +40,8 @@ func SharingLinkTypeFromCS3Permissions(permissions *linkv1beta1.PublicSharePermi
 	return nil, unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissions.GetPermissions())
 }
 
+// CS3ResourcePermissionsFromSharingLink creates a cs3 resource permissions type
+// it returns an error when the link type is not allowed or empty
 func CS3ResourcePermissionsFromSharingLink(createLink libregraph.DriveItemCreateLink, info provider.ResourceType) (*provider.ResourcePermissions, error) {
 	switch createLink.GetType() {
 	case "":
@@ -64,6 +70,7 @@ func CS3ResourcePermissionsFromSharingLink(createLink libregraph.DriveItemCreate
 	}
 }
 
+// NewInternalLinkPermissionSet creates cs3 permissions for the internal link type
 func NewInternalLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{},
@@ -71,6 +78,7 @@ func NewInternalLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewViewLinkPermissionSet creates cs3 permissions for the view link type
 func NewViewLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{
@@ -86,6 +94,7 @@ func NewViewLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewFileEditLinkPermissionSet creates cs3 permissions for the file edit link type
 func NewFileEditLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{
@@ -104,6 +113,7 @@ func NewFileEditLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewFolderEditLinkPermissionSet creates cs3 permissions for the folder edit link type
 func NewFolderEditLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{
@@ -125,6 +135,7 @@ func NewFolderEditLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewFolderDropLinkPermissionSet creates cs3 permissions for the folder createOnly link type
 func NewFolderDropLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{
@@ -137,6 +148,7 @@ func NewFolderDropLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewFolderUploadLinkPermissionSet creates cs3 permissions for the folder upload link type
 func NewFolderUploadLinkPermissionSet() *LinkType {
 	return &LinkType{
 		Permissions: &provider.ResourcePermissions{
@@ -153,6 +165,7 @@ func NewFolderUploadLinkPermissionSet() *LinkType {
 	}
 }
 
+// GetAvailableLinkTypes returns a slice of all available link types
 func GetAvailableLinkTypes() []*LinkType {
 	return []*LinkType{
 		NewInternalLinkPermissionSet(),

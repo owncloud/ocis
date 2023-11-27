@@ -17,23 +17,16 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
+// CreateLink creates a public link on the cs3 api
 func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create link")
-	driveID, err := parseIDParam(r, "driveID")
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+
+	_, driveItemID, ok := g.GetDriveAndItemIDParam(w, r)
+	if !ok {
 		return
 	}
-	driveItemID, err := parseIDParam(r, "itemID")
-	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
-	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
-		return
-	}
+
 	var createLink libregraph.DriveItemCreateLink
 	if err := StrictJSONUnmarshal(r.Body, &createLink); err != nil {
 		logger.Error().Err(err).Interface("body", r.Body).Msg("could not create link: invalid body schema definition")

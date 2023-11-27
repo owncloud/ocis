@@ -216,7 +216,7 @@ var _ = Describe("createLinkTests", func() {
 			Expect(err).ToNot(HaveOccurred())
 			getError := odataError.GetError()
 			Expect(getError.GetCode()).To(Equal("invalidRequest"))
-			Expect(getError.GetMessage()).To(Equal("invalidRequest: can't split empty storage space ID: invalid storage space id"))
+			Expect(getError.GetMessage()).To(Equal("invalid driveID"))
 		})
 
 		It("fails due to an empty itemID", func() {
@@ -240,7 +240,7 @@ var _ = Describe("createLinkTests", func() {
 			Expect(err).ToNot(HaveOccurred())
 			getError := odataError.GetError()
 			Expect(getError.GetCode()).To(Equal("invalidRequest"))
-			Expect(getError.GetMessage()).To(Equal("invalidRequest: can't split empty storage space ID: invalid storage space id"))
+			Expect(getError.GetMessage()).To(Equal("invalid itemID"))
 		})
 
 		It("fails due to an itemID on a different storage", func() {
@@ -265,7 +265,7 @@ var _ = Describe("createLinkTests", func() {
 			Expect(err).ToNot(HaveOccurred())
 			getError := odataError.GetError()
 			Expect(getError.GetCode()).To(Equal("itemNotFound"))
-			Expect(getError.GetMessage()).To(Equal("Item does not exist"))
+			Expect(getError.GetMessage()).To(Equal("driveID and itemID do not match"))
 		})
 
 		// Public Shares / "links" in graph terms
