@@ -19,6 +19,9 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
+	github.com/emersion/go-ical v0.0.0-20220601085725-0864dccc089f
+	github.com/emersion/go-vcard v0.0.0-20191221110513-5f81fa0d3cc7
+	github.com/emersion/go-webdav v0.4.0
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/ggwhite/go-masker v1.1.0
 	github.com/go-chi/chi/v5 v5.0.12
@@ -314,6 +317,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/studio-b12/gowebdav v0.0.0-20221015232716-17255f2e7423 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
+	github.com/teambition/rrule-go v1.7.2 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect

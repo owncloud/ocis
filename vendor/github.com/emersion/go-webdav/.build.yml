@@ -1,0 +1,9 @@
+image: alpine/edge
+packages:
+  - go
+sources:
+  - https://github.com/emersion/go-webdav
+tasks:
+  - test: |
+      cd go-webdav
+      go test -v ./...

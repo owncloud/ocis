@@ -776,6 +776,18 @@ github.com/egirna/icap
 # github.com/egirna/icap-client v0.1.1 => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 ## explicit; go 1.21
 github.com/egirna/icap-client
+# github.com/emersion/go-ical v0.0.0-20220601085725-0864dccc089f
+## explicit; go 1.13
+github.com/emersion/go-ical
+# github.com/emersion/go-vcard v0.0.0-20191221110513-5f81fa0d3cc7
+## explicit; go 1.13
+github.com/emersion/go-vcard
+# github.com/emersion/go-webdav v0.4.0
+## explicit; go 1.13
+github.com/emersion/go-webdav
+github.com/emersion/go-webdav/caldav
+github.com/emersion/go-webdav/carddav
+github.com/emersion/go-webdav/internal
 # github.com/emirpasic/gods v1.18.1
 ## explicit; go 1.2
 github.com/emirpasic/gods/containers
@@ -1766,6 +1778,9 @@ github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.1
 ## explicit; go 1.16
 github.com/tchap/go-patricia/v2/patricia
+# github.com/teambition/rrule-go v1.7.2
+## explicit; go 1.14
+github.com/teambition/rrule-go
 # github.com/thejerf/suture/v4 v4.0.5
 ## explicit; go 1.9
 github.com/thejerf/suture/v4
