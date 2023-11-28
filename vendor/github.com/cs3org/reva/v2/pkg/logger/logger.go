@@ -19,10 +19,13 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -84,4 +87,78 @@ func parseLevel(v string) zerolog.Level {
 	}
 
 	return lvl
+}
+
+func InitLoggerOrDie(v interface{}, logLevel string) *zerolog.Logger {
+	conf := ParseLogConfOrDie(v, logLevel)
+	log, err := FromConfig(conf)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error creating logger, exiting ...")
+		os.Exit(1)
+	}
+	return log
+}
+
+func ParseLogConfOrDie(v interface{}, logLevel string) *LogConf {
+	c := &LogConf{}
+	if err := mapstructure.Decode(v, c); err != nil {
+		fmt.Fprintf(os.Stderr, "error decoding log config: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	// if mode is not set, we use console mode, easier for devs
+	if c.Mode == "" {
+		c.Mode = "console"
+	}
+
+	// Give priority to the log level passed through the command line.
+	if logLevel != "" {
+		c.Level = logLevel
+	}
+
+	return c
+}
+
+type LogConf struct {
+	Output string `mapstructure:"output"`
+	Mode   string `mapstructure:"mode"`
+	Level  string `mapstructure:"level"`
+}
+
+func FromConfig(conf *LogConf) (*zerolog.Logger, error) {
+	if conf.Level == "" {
+		conf.Level = zerolog.DebugLevel.String()
+	}
+
+	var opts []Option
+	opts = append(opts, WithLevel(conf.Level))
+
+	w, err := getWriter(conf.Output)
+	if err != nil {
+		return nil, err
+	}
+
+	opts = append(opts, WithWriter(w, Mode(conf.Mode)))
+
+	l := New(opts...)
+	sub := l.With().Int("pid", os.Getpid()).Logger()
+	return &sub, nil
+}
+
+func getWriter(out string) (io.Writer, error) {
+	if out == "stderr" || out == "" {
+		return os.Stderr, nil
+	}
+
+	if out == "stdout" {
+		return os.Stdout, nil
+	}
+
+	fd, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		err = errors.Wrap(err, "error creating log file: "+out)
+		return nil, err
+	}
+
+	return fd, nil
 }

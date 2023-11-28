@@ -20,7 +20,6 @@ package runtime
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -43,9 +42,8 @@ import (
 
 // Run runs a reva server with the given config file and pid file.
 func Run(mainConf map[string]interface{}, pidFile, logLevel string) {
-	logConf := parseLogConfOrDie(mainConf["log"], logLevel)
-	logger := initLogger(logConf)
-	RunWithOptions(mainConf, pidFile, WithLogger(logger))
+	log := logger.InitLoggerOrDie(mainConf["log"], logLevel)
+	RunWithOptions(mainConf, pidFile, WithLogger(log))
 }
 
 // RunWithOptions runs a reva server with the given config file, pid file and options.
@@ -180,15 +178,6 @@ func initCPUCount(conf *coreConf, log *zerolog.Logger) {
 	log.Info().Msgf("running on %d cpus", ncpus)
 }
 
-func initLogger(conf *logConf) *zerolog.Logger {
-	log, err := newLogger(conf)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating logger, exiting ...")
-		os.Exit(1)
-	}
-	return log
-}
-
 func handlePIDFlag(l *zerolog.Logger, pidFile string, gracefulShutdownTimeout int) (*grace.Watcher, error) {
 	w := grace.NewWatcher(grace.WithPIDFile(pidFile),
 		grace.WithLogger(l.With().Str("pkg", "grace").Logger()),
@@ -220,46 +209,6 @@ func start(mainConf map[string]interface{}, servers map[string]grace.Server, lis
 		}()
 	}
 	watcher.TrapSignals()
-}
-
-func newLogger(conf *logConf) (*zerolog.Logger, error) {
-	// TODO(labkode): use debug level rather than info as default until reaching a stable version.
-	// Helps having smaller development files.
-	if conf.Level == "" {
-		conf.Level = zerolog.DebugLevel.String()
-	}
-
-	var opts []logger.Option
-	opts = append(opts, logger.WithLevel(conf.Level))
-
-	w, err := getWriter(conf.Output)
-	if err != nil {
-		return nil, err
-	}
-
-	opts = append(opts, logger.WithWriter(w, logger.Mode(conf.Mode)))
-
-	l := logger.New(opts...)
-	sub := l.With().Int("pid", os.Getpid()).Logger()
-	return &sub, nil
-}
-
-func getWriter(out string) (io.Writer, error) {
-	if out == "stderr" || out == "" {
-		return os.Stderr, nil
-	}
-
-	if out == "stdout" {
-		return os.Stdout, nil
-	}
-
-	fd, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-	if err != nil {
-		err = errors.Wrap(err, "error creating log file: "+out)
-		return nil, err
-	}
-
-	return fd, nil
 }
 
 func getGRPCServer(conf interface{}, l *zerolog.Logger, tp trace.TracerProvider) (*rgrpc.Server, error) {
@@ -346,32 +295,6 @@ func parseSharedConfOrDie(v interface{}) {
 		fmt.Fprintf(os.Stderr, "error decoding shared config: %s\n", err.Error())
 		os.Exit(1)
 	}
-}
-
-func parseLogConfOrDie(v interface{}, logLevel string) *logConf {
-	c := &logConf{}
-	if err := mapstructure.Decode(v, c); err != nil {
-		fmt.Fprintf(os.Stderr, "error decoding log config: %s\n", err.Error())
-		os.Exit(1)
-	}
-
-	// if mode is not set, we use console mode, easier for devs
-	if c.Mode == "" {
-		c.Mode = "console"
-	}
-
-	// Give priority to the log level passed through the command line.
-	if logLevel != "" {
-		c.Level = logLevel
-	}
-
-	return c
-}
-
-type logConf struct {
-	Output string `mapstructure:"output"`
-	Mode   string `mapstructure:"mode"`
-	Level  string `mapstructure:"level"`
 }
 
 func isEnabledHTTP(conf map[string]interface{}) bool {
