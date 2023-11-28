@@ -154,6 +154,10 @@ func (e Error) Error() string {
 	return errString
 }
 
+func (e Error) GetCode() ErrorCode {
+	return e.errorCode
+}
+
 // RenderError render the Graph Error based on a code or default one
 func RenderError(w http.ResponseWriter, r *http.Request, err error) {
 	var errcode Error
