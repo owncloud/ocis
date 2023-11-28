@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
+* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 
 ## Details
 
@@ -91,6 +92,13 @@ The following sections list the changes for unreleased.
    We updated to go 1.21.
 
    https://github.com/owncloud/ocis/pull/7794
+
+* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
+
+   We've added a new sharing ng endpoint which lists all permissions for a given item.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7805
 
 # Changelog for [5.0.0] (2023-11-22)
 
