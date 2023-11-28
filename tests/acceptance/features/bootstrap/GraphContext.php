@@ -2466,4 +2466,51 @@ class GraphContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given user :user has switched the system language to :language using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $language
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSwitchedTheSystemLanguageUsingGraphApi(string $user, string $language): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response =  GraphHelper::switchSystemLanguage(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$language
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200",
+			$response
+		);
+	}
+
+	/**
+	 * @When user :user switches the system language to :language using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $language
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSwitchesTheSystemLanguageUsingGraphApi(string $user, string $language): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::switchSystemLanguage(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$language
+			)
+		);
+	}
 }

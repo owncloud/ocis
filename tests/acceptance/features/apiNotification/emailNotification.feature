@@ -78,8 +78,8 @@ Feature: Email notification
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es"
-    And user "Carol" has switched the system language to "de"
+    And user "Brian" has switched the system language to "es" using the Graph API
+    And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has created folder "/HelloWorld"
     When user "Alice" shares folder "HelloWorld" with group "group1" using the sharing API
     Then the HTTP status code should be "200"
@@ -107,8 +107,8 @@ Feature: Email notification
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es"
-    And user "Carol" has switched the system language to "de"
+    And user "Brian" has switched the system language to "es" using the Graph API
+    And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "text.txt"
     When user "Alice" shares file "text.txt" with group "group1" using the sharing API
     Then the HTTP status code should be "200"
@@ -137,8 +137,8 @@ Feature: Email notification
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es"
-    And user "Carol" has switched the system language to "de"
+    And user "Brian" has switched the system language to "es" using the Graph API
+    And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" shares a space "new-space" with settings:
       | shareWith | group1 |

@@ -308,7 +308,7 @@ Feature: antivirus
 
   @issue-enterprise-5706
   Scenario Outline: upload a file with virus and get notification in different languages
-    Given user "Alice" has switched the system language to "<language>"
+    Given user "Alice" has switched the system language to "<language>" using the Graph API
     And using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"

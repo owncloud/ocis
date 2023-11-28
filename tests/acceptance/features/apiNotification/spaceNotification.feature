@@ -419,7 +419,7 @@ Feature: Notification
 
 
   Scenario Outline: get a notification about a space share in various languages
-    Given user "Brian" has switched the system language to "<language>"
+    Given user "Brian" has switched the system language to "<language>" using the Graph API
     And user "Alice" has shared a space "notification checking" with settings:
       | shareWith | Brian  |
       | role      | editor |

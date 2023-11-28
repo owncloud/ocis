@@ -443,7 +443,7 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has switched the system language to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has switched the system language to "([^"]*)" using the settings API$/
 	 *
 	 * @param string $user
 	 * @param string $language
