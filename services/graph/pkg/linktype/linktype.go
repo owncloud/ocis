@@ -7,6 +7,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
@@ -30,10 +31,17 @@ func (l *LinkType) GetPermissions() *provider.ResourcePermissions {
 
 // SharingLinkTypeFromCS3Permissions creates a libregraph link type
 // It returns a list of libregraph actions when the conversion is not possible
-func SharingLinkTypeFromCS3Permissions(permissions *linkv1beta1.PublicSharePermissions) (*libregraph.SharingLinkType, []string) {
+func SharingLinkTypeFromCS3Permissions(permissions *linkv1beta1.PublicSharePermissions, c *graph.Config) (*libregraph.SharingLinkType, []string) {
 	linkTypes := GetAvailableLinkTypes()
+	cS3Permissions := *permissions.GetPermissions()
+
+	// match legacy public links when config is enabled
+	if c.FilesSharing.MatchLegacyLinkPermissions {
+		cS3Permissions.ListRecycle = false
+		cS3Permissions.RestoreRecycleItem = false
+	}
 	for _, linkType := range linkTypes {
-		if grants.PermissionsEqual(linkType.GetPermissions(), permissions.GetPermissions()) {
+		if grants.PermissionsEqual(linkType.GetPermissions(), &cS3Permissions) {
 			return &linkType.linkType, nil
 		}
 	}
@@ -86,9 +94,7 @@ func NewViewLinkPermissionSet() *LinkType {
 			GetQuota:             true,
 			InitiateFileDownload: true,
 			ListContainer:        true,
-			// why is this needed?
-			ListRecycle: true,
-			Stat:        true,
+			Stat:                 true,
 		},
 		linkType: libregraph.VIEW,
 	}
@@ -103,11 +109,7 @@ func NewFileEditLinkPermissionSet() *LinkType {
 			InitiateFileDownload: true,
 			InitiateFileUpload:   true,
 			ListContainer:        true,
-			// why is this needed?
-			ListRecycle: true,
-			// why is this needed?
-			RestoreRecycleItem: true,
-			Stat:               true,
+			Stat:                 true,
 		},
 		linkType: libregraph.EDIT,
 	}
@@ -124,12 +126,8 @@ func NewFolderEditLinkPermissionSet() *LinkType {
 			InitiateFileDownload: true,
 			InitiateFileUpload:   true,
 			ListContainer:        true,
-			// why is this needed?
-			ListRecycle: true,
-			Move:        true,
-			// why is this needed?
-			RestoreRecycleItem: true,
-			Stat:               true,
+			Move:                 true,
+			Stat:                 true,
 		},
 		linkType: libregraph.EDIT,
 	}
@@ -158,7 +156,6 @@ func NewFolderUploadLinkPermissionSet() *LinkType {
 			InitiateFileDownload: true,
 			InitiateFileUpload:   true,
 			ListContainer:        true,
-			ListRecycle:          true,
 			Stat:                 true,
 		},
 		linkType: libregraph.UPLOAD,

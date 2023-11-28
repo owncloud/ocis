@@ -148,5 +148,6 @@ type ServiceAccount struct {
 
 // FilesSharing is the configuration for the files sharing
 type FilesSharing struct {
-	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing."`
+	EnableResharing            bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing."`
+	MatchLegacyLinkPermissions bool `yaml:"match_legacy_link_permissions" env:"GRAPH_SHARING_MATCH_LEGACY_PUBLIC_LINK_PERMISSIONS" desc:"Match legacy public links created by the ocs api to the new libregraph link types. This setting is recommended when the instance was already running before 5.0.0 was released."`
 }

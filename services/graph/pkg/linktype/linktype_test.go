@@ -7,22 +7,32 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 )
 
 var _ = Describe("LinktypeFromPermission", func() {
 	var (
-		internalLinkType, _        = libregraph.NewSharingLinkTypeFromValue("internal")
-		createOnlyLinkType, _      = libregraph.NewSharingLinkTypeFromValue("createOnly")
-		viewLinkType, _            = libregraph.NewSharingLinkTypeFromValue("view")
-		uploadLinkType, _          = libregraph.NewSharingLinkTypeFromValue("upload")
-		editLinkType, _            = libregraph.NewSharingLinkTypeFromValue("edit")
-		folderEditPermsHaveChanged = linktype.NewFolderEditLinkPermissionSet().GetPermissions()
+		internalLinkType, _         = libregraph.NewSharingLinkTypeFromValue("internal")
+		createOnlyLinkType, _       = libregraph.NewSharingLinkTypeFromValue("createOnly")
+		viewLinkType, _             = libregraph.NewSharingLinkTypeFromValue("view")
+		uploadLinkType, _           = libregraph.NewSharingLinkTypeFromValue("upload")
+		editLinkType, _             = libregraph.NewSharingLinkTypeFromValue("edit")
+		folderEditPermsHaveChanged  = linktype.NewFolderEditLinkPermissionSet().GetPermissions()
+		folderEditPermissionsLegacy = linktype.NewFolderEditLinkPermissionSet().GetPermissions()
+		config                      = &graph.Config{}
 	)
 
 	BeforeEach(func() {
-		// simulate that permissions have changed after link creation
+		// simulate that legacy permissions have changed after link creation
 		folderEditPermsHaveChanged.CreateContainer = false
+		folderEditPermsHaveChanged.ListRecycle = true
+		folderEditPermsHaveChanged.RestoreRecycleItem = true
+
+		// simulate legacy editor permissions
+		folderEditPermissionsLegacy.RestoreRecycleItem = true
+		folderEditPermissionsLegacy.ListRecycle = true
+		config.FilesSharing.MatchLegacyLinkPermissions = true
 	})
 
 	DescribeTable("SharingLinkTypeFromCS3Permissions",
@@ -30,7 +40,7 @@ var _ = Describe("LinktypeFromPermission", func() {
 			expectedSharingLinkType *libregraph.SharingLinkType,
 			expectedActions []string) {
 
-			sharingLinkType, actions := linktype.SharingLinkTypeFromCS3Permissions(permissions)
+			sharingLinkType, actions := linktype.SharingLinkTypeFromCS3Permissions(permissions, config)
 			Expect(sharingLinkType).To(Equal(expectedSharingLinkType))
 			Expect(expectedActions).To(Equal(actions))
 		},
@@ -62,6 +72,11 @@ var _ = Describe("LinktypeFromPermission", func() {
 		),
 		Entry("Folder Edit",
 			&linkv1beta1.PublicSharePermissions{Permissions: linktype.NewFolderEditLinkPermissionSet().GetPermissions()},
+			editLinkType,
+			nil,
+		),
+		Entry("Folder Edit Legacy",
+			&linkv1beta1.PublicSharePermissions{Permissions: folderEditPermissionsLegacy},
 			editLinkType,
 			nil,
 		),

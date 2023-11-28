@@ -82,6 +82,7 @@ var _ = Describe("createLinkTests", func() {
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 		cfg.FilesSharing.EnableResharing = true
+		cfg.FilesSharing.MatchLegacyLinkPermissions = true
 
 		svc, _ = service.NewService(
 			service.Config(cfg),
@@ -370,7 +371,7 @@ var _ = Describe("createLinkTests", func() {
 			respLinkType := respLink.GetType()
 			Expect(err).ToNot(HaveOccurred())
 			mockLink := libregraph.SharingLink{}
-			lt, _ := linktype.SharingLinkTypeFromCS3Permissions(&link.PublicSharePermissions{Permissions: permissions})
+			lt, _ := linktype.SharingLinkTypeFromCS3Permissions(&link.PublicSharePermissions{Permissions: permissions}, cfg)
 			mockLink.Type = lt
 			expectedType := mockLink.GetType()
 			Expect(&respLinkType).To(Equal(&expectedType))

@@ -106,7 +106,8 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		FilesSharing: config.FilesSharing{
-			EnableResharing: true,
+			EnableResharing:            true,
+			MatchLegacyLinkPermissions: true,
 		},
 	}
 }

@@ -124,7 +124,7 @@ func (g Graph) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicSh
 			Msg("failed to parse webURL base url")
 		return nil, err
 	}
-	lt, actions := linktype.SharingLinkTypeFromCS3Permissions(createdLink.GetPermissions())
+	lt, actions := linktype.SharingLinkTypeFromCS3Permissions(createdLink.GetPermissions(), g.config)
 	perm := libregraph.NewPermission()
 	perm.Id = libregraph.PtrString(createdLink.GetId().GetOpaqueId())
 	perm.Link = &libregraph.SharingLink{
