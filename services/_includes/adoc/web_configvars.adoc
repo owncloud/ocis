@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-11-28-09-43-49]
+[#deprecation-note-2023-11-28-09-52-51]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -373,7 +373,7 @@ a|`WEB_OPTION_PREVIEW_FILE_MIMETYPES` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp] ++
+++[image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp application/vnd.geogebra.slides] ++
 a| [subs=-attributes]
 A list of mimeTypes to specify which ones will be previewed in the UI. For example, to only preview jpg and text files, set this option to 'image/jpeg,text/plain'. See the Environment Variable Types description for more details.
 

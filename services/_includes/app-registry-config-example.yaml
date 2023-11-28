@@ -106,3 +106,10 @@ app_registry:
     icon: ""
     default_app: ""
     allow_creation: false
+  - mime_type: application/vnd.geogebra.slides
+    extension: ggs
+    name: GeoGebra Slides
+    description: GeoGebra Slides
+    icon: ""
+    default_app: ""
+    allow_creation: false

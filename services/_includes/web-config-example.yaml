@@ -109,6 +109,7 @@ web:
       - image/tiff
       - image/bmp
       - image/x-ms-bmp
+      - application/vnd.geogebra.slides
       accountEditLink: null
       disableFeedbackLink: false
       feedbackLink: null
