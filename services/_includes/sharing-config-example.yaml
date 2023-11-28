@@ -71,3 +71,4 @@ public_sharing_drivers:
     system_user_idp: internal
     system_user_api_key: ""
 public_sharing_writeableshare_must_have_password: false
+enable_expired_shares_cleanup: true
