@@ -1470,4 +1470,26 @@ class GraphHelper {
 			. " Cannot find share mountpoint id of '$path' for user '$user'"
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $language
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function switchSystemLanguage(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $language
+	): ResponseInterface {
+		$fullUrl = self::getFullUrl($baseUrl, 'me');
+		$payload['preferredLanguage'] = $language;
+		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PATCH', $user, $password, null, \json_encode($payload));
+	}
 }

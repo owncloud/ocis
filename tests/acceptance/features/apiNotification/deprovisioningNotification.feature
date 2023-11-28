@@ -102,7 +102,7 @@ Feature: Deprovisioning notification
 
   Scenario Outline: get a deprovisioning notification in various languages
     Given the administrator has created a deprovisioning notification
-    And user "Alice" has switched the system language to "<language>"
+    And user "Alice" has switched the system language to "<language>" using the Graph API
     When user "Alice" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "<subject>" and the message-details should match

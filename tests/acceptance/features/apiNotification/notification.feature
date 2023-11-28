@@ -241,7 +241,7 @@ Feature: Notification
 
 
   Scenario Outline: get a notification about a file share in various languages
-    Given user "Brian" has switched the system language to "<language>"
+    Given user "Brian" has switched the system language to "<language>" using the <api> API
     And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
@@ -263,9 +263,11 @@ Feature: Notification
       }
       """
     Examples:
-      | language | subject            | message                                          |
-      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt |
-      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     |
+      | language | subject            | message                                          | api      |
+      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | Graph    |
+      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | settings |
+      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | Graph    |
+      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | settings |
 
   @env-config
   Scenario: get a notification about a file share in default languages
