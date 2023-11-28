@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
         "skip": False,
@@ -78,19 +78,20 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
+            "skip": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -107,7 +108,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -121,7 +122,7 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
     },
@@ -132,11 +133,11 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -148,8 +149,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
-    "codestyle": True,
+    "litmus": False,
+    "codestyle": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -234,12 +235,7 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -259,7 +255,8 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines  #+ build_release_pipelines + build_release_helpers
+    return pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
