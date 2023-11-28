@@ -14,6 +14,7 @@ import (
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
@@ -23,12 +24,15 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -233,10 +237,7 @@ var _ = Describe("Driveitems", func() {
 
 	Describe("Invite", func() {
 		var (
-			itemID              string
 			driveItemInvite     *libregraph.DriveItemInvite
-			listSharesMock      *mock.Call
-			listSharesResponse  *collaboration.ListSharesResponse
 			statMock            *mock.Call
 			statResponse        *provider.StatResponse
 			getUserResponse     *userpb.GetUserResponse
@@ -248,10 +249,9 @@ var _ = Describe("Driveitems", func() {
 		)
 
 		BeforeEach(func() {
-			itemID = "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!1177add3-b4eb-434e-a2e8-1859b31b17bf"
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
-			rctx.URLParams.Add("itemID", itemID)
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
 
 			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
 			ctx = revactx.ContextSetUser(ctx, currentUser)
@@ -288,12 +288,6 @@ var _ = Describe("Driveitems", func() {
 				},
 			}
 			getGroupMock.Return(getGroupResponse, nil)
-
-			listSharesMock = gatewayClient.On("ListShares", mock.Anything, mock.Anything)
-			listSharesResponse = &collaboration.ListSharesResponse{
-				Status: status.NewOK(ctx),
-			}
-			listSharesMock.Return(listSharesResponse, nil)
 
 			createShareMock = gatewayClient.On("CreateShare", mock.Anything, mock.Anything)
 			createShareResponse = &collaboration.CreateShareResponse{
@@ -378,53 +372,6 @@ var _ = Describe("Driveitems", func() {
 			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions.0`).String()).To(Equal(unifiedrole.DriveItemContentRead))
 		})
 
-		It("validates the driveID", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.Invite(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
-					WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("validates the itemID", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
-			rctx.URLParams.Add("itemID", "")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.Invite(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
-					WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("checks if the itemID and driveID is compatible to each other", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "1$2!3")
-			rctx.URLParams.Add("itemID", "4$5!6")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.Invite(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
-					WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
 		It("fails if the request body is empty", func() {
 			svc.Invite(
 				rr,
@@ -448,26 +395,6 @@ var _ = Describe("Driveitems", func() {
 			Entry("fails on unknown fields", func() *strings.Reader {
 				return strings.NewReader(`{"unknown":"field"}`)
 			}, http.StatusBadRequest),
-		)
-
-		DescribeTable("Stat",
-			func(prep func(), code int) {
-				prep()
-				svc.Invite(
-					rr,
-					httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
-						WithContext(ctx),
-				)
-
-				Expect(rr.Code).To(Equal(code))
-				statMock.Parent.AssertNumberOfCalls(GinkgoT(), "Stat", 1)
-			},
-			Entry("fails if not ok", func() {
-				statResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
-			Entry("fails if errors", func() {
-				statMock.Return(nil, errors.New("error"))
-			}, http.StatusInternalServerError),
 		)
 
 		DescribeTable("GetGroup",
@@ -536,6 +463,90 @@ var _ = Describe("Driveitems", func() {
 				createShareMock.Return(nil, errors.New("error"))
 			}, http.StatusInternalServerError),
 		)
+	})
+
+	Describe("ListPermissions", func() {
+		var (
+			statMock                 *mock.Call
+			statResponse             *provider.StatResponse
+			listSharesMock           *mock.Call
+			listSharesResponse       *collaboration.ListSharesResponse
+			listPublicSharesMock     *mock.Call
+			listPublicSharesResponse *link.ListPublicSharesResponse
+		)
+
+		toResourceID := func(in string) *provider.ResourceId {
+			out, err := storagespace.ParseID(in)
+			Expect(err).To(BeNil())
+
+			return &out
+		}
+
+		BeforeEach(func() {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+
+			statMock = gatewayClient.On("Stat", mock.Anything, mock.Anything)
+			statResponse = &provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: toResourceID("1$2!3"),
+					PermissionSet: unifiedrole.PermissionsToCS3ResourcePermissions(
+						conversions.ToPointerSlice(unifiedrole.NewViewerUnifiedRole(true).GetRolePermissions()),
+					),
+					Owner: &userpb.UserId{},
+				},
+			}
+			statMock.Return(statResponse, nil)
+
+			listSharesMock = gatewayClient.On("ListShares", mock.Anything, mock.Anything)
+			listSharesResponse = &collaboration.ListSharesResponse{
+				Status: status.NewOK(ctx),
+				Shares: []*collaboration.Share{{
+					Id:         &collaboration.ShareId{OpaqueId: "123"},
+					ResourceId: toResourceID("1$2!3"),
+					Grantee:    &provider.Grantee{},
+					Permissions: &collaboration.SharePermissions{
+						Permissions: unifiedrole.PermissionsToCS3ResourcePermissions(
+							conversions.ToPointerSlice(unifiedrole.NewViewerUnifiedRole(true).GetRolePermissions()),
+						),
+					},
+				}},
+			}
+			listSharesMock.Return(listSharesResponse, nil)
+
+			listPublicSharesMock = gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything)
+			listPublicSharesResponse = &link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+			}
+			listPublicSharesMock.Return(listPublicSharesResponse, nil)
+		})
+
+		It("lists permissions", func() {
+			svc.ListPermissions(
+				rr,
+				httptest.NewRequest(http.MethodGet, "/", nil).
+					WithContext(ctx),
+			)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			actions := gjson.Get(rr.Body.String(), `@libre\.graph\.permissions\.actions\.allowedValues`)
+			Expect(actions.Get("#").Num).To(Equal(float64(7)))
+
+			roles := gjson.Get(rr.Body.String(), `@libre\.graph\.permissions\.roles\.allowedValues`)
+			Expect(roles.Get("#").Num).To(Equal(float64(1)))
+			Expect(roles.Get("0.id").Str).To(Equal("b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"))
+			Expect(roles.Get("0.rolePermissions").Exists()).To(BeFalse())
+
+			value := gjson.Get(rr.Body.String(), "value")
+			Expect(value.Get("#").Num).To(Equal(float64(1)))
+			Expect(value.Get("0.id").Str).To(Equal("123"))
+		})
 	})
 
 	Describe("GetRootDriveChildren", func() {

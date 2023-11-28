@@ -110,6 +110,7 @@ type Service interface {
 	CreateLink(w http.ResponseWriter, r *http.Request)
 
 	Invite(w http.ResponseWriter, r *http.Request)
+	ListPermissions(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
 
 	GetTags(w http.ResponseWriter, r *http.Request)
@@ -202,8 +203,9 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Get("/me/drive/sharedWithMe", svc.ListSharedWithMe)
 			r.Route("/drives/{driveID}/items/{itemID}", func(r chi.Router) {
 				r.Post("/invite", svc.Invite)
-				r.Post("/createLink", svc.CreateLink)
+				r.Get("/permissions", svc.ListPermissions)
 				r.Delete("/permissions/{permissionID}", svc.DeletePermission)
+				r.Post("/createLink", svc.CreateLink)
 			})
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
 				r.Get("/", svc.GetRoleDefinitions)
@@ -222,13 +224,13 @@ func NewService(opts ...Option) (Graph, error) {
 			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
-				r.Get("/drive", svc.GetUserDrive)
-				r.Route("/drives", func(r chi.Router) {
-					r.Get("/", svc.GetDrives)
-				})
-				r.Get("/drive/root/children", svc.GetRootDriveChildren)
-				r.Post("/changePassword", svc.ChangeOwnPassword)
 				r.Patch("/", svc.PatchMe)
+				r.Route("/drive", func(r chi.Router) {
+					r.Get("/", svc.GetUserDrive)
+					r.Get("/root/children", svc.GetRootDriveChildren)
+				})
+				r.Get("/drives", svc.GetDrives)
+				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.With(requireAdmin).Get("/", svc.GetUsers)

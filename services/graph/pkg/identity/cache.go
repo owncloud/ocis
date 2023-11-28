@@ -12,7 +12,7 @@ import (
 	revautils "github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
 
 // IdentityCache implements a simple ttl based cache for looking up users and groups by ID

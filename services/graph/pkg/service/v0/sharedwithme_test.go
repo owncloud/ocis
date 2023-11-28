@@ -25,9 +25,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
 var _ = Describe("SharedWithMe", func() {

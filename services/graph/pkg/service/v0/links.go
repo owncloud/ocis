@@ -12,11 +12,12 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
+	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
 // CreateLink creates a public link on the cs3 api
@@ -24,8 +25,9 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create link")
 
-	_, driveItemID, ok := g.GetDriveAndItemIDParam(w, r)
-	if !ok {
+	_, driveItemID, err := g.GetDriveAndItemIDParam(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

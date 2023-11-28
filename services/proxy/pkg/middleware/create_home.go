@@ -13,7 +13,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"google.golang.org/grpc/metadata"
 )
 

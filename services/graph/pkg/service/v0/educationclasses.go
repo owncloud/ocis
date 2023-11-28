@@ -11,7 +11,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

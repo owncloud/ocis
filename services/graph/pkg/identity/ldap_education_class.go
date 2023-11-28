@@ -8,7 +8,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
 
 type educationClassAttributeMap struct {
