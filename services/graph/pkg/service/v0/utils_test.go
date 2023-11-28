@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -18,13 +19,10 @@ import (
 
 var _ = Describe("Utils", func() {
 	var (
-		svc      service.Graph
-		recorder *httptest.ResponseRecorder
+		svc service.Graph
 	)
 
 	BeforeEach(func() {
-		recorder = httptest.NewRecorder()
-
 		cfg := defaults.FullDefaultConfig()
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
@@ -39,8 +37,7 @@ var _ = Describe("Utils", func() {
 			rctx.URLParams.Add("driveID", driveID)
 			rctx.URLParams.Add("itemID", itemID)
 
-			_, _, ok := svc.GetDriveAndItemIDParam(
-				recorder,
+			extractedDriveID, extractedItemID, err := svc.GetDriveAndItemIDParam(
 				httptest.NewRequest(http.MethodGet, "/", nil).
 					WithContext(
 						context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
@@ -49,11 +46,14 @@ var _ = Describe("Utils", func() {
 
 			switch shouldPass {
 			case true:
-				Expect(ok).To(BeTrue())
-				Expect(recorder.Code).To(Equal(http.StatusOK))
+				Expect(err).To(BeNil())
+				parsedItemID, _ := storagespace.ParseID(itemID)
+				Expect(extractedItemID).To(Equal(parsedItemID))
+
+				parsedDriveID, _ := storagespace.ParseID(driveID)
+				Expect(extractedDriveID).To(Equal(parsedDriveID))
 			default:
-				Expect(ok).To(BeFalse())
-				Expect(recorder.Code).To(Equal(http.StatusBadRequest))
+				Expect(err).ToNot(BeNil())
 			}
 		},
 		Entry("fails: invalid driveID", "", "1$2!3", false),

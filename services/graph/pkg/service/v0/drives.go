@@ -19,19 +19,20 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/pkg/errors"
+	merrors "go-micro.dev/v4/errors"
+	"golang.org/x/sync/errgroup"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
-	"github.com/pkg/errors"
-	merrors "go-micro.dev/v4/errors"
-	"golang.org/x/sync/errgroup"
 )
 
 const (

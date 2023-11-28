@@ -21,12 +21,13 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
-	"github.com/cs3org/reva/v2/pkg/publicshare"
-	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/cs3org/reva/v2/pkg/publicshare"
+	"github.com/cs3org/reva/v2/pkg/share"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -255,8 +256,9 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, itemID, ok := g.GetDriveAndItemIDParam(w, r)
-	if !ok {
+	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -332,8 +334,9 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, itemID, ok := g.GetDriveAndItemIDParam(w, r)
-	if !ok {
+	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

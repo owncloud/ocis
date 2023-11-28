@@ -32,36 +32,32 @@ func IsSpaceRoot(rid *storageprovider.ResourceId) bool {
 
 // GetDriveAndItemIDParam parses the driveID and itemID from the request,
 // validates the common fields and returns the parsed IDs if ok.
-func (g Graph) GetDriveAndItemIDParam(w http.ResponseWriter, r *http.Request) (storageprovider.ResourceId, storageprovider.ResourceId, bool) {
+func (g Graph) GetDriveAndItemIDParam(r *http.Request) (storageprovider.ResourceId, storageprovider.ResourceId, error) {
 	empty := storageprovider.ResourceId{}
 
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("could not parse driveID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
-		return empty, empty, false
+		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid driveID")
 	}
 
 	itemID, err := parseIDParam(r, "itemID")
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("could not parse itemID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
-		return empty, empty, false
+		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
 	}
 
 	if itemID.GetOpaqueId() == "" {
 		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("empty item opaqueID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
-		return empty, empty, false
+		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
 	}
 
 	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
 		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "driveID and itemID do not match")
-		return empty, empty, false
+		return empty, empty, errorcode.New(errorcode.ItemNotFound, "driveID and itemID do not match")
 	}
 
-	return driveID, itemID, true
+	return driveID, itemID, nil
 }
 
 // GetGatewayClient returns a gateway client from the gatewaySelector.
