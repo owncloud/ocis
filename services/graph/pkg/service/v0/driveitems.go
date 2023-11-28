@@ -392,7 +392,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
-				permission.ExpirationDateTime = libregraph.PtrTime(utils.TSToTime(expiration))
+				permission.SetExpirationDateTime(utils.TSToTime(expiration))
 			}
 
 			createShareSuccesses.Store(objectId, permission)

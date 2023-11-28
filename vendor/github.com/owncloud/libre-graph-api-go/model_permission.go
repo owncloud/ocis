@@ -25,7 +25,7 @@ type Permission struct {
 	// Indicates whether the password is set for this permission. This property only appears in the response. Optional. Read-only.
 	HasPassword *bool `json:"hasPassword,omitempty"`
 	// An optional expiration date which limits the permission in time.
-	ExpirationDateTime *time.Time             `json:"expirationDateTime,omitempty"`
+	ExpirationDateTime NullableTime           `json:"expirationDateTime,omitempty"`
 	GrantedToV2        *SharePointIdentitySet `json:"grantedToV2,omitempty"`
 	Link               *SharingLink           `json:"link,omitempty"`
 	Roles              []string               `json:"roles,omitempty"`
@@ -119,36 +119,47 @@ func (o *Permission) SetHasPassword(v bool) {
 	o.HasPassword = &v
 }
 
-// GetExpirationDateTime returns the ExpirationDateTime field value if set, zero value otherwise.
+// GetExpirationDateTime returns the ExpirationDateTime field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *Permission) GetExpirationDateTime() time.Time {
-	if o == nil || IsNil(o.ExpirationDateTime) {
+	if o == nil || IsNil(o.ExpirationDateTime.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.ExpirationDateTime
+	return *o.ExpirationDateTime.Get()
 }
 
 // GetExpirationDateTimeOk returns a tuple with the ExpirationDateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *Permission) GetExpirationDateTimeOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.ExpirationDateTime) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ExpirationDateTime, true
+	return o.ExpirationDateTime.Get(), o.ExpirationDateTime.IsSet()
 }
 
 // HasExpirationDateTime returns a boolean if a field has been set.
 func (o *Permission) HasExpirationDateTime() bool {
-	if o != nil && !IsNil(o.ExpirationDateTime) {
+	if o != nil && o.ExpirationDateTime.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetExpirationDateTime gets a reference to the given time.Time and assigns it to the ExpirationDateTime field.
+// SetExpirationDateTime gets a reference to the given NullableTime and assigns it to the ExpirationDateTime field.
 func (o *Permission) SetExpirationDateTime(v time.Time) {
-	o.ExpirationDateTime = &v
+	o.ExpirationDateTime.Set(&v)
+}
+
+// SetExpirationDateTimeNil sets the value for ExpirationDateTime to be an explicit nil
+func (o *Permission) SetExpirationDateTimeNil() {
+	o.ExpirationDateTime.Set(nil)
+}
+
+// UnsetExpirationDateTime ensures that no value is present for ExpirationDateTime, not even an explicit nil
+func (o *Permission) UnsetExpirationDateTime() {
+	o.ExpirationDateTime.Unset()
 }
 
 // GetGrantedToV2 returns the GrantedToV2 field value if set, zero value otherwise.
@@ -362,8 +373,8 @@ func (o Permission) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.HasPassword) {
 		toSerialize["hasPassword"] = o.HasPassword
 	}
-	if !IsNil(o.ExpirationDateTime) {
-		toSerialize["expirationDateTime"] = o.ExpirationDateTime
+	if o.ExpirationDateTime.IsSet() {
+		toSerialize["expirationDateTime"] = o.ExpirationDateTime.Get()
 	}
 	if !IsNil(o.GrantedToV2) {
 		toSerialize["grantedToV2"] = o.GrantedToV2

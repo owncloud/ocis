@@ -19,11 +19,7 @@ var _ MappedNullable = &CollectionOfPermissions{}
 
 // CollectionOfPermissions struct for CollectionOfPermissions
 type CollectionOfPermissions struct {
-	// A list of role definitions that can be chosen for the resource.
-	LibreGraphPermissionsRolesAllowedValues []UnifiedRoleDefinition `json:"@libre.graph.permissions.roles.allowedValues,omitempty"`
-	// A list of actions that can be chosen for a custom role.  Following the CS3 API we can represent the CS3 permissions by mapping them to driveItem properties or relations like this: | [CS3 ResourcePermission](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourcePermissions) | action | comment | | ------------------------------------------------------------------------------------------------------------ | ------ | ------- | | `stat` | `libre.graph/driveItem/basic/read` | `basic` because it does not include versions or trashed items | | `get_quota` | `libre.graph/driveItem/quota/read` | read only the `quota` property | | `get_path` | `libre.graph/driveItem/path/read` | read only the `path` property | | `move` | `libre.graph/driveItem/path/update` | allows updating the `path` property of a CS3 resource | | `delete` | `libre.graph/driveItem/standard/delete` | `standard` because deleting is a common update operation | | `list_container` | `libre.graph/driveItem/children/read` | | | `create_container` | `libre.graph/driveItem/children/create` | | | `initiate_file_download` | `libre.graph/driveItem/content/read` | `content` is the property read when initiating a download | | `initiate_file_upload` | `libre.graph/driveItem/upload/create` | `uploads` are a separate property. postprocessing creates the `content` | | `add_grant` | `libre.graph/driveItem/permissions/create` | | | `list_grant` | `libre.graph/driveItem/permissions/read` | | | `update_grant` | `libre.graph/driveItem/permissions/update` | | | `remove_grant` | `libre.graph/driveItem/permissions/delete` | | | `deny_grant` | `libre.graph/driveItem/permissions/deny` | uses a non CRUD action `deny` | | `list_file_versions` | `libre.graph/driveItem/versions/read` | `versions` is a `driveItemVersion` collection | | `restore_file_version` | `libre.graph/driveItem/versions/update` | the only `update` action is restore | | `list_recycle` | `libre.graph/driveItem/deleted/read` | reading a driveItem `deleted` property implies listing | | `restore_recycle_item` | `libre.graph/driveItem/deleted/update` | the only `update` action is restore | | `purge_recycle` | `libre.graph/driveItem/deleted/delete` | allows purging deleted `driveItems` |
-	LibreGraphPermissionsActionsAllowedValues []string     `json:"@libre.graph.permissions.actions.allowedValues,omitempty"`
-	Value                                     []Permission `json:"value,omitempty"`
+	Value []Permission `json:"value,omitempty"`
 }
 
 // NewCollectionOfPermissions instantiates a new CollectionOfPermissions object
@@ -41,70 +37,6 @@ func NewCollectionOfPermissions() *CollectionOfPermissions {
 func NewCollectionOfPermissionsWithDefaults() *CollectionOfPermissions {
 	this := CollectionOfPermissions{}
 	return &this
-}
-
-// GetLibreGraphPermissionsRolesAllowedValues returns the LibreGraphPermissionsRolesAllowedValues field value if set, zero value otherwise.
-func (o *CollectionOfPermissions) GetLibreGraphPermissionsRolesAllowedValues() []UnifiedRoleDefinition {
-	if o == nil || IsNil(o.LibreGraphPermissionsRolesAllowedValues) {
-		var ret []UnifiedRoleDefinition
-		return ret
-	}
-	return o.LibreGraphPermissionsRolesAllowedValues
-}
-
-// GetLibreGraphPermissionsRolesAllowedValuesOk returns a tuple with the LibreGraphPermissionsRolesAllowedValues field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CollectionOfPermissions) GetLibreGraphPermissionsRolesAllowedValuesOk() ([]UnifiedRoleDefinition, bool) {
-	if o == nil || IsNil(o.LibreGraphPermissionsRolesAllowedValues) {
-		return nil, false
-	}
-	return o.LibreGraphPermissionsRolesAllowedValues, true
-}
-
-// HasLibreGraphPermissionsRolesAllowedValues returns a boolean if a field has been set.
-func (o *CollectionOfPermissions) HasLibreGraphPermissionsRolesAllowedValues() bool {
-	if o != nil && !IsNil(o.LibreGraphPermissionsRolesAllowedValues) {
-		return true
-	}
-
-	return false
-}
-
-// SetLibreGraphPermissionsRolesAllowedValues gets a reference to the given []UnifiedRoleDefinition and assigns it to the LibreGraphPermissionsRolesAllowedValues field.
-func (o *CollectionOfPermissions) SetLibreGraphPermissionsRolesAllowedValues(v []UnifiedRoleDefinition) {
-	o.LibreGraphPermissionsRolesAllowedValues = v
-}
-
-// GetLibreGraphPermissionsActionsAllowedValues returns the LibreGraphPermissionsActionsAllowedValues field value if set, zero value otherwise.
-func (o *CollectionOfPermissions) GetLibreGraphPermissionsActionsAllowedValues() []string {
-	if o == nil || IsNil(o.LibreGraphPermissionsActionsAllowedValues) {
-		var ret []string
-		return ret
-	}
-	return o.LibreGraphPermissionsActionsAllowedValues
-}
-
-// GetLibreGraphPermissionsActionsAllowedValuesOk returns a tuple with the LibreGraphPermissionsActionsAllowedValues field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CollectionOfPermissions) GetLibreGraphPermissionsActionsAllowedValuesOk() ([]string, bool) {
-	if o == nil || IsNil(o.LibreGraphPermissionsActionsAllowedValues) {
-		return nil, false
-	}
-	return o.LibreGraphPermissionsActionsAllowedValues, true
-}
-
-// HasLibreGraphPermissionsActionsAllowedValues returns a boolean if a field has been set.
-func (o *CollectionOfPermissions) HasLibreGraphPermissionsActionsAllowedValues() bool {
-	if o != nil && !IsNil(o.LibreGraphPermissionsActionsAllowedValues) {
-		return true
-	}
-
-	return false
-}
-
-// SetLibreGraphPermissionsActionsAllowedValues gets a reference to the given []string and assigns it to the LibreGraphPermissionsActionsAllowedValues field.
-func (o *CollectionOfPermissions) SetLibreGraphPermissionsActionsAllowedValues(v []string) {
-	o.LibreGraphPermissionsActionsAllowedValues = v
 }
 
 // GetValue returns the Value field value if set, zero value otherwise.
@@ -149,12 +81,6 @@ func (o CollectionOfPermissions) MarshalJSON() ([]byte, error) {
 
 func (o CollectionOfPermissions) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.LibreGraphPermissionsRolesAllowedValues) {
-		toSerialize["@libre.graph.permissions.roles.allowedValues"] = o.LibreGraphPermissionsRolesAllowedValues
-	}
-	if !IsNil(o.LibreGraphPermissionsActionsAllowedValues) {
-		toSerialize["@libre.graph.permissions.actions.allowedValues"] = o.LibreGraphPermissionsActionsAllowedValues
-	}
 	if !IsNil(o.Value) {
 		toSerialize["value"] = o.Value
 	}

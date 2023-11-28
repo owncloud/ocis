@@ -887,7 +887,7 @@ type ApiListSchoolUsersRequest struct {
 	schoolId   string
 }
 
-func (r ApiListSchoolUsersRequest) Execute() (*CollectionOfEducationUser1, *http.Response, error) {
+func (r ApiListSchoolUsersRequest) Execute() (*CollectionOfEducationUser, *http.Response, error) {
 	return r.ApiService.ListSchoolUsersExecute(r)
 }
 
@@ -907,13 +907,13 @@ func (a *EducationSchoolApiService) ListSchoolUsers(ctx context.Context, schoolI
 }
 
 // Execute executes the request
-//  @return CollectionOfEducationUser1
-func (a *EducationSchoolApiService) ListSchoolUsersExecute(r ApiListSchoolUsersRequest) (*CollectionOfEducationUser1, *http.Response, error) {
+//  @return CollectionOfEducationUser
+func (a *EducationSchoolApiService) ListSchoolUsersExecute(r ApiListSchoolUsersRequest) (*CollectionOfEducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *CollectionOfEducationUser1
+		localVarReturnValue *CollectionOfEducationUser
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "EducationSchoolApiService.ListSchoolUsers")

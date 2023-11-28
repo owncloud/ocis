@@ -2,6 +2,8 @@ package svc
 
 import (
 	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -28,7 +30,8 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var createLink libregraph.DriveItemCreateLink
-	if err := StrictJSONUnmarshal(r.Body, &createLink); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err := json.Unmarshal(body, &createLink); err != nil {
 		logger.Error().Err(err).Interface("body", r.Body).Msg("could not create link: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
@@ -87,8 +90,9 @@ func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.Reso
 			Password: createLink.GetPassword(),
 		},
 	}
-	if createLink.ExpirationDateTime != nil {
-		req.GetGrant().Expiration = utils.TimeToTS(createLink.GetExpirationDateTime())
+	expirationDate, isSet := createLink.GetExpirationDateTimeOk()
+	if isSet {
+		req.GetGrant().Expiration = utils.TimeToTS(*expirationDate)
 	}
 
 	// set displayname and password protected as arbitrary metadata
