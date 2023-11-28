@@ -224,16 +224,20 @@ func Get(ctx context.Context, id string, lu *lookup.Lookup, tp Tree, fsRoot stri
 	}
 
 	ctx = ctxpkg.ContextSetUser(ctx, u)
-	// TODO configure the logger the same way ... store and add traceid in file info
 
-	var opts []logger.Option
-	opts = append(opts, logger.WithLevel(info.Storage["LogLevel"]))
-	opts = append(opts, logger.WithWriter(os.Stderr, logger.ConsoleMode))
-	l := logger.New(opts...)
-
-	sub := l.With().Int("pid", os.Getpid()).Logger()
-
+	// restore logger from file info
+	log, err := logger.FromConfig(&logger.LogConf{
+		Output: "stderr", // TODO use config from decomposedfs
+		Mode:   "json",   // TODO use config from decomposedfs
+		Level:  info.Storage["LogLevel"],
+	})
+	if err != nil {
+		return nil, err
+	}
+	sub := log.With().Int("pid", os.Getpid()).Logger()
 	ctx = appctx.WithLogger(ctx, &sub)
+
+	// TODO store and add traceid in file info
 
 	up := buildUpload(ctx, info, info.Storage["BinPath"], infoPath, lu, tp, pub, async, tknopts)
 	up.versionsPath = info.MetaData["versionsPath"]
