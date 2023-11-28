@@ -131,3 +131,65 @@ Feature: changing a public link share
     When the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "PARENT/parent.txt" should exist
+
+
+  Scenario: remove password of a public link as a normal user
+    Given user "Alice" has created a public link share with settings
+      | path        | /PARENT  |
+      | permissions | change   |
+      | password    | %public% |
+    When user "Alice" updates the last public link share using the sharing API with
+      | path        | /PARENT |
+      | permissions | change  |
+      | password    |         |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+
+  @issue-7821
+  Scenario: remove password of a public link as a normal user (update without sending permissions)
+    Given user "Alice" has created a public link share with settings
+      | path        | /PARENT  |
+      | permissions | change   |
+      | password    | %public% |
+    When user "Alice" updates the last public link share using the sharing API with
+      | path     | /PARENT |
+      | password |         |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+
+
+  Scenario: remove password of a read-only public link as a administrator
+    Given admin has created folder "/PARENT"
+    And user "admin" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "admin" has created a public link share with settings
+      | path        | /PARENT  |
+      | permissions | read     |
+      | password    | %public% |
+    When user "admin" updates the last public link share using the sharing API with
+      | path        | /PARENT |
+      | permissions | read    |
+      | password    |         |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
+    And the public should be able to download file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password ""
+
+
+  Scenario Outline: remove password of a public link with read permission as a administrator
+    Given admin has created folder "/PARENT"
+    And user "admin" has created a public link share with settings
+      | path        | /PARENT       |
+      | permissions | <permissions> |
+      | password    | %public%      |
+    When user "admin" updates the last public link share using the sharing API with
+      | path        | /PARENT       |
+      | permissions | <permissions> |
+      | password    |               |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | permissions |
+      | change      |
+      | create      |
