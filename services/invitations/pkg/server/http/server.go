@@ -13,7 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
 	svc "github.com/owncloud/ocis/v2/services/invitations/pkg/service/v0"
 	"go-micro.dev/v4"

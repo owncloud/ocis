@@ -3,15 +3,16 @@ package middleware
 import (
 	"net/http"
 
+	gmmetadata "go-micro.dev/v4/metadata"
+	"google.golang.org/grpc/metadata"
+
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	gmmetadata "go-micro.dev/v4/metadata"
-	"google.golang.org/grpc/metadata"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
 
 // authOptions initializes the available default options.
