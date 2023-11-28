@@ -1908,7 +1908,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-        "OCIS_LOG_LEVEL": "error",
+        "OCIS_LOG_LEVEL": "info",
         "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
