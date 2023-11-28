@@ -89,6 +89,7 @@ Class | Method | HTTP request | Description
 *DrivesPermissionsApi* | [**GetPermission**](docs/DrivesPermissionsApi.md#getpermission) | **Get** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Get sharing permission for a file or folder
 *DrivesPermissionsApi* | [**Invite**](docs/DrivesPermissionsApi.md#invite) | **Post** /v1beta1/drives/{drive-id}/items/{item-id}/invite | Send a sharing invitation
 *DrivesPermissionsApi* | [**ListPermissions**](docs/DrivesPermissionsApi.md#listpermissions) | **Get** /v1beta1/drives/{drive-id}/items/{item-id}/permissions | List the effective sharing permissions on a driveItem.
+*DrivesPermissionsApi* | [**SetPermissionPassword**](docs/DrivesPermissionsApi.md#setpermissionpassword) | **Post** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id}/setPassword | Set sharing link password
 *DrivesPermissionsApi* | [**UpdatePermission**](docs/DrivesPermissionsApi.md#updatepermission) | **Patch** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Update sharing permission
 *DrivesRootApi* | [**GetRoot**](docs/DrivesRootApi.md#getroot) | **Get** /v1.0/drives/{drive-id}/root | Get root from arbitrary space
 *EducationClassApi* | [**AddUserToClass**](docs/EducationClassApi.md#addusertoclass) | **Post** /v1.0/education/classes/{class-id}/members/$ref | Assign a user to a class
@@ -169,9 +170,9 @@ Class | Method | HTTP request | Description
  - [CollectionOfDrives1](docs/CollectionOfDrives1.md)
  - [CollectionOfEducationClass](docs/CollectionOfEducationClass.md)
  - [CollectionOfEducationUser](docs/CollectionOfEducationUser.md)
- - [CollectionOfEducationUser1](docs/CollectionOfEducationUser1.md)
  - [CollectionOfGroup](docs/CollectionOfGroup.md)
  - [CollectionOfPermissions](docs/CollectionOfPermissions.md)
+ - [CollectionOfPermissionsWithAllowedValues](docs/CollectionOfPermissionsWithAllowedValues.md)
  - [CollectionOfSchools](docs/CollectionOfSchools.md)
  - [CollectionOfTags](docs/CollectionOfTags.md)
  - [CollectionOfUser](docs/CollectionOfUser.md)
@@ -215,6 +216,7 @@ Class | Method | HTTP request | Description
  - [SharePointIdentitySet](docs/SharePointIdentitySet.md)
  - [Shared](docs/Shared.md)
  - [SharingLink](docs/SharingLink.md)
+ - [SharingLinkPassword](docs/SharingLinkPassword.md)
  - [SharingLinkType](docs/SharingLinkType.md)
  - [SpecialFolder](docs/SpecialFolder.md)
  - [TagAssignment](docs/TagAssignment.md)

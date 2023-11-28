@@ -797,7 +797,7 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 		}
 
 		if exp := permissionsExpirations[id]; exp != nil {
-			p.ExpirationDateTime = libregraph.PtrTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
+			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
 		// we need to map the permissions to the roles
