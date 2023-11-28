@@ -128,3 +128,65 @@ Feature: Share spaces via link
     Then the HTTP status code should be "400"
     And the OCS status message should be "Can not share space root"
     And for user "Alice" the space "Alice Hansen" should not contain the last created public link
+
+  Scenario: remove password of a public link space share with read permission as a Space Admin
+    Given user "Alice" has created a public link share of the space "share space" with settings:
+      | permissions | 1        |
+      | password    | %public% |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | 1 |
+      | password    |   |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "100"
+
+
+  Scenario Outline: remove password of a public link space share with read permission as a Space Admin
+    Given user "Alice" has created a public link share of the space "share space" with settings:
+      | permissions | <permissions> |
+      | password    | %public%      |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | <permissions> |
+      | password    |               |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | permissions |
+      | 5           |
+      | 15          |
+      | 4           |
+
+
+  Scenario: remove password of a public link space share with read permission as a Space Admin
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
+    And user "Brian" has created a public link share of the space "share space" with settings:
+      | permissions | 1        |
+      | password    | %public% |
+    When user "Brian" updates the last public link share using the sharing API with
+      | permissions | 1 |
+      | password    |   |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "104"
+    And the OCS status message should be "user is not allowed to delete the password from the public link"
+
+
+  Scenario Outline: remove password of a public link space share with read permission as a Space Admin
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
+    And user "Brian" has created a public link share of the space "share space" with settings:
+      | permissions | <permissions> |
+      | password    | %public%      |
+    When user "Brian" updates the last public link share using the sharing API with
+      | permissions | <permissions> |
+      | password    |               |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | permissions |
+      | 5           |
+      | 15          |
+      | 4           |

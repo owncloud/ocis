@@ -516,7 +516,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L23)
 
 #### [Normal users can update the public link to delete its password if permission is not sent in data](https://github.com/owncloud/ocis/issues/7821)
-- [coreApiSharePublicLink1/changingPublicLinkShare.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/ccoreApiSharePublicLink1/changingPublicLinkShare.feature#L150)
+- [coreApiSharePublicLink1/changingPublicLinkShare.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/changingPublicLinkShare.feature#L150)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
