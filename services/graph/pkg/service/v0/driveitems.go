@@ -265,7 +265,12 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	fmt.Println(1)
+	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
+		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse)
+		errCode.Render(w, r)
+		return
+	}
+
 	switch {
 	case err != nil:
 		fallthrough
@@ -368,12 +373,9 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	switch {
-	case err != nil:
-		fallthrough
-	case statResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
-		g.logger.Debug().Err(err).Interface("itemID", itemID).Interface("Stat", statResponse).Msg("stat failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
+		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse)
+		errCode.Render(w, r)
 		return
 	}
 
