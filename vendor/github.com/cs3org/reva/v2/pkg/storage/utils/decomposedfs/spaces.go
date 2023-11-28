@@ -424,15 +424,15 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 					continue
 				}
 				// always read link in case storage space id != node id
-				spaceID, nodeID, err = ReadSpaceAndNodeFromIndexLink(match)
+				linkSpaceID, linkNodeID, err := ReadSpaceAndNodeFromIndexLink(match)
 				if err != nil {
 					appctx.GetLogger(ctx).Error().Err(err).Str("match", match).Msg("could not read link, skipping")
 					continue
 				}
 
-				n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, true, nil, true)
+				n, err := node.ReadNode(ctx, fs.lu, linkSpaceID, linkNodeID, true, nil, true)
 				if err != nil {
-					appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not read node, skipping")
+					appctx.GetLogger(ctx).Error().Err(err).Str("id", linkNodeID).Msg("could not read node, skipping")
 					continue
 				}
 
@@ -448,7 +448,7 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 					case errtypes.NotFound:
 						// ok
 					default:
-						appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not convert to storage space")
+						appctx.GetLogger(ctx).Error().Err(err).Str("id", linkNodeID).Msg("could not convert to storage space")
 					}
 					continue
 				}
