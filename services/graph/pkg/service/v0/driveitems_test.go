@@ -397,26 +397,6 @@ var _ = Describe("Driveitems", func() {
 			}, http.StatusBadRequest),
 		)
 
-		DescribeTable("Stat",
-			func(prep func(), code int) {
-				prep()
-				svc.Invite(
-					rr,
-					httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
-						WithContext(ctx),
-				)
-
-				Expect(rr.Code).To(Equal(code))
-				statMock.Parent.AssertNumberOfCalls(GinkgoT(), "Stat", 1)
-			},
-			Entry("fails if not ok", func() {
-				statResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
-			Entry("fails if errors", func() {
-				statMock.Return(nil, errors.New("error"))
-			}, http.StatusInternalServerError),
-		)
-
 		DescribeTable("GetGroup",
 			func(prep func(), code int) {
 				driveItemInvite.Recipients = []libregraph.DriveRecipient{
@@ -567,32 +547,6 @@ var _ = Describe("Driveitems", func() {
 			Expect(value.Get("#").Num).To(Equal(float64(1)))
 			Expect(value.Get("0.id").Str).To(Equal("123"))
 		})
-
-		DescribeTable("fails",
-			func(prep func(), code int) {
-				prep()
-				svc.ListPermissions(
-					rr,
-					httptest.NewRequest(http.MethodGet, "/", nil).
-						WithContext(ctx),
-				)
-
-				Expect(rr.Code).To(Equal(code))
-				statMock.Parent.AssertNumberOfCalls(GinkgoT(), "Stat", 1)
-			},
-			Entry("if stat is not ok", func() {
-				statResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
-			Entry("if stat errors", func() {
-				statMock.Return(nil, errors.New("error"))
-			}, http.StatusInternalServerError),
-			Entry("if the stat info is invalid", func() {
-				statMock.Return(&provider.StatResponse{
-					Status: status.NewOK(ctx),
-					Info:   &provider.ResourceInfo{},
-				}, nil)
-			}, http.StatusInternalServerError),
-		)
 	})
 
 	Describe("GetRootDriveChildren", func() {

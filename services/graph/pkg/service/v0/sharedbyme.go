@@ -9,12 +9,12 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/share"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
+	"github.com/cs3org/reva/v2/pkg/share"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"

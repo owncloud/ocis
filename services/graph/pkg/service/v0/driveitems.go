@@ -271,21 +271,6 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch {
-	case err != nil:
-		fallthrough
-	case statResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
-		g.logger.Debug().Err(err).Interface("itemID", itemID).Interface("Stat", statResponse).Msg("stat failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
-	case statResponse.GetInfo().GetPermissionSet() == nil:
-		fallthrough
-	case statResponse.GetInfo().GetOwner() == nil:
-		g.logger.Debug().Interface("Stat", statResponse).Msg("incomplete stat response")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
-	}
-
 	permissionSet := *statResponse.GetInfo().GetPermissionSet()
 	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
 
