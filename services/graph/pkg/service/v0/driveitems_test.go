@@ -105,51 +105,7 @@ var _ = Describe("Driveitems", func() {
 	})
 
 	Describe("DeletePermission", func() {
-		It("validates the driveID", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.DeletePermission(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", nil).WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("validates the itemID", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "f0042750-23c5-441c-9f2c-ff7c53e5bd2a$cd621428-dfbe-44c1-9393-65bf0dd440a6!cd621428-dfbe-44c1-9393-65bf0dd440a6")
-			rctx.URLParams.Add("itemID", "")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.DeletePermission(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", nil).WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("checks if the itemID and driveID is compatible to each other", func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "1$2!3")
-			rctx.URLParams.Add("itemID", "4$5!6")
-
-			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
-
-			svc.DeletePermission(
-				rr,
-				httptest.NewRequest(http.MethodPost, "/", nil).WithContext(ctx),
-			)
-
-			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-		})
-
-		It("deletes a permission as expected", func() {
+		It("deletes a user permission as expected", func() {
 			getShareMock := gatewayClient.On("GetShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
@@ -186,6 +142,63 @@ var _ = Describe("Driveitems", func() {
 			rctx.URLParams.Add("driveID", "1$2")
 			rctx.URLParams.Add("itemID", "1$2!3")
 			rctx.URLParams.Add("permissionID", "permissionid")
+
+			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+
+			svc.DeletePermission(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", nil).WithContext(ctx),
+			)
+
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+		})
+		It("deletes a link permission as expected", func() {
+			getShareMock := gatewayClient.On("GetShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "linkpermissionid"
+				}),
+			)
+			getShareMockResponse := &collaboration.GetShareResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}
+			getShareMock.Return(getShareMockResponse, nil)
+
+			getPublicShareMock := gatewayClient.On("GetPublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "linkpermissionid"
+				}),
+			)
+			getPublicShareMock.Return(&link.GetPublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share: &link.PublicShare{
+					Id: &link.PublicShareId{
+						OpaqueId: "permissionid",
+					},
+					ResourceId: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+				},
+			}, nil)
+
+			rmPublicShareMock := gatewayClient.On("RemovePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.RemovePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "linkpermissionid"
+				}),
+			)
+			rmPublicShareMockResponse := &link.RemovePublicShareResponse{
+				Status: status.NewOK(ctx),
+			}
+			rmPublicShareMock.Return(rmPublicShareMockResponse, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+			rctx.URLParams.Add("permissionID", "linkpermissionid")
 
 			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
 

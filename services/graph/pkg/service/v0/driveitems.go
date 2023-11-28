@@ -504,14 +504,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 
 // DeletePermission removes a Permission from a Drive item
 func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
-	}
-
-	_, itemID, err := g.extractDriveAndDriveItem(r)
+	_, itemID, err := g.GetDriveAndItemIDParam(r)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -526,6 +519,56 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
+	isUserPermission := true
+
+	// Check if the id is refering to a User Share
+	sharedResourceId, err := g.getUserPermissionResourceID(ctx, permissionID)
+	var errcode *errorcode.Error
+	if err != nil && errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
+		// there is no user share with that ID, so lets check if it is refering to a public link
+		isUserPermission = false
+		sharedResourceId, err = g.getLinkPermissionResourceID(ctx, permissionID)
+	}
+
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	// The resourceID of the shared resource need to match the item ID from the Request Path
+	// otherwise this is an invalid Request.
+	if sharedResourceId.GetStorageId() != itemID.GetStorageId() ||
+		sharedResourceId.GetSpaceId() != itemID.GetSpaceId() ||
+		sharedResourceId.GetOpaqueId() != itemID.GetOpaqueId() {
+		g.logger.Debug().Msg("resourceID of shared does not match itemID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
+		return
+	}
+
+	if isUserPermission {
+		err = g.removeUserShare(ctx, permissionID)
+	} else {
+		err = g.removePublicShare(ctx, permissionID)
+	}
+
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+
+	return
+}
+
+func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
 	getShareResp, err := gatewayClient.GetShare(ctx,
 		&collaboration.GetShareRequest{
 			Ref: &collaboration.ShareReference{
@@ -537,18 +580,16 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
-		return nil, err
+		return nil, errCode
 	}
+	return getShareResp.Share.GetResourceId(), nil
+}
 
-	sharedResourceId := getShareResp.GetShare().GetResourceId()
-	// The resourceID of the shared resource need to matched the item ID from the Request Path
-	// otherwise this is an invalid Request.
-	if sharedResourceId.GetStorageId() != itemID.GetStorageId() ||
-		sharedResourceId.GetSpaceId() != itemID.GetSpaceId() ||
-		sharedResourceId.GetOpaqueId() != itemID.GetOpaqueId() {
-		g.logger.Debug().Msg("resourceID of shared does not match itemID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
-		return
+func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
 	}
 
 	removeShareResp, err := gatewayClient.RemoveShare(ctx,
@@ -561,38 +602,60 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		})
-	switch {
-	case err != nil:
-		fallthrough
-	case removeShareResp.Status.GetCode() != cs3rpc.Code_CODE_OK:
-		g.logger.Debug().Err(err).Interface("permissionID", permissionID).Interface("GetShare", getShareResp).Msg("GetShare failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
-	}
-	render.Status(r, http.StatusNoContent)
-	render.NoContent(w, r)
 
-	return
+	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
+		return errCode
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
 }
 
-func (g Graph) extractDriveAndDriveItem(r *http.Request) (driveID storageprovider.ResourceId, itemID storageprovider.ResourceId, err error) {
-	driveID, err = parseIDParam(r, "driveID")
+func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse driveID")
-		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "invalid driveID")
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
 	}
 
-	itemID, err = parseIDParam(r, "itemID")
+	getPublicShareResp, err := gatewayClient.GetPublicShare(ctx,
+		&link.GetPublicShareRequest{
+			Ref: &link.PublicShareReference{
+				Spec: &link.PublicShareReference_Id{
+					Id: &link.PublicShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		},
+	)
+	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
+		return nil, errCode
+	}
+	return getPublicShareResp.Share.GetResourceId(), nil
+}
+
+func (g Graph) removePublicShare(ctx context.Context, permissionID string) error {
+	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse itemID")
-		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
 	}
 
-	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
-		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
-		return driveID, itemID, errorcode.New(errorcode.InvalidRequest, "driveID and itemID do not match")
+	removePublicShareResp, err := gatewayClient.RemovePublicShare(ctx,
+		&link.RemovePublicShareRequest{
+			Ref: &link.PublicShareReference{
+				Spec: &link.PublicShareReference_Id{
+					Id: &link.PublicShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	if errcode := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); errcode != nil {
+		return errcode
 	}
-	return driveID, itemID, nil
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
 }
 
 func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
