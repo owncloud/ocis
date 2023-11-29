@@ -51,18 +51,29 @@ func Start(envMap map[string]any) {
 		log.Panic(err)
 	}
 
-	// Read and print the logs when the 'ocis server' command is running
 	logScanner := bufio.NewScanner(logs)
-	for logScanner.Scan() {
-		m := logScanner.Text()
-		fmt.Println(m)
-	}
-	// Read output when the 'ocis server' command gets exited
 	outputScanner := bufio.NewScanner(output)
-	for outputScanner.Scan() {
-		m := outputScanner.Text()
-		fmt.Println(m)
-	}
+	outChan := make(chan string)
+
+	// Read the logs when the 'ocis server' command is running
+	go func() {
+		for logScanner.Scan() {
+			outChan <- logScanner.Text()
+		}
+	}()
+
+	go func() {
+		for outputScanner.Scan() {
+			outChan <- outputScanner.Text()
+		}
+	}()
+
+	// Fetch logs from the channel and print them
+	go func() {
+		for s := range outChan {
+			fmt.Println(s)
+		}
+	}()
 
 	if err := cmd.Wait(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
@@ -82,6 +93,7 @@ func Start(envMap map[string]any) {
 					Start(envMap)
 				}
 			}
+			close(outChan)
 		}
 	}
 }
