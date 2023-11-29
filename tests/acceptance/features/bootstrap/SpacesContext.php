@@ -3477,25 +3477,41 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param ?string $resource
 	 *
-	 * @throws GuzzleException
-	 *
 	 * @return void
+	 *
+	 * @throws JsonException
+	 *
+	 * @throws GuzzleException
 	 */
 	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): void {
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToSpace($user, $spaceName, $resource)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string|null $resource
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 *
+	 * @throws JsonException
+	 */
+	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): ResponseInterface {
 		$this->setSpaceIDByName($user, $spaceName);
 		$properties = ['oc:permissions','oc:file-parent','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype','oc:tags','d:lockdiscovery','d:activelock'];
-		$this->featureContext->setResponse(
-			WebDavHelper::propfind(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getPasswordForUser($user),
-				$resource,
-				$properties,
-				$this->featureContext->getStepLineRef(),
-				"0",
-				"files",
-				WebDavHelper::DAV_VERSION_SPACES
-			)
+		return  WebDavHelper::propfind(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$resource,
+			$properties,
+			$this->featureContext->getStepLineRef(),
+			"0",
+			"files",
+			WebDavHelper::DAV_VERSION_SPACES
 		);
 	}
 
