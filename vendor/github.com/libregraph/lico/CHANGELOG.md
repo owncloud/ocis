@@ -4,6 +4,30 @@
 
 
 
+## v0.61.1 (2023-11-22)
+
+- Fix branding settings cache usage
+
+
+## v0.61.0 (2023-11-15)
+
+- Bump github.com/rs/cors from 1.9.0 to 1.10.1
+- Bump github.com/sirupsen/logrus from 1.9.1 to 1.9.3
+- Bump Node in CI to 18
+- Improve visuals of login form fields
+- Migrate from react-scripts to vite
+- Update 3rd-party Javascript dependencies
+- Bump github.com/go-ldap/ldap/v3 from 3.4.4 to 3.4.6
+- Bump golang.org/x/net from 0.10.0 to 0.17.0
+- Bump github.com/crewjam/saml from 0.4.13 to 0.4.14
+- Increase golangci-lint timeout to 2 minutes
+- Escape LDAP filter values when constructing filters
+- Bump github.com/sirupsen/logrus from 1.9.0 to 1.9.1
+- LDAP Attributetypes are case-insensitive
+- Bump github.com/beevik/etree from 1.1.0 to 1.2.0
+- Bump golang.org/x/crypto from 0.0.0-20220622213112-05595931fe9d to 0.9.0
+
+
 ## v0.60.0 (2023-05-11)
 
 - Bump golang.org/x/oauth2 from 0.5.0 to 0.8.0

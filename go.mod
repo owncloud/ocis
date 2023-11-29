@@ -56,7 +56,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
-	github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d
+	github.com/libregraph/lico v0.61.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.2.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -290,7 +290,7 @@ require (
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
-	github.com/rs/cors v1.9.0 // indirect
+	github.com/rs/cors v1.10.1 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
