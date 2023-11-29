@@ -234,7 +234,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	log.Info().Str("path", req.Path).Msg("cs3.Upload 1")
 	defer func() {
 		log.Info().Str("path", req.Path).Msg("cs3.Upload closing body")
-		resp.Body.Close()
+		go func() { resp.Body.Close() }()
 		log.Info().Str("path", req.Path).Msg("cs3.Upload closed body")
 	}()
 	log.Info().Str("path", req.Path).Msg("cs3.Upload 2")
