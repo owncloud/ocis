@@ -914,9 +914,9 @@ class WebDavLockingContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function numberOfLockShouldBeReportedInProjectSpace(int $count, string $file, string $spaceName, string $user) {
-		$this->spacesContext->userSendsPropfindRequestToSpace($user, $spaceName, $file);
-		$this->featureContext->theHTTPStatusCodeShouldBe(207, "");
-		$responseXml = $this->featureContext->getResponseXml();
+		$response = $this->spacesContext->sendPropfindRequestToSpace($user, $spaceName, $file);
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
+		$responseXml = $this->featureContext->getResponseXml($response);
 		$xmlPart = $responseXml->xpath("//d:response//d:lockdiscovery/d:activelock");
 		if (\is_array($xmlPart)) {
 			$lockCount = \count($xmlPart);
