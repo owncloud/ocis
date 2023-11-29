@@ -4,6 +4,7 @@ import (
 	"context"
 	"path"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/store"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
@@ -44,13 +45,18 @@ func (c *CachedMDC) SimpleDownload(ctx context.Context, id string) ([]byte, erro
 
 // SimpleUpload caches the answer from SimpleUpload and invalidates the cache
 func (c *CachedMDC) SimpleUpload(ctx context.Context, id string, content []byte) error {
+	log := appctx.GetLogger(ctx).With().Logger()
+	log.Info().Str("id", id).Msg("CachedMDC SimpleUpload...")
+
 	b, err := c.filesCache.Read(id)
 	if err == nil && len(b) == 1 && string(b[0].Value) == string(content) {
 		// no need to bug mdc
 		return nil
 	}
 
+	log.Info().Str("id", id).Msg("CachedMDC calling next.SimpleUpload...")
 	err = c.next.SimpleUpload(ctx, id, content)
+	log.Info().Str("id", id).Msg("CachedMDC next.SimpleUpload done")
 	if err != nil {
 		return err
 	}

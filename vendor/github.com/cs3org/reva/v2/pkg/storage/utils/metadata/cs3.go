@@ -128,6 +128,8 @@ func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
 
 // SimpleUpload uploads a file to the metadata storage
 func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
+	log := appctx.GetLogger(ctx).With().Logger()
+	log.Info().Str("uploadpath", uploadpath).Msg("cs3.SimpleUpload starting...")
 	ctx, span := tracer.Start(ctx, "SimpleUpload")
 	defer span.End()
 
@@ -142,17 +144,21 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 // Upload uploads a file to the metadata storage
 func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse, error) {
 	log := appctx.GetLogger(ctx).With().Logger()
+	log.Info().Str("path", req.Path).Msg("cs3.Upload starting...")
 	ctx, span := tracer.Start(ctx, "Upload")
 	defer span.End()
+	log.Info().Str("path", req.Path).Msg("cs3.Upload tracer started...")
 
 	client, err := cs3.providerClient()
 	if err != nil {
 		return nil, err
 	}
+	log.Info().Str("path", req.Path).Msg("cs3.Upload got provider client...")
 	ctx, err = cs3.getAuthContext(ctx)
 	if err != nil {
 		return nil, err
 	}
+	log.Info().Str("path", req.Path).Msg("cs3.Upload got auth context...")
 
 	ifuReq := &provider.InitiateFileUploadRequest{
 		Opaque: &types.Opaque{},
