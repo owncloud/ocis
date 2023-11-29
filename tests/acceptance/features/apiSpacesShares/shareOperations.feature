@@ -358,13 +358,13 @@ Feature: sharing
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
-      | path        | /FOLDER  |
-      | permissions | <permissions>   |
-      | password    | %public% |
+      | path        | /FOLDER       |
+      | permissions | <permissions> |
+      | password    | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
-      | path        | /FOLDER |
-      | permissions | <permissions>  |
-      | password    |         |
+      | path        | /FOLDER       |
+      | permissions | <permissions> |
+      | password    |               |
     Then the HTTP status code should be "200"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
@@ -380,11 +380,11 @@ Feature: sharing
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path        | /FOLDER  |
-      | permissions | read   |
+      | permissions | read     |
       | password    | %public% |
     When user "Alice" updates the last public link share using the sharing API with
       | path        | /FOLDER |
-      | permissions | read  |
+      | permissions | read    |
       | password    |         |
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
