@@ -40,8 +40,16 @@ func FromCS3Status(status *cs3rpc.Status, ignore ...cs3rpc.Code) *Error {
 		err.errorCode = NameAlreadyExists
 	case code == cs3rpc.Code_CODE_FAILED_PRECONDITION:
 		err.errorCode = PreconditionFailed
+	case code == cs3rpc.Code_CODE_OUT_OF_RANGE:
+		err.errorCode = InvalidRange
 	case code == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		err.errorCode = NotSupported
+	case code == cs3rpc.Code_CODE_UNAVAILABLE:
+		err.errorCode = ServiceNotAvailable
+	case code == cs3rpc.Code_CODE_INSUFFICIENT_STORAGE:
+		err.errorCode = QuotaLimitReached
+	case code == cs3rpc.Code_CODE_LOCKED:
+		err.errorCode = ItemIsLocked
 	}
 
 	return err
