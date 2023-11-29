@@ -88,8 +88,10 @@ services:
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
-      # admin user password
+      # password policies
+      FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
+      - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:

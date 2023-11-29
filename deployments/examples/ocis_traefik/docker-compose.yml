@@ -74,7 +74,10 @@ services:
       NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
       NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
       NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
+      # password policies
+      FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
+      - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
