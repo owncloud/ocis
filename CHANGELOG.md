@@ -39,6 +39,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
 * Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
@@ -69,6 +70,13 @@ The following sections list the changes for unreleased.
    overwritten by default configuration.
 
    https://github.com/owncloud/ocis/pull/7795
+
+* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
+
+   We add banned password list to the default deployments
+
+   https://github.com/owncloud/ocis/issues/7724
+   https://github.com/owncloud/ocis/pull/7784
 
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 
