@@ -536,13 +536,8 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		})
-	switch {
-	case err != nil:
-		fallthrough
-	case getShareResp.Status.GetCode() != cs3rpc.Code_CODE_OK:
-		g.logger.Debug().Err(err).Interface("permissionID", permissionID).Interface("GetShare", getShareResp).Msg("GetShare failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-		return
+	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
+		return nil, err
 	}
 
 	sharedResourceId := getShareResp.GetShare().GetResourceId()
