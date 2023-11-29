@@ -16,7 +16,7 @@ all: build
 build: vendor | src i18n ; $(info building identifier Webapp ...)	@
 	@rm -rf build
 
-	REACT_APP_KOPANO_BUILD="${VERSION}" CI=false $(YARN) run build
+	VITE_KOPANO_BUILD="${VERSION}" CI=false $(YARN) run build
 
 .PHONY: src
 src:

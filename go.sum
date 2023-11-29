@@ -1618,8 +1618,8 @@ github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1 h1:k56sFO
 github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1/go.mod h1:AT4NpQrOmyj1L/+hLja6aR0lk81yYYL4ePnj2kp7d6M=
 github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5 h1:brLMXSjWoWhGXs8LpK+Lx+FQCtGLUa51Mq/ggHv9AV0=
 github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5/go.mod h1:Tnm4pyVJTEbHm3GUNmceWT1DHzdrYqrJmZyt/xh7L+A=
-github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d h1:ukYcazYg31ipU6emsMKAdxYZT9o78T9ypQ1f7ThbcyQ=
-github.com/libregraph/lico v0.60.1-0.20230811070109-1d4140be554d/go.mod h1:RLIfwh3pIE27Sbe/aBHlaZEE6j11Fvg7xAGHnNqGt+U=
+github.com/libregraph/lico v0.61.1 h1:md5z939Fq3pUuRWNA0M2y8F7xel+XWgp9vCXwMih8mQ=
+github.com/libregraph/lico v0.61.1/go.mod h1:pnRet4pexWmy6rAB2fLAlEU885ShDIJhbjbuekDSlMU=
 github.com/libregraph/oidc-go v1.0.0 h1:l2tE/EwLyLXVy0B5BuVKgIFX9pNpz/5J3x5IBw0KEhc=
 github.com/libregraph/oidc-go v1.0.0/go.mod h1:7TRHrY/H1Vg6JqFjV0oAe1+kN+mGFBqXYvclSyvhRyc=
 github.com/linode/linodego v0.25.3/go.mod h1:GSBKPpjoQfxEfryoCRcgkuUOCuVtGHWhzI8OMdycNTE=
@@ -1904,8 +1904,8 @@ github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6po
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
-github.com/rs/cors v1.9.0 h1:l9HGsTsHJcvW14Nk7J9KFz8bzeAWXn3CG6bgt7LsrAE=
-github.com/rs/cors v1.9.0/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=
+github.com/rs/cors v1.10.1 h1:L0uuZVXIKlI1SShY2nhFfo44TYvDPQ1w4oFkUJNfhyo=
+github.com/rs/cors v1.10.1/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=
 github.com/rs/xid v1.5.0 h1:mKX4bl4iPYJtEIxp6CYiUuLQ/8DYMoz0PUdtGgMFRVc=
 github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
 github.com/rs/zerolog v1.31.0 h1:FcTR3NnLWW+NnTwwhFWiJSZr4ECLpqCm6QsEnyvbV4A=
