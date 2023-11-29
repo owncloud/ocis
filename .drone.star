@@ -54,11 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
-        "skipExceptParts": [],
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
         "skip": False,
@@ -79,7 +78,7 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
             ],
-            "skip": True,
+            "skip": False,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
@@ -129,15 +128,15 @@ config = {
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [9],
+        "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": True,
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",
