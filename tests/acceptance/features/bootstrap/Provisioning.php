@@ -3641,57 +3641,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function removeUserFromGroupAsAdminUsingTheProvisioningApi(string $user, string $group):void {
-		$this->userRemovesUserFromGroupUsingTheProvisioningApi(
-			$this->getAdminUsername(),
-			$user,
-			$group
-		);
-	}
-
-	/**
-	 * @When the administrator removes user :user from group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$user = $this->getActualUsername($user);
-		$this->removeUserFromGroupAsAdminUsingTheProvisioningApi(
-			$user,
-			$group
-		);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @When the administrator removes the following users from the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorRemovesTheFollowingUserFromTheFollowingGroupUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ['username', 'groupname']);
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
-		foreach ($table as $row) {
-			$this->adminRemovesUserFromGroupUsingTheProvisioningApi($row['username'], $row['groupname']);
-			$this->pushToLastStatusCodesArrays();
-		}
-	}
-
-	/**
 	 * @Given user :user has been removed from group :group
 	 *
 	 * @param string $user
@@ -3707,72 +3656,44 @@ trait Provisioning {
 		) {
 			$this->removeUserFromLdapGroup($user, $group);
 		} elseif (OcisHelper::isTestingWithGraphApi()) {
-			$this->graphContext->adminHasRemovedUserFromGroupUsingTheGraphApi($user, $group);
-		} else {
-			$this->removeUserFromGroupAsAdminUsingTheProvisioningApi(
-				$user,
-				$group
-			);
+			$user = $this->getActualUsername($user);
+			$response = $this->graphContext->removeUserFromGroup($group, $user);
+			$this->TheHTTPStatusCodeShouldBe(204, '', $response);
 		}
 		$this->userShouldNotBelongToGroup($user, $group);
 	}
 
 	/**
-	 * @When user :user removes user :otherUser from group :group using the provisioning API
+	 * @When the administrator removes user :user from group :group using the provisioning API
 	 *
 	 * @param string $user
-	 * @param string $otherUser
 	 * @param string $group
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRemovesUserFromGroupUsingTheProvisioningApi(
-		string $user,
-		string $otherUser,
-		string $group
-	):void {
-		$this->userTriesToRemoveUserFromGroupUsingTheProvisioningApi(
-			$user,
-			$otherUser,
-			$group
-		);
-
-		if ($this->response->getStatusCode() !== 200) {
-			\error_log(
-				"INFORMATION: could not remove user '$user' from group '$group'"
-				. $this->response->getStatusCode() . " " . $this->response->getBody()
+	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group):void {
+		$user = $this->getActualUsername($user);
+		if (OcisHelper::isTestingWithGraphApi()) {
+			$this->setResponse(
+				$this->graphContext->removeUserFromGroup(
+					$group,
+					$user
+				)
+			);
+		} else {
+			$this->response = UserHelper::removeUserFromGroup(
+				$this->getBaseUrl(),
+				$user,
+				$group,
+				$this->getAdminUsername(),
+				$this->getAdminPassword(),
+				$this->getStepLineRef(),
+				$this->ocsApiVersion
 			);
 		}
-	}
 
-	/**
-	 * @When user :user tries to remove user :otherUser from group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $otherUser
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToRemoveUserFromGroupUsingTheProvisioningApi(
-		string $user,
-		string $otherUser,
-		string $group
-	):void {
-		$actualUser = $this->getActualUsername($user);
-		$actualPassword = $this->getUserPassword($actualUser);
-		$actualOtherUser = $this->getActualUsername($otherUser);
-		$this->response = UserHelper::removeUserFromGroup(
-			$this->getBaseUrl(),
-			$actualOtherUser,
-			$group,
-			$actualUser,
-			$actualPassword,
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
+		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
@@ -3925,55 +3846,6 @@ trait Provisioning {
 			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
-		);
-	}
-
-	/**
-	 * @When the administrator removes user :user from being a subadmin of group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 */
-	public function theAdministratorRemovesUserFromBeingASubadminOfGroupUsingTheProvisioningApi(
-		string $user,
-		string $group
-	):void {
-		$this->userRemovesUserFromBeingASubadminOfGroupUsingTheProvisioningApi(
-			$this->getAdminUsername(),
-			$user,
-			$group
-		);
-	}
-
-	/**
-	 * @When user :user removes user :otherUser from being a subadmin of group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $otherUser
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userRemovesUserFromBeingASubadminOfGroupUsingTheProvisioningApi(
-		string $user,
-		string $otherUser,
-		string $group
-	):void {
-		$actualOtherUser = $this->getActualUsername($otherUser);
-		$fullUrl = $this->getBaseUrl()
-			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/subadmins";
-		$actualUser = $this->getActualUsername($user);
-		$actualPassword = $this->getUserPassword($actualUser);
-		$this->response = HttpRequestHelper::delete(
-			$fullUrl,
-			$this->getStepLineRef(),
-			$actualUser,
-			$actualPassword,
-			null,
-			['groupid' => $group]
 		);
 	}
 
