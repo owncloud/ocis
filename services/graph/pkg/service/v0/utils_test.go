@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
@@ -26,8 +27,10 @@ var _ = Describe("Utils", func() {
 		cfg := defaults.FullDefaultConfig()
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
+		identityBackend := &identitymocks.Backend{}
 		svc, _ = service.NewService(
 			service.Config(cfg),
+			service.WithIdentityBackend(identityBackend),
 		)
 	})
 
