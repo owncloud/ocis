@@ -129,7 +129,8 @@ Feature: Share spaces via link
     And the OCS status message should be "Can not share space root"
     And for user "Alice" the space "Alice Hansen" should not contain the last created public link
 
-  Scenario: remove password of a public link space share with read permission as a Space Admin
+
+  Scenario: remove password of a public link share (read permission) of a space as a Space Admin
     Given user "Alice" has created a public link share of the space "share space" with settings:
       | permissions | 1        |
       | password    | %public% |
@@ -157,7 +158,7 @@ Feature: Share spaces via link
       | 4           |
 
 
-  Scenario: remove password of a public link space share with read permission as a Space Admin
+  Scenario: remove password of a public link space share with read permission as a Space Manager
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -172,7 +173,7 @@ Feature: Share spaces via link
     And the OCS status message should be "user is not allowed to delete the password from the public link"
 
 
-  Scenario Outline: remove password of a public link space share with various permissions as a Space Admin
+  Scenario Outline: remove password of a public link space share with various permissions as a Space Manager
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
