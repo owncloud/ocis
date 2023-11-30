@@ -113,6 +113,8 @@ type Service interface {
 	ListPermissions(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
 
+	CreateUploadSession(w http.ResponseWriter, r *http.Request)
+
 	GetTags(w http.ResponseWriter, r *http.Request)
 	AssignTags(w http.ResponseWriter, r *http.Request)
 	UnassignTags(w http.ResponseWriter, r *http.Request)
@@ -274,6 +276,7 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Route("/items/{driveItemID}", func(r chi.Router) {
 						r.Get("/", svc.GetDriveItem)
 						r.Get("/children", svc.GetDriveItemChildren)
+						r.Post("/createUploadSession", svc.CreateUploadSession)
 					})
 				})
 			})
