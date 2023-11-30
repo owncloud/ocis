@@ -151,7 +151,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
-  @issue-1289 @skipOnGraph
+  @issue-1289
   Scenario: share a folder to a group, and remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -164,7 +164,7 @@ Feature: sharing
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Carol" has accepted share "/PARENT" offered by user "Alice"
     When the administrator removes user "Carol" from group "group0" using the provisioning API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "204"
     And user "Brian" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
