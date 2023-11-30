@@ -146,7 +146,7 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 	perm.SetId(share.Id.OpaqueId)
 	grantedTo := libregraph.SharePointIdentitySet{}
 	var li libregraph.Identity
-	switch share.Grantee.Type {
+	switch share.GetGrantee().GetType() {
 	case storageprovider.GranteeType_GRANTEE_TYPE_USER:
 		user, err := g.identityCache.GetUser(ctx, share.Grantee.GetUserId().GetOpaqueId())
 		switch {

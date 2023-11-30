@@ -486,3 +486,12 @@ func convert(role *conversions.Role) []string {
 	}
 	return CS3ResourcePermissionsToLibregraphActions(*role.CS3ResourcePermissions())
 }
+
+func GetAllowedResourceActions(role *libregraph.UnifiedRoleDefinition, condition string) []string {
+	for _, p := range role.GetRolePermissions() {
+		if p.GetCondition() == condition {
+			return p.GetAllowedResourceActions()
+		}
+	}
+	return []string{}
+}

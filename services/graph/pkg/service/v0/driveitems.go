@@ -27,6 +27,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/share"
@@ -609,6 +610,65 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: value})
 }
 
+// UpdatePermission updates a Permission of a Drive item
+func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
+	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	permission := &libregraph.Permission{}
+	if err := StrictJSONUnmarshal(r.Body, permission); err != nil {
+		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("failed unmarshalling request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	ctx := r.Context()
+	if err := validate.StructCtx(ctx, permission); err != nil {
+		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	oldPermission, sharedResourceId, err := g.getPermissionByID(ctx, permissionID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	// The resourceID of the shared resource need to match the item ID from the Request Path
+	// otherwise this is an invalid Request.
+	if !utils.ResourceIDEqual(sharedResourceId, &itemID) {
+		g.logger.Debug().Msg("resourceID of shared does not match itemID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
+		return
+	}
+
+	// We don't implement updating link permissions yet
+	if _, ok := oldPermission.GetLinkOk(); ok {
+		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, "not implemented")
+		return
+	}
+	// This is a user share
+	updatedPermission, err := g.updateUserShare(ctx, permissionID, oldPermission, permission)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &updatedPermission)
+	return
+}
+
 // DeletePermission removes a Permission from a Drive item
 func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := g.GetDriveAndItemIDParam(r)
@@ -666,7 +726,43 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (g Graph) getPermissionByID(ctx context.Context, permissionID string) (*libregraph.Permission, *storageprovider.ResourceId, error) {
+	share, err := g.getCS3UserShareByID(ctx, permissionID)
+	if err == nil {
+		permission, err := g.cs3UserShareToPermission(ctx, share)
+		if err != nil {
+			return nil, nil, err
+		}
+		return permission, share.GetResourceId(), nil
+	}
+
+	var errcode errorcode.Error
+	if errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
+		// there is no user share with that id, check if this is a public link
+		publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
+		if err != nil {
+			return nil, nil, err
+		}
+		permission, err := g.libreGraphPermissionFromCS3PublicShare(publicShare)
+		if err != nil {
+			return nil, nil, err
+		}
+		return permission, publicShare.GetResourceId(), nil
+	}
+
+	return nil, nil, err
+
+}
+
 func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	share, err := g.getCS3UserShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, err
+	}
+	return share.GetResourceId(), nil
+}
+
+func (g Graph) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
@@ -686,7 +782,84 @@ func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID str
 	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
 		return nil, *errCode
 	}
-	return getShareResp.Share.GetResourceId(), nil
+	return getShareResp.GetShare(), nil
+}
+
+func (g Graph) updateUserShare(ctx context.Context, permissionID string, oldPermission, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
+	cs3UpdateShareReq := &collaboration.UpdateShareRequest{
+		Ref: &collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Id{
+				Id: &collaboration.ShareId{
+					OpaqueId: permissionID,
+				},
+			},
+		},
+		Share: &collaboration.Share{},
+	}
+	fieldmask := []string{}
+	if expiration, ok := newPermission.GetExpirationDateTimeOk(); ok {
+		fieldmask = append(fieldmask, "expiration")
+		if expiration != nil {
+			cs3UpdateShareReq.Share.Expiration = utils.TimeToTS(*expiration)
+		}
+	}
+	var roles, allowedResourceActions []string
+	var permissionsUpdated, ok bool
+	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
+		for _, roleId := range roles {
+			role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
+			if err != nil {
+				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
+				return nil, err
+			}
+
+			// FIXME: When setting permissions on a space, we need to use UnifiedRoleConditionOwner here
+			allowedResourceActions = unifiedrole.GetAllowedResourceActions(role, unifiedrole.UnifiedRoleConditionGrantee)
+			if len(allowedResourceActions) == 0 {
+				return nil, errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")
+			}
+		}
+		permissionsUpdated = true
+	} else if allowedResourceActions, ok = newPermission.GetLibreGraphPermissionsActionsOk(); ok && len(allowedResourceActions) > 0 {
+		permissionsUpdated = true
+	}
+
+	if permissionsUpdated {
+		cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(
+			[]*libregraph.UnifiedRolePermission{
+				{
+
+					AllowedResourceActions: allowedResourceActions,
+				},
+			},
+		)
+		cs3UpdateShareReq.Share.Permissions = &collaboration.SharePermissions{
+			Permissions: cs3ResourcePermissions,
+		}
+		fieldmask = append(fieldmask, "permissions")
+	}
+
+	cs3UpdateShareReq.UpdateMask = &fieldmaskpb.FieldMask{
+		Paths: fieldmask,
+	}
+
+	updateUserShareResp, err := gatewayClient.UpdateShare(ctx, cs3UpdateShareReq)
+	if errCode := errorcode.FromCS3Status(updateUserShareResp.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+
+	permission, err := g.cs3UserShareToPermission(ctx, updateUserShareResp.GetShare())
+	if err != nil {
+		return nil, err
+	}
+
+	return permission, nil
 }
 
 func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
@@ -715,6 +888,14 @@ func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
 }
 
 func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	share, err := g.getCS3PublicShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, err
+	}
+	return share.GetResourceId(), nil
+}
+
+func (g Graph) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
@@ -735,7 +916,7 @@ func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID str
 	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
 		return nil, *errCode
 	}
-	return getPublicShareResp.Share.GetResourceId(), nil
+	return getPublicShareResp.GetShare(), nil
 }
 
 func (g Graph) removePublicShare(ctx context.Context, permissionID string) error {
