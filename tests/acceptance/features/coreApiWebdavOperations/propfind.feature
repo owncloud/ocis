@@ -37,6 +37,10 @@ Feature: PROPFIND
       | /remote.php/dav/spaces/%spaceid% | 0        | 207       |
       | /remote.php/dav/spaces/%spaceid% | 1        | 207       |
       | /remote.php/dav/spaces/%spaceid% | infinity | 400       |
+
+    @skipOnReva
+    Examples:
+      | dav-path                         | depth    | http-code |
       | /remote.php/webdav               | infinity | 400       |
       | /remote.php/dav/files/alice      | infinity | 400       |
 
