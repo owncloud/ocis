@@ -14,15 +14,19 @@ import (
 	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/go-chi/chi/v5"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -31,9 +35,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc"
 )
 
 var _ = Describe("Graph", func() {
@@ -101,7 +102,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -114,7 +115,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetAllDrives(rr, r)
+				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -144,7 +145,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -218,7 +219,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=name%20asc", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -309,7 +310,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -350,7 +351,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=owner%20asc", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -363,7 +364,7 @@ var _ = Describe("Graph", func() {
 			It("can list a spaces with invalid query parameter", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?§orderby=owner%20asc", nil)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -376,7 +377,7 @@ var _ = Describe("Graph", func() {
 			It("can list a spaces with an unsupported operand", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$filter=contains(driveType,personal)", nil)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusNotImplemented))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -392,7 +393,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -410,7 +411,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -428,7 +429,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 
 				body, _ := io.ReadAll(rr.Body)
@@ -464,7 +465,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrives(rr, r)
+				svc.GetDrivesV1(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 

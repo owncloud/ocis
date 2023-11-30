@@ -25,13 +25,16 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"golang.org/x/sync/errgroup"
 
+	revaConversions "github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
@@ -57,19 +60,165 @@ var (
 	ErrForbiddenCharacter = fmt.Errorf("spacenames must not contain %v", _invalidSpaceNameCharacters)
 )
 
-// GetDrives lists all drives the current user has access to
-func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
-	g.getDrives(w, r, false)
+// GetDrives serves as a factory method that returns the appropriate
+// http.Handler function based on the specified API version.
+func (g Graph) GetDrives(version APIVersion) http.HandlerFunc {
+	switch version {
+	case APIVersion_1:
+		return g.GetDrivesV1
+	case APIVersion_Beta:
+		return g.GetDrivesBeta
+	default:
+		return func(w http.ResponseWriter, r *http.Request) {
+			errorcode.New(errorcode.NotSupported, "api version not supported").Render(w, r)
+		}
+	}
 }
 
-// GetAllDrives lists all drives, including other user's drives, if the current
-// user has the permission.
-func (g Graph) GetAllDrives(w http.ResponseWriter, r *http.Request) {
-	g.getDrives(w, r, true)
+// GetDrivesV1 attempts to retrieve the current users drives;
+// it lists all drives the current user has access to.
+func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
+	spaces, errCode := g.getDrives(r, false)
+	if errCode != nil {
+		errCode.Render(w, r)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+
+	switch {
+	case spaces == nil && errCode == nil:
+		render.JSON(w, r, nil)
+	default:
+		render.JSON(w, r, &ListResponse{Value: spaces})
+	}
+
+}
+
+// GetDrivesBeta is the same as the GetDrivesV1 endpoint, expect:
+// it includes the grantedtoV2 property
+// it uses unified roles instead of the cs3 representations
+func (g Graph) GetDrivesBeta(w http.ResponseWriter, r *http.Request) {
+	spaces, errCode := g.getDrivesBeta(r, false)
+	if errCode != nil {
+		errCode.Render(w, r)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+
+	switch {
+	case spaces == nil && errCode == nil:
+		render.JSON(w, r, nil)
+	default:
+		render.JSON(w, r, &ListResponse{Value: spaces})
+	}
+}
+
+// GetAllDrives serves as a factory method that returns the appropriate
+// http.Handler function based on the specified API version.
+func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
+	switch version {
+	case APIVersion_1:
+		return g.GetAllDrivesV1
+	case APIVersion_Beta:
+		return g.GetAllDrivesBeta
+	default:
+		return func(w http.ResponseWriter, r *http.Request) {
+			errorcode.New(errorcode.NotSupported, "api version not supported").Render(w, r)
+		}
+	}
+}
+
+// GetAllDrivesV1 attempts to retrieve the current users drives;
+// it includes another user's drives, if the current user has the permission.
+func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
+	spaces, errCode := g.getDrives(r, true)
+	if errCode != nil {
+		errCode.Render(w, r)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+
+	switch {
+	case spaces == nil && errCode == nil:
+		render.JSON(w, r, nil)
+	default:
+		render.JSON(w, r, &ListResponse{Value: spaces})
+	}
+}
+
+// GetAllDrivesBeta is the same as the GetAllDrivesV1 endpoint, expect:
+// it includes the grantedtoV2 property
+// it uses unified roles instead of the cs3 representations
+func (g Graph) GetAllDrivesBeta(w http.ResponseWriter, r *http.Request) {
+	drives, errCode := g.getDrivesBeta(r, true)
+	if errCode != nil {
+		errCode.Render(w, r)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+
+	switch {
+	case drives == nil && errCode == nil:
+		render.JSON(w, r, nil)
+	default:
+		render.JSON(w, r, &ListResponse{Value: drives})
+	}
+}
+
+// getDrivesBeta retrieves the drives associated with the given request 'r'.
+// It updates the 'GrantedToIdentities' to 'GrantedToV2',
+// which represents the transition from legacy identity representation to a newer version.
+// It also maps the old role names to their new unified role identifiers.
+func (g Graph) getDrivesBeta(r *http.Request, unrestricted bool) ([]*libregraph.Drive, *errorcode.Error) {
+	drives, errCode := g.getDrives(r, unrestricted)
+	if errCode != nil {
+		return nil, errCode
+	}
+
+	for _, drive := range drives {
+		for i, permission := range drive.GetRoot().Permissions {
+			grantedToIdentities := permission.GetGrantedToIdentities()
+
+			if len(grantedToIdentities) < 1 {
+				continue
+			}
+
+			permission.GrantedToIdentities = nil
+			grantedToIdentity := grantedToIdentities[0]
+
+			permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
+				User:  grantedToIdentity.User,
+				Group: grantedToIdentity.Group,
+			}
+
+			for i, role := range permission.GetRoles() {
+				cs3Role := revaConversions.RoleFromName(role, g.config.FilesSharing.EnableResharing)
+				uniRole := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+					*cs3Role.CS3ResourcePermissions(),
+					unifiedrole.UnifiedRoleConditionGrantee, // fixMe: UnifiedRoleConditionOwner
+					g.config.FilesSharing.EnableResharing,
+				)
+
+				if uniRole == nil {
+					continue
+				}
+
+				permission.Roles[i] = uniRole.GetId()
+			}
+
+			drive.Root.Permissions[i] = permission
+		}
+	}
+
+	return drives, nil
 }
 
 // getDrives implements the Service interface.
-func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bool) {
+func (g Graph) getDrives(r *http.Request, unrestricted bool) ([]*libregraph.Drive, *errorcode.Error) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().
 		Interface("query", r.URL.Query()).
@@ -80,23 +229,20 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: query error")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, err.Error()))
 	}
 	ctx := r.Context()
 
 	filters, err := generateCs3Filters(odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: error parsing filters")
-		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.NotSupported, err.Error()))
 	}
 	if !unrestricted {
 		user, ok := revactx.ContextGetUser(r.Context())
 		if !ok {
 			logger.Debug().Msg("could not create drive: invalid user")
-			errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
-			return
+			return nil, conversions.ToPointer(errorcode.New(errorcode.AccessDenied, "invalid user"))
 		}
 		filters = append(filters, &storageprovider.ListStorageSpacesRequest_Filter{
 			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
@@ -114,43 +260,35 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Msg("could not get drives: transport error")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			// return an empty list
-			render.Status(r, http.StatusOK)
-			render.JSON(w, r, &ListResponse{})
-			return
+			// ok, empty return
+			return nil, nil
 		}
 		logger.Debug().Str("message", res.GetStatus().GetMessage()).Msg("could not get drives: grpc error")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, res.Status.Message))
 	}
 
 	webDavBaseURL, err := g.getWebDavBaseURL()
 	if err != nil {
 		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drives: error parsing url")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
 	}
 
 	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
 	}
 
 	spaces, err = sortSpaces(odataReq, spaces)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error sorting the spaces list according to query")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
+		return nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, err.Error()))
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: spaces})
+	return spaces, nil
 }
 
 // GetSingleDrive does a lookup of a single space by spaceId

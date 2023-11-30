@@ -94,9 +94,11 @@ type Service interface {
 	PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 	DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 
-	GetDrives(w http.ResponseWriter, r *http.Request)
+	GetDrivesV1(w http.ResponseWriter, r *http.Request)
+	GetDrivesBeta(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
-	GetAllDrives(w http.ResponseWriter, r *http.Request)
+	GetAllDrivesV1(w http.ResponseWriter, r *http.Request)
+	GetAllDrivesBeta(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
@@ -199,14 +201,24 @@ func NewService(opts ...Option) (Graph, error) {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1beta1", func(r chi.Router) {
-			r.Get("/me/drive/sharedByMe", svc.GetSharedByMe)
-			r.Get("/me/drive/sharedWithMe", svc.ListSharedWithMe)
-			r.Route("/drives/{driveID}/items/{itemID}", func(r chi.Router) {
-				r.Post("/invite", svc.Invite)
-				r.Get("/permissions", svc.ListPermissions)
-				r.Delete("/permissions/{permissionID}", svc.DeletePermission)
-				r.Post("/createLink", svc.CreateLink)
+			r.Route("/me", func(r chi.Router) {
+				r.Get("/drives", svc.GetDrives(APIVersion_Beta))
+				r.Route("/drive", func(r chi.Router) {
+					r.Get("/sharedByMe", svc.GetSharedByMe)
+					r.Get("/sharedWithMe", svc.ListSharedWithMe)
+				})
 			})
+
+			r.Route("/drives", func(r chi.Router) {
+				r.Get("/", svc.GetAllDrives(APIVersion_Beta))
+				r.Route("/{driveID}/items/{itemID}", func(r chi.Router) {
+					r.Post("/invite", svc.Invite)
+					r.Get("/permissions", svc.ListPermissions)
+					r.Delete("/permissions/{permissionID}", svc.DeletePermission)
+					r.Post("/createLink", svc.CreateLink)
+				})
+			})
+
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
 				r.Get("/", svc.GetRoleDefinitions)
 				r.Get("/{roleID}", svc.GetRoleDefinition)
@@ -229,7 +241,7 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Get("/", svc.GetUserDrive)
 					r.Get("/root/children", svc.GetRootDriveChildren)
 				})
-				r.Get("/drives", svc.GetDrives)
+				r.Get("/drives", svc.GetDrives(APIVersion_1))
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
 			r.Route("/users", func(r chi.Router) {
@@ -265,7 +277,7 @@ func NewService(opts ...Option) (Graph, error) {
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives)
+				r.Get("/", svc.GetAllDrives(APIVersion_1))
 				r.Post("/", svc.CreateDrive)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Patch("/", svc.UpdateDrive)
