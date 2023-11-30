@@ -1307,6 +1307,28 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has uploaded a file :source to :destination in space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasUploadedAFileToInSpaceUsingTheWebdavApi(string $user, string $source, string $destination, string $spaceName): void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$response = $this->featureContext->uploadFile($user, $source, $destination);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
