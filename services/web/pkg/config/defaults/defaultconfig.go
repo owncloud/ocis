@@ -201,7 +201,9 @@ func Sanitize(cfg *config.Config) {
 	// remove Embed parent if no value is set
 	if cfg.Web.Config.Options.Embed.Enabled == "" &&
 		cfg.Web.Config.Options.Embed.Target == "" &&
-		cfg.Web.Config.Options.Embed.MessagesOrigin == "" {
+		cfg.Web.Config.Options.Embed.MessagesOrigin == "" &&
+		cfg.Web.Config.Options.Embed.DelegateAuthentication == "" &&
+		cfg.Web.Config.Options.Embed.DelegateAuthenticationOrigin == "" {
 		cfg.Web.Config.Options.Embed = nil
 	}
 }
