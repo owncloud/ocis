@@ -77,7 +77,7 @@ func (g Graph) applyFilterFunctionStartsWith(ctx context.Context, req *godata.Go
 		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by startsWith")
 		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
 			for _, user := range users {
-				if strings.HasPrefix(user.GetDisplayName(), filterValue) {
+				if strings.HasPrefix(strings.ToLower(user.GetDisplayName()), strings.ToLower(filterValue)) {
 					retUsers = append(retUsers, user)
 				}
 			}
@@ -103,7 +103,7 @@ func (g Graph) applyFilterFunctionContains(ctx context.Context, req *godata.GoDa
 		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by contains")
 		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
 			for _, user := range users {
-				if strings.Contains(user.GetDisplayName(), filterValue) {
+				if strings.Contains(strings.ToLower(user.GetDisplayName()), strings.ToLower(filterValue)) {
 					retUsers = append(retUsers, user)
 				}
 			}
