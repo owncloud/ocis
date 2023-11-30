@@ -629,7 +629,7 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 
 	// Check if the id is refering to a User Share
 	sharedResourceId, err := g.getUserPermissionResourceID(ctx, permissionID)
-	var errcode *errorcode.Error
+	var errcode errorcode.Error
 	if err != nil && errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
 		// there is no user share with that ID, so lets check if it is referring to a public link
 		isUserPermission = false
@@ -684,7 +684,7 @@ func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID str
 			},
 		})
 	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
-		return nil, errCode
+		return nil, *errCode
 	}
 	return getShareResp.Share.GetResourceId(), nil
 }
@@ -708,7 +708,7 @@ func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
 		})
 
 	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
-		return errCode
+		return *errCode
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
@@ -733,7 +733,7 @@ func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID str
 		},
 	)
 	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
-		return nil, errCode
+		return nil, *errCode
 	}
 	return getPublicShareResp.Share.GetResourceId(), nil
 }
@@ -756,7 +756,7 @@ func (g Graph) removePublicShare(ctx context.Context, permissionID string) error
 			},
 		})
 	if errcode := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); errcode != nil {
-		return errcode
+		return *errcode
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
