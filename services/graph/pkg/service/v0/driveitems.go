@@ -494,7 +494,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	case hasErrors && hasSuccesses:
 		render.Status(r, http.StatusMultiStatus)
 	case hasSuccesses:
-		render.Status(r, http.StatusCreated)
+		render.Status(r, http.StatusOK)
 	default:
 		render.Status(r, http.StatusInternalServerError)
 	}

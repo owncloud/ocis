@@ -322,7 +322,7 @@ var _ = Describe("Driveitems", func() {
 
 			jsonData := gjson.Get(rr.Body.String(), "value")
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 			Expect(jsonData.Get("#").Num).To(Equal(float64(2)))
 
 			Expect(jsonData.Get("0.id").Str).To(Equal("123"))
@@ -347,7 +347,7 @@ var _ = Describe("Driveitems", func() {
 
 			jsonData := gjson.Get(rr.Body.String(), "value")
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions`).Exists()).To(BeFalse())
 			Expect(jsonData.Get("0.roles.#").Num).To(Equal(float64(1)))
@@ -365,7 +365,7 @@ var _ = Describe("Driveitems", func() {
 
 			jsonData := gjson.Get(rr.Body.String(), "value")
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			Expect(jsonData.Get("0.roles").Exists()).To(BeFalse())
 			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions.#`).Num).To(Equal(float64(1)))
