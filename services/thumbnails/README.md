@@ -39,6 +39,21 @@ If a file type was not properly assigned or the type identification failed, thum
 
 Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types are hardcoded and no other types can be requested. A requestor, like another service or a client, can request one of the available types to be generated. If more than one type is required, each type must be requested individually.
 
+## Thumbnail Query String Parameters
+
+Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with thumbnail availabe respond with HTTP status `404`.
+
+The following query parameters are supported:
+
+| Parameter | Required | Default Value                                        | Description                   |
+| --------- | -------- | ---------------------------------------------------- | ----------------------------- |
+| preview   | YES      | 1                                                    | generates preview             |
+| x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size        |
+| y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size          |
+| a         | NO       | 1                                                    | aspect ratio                  |
+| c         | NO       | ???                                                  | ???                           |
+| processor | NO       | ???                                                  | preferred thumbnail processor |
+
 ## Thumbnail Resolution
 
 Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can request any arbitrary resolution and the thumbnail service will use the one closest to the requested resolution. If more than one resolution is required, each resolution must be requested individually.
