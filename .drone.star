@@ -54,9 +54,12 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
+        "skip": True,
+    },
+    "k6LoadTests": {
         "skip": False,
     },
     "localApiTests": {
@@ -75,7 +78,7 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
@@ -87,7 +90,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -104,7 +107,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -118,22 +121,22 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -335,6 +338,9 @@ def testPipelines(ctx):
 
     if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
         pipelines += e2eTests(ctx)
+
+    if "skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]:
+        pipelines += k6LoadTests(ctx)
 
     return pipelines
 
@@ -2776,3 +2782,41 @@ def logRequests():
             ],
         },
     }]
+
+def k6LoadTests(ctx):
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "k6-load-test",
+        "steps": [
+            {
+                "name": "k6-load-test",
+                "image": OC_CI_ALPINE,
+                "environment": {
+                    "SSH_SERVER": {
+                        "from_secret": "ssh_ocis_remote",
+                    },
+                    "SSH_USERNAME": {
+                        "from_secret": "ssh_ocis_user",
+                    },
+                    "SSH_PASSWORD": {
+                        "from_secret": "ssh_ocis_pass",
+                    },
+                    "TEST_SERVER_URL": "url",
+                    "SSH_COMMAND": "bash scripts/ocis.sh start",
+                },
+                "commands": [
+                    "sh %s/tests/config/drone/ssh_login.sh" % (dirs["base"]),
+                    "cd scripts",
+                    "ls",
+                ],
+            },
+        ],
+        "depends_on": [],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/pull/**",
+            ],
+        },
+    }
