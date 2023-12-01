@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
+* Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
 * Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 
 ## Details
@@ -100,6 +101,13 @@ The following sections list the changes for unreleased.
    We updated to go 1.21.
 
    https://github.com/owncloud/ocis/pull/7794
+
+* Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
+
+   Introduce a config to require filters in order to list users in Web via
+   `WEB_OPTION_USER_LIST_REQUIRES_FILTER`.
+
+   https://github.com/owncloud/ocis/pull/7866
 
 * Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 
