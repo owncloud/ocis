@@ -1524,15 +1524,15 @@ trait Provisioning {
 	 * @param string $targetUser
 	 * @param string $email
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws JsonException
 	 */
 	public function userChangesUserEmailUsingProvisioningApi(
 		string $requestingUser,
 		string $targetUser,
 		string $email
-	):void {
-		$this->response = UserHelper::editUser(
+	):ResponseInterface {
+		return UserHelper::editUser(
 			$this->getBaseUrl(),
 			$this->getActualUsername($targetUser),
 			'email',
@@ -1585,7 +1585,7 @@ trait Provisioning {
 	):void {
 		$requestingUser = $this->getActualUsername($requestingUser);
 		$targetUser = $this->getActualUsername($targetUser);
-		$this->userChangesUserEmailUsingProvisioningApi(
+		$this->response = $this->userChangesUserEmailUsingProvisioningApi(
 			$requestingUser,
 			$targetUser,
 			$email
@@ -1625,12 +1625,12 @@ trait Provisioning {
 				$updatedUserData['mail'],
 			);
 		} else {
-			$this->userChangesUserEmailUsingProvisioningApi(
+			$response = $this->userChangesUserEmailUsingProvisioningApi(
 				$requestingUser,
 				$targetUser,
 				$email
 			);
-			$this->theHTTPStatusCodeShouldBeSuccess();
+			$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 		}
 		$this->rememberUserEmailAddress($targetUser, $email);
 	}
@@ -1708,8 +1708,11 @@ trait Provisioning {
 				$this->getAdminPassword(),
 				$this->getStepLineRef()
 			);
-			$this->setResponse($response);
-			$this->theDisplayNameReturnedByTheApiShouldBe($displayName);
+			$actualDisplayName = $this->getDisplayNameFromResponse($response);
+			Assert::assertEquals(
+				$displayName,
+				$actualDisplayName
+			);
 		}
 		$this->rememberUserDisplayName($user, $displayName);
 	}
@@ -1734,7 +1737,7 @@ trait Provisioning {
 		string $displayName
 	):void {
 		$user = $this->getActualUsername($user);
-		$this->adminChangesTheDisplayNameOfUserUsingKey(
+		$this->response = $this->adminChangesTheDisplayNameOfUserUsingKey(
 			$user,
 			'display',
 			$displayName
@@ -1748,14 +1751,14 @@ trait Provisioning {
 	 * @param string $key
 	 * @param string $displayName
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
 	public function adminChangesTheDisplayNameOfUserUsingKey(
 		string $user,
 		string $key,
 		string $displayName
-	):void {
+	):ResponseInterface {
 		$result = UserHelper::editUser(
 			$this->getBaseUrl(),
 			$this->getActualUsername($user),
@@ -1766,13 +1769,7 @@ trait Provisioning {
 			$this->getStepLineRef(),
 			$this->ocsApiVersion
 		);
-		$this->response = $result;
-		if ($result->getStatusCode() !== 200) {
-			throw new Exception(
-				__METHOD__ . " could not change display name of user using key $key "
-				. $result->getStatusCode() . " " . $result->getBody()
-			);
-		}
+		return $result;
 	}
 
 	/**
@@ -1827,7 +1824,7 @@ trait Provisioning {
 	):void {
 		$requestingUser = $this->getActualUsername($requestingUser);
 		$targetUser = $this->getActualUsername($targetUser);
-		$this->userChangesTheDisplayNameOfUserUsingKey(
+		$this->response = $this->userChangesTheDisplayNameOfUserUsingKey(
 			$requestingUser,
 			$targetUser,
 			'displayname',
@@ -1902,13 +1899,14 @@ trait Provisioning {
 				$updatedUserData['displayName']
 			);
 		} else {
-			$this->userChangesTheDisplayNameOfUserUsingKey(
+			$response = $this->userChangesTheDisplayNameOfUserUsingKey(
 				$requestingUser,
 				$targetUser,
 				'displayname',
 				$displayName
 			);
 			$this->theHTTPStatusCodeShouldBeSuccess();
+			$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 		}
 		$this->rememberUserDisplayName($targetUser, $displayName);
 	}
@@ -1919,15 +1917,15 @@ trait Provisioning {
 	 * @param string $key
 	 * @param string $displayName
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function userChangesTheDisplayNameOfUserUsingKey(
 		string $requestingUser,
 		string $targetUser,
 		string $key,
 		string $displayName
-	):void {
-		$result = UserHelper::editUser(
+	):ResponseInterface {
+		return UserHelper::editUser(
 			$this->getBaseUrl(),
 			$this->getActualUsername($targetUser),
 			$key,
@@ -1937,7 +1935,6 @@ trait Provisioning {
 			$this->getStepLineRef(),
 			$this->ocsApiVersion
 		);
-		$this->response = $result;
 	}
 
 	/**
@@ -1993,14 +1990,14 @@ trait Provisioning {
 	 * @param string $targetUser
 	 * @param string $quota
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function userChangeQuotaOfUserUsingProvisioningApi(
 		string $requestingUser,
 		string $targetUser,
 		string $quota
-	):void {
-		$result = UserHelper::editUser(
+	):ResponseInterface {
+		return UserHelper::editUser(
 			$this->getBaseUrl(),
 			$this->getActualUsername($targetUser),
 			'quota',
@@ -2010,7 +2007,6 @@ trait Provisioning {
 			$this->getStepLineRef(),
 			$this->ocsApiVersion
 		);
-		$this->response = $result;
 	}
 
 	/**
@@ -2027,7 +2023,7 @@ trait Provisioning {
 		string $targetUser,
 		string $quota
 	):void {
-		$this->userChangeQuotaOfUserUsingProvisioningApi(
+		$this->response = $this->userChangeQuotaOfUserUsingProvisioningApi(
 			$requestingUser,
 			$targetUser,
 			$quota
@@ -2049,24 +2045,24 @@ trait Provisioning {
 		string $targetUser,
 		string $quota
 	):void {
-		$this->userChangeQuotaOfUserUsingProvisioningApi(
+		$response = $this->userChangeQuotaOfUserUsingProvisioningApi(
 			$requestingUser,
 			$targetUser,
 			$quota
 		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
 	 * @param string $user
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws JsonException
 	 */
 	public function retrieveUserInformationAsAdminUsingProvisioningApi(
 		string $user
-	):void {
-		$result = UserHelper::getUser(
+	):ResponseInterface {
+		return UserHelper::getUser(
 			$this->getBaseUrl(),
 			$this->getActualUsername($user),
 			$this->getAdminUsername(),
@@ -2074,7 +2070,6 @@ trait Provisioning {
 			$this->getStepLineRef(),
 			$this->ocsApiVersion
 		);
-		$this->response = $result;
 	}
 
 	/**
@@ -2813,18 +2808,18 @@ trait Provisioning {
 			$this->graphContext->userShouldNotBeMemberInGroupUsingTheGraphApi($user, $group);
 		} else {
 			$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
-			$this->response = HttpRequestHelper::get(
+			$response = HttpRequestHelper::get(
 				$fullUrl,
 				$this->getStepLineRef(),
 				$this->getAdminUsername(),
 				$this->getAdminPassword()
 			);
-			$respondedArray = $this->getArrayOfGroupsResponded($this->response);
+			$respondedArray = $this->getArrayOfGroupsResponded($response);
 			\sort($respondedArray);
 			Assert::assertNotContains($group, $respondedArray);
 			Assert::assertEquals(
 				200,
-				$this->response->getStatusCode()
+				$response->getStatusCode()
 			);
 		}
 	}
@@ -2856,13 +2851,13 @@ trait Provisioning {
 	public function groupShouldNotContainUser(string $group, string $username):void {
 		$username = $this->getActualUsername($username);
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/groups/$group";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
-		$this->theUsersReturnedByTheApiShouldNotInclude($username);
+		Assert::assertNotContains($username, $this->getArrayOfUsersResponded($response));
 	}
 
 	/**
@@ -4089,13 +4084,13 @@ trait Provisioning {
 	 */
 	public function appShouldNotBeInTheAppsList(string $appName):void {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/apps";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
-		$respondedArray = $this->getArrayOfAppsResponded($this->response);
+		$respondedArray = $this->getArrayOfAppsResponded($response);
 		Assert::assertNotContains($appName, $respondedArray);
 	}
 
@@ -4140,6 +4135,15 @@ trait Provisioning {
 	}
 
 	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return string
+	 */
+	public function getDisplayNameFromResponse(ResponseInterface $response): string {
+		return (string) $this->getResponseXml($response, __METHOD__)->data[0]->displayname;
+	}
+
+	/**
 	 * @Then /^the display name returned by the API should be "([^"]*)"$/
 	 *
 	 * @param string $expectedDisplayName
@@ -4166,8 +4170,12 @@ trait Provisioning {
 	 */
 	public function theDisplayNameOfUserShouldBe(string $user, string $displayname):void {
 		$actualUser = $this->getActualUsername($user);
-		$this->retrieveUserInformationAsAdminUsingProvisioningApi($actualUser);
-		$this->theDisplayNameReturnedByTheApiShouldBe($displayname);
+		$response = $this->retrieveUserInformationAsAdminUsingProvisioningApi($actualUser);
+		$actualDisplayName = $this->getDisplayNameFromResponse($response, $displayname);
+		Assert::assertEquals(
+			$displayname,
+			$actualDisplayName
+		);
 	}
 
 	/**
@@ -4411,17 +4419,17 @@ trait Provisioning {
 	public function appShouldBeDisabled(string $app):void {
 		$fullUrl = $this->getBaseUrl()
 			. "/ocs/v2.php/cloud/apps?filter=disabled";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
-		$respondedArray = $this->getArrayOfAppsResponded($this->response);
+		$respondedArray = $this->getArrayOfAppsResponded($response);
 		Assert::assertContains($app, $respondedArray);
 		Assert::assertEquals(
 			200,
-			$this->response->getStatusCode()
+			$response->getStatusCode()
 		);
 	}
 
@@ -4435,17 +4443,17 @@ trait Provisioning {
 	 */
 	public function appShouldBeEnabled(string $app):void {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/apps?filter=enabled";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
-		$respondedArray = $this->getArrayOfAppsResponded($this->response);
+		$respondedArray = $this->getArrayOfAppsResponded($response);
 		Assert::assertContains($app, $respondedArray);
 		Assert::assertEquals(
 			200,
-			$this->response->getStatusCode()
+			$response->getStatusCode()
 		);
 	}
 
@@ -4459,7 +4467,7 @@ trait Provisioning {
 	 */
 	public function theInformationForAppShouldHaveAValidVersion(string $app):void {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/apps/$app";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
@@ -4467,9 +4475,9 @@ trait Provisioning {
 		);
 		Assert::assertEquals(
 			200,
-			$this->response->getStatusCode()
+			$response->getStatusCode()
 		);
-		$respondedArray = $this->getArrayOfAppInfoResponded($this->response);
+		$respondedArray = $this->getArrayOfAppInfoResponded($response);
 		Assert::assertArrayHasKey(
 			'version',
 			$respondedArray,
@@ -4494,7 +4502,7 @@ trait Provisioning {
 		$user = $this->getActualUsername($user);
 		$fullUrl = $this->getBaseUrl()
 			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
@@ -4502,7 +4510,7 @@ trait Provisioning {
 		);
 		Assert::assertEquals(
 			"false",
-			$this->getResponseXml(null, __METHOD__)->data[0]->enabled
+			$this->getResponseXml($response, __METHOD__)->data[0]->enabled
 		);
 	}
 
@@ -4534,7 +4542,7 @@ trait Provisioning {
 		$user = $this->getActualUsername($user);
 		$fullUrl = $this->getBaseUrl()
 			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
-		$this->response = HttpRequestHelper::get(
+		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
 			$this->getAdminUsername(),
@@ -4542,7 +4550,7 @@ trait Provisioning {
 		);
 		Assert::assertEquals(
 			"true",
-			$this->getResponseXml(null, __METHOD__)->data[0]->enabled
+			$this->getResponseXml($response, __METHOD__)->data[0]->enabled
 		);
 	}
 
