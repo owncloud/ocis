@@ -203,8 +203,10 @@ func (s *stream) Consume(topic string, opts ...events.ConsumeOption) (<-chan eve
 	}
 
 	// setup the options
-	subOpts := []nats.SubOpt{
-		nats.Durable(options.Group),
+	subOpts := []nats.SubOpt{}
+
+	if !s.opts.DisableDurableStreams {
+		subOpts = append(subOpts, nats.Durable(options.Group))
 	}
 
 	if options.CustomRetries {
