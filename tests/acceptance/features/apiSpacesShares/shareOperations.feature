@@ -353,7 +353,7 @@ Feature: sharing
       | create      |
 
 
-  Scenario Outline: try to remove password of a public link share change/create permission) as a Space Admin
+  Scenario Outline: space admin tries to remove password of a public link share (change/create permission)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
@@ -374,7 +374,7 @@ Feature: sharing
       | create      |
 
 
-  Scenario: remove password of a public link with share(read permission) as a Space Admin
+  Scenario: space admin removes password of a public link share (read permission)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"

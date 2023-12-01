@@ -130,7 +130,7 @@ Feature: Share spaces via link
     And for user "Alice" the space "Alice Hansen" should not contain the last created public link
 
 
-  Scenario: remove password of a public link share (read permission) of a space as a Space Admin
+  Scenario: space admin removes password of a public link share of a space
     Given user "Alice" has created a public link share of the space "share space" with settings:
       | permissions | 1        |
       | password    | %public% |
@@ -141,7 +141,7 @@ Feature: Share spaces via link
     And the OCS status code should be "100"
 
 
-  Scenario Outline: remove password of a public link space share with various permissions as a Space Admin
+  Scenario Outline: space admin tries to remove password of a public link share of a space (various permission)
     Given user "Alice" has created a public link share of the space "share space" with settings:
       | permissions | <permissions> |
       | password    | %public%      |
@@ -158,7 +158,7 @@ Feature: Share spaces via link
       | 4           |
 
 
-  Scenario: remove password of a public link space share with read permission as a Space Manager
+  Scenario: space manager tries to remove password of a public link share of a space (read permission)
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -173,7 +173,7 @@ Feature: Share spaces via link
     And the OCS status message should be "user is not allowed to delete the password from the public link"
 
 
-  Scenario Outline: remove password of a public link space share with various permissions as a Space Manager
+  Scenario Outline: space manager tries to remove password of a public link share of a space (various permission)
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |

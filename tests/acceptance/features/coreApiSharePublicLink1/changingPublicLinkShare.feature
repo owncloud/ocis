@@ -133,7 +133,7 @@ Feature: changing a public link share
     And as "Alice" file "PARENT/parent.txt" should exist
 
 
-  Scenario Outline:try to remove password of a public link share(change, create permission) as a normal user
+  Scenario Outline: normal user tries to remove password of a public link share (change/create permission)
     Given user "Alice" has created a public link share with settings
       | path        | /PARENT       |
       | permissions | <permissions> |
@@ -151,7 +151,7 @@ Feature: changing a public link share
       | create      |
 
   @issue-7821
-  Scenario: try to remove password of a public link as a normal user (update without sending permissions)
+  Scenario: normal user tries to remove password of a public link (update without sending permissions)
     Given user "Alice" has created a public link share with settings
       | path        | /PARENT  |
       | permissions | change   |
@@ -164,7 +164,7 @@ Feature: changing a public link share
     And the OCS status message should be "missing required password"
 
 
-  Scenario: remove password of a read-only public link as a administrator
+  Scenario: administrator removes password of a read-only public link
     Given admin has created folder "/PARENT"
     And user "admin" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "admin" has created a public link share with settings
@@ -180,7 +180,7 @@ Feature: changing a public link share
     And the public should be able to download file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password ""
 
 
-  Scenario Outline: try to remove password of a public link share(change, create permission) as a administrator
+  Scenario Outline: administrator tries to remove password of a public link share (change/create permission)
     Given admin has created folder "/PARENT"
     And user "admin" has created a public link share with settings
       | path        | /PARENT       |
