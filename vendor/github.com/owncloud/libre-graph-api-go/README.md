@@ -84,6 +84,7 @@ Class | Method | HTTP request | Description
 *DrivesApi* | [**GetDrive**](docs/DrivesApi.md#getdrive) | **Get** /v1.0/drives/{drive-id} | Get drive by id
 *DrivesApi* | [**UpdateDrive**](docs/DrivesApi.md#updatedrive) | **Patch** /v1.0/drives/{drive-id} | Update the drive
 *DrivesGetDrivesApi* | [**ListAllDrives**](docs/DrivesGetDrivesApi.md#listalldrives) | **Get** /v1.0/drives | Get all available drives
+*DrivesGetDrivesApi* | [**ListAllDrivesBeta**](docs/DrivesGetDrivesApi.md#listalldrivesbeta) | **Get** /v1beta1/drives | Alias for &#39;/v1.0/drives&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 *DrivesPermissionsApi* | [**CreateLink**](docs/DrivesPermissionsApi.md#createlink) | **Post** /v1beta1/drives/{drive-id}/items/{item-id}/createLink | Create a sharing link for a DriveItem
 *DrivesPermissionsApi* | [**DeletePermission**](docs/DrivesPermissionsApi.md#deletepermission) | **Delete** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Remove access to a DriveItem
 *DrivesPermissionsApi* | [**GetPermission**](docs/DrivesPermissionsApi.md#getpermission) | **Get** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Get sharing permission for a file or folder
@@ -134,6 +135,7 @@ Class | Method | HTTP request | Description
 *MeDriveRootApi* | [**HomeGetRoot**](docs/MeDriveRootApi.md#homegetroot) | **Get** /v1.0/me/drive/root | Get root from personal space
 *MeDriveRootChildrenApi* | [**HomeGetChildren**](docs/MeDriveRootChildrenApi.md#homegetchildren) | **Get** /v1.0/me/drive/root/children | Get children from drive
 *MeDrivesApi* | [**ListMyDrives**](docs/MeDrivesApi.md#listmydrives) | **Get** /v1.0/me/drives | Get all drives where the current user is a regular member of
+*MeDrivesApi* | [**ListMyDrivesBeta**](docs/MeDrivesApi.md#listmydrivesbeta) | **Get** /v1beta1/me/drives | Alias for &#39;/v1.0/drives&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 *MeUserApi* | [**GetOwnUser**](docs/MeUserApi.md#getownuser) | **Get** /v1.0/me | Get current user
 *MeUserApi* | [**UpdateOwnUser**](docs/MeUserApi.md#updateownuser) | **Patch** /v1.0/me | Update the current user
 *RoleManagementApi* | [**GetPermissionRoleDefinition**](docs/RoleManagementApi.md#getpermissionroledefinition) | **Get** /v1beta1/roleManagement/permissions/roleDefinitions/{role-id} | Get unifiedRoleDefinition

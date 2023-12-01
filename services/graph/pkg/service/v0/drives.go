@@ -196,10 +196,20 @@ func (g Graph) getDrivesBeta(r *http.Request, unrestricted bool) ([]*libregraph.
 			}
 
 			for i, role := range permission.GetRoles() {
+
+				// v1 implementation for getDrives > ** > cs3PermissionsToLibreGraph
+				// does not use space related role names, we first need to resolve the correct descriptor.
+				switch role {
+				case revaConversions.RoleViewer:
+					role = revaConversions.RoleSpaceViewer
+				case revaConversions.RoleEditor:
+					role = revaConversions.RoleSpaceEditor
+				}
+
 				cs3Role := revaConversions.RoleFromName(role, g.config.FilesSharing.EnableResharing)
 				uniRole := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 					*cs3Role.CS3ResourcePermissions(),
-					unifiedrole.UnifiedRoleConditionGrantee, // fixMe: UnifiedRoleConditionOwner
+					unifiedrole.UnifiedRoleConditionOwner,
 					g.config.FilesSharing.EnableResharing,
 				)
 

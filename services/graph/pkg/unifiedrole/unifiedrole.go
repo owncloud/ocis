@@ -6,9 +6,10 @@ import (
 	"slices"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/cs3org/reva/v2/pkg/conversions"
 )
 
 const (
@@ -187,6 +188,10 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 			{
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionGrantee),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionOwner),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
