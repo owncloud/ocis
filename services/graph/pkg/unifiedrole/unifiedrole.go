@@ -230,23 +230,27 @@ func GetApplicableRoleDefinitionsForActions(actions []string, constraints string
 	var definitions []*libregraph.UnifiedRoleDefinition
 
 	for _, definition := range GetBuiltinRoleDefinitionList(resharing) {
-		match := true
+		definitionMatch := true
 
 		for _, permission := range definition.GetRolePermissions() {
 			if permission.GetCondition() != constraints {
-				match = false
-				break
+				definitionMatch = false
+				continue
 			}
 
 			for _, action := range permission.GetAllowedResourceActions() {
 				if !slices.Contains(actions, action) {
-					match = false
+					definitionMatch = false
 					break
 				}
 			}
+
+			if definitionMatch {
+				break
+			}
 		}
 
-		if !match {
+		if !definitionMatch {
 			continue
 		}
 
