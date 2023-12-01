@@ -134,6 +134,7 @@ web:
       tokenStorageLocal: true
       disabledExtensions: []
       embed: null
+      userListRequiresFilter: false
     styles: []
     scripts: []
     custom_translations: []

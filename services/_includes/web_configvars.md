@@ -54,5 +54,6 @@
 | WEB_OPTION_ACCESS_DENIED_HELP_URL | string |  | Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.|
 | WEB_OPTION_TOKEN_STORAGE_LOCAL | bool | true | Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required.|
 | WEB_OPTION_DISABLED_EXTENSIONS | []string | [] | A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details.|
+| WEB_OPTION_USER_LIST_REQUIRES_FILTER | bool | false | Defines whether one ore more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | WEB_GATEWAY_GRPC_ADDR | string | com.owncloud.api.gateway | The bind address of the GRPC service.|
