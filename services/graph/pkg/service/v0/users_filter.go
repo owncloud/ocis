@@ -73,7 +73,7 @@ func (g Graph) applyFilterFunctionStartsWith(ctx context.Context, req *godata.Go
 	switch operand1.Token.Value {
 	case "displayName":
 		var retUsers []*libregraph.User
-		filterValue := operand2.Token.Value
+		filterValue := strings.Trim(operand2.Token.Value, "'")
 		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by startsWith")
 		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
 			for _, user := range users {
@@ -99,7 +99,7 @@ func (g Graph) applyFilterFunctionContains(ctx context.Context, req *godata.GoDa
 	switch operand1.Token.Value {
 	case "displayName":
 		var retUsers []*libregraph.User
-		filterValue := operand2.Token.Value
+		filterValue := strings.Trim(operand2.Token.Value, "'")
 		logger.Debug().Str("property", operand2.Token.Value).Str("value", filterValue).Msg("Filtering displayName by contains")
 		if users, err := g.identityBackend.GetUsers(ctx, req); err == nil {
 			for _, user := range users {
