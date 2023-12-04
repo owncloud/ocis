@@ -49,6 +49,8 @@ var (
 	PPOutcomeAbort PostprocessingOutcome = "abort"
 	// PPOutcomeContinue means that the upload is moved to its final destination (eventually being marked with pp results)
 	PPOutcomeContinue PostprocessingOutcome = "continue"
+	// PPOutcomeRetry means that there was a temporary issue and the postprocessing should be retried at a later point in time
+	PPOutcomeRetry PostprocessingOutcome = "retry"
 )
 
 // BytesReceived is emitted by the server when it received all bytes of an upload
@@ -149,6 +151,22 @@ type PostprocessingFinished struct {
 // Unmarshal to fulfill umarshaller interface
 func (PostprocessingFinished) Unmarshal(v []byte) (interface{}, error) {
 	e := PostprocessingFinished{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}
+
+// PostprocessingRetry is emitted by *some* service which can decide that
+type PostprocessingRetry struct {
+	UploadID        string
+	Filename        string
+	ExecutingUser   *user.User
+	Failures        int
+	BackoffDuration time.Duration
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (PostprocessingRetry) Unmarshal(v []byte) (interface{}, error) {
+	e := PostprocessingRetry{}
 	err := json.Unmarshal(v, &e)
 	return e, err
 }
