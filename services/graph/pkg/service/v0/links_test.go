@@ -163,7 +163,7 @@ var _ = Describe("createLinkTests", func() {
 					WithContext(ctx),
 			)
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			var createLinkResponseBody []*libregraph.Permission
 			err := json.Unmarshal(rr.Body.Bytes(), &createLinkResponseBody)
@@ -355,7 +355,7 @@ var _ = Describe("createLinkTests", func() {
 					WithContext(ctx),
 			)
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			var createLinkResponseBody []*libregraph.Permission
 			err = json.Unmarshal(rr.Body.Bytes(), &createLinkResponseBody)
