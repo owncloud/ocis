@@ -52,7 +52,7 @@ The following query parameters are supported:
 | y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size                                                            |
 | a         | NO       | 1                                                    | aspect ratio                                                                    |
 | c         | NO       | Caching string                                       | Clients should send the etag, so they get a fresh thumbnail after a file change |
-| processor | NO       | ???                                                  | preferred thumbnail processor                                                   |
+| processor | NO       | `resize` for gif's and `thumbnail` for all others    | preferred thumbnail processor                                                   |
 
 ## Thumbnail Resolution
 
