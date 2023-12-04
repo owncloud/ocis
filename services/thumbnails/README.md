@@ -39,6 +39,22 @@ If a file type was not properly assigned or the type identification failed, thum
 
 Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types are hardcoded and no other types can be requested. A requestor, like another service or a client, can request one of the available types to be generated. If more than one type is required, each type must be requested individually.
 
+## Thumbnail Query String Parameters
+
+Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with thumbnail availabe respond with HTTP status `404`.
+
+The following query parameters are supported:
+
+| Parameter | Required | Default Value                                        | Description                                                                     |
+| --------- | -------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+| preview   | YES      | 1                                                    | generates preview                                                               |
+| x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size                                                          |
+| y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size                                                            |
+| scalingup | NO       | 0                                                    | prevents upscaling of small images                                              |
+| a         | NO       | 1                                                    | aspect ratio                                                                    |
+| c         | NO       | Caching string                                       | Clients should send the etag, so they get a fresh thumbnail after a file change |
+| processor | NO       | `resize` for gif's and `thumbnail` for all others    | preferred thumbnail processor                                                   |
+
 ## Thumbnail Resolution
 
 Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can request any arbitrary resolution and the thumbnail service will use the one closest to the requested resolution. If more than one resolution is required, each resolution must be requested individually.
@@ -54,10 +70,10 @@ Returned: 15x10
 Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative 
 impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by defining on how the preview image generation will be done. The following processors are available:
 
-*   `resize`
-*   `fit`
-*   `fill`
-*   `thumbnail`
+*   `resize` resizes the image to the specified width and height and returns the transformed image. If one of width or height is 0, the image aspect ratio is preserved.
+*   `fit` scales down the image to fit the specified maximum width and height and returns the transformed image.
+*   `fill`: creates an image with the specified dimensions and fills it with the scaled source image. To achieve the correct aspect ratio without stretching, the source image will be cropped.
+*   `thumbnail` scales the image up or down, crops it to the specified width and hight and returns the transformed image.
 
 To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
 
