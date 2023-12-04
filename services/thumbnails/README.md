@@ -45,14 +45,14 @@ Clients can request thumbnail previews for files by adding `?preview=1` to the f
 
 The following query parameters are supported:
 
-| Parameter | Required | Default Value                                        | Description                   |
-| --------- | -------- | ---------------------------------------------------- | ----------------------------- |
-| preview   | YES      | 1                                                    | generates preview             |
-| x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size        |
-| y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size          |
-| a         | NO       | 1                                                    | aspect ratio                  |
-| c         | NO       | ???                                                  | ???                           |
-| processor | NO       | ???                                                  | preferred thumbnail processor |
+| Parameter | Required | Default Value                                        | Description                                                                     |
+| --------- | -------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+| preview   | YES      | 1                                                    | generates preview                                                               |
+| x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size                                                          |
+| y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size                                                            |
+| a         | NO       | 1                                                    | aspect ratio                                                                    |
+| c         | NO       | Caching string                                       | Clients should send the etag, so they get a fresh thumbnail after a file change |
+| processor | NO       | ???                                                  | preferred thumbnail processor                                                   |
 
 ## Thumbnail Resolution
 
