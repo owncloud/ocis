@@ -55,6 +55,7 @@ func WalkSegments(segments []string, claims map[string]interface{}) (interface{}
 	return claims[segments[i]], nil
 }
 
+// ReadStringClaim returns the string obtained by following the . seperated path in the claims
 func ReadStringClaim(path string, claims map[string]interface{}) (string, error) {
 	// check the simple case first
 	value, _ := claims[path].(string)
