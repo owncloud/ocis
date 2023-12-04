@@ -21,6 +21,7 @@ package upload
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	iofs "io/fs"
 	"os"
@@ -496,4 +497,86 @@ func lookupNode(ctx context.Context, spaceRoot *node.Node, path string, lu *look
 		n.Name = filepath.Base(path)
 	}
 	return n, nil
+}
+
+// Progress adapts the persisted upload metadata for the UploadSessionLister interface
+type Progress struct {
+	Path       string
+	Info       tusd.FileInfo
+	Processing bool
+}
+
+// ID implements the storage.UploadSession interface
+func (p Progress) ID() string {
+	return p.Info.ID
+}
+
+// Filename implements the storage.UploadSession interface
+func (p Progress) Filename() string {
+	return p.Info.MetaData["filename"]
+}
+
+// Size implements the storage.UploadSession interface
+func (p Progress) Size() int64 {
+	return p.Info.Size
+}
+
+// Offset implements the storage.UploadSession interface
+func (p Progress) Offset() int64 {
+	return p.Info.Offset
+}
+
+// Reference implements the storage.UploadSession interface
+func (p Progress) Reference() provider.Reference {
+	return provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: p.Info.MetaData["providerID"],
+			SpaceId:   p.Info.Storage["SpaceRoot"],
+			OpaqueId:  p.Info.Storage["NodeId"], // Node id is always set in InitiateUpload
+		},
+	}
+}
+
+// Executant implements the storage.UploadSession interface
+func (p Progress) Executant() userpb.UserId {
+	return userpb.UserId{
+		Idp:      p.Info.Storage["Idp"],
+		OpaqueId: p.Info.Storage["UserId"],
+		Type:     utils.UserTypeMap(p.Info.Storage["UserType"]),
+	}
+}
+
+// SpaceOwner implements the storage.UploadSession interface
+func (p Progress) SpaceOwner() *userpb.UserId {
+	return &userpb.UserId{
+		// idp and type do not seem to be consumed and the node currently only stores the user id anyway
+		OpaqueId: p.Info.Storage["SpaceOwnerOrManager"],
+	}
+}
+
+// Expires implements the storage.UploadSession interface
+func (p Progress) Expires() time.Time {
+	mt, _ := utils.MTimeToTime(p.Info.MetaData["expires"])
+	return mt
+}
+
+// IsProcessing implements the storage.UploadSession interface
+func (p Progress) IsProcessing() bool {
+	return p.Processing
+}
+
+// Purge implements the storage.UploadSession interface
+func (p Progress) Purge(ctx context.Context) error {
+	berr := os.Remove(p.Info.Storage["BinPath"])
+	if berr != nil {
+		appctx.GetLogger(ctx).Error().Str("id", p.Info.ID).Interface("path", p.Info.Storage["BinPath"]).Msg("Decomposedfs: could not purge bin path for upload session")
+	}
+
+	// remove upload metadata
+	merr := os.Remove(p.Path)
+	if merr != nil {
+		appctx.GetLogger(ctx).Error().Str("id", p.Info.ID).Interface("path", p.Path).Msg("Decomposedfs: could not purge metadata path for upload session")
+	}
+
+	return stderrors.Join(berr, merr)
 }
