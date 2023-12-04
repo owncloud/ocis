@@ -170,7 +170,10 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 		outcome = av.o
 	case !res.Infected && err == nil:
 		outcome = events.PPOutcomeContinue
+	case err != nil:
+		outcome = events.PPOutcomeRetry
 	default:
+		// Not sure what this is about. abort.
 		outcome = events.PPOutcomeAbort
 	}
 
