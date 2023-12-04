@@ -50,6 +50,7 @@ The following query parameters are supported:
 | preview   | YES      | 1                                                    | generates preview                                                               |
 | x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size                                                          |
 | y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size                                                            |
+| scalingup | NO       | 0                                                    | prevents upscaling of small images                                              |
 | a         | NO       | 1                                                    | aspect ratio                                                                    |
 | c         | NO       | Caching string                                       | Clients should send the etag, so they get a fresh thumbnail after a file change |
 | processor | NO       | `resize` for gif's and `thumbnail` for all others    | preferred thumbnail processor                                                   |
