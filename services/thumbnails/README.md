@@ -69,10 +69,10 @@ Returned: 15x10
 Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative 
 impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by defining on how the preview image generation will be done. The following processors are available:
 
-*   `resize`
-*   `fit`
-*   `fill`
-*   `thumbnail`
+*   `resize` resizes the image to the specified width and height and returns the transformed image. If one of width or height is 0, the image aspect ratio is preserved.
+*   `fit` scales down the image to fit the specified maximum width and height and returns the transformed image.
+*   `fill`: creates an image with the specified dimensions and fills it with the scaled source image. To achieve the correct aspect ratio without stretching, the source image will be cropped.
+*   `thumbnail` scales the image up or down, crops it to the specified width and hight and returns the transformed image.
 
 To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
 
