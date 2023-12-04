@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
         "skip": False,
@@ -78,7 +78,7 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
             ],
-            "skip": True,
+            "skip": False,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
@@ -90,7 +90,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": True,
+            "skip": False,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -107,7 +107,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": True,
+            "skip": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -121,22 +121,22 @@ config = {
             "suites": [
                 "apiSearch",
             ],
-            "skip": True,
+            "skip": False,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": True,
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -2784,39 +2784,53 @@ def logRequests():
     }]
 
 def k6LoadTests(ctx):
-    return {
+    ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
+    script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "k6-load-test",
+        "clone": {
+            "disable": True,
+        },
         "steps": [
             {
                 "name": "k6-load-test",
                 "image": OC_CI_ALPINE,
                 "environment": {
-                    "SSH_SERVER": {
+                    "SSH_OCIS_REMOTE": {
                         "from_secret": "ssh_ocis_remote",
                     },
-                    "SSH_USERNAME": {
+                    "SSH_OCIS_USERNAME": {
                         "from_secret": "ssh_ocis_user",
                     },
-                    "SSH_PASSWORD": {
+                    "SSH_OCIS_PASSWORD": {
                         "from_secret": "ssh_ocis_pass",
                     },
-                    "TEST_SERVER_URL": "url",
-                    "SSH_COMMAND": "bash scripts/ocis.sh start",
+                    "TEST_SERVER_URL": {
+                        "from_secret": "ssh_ocis_server_url",
+                    },
+                    "SSH_K6_REMOTE": {
+                        "from_secret": "ssh_k6_remote",
+                    },
+                    "SSH_K6_USERNAME": {
+                        "from_secret": "ssh_k6_user",
+                    },
+                    "SSH_K6_PASSWORD": {
+                        "from_secret": "ssh_k6_pass",
+                    },
                 },
                 "commands": [
-                    "sh %s/tests/config/drone/ssh_login.sh" % (dirs["base"]),
-                    "cd scripts",
-                    "ls",
+                    "curl -s -o run_k6_tests.sh %s" % script_link,
+                    "apk add --no-cache openssh-client sshpass",
+                    "sh %s/run_k6_tests.sh" % (dirs["base"]),
                 ],
             },
         ],
         "depends_on": [],
         "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/pull/**",
+            "event": [
+                "cron",
             ],
         },
-    }
+    }]
