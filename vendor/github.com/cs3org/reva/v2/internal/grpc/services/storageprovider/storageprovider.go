@@ -76,6 +76,7 @@ type eventconfig struct {
 	TLSInsecure          bool   `mapstructure:"tls_insecure"  docs:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `mapstructure:"tls_root_ca_cert"  docs:"The root CA certificate used to validate the server's TLS certificate."`
 	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
+	EphemeralConsumers   bool
 }
 
 func (c *config) init() {

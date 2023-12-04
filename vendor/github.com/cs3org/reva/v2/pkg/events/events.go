@@ -80,7 +80,12 @@ type (
 // group defines the service type: One group will get exactly one copy of a event that is emitted
 // NOTE: uses reflect on initialization
 func Consume(s Consumer, group string, evs ...Unmarshaller) (<-chan Event, error) {
-	c, err := s.Consume(MainQueueName, events.WithGroup(group))
+	consumeOpts := []events.ConsumeOption{}
+	if group != "" {
+		consumeOpts = append(consumeOpts, events.WithGroup(group))
+	}
+
+	c, err := s.Consume(MainQueueName, consumeOpts...)
 	if err != nil {
 		return nil, err
 	}

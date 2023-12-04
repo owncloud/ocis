@@ -22,6 +22,7 @@ type NatsConfig struct {
 	TLSInsecure          bool   // Whether to verify TLS certificates
 	TLSRootCACertificate string // The root CA certificate used to validate the TLS certificate
 	EnableTLS            bool   // Enable TLS
+	EphemeralConsumers   bool   // Make the consumers durable or not. Ephimeral is not durable
 }
 
 // NatsFromConfig returns a nats stream from the given config
@@ -48,13 +49,18 @@ func NatsFromConfig(connName string, cfg NatsConfig) (events.Stream, error) {
 			RootCAs:            rootCAPool,
 		}
 	}
-	return Nats(
+
+	natsOpts := []natsjs.Option{
 		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(cfg.Endpoint),
 		natsjs.ClusterID(cfg.Cluster),
 		natsjs.SynchronousPublish(true),
 		natsjs.Name(connName),
-	)
+	}
+	if cfg.EphemeralConsumers {
+		natsOpts = append(natsOpts, natsjs.DisableDurableStreams())
+	}
+	return Nats(natsOpts...)
 
 }
 

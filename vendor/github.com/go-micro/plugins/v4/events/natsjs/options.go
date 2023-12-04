@@ -8,14 +8,15 @@ import (
 
 // Options which are used to configure the nats stream.
 type Options struct {
-	ClusterID   string
-	ClientID    string
-	Address     string
-	NkeyConfig  string
-	TLSConfig   *tls.Config
-	Logger      logger.Logger
-	SyncPublish bool
-	Name        string
+	ClusterID             string
+	ClientID              string
+	Address               string
+	NkeyConfig            string
+	TLSConfig             *tls.Config
+	Logger                logger.Logger
+	SyncPublish           bool
+	Name                  string
+	DisableDurableStreams bool
 }
 
 // Option is a function which configures options.
@@ -74,5 +75,12 @@ func SynchronousPublish(sync bool) Option {
 func Name(name string) Option {
 	return func(o *Options) {
 		o.Name = name
+	}
+}
+
+// DisableDurableStreams will disable durable streams
+func DisableDurableStreams() Option {
+	return func(o *Options) {
+		o.DisableDurableStreams = true
 	}
 }

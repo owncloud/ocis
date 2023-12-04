@@ -23,15 +23,9 @@ import (
 	"io"
 	"net/url"
 
-	tusd "github.com/tus/tusd/pkg/handler"
-
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 )
-
-// UploadFinishedFunc is a callback function used in storage drivers to indicate that an upload has finished
-type UploadFinishedFunc func(spaceOwner, owner *userpb.UserId, ref *provider.Reference)
 
 // FS is the interface to implement access to the storage.
 type FS interface {
@@ -77,12 +71,6 @@ type FS interface {
 	DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error
 }
 
-// UploadsManager defines the interface for FS implementations that allow for managing uploads
-type UploadsManager interface {
-	ListUploads() ([]tusd.FileInfo, error)
-	PurgeExpiredUploads(chan<- tusd.FileInfo) error
-}
-
 // Registry is the interface that storage registries implement
 // for discovering storage providers
 type Registry interface {
@@ -97,10 +85,4 @@ type Registry interface {
 type PathWrapper interface {
 	Unwrap(ctx context.Context, rp string) (string, error)
 	Wrap(ctx context.Context, rp string) (string, error)
-}
-
-type UploadRequest struct {
-	Ref    *provider.Reference
-	Body   io.ReadCloser
-	Length int64
 }

@@ -59,7 +59,9 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				natsStream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
+				natsCfg := stream.NatsConfig(cfg.Events)
+				natsCfg.EphemeralConsumers = true // always true in this case
+				natsStream, err := stream.NatsFromConfig(cfg.Service.Name, natsCfg)
 				if err != nil {
 					return err
 				}
