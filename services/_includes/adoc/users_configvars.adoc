@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-04-10-51-41]
+[#deprecation-note-2023-12-04-11-20-55]
 [caption=]
 .Deprecation notes for the users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -268,7 +268,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `USERS_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-12-04-10-51-41[Deprecation Note]
+xref:deprecation-note-2023-12-04-11-20-55[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -420,7 +420,7 @@ LDAP Attribute to use as the unique ID for users. This should be a stable global
 a|`OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
-xref:deprecation-note-2023-12-04-10-51-41[Deprecation Note]
+xref:deprecation-note-2023-12-04-11-20-55[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
