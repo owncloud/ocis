@@ -247,7 +247,7 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
 			r.Route("/users", func(r chi.Router) {
-				r.With(requireAdmin).Get("/", svc.GetUsers)
+				r.Get("/", svc.GetUsers)
 				r.With(requireAdmin).Post("/", svc.PostUser)
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
