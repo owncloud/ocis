@@ -195,6 +195,21 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (g Graph) contextUserHasFullAccountPerms(reqctx context.Context) bool {
+	// mostly copied from the canCreateSpace method
+	pr, err := g.permissionsService.GetPermissionByID(reqctx, &settingssvc.GetPermissionByIDRequest{
+		PermissionId: defaults.AccountManagementPermission(0).Id,
+	})
+	if err != nil || pr.Permission == nil {
+		return false
+	}
+
+	if pr.Permission.Constraint != defaults.All {
+		return false
+	}
+	return true
+}
+
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
@@ -204,6 +219,21 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
+	if !ctxHasFullPerms && (odataReq.Query == nil || odataReq.Query.Search == nil || len(odataReq.Query.Search.RawValue) < 3) {
+		// regular user must search with at least 3 chars
+		logger.Debug().Interface("query", r.URL.Query()).Msg("search with less than 3 chars for a regular user")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "regular users must enter at least 3 characters to search")
+		return
+	}
+
+	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
+		// regular users can't use filter, apply, expand and compute
+		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "query has forbidden elements for regular users")
 		return
 	}
 
@@ -230,6 +260,15 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
+	}
+
+	// If the user isn't admin, we'll show just the minimum user attibutes
+	if !ctxHasFullPerms {
+		finalUsers := make([]*libregraph.User, len(users))
+		for i, u := range users {
+			finalUsers[i] = &libregraph.User{Id: u.Id, DisplayName: u.DisplayName, Mail: u.Mail}
+		}
+		users = finalUsers
 	}
 
 	exp, err := identity.GetExpandValues(odataReq.Query)
