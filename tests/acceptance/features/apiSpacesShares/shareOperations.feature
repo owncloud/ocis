@@ -355,6 +355,7 @@ Feature: sharing
 
   Scenario Outline: space admin tries to remove password of a public link share (change/create permission)
     Given using spaces DAV path
+    And using OCS API version "<ocs_api_version>"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -365,17 +366,20 @@ Feature: sharing
       | path        | /FOLDER       |
       | permissions | <permissions> |
       | password    |               |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "<http_status_code>"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | permissions |
-      | change      |
-      | create      |
+      | ocs_api_version | permissions | http_status_code |
+      | 1               | change      | 200              |
+      | 2               | change      | 400              |
+      | 1               | create      | 200              |
+      | 2               | create      | 400              |
 
 
-  Scenario: space admin removes password of a public link share (read permission)
+  Scenario Outline: space admin removes password of a public link share (read permission)
     Given using spaces DAV path
+    And using OCS API version "<ocs_api_version>"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -387,4 +391,8 @@ Feature: sharing
       | permissions | read    |
       | password    |         |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
+    And the OCS status code should be "<ocs_status_code>"
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |

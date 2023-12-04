@@ -150,20 +150,24 @@ Feature: Share spaces via link
 
 
   Scenario Outline: space admin tries to remove password of a public link share of a space (various permission)
-    Given user "Alice" has created a public link share of the space "share space" with settings:
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has created a public link share of the space "share space" with settings:
       | permissions | <permissions> |
       | password    | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    |               |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "<http_status_code>"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | permissions |
-      | 5           |
-      | 15          |
-      | 4           |
+      | ocs_api_version | permissions | http_status_code |
+      | 1               | 5           | 200              |
+      | 2               | 5           | 400              |
+      | 1               | 15          | 200              |
+      | 2               | 15          | 400              |
+      | 1               | 4           | 200              |
+      | 2               | 4           | 400              |
 
 
   Scenario Outline: space admin removes password of a public link share of a space (invite permission)
@@ -183,8 +187,9 @@ Feature: Share spaces via link
       | 2               | 200             |
 
 
-  Scenario: space manager tries to remove password of a public link share of a space (read permission)
-    Given user "Alice" has shared a space "share space" with settings:
+  Scenario Outline: space manager tries to remove password of a public link share of a space (read permission)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
     And user "Brian" has created a public link share of the space "share space" with settings:
@@ -193,13 +198,18 @@ Feature: Share spaces via link
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 1 |
       | password    |   |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "<http_status_code>"
     And the OCS status code should be "104"
     And the OCS status message should be "user is not allowed to delete the password from the public link"
+    Examples:
+      | ocs_api_version | http_status_code |
+      | 1               | 200              |
+      | 2               | 403              |
 
 
   Scenario Outline: space manager tries to remove password of a public link share of a space (various permission)
-    Given user "Alice" has shared a space "share space" with settings:
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
     And user "Brian" has created a public link share of the space "share space" with settings:
@@ -208,14 +218,17 @@ Feature: Share spaces via link
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    |               |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "<http_status_code>"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | permissions |
-      | 5           |
-      | 15          |
-      | 4           |
+      | ocs_api_version | permissions | http_status_code |
+      | 1               | 5           | 200              |
+      | 2               | 5           | 400              |
+      | 1               | 15          | 200              |
+      | 2               | 15          | 400              |
+      | 1               | 4           | 200              |
+      | 2               | 4           | 400              |
 
 
   Scenario Outline: space manager removes password of a public link share of a space (invite permission)
