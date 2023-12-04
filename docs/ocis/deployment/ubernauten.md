@@ -6,7 +6,9 @@ geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: ubernauten.md
 ---
+
 [comment]: # Is there a style guide?
+
 [comment]: # How to do inline URLs and where to put the videos?
 
 {{< toc >}}
@@ -72,11 +74,9 @@ If you want `ocis` to run continuously, you need to configure `supervisord` (htt
 You can start and stop services with `supervisorctl`, it will (re)read configuration files it finds in your home directory, under `etc/services.d/`, in `.ini` files. The content of these files is very simple, you only have to enter three lines, here is the example for Infinite Scale in `/home/owncloud/etc/services.d/ocis.ini`.
 
 ```
-{
 [program:ocis]
 command="/home/owncloud/ocis.start"
 startsecs=60
-}
 ```
 
 `ocis.start` is a script that combines all of the commands above except for the download of the ocis binary. It looks like this:
@@ -115,7 +115,6 @@ Don't worry, you can always go back to the older version you had installed, ther
 This little script is removing your ocis installation (and ==all of your data!==), replacing it with a new, clean ocis installation. Be careful and only use it for testing purposes. Specify your desired ocis version in the curl command.
 
 ```
-{
 #!/bin/bash
 # This file is named ocis.reinstall
 rm -rf .ocis
@@ -128,7 +127,6 @@ export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug
 ./ocis init
 ./ocis server
-}
 ```
 
 ### Troubleshooting
