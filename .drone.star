@@ -59,6 +59,9 @@ config = {
     "wopiValidatorTests": {
         "skip": False,
     },
+    "k6LoadTests": {
+        "skip": False,
+    },
     "localApiTests": {
         "basic": {
             "suites": [
@@ -335,6 +338,9 @@ def testPipelines(ctx):
 
     if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
         pipelines += e2eTests(ctx)
+
+    if "skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]:
+        pipelines += k6LoadTests(ctx)
 
     return pipelines
 
@@ -2773,6 +2779,58 @@ def logRequests():
         "when": {
             "status": [
                 "failure",
+            ],
+        },
+    }]
+
+def k6LoadTests(ctx):
+    ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
+    script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "k6-load-test",
+        "clone": {
+            "disable": True,
+        },
+        "steps": [
+            {
+                "name": "k6-load-test",
+                "image": OC_CI_ALPINE,
+                "environment": {
+                    "SSH_OCIS_REMOTE": {
+                        "from_secret": "ssh_ocis_remote",
+                    },
+                    "SSH_OCIS_USERNAME": {
+                        "from_secret": "ssh_ocis_user",
+                    },
+                    "SSH_OCIS_PASSWORD": {
+                        "from_secret": "ssh_ocis_pass",
+                    },
+                    "TEST_SERVER_URL": {
+                        "from_secret": "ssh_ocis_server_url",
+                    },
+                    "SSH_K6_REMOTE": {
+                        "from_secret": "ssh_k6_remote",
+                    },
+                    "SSH_K6_USERNAME": {
+                        "from_secret": "ssh_k6_user",
+                    },
+                    "SSH_K6_PASSWORD": {
+                        "from_secret": "ssh_k6_pass",
+                    },
+                },
+                "commands": [
+                    "curl -s -o run_k6_tests.sh %s" % script_link,
+                    "apk add --no-cache openssh-client sshpass",
+                    "sh %s/run_k6_tests.sh" % (dirs["base"]),
+                ],
+            },
+        ],
+        "depends_on": [],
+        "trigger": {
+            "event": [
+                "cron",
             ],
         },
     }]
