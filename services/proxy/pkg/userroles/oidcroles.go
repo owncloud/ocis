@@ -9,6 +9,7 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4/metadata"
 )
@@ -29,6 +30,45 @@ func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 	}
 }
 
+func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]struct{}, error) {
+
+	claimRoles := map[string]struct{}{}
+	// happy path
+	value, _ := claims[rolesClaim].(string)
+	if value != "" {
+		claimRoles[value] = struct{}{}
+		return claimRoles, nil
+	}
+
+	claim, err := oidc.WalkSegments(oidc.SplitWithEscaping(rolesClaim, ".", "\\"), claims)
+	if err != nil {
+		return nil, err
+	}
+
+	switch v := claim.(type) {
+	case []string:
+		for _, cr := range v {
+			claimRoles[cr] = struct{}{}
+		}
+	case []interface{}:
+		for _, cri := range v {
+			cr, ok := cri.(string)
+			if !ok {
+				err := errors.New("invalid role in claims")
+				return nil, err
+			}
+
+			claimRoles[cr] = struct{}{}
+		}
+	case string:
+		claimRoles[v] = struct{}{}
+	default:
+		return nil, errors.New("no roles in user claims")
+	}
+
+	return claimRoles, nil
+}
+
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3.User, claims map[string]interface{}) (*cs3.User, error) {
@@ -39,23 +79,10 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 
-	claimRolesRaw, ok := claims[ra.rolesClaim].([]interface{})
-	if !ok {
-		logger.Error().Str("rolesClaim", ra.rolesClaim).Msg("No roles in user claims")
-		return nil, errors.New("no roles in user claims")
-	}
-
-	logger.Debug().Str("rolesClaim", ra.rolesClaim).Interface("rolesInClaim", claims[ra.rolesClaim]).Msg("got roles in claim")
-	claimRoles := map[string]struct{}{}
-	for _, cri := range claimRolesRaw {
-		cr, ok := cri.(string)
-		if !ok {
-			err := errors.New("invalid role in claims")
-			logger.Error().Err(err).Interface("claimValue", cri).Msg("Is not a valid string.")
-			return nil, err
-		}
-
-		claimRoles[cr] = struct{}{}
+	claimRoles, err := extractRoles(ra.rolesClaim, claims)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error mapping role names to role ids")
+		return nil, err
 	}
 
 	if len(claimRoles) == 0 {
