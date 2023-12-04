@@ -190,6 +190,8 @@ Feature: changing a public link share
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
       | 2               | 200             |
+    And the OCS status code should be "104"
+    And the OCS status message should be "user is not allowed to delete the password from the public link"
 
 
   Scenario Outline: administrator removes password of a read-only public link
