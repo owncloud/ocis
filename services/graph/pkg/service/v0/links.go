@@ -51,7 +51,7 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
+	render.Status(r, http.StatusOK)
 	render.JSON(w, r, []libregraph.Permission{*perm})
 }
 
