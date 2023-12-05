@@ -273,6 +273,8 @@ def main(ctx):
                 pipelines,
             )
 
+    pipelines = pipelines + k6LoadTests(ctx)
+
     # always append notification step
     pipelines.append(
         pipelineDependsOn(
@@ -338,9 +340,6 @@ def testPipelines(ctx):
 
     if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
         pipelines += e2eTests(ctx)
-
-    if "skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]:
-        pipelines += k6LoadTests(ctx)
 
     return pipelines
 
@@ -2784,6 +2783,9 @@ def logRequests():
     }]
 
 def k6LoadTests(ctx):
+    if "skip" in config["k6LoadTests"] and config["k6LoadTests"]["skip"]:
+        return []
+
     ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
     script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
     return [{
