@@ -66,8 +66,8 @@ func (g Graph) GetDrives(version APIVersion) http.HandlerFunc {
 	switch version {
 	case APIVersion_1:
 		return g.GetDrivesV1
-	case APIVersion_Beta:
-		return g.GetDrivesBeta
+	case APIVersion_1_Beta_1:
+		return g.GetDrivesV1Beta1
 	default:
 		return func(w http.ResponseWriter, r *http.Request) {
 			errorcode.New(errorcode.NotSupported, "api version not supported").Render(w, r)
@@ -95,10 +95,10 @@ func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetDrivesBeta is the same as the GetDrivesV1 endpoint, expect:
+// GetDrivesV1Beta1 is the same as the GetDrivesV1 endpoint, expect:
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
-func (g Graph) GetDrivesBeta(w http.ResponseWriter, r *http.Request) {
+func (g Graph) GetDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	spaces, errCode := g.getDrivesBeta(r, false)
 	if errCode != nil {
 		errCode.Render(w, r)
@@ -121,8 +121,8 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 	switch version {
 	case APIVersion_1:
 		return g.GetAllDrivesV1
-	case APIVersion_Beta:
-		return g.GetAllDrivesBeta
+	case APIVersion_1_Beta_1:
+		return g.GetAllDrivesV1Beta1
 	default:
 		return func(w http.ResponseWriter, r *http.Request) {
 			errorcode.New(errorcode.NotSupported, "api version not supported").Render(w, r)
@@ -149,10 +149,10 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetAllDrivesBeta is the same as the GetAllDrivesV1 endpoint, expect:
+// GetAllDrivesV1Beta1 is the same as the GetAllDrivesV1 endpoint, expect:
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
-func (g Graph) GetAllDrivesBeta(w http.ResponseWriter, r *http.Request) {
+func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	drives, errCode := g.getDrivesBeta(r, true)
 	if errCode != nil {
 		errCode.Render(w, r)

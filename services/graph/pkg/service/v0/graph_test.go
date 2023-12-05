@@ -20,6 +20,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
+	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -35,6 +36,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 var _ = Describe("Graph", func() {
@@ -92,7 +94,7 @@ var _ = Describe("Graph", func() {
 	})
 
 	Describe("Drives", func() {
-		Describe("List drives", func() {
+		Describe("GetDrivesV1 and GetAllDrivesV1", func() {
 			It("can list an empty list of spaces", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
@@ -477,6 +479,58 @@ var _ = Describe("Graph", func() {
 				Expect(libreError.Error.Code).To(Equal(errorcode.GeneralException.String()))
 			})
 		})
+		DescribeTable("GetDrivesV1Beta1 and GetAllDrivesV1Beta1",
+			func(check func(gjson.Result), resourcePermissions provider.ResourcePermissions) {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Opaque: utils.AppendJSONToOpaque(nil, "grants", map[string]provider.ResourcePermissions{
+								"1": resourcePermissions,
+							}),
+							Root: &provider.ResourceId{},
+						},
+					},
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userprovider.GetUserResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1Beta1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				jsonData := gjson.Get(rr.Body.String(), "value")
+
+				Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
+				Expect(jsonData.Get("0.root.permissions.#").Num).To(Equal(float64(1)))
+				Expect(jsonData.Get("0.root.permissions.0.grantedToIdentities").Exists()).To(BeFalse())
+				Expect(jsonData.Get("0.root.permissions.0.grantedToIdentities").Exists()).To(BeFalse())
+				Expect(jsonData.Get("0.root.permissions.0.grantedToV2.user.id").Str).To(Equal("1"))
+				Expect(jsonData.Get("0.root.permissions.0.roles.#").Num).To(Equal(float64(1)))
+
+				check(jsonData)
+			},
+			Entry("injects grantedToV2", func(jsonData gjson.Result) {}, provider.ResourcePermissions{RemoveGrant: true}),
+			Entry("remaps manager role to the unified counterpart", func(jsonData gjson.Result) {
+				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleManagerID))
+			}, provider.ResourcePermissions{RemoveGrant: true}),
+			Entry("remaps editor role to the unified counterpart", func(jsonData gjson.Result) {
+				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleSpaceEditorID))
+			}, provider.ResourcePermissions{InitiateFileUpload: true}),
+			Entry("remaps viewer role to the unified counterpart", func(jsonData gjson.Result) {
+				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleSpaceViewerID))
+			}, provider.ResourcePermissions{Stat: true}),
+		)
 		Describe("Create Drive", func() {
 			It("cannot create a space without valid user in context", func() {
 				jsonBody := []byte(`{"Name": "Test Space"}`)

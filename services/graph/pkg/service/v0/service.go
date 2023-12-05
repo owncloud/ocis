@@ -95,10 +95,10 @@ type Service interface {
 	DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 
 	GetDrivesV1(w http.ResponseWriter, r *http.Request)
-	GetDrivesBeta(w http.ResponseWriter, r *http.Request)
+	GetDrivesV1Beta1(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrivesV1(w http.ResponseWriter, r *http.Request)
-	GetAllDrivesBeta(w http.ResponseWriter, r *http.Request)
+	GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
@@ -202,7 +202,7 @@ func NewService(opts ...Option) (Graph, error) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
-				r.Get("/drives", svc.GetDrives(APIVersion_Beta))
+				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
 				r.Route("/drive", func(r chi.Router) {
 					r.Get("/sharedByMe", svc.GetSharedByMe)
 					r.Get("/sharedWithMe", svc.ListSharedWithMe)
@@ -210,7 +210,7 @@ func NewService(opts ...Option) (Graph, error) {
 			})
 
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives(APIVersion_Beta))
+				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Route("/{driveID}/items/{itemID}", func(r chi.Router) {
 					r.Post("/invite", svc.Invite)
 					r.Get("/permissions", svc.ListPermissions)

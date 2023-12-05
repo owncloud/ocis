@@ -130,11 +130,11 @@ const (
 	// APIVersion_1 represents the first version of the API.
 	APIVersion_1 APIVersion = iota + 1
 
-	// APIVersion_Beta refers to the beta version of the API.
+	// APIVersion_1_Beta_1 refers to the beta version of the API.
 	// It is typically used for testing purposes and may have more
 	// inconsistencies and bugs than the stable version as it is
 	// still in the testing phase, use it with caution.
-	APIVersion_Beta
+	APIVersion_1_Beta_1
 )
 
 // TODO might be different for /education/users vs /users
