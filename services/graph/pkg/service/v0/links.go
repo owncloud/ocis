@@ -52,7 +52,7 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, []libregraph.Permission{*perm})
+	render.JSON(w, r, *perm)
 }
 
 func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (*link.PublicShare, error) {

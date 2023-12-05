@@ -165,15 +165,14 @@ var _ = Describe("createLinkTests", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			var createLinkResponseBody []*libregraph.Permission
+			var createLinkResponseBody *libregraph.Permission
 			err := json.Unmarshal(rr.Body.Bytes(), &createLinkResponseBody)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(createLinkResponseBody)).To(Equal(1))
-			Expect(createLinkResponseBody[0].GetId()).To(Equal("123"))
-			Expect(createLinkResponseBody[0].GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
-			Expect(createLinkResponseBody[0].GetHasPassword()).To(Equal(false))
-			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
-			link := createLinkResponseBody[0].GetLink()
+			Expect(createLinkResponseBody.GetId()).To(Equal("123"))
+			Expect(createLinkResponseBody.GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
+			Expect(createLinkResponseBody.GetHasPassword()).To(Equal(false))
+			Expect(createLinkResponseBody.GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
+			link := createLinkResponseBody.GetLink()
 			respLinkType := link.GetType()
 			expected, err := libregraph.NewSharingLinkTypeFromValue("view")
 			Expect(err).ToNot(HaveOccurred())
@@ -357,15 +356,14 @@ var _ = Describe("createLinkTests", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			var createLinkResponseBody []*libregraph.Permission
+			var createLinkResponseBody *libregraph.Permission
 			err = json.Unmarshal(rr.Body.Bytes(), &createLinkResponseBody)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(createLinkResponseBody)).To(Equal(1))
-			Expect(createLinkResponseBody[0].GetId()).To(Equal("123"))
-			Expect(createLinkResponseBody[0].GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
-			Expect(createLinkResponseBody[0].GetHasPassword()).To(Equal(false))
-			Expect(createLinkResponseBody[0].GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
-			respLink := createLinkResponseBody[0].GetLink()
+			Expect(createLinkResponseBody.GetId()).To(Equal("123"))
+			Expect(createLinkResponseBody.GetExpirationDateTime().Unix()).To(Equal(driveItemCreateLink.ExpirationDateTime.Unix()))
+			Expect(createLinkResponseBody.GetHasPassword()).To(Equal(false))
+			Expect(createLinkResponseBody.GetLink().LibreGraphDisplayName).To(Equal(libregraph.PtrString(ViewerLinkString)))
+			respLink := createLinkResponseBody.GetLink()
 			// some conversion gymnastics
 			respLinkType := respLink.GetType()
 			Expect(err).ToNot(HaveOccurred())
@@ -374,7 +372,7 @@ var _ = Describe("createLinkTests", func() {
 			mockLink.Type = lt
 			expectedType := mockLink.GetType()
 			Expect(&respLinkType).To(Equal(&expectedType))
-			libreGraphActions := createLinkResponseBody[0].LibreGraphPermissionsActions
+			libreGraphActions := createLinkResponseBody.LibreGraphPermissionsActions
 			Expect(libreGraphActions[0]).To(Equal("libre.graph/driveItem/children/create"))
 			Expect(libreGraphActions[1]).To(Equal("libre.graph/driveItem/upload/create"))
 			Expect(libreGraphActions[2]).To(Equal("libre.graph/driveItem/path/update"))
