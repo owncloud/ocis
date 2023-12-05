@@ -83,7 +83,8 @@ startsecs=60
 
 ```
 #!/bin/bash
-# This file is named ocis.start
+# This file is named ocis.start.
+# It sets environment variables needed for uber.space needed for Infinite Scale
 /usr/bin/uberspace web backend set / --http --port 9200 &
 export OCIS_URL=https://ocis.uber.space
 export PROXY_TLS=false
@@ -117,6 +118,7 @@ This little script is removing your ocis installation (and ==all of your data!==
 ```
 #!/bin/bash
 # This file is named ocis.reinstall
+# It deletes the old ocis installation, fetches a new binary and starts ocis.
 rm -rf .ocis
 curl https://download.owncloud.com/ocis/ocis/stable/4.0.2/ocis-4.0.2-linux-amd64 --output ocis
 chmod +x ocis
