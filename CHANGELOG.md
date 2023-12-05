@@ -1,7 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0](#changelog-for-500-2023-11-22)
+* [Changelog for 5.0.0](#changelog-for-500-2023-11-30)
 * [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
@@ -36,71 +36,9 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
-* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
-* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
-* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
-* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
-* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
-* Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
 * Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
-* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 
 ## Details
-
-* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
-
-   We fixed that current date is always printed.
-
-   https://github.com/owncloud/ocis/issues/6124
-   https://github.com/owncloud/ocis/pull/6132
-
-* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
-
-   We fixed the Disabled DEPTH infinity in PROPFIND for: Personal /remote.php/dav/files/admin
-   Public link share /remote.php/dav/public-files/<token> Trashbin
-   /remote.php/dav/spaces/trash-bin/<personal-space-id>
-
-   https://github.com/owncloud/ocis/issues/7359
-   https://github.com/owncloud/ocis/pull/7746
-   https://github.com/cs3org/reva/pull/4278
-
-* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
-
-   The `search` service would sometimes not start correctly because config values are
-   overwritten by default configuration.
-
-   https://github.com/owncloud/ocis/pull/7795
-
-* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
-
-   We add banned password list to the default deployments
-
-   https://github.com/owncloud/ocis/issues/7724
-   https://github.com/owncloud/ocis/pull/7784
-
-* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
-
-   A new config for default link permissions that is being announced via capabilities has been
-   added. It defaults to 1 (= public link with viewer permissions).
-
-   https://github.com/owncloud/web/issues/9919
-   https://github.com/owncloud/ocis/pull/7783
-
-* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
-
-   We add two new filters to the user list endpoint. The `startswith` filter allows to filter users
-   by the beginning of their name. The `contains` filter allows to filter users by a substring of
-   their name.
-
-   https://github.com/owncloud/ocis/issues/5486
-   https://github.com/owncloud/ocis/pull/7739
-
-* Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
-
-   We updated to go 1.21.
-
-   https://github.com/owncloud/ocis/pull/7794
 
 * Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
 
@@ -109,14 +47,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7866
 
-* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
-
-   We've added a new sharing ng endpoint which lists all permissions for a given item.
-
-   https://github.com/owncloud/ocis/issues/6993
-   https://github.com/owncloud/ocis/pull/7805
-
-# Changelog for [5.0.0] (2023-11-22)
+# Changelog for [5.0.0] (2023-11-30)
 
 The following sections list the changes for 5.0.0.
 
@@ -129,7 +60,9 @@ The following sections list the changes for 5.0.0.
 * Bugfix - Don't reload web config: [#7369](https://github.com/owncloud/ocis/pull/7369)
 * Bugfix - Fix the auth service env variable: [#7523](https://github.com/owncloud/ocis/pull/7523)
 * Bugfix - Fix the kql-bleve search: [#7290](https://github.com/owncloud/ocis/pull/7290)
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
 * Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
+* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
 * Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
 * Bugfix - Fix libre-graph status codes: [#7678](https://github.com/owncloud/ocis/issues/7678)
 * Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
@@ -137,6 +70,7 @@ The following sections list the changes for 5.0.0.
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Bugfix - Set existing mountpoint on auto accept: [#7592](https://github.com/owncloud/ocis/pull/7592)
 * Bugfix - Deprecate redundant encryptions settings for notification service: [#7345](https://github.com/owncloud/ocis/issues/7345)
+* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 * Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
 * Bugfix - Token storage config fixed: [#7528](https://github.com/owncloud/ocis/pull/7528)
@@ -147,11 +81,15 @@ The following sections list the changes for 5.0.0.
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
+* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Add "Last modified" filter Chip: [#7455](https://github.com/owncloud/ocis/pull/7455)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
+* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+* Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Edit wrong named enves: [#7406](https://github.com/owncloud/ocis/pull/7406)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
@@ -162,6 +100,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Add support for audio files to the thumbnails service: [#7491](https://github.com/owncloud/ocis/pull/7491)
 * Enhancement - New value `auto` for NOTIFICATIONS_SMTP_AUTHENTICATION: [#7356](https://github.com/owncloud/ocis/issues/7356)
 * Enhancement - Tika content extraction cleanup for search: [#7553](https://github.com/owncloud/ocis/pull/7553)
+* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
 * Enhancement - Store and index metadata: [#7490](https://github.com/owncloud/ocis/pull/7490)
@@ -221,11 +160,28 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/issues/7282
    https://github.com/owncloud/ocis/pull/7290
 
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
+
+   We fixed that current date is always printed.
+
+   https://github.com/owncloud/ocis/issues/6124
+   https://github.com/owncloud/ocis/pull/6132
+
 * Bugfix - Fix default language fallback: [#7465](https://github.com/owncloud/ocis/issues/7465)
 
    Add the default language for the webui, the settings, userlog and notification service.
 
    https://github.com/owncloud/ocis/issues/7465
+
+* Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
+
+   We fixed the Disabled DEPTH infinity in PROPFIND for: Personal /remote.php/dav/files/admin
+   Public link share /remote.php/dav/public-files/<token> Trashbin
+   /remote.php/dav/spaces/trash-bin/<personal-space-id>
+
+   https://github.com/owncloud/ocis/issues/7359
+   https://github.com/owncloud/ocis/pull/7746
+   https://github.com/cs3org/reva/pull/4278
 
 * Bugfix - Fix 403 in docs pipeline: [#7509](https://github.com/owncloud/ocis/issues/7509)
 
@@ -295,6 +251,13 @@ The following sections list the changes for 5.0.0.
    they are still used. Please use `starttls` instead for `tls` and `ssltls` instead of `ssl.
 
    https://github.com/owncloud/ocis/issues/7345
+
+* Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+
+   The `search` service would sometimes not start correctly because config values are
+   overwritten by default configuration.
+
+   https://github.com/owncloud/ocis/pull/7795
 
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 
@@ -369,6 +332,21 @@ The following sections list the changes for 5.0.0.
    which, in violation of the OpenID Connect spec, takes precedence over `issuer`.
 
    https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
+
+   We add banned password list to the default deployments
+
+   https://github.com/owncloud/ocis/issues/7724
+   https://github.com/owncloud/ocis/pull/7784
+
+* Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
+
+   A new config for default link permissions that is being announced via capabilities has been
+   added. It defaults to 1 (= public link with viewer permissions).
+
+   https://github.com/owncloud/web/issues/9919
+   https://github.com/owncloud/ocis/pull/7783
 
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 
@@ -465,11 +443,26 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/ocis/pull/7194
    https://github.com/cs3org/reva/pull/4147
 
+* Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
+
+   We add two new filters to the user list endpoint. The `startswith` filter allows to filter users
+   by the beginning of their name. The `contains` filter allows to filter users by a substring of
+   their name.
+
+   https://github.com/owncloud/ocis/issues/5486
+   https://github.com/owncloud/ocis/pull/7739
+
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 
    Allows adding custom routes to the ocis proxy. This enables customs ocis extensions
 
    https://github.com/owncloud/ocis/pull/7740
+
+* Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
+
+   We updated to go 1.21.
+
+   https://github.com/owncloud/ocis/pull/7794
 
 * Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 
@@ -548,6 +541,13 @@ The following sections list the changes for 5.0.0.
 
    https://github.com/owncloud/ocis/issues/6674
    https://github.com/owncloud/ocis/pull/7553
+
+* Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
+
+   We've added a new sharing ng endpoint which lists all permissions for a given item.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7805
 
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 
