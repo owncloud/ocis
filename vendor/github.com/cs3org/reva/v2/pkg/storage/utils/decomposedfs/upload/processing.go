@@ -20,12 +20,9 @@ package upload
 
 import (
 	"context"
-	"encoding/json"
-	stderrors "errors"
-	iofs "io/fs"
+	"errors"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -36,9 +33,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/pkg/handler"
 )
 
@@ -51,64 +47,10 @@ type Propagator interface {
 	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
 }
 
-// Get returns the Upload for the given upload id
-func Get(ctx context.Context, id string, lu *lookup.Lookup, tp Tree, fsRoot string, pub events.Publisher, async bool, tknopts options.TokenOptions) (*Upload, error) {
-	infoPath := filepath.Join(fsRoot, "uploads", id+".info")
-
-	info := tusd.FileInfo{}
-	data, err := os.ReadFile(infoPath)
-	if err != nil {
-		if errors.Is(err, iofs.ErrNotExist) {
-			// Interpret os.ErrNotExist as 404 Not Found
-			err = tusd.ErrNotFound
-		}
-		return nil, err
-	}
-	if err := json.Unmarshal(data, &info); err != nil {
-		return nil, err
-	}
-
-	stat, err := os.Stat(info.Storage["BinPath"])
-	if err != nil {
-		return nil, err
-	}
-
-	info.Offset = stat.Size()
-
-	u := &userpb.User{
-		Id: &userpb.UserId{
-			Idp:      info.Storage["Idp"],
-			OpaqueId: info.Storage["UserId"],
-			Type:     utils.UserTypeMap(info.Storage["UserType"]),
-		},
-		Username: info.Storage["UserName"],
-	}
-
-	ctx = ctxpkg.ContextSetUser(ctx, u)
-
-	// restore logger from file info
-	log, err := logger.FromConfig(&logger.LogConf{
-		Output: "stderr", // TODO use config from decomposedfs
-		Mode:   "json",   // TODO use config from decomposedfs
-		Level:  info.Storage["LogLevel"],
-	})
-	if err != nil {
-		return nil, err
-	}
-	sub := log.With().Int("pid", os.Getpid()).Logger()
-	ctx = appctx.WithLogger(ctx, &sub)
-
-	// TODO store and add traceid in file info
-
-	up := buildUpload(ctx, info, info.Storage["BinPath"], infoPath, lu, tp, pub, async, tknopts)
-	up.versionsPath = info.MetaData["versionsPath"]
-	up.SizeDiff, _ = strconv.ParseInt(info.MetaData["sizeDiff"], 10, 64)
-	return up, nil
-}
-
-// CreateNodeForUpload will create the target node for the Upload
-func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node, error) {
-	ctx, span := tracer.Start(upload.Ctx, "CreateNodeForUpload")
+// Postprocessing starts the postprocessing result collector
+func Postprocessing(lu *lookup.Lookup, propagator Propagator, cache cache.StatCache, es events.Stream, tusDataStore tusd.DataStore, blobstore tree.Blobstore, downloadURLfunc func(ctx context.Context, id string) (string, error), ch <-chan events.Event) {
+	ctx := context.TODO() // we should pass the trace id in the event and initialize the trace provider here
+	ctx, span := tracer.Start(ctx, "Postprocessing")
 	defer span.End()
 	log := logger.New()
 	for event := range ch {
@@ -416,63 +358,59 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 
 // Progress adapts the persisted upload metadata for the UploadSessionLister interface
 type Progress struct {
+	Upload     tusd.Upload
 	Path       string
-	Info       tusd.FileInfo
+	Metadata   Metadata
 	Processing bool
 }
 
 // ID implements the storage.UploadSession interface
 func (p Progress) ID() string {
-	return p.Info.ID
+	return p.Metadata.ID
 }
 
 // Filename implements the storage.UploadSession interface
 func (p Progress) Filename() string {
-	return p.Info.MetaData["filename"]
+	return p.Metadata.Filename
 }
 
 // Size implements the storage.UploadSession interface
 func (p Progress) Size() int64 {
-	return p.Info.Size
+	info, err := p.Upload.GetInfo(context.Background())
+	if err != nil {
+		return p.Metadata.GetSize()
+	}
+	return info.Offset
 }
 
 // Offset implements the storage.UploadSession interface
 func (p Progress) Offset() int64 {
-	return p.Info.Offset
+	info, err := p.Upload.GetInfo(context.Background())
+	if err != nil {
+		return 0
+	}
+	return info.Offset
 }
 
 // Reference implements the storage.UploadSession interface
 func (p Progress) Reference() provider.Reference {
-	return provider.Reference{
-		ResourceId: &provider.ResourceId{
-			StorageId: p.Info.MetaData["providerID"],
-			SpaceId:   p.Info.Storage["SpaceRoot"],
-			OpaqueId:  p.Info.Storage["NodeId"], // Node id is always set in InitiateUpload
-		},
-	}
+	return p.Metadata.GetReference()
 }
 
 // Executant implements the storage.UploadSession interface
-func (p Progress) Executant() userpb.UserId {
-	return userpb.UserId{
-		Idp:      p.Info.Storage["Idp"],
-		OpaqueId: p.Info.Storage["UserId"],
-		Type:     utils.UserTypeMap(p.Info.Storage["UserType"]),
-	}
+func (p Progress) Executant() user.UserId {
+	return p.Metadata.GetExecutantID()
 }
 
 // SpaceOwner implements the storage.UploadSession interface
-func (p Progress) SpaceOwner() *userpb.UserId {
-	return &userpb.UserId{
-		// idp and type do not seem to be consumed and the node currently only stores the user id anyway
-		OpaqueId: p.Info.Storage["SpaceOwnerOrManager"],
-	}
+func (p Progress) SpaceOwner() *user.UserId {
+	u := p.Metadata.GetSpaceOwner()
+	return &u
 }
 
 // Expires implements the storage.UploadSession interface
 func (p Progress) Expires() time.Time {
-	mt, _ := utils.MTimeToTime(p.Info.MetaData["expires"])
-	return mt
+	return p.Metadata.Expires
 }
 
 // IsProcessing implements the storage.UploadSession interface
@@ -482,16 +420,22 @@ func (p Progress) IsProcessing() bool {
 
 // Purge implements the storage.UploadSession interface
 func (p Progress) Purge(ctx context.Context) error {
-	berr := os.Remove(p.Info.Storage["BinPath"])
-	if berr != nil {
-		appctx.GetLogger(ctx).Error().Str("id", p.Info.ID).Interface("path", p.Info.Storage["BinPath"]).Msg("Decomposedfs: could not purge bin path for upload session")
+	// terminate tus upload
+	var terr error
+	if terminatableUpload, ok := p.Upload.(tusd.TerminatableUpload); ok {
+		terr = terminatableUpload.Terminate(ctx)
+		if terr != nil {
+			appctx.GetLogger(ctx).Error().Str("id", p.Metadata.ID).Msg("Decomposedfs: could not terminate tus upload for session")
+		}
+	} else {
+		terr = errors.New("tus upload does not implement TerminatableUpload interface")
 	}
 
-	// remove upload metadata
+	// remove upload session metadata
 	merr := os.Remove(p.Path)
 	if merr != nil {
-		appctx.GetLogger(ctx).Error().Str("id", p.Info.ID).Interface("path", p.Path).Msg("Decomposedfs: could not purge metadata path for upload session")
+		appctx.GetLogger(ctx).Error().Str("id", p.Metadata.ID).Interface("path", p.Path).Msg("Decomposedfs: could not purge metadata path for upload session")
 	}
 
-	return stderrors.Join(berr, merr)
+	return errors.Join(terr, merr)
 }

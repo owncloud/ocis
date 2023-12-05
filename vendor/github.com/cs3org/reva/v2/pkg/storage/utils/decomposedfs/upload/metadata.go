@@ -22,6 +22,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -65,7 +66,7 @@ type Metadata struct {
 	HeaderIfMatch           string
 	HeaderIfNoneMatch       string
 	HeaderIfUnmodifiedSince string
-	Expires                 string
+	Expires                 time.Time
 }
 
 // WriteMetadata will create a metadata file to keep track of an upload
@@ -157,14 +158,12 @@ func UpdateMetadata(ctx context.Context, lu *lookup.Lookup, uploadID string, siz
 				log.Error().Err(err).Msg("could not init new node")
 				return Metadata{}, nil, err
 			}
-			log.Info().Str("lockfile", nodeHandle.Name()).Msg("got lock file from initNewNode")
 		} else {
 			nodeHandle, err = openExistingNode(ctx, lu, n)
 			if err != nil {
 				log.Error().Err(err).Msg("could not open existing node")
 				return Metadata{}, nil, err
 			}
-			log.Info().Str("lockfile", nodeHandle.Name()).Msg("got lock file from openExistingNode")
 		}
 	}
 
@@ -179,7 +178,6 @@ func UpdateMetadata(ctx context.Context, lu *lookup.Lookup, uploadID string, siz
 			log.Error().Err(err).Msg("could not open existing node")
 			return Metadata{}, nil, err
 		}
-		log.Info().Str("lockfile", nodeHandle.Name()).Msg("got lock file from openExistingNode")
 	}
 	defer func() {
 		if nodeHandle == nil {
@@ -256,11 +254,11 @@ func (m Metadata) GetExecutantID() userpb.UserId {
 }
 func (m Metadata) GetSpaceOwner() userpb.UserId {
 	return userpb.UserId{
+		// idp and type do not seem to be consumed and the node currently only stores the user id anyway
 		OpaqueId: m.SpaceOwnerOrManager,
-		// TODO the rest?
 	}
 
 }
-func (m Metadata) GetExpires() string {
-	return m.Expires // TODO use time?
+func (m Metadata) GetExpires() time.Time {
+	return m.Expires
 }

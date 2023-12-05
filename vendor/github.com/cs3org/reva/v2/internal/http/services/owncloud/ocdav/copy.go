@@ -127,7 +127,6 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 		return
 	}
 
-	sublog.Debug().Str("src", src).Str("dst", dst).Msg("preparing copy")
 	cp := s.prepareCopy(ctx, w, r, spacelookup.MakeRelativeReference(srcSpace, src, false), spacelookup.MakeRelativeReference(dstSpace, dst, false), &sublog)
 	if cp == nil {
 		return

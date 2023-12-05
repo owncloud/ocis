@@ -82,7 +82,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	zlog, err := logger.FromConfig(&logger.LogConf{
 		Output: "stderr",
 		Mode:   "json",
-		Level:  "error",
+		Level:  "error", // FIXME introduce shared config for logging
 	})
 	if err != nil {
 		return nil, errtypes.NotSupported("could not initialize log")
@@ -129,22 +129,30 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		return nil, err
 	}
 
-	umg, ok := fs.(storage.HasUploadMetadata)
+	usl, ok := fs.(storage.UploadSessionLister)
 	if ok {
+		// We can currently only send updates if the fs is decomposedfs as we read very specific keys from the storage map of the tus info
 		go func() {
 			for {
 				ev := <-handler.CompleteUploads
-				info := ev.Upload
-				um, err := umg.GetUploadMetadata(context.TODO(), info.ID) // TODO we need to pass in a context, maybe with tusd 2.0. IIRC the relvease notes mention using context in more places.
+				// We should be able to get the upload progress with fs.GetUploadProgress, but currently tus will erase the info files
+				// so we create a Progress instance here that is used to read the correct properties
+				sessions, err := usl.ListUploadSessions(context.Background(), storage.UploadSessionFilter{ID: &ev.Upload.ID})
 				if err != nil {
-					appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to get upload metadata on publish FileUploaded event")
+					appctx.GetLogger(context.Background()).Error().Err(err).Str("id", ev.Upload.ID).Msg("failed to list upload session for upload")
+					continue
 				}
-				spaceOwner := um.GetSpaceOwner()
-				executant := um.GetExecutantID()
-				ref := um.GetReference()
+				if len(sessions) != 1 {
+					appctx.GetLogger(context.Background()).Error().Err(err).Str("id", ev.Upload.ID).Msg("no upload session found")
+					continue
+				}
+				us := sessions[0]
+
+				executant := us.Executant()
+				ref := us.Reference()
 				datatx.InvalidateCache(&executant, &ref, m.statCache)
 				if m.publisher != nil {
-					if err := datatx.EmitFileUploadedEvent(&spaceOwner, &executant, &ref, m.publisher); err != nil {
+					if err := datatx.EmitFileUploadedEvent(us.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
 						appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
 					}
 				}
@@ -166,7 +174,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
-			setHeaders(dataStore, umg, w, r)
+			setHeaders(dataStore, usl, w, r)
 			handler.PostFile(w, r)
 		case "HEAD":
 			handler.HeadFile(w, r)
@@ -176,7 +184,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
-			setHeaders(dataStore, umg, w, r)
+			setHeaders(dataStore, usl, w, r)
 			handler.PatchFile(w, r)
 		case "DELETE":
 			handler.DelFile(w, r)
@@ -208,29 +216,42 @@ type hasTusDatastore interface {
 	GetDataStore() tusd.DataStore
 }
 
-func setHeaders(datastore tusd.DataStore, umg storage.HasUploadMetadata, w http.ResponseWriter, r *http.Request) {
+func setHeaders(datastore tusd.DataStore, usl storage.UploadSessionLister, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := path.Base(r.URL.Path)
-	u, err := datastore.GetUpload(ctx, id)
+	upload, err := datastore.GetUpload(ctx, id)
 	if err != nil {
 		appctx.GetLogger(ctx).Error().Err(err).Msg("could not get upload from storage")
 		return
 	}
-	info, err := u.GetInfo(ctx)
+	info, err := upload.GetInfo(ctx)
 	if err != nil {
 		appctx.GetLogger(ctx).Error().Err(err).Msg("could not get upload info for upload")
 		return
 	}
-	expires := ""
-	resourceid := provider.ResourceId{}
-	if umg != nil {
-		um, err := umg.GetUploadMetadata(ctx, info.ID)
+	var expires string
+
+	var resourceid provider.ResourceId
+	var uploadSession storage.UploadSession
+	if usl != nil {
+		sessions, err := usl.ListUploadSessions(ctx, storage.UploadSessionFilter{ID: &id})
 		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Msg("could not get upload info for upload")
+			appctx.GetLogger(context.Background()).Error().Err(err).Str("id", id).Msg("failed to list upload session for upload")
 			return
 		}
-		expires = um.GetExpires()
-		resourceid = um.GetResourceID()
+		if len(sessions) != 1 {
+			appctx.GetLogger(context.Background()).Error().Err(err).Str("id", id).Msg("no upload session found")
+			return
+		}
+		uploadSession = sessions[0]
+
+		t := time.Time{}
+		if uploadSession.Expires() != t {
+			expires = uploadSession.Expires().Format(net.RFC1123)
+		}
+
+		reference := uploadSession.Reference()
+		resourceid = *reference.GetResourceId()
 	}
 
 	// FIXME expires should be part of the tus handler
@@ -238,18 +259,19 @@ func setHeaders(datastore tusd.DataStore, umg storage.HasUploadMetadata, w http.
 	if expires == "" {
 		expires = info.MetaData["expires"]
 	}
+
 	if expires != "" {
 		w.Header().Set(net.HeaderTusUploadExpires, expires)
 	}
 
 	// fallback for outdated storageproviders that implement a tus datastore
-	if resourceid.StorageId == "" {
+	if resourceid.GetStorageId() == "" {
 		resourceid.StorageId = info.MetaData["providerID"]
 	}
-	if resourceid.SpaceId == "" {
+	if resourceid.GetSpaceId() == "" {
 		resourceid.SpaceId = info.MetaData["SpaceRoot"]
 	}
-	if resourceid.OpaqueId == "" {
+	if resourceid.GetOpaqueId() == "" {
 		resourceid.OpaqueId = info.MetaData["NodeId"]
 	}
 

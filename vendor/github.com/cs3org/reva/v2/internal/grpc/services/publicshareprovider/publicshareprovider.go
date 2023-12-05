@@ -24,6 +24,10 @@ import (
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -32,9 +36,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-	"google.golang.org/grpc"
 )
 
 func init() {
@@ -163,15 +164,17 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 		log.Error().Msg("error getting user from context")
 	}
 
+	res := &link.CreatePublicShareResponse{}
 	share, err := s.sm.CreatePublicShare(ctx, u, req.ResourceInfo, req.Grant)
-	if err != nil {
-		log.Debug().Err(err).Str("createShare", "shares").Msg("error connecting to storage provider")
+	switch {
+	case err != nil:
+		log.Error().Err(err).Interface("request", req).Msg("could not write public share")
+		res.Status = status.NewInternal(ctx, "error persisting public share:"+err.Error())
+	default:
+		res.Status = status.NewOK(ctx)
+		res.Share = share
 	}
 
-	res := &link.CreatePublicShareResponse{
-		Status: status.NewOK(ctx),
-		Share:  share,
-	}
 	return res, nil
 }
 

@@ -39,7 +39,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -379,6 +378,7 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 
 				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n.SpaceRoot, true)
 				if err != nil {
+					appctx.GetLogger(ctx).Error().Err(err).Str("space", n.SpaceID).Str("node", nodeID).Msg("cannot read node")
 					continue
 				}
 
@@ -586,7 +586,7 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 			deletePath = filepath.Join(resolvedTrashRoot, trashPath)
 		}
 		if err = os.Remove(deletePath); err != nil {
-			log.Error().Err(err).Str("trashItem", trashItem).Msg("error deleting trash item")
+			appctx.GetLogger(ctx).Error().Err(err).Str("trashItem", trashItem).Msg("error deleting trash item")
 		}
 
 		var sizeDiff int64
@@ -626,7 +626,7 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 			deletePath = filepath.Join(resolvedTrashRoot, path)
 		}
 		if err = os.Remove(deletePath); err != nil {
-			log.Error().Err(err).Str("deletePath", deletePath).Msg("error deleting trash item")
+			appctx.GetLogger(ctx).Error().Err(err).Str("deletePath", deletePath).Msg("error deleting trash item")
 			return err
 		}
 
@@ -637,6 +637,7 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 }
 
 func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error {
+	log := appctx.GetLogger(ctx)
 	// delete the actual node
 	if err := utils.RemoveItem(path); err != nil {
 		log.Error().Err(err).Str("path", path).Msg("error purging node")
@@ -779,7 +780,7 @@ func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (
 	if attrBytes, err = backend.Get(ctx, resolvedTrashItem, prefixes.TrashOriginAttr); err == nil {
 		origin = filepath.Join(string(attrBytes), path)
 	} else {
-		log.Error().Err(err).Str("trashItem", trashItem).Str("deletedNodePath", deletedNodePath).Msg("could not read origin path, restoring to /")
+		appctx.GetLogger(ctx).Error().Err(err).Str("trashItem", trashItem).Str("deletedNodePath", deletedNodePath).Msg("could not read origin path, restoring to /")
 	}
 
 	return

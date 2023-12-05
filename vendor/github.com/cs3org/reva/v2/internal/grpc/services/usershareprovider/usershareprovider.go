@@ -23,6 +23,7 @@ import (
 	"regexp"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mitchellh/mapstructure"
@@ -209,8 +210,15 @@ func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShar
 func (s *service) GetShare(ctx context.Context, req *collaboration.GetShareRequest) (*collaboration.GetShareResponse, error) {
 	share, err := s.sm.GetShare(ctx, req.Ref)
 	if err != nil {
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, err.Error())
+		}
 		return &collaboration.GetShareResponse{
-			Status: status.NewInternal(ctx, "error getting share"),
+			Status: st,
 		}, nil
 	}
 
