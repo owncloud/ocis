@@ -16,11 +16,11 @@ geekdocFilePath: ubernauten.md
 
 ## Uberspace and ownCloud Infinite Scale in 50 seconds
 
-This howto shows how to set up ownCloud Infinite Scale for a quick test. For convenience, we will use the free service from the Ubernauten ((Join us here: https://dashboard.uberspace.de/register?lang=en). They offer free of charge (for the first month) web hosting.
+This howto shows how to set up ownCloud Infinite Scale for a quick test. For convenience, we will use the free service from the Ubernauten -- Join us here: [Uberspace Registration Page](https://dashboard.uberspace.de/register?lang=en). They offer free of charge (for the first month) web hosting.
 
 In this documentation, we are assuming you already have an account there and it is configured for SSH access. This guide is using "ocis.uber.space" as a domain at Uberspace, version 4.0.2 of Infinite Scale and the local user "owncloud". Make sure you adapt the example code and scripts mentioned in this page to your needs Both username and domain will be set when you sign in to Uberspace.
 
-Installing ownCloud Infinite Scale on Ubernauten is pretty straigt-forward, you can do it in three steps that take less than a minute: Here's a short video that shows how fast the whole process actually is - thanks to Infinite Scale's cloud native architecture. [ownCloud Infinite Scale in 50 seconds](001-OCIS-in-50-seconds-2023-10-17.mkv)
+Installing ownCloud Infinite Scale on Ubernauten is pretty straigt-forward, you can do it in three steps that take less than a minute: Here's a short video that shows how fast the whole process actually is - thanks to Infinite Scale's cloud native architecture. [ownCloud Infinite Scale in 50 seconds](./ubernauten_media/videos/001-OCIS-in-50-seconds-2023-10-17.mkv)
 
 [comment]: # Fix URL, put video in a location that makes sense. Is mkv Ok?
 
@@ -46,7 +46,7 @@ export PROXY_LOG_LEVEL=debug
 ./ocis init
 ./ocis server
 ```
-Wait a few seconds, now you can visit the url of your uberspace server and login: ![alt="Login to ownCloud Infinite Scale"](login.png)
+Wait a few seconds, now you can visit the url of your uberspace server and login: ![alt="Login to ownCloud Infinite Scale"](./ubernauten_media/login.png)
 
 To make it easier (and faster), here's the commands in a script called `ocis.install`:
 
