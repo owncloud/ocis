@@ -41,15 +41,16 @@ type userList struct {
 
 var _ = Describe("Users", func() {
 	var (
-		svc             service.Service
-		ctx             context.Context
-		cfg             *config.Config
-		gatewayClient   *cs3mocks.GatewayAPIClient
-		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		eventsPublisher mocks.Publisher
-		roleService     *mocks.RoleService
-		valueService    *mocks.ValueService
-		identityBackend *identitymocks.Backend
+		svc               service.Service
+		ctx               context.Context
+		cfg               *config.Config
+		gatewayClient     *cs3mocks.GatewayAPIClient
+		gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
+		eventsPublisher   mocks.Publisher
+		roleService       *mocks.RoleService
+		valueService      *mocks.ValueService
+		permissionService *mocks.Permissions
+		identityBackend   *identitymocks.Backend
 
 		rr *httptest.ResponseRecorder
 
@@ -76,6 +77,7 @@ var _ = Describe("Users", func() {
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
 		valueService = &mocks.ValueService{}
+		permissionService = &mocks.Permissions{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -94,6 +96,7 @@ var _ = Describe("Users", func() {
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),
 			service.WithValueService(valueService),
+			service.PermissionService(permissionService),
 		)
 	})
 
@@ -234,6 +237,13 @@ var _ = Describe("Users", func() {
 		})
 
 		It("lists the users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+
 			user := &libregraph.User{}
 			user.SetId("user1")
 			users := []*libregraph.User{user}
@@ -269,6 +279,13 @@ var _ = Describe("Users", func() {
 			users := []*libregraph.User{user, user2}
 
 			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
 
 			getUsers := func(path string) []*libregraph.User {
 				r := httptest.NewRequest(http.MethodGet, path, nil)
@@ -351,6 +368,12 @@ var _ = Describe("Users", func() {
 			users := []*libregraph.User{user, user2}
 			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
 
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(func(ctx context.Context, in *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
 				return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
 					{
@@ -395,6 +418,13 @@ var _ = Describe("Users", func() {
 
 	DescribeTable("GetUsers handles unsupported or invalid filters",
 		func(filter string, status int) {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
 			svc.GetUsers(rr, r)
 
@@ -422,6 +452,13 @@ var _ = Describe("Users", func() {
 
 	DescribeTable("With a valid filter",
 		func(filter string, status int) {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+
 			user := &libregraph.User{}
 			user.SetId("25cb7bc0-3168-4a0c-adbe-396f478ad494")
 			users := []*libregraph.User{user}
