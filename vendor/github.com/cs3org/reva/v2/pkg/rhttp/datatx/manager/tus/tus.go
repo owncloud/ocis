@@ -80,9 +80,9 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 
 func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	zlog, err := logger.FromConfig(&logger.LogConf{
-		Output: "stdout",
-		Mode:   "console",
-		Level:  "debug",
+		Output: "stderr",
+		Mode:   "json",
+		Level:  "error",
 	})
 	if err != nil {
 		return nil, errtypes.NotSupported("could not initialize log")
