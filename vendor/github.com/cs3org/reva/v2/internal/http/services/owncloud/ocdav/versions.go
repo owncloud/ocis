@@ -180,6 +180,7 @@ func (h *VersionsHandler) doListVersions(w http.ResponseWriter, r *http.Request,
 			Type: provider.ResourceType_RESOURCE_TYPE_FILE,
 			Id: &provider.ResourceId{
 				StorageId: "versions",
+				SpaceId:   info.Id.SpaceId,
 				OpaqueId:  info.Id.OpaqueId + "@" + versions[i].GetKey(),
 			},
 			// Checksum

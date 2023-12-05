@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -17,6 +18,7 @@ import (
 func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	if len(bundleIDs) == 0 {
 		bIDs, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
@@ -61,6 +63,8 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
+
 	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))
 	switch err.(type) {
 	case nil:
@@ -79,6 +83,7 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	ids, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
 	switch err.(type) {
@@ -114,6 +119,7 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 func (s *Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	b, err := json.Marshal(record)
 	if err != nil {

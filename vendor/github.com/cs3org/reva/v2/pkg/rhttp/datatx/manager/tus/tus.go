@@ -16,6 +16,9 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
+// Package tus implements a data tx manager that handles uploads using the TUS protocol.
+// reva storage drivers should implement the hasTusDatastore interface by using composition
+// of an upstream tusd.DataStore. If necessary they can also implement a tusd.DataStore directly.
 package tus
 
 import (
@@ -33,12 +36,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/mitchellh/mapstructure"
 )
@@ -76,24 +79,49 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 }
 
 func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
-	composable, ok := fs.(composable)
-	if !ok {
-		return nil, errtypes.NotSupported("file system does not support the tus protocol")
+	zlog, err := logger.FromConfig(&logger.LogConf{
+		Output: "stderr",
+		Mode:   "json",
+		Level:  "error", // FIXME introduce shared config for logging
+	})
+	if err != nil {
+		return nil, errtypes.NotSupported("could not initialize log")
 	}
 
-	// A storage backend for tusd may consist of multiple different parts which
-	// handle upload creation, locking, termination and so on. The composer is a
-	// place where all those separated pieces are joined together. In this example
-	// we only use the file store but you may plug in multiple.
 	composer := tusd.NewStoreComposer()
 
-	// let the composable storage tell tus which extensions it supports
-	composable.UseIn(composer)
-
 	config := tusd.Config{
-		StoreComposer:         composer,
+		StoreComposer: composer,
+		PreUploadCreateCallback: func(hook tusd.HookEvent) error {
+			return errors.New("uploads must be created with a cs3 InitiateUpload call")
+		},
 		NotifyCompleteUploads: true,
-		Logger:                log.New(appctx.GetLogger(context.Background()), "", 0),
+		Logger:                log.New(zlog, "", 0),
+	}
+
+	var dataStore tusd.DataStore
+
+	cb, ok := fs.(hasTusDatastore)
+	if ok {
+		dataStore = cb.GetDataStore()
+		composable, ok := dataStore.(composable)
+		if !ok {
+			return nil, errtypes.NotSupported("tus datastore is not composable")
+		}
+		composable.UseIn(composer)
+		config.PreFinishResponseCallback = cb.PreFinishResponseCallback
+	} else {
+		composable, ok := fs.(composable)
+		if !ok {
+			return nil, errtypes.NotSupported("storage driver does not support the tus protocol")
+		}
+
+		// let the composable storage tell tus which extensions it supports
+		composable.UseIn(composer)
+		dataStore, ok = fs.(tusd.DataStore)
+		if !ok {
+			return nil, errtypes.NotSupported("storage driver does not support the tus datastore")
+		}
 	}
 
 	handler, err := tusd.NewUnroutedHandler(config)
@@ -101,21 +129,30 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		return nil, err
 	}
 
-	if _, ok := fs.(storage.UploadSessionLister); ok {
+	usl, ok := fs.(storage.UploadSessionLister)
+	if ok {
 		// We can currently only send updates if the fs is decomposedfs as we read very specific keys from the storage map of the tus info
 		go func() {
 			for {
 				ev := <-handler.CompleteUploads
 				// We should be able to get the upload progress with fs.GetUploadProgress, but currently tus will erase the info files
 				// so we create a Progress instance here that is used to read the correct properties
-				up := upload.Progress{
-					Info: ev.Upload,
+				sessions, err := usl.ListUploadSessions(context.Background(), storage.UploadSessionFilter{ID: &ev.Upload.ID})
+				if err != nil {
+					appctx.GetLogger(context.Background()).Error().Err(err).Str("id", ev.Upload.ID).Msg("failed to list upload session for upload")
+					continue
 				}
-				executant := up.Executant()
-				ref := up.Reference()
+				if len(sessions) != 1 {
+					appctx.GetLogger(context.Background()).Error().Err(err).Str("id", ev.Upload.ID).Msg("no upload session found")
+					continue
+				}
+				us := sessions[0]
+
+				executant := us.Executant()
+				ref := us.Reference()
 				datatx.InvalidateCache(&executant, &ref, m.statCache)
 				if m.publisher != nil {
-					if err := datatx.EmitFileUploadedEvent(up.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
+					if err := datatx.EmitFileUploadedEvent(us.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
 						appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
 					}
 				}
@@ -137,7 +174,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
-			setHeaders(fs, w, r)
+			setHeaders(dataStore, usl, w, r)
 			handler.PostFile(w, r)
 		case "HEAD":
 			handler.HeadFile(w, r)
@@ -147,7 +184,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
-			setHeaders(fs, w, r)
+			setHeaders(dataStore, usl, w, r)
 			handler.PatchFile(w, r)
 		case "DELETE":
 			handler.DelFile(w, r)
@@ -174,14 +211,14 @@ type composable interface {
 	UseIn(composer *tusd.StoreComposer)
 }
 
-func setHeaders(fs storage.FS, w http.ResponseWriter, r *http.Request) {
+type hasTusDatastore interface {
+	PreFinishResponseCallback(hook tusd.HookEvent) error
+	GetDataStore() tusd.DataStore
+}
+
+func setHeaders(datastore tusd.DataStore, usl storage.UploadSessionLister, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := path.Base(r.URL.Path)
-	datastore, ok := fs.(tusd.DataStore)
-	if !ok {
-		appctx.GetLogger(ctx).Error().Interface("fs", fs).Msg("storage is not a tus datastore")
-		return
-	}
 	upload, err := datastore.GetUpload(ctx, id)
 	if err != nil {
 		appctx.GetLogger(ctx).Error().Err(err).Msg("could not get upload from storage")
@@ -192,14 +229,51 @@ func setHeaders(fs storage.FS, w http.ResponseWriter, r *http.Request) {
 		appctx.GetLogger(ctx).Error().Err(err).Msg("could not get upload info for upload")
 		return
 	}
-	expires := info.MetaData["expires"]
+	var expires string
+
+	var resourceid provider.ResourceId
+	var uploadSession storage.UploadSession
+	if usl != nil {
+		sessions, err := usl.ListUploadSessions(ctx, storage.UploadSessionFilter{ID: &id})
+		if err != nil {
+			appctx.GetLogger(context.Background()).Error().Err(err).Str("id", id).Msg("failed to list upload session for upload")
+			return
+		}
+		if len(sessions) != 1 {
+			appctx.GetLogger(context.Background()).Error().Err(err).Str("id", id).Msg("no upload session found")
+			return
+		}
+		uploadSession = sessions[0]
+
+		t := time.Time{}
+		if uploadSession.Expires() != t {
+			expires = uploadSession.Expires().Format(net.RFC1123)
+		}
+
+		reference := uploadSession.Reference()
+		resourceid = *reference.GetResourceId()
+	}
+
+	// FIXME expires should be part of the tus handler
+	// fallback for outdated storageproviders that implement a tus datastore
+	if expires == "" {
+		expires = info.MetaData["expires"]
+	}
+
 	if expires != "" {
 		w.Header().Set(net.HeaderTusUploadExpires, expires)
 	}
-	resourceid := provider.ResourceId{
-		StorageId: info.MetaData["providerID"],
-		SpaceId:   info.Storage["SpaceRoot"],
-		OpaqueId:  info.Storage["NodeId"],
+
+	// fallback for outdated storageproviders that implement a tus datastore
+	if resourceid.GetStorageId() == "" {
+		resourceid.StorageId = info.MetaData["providerID"]
 	}
+	if resourceid.GetSpaceId() == "" {
+		resourceid.SpaceId = info.MetaData["SpaceRoot"]
+	}
+	if resourceid.GetOpaqueId() == "" {
+		resourceid.OpaqueId = info.MetaData["NodeId"]
+	}
+
 	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(resourceid))
 }

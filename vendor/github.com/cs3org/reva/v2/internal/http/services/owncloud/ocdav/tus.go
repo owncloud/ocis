@@ -88,6 +88,10 @@ func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceI
 
 	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("path", r.URL.Path).Logger()
 
+	// use filename to build a storage space reference
+	// but what if upload happens directly to toh resourceid .. and filename is empty?
+	// currently there is always a validator thet requires the filename is not empty ...
+	// hm -> bug: clients currently cannot POST to an existing source with a resource id only
 	ref, err := spacelookup.MakeStorageSpaceReference(spaceID, path.Join(r.URL.Path, meta["filename"]))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

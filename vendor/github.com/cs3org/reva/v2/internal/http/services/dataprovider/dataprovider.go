@@ -143,7 +143,13 @@ func getDataTXs(c *config, fs storage.FS, publisher events.Publisher) (map[strin
 			if tx, err := f(c.DataTXs[t], publisher); err == nil {
 				if handler, err := tx.Handler(fs); err == nil {
 					txs[t] = handler
+					// FIXME we at least need to log this. the ocm received storage e.g. does not support tus
+					// } else {
+					// return nil, err
 				}
+				// FIXME we at least need to log this. the ocm received storage e.g. does not support tus
+				// } else {
+				// return nil, err
 			}
 		}
 	}

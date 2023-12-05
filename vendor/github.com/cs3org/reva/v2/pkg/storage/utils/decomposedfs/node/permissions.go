@@ -20,7 +20,6 @@ package node
 
 import (
 	"context"
-	"strings"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -132,17 +131,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 	if u.GetId().GetType() == userpb.UserType_USER_TYPE_SERVICE {
 		return ServiceAccountPermissions(), nil
 	}
-
-	// are we reading a revision?
-	if strings.Contains(n.ID, RevisionIDDelimiter) {
-		// verify revision key format
-		kp := strings.SplitN(n.ID, RevisionIDDelimiter, 2)
-		if len(kp) != 2 {
-			return NoPermissions(), errtypes.NotFound(n.ID)
-		}
-		// use the actual node for the permission assembly
-		n.ID = kp[0]
-	}
+	n.ID, _ = SplitRevisionKey(n.ID)
 
 	// determine root
 	rn := n.SpaceRoot

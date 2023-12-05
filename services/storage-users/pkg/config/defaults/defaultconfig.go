@@ -73,6 +73,7 @@ func DefaultConfig() *config.Config {
 				PermissionsEndpoint:        "com.owncloud.api.settings",
 				MaxAcquireLockCycles:       20,
 				LockCycleDurationFactor:    30,
+				UploadObjectPrefix:         "uploads",
 			},
 			OCIS: config.OCISDriver{
 				MetadataBackend:            "messagepack",

@@ -7,6 +7,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -99,6 +100,8 @@ func NewMetadataClient(cfg config.Metadata) MetadataClient {
 // we need to lazy initialize the MetadataClient because metadata service might not be ready
 func (s *Store) initMetadataClient(mdc MetadataClient) error {
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
+
 	err := mdc.Init(ctx, settingsSpaceID)
 	if err != nil {
 		return err

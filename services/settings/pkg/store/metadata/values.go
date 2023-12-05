@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -19,6 +20,7 @@ import (
 func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
 	switch err.(type) {
@@ -70,6 +72,7 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	b, err := s.mdc.SimpleDownload(ctx, valuePath(valueID))
 	switch err.(type) {
@@ -91,6 +94,7 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 	}
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
 	if err != nil {
@@ -125,6 +129,7 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
 	s.Init()
 	ctx := context.TODO()
+	ctx = appctx.WithLogger(ctx, &s.Logger.Logger)
 
 	if value.Id == "" {
 		value.Id = uuid.Must(uuid.NewV4()).String()

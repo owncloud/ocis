@@ -34,7 +34,6 @@ import (
 	"strings"
 	"time"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -61,6 +60,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
+	tusHandler "github.com/tus/tusd/pkg/handler"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -96,10 +96,6 @@ type Tree interface {
 	RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, target *node.Node) (*node.Node, *node.Node, func() error, error)
 	PurgeRecycleItemFunc(ctx context.Context, spaceid, key, purgePath string) (*node.Node, func() error, error)
 
-	WriteBlob(node *node.Node, source string) error
-	ReadBlob(node *node.Node) (io.ReadCloser, error)
-	DeleteBlob(node *node.Node) error
-
 	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
 }
 
@@ -112,6 +108,8 @@ type Decomposedfs struct {
 	chunkHandler *chunking.ChunkHandler
 	stream       events.Stream
 	cache        cache.StatCache
+	tusDataStore tusHandler.DataStore
+	blobstore    tree.Blobstore
 
 	UserCache       *ttlcache.Cache
 	userSpaceIndex  *spaceidindex.Index
@@ -120,7 +118,7 @@ type Decomposedfs struct {
 }
 
 // NewDefault returns an instance with default components
-func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (storage.FS, error) {
+func NewDefault(m map[string]interface{}, bs tree.Blobstore, tusDataStore tusHandler.DataStore, es events.Stream) (storage.FS, error) {
 	o, err := options.New(m)
 	if err != nil {
 		return nil, err
@@ -152,12 +150,12 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 
 	permissions := NewPermissions(node.NewPermissions(lu), permissionsSelector)
 
-	return New(o, lu, permissions, tp, es)
+	return New(o, lu, permissions, tp, es, tusDataStore, bs)
 }
 
 // New returns an implementation of the storage.FS interface that talks to
 // a local filesystem.
-func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es events.Stream) (storage.FS, error) {
+func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es events.Stream, tusDataStore tusHandler.DataStore, blobstore tree.Blobstore) (storage.FS, error) {
 	log := logger.New()
 	err := tp.Setup()
 	if err != nil {
@@ -208,6 +206,8 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
 		spaceTypeIndex:  spaceTypeIndex,
+		tusDataStore:    tusDataStore,
+		blobstore:       blobstore,
 	}
 
 	if o.AsyncFileUploads {
@@ -226,256 +226,11 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		}
 
 		for i := 0; i < o.Events.NumConsumers; i++ {
-			go fs.Postprocessing(ch)
+			go upload.Postprocessing(lu, tp, fs.cache, es, tusDataStore, blobstore, fs.downloadURL, ch)
 		}
 	}
 
 	return fs, nil
-}
-
-// Postprocessing starts the postprocessing result collector
-func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
-	ctx := context.TODO() // we should pass the trace id in the event and initialize the trace provider here
-	ctx, span := tracer.Start(ctx, "Postprocessing")
-	defer span.End()
-	log := logger.New()
-	for event := range ch {
-		switch ev := event.Event.(type) {
-		case events.PostprocessingFinished:
-			up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
-			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
-				continue // NOTE: since we can't get the upload, we can't delete the blob
-			}
-
-			var (
-				failed     bool
-				keepUpload bool
-			)
-
-			n, err := node.ReadNode(ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, true)
-			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
-				continue
-			}
-			up.Node = n
-
-			switch ev.Outcome {
-			default:
-				log.Error().Str("outcome", string(ev.Outcome)).Str("uploadID", ev.UploadID).Msg("unknown postprocessing outcome - aborting")
-				fallthrough
-			case events.PPOutcomeAbort:
-				failed = true
-				keepUpload = true
-			case events.PPOutcomeContinue:
-				if err := up.Finalize(); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
-					keepUpload = true // should we keep the upload when assembling failed?
-					failed = true
-				}
-			case events.PPOutcomeDelete:
-				failed = true
-			}
-
-			getParent := func() *node.Node {
-				p, err := up.Node.Parent(ctx)
-				if err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read parent")
-					return nil
-				}
-				return p
-			}
-
-			now := time.Now()
-			if failed {
-				// propagate sizeDiff after failed postprocessing
-				if err := fs.tp.Propagate(ctx, up.Node, -up.SizeDiff); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate tree size change")
-				}
-			} else if p := getParent(); p != nil {
-				// update parent tmtime to propagate etag change after successful postprocessing
-				_ = p.SetTMTime(ctx, &now)
-				if err := fs.tp.Propagate(ctx, p, 0); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate etag change")
-				}
-			}
-
-			upload.Cleanup(up, failed, keepUpload)
-
-			// remove cache entry in gateway
-			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
-
-			if err := events.Publish(
-				ctx,
-				fs.stream,
-				events.UploadReady{
-					UploadID:      ev.UploadID,
-					Failed:        failed,
-					ExecutingUser: ev.ExecutingUser,
-					Filename:      ev.Filename,
-					FileRef: &provider.Reference{
-						ResourceId: &provider.ResourceId{
-							StorageId: up.Info.MetaData["providerID"],
-							SpaceId:   up.Info.Storage["SpaceRoot"],
-							OpaqueId:  up.Info.Storage["SpaceRoot"],
-						},
-						Path: utils.MakeRelativePath(filepath.Join(up.Info.MetaData["dir"], up.Info.MetaData["filename"])),
-					},
-					Timestamp:  utils.TimeToTS(now),
-					SpaceOwner: n.SpaceOwnerOrManager(ctx),
-				},
-			); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish UploadReady event")
-			}
-		case events.RestartPostprocessing:
-			up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
-			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
-				continue
-			}
-			n, err := node.ReadNode(ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, true)
-			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
-				continue
-			}
-			s, err := up.URL(up.Ctx)
-			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not create url")
-				continue
-			}
-			// restart postprocessing
-			if err := events.Publish(ctx, fs.stream, events.BytesReceived{
-				UploadID:      up.Info.ID,
-				URL:           s,
-				SpaceOwner:    n.SpaceOwnerOrManager(up.Ctx),
-				ExecutingUser: &user.User{Id: &user.UserId{OpaqueId: "postprocessing-restart"}}, // send nil instead?
-				ResourceID:    &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
-				Filename:      up.Info.Storage["NodeName"],
-				Filesize:      uint64(up.Info.Size),
-			}); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish BytesReceived event")
-			}
-		case events.PostprocessingStepFinished:
-			if ev.FinishedStep != events.PPStepAntivirus {
-				// atm we are only interested in antivirus results
-				continue
-			}
-
-			res := ev.Result.(events.VirusscanResult)
-			if res.ErrorMsg != "" {
-				// scan failed somehow
-				// Should we handle this here?
-				continue
-			}
-
-			var n *node.Node
-			switch ev.UploadID {
-			case "":
-				// uploadid is empty -> this was an on-demand scan
-				/* ON DEMAND SCANNING NOT SUPPORTED ATM
-				ctx := ctxpkg.ContextSetUser(context.Background(), ev.ExecutingUser)
-				ref := &provider.Reference{ResourceId: ev.ResourceID}
-
-				no, err := fs.lu.NodeFromResource(ctx, ref)
-				if err != nil {
-					log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to get node after scan")
-					continue
-
-				}
-				n = no
-				if ev.Outcome == events.PPOutcomeDelete {
-					// antivir wants us to delete the file. We must obey and need to
-
-					// check if there a previous versions existing
-					revs, err := fs.ListRevisions(ctx, ref)
-					if len(revs) == 0 {
-						if err != nil {
-							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to list revisions. Fallback to delete file")
-						}
-
-						// no versions -> trash file
-						err := fs.Delete(ctx, ref)
-						if err != nil {
-							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to delete infected resource")
-							continue
-						}
-
-						// now purge it from the recycle bin
-						if err := fs.PurgeRecycleItem(ctx, &provider.Reference{ResourceId: &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.SpaceID}}, n.ID, "/"); err != nil {
-							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Failed to purge infected resource from trash")
-						}
-
-						// remove cache entry in gateway
-						fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
-						continue
-					}
-
-					// we have versions - find the newest
-					versions := make(map[uint64]string) // remember all versions - we need them later
-					var nv uint64
-					for _, v := range revs {
-						versions[v.Mtime] = v.Key
-						if v.Mtime > nv {
-							nv = v.Mtime
-						}
-					}
-
-					// restore newest version
-					if err := fs.RestoreRevision(ctx, ref, versions[nv]); err != nil {
-						log.Error().Err(err).Interface("resourceID", ev.ResourceID).Str("revision", versions[nv]).Msg("Failed to restore revision")
-						continue
-					}
-
-					// now find infected version
-					revs, err = fs.ListRevisions(ctx, ref)
-					if err != nil {
-						log.Error().Err(err).Interface("resourceID", ev.ResourceID).Msg("Error listing revisions after restore")
-					}
-
-					for _, v := range revs {
-						// we looking for a version that was previously not there
-						if _, ok := versions[v.Mtime]; ok {
-							continue
-						}
-
-						if err := fs.DeleteRevision(ctx, ref, v.Key); err != nil {
-							log.Error().Err(err).Interface("resourceID", ev.ResourceID).Str("revision", v.Key).Msg("Failed to delete revision")
-						}
-					}
-
-					// remove cache entry in gateway
-					fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
-					continue
-				}
-				*/
-			default:
-				// uploadid is not empty -> this is an async upload
-				up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
-				if err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
-					continue
-				}
-
-				no, err := node.ReadNode(up.Ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, false)
-				if err != nil {
-					log.Error().Err(err).Interface("uploadID", ev.UploadID).Msg("Failed to get node after scan")
-					continue
-				}
-
-				n = no
-			}
-
-			if err := n.SetScanData(ctx, res.Description, res.Scandate); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("resourceID", res.ResourceID).Msg("Failed to set scan results")
-				continue
-			}
-
-			// remove cache entry in gateway
-			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
-		default:
-			log.Error().Interface("event", ev).Msg("Unknown event")
-		}
-	}
 }
 
 // Shutdown shuts down the storage
@@ -1027,9 +782,12 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (
 	if currentEtag != expectedEtag {
 		return nil, errtypes.Aborted(fmt.Sprintf("file changed from etag %s to %s", expectedEtag, currentEtag))
 	}
-	reader, err := fs.tp.ReadBlob(n)
+	if n.Blobsize == 0 {
+		return io.NopCloser(strings.NewReader("")), nil
+	}
+	reader, err := fs.blobstore.Download(n)
 	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error download blob '"+n.ID+"'")
+		return nil, errors.Wrap(err, "Decomposedfs: error downloading blob '"+n.BlobID+"' for node '"+n.ID+"'")
 	}
 	return reader, nil
 }

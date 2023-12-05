@@ -159,7 +159,7 @@ func (XattrsBackend) Remove(ctx context.Context, filePath string, key string, ac
 }
 
 // IsMetaFile returns whether the given path represents a meta file
-func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".meta.lock") }
+func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".mlock") }
 
 // Purge purges the data of a given path
 func (XattrsBackend) Purge(path string) error { return nil }

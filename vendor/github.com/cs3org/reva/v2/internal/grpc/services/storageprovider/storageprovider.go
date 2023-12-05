@@ -338,6 +338,15 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		}, nil
 	}
 
+	// FIXME: This is a hack to transport more metadata to the storage.FS InitiateUpload implementation
+	// we should use a request object that can carry
+	// * if-match
+	// * if-unmodified-since
+	// * uploadLength from the tus Upload-Length header
+	// * checksum from the tus Upload-Checksum header
+	// * mtime from the X-OC-Mtime header
+	// * expires from the s.conf.UploadExpiration ... should that not be part of the driver?
+	// * providerID
 	metadata := map[string]string{}
 	ifMatch := req.GetIfMatch()
 	if ifMatch != "" {
