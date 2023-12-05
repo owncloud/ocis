@@ -82,9 +82,7 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	if err != nil {
 		return nil, err
 	}
-	s.Logger.Info().Err(err).Msg("calling SimpleUpload from store.WriteRoleAssignment...")
 	err = s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
-	s.Logger.Info().Err(err).Msg("returning from store.WriteRoleAssignment")
 	return ass, err
 }
 

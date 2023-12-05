@@ -5,21 +5,18 @@ package v0
 
 import (
 	fmt "fmt"
-	math "math"
-	"os"
-
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	proto "google.golang.org/protobuf/proto"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	math "math"
+)
 
+import (
 	context "context"
-
 	api "go-micro.dev/v4/api"
-
 	client "go-micro.dev/v4/client"
-
 	server "go-micro.dev/v4/server"
 )
 
@@ -456,9 +453,7 @@ func (c *roleService) ListRoleAssignments(ctx context.Context, in *ListRoleAssig
 func (c *roleService) AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...client.CallOption) (*AssignRoleToUserResponse, error) {
 	req := c.c.NewRequest(c.name, "RoleService.AssignRoleToUser", in)
 	out := new(AssignRoleToUserResponse)
-	fmt.Fprintln(os.Stderr, "roleService.AssignRoleToUser...")
 	err := c.c.Call(ctx, req, out, opts...)
-	fmt.Fprintln(os.Stderr, "roleService.AssignRoleToUser done")
 	if err != nil {
 		return nil, err
 	}

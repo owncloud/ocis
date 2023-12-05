@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"os"
-	"time"
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
 	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
@@ -68,7 +67,6 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	reg := registry.GetRegistry()
 	var tlsConfig *tls.Config
 	cOpts := []client.Option{
-		client.RequestTimeout(60 * time.Second),
 		client.Registry(reg),
 		client.Wrap(mbreaker.NewClientWrapper()),
 		client.Wrap(mtracer.NewClientWrapper(

@@ -420,9 +420,7 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 		return merrors.Forbidden(g.id, "user has no role management permission")
 	}
 
-	g.logger.Debug().Str("req.AccountUuid", req.AccountUuid).Msg("Calling WriteRoleAssignment...")
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
-	g.logger.Debug().Err(err).Str("req.AccountUuid", req.AccountUuid).Msg("Calling WriteRoleAssignment done")
 	if err != nil {
 		return merrors.BadRequest(g.id, err.Error())
 	}
