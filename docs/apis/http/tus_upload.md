@@ -13,6 +13,35 @@ In situations where file uploads might be interrupted due to network issues, bro
 tus ensures that uploads can be resumed from the point of failure without losing data.
 This documentation shows some basic examples, refer [tus official site](https://tus.io/protocols/resumable-upload) for more details.
 
+## Supported tus Features
+
+The backend announces certain tus features to clients. WebDAV responses come with tus HTTP headers for the offical tus features, and additional, ownCloud specific features are announced via the capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabilities?format=json`).
+
+```json
+{
+  "ocs": {
+    "data": {
+      "capabilities": {
+        "files": {
+          "tus_support": {
+              "version": "1.0.0",
+              "resumable": "1.0.0",
+              "extension": "creation,creation-with-upload",
+              "max_chunk_size": 10000000,
+              "http_method_override": ""
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+| Parameter      | Environment Variable           | Default Value | Description                                                         |
+| -------------- | ------------------------------ | ------------- | ------------------------------------------------------------------- |
+| max_chunk_size | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | 10000000      | Announces the max chunk sizes in bytes for uploads via the clients. |
+
 ## Upload in Chunks
 
 ### Create an Upload URL
@@ -191,3 +220,31 @@ curl -ks -XPOST https://ocis.test/remote.php/dav/spaces/{space-id} \
 {{< hint type=warning title="Important Warning" >}}
 `Upload-Length` header should contain the exact byte as upload content.
 {{< /hint >}}
+
+## Supported Upload-Metadata
+
+Upload-metadata key-value pairs aren't specified in the general tus docs. The following ones are supported in the ownCloud ecosystem:
+
+| Parameter (key)        | Example (value, MUST be Base64 encoded)                                                                                                              | Description                               |
+| ---------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------| ------------- | ------------------------- |
+| filename (mandatory)   | example.pdf                                                                                                                                          | Filename                                  |
+| mtime (recommended)    | 1701708712                                                                                                                                           | Modification time (Unix time format)      |
+| checksum (recommended) | SHA1 a330de5886e5a92d78fb3f8d59fe469857759e72                                                                                                        | Checksum, computed from the client        |
+| name                   | example.pdf                                                                                                                                          | Alternate name sent by the web UI         |
+| type                   | application/pdf                                                                                                                                      | MIME Type, sent by the web UI             |
+| filetype               | application/pdf                                                                                                                                      | MIME Type, sent by the web UI             |
+| relativePath           | undefined                                                                                                                                            | Sent by the web UI                        |
+| spaceId                | 8748cddf-66b7-4b85-91a7-e6d08d8e1639$a9778d63-21e7-4d92-9b47-1b81144b9993                                                                            | Sent by the web UI                        |
+| spaceName              | Personal                                                                                                                                             | Sent by the web UI                        |
+| driveAlias             | personal/admin                                                                                                                                       | Sent by the web UI                        |
+| driveType              | personal                                                                                                                                             | Sent by the web UI                        |
+| currentFolder          | /                                                                                                                                                    | Sent by the web UI                        |
+| currentFolderId        | ODc0OGNkZGYtNjZiNy00Yjg1LTkxYTctZTZkMDhkOGUxNjM5JGE5Nzc4ZDYzLTIxZTctNGQ5Mi05YjQ3LTFiODExNDRiOTk5MyFhOTc3OGQ2My0yMWU3LTRkOTItOWI0Ny0xYjgxMTQ0Yjk5OTM= | Sent by the web UI                        |
+| uppyId                 | uppy-example/pdf-1e-application/pdf-238300                                                                                                           | Sent by the web UI                        |
+| relativeFolder         |                                                                                                                                                      | Key sent by the web UI, but without value |
+| tusEndpoint            | https://ocis.ocis-traefik.latest.owncloud.works/remote.php/dav/spaces/8748cddf-66b7-4b85-91a7-e6d08d8e1639$a9778d63-21e7-4d92-9b47-1b81144b9993      | Sent by the web UI                        |
+| uploadId               | 71d5f878-a96c-4d7b-9627-658d782c93d7                                                                                                                 | Sent by the web UI                        |
+| topLevelFolderId       | undefined                                                                                                                                            | Sent by the web UI                        |
+| routeName              | files-spaces-generic                                                                                                                                 | Sent by the web UI                        |
+| routeDriveAliasAndItem | cGVyc29uYWwvYWRtaW4=                                                                                                                                 | Sent by the web UI                        |
+| routeShareId           |                                                                                                                                                      | Key sent by the web UI, but without value |
