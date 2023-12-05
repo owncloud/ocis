@@ -9,19 +9,12 @@ debug:
   token: ""
   pprof: false
   zpages: false
-token_manager:
-  jwt_secret: ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
-reva:
-  address: com.owncloud.api.gateway
-  tls:
-    mode: ""
-    cacert: ""
 grpc_client_tls: null
 log:
   level: ""
