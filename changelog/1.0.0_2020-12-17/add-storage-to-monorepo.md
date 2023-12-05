@@ -124,7 +124,8 @@ Tags: storage, reva
    Furthermore, the separate find filters now allows searching users by their displayname or
    email as well.
 
-   ``` userfilter =
+   ```
+  userfilter =
    "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))"
    findfilter =
    "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))"
