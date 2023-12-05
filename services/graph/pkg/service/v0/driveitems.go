@@ -366,7 +366,7 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -439,7 +439,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -646,7 +646,7 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 
 // DeletePermission removes a Permission from a Drive item
 func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
-	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
