@@ -21,7 +21,8 @@ type Document struct {
 	Mtime    string
 	MimeType string
 	Tags     []string
-	Audio    *libregraph.Audio `json:"audio,omitempty"`
+	Audio    *libregraph.Audio          `json:"audio,omitempty"`
+	Location *libregraph.GeoCoordinates `json:"location,omitempty"`
 }
 
 func CleanString(content, langCode string) string {

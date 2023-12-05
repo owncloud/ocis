@@ -118,6 +118,42 @@ func (m *Audio) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*Audio)(nil)
 
+// GeoCoordinatesJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GeoCoordinates. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var GeoCoordinatesJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *GeoCoordinates) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := GeoCoordinatesJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*GeoCoordinates)(nil)
+
+// GeoCoordinatesJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GeoCoordinates. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var GeoCoordinatesJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *GeoCoordinates) UnmarshalJSON(b []byte) error {
+	return GeoCoordinatesJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*GeoCoordinates)(nil)
+
 // EntityJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Entity. This struct is safe to replace or modify but
 // should not be done so concurrently.

@@ -36,6 +36,12 @@ message Audio {
 	optional int32 year = 16;
 }
 
+message GeoCoordinates {
+	optional double altitude  = 1;
+	optional double latitude = 2;
+	optional double longitude = 3;
+}
+
 message Entity {
 	Reference ref = 1;
 	ResourceID id = 2;
@@ -52,6 +58,7 @@ message Entity {
 	repeated string tags = 13;
 	string highlights = 14;
 	Audio audio = 15;
+	GeoCoordinates location = 16;
 }
 
 message Match {

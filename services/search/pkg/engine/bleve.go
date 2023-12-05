@@ -211,6 +211,7 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Highlights: getFragmentValue(hit.Fragments, "Content", 0),
 				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
+				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
 			},
 		}
 
@@ -329,6 +330,7 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Content:  getFieldValue[string](fields, "Content"),
 			Tags:     getFieldSliceValue[string](fields, "Tags"),
 			Audio:    getAudioValue[libregraph.Audio](fields),
+			Location: getLocationValue[libregraph.GeoCoordinates](fields),
 		},
 	}, nil
 }
@@ -377,6 +379,15 @@ func getAudioValue[T any](fields map[string]interface{}) *T {
 	var audio = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(audio, fields, "audio."); ok {
 		return audio
+	}
+
+	return nil
+}
+
+func getLocationValue[T any](fields map[string]interface{}) *T {
+	var location = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(location, fields, "location."); ok {
+		return location
 	}
 
 	return nil
