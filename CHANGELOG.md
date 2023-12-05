@@ -119,7 +119,7 @@ The following sections list the changes for 5.0.0.
 * Enhancement - Make sse service scalable: [#7382](https://github.com/owncloud/ocis/pull/7382)
 * Enhancement - Allow configuring storage registry with envvars: [#7554](https://github.com/owncloud/ocis/pull/7554)
 * Enhancement - Thumbnail generation with image processors: [#7409](https://github.com/owncloud/ocis/pull/7409)
-* Enhancement - Update web to v8.0.0: [#7852](https://github.com/owncloud/ocis/pull/7852)
+* Enhancement - Update web to v8.0.0-alpha.12: [#7883](https://github.com/owncloud/ocis/pull/7883)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
 ## Details
@@ -768,12 +768,12 @@ The following sections list the changes for 5.0.0.
    https://github.com/owncloud/web/issues/7728
    https://github.com/owncloud/ocis/pull/7409
 
-* Enhancement - Update web to v8.0.0: [#7852](https://github.com/owncloud/ocis/pull/7852)
+* Enhancement - Update web to v8.0.0-alpha.12: [#7883](https://github.com/owncloud/ocis/pull/7883)
 
    Tags: web
 
-   We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for details on the web
-   release.
+   We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog (linked) for
+   details on the web release.
 
    ## Summary * Bugfix
    [owncloud/web#9257](https://github.com/owncloud/web/issues/9257): Filter out shares
@@ -817,7 +817,11 @@ The following sections list the changes for 5.0.0.
    mapping * Bugfix [owncloud/web#10065](https://github.com/owncloud/web/pull/10065):
    Logout page after token expiry * Bugfix
    [owncloud/web#10083](https://github.com/owncloud/web/pull/10083): Disable
-   expiration date for alias link (internal) * Change
+   expiration date for alias link (internal) * Bugfix
+   [owncloud/web#10092](https://github.com/owncloud/web/pull/10092): Allow empty
+   search query in "in-here" search * Bugfix
+   [owncloud/web#10096](https://github.com/owncloud/web/pull/10096): Remove password
+   buttons on input if disabled * Change
    [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove
    deprecated code * Enhancement
    [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317): Make login url
@@ -923,11 +927,15 @@ The following sections list the changes for 5.0.0.
    creation during upload * Enhancement
    [owncloud/web#10062](https://github.com/owncloud/web/pull/10062): Show webdav
    information in details view * Enhancement
-   [owncloud/web#10082](https://github.com/owncloud/web/pull/10082): Add
-   authentication delegation in the Embed mode
+   [owncloud/web#10072](https://github.com/owncloud/web/issues/10072): Add
+   authentication delegation in the Embed mode * Enhancement
+   [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support
+   mandatory filter while listing users * Enhancement
+   [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
+   quick actions as extension
 
-   https://github.com/owncloud/ocis/pull/7852
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.11
+   https://github.com/owncloud/ocis/pull/7883
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
 
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 
