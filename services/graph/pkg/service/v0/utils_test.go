@@ -11,40 +11,25 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
 var _ = Describe("Utils", func() {
-	var (
-		svc service.Graph
-	)
-
-	BeforeEach(func() {
-		cfg := defaults.FullDefaultConfig()
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-
-		identityBackend := &identitymocks.Backend{}
-		svc, _ = service.NewService(
-			service.Config(cfg),
-			service.WithIdentityBackend(identityBackend),
-		)
-	})
-
 	DescribeTable("GetDriveAndItemIDParam",
 		func(driveID, itemID string, shouldPass bool) {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", driveID)
 			rctx.URLParams.Add("itemID", itemID)
 
-			extractedDriveID, extractedItemID, err := svc.GetDriveAndItemIDParam(
+			extractedDriveID, extractedItemID, err := service.GetDriveAndItemIDParam(
 				httptest.NewRequest(http.MethodGet, "/", nil).
 					WithContext(
 						context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 					),
+				conversions.ToPointer(log.NopLogger()),
 			)
 
 			switch shouldPass {

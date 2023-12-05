@@ -204,8 +204,27 @@ func NewService(opts ...Option) (Graph, error) {
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
+	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger)
+	if err != nil {
+		return svc, err
+	}
+
+	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, options.Logger)
+	if err != nil {
+		return svc, err
+	}
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
+
+		for _, router := range []Router{
+			drivesDriveItemApi,
+		} {
+			for _, route := range router.Routes() {
+				r.Method(route.Method, route.Pattern, route.HandlerFunc)
+			}
+		}
+
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
