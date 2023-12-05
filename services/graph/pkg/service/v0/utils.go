@@ -8,6 +8,8 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
 
@@ -32,28 +34,28 @@ func IsSpaceRoot(rid *storageprovider.ResourceId) bool {
 
 // GetDriveAndItemIDParam parses the driveID and itemID from the request,
 // validates the common fields and returns the parsed IDs if ok.
-func (g Graph) GetDriveAndItemIDParam(r *http.Request) (storageprovider.ResourceId, storageprovider.ResourceId, error) {
+func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (storageprovider.ResourceId, storageprovider.ResourceId, error) {
 	empty := storageprovider.ResourceId{}
 
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse driveID")
+		logger.Debug().Err(err).Msg("could not parse driveID")
 		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid driveID")
 	}
 
 	itemID, err := parseIDParam(r, "itemID")
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse itemID")
+		logger.Debug().Err(err).Msg("could not parse itemID")
 		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
 	}
 
 	if itemID.GetOpaqueId() == "" {
-		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("empty item opaqueID")
+		logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("empty item opaqueID")
 		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
 	}
 
 	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
-		g.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
+		logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
 		return empty, empty, errorcode.New(errorcode.ItemNotFound, "driveID and itemID do not match")
 	}
 

@@ -59,6 +59,18 @@ type RoleService interface {
 	RemoveRoleFromUser(ctx context.Context, in *settingssvc.RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
 
+// A Route defines the parameters for an api endpoint
+type Route struct {
+	Method      string
+	Pattern     string
+	HandlerFunc http.HandlerFunc
+}
+
+// Router defines the required methods for retrieving api routes
+type Router interface {
+	Routes() []Route
+}
+
 // Graph defines implements the business logic for Service.
 type Graph struct {
 	config                   *config.Config
