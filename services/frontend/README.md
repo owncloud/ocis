@@ -72,22 +72,24 @@ With the password policy, mandatory criteria for the password can be defined via
 
 Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
-The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OCIS_CONFIG_DIR/FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
+The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OCIS_CONFIG_DIR/OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
 
 Following environment variables can be set to define the password policy behaviour:
 
--   `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`
+-   `OCIS_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
--   `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
+-   `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
 Define the minimum number of uppercase letters.
--   `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
+-   `OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
 Define the minimum number of lowercase letters.
--   `FRONTEND_PASSWORD_POLICY_MIN_DIGITS`
+-   `OCIS_PASSWORD_POLICY_MIN_DIGITS`
 Define the minimum number of digits.
--   `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
+-   `OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
 Define the minimum number of special characters.
--   `FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
+-   `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 Path to the 'banned passwords list' file.
+
+These variables are global ocis variables because they are used not only in the frontend service, but also in the sharing service.
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
 
