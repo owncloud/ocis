@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-06-11-17-23]
+[#deprecation-note-2023-12-06-13-24-14]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -235,7 +235,7 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-12-06-11-17-23[Deprecation Note]
+xref:deprecation-note-2023-12-06-13-24-14[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -526,5 +526,75 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+
+a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+`SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on all public shares.
+
+a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_CHARACTERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++8 ++
+a| [subs=-attributes]
+Define the minimum password length. Defaults to 0 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of uppercase letters. Defaults to 0 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of lowercase letters. Defaults to 0 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
+`SHARING_PASSWORD_POLICY_MIN_DIGITS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of digits. Defaults to 0 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.
+
+a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+`SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path to the 'banned passwords list' file. See the documentation for more details.
 |===
 

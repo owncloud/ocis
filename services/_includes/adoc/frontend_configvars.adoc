@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-06-11-17-23]
+[#deprecation-note-2023-12-06-13-24-14]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -718,7 +718,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The service account secret.
 
-a|`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
+a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -727,7 +728,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum password length. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -736,7 +738,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of uppercase letters. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -745,7 +748,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of lowercase letters. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
+a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
+`FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -754,7 +758,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of digits. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 
 a| [subs=-attributes]
 ++int ++
@@ -763,7 +768,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.
 
-a|`FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+`FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 
 a| [subs=-attributes]
 ++string ++
