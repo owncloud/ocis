@@ -78,7 +78,7 @@ services:
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
       # password policies
-      FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ocis-config:/etc/ocis

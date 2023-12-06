@@ -72,7 +72,7 @@ services:
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
       # password policies
-      FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
