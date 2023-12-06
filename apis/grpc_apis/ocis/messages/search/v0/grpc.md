@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.search.v0"
 url: /apis/grpc_apis/ocis_messages_search_v0
-date: 2023-12-06T14:25:06Z
+date: 2023-12-06T14:48:54Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -56,6 +56,17 @@ geekdocRepo: https://github.com/owncloud/ocis
 | tags | [string](#string) | repeated |  |
 | highlights | [string](#string) |  |  |
 | audio | [Audio](#audio) |  |  |
+| location | [GeoCoordinates](#geocoordinates) |  |  |
+
+### GeoCoordinates
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| altitude | [double](#double) | optional |  |
+| latitude | [double](#double) | optional |  |
+| longitude | [double](#double) | optional |  |
 
 ### Match
 
