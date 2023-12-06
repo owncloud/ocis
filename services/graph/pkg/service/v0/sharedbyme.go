@@ -219,6 +219,10 @@ func cs3StatusToErrCode(code rpc.Code) (errcode errorcode.ErrorCode) {
 		errcode = errorcode.ItemNotFound
 	case rpc.Code_CODE_LOCKED:
 		errcode = errorcode.ItemIsLocked
+	case rpc.Code_CODE_INVALID_ARGUMENT:
+		errcode = errorcode.InvalidRequest
+	case rpc.Code_CODE_FAILED_PRECONDITION:
+		errcode = errorcode.InvalidRequest
 	default:
 		errcode = errorcode.GeneralException
 	}
