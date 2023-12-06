@@ -759,6 +759,7 @@ var _ = Describe("Driveitems", func() {
 
 				res := assertItemsList(1)
 				Expect(res.Value[0].Audio).To(BeNil())
+				Expect(res.Value[0].Location).To(BeNil())
 			})
 
 			It("returns the audio facet if metadata is available", func() {
@@ -815,6 +816,36 @@ var _ = Describe("Driveitems", func() {
 				Expect(audio.Track).To(Equal(libregraph.PtrInt32(6)))
 				Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(9)))
 				Expect(audio.Year).To(Equal(libregraph.PtrInt32(1994)))
+			})
+
+			It("returns the location facet if metadata is available", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "image/jpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.location.altitude":  "1047.7",
+									"libre.graph.location.latitude":  "49.48675890884328",
+									"libre.graph.location.longitude": "11.103870357204285",
+								},
+							},
+						},
+					},
+				}, nil)
+
+				res := assertItemsList(1)
+				location := res.Value[0].Location
+
+				Expect(location).ToNot(BeNil())
+				Expect(location.Altitude).To(Equal(libregraph.PtrFloat64(1047.7)))
+				Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
+				Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
 			})
 		})
 	})

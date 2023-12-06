@@ -36,7 +36,7 @@ type GetThumbnailRequest struct {
 	Width int32 `protobuf:"varint,3,opt,name=width,proto3" json:"width,omitempty"`
 	// The height of the thumbnail
 	Height int32 `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
-	// Indicates which processor should be used
+	// Indicates which image processor to use
 	Processor string `protobuf:"bytes,5,opt,name=processor,proto3" json:"processor,omitempty"`
 	// Types that are assignable to Source:
 	//

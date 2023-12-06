@@ -270,6 +270,26 @@
         },
         "audio": {
           "$ref": "#/definitions/v0Audio"
+        },
+        "location": {
+          "$ref": "#/definitions/v0GeoCoordinates"
+        }
+      }
+    },
+    "v0GeoCoordinates": {
+      "type": "object",
+      "properties": {
+        "altitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
         }
       }
     },

@@ -140,6 +140,28 @@ var _ = Describe("Tika", func() {
 
 		})
 
+		It("adds location content", func() {
+			fullResponse = `[
+				{
+					"geo:lat": "49.48675890884328",
+					"geo:long": "11.103870357204285"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			location := doc.Location
+			Expect(location).ToNot(BeNil())
+
+			// TODO: Altitude is not supported right now
+			Expect(location.Altitude).To(BeNil())
+			Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
+			Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
+		})
+
 		It("removes stop words", func() {
 			body = "body to test stop words!!! against almost everyone"
 			language = "en"

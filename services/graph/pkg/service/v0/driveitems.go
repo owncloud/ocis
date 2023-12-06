@@ -870,7 +870,10 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		driveItem.Folder = &libregraph.Folder{}
 	}
 
-	driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
+	if res.ArbitraryMetadata != nil {
+		driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
+		driveItem.Location = cs3ResourceToDriveItemLocationFacet(logger, res)
+	}
 
 	return driveItem, nil
 }
@@ -888,6 +891,20 @@ func cs3ResourceToDriveItemAudioFacet(logger *log.Logger, res *storageprovider.R
 	var audio = &libregraph.Audio{}
 	if ok := unmarshalStringMap(logger, audio, k, "libre.graph.audio."); ok {
 		return audio
+	}
+
+	return nil
+}
+
+func cs3ResourceToDriveItemLocationFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.GeoCoordinates {
+	k := res.ArbitraryMetadata.Metadata
+	if k == nil {
+		return nil
+	}
+
+	var location = &libregraph.GeoCoordinates{}
+	if ok := unmarshalStringMap(logger, location, k, "libre.graph.location."); ok {
+		return location
 	}
 
 	return nil
@@ -922,6 +939,10 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 					tmp, err = strconv.ParseInt(value, 10, 32)
 				case reflect.Int64:
 					tmp, err = strconv.ParseInt(value, 10, 64)
+				case reflect.Float32:
+					tmp, err = strconv.ParseFloat(value, 32)
+				case reflect.Float64:
+					tmp, err = strconv.ParseFloat(value, 64)
 				case reflect.Bool:
 					tmp, err = strconv.ParseBool(value)
 				default:
