@@ -40,6 +40,7 @@ class SharingHelper {
 		'create' => 4,
 		'delete' => 8,
 		'share' => 16,
+		'invite' => 0
 	];
 
 	public const SHARE_TYPES = [
@@ -181,6 +182,7 @@ class SharingHelper {
 	 * 'create' => 4
 	 * 'delete' => 8
 	 * 'share' => 16
+	 * 'invite' => 0
 	 *
 	 * @param string[]|string|int|int[] $permissions
 	 *
@@ -209,7 +211,7 @@ class SharingHelper {
 				);
 			}
 		}
-		if ($permissionSum < 1 || $permissionSum > 31) {
+		if ($permissionSum < 0 || $permissionSum > 31) {
 			throw new InvalidArgumentException(
 				"invalid permission total ($permissionSum)"
 			);

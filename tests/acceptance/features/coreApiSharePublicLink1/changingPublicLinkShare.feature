@@ -164,6 +164,26 @@ Feature: changing a public link share
     And the OCS status message should be "missing required password"
 
 
+  Scenario Outline: normal user removes password of a public link (invite only public link)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /PARENT  |
+      | permissions | invite   |
+      | password    | %public% |
+    When user "Alice" updates the last public link share using the sharing API with
+      | path        | /PARENT |
+      | password    |         |
+      | permissions | invite  |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status message should be "OK"
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
+
+
   Scenario: administrator removes password of a read-only public link
     Given admin has created folder "/PARENT"
     And user "admin" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
