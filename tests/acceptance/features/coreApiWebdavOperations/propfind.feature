@@ -25,7 +25,7 @@ Feature: PROPFIND
       | depth  | <depth> |
     Then the HTTP status code should be "<http-code>"
     Examples:
-      | dav-path                    | depth    | http-code | 
+      | dav-path                    | depth    | http-code |
       | /remote.php/webdav          | 0        | 207       |
       | /remote.php/webdav          | 1        | 207       |
       | /remote.php/dav/files/alice | 0        | 207       |
@@ -33,7 +33,7 @@ Feature: PROPFIND
 
     @skipOnRevaMaster
     Examples:
-      | dav-path                         | depth    | http-code | 
+      | dav-path                         | depth    | http-code |
       | /remote.php/dav/spaces/%spaceid% | 0        | 207       |
       | /remote.php/dav/spaces/%spaceid% | 1        | 207       |
       | /remote.php/dav/spaces/%spaceid% | infinity | 400       |
