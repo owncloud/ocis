@@ -163,13 +163,13 @@ Feature: changing a public link share
     When user "Alice" updates the last public link share using the sharing API with
       | path     | /PARENT |
       | password |         |
-    Then the HTTP status code should be "200"
-    And the OCS status code should be "400"
-    And the OCS status message should be "missing required password"
+    Then the HTTP status code should be "<http_status_code>"
+    And the OCS status code should be "104"
+    And the OCS status message should be "user is not allowed to delete the password from the public link"
     Examples:
-      | ocs_api_version |
-      | 1               |
-      | 2               |
+      | ocs_api_version | http_status_code |
+      | 1               | 200              |
+      | 2               | 403              |
 
 
   Scenario Outline: normal user removes password of a public link (invite only public link)
