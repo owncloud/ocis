@@ -226,14 +226,14 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	if !ctxHasFullPerms && (odataReq.Query == nil || odataReq.Query.Search == nil || len(odataReq.Query.Search.RawValue) < g.config.API.IdentitySearchMinLength) {
 		// for regular user the search term must have a minimum length
 		logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "search term too short")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
 		return
 	}
 
 	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
 		// regular users can't use filter, apply, expand and compute
 		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "query has forbidden elements for regular users")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
 		return
 	}
 
