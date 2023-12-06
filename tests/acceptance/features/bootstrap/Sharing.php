@@ -236,7 +236,7 @@ trait Sharing {
 	 *       | permissions        | The permissions to set on the share.                |
 	 *       |                    |     1 = read; 2 = update; 4 = create;               |
 	 *       |                    |     8 = delete; 16 = share; 31 = all                |
-	 *       |                    |     15 = change                                     |
+	 *       |                    |     15 = change; 0 = invite                         |
 	 *       |                    |     4 = uploadwriteonly                             |
 	 *       |                    |     (default: 31, for public shares: 1)             |
 	 *       |                    |     Pass either the (total) number,                 |

@@ -130,15 +130,23 @@ Feature: Share spaces via link
     And for user "Alice" the space "Alice Hansen" should not contain the last created public link
 
 
-  Scenario: space admin removes password of a public link share of a space
-    Given user "Alice" has created a public link share of the space "share space" with settings:
-      | permissions | 1        |
-      | password    | %public% |
+  Scenario Outline: space admin removes password of a public link share of a space (read/invite permission)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has created a public link share of the space "share space" with settings:
+      | permissions | <permissions> |
+      | password    | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
-      | permissions | 1 |
-      | password    |   |
+      | permissions | <permissions> |
+      | password    |               |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
+    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status message should be "OK"
+    Examples:
+      | ocs_api_version | ocs_status_code | permissions |
+      | 1               | 100             | 1           |
+      | 1               | 100             | 0           |
+      | 2               | 200             | 1           |
+      | 2               | 200             | 0           |
 
 
   Scenario Outline: space admin tries to remove password of a public link share of a space (various permission)
@@ -156,6 +164,23 @@ Feature: Share spaces via link
       | 5           |
       | 15          |
       | 4           |
+
+
+  Scenario Outline: space admin removes password of a public link share of a space (invite permission)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has created a public link share of the space "share space" with settings:
+      | permissions | 1        |
+      | password    | %public% |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | 0 |
+      | password    |   |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status message should be "OK"
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario: space manager tries to remove password of a public link share of a space (read permission)
@@ -191,3 +216,61 @@ Feature: Share spaces via link
       | 5           |
       | 15          |
       | 4           |
+
+
+  Scenario Outline: space manager removes password of a public link share of a space (invite permission)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
+    And user "Brian" has created a public link share of the space "share space" with settings:
+      | permissions | 1        |
+      | password    | %public% |
+    When user "Brian" updates the last public link share using the sharing API with
+      | permissions | 0 |
+      | password    |   |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status message should be "OK"
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
+
+
+  Scenario Outline: space member tries to remove the password of a public link share of a space
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    And user "Alice" has created a public link share of the space "share space" with settings:
+      | permissions | <permissions>        |
+      | password    | %public% |
+    When user "Brian" updates the last public link share using the sharing API with
+      | permissions | <permissions> |
+      | password    |   |
+    Then the HTTP status code should be "<http_status_code>"
+    And the OCS status code should be "997"
+    And the OCS status message should be "missing permissions to update share"
+    Examples:
+      | ocs_api_version | http_status_code | role   | permissions |
+      | 1               | 200              | viewer | 1           |
+      | 2               | 401              | viewer | 1           |
+      | 1               | 200              | viewer | 5           |
+      | 2               | 401              | viewer | 5           |
+      | 1               | 200              | viewer | 15          |
+      | 2               | 401              | viewer | 15          |
+      | 1               | 200              | viewer | 4           |
+      | 2               | 401              | viewer | 4           |
+      | 1               | 200              | viewer | 0           |
+      | 2               | 401              | viewer | 0           |
+      | 1               | 200              | editor | 1           |
+      | 2               | 401              | editor | 1           |
+      | 1               | 200              | editor | 5           |
+      | 2               | 401              | editor | 5           |
+      | 1               | 200              | editor | 15          |
+      | 2               | 401              | editor | 15          |
+      | 1               | 200              | editor | 4           |
+      | 2               | 401              | editor | 4           |
+      | 1               | 200              | editor | 0           |
+      | 2               | 401              | editor | 0           |
