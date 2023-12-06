@@ -24,6 +24,8 @@ strong {
   background-repeat: no-repeat;
   background-position: center;
   z-index: 0;
+  display: flex;
+  width: 100%;
 }
 
 #loader {

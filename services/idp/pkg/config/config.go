@@ -54,7 +54,8 @@ type Ldap struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"asset" env:"IDP_ASSET_PATH" desc:"Serve IDP assets from a path on the filesystem instead of the builtin assets."`
+	Path               string `yaml:"asset" env:"IDP_ASSET_PATH" desc:"Serve IDP assets from a path on the filesystem instead of the builtin assets."`
+	LoginBackgroundUrl string `yaml:"login-background-url" env:"IDP_LOGIN_BACKGROUND_URL" desc:"Configure an alternative URL to the background image for the login page."`
 }
 
 type Client struct {
