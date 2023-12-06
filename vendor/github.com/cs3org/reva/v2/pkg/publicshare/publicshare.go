@@ -24,7 +24,6 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
-	"errors"
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -39,11 +38,6 @@ const (
 	// StorageIDFilterType defines a new filter type for storage id.
 	// TODO: Remove this once the filter type is in the CS3 API.
 	StorageIDFilterType link.ListPublicSharesRequest_Filter_Type = 4
-)
-
-var (
-	// ErrShareNeedsPassword is an error which is returned when a public share must have a password.
-	ErrShareNeedsPassword = errors.New("the public share needs to have a password")
 )
 
 // Manager manipulates public shares.

@@ -20,10 +20,21 @@ package publicshareprovider
 
 import (
 	"context"
+	"fmt"
 	"regexp"
+	"strconv"
+	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/password"
+	"github.com/cs3org/reva/v2/pkg/permission"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/sharedconf"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -38,6 +49,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 )
 
+const getUserCtxErrMsg = "error getting user from context"
+
 func init() {
 	rgrpc.Register("publicshareprovider", New)
 }
@@ -45,9 +58,21 @@ func init() {
 type config struct {
 	Driver                         string                            `mapstructure:"driver"`
 	Drivers                        map[string]map[string]interface{} `mapstructure:"drivers"`
+	GatewayAddr                    string                            `mapstructure:"gateway_addr"`
 	AllowedPathsForShares          []string                          `mapstructure:"allowed_paths_for_shares"`
 	EnableExpiredSharesCleanup     bool                              `mapstructure:"enable_expired_shares_cleanup"`
 	WriteableShareMustHavePassword bool                              `mapstructure:"writeable_share_must_have_password"`
+	PublicShareMustHavePassword    bool                              `mapstructure:"public_share_must_have_password"`
+	PasswordPolicy                 map[string]interface{}            `mapstructure:"password_policy"`
+}
+
+type passwordPolicy struct {
+	MinCharacters          int                 `mapstructure:"min_characters"`
+	MinLowerCaseCharacters int                 `mapstructure:"min_lowercase_characters"`
+	MinUpperCaseCharacters int                 `mapstructure:"min_uppercase_characters"`
+	MinDigits              int                 `mapstructure:"min_digits"`
+	MinSpecialCharacters   int                 `mapstructure:"min_special_characters"`
+	BannedPasswordsList    map[string]struct{} `mapstructure:"banned_passwords_list"`
 }
 
 func (c *config) init() {
@@ -59,7 +84,9 @@ func (c *config) init() {
 type service struct {
 	conf                  *config
 	sm                    publicshare.Manager
+	gatewaySelector       pool.Selectable[gateway.GatewayAPIClient]
 	allowedPathsForShares []*regexp.Regexp
+	passwordValidator     password.Validator
 }
 
 func getShareManager(c *config) (publicshare.Manager, error) {
@@ -84,16 +111,29 @@ func (s *service) Register(ss *grpc.Server) {
 func parseConfig(m map[string]interface{}) (*config, error) {
 	c := &config{}
 	if err := mapstructure.Decode(m, c); err != nil {
-		err = errors.Wrap(err, "error decoding conf")
+		err = errors.Wrap(err, "error decoding config")
 		return nil, err
 	}
 	return c, nil
+}
+
+func parsePasswordPolicy(m map[string]interface{}) (*passwordPolicy, error) {
+	p := &passwordPolicy{}
+	if err := mapstructure.Decode(m, p); err != nil {
+		err = errors.Wrap(err, "error decoding password policy config")
+		return nil, err
+	}
+	return p, nil
 }
 
 // New creates a new user share provider svc
 func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 
 	c, err := parseConfig(m)
+	if err != nil {
+		return nil, err
+	}
+	p, err := parsePasswordPolicy(c.PasswordPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -114,13 +154,34 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		allowedPathsForShares = append(allowedPathsForShares, regex)
 	}
 
+	gatewaySelector, err := pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
+	if err != nil {
+		return nil, err
+	}
+
 	service := &service{
 		conf:                  c,
 		sm:                    sm,
+		gatewaySelector:       gatewaySelector,
 		allowedPathsForShares: allowedPathsForShares,
+		passwordValidator:     newPasswordPolicy(p),
 	}
 
 	return service, nil
+}
+
+func newPasswordPolicy(c *passwordPolicy) password.Validator {
+	if c == nil {
+		return password.NewPasswordPolicy(0, 0, 0, 0, 0, nil)
+	}
+	return password.NewPasswordPolicy(
+		c.MinCharacters,
+		c.MinLowerCaseCharacters,
+		c.MinUpperCaseCharacters,
+		c.MinDigits,
+		c.MinSpecialCharacters,
+		c.BannedPasswordsList,
+	)
 }
 
 func (s *service) isPathAllowed(path string) bool {
@@ -139,33 +200,129 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 	log := appctx.GetLogger(ctx)
 	log.Info().Str("publicshareprovider", "create").Msg("create public share")
 
-	if !conversions.SufficientCS3Permissions(req.GetResourceInfo().GetPermissionSet(), req.GetGrant().GetPermissions().GetPermissions()) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	isInternalLink := grants.PermissionsEqual(req.GetGrant().GetPermissions().GetPermissions(), &provider.ResourcePermissions{})
+
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: req.GetResourceInfo().GetId()}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", req.GetResourceInfo().GetId()).Msg("failed to stat resource to share")
 		return &link.CreatePublicShareResponse{
-			Status: status.NewInvalid(ctx, "insufficient permissions to create that kind of share"),
+			Status: status.NewInternal(ctx, "failed to stat resource to share"),
+		}, err
+	}
+
+	// all users can create internal links
+	if !isInternalLink {
+		// check if the user has the permission in the user role
+		ok, err := utils.CheckPermission(ctx, permission.WritePublicLink, gatewayClient)
+		if err != nil {
+			return &link.CreatePublicShareResponse{
+				Status: status.NewInternal(ctx, "failed check user permission to write public link"),
+			}, err
+		}
+		if !ok {
+			return &link.CreatePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "no permission to create public links"),
+			}, nil
+		}
+	}
+
+	// check that user has share permissions
+	if !sRes.GetInfo().GetPermissionSet().AddGrant {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewInvalidArg(ctx, "no share permission"),
 		}, nil
 	}
 
-	if !s.isPathAllowed(req.ResourceInfo.Path) {
+	// check if the user can share with the desired permissions
+	if !conversions.SufficientCS3Permissions(sRes.GetInfo().GetPermissionSet(), req.GetGrant().GetPermissions().GetPermissions()) {
 		return &link.CreatePublicShareResponse{
-			Status: status.NewInvalid(ctx, "share creation is not allowed for the specified path"),
+			Status: status.NewInvalidArg(ctx, "insufficient permissions to create that kind of share"),
 		}, nil
+	}
+
+	// validate path
+	if !s.isPathAllowed(req.GetResourceInfo().GetPath()) {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewFailedPrecondition(ctx, nil, "share creation is not allowed for the specified path"),
+		}, nil
+	}
+
+	// check that this is a not a personal space root
+	if req.GetResourceInfo().GetId().GetOpaqueId() == req.GetResourceInfo().GetId().GetSpaceId() &&
+		req.GetResourceInfo().GetSpace().GetSpaceType() == "personal" {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewInvalidArg(ctx, "cannot create link on personal space root"),
+		}, nil
+	}
+
+	// quick link returns the existing one if already present
+	quickLink, err := checkQuicklink(req.GetResourceInfo())
+	if err != nil {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewInvalidArg(ctx, "invalid quicklink value"),
+		}, nil
+	}
+	if quickLink {
+		f := []*link.ListPublicSharesRequest_Filter{publicshare.ResourceIDFilter(req.GetResourceInfo().GetId())}
+		req := link.ListPublicSharesRequest{Filters: f}
+		res, err := s.ListPublicShares(ctx, &req)
+		if err != nil || res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			return &link.CreatePublicShareResponse{
+				Status: status.NewInternal(ctx, "could not list public links"),
+			}, nil
+		}
+		for _, l := range res.GetShare() {
+			if l.Quicklink {
+				return &link.CreatePublicShareResponse{
+					Status: status.NewOK(ctx),
+					Share:  l,
+				}, nil
+			}
+		}
 	}
 
 	grant := req.GetGrant()
-	if grant != nil && s.conf.WriteableShareMustHavePassword &&
-		publicshare.IsWriteable(grant.GetPermissions()) && grant.Password == "" {
+
+	// validate expiration date
+	if grant.GetExpiration() != nil {
+		expirationDateTime := utils.TSToTime(grant.GetExpiration()).UTC()
+		if expirationDateTime.Before(time.Now().UTC()) {
+			msg := fmt.Sprintf("expiration date is in the past: %s", expirationDateTime.Format(time.RFC3339))
+			return &link.CreatePublicShareResponse{
+				Status: status.NewInvalidArg(ctx, msg),
+			}, nil
+		}
+	}
+
+	// enforce password if needed
+	setPassword := grant.GetPassword()
+	if !isInternalLink && enforcePassword(grant, s.conf) && len(setPassword) == 0 {
 		return &link.CreatePublicShareResponse{
-			Status: status.NewInvalid(ctx, "writeable shares must have a password protection"),
+			Status: status.NewInvalidArg(ctx, "password protection is enforced"),
 		}, nil
+	}
+
+	// validate password policy
+	if len(setPassword) > 0 {
+		if err := s.passwordValidator.Validate(setPassword); err != nil {
+			return &link.CreatePublicShareResponse{
+				Status: status.NewInvalidArg(ctx, err.Error()),
+			}, nil
+		}
 	}
 
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
-		log.Error().Msg("error getting user from context")
+		log.Error().Msg(getUserCtxErrMsg)
 	}
 
 	res := &link.CreatePublicShareResponse{}
-	share, err := s.sm.CreatePublicShare(ctx, u, req.ResourceInfo, req.Grant)
+	share, err := s.sm.CreatePublicShare(ctx, u, req.GetResourceInfo(), req.GetGrant())
 	switch {
 	case err != nil:
 		log.Error().Err(err).Interface("request", req).Msg("could not write public share")
@@ -179,11 +336,37 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 }
 
 func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicShareRequest) (*link.RemovePublicShareResponse, error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	log := appctx.GetLogger(ctx)
 	log.Info().Str("publicshareprovider", "remove").Msg("remove public share")
 
 	user := ctxpkg.ContextMustGetUser(ctx)
-	err := s.sm.RevokePublicShare(ctx, user, req.Ref)
+	ps, err := s.sm.GetPublicShare(ctx, user, req.GetRef(), false)
+	if err != nil {
+		return &link.RemovePublicShareResponse{
+			Status: status.NewInternal(ctx, "error loading public share"),
+		}, err
+	}
+	if !publicshare.IsCreatedByUser(*ps, user) {
+		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
+		if err != nil {
+			log.Err(err).Interface("resource_id", ps.ResourceId).Msg("failed to stat shared resource")
+			return &link.RemovePublicShareResponse{
+				Status: status.NewInternal(ctx, "failed to stat shared resource"),
+			}, err
+		}
+
+		if !sRes.GetInfo().GetPermissionSet().RemoveGrant {
+			return &link.RemovePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "no permission to delete public share"),
+			}, err
+		}
+	}
+	err = s.sm.RevokePublicShare(ctx, user, req.Ref)
 	if err != nil {
 		return &link.RemovePublicShareResponse{
 			Status: status.NewInternal(ctx, "error deleting public share"),
@@ -227,7 +410,7 @@ func (s *service) GetPublicShare(ctx context.Context, req *link.GetPublicShareRe
 
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
-		log.Error().Msg("error getting user from context")
+		log.Error().Msg(getUserCtxErrMsg)
 	}
 
 	ps, err := s.sm.GetPublicShare(ctx, u, req.Ref, req.GetSign())
@@ -281,16 +464,11 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
-		log.Error().Msg("error getting user from context")
+		log.Error().Msg(getUserCtxErrMsg)
 	}
 
 	updateR, err := s.sm.UpdatePublicShare(ctx, u, req)
 	if err != nil {
-		if errors.Is(err, publicshare.ErrShareNeedsPassword) {
-			return &link.UpdatePublicShareResponse{
-				Status: status.NewInvalid(ctx, err.Error()),
-			}, nil
-		}
 		return &link.UpdatePublicShareResponse{
 			Status: status.NewInternal(ctx, err.Error()),
 		}, nil
@@ -301,4 +479,31 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 		Share:  updateR,
 	}
 	return res, nil
+}
+
+func enforcePassword(grant *link.Grant, conf *config) bool {
+	if conf.PublicShareMustHavePassword {
+		return true
+	}
+	isReadOnly := conversions.SufficientCS3Permissions(conversions.NewViewerRole(true).CS3ResourcePermissions(), grant.GetPermissions().GetPermissions())
+	return !isReadOnly && conf.WriteableShareMustHavePassword
+}
+
+func checkQuicklink(info *provider.ResourceInfo) (bool, error) {
+	if info == nil {
+		return false, nil
+	}
+	if m := info.GetArbitraryMetadata().GetMetadata(); m != nil {
+		q, ok := m["quicklink"]
+		// empty string would trigger an error in ParseBool()
+		if !ok || q == "" {
+			return false, nil
+		}
+		quickLink, err := strconv.ParseBool(q)
+		if err != nil {
+			return false, err
+		}
+		return quickLink, nil
+	}
+	return false, nil
 }
