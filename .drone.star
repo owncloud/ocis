@@ -273,8 +273,6 @@ def main(ctx):
                 pipelines,
             )
 
-    pipelines = pipelines + k6LoadTests(ctx)
-
     # always append notification step
     pipelines.append(
         pipelineDependsOn(
@@ -282,6 +280,8 @@ def main(ctx):
             pipelines,
         ),
     )
+
+    pipelines = pipelines + k6LoadTests(ctx)
 
     pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
