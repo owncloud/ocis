@@ -64,6 +64,33 @@ const (
 	tracerName = "ocdav"
 )
 
+// these keys are used to lookup in ArbitraryMetadata, generated prop names are lowercased
+var (
+	audioKeys = []string{
+		"album",
+		"albumArtist",
+		"artist",
+		"bitrate",
+		"composers",
+		"copyright",
+		"disc",
+		"discCount",
+		"duration",
+		"genre",
+		"hasDrm",
+		"isVariableBitrate",
+		"title",
+		"track",
+		"trackCount",
+		"year",
+	}
+	locationKeys = []string{
+		"altitude",
+		"latitude",
+		"longitude",
+	}
+)
+
 type countingReader struct {
 	n int
 	r io.Reader
@@ -786,6 +813,14 @@ func (p *Handler) getSpaceResourceInfos(ctx context.Context, w http.ResponseWrit
 	return resourceInfos, true
 }
 
+func metadataKeysWithPrefix(prefix string, keys []string) []string {
+	fullKeys := []string{}
+	for _, key := range keys {
+		fullKeys = append(fullKeys, fmt.Sprintf("%s.%s", prefix, key))
+	}
+	return fullKeys
+}
+
 // metadataKeys splits the propfind properties into arbitrary metadata and ResourceInfo field mask paths
 func metadataKeys(pf XML) ([]string, []string) {
 
@@ -809,6 +844,10 @@ func metadataKeys(pf XML) ([]string, []string) {
 				switch key {
 				case "share-types":
 					fieldMaskKeys = append(fieldMaskKeys, key)
+				case "http://owncloud.org/ns/audio":
+					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.audio", audioKeys)...)
+				case "http://owncloud.org/ns/location":
+					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.location", locationKeys)...)
 				default:
 					metadataKeys = append(metadataKeys, key)
 				}
@@ -866,7 +905,7 @@ func requiresExplicitFetching(n *xml.Name) bool {
 		}
 	case net.NsOwncloud:
 		switch n.Local {
-		case "favorite", "share-types", "checksums", "size", "tags":
+		case "favorite", "share-types", "checksums", "size", "tags", "audio", "location":
 			return true
 		default:
 			return false
@@ -1082,6 +1121,33 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 		appendToNotFound = func(p ...prop.PropertyXML) {}
 	}
 
+	appendMetadataProp := func(metadata map[string]string, tagNamespace string, name string, metadataPrefix string, keys []string) {
+		content := strings.Builder{}
+		for _, key := range keys {
+			lowerCaseKey := strings.ToLower(key)
+			if v, ok := metadata[fmt.Sprintf("%s.%s", metadataPrefix, key)]; ok {
+				content.WriteString("<")
+				content.WriteString(tagNamespace)
+				content.WriteString(":")
+				content.WriteString(lowerCaseKey)
+				content.WriteString(">")
+				content.Write(prop.Escaped("", v).InnerXML)
+				content.WriteString("</")
+				content.WriteString(tagNamespace)
+				content.WriteString(":")
+				content.WriteString(lowerCaseKey)
+				content.WriteString(">")
+			}
+		}
+
+		propName := fmt.Sprintf("%s:%s", tagNamespace, name)
+		if content.Len() > 0 {
+			appendToOK(prop.Raw(propName, content.String()))
+		} else {
+			appendToNotFound(prop.NotFound(propName))
+		}
+	}
+
 	// when allprops has been requested
 	if pf.Allprop != nil {
 		// return all known properties
@@ -1180,6 +1246,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 
 		if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
 			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:tags", k["tags"]))
+			appendMetadataProp(k, "oc", "audio", "libre.graph.audio", audioKeys)
+			appendMetadataProp(k, "oc", "location", "libre.graph.location", locationKeys)
 		}
 
 		// ls do not report any properties as missing by default
@@ -1452,6 +1520,14 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				case "tags":
 					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:tags", k["tags"]))
+					}
+				case "audio":
+					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
+						appendMetadataProp(k, "oc", "audio", "libre.graph.audio", audioKeys)
+					}
+				case "location":
+					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
+						appendMetadataProp(k, "oc", "location", "libre.graph.location", locationKeys)
 					}
 				case "name":
 					appendToOK(prop.Escaped("oc:name", md.Name))
