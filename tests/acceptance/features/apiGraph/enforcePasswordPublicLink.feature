@@ -6,11 +6,11 @@ Feature: enforce password on public link
 
       Password requirements. set by default:
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | true |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1    |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1    |
 
 
   Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
@@ -82,11 +82,11 @@ Feature: enforce password on public link
     Given the following configs have been set:
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS                    | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -109,11 +109,11 @@ Feature: enforce password on public link
   Scenario Outline: try to create a public link with a password that does not comply with the password policy
     Given the following configs have been set:
       | config                                            | value |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -142,11 +142,11 @@ Feature: enforce password on public link
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -173,11 +173,11 @@ Feature: enforce password on public link
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS                | 13    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS      | 3     |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS      | 2     |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS                    | 1     |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS        | 2     |
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -220,14 +220,14 @@ Feature: enforce password on public link
     But the public should be able to download file "/textfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
     Examples:
       | config                                            | config-value | password                             |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 4            | Ps-1                                 |
-      | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 14           | Ps1:with space                       |
-      | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 4            | PS1:test                             |
-      | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | PS1:TeƒsT                            |
-      | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | PS1:test2                            |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2            | PS1:test pass                        |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 33           | pS1! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
-      | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 5            | 1sameCharacterShouldWork!!!!!        |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 4            | Ps-1                                 |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 14           | Ps1:with space                       |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 4            | PS1:test                             |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | PS1:TeƒsT                            |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2            | PS1:test2                            |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2            | PS1:test pass                        |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 33           | pS1! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 5            | 1sameCharacterShouldWork!!!!!        |
 
 
   Scenario Outline: try to create a public link with a password that does not comply with the password policy (invalid cases)
@@ -250,7 +250,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -268,10 +268,10 @@ Feature: enforce password on public link
       | 123      | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | password | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | ownCloud | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
-      
+
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
-    Given the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -287,4 +287,3 @@ Feature: enforce password on public link
       | 123      | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | password | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | ownCloud | 400       | 400      | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
- 
