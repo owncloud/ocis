@@ -618,10 +618,9 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
-
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse driveID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		g.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
 		return
 	}
 
@@ -632,7 +631,7 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	sharedResourceId, err := g.getUserPermissionResourceID(ctx, permissionID)
 	var errcode *errorcode.Error
 	if err != nil && errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
-		// there is no user share with that ID, so lets check if it is refering to a public link
+		// there is no user share with that ID, so lets check if it is referring to a public link
 		isUserPermission = false
 		sharedResourceId, err = g.getLinkPermissionResourceID(ctx, permissionID)
 	}
@@ -644,9 +643,7 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if sharedResourceId.GetStorageId() != itemID.GetStorageId() ||
-		sharedResourceId.GetSpaceId() != itemID.GetSpaceId() ||
-		sharedResourceId.GetOpaqueId() != itemID.GetOpaqueId() {
+	if !utils.ResourceIDEqual(sharedResourceId, &itemID) {
 		g.logger.Debug().Msg("resourceID of shared does not match itemID")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
 		return

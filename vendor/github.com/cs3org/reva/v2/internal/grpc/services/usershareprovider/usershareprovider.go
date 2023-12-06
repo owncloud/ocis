@@ -156,13 +156,13 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 		req.GetGrant().GetPermissions().GetPermissions(),
 	); !shareCreationAllowed {
 		return &collaboration.CreateShareResponse{
-			Status: status.NewInvalid(ctx, "insufficient permissions to create that kind of share"),
+			Status: status.NewPermissionDenied(ctx, nil, "insufficient permissions to create that kind of share"),
 		}, nil
 	}
 
 	if !s.isPathAllowed(req.GetResourceInfo().GetPath()) {
 		return &collaboration.CreateShareResponse{
-			Status: status.NewInvalid(ctx, "share creation is not allowed for the specified path"),
+			Status: status.NewFailedPrecondition(ctx, nil, "share creation is not allowed for the specified path"),
 		}, nil
 	}
 

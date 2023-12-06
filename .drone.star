@@ -1065,11 +1065,11 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
 
     extra_server_environment = {
         "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD": False,
-        "FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS": 1,
-        "FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": 0,
-        "FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": 0,
-        "FRONTEND_PASSWORD_POLICY_MIN_DIGITS": 0,
-        "FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": 0,
+        "OCIS_PASSWORD_POLICY_MIN_CHARACTERS": 1,
+        "OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": 0,
+        "OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": 0,
+        "OCIS_PASSWORD_POLICY_MIN_DIGITS": 0,
+        "OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": 0,
     }
 
     return {
@@ -1137,7 +1137,7 @@ def e2eTests(ctx):
     }
 
     extra_server_environment = {
-        "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
     }
 
     e2e_trigger = {
@@ -1929,6 +1929,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     if deploy_type == "cs3api_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  #  make gateway available to cs3api-validator
+        environment["OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD"] = False
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server

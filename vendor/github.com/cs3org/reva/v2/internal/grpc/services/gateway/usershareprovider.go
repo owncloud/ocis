@@ -123,9 +123,9 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 	if s.c.CommitShareToStorageGrant {
 		creator := ctxpkg.ContextMustGetUser(ctx)
 		grant := &provider.Grant{
-			Grantee:     req.GetShare().GetGrantee(),
-			Permissions: req.GetShare().GetPermissions().GetPermissions(),
-			Expiration:  req.GetShare().GetExpiration(),
+			Grantee:     res.GetShare().GetGrantee(),
+			Permissions: res.GetShare().GetPermissions().GetPermissions(),
+			Expiration:  res.GetShare().GetExpiration(),
 			Creator:     creator.GetId(),
 		}
 		updateGrantStatus, err := s.updateGrant(ctx, res.GetShare().GetResourceId(), grant, nil)

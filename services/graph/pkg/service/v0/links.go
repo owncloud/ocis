@@ -8,14 +8,14 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"time"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 )
@@ -94,7 +94,12 @@ func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.Reso
 	}
 	expirationDate, isSet := createLink.GetExpirationDateTimeOk()
 	if isSet {
-		req.GetGrant().Expiration = utils.TimeToTS(*expirationDate)
+		expireTime := parseAndFillUpTime(expirationDate)
+		if expireTime == nil {
+			g.logger.Debug().Interface("createLink", createLink).Msg(err.Error())
+			return nil, errorcode.New(errorcode.InvalidRequest, "invalid expiration date")
+		}
+		req.GetGrant().Expiration = expireTime
 	}
 
 	// set displayname and password protected as arbitrary metadata
@@ -139,7 +144,24 @@ func (g Graph) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicSh
 
 	// set expiration date
 	if createdLink.GetExpiration() != nil {
-		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()))
+		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()).UTC())
 	}
 	return perm, nil
+}
+
+func parseAndFillUpTime(t *time.Time) *types.Timestamp {
+	if t == nil {
+		return nil
+	}
+
+	// the link needs to be valid for the whole day
+	tLink := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	tLink = tLink.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+
+	final := tLink.UnixNano()
+
+	return &types.Timestamp{
+		Seconds: uint64(final / 1000000000),
+		Nanos:   uint32(final % 1000000000),
+	}
 }

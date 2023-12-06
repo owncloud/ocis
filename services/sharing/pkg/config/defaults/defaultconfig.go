@@ -75,7 +75,15 @@ func DefaultConfig() *config.Config {
 			ClusterID: "ocis-cluster",
 			EnableTLS: false,
 		},
-		EnableExpiredSharesCleanup: true,
+		EnableExpiredSharesCleanup:  true,
+		PublicShareMustHavePassword: true,
+		PasswordPolicy: config.PasswordPolicy{
+			MinCharacters:          8,
+			MinLowerCaseCharacters: 1,
+			MinUpperCaseCharacters: 1,
+			MinDigits:              1,
+			MinSpecialCharacters:   1,
+		},
 	}
 }
 
