@@ -266,7 +266,12 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	if !ctxHasFullPerms {
 		finalUsers := make([]*libregraph.User, len(users))
 		for i, u := range users {
-			finalUsers[i] = &libregraph.User{Id: u.Id, DisplayName: u.DisplayName, Mail: u.Mail}
+			finalUsers[i] = &libregraph.User{
+				Id:          u.Id,
+				DisplayName: u.DisplayName,
+				Mail:        u.Mail,
+				UserType:    u.UserType,
+			}
 		}
 		users = finalUsers
 	}

@@ -305,7 +305,7 @@ var _ = Describe("Users", func() {
 			userMap, err := res.Value[0].ToMap()
 			Expect(err).ToNot(HaveOccurred())
 			for k, _ := range userMap {
-				Expect(k).Should(BeElementOf([]string{"mail", "displayName", "id"}))
+				Expect(k).Should(BeElementOf([]string{"mail", "displayName", "id", "userType"}))
 			}
 		})
 
