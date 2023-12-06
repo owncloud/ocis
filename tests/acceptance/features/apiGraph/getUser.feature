@@ -229,7 +229,7 @@ Feature: get users
   Scenario Outline: non-admin user tries to get all users
     Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     When user "Brian" tries to get all users using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
     """
     {
@@ -831,7 +831,7 @@ Feature: get users
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     When the user "Brian" gets all users of the group "tea-lover" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
     """
     {
@@ -968,7 +968,7 @@ Feature: get users
   Scenario Outline: non-admin user tries to get users with a certain role
     Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     When the user "Alice" gets all users with role "<role>" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
     """
     {
