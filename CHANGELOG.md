@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-alpha.5](#changelog-for-500-alpha5-2023-12-05)
 * [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
@@ -26,6 +27,27 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.5...master
+
+## Summary
+
+* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+
+## Details
+
+* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+
+   We changed the implementation of the public share provider in reva to do the
+   validation on the CS3 Api side. This makes the implementation on the graph side
+   smaller.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7877
 
 # Changelog for [5.0.0-alpha.5] (2023-12-05)
 
