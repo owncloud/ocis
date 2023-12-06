@@ -264,6 +264,50 @@ var _ = Describe("Users", func() {
 			Expect(len(res.Value)).To(Equal(1))
 			Expect(res.Value[0].GetId()).To(Equal("user1"))
 		})
+		It("denies listing for unprivileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("denies using to short search terms for unprivileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=a", nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("only returns a restricted set of attributes for unprivileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+			user := &libregraph.User{}
+			user.SetId("user1")
+			user.SetPasswordProfile(
+				libregraph.PasswordProfile{
+					Password: libregraph.PtrString("password"),
+				},
+			)
+			user.SetUserType("usertype")
+			user.SetDisplayName("abc user")
+			users := []*libregraph.User{user}
+
+			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=abc", nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := userList{}
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			userMap, err := res.Value[0].ToMap()
+			Expect(err).ToNot(HaveOccurred())
+			for k, _ := range userMap {
+				Expect(k).Should(BeElementOf([]string{"mail", "displayName", "id"}))
+			}
+		})
 
 		It("sorts", func() {
 			user := &libregraph.User{}
