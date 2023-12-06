@@ -13,7 +13,6 @@ geekdocFilePath: ubernauten.md
 
 {{< toc >}}
 
-
 ## Uberspace and ownCloud Infinite Scale in 50 seconds
 
 This howto shows how to set up ownCloud Infinite Scale for a quick test. For convenience, we will use the free service from the Ubernauten -- Join us here: [Uberspace Registration Page](https://dashboard.uberspace.de/register?lang=en). They offer free of charge (for the first month) web hosting.
@@ -56,7 +55,7 @@ To make it easier (and faster), here's the commands in a script called `ocis.ins
 # It downloads ocis, configures the environment varibles and starts
 # ownCloud Infinite Scale on a ubernauten account. You can run it in your home directory
 
-curl https://download.owncloud.com/ocis/ocis/stable/4.0.2/ocis-4.0.2-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/stable/4.0.3/ocis-4.0.3-linux-amd64 --output ocis
 chmod +x ocis
 uberspace web backend set / --http --port 9200
 export OCIS_URL=https://ocis.uber.space
