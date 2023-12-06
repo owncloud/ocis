@@ -870,8 +870,10 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		driveItem.Folder = &libregraph.Folder{}
 	}
 
-	driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
-	driveItem.Location = cs3ResourceToDriveItemLocationFacet(logger, res)
+	if res.ArbitraryMetadata != nil {
+		driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
+		driveItem.Location = cs3ResourceToDriveItemLocationFacet(logger, res)
+	}
 
 	return driveItem, nil
 }
