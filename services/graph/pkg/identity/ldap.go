@@ -582,7 +582,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		userFilter = fmt.Sprintf(
-			"(|(%s=%s*)(%s=%s*)(%s=%s*))",
+			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
 			i.userAttributeMap.userName, search,
 			i.userAttributeMap.mail, search,
 			i.userAttributeMap.displayName, search,
