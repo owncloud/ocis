@@ -548,5 +548,38 @@ var _ = Describe("Bleve", func() {
 			})
 		})
 
+		Context("with location metadata", func() {
+			BeforeEach(func() {
+				resource := engine.Resource{
+					ID:       "1$2!7",
+					ParentID: rootResource.ID,
+					RootID:   rootResource.ID,
+					Path:     "./team.jpg",
+					Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+					Document: content.Document{
+						Name:     "team.jpg",
+						MimeType: "image/jpeg",
+						Location: &libregraph.GeoCoordinates{
+							Altitude:  libregraph.PtrFloat64(1047.7),
+							Latitude:  libregraph.PtrFloat64(49.48675890884328),
+							Longitude: libregraph.PtrFloat64(11.103870357204285),
+						},
+					},
+				}
+				err := eng.Upsert(resource.ID, resource)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns audio metadata for search", func() {
+				matches := assertDocCount(rootResource.ID, `*team*`, 1)
+				location := matches[0].Entity.Location
+
+				Expect(location).ToNot(BeNil())
+
+				Expect(location.Altitude).To(Equal(libregraph.PtrFloat64(1047.7)))
+				Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
+				Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
+			})
+		})
 	})
 })
