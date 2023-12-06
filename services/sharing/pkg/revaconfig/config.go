@@ -1,11 +1,29 @@
 package revaconfig
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 )
 
 // SharingConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
+func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]interface{}, error) {
+	var bannedPasswordsList map[string]struct{}
+	var err error
+	if cfg.PasswordPolicy.BannedPasswordsList != "" {
+		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
+		if err != nil {
+			err = fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
+			logger.Err(err).Send()
+			return nil, err
+		}
+	}
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
@@ -73,6 +91,17 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 				"publicshareprovider": map[string]interface{}{
+					"gateway_addr":                       cfg.Reva.Address,
+					"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
+					"public_share_must_have_password":    cfg.PublicShareMustHavePassword,
+					"password_policy": map[string]interface{}{
+						"min_digits":               cfg.PasswordPolicy.MinDigits,
+						"min_characters":           cfg.PasswordPolicy.MinCharacters,
+						"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
+						"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
+						"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
+						"banned_passwords_list":    bannedPasswordsList,
+					},
 					"driver": cfg.PublicSharingDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
@@ -97,13 +126,12 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
 						},
 						"jsoncs3": map[string]interface{}{
-							"gateway_addr":                       cfg.Reva.Address,
-							"provider_addr":                      cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
-							"service_user_id":                    cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
-							"service_user_idp":                   cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
-							"machine_auth_apikey":                cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
-							"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
-							"enable_expired_shares_cleanup":      cfg.EnableExpiredSharesCleanup,
+							"gateway_addr":                  cfg.Reva.Address,
+							"provider_addr":                 cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+							"service_user_id":               cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
+							"service_user_idp":              cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
+							"machine_auth_apikey":           cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
+							"enable_expired_shares_cleanup": cfg.EnableExpiredSharesCleanup,
 						},
 					},
 				},
@@ -126,5 +154,33 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 		},
 	}
-	return rcfg
+	return rcfg, nil
+}
+
+func readMultilineFile(path string) (map[string]struct{}, error) {
+	if !fileExists(path) {
+		path = filepath.Join(defaults.BaseConfigPath(), path)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	data := make(map[string]struct{})
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != "" {
+			data[line] = struct{}{}
+		}
+	}
+	return data, err
+}
+
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir()
 }
