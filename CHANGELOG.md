@@ -37,6 +37,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
 
 ## Details
 
@@ -48,6 +49,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6993
    https://github.com/owncloud/ocis/pull/7877
+
+* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
+
+   Location metadata is now extracted and stored by the search service. It is
+   available for driveItems in a folder listing using the Graph API.
+
+   https://github.com/owncloud/ocis/pull/7886
 
 # Changelog for [5.0.0-alpha.5] (2023-12-05)
 
