@@ -44,9 +44,10 @@ func DefaultConfig() *config.Config {
 			DisplayName: "ownCloud Infinite Scale",
 		},
 		API: config.API{
-			GroupMembersPatchLimit: 20,
-			UsernameMatch:          "default",
-			AssignDefaultUserRole:  true,
+			GroupMembersPatchLimit:  20,
+			UsernameMatch:           "default",
+			AssignDefaultUserRole:   true,
+			IdentitySearchMinLength: 3,
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
