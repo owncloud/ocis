@@ -10,15 +10,16 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
 	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -121,6 +122,19 @@ const (
 	ReadmeSpecialFolderName = "readme"
 	// SpaceImageSpecialFolderName for the drive specialFolder property
 	SpaceImageSpecialFolderName = "image"
+)
+
+type APIVersion int
+
+const (
+	// APIVersion_1 represents the first version of the API.
+	APIVersion_1 APIVersion = iota + 1
+
+	// APIVersion_1_Beta_1 refers to the beta version of the API.
+	// It is typically used for testing purposes and may have more
+	// inconsistencies and bugs than the stable version as it is
+	// still in the testing phase, use it with caution.
+	APIVersion_1_Beta_1
 )
 
 // TODO might be different for /education/users vs /users

@@ -121,8 +121,9 @@ func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 	switch e.errorCode {
 	case AccessDenied:
 		status = http.StatusForbidden
-	case
-		InvalidRange:
+	case NotSupported:
+		status = http.StatusNotImplemented
+	case InvalidRange:
 		status = http.StatusRequestedRangeNotSatisfiable
 	case InvalidRequest:
 		status = http.StatusBadRequest

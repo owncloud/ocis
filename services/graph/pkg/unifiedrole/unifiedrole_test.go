@@ -17,18 +17,21 @@ import (
 
 var _ = Describe("unifiedroles", func() {
 	DescribeTable("CS3ResourcePermissionsToUnifiedRole",
-		func(legacyRole *rConversions.Role, unifiedRole *libregraph.UnifiedRoleDefinition) {
+		func(legacyRole *rConversions.Role, unifiedRole *libregraph.UnifiedRoleDefinition, constraints string) {
 			cs3perm := legacyRole.CS3ResourcePermissions()
 
-			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3perm, unifiedrole.UnifiedRoleConditionGrantee, true)
+			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3perm, constraints, true)
 			Expect(r.GetId()).To(Equal(unifiedRole.GetId()))
 
 		},
-		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true)),
-		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true)),
-		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true)),
-		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole()),
-		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole()),
+		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
+		Entry(rConversions.RoleSpaceViewer, rConversions.NewSpaceViewerRole(), unifiedrole.NewSpaceViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
+		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 	)
 
 	DescribeTable("UnifiedRolePermissionsToCS3ResourcePermissions",
