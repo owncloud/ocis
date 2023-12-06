@@ -75,7 +75,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		groupFilter = fmt.Sprintf(
-			"(|(%s=%s*)(%s=%s*))",
+			"(|(%s=*%s*)(%s=*%s*))",
 			i.groupAttributeMap.name, search,
 			i.groupAttributeMap.id, search,
 		)

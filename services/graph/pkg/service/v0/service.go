@@ -265,7 +265,7 @@ func NewService(opts ...Option) (Graph, error) {
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
-				r.With(requireAdmin).Get("/", svc.GetGroups)
+				r.Get("/", svc.GetGroups)
 				r.With(requireAdmin).Post("/", svc.PostGroup)
 				r.Route("/{groupID}", func(r chi.Router) {
 					r.Get("/", svc.GetGroup)

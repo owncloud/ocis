@@ -31,12 +31,38 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
+	if !ctxHasFullPerms && (odataReq.Query == nil || odataReq.Query.Search == nil || len(odataReq.Query.Search.RawValue) < g.config.API.IdentitySearchMinLength) {
+		// for regular user the search term must have a minimum length
+		logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
+		return
+	}
+
+	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
+		// regular users can't use filter, apply, expand and compute
+		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
+		return
+	}
 
 	groups, err := g.identityBackend.GetGroups(r.Context(), r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get groups: backend error")
 		errorcode.RenderError(w, r, err)
 		return
+	}
+	// If the user isn't admin, we'll show just the minimum group attibutes
+	if !ctxHasFullPerms {
+		finalGroups := make([]*libregraph.Group, len(groups))
+		for i, grp := range groups {
+			finalGroups[i] = &libregraph.Group{
+				Id:          grp.Id,
+				DisplayName: grp.DisplayName,
+				GroupTypes:  grp.GroupTypes,
+			}
+		}
+		groups = finalGroups
 	}
 
 	groups, err = sortGroups(odataReq, groups)
