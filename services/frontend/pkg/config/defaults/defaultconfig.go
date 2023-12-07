@@ -112,6 +112,7 @@ func DefaultConfig() *config.Config {
 			HomeNamespace:               "/users/{{.Id.OpaqueId}}",
 			AdditionalInfoAttribute:     "{{.Mail}}",
 			StatCacheType:               "nats-js-kv",
+			StatCacheNodes:              []string{"127.0.0.1:9233"},
 			StatCacheDatabase:           "cache-stat",
 			StatCacheTTL:                300 * time.Second,
 			ListOCMShares:               true,

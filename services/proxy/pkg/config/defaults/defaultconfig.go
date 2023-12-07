@@ -44,8 +44,8 @@ func DefaultConfig() *config.Config {
 			SkipUserInfo:            false,
 			UserinfoCache: &config.Cache{
 				Store:    "nats-js-kv",
+				Nodes:    []string{"127.0.0.1:9233"},
 				Database: "cache-userinfo",
-				Table:    "userinfo",
 				TTL:      time.Second * 10,
 			},
 			JWKS: config.JWKS{

@@ -94,17 +94,20 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		StatCache: config.StatCache{
-			Store:    "noop",
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "ocis",
 			TTL:      300 * time.Second,
 		},
 		FilemetadataCache: config.FilemetadataCache{
 			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "cache-filemetadata",
 			TTL:      24 * 60 * time.Second,
 		},
 		IDCache: config.IDCache{
 			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "ids-storage-users",
 			TTL:      24 * 60 * time.Second,
 		},

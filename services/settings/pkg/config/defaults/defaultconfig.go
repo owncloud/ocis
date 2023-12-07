@@ -58,6 +58,7 @@ func DefaultConfig() *config.Config {
 			SystemUserIDP:  "internal",
 			Cache: &config.Cache{
 				Store:          "nats-js-kv",
+				Nodes:          []string{"127.0.0.1:9233"},
 				Database:       "settings-cache",
 				FileTable:      "settings_files",
 				DirectoryTable: "settings_dirs",

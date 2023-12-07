@@ -1919,8 +1919,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "OCIS_EVENTS_ENABLE_TLS": False,
         "MICRO_REGISTRY": "natsjs",
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
-        "OCIS_CACHE_STORE": "nats-js-kv",
-        "OCIS_CACHE_STORE_NODES": "127.0.0.1:9233",
     }
 
     if deploy_type == "":

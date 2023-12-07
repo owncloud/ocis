@@ -41,11 +41,14 @@ func DefaultConfig() *config.Config {
 		Cache: config.Cache{
 			StatCacheStore:          "noop", // NOTE: stat cache not working
 			StatCacheDatabase:       "ocis",
+			StatCacheNodes:          []string{"127.0.0.1:9233"},
 			StatCacheTTL:            300 * time.Second,
 			ProviderCacheStore:      "noop",
+			ProviderCacheNodes:      []string{"127.0.0.1:9233"},
 			ProviderCacheDatabase:   "cache-providers",
 			ProviderCacheTTL:        300 * time.Second,
 			CreateHomeCacheStore:    "nats-js-kv",
+			CreateHomeCacheNodes:    []string{"127.0.0.1:9233"},
 			CreateHomeCacheDatabase: "cache-createhome",
 			CreateHomeCacheTTL:      300 * time.Second,
 		},

@@ -97,8 +97,8 @@ func DefaultConfig() *config.Config {
 		},
 		Cache: &config.Cache{
 			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "cache-roles",
-			Table:    "roles",
 			TTL:      time.Hour * 336,
 		},
 		Events: config.Events{
