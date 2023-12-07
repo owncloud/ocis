@@ -368,7 +368,7 @@ class HttpRequestHelper {
 		}
 		$options['stream'] = $stream;
 		$options['verify'] = false;
-		$options['timeout'] = $timeout;
+		$options['timeout'] = $timeout ?: self::getRequestTimeout();
 		return new Client($options);
 	}
 
@@ -676,5 +676,13 @@ class HttpRequestHelper {
 			}
 		}
 		return $parsedResponse;
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getRequestTimeout(): int {
+		$timeout = \getenv("REQUEST_TIMEOUT");
+		return (int)$timeout ?: 60;
 	}
 }
