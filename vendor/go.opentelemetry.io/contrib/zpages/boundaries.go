@@ -19,8 +19,10 @@ import (
 	"time"
 )
 
-const zeroDuration = time.Duration(0)
-const maxDuration = time.Duration(1<<63 - 1)
+const (
+	zeroDuration = time.Duration(0)
+	maxDuration  = time.Duration(1<<63 - 1)
+)
 
 var defaultBoundaries = newBoundaries([]time.Duration{
 	10 * time.Microsecond,
