@@ -1219,8 +1219,8 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.17.2
-## explicit; go 1.18
+# github.com/klauspost/compress v1.17.4
+## explicit; go 1.19
 github.com/klauspost/compress/flate
 github.com/klauspost/compress/s2
 # github.com/klauspost/cpuid/v2 v2.1.0
@@ -1376,7 +1376,7 @@ github.com/mschoch/smat
 # github.com/nats-io/jwt/v2 v2.5.3
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.5
+# github.com/nats-io/nats-server/v2 v2.10.7
 ## explicit; go 1.20
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/ldap
