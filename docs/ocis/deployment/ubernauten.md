@@ -1,5 +1,6 @@
 ---
-title: "Installing Infinite Scale at Ubernauten"
+title: "Installing ownCloud Infinite Scale at Ubernauten"
+
 date: 2023-12-04T14:04:00+01:00
 weight: 100
 geekdocRepo: https://github.com/owncloud/ocis
@@ -13,7 +14,7 @@ geekdocFilePath: ubernauten.md
 
 This howto shows how to set up ownCloud Infinite Scale for a quick test. For convenience, we will use the free service from the Ubernauten -- Join us here: [Uberspace Registration Page](https://dashboard.uberspace.de/register?lang=en). They offer free of charge (for the first month) web hosting.
 
-In this documentation, we are assuming you already have an account there and it is configured for SSH access. This guide is using "ocis.uber.space" as a domain at Uberspace, version 4.0.2 of Infinite Scale and the local user "owncloud". Make sure you adapt the example code and scripts mentioned in this page to your needs Both username and domain will be set when you sign in to Uberspace.
+In this documentation, we are assuming you already have an account there and it is configured for SSH access. This guide is using "ocis.uber.space" as a domain at Uberspace, version 4.0.3 of Infinite Scale and the local user "owncloud". Make sure you adapt the example code and scripts mentioned in this page to your needs Both username and domain will be set when you sign in to Uberspace.
 
 Installing ownCloud Infinite Scale on Ubernauten is pretty straigt-forward, you can do it in three steps that take less than a minute: Here's a short video that shows how fast the whole process actually is - thanks to Infinite Scale's cloud native architecture. [ownCloud Infinite Scale in 50 seconds](/ocis/deployment/ubernauten_media/001-OCIS-in-50-seconds-2023-10-17.mkv)
 
@@ -85,7 +86,7 @@ export OCIS_URL=https://ocis.uber.space
 export PROXY_TLS=false
 export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug
-/home/ocis/ocis server
+/home/owncloud/ocis server
 ```
 
 There are three supervisorctl commands that you will find useful (many more can be found in its documentation). You can use `supervisorctl status` to check which services managed by supervisorctl are running, a `supervisorctl reread` will be necessary after you changed the `ini` files, and an `update` is applying the changes:
@@ -108,14 +109,14 @@ Don't worry, you can always go back to the older version you had installed, ther
 
 ### Wiping and Clean Restart from Scratch
 
-This little script is removing your ocis installation (and ==all of your data!==), replacing it with a new, clean ocis installation. Be careful and only use it for testing purposes. Specify your desired ocis version in the curl command.
+This little script is removing your ocis installation (and **all of your data!**), replacing it with a new, clean ocis installation. Be careful and only use it for testing purposes. Specify your desired ocis version in the curl command.
 
 ```
 #!/bin/bash
 # This file is named ocis.reinstall
 # It deletes the old ocis installation, fetches a new binary and starts ocis.
 rm -rf .ocis
-curl https://download.owncloud.com/ocis/ocis/stable/4.0.2/ocis-4.0.2-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/stable/4.0.3/ocis-4.0.3-linux-amd64 --output ocis
 chmod +x ocis
 uberspace web backend set / --http --port 9200
 export OCIS_URL=https://ocis.uber.space
