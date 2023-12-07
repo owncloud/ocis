@@ -5,6 +5,7 @@ weight: -10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
 
 {{< figure class="floatright" src="/media/is.png" width="70%" height="auto" >}}
