@@ -5,6 +5,7 @@ weight: 0
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/getting-started
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
 
 {{< toc >}}
