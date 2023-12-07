@@ -7,10 +7,6 @@ geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: ubernauten.md
 ---
 
-[comment]: # Is there a style guide?
-
-[comment]: # How to do inline URLs and where to put the videos?
-
 {{< toc >}}
 
 ## Uberspace and ownCloud Infinite Scale in 50 seconds
@@ -19,15 +15,13 @@ This howto shows how to set up ownCloud Infinite Scale for a quick test. For con
 
 In this documentation, we are assuming you already have an account there and it is configured for SSH access. This guide is using "ocis.uber.space" as a domain at Uberspace, version 4.0.2 of Infinite Scale and the local user "owncloud". Make sure you adapt the example code and scripts mentioned in this page to your needs Both username and domain will be set when you sign in to Uberspace.
 
-Installing ownCloud Infinite Scale on Ubernauten is pretty straigt-forward, you can do it in three steps that take less than a minute: Here's a short video that shows how fast the whole process actually is - thanks to Infinite Scale's cloud native architecture. [ownCloud Infinite Scale in 50 seconds](./ubernauten_media/001-OCIS-in-50-seconds-2023-10-17.mkv)
-
-[comment]: # Fix URL, put video in a location that makes sense. Is mkv Ok?
+Installing ownCloud Infinite Scale on Ubernauten is pretty straigt-forward, you can do it in three steps that take less than a minute: Here's a short video that shows how fast the whole process actually is - thanks to Infinite Scale's cloud native architecture. [ownCloud Infinite Scale in 50 seconds](/ocis/deployment/ubernauten_media/001-OCIS-in-50-seconds-2023-10-17.mkv)
 
 ### Three Steps to your Infinite UberSpace
 
 * Download the Infinite Scale binary and make it executable
 ```
-curl https://download.owncloud.com/ocis/ocis/stable/4.0.2/ocis-4.0.2-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/stable/4.0.3/ocis-4.0.3-linux-amd64 --output ocis
 chmod +x ocis
 ```
 
@@ -45,7 +39,9 @@ export PROXY_LOG_LEVEL=debug
 ./ocis init
 ./ocis server
 ```
-Wait a few seconds, now you can visit the url of your uberspace server and login: ![alt="Login to ownCloud Infinite Scale"](./ubernauten_media/login.png)
+Wait a few seconds, now you can visit the url of your uberspace server and login:
+
+{{< figure src="/ocis/deployment/ubernauten_media/login.png" width="70%" height="auto" >}}
 
 To make it easier (and faster), here's the commands in a script called `ocis.install`:
 
