@@ -38,6 +38,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
 * Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
+* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
 
 ## Details
 
@@ -56,6 +57,19 @@ The following sections list the changes for unreleased.
    available for driveItems in a folder listing using the Graph API.
 
    https://github.com/owncloud/ocis/pull/7886
+
+* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
+
+   Regular users can search for other users and groups. The following limitations
+   apply:
+
+  * Only search queries are allowed (using the `$search=term` query parameter)
+  * The search term needs to have at least 3 characters
+  * for user searches the result set only contains the attributes `displayName`, `userType`, `mail` and `id`
+  * for group searches the result set only contains the attributes `displayName`, `groupTypes` and `id`
+
+   https://github.com/owncloud/ocis/issues/7782
+   https://github.com/owncloud/ocis/pull/7887
 
 # Changelog for [5.0.0-alpha.5] (2023-12-05)
 
