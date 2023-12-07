@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-07-06-28-12]
+[#deprecation-note-2023-12-07-09-23-38]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -326,6 +326,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user.
 
+a|`GRAPH_IDENTITY_SEARCH_MIN_LENGTH` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++3 ++
+a| [subs=-attributes]
+The minimum length the search term needs to have for unprivileged users when searching for users or groups.
+
 a|`OCIS_REVA_GATEWAY` +
 
 a| [subs=-attributes]
@@ -488,7 +497,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-12-07-06-28-12[Deprecation Note]
+xref:deprecation-note-2023-12-07-09-23-38[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
