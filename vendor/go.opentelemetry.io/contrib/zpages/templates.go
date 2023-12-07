@@ -58,6 +58,7 @@ func parseTemplate(name string) *template.Template {
 	return template.Must(template.New(name).Funcs(templateFunctions).Parse(string(text)))
 }
 
+//nolint:gosec // G203: The used method does not auto-escape HTML. Tracked under https://github.com/open-telemetry/opentelemetry-go-contrib/issues/4451.
 func spanRowFormatter(r spanRow) template.HTML {
 	if !r.SpanContext.IsValid() {
 		return ""
