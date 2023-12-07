@@ -284,7 +284,18 @@ func (ms *memStore) GetSeqFromTime(t time.Time) uint64 {
 	if ts <= ms.msgs[ms.state.FirstSeq].ts {
 		return ms.state.FirstSeq
 	}
-	last := ms.msgs[ms.state.LastSeq].ts
+	// LastSeq is not guaranteed to be present since last does not go backwards.
+	var lmsg *StoreMsg
+	for lseq := ms.state.LastSeq; lseq > ms.state.FirstSeq; lseq-- {
+		if lmsg = ms.msgs[lseq]; lmsg != nil {
+			break
+		}
+	}
+	if lmsg == nil {
+		return ms.state.FirstSeq
+	}
+
+	last := lmsg.ts
 	if ts == last {
 		return ms.state.LastSeq
 	}
@@ -292,7 +303,10 @@ func (ms *memStore) GetSeqFromTime(t time.Time) uint64 {
 		return ms.state.LastSeq + 1
 	}
 	index := sort.Search(len(ms.msgs), func(i int) bool {
-		return ms.msgs[uint64(i)+ms.state.FirstSeq].ts >= ts
+		if msg := ms.msgs[ms.state.FirstSeq+uint64(i)]; msg != nil {
+			return msg.ts >= ts
+		}
+		return false
 	})
 	return uint64(index) + ms.state.FirstSeq
 }
@@ -550,6 +564,9 @@ func (ms *memStore) enforcePerSubjectLimit(subj string, ss *SimpleState) {
 // Will check the msg limit and drop firstSeq msg if needed.
 // Lock should be held.
 func (ms *memStore) enforceMsgLimit() {
+	if ms.cfg.Discard != DiscardOld {
+		return
+	}
 	if ms.cfg.MaxMsgs <= 0 || ms.state.Msgs <= uint64(ms.cfg.MaxMsgs) {
 		return
 	}
@@ -561,6 +578,9 @@ func (ms *memStore) enforceMsgLimit() {
 // Will check the bytes limit and drop msgs if needed.
 // Lock should be held.
 func (ms *memStore) enforceBytesLimit() {
+	if ms.cfg.Discard != DiscardOld {
+		return
+	}
 	if ms.cfg.MaxBytes <= 0 || ms.state.Bytes <= uint64(ms.cfg.MaxBytes) {
 		return
 	}
