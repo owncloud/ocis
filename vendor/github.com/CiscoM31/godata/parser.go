@@ -233,6 +233,7 @@ func (o *Operator) WithListExprPreference(v bool) *Operator {
 type Function struct {
 	Token  string // The function token
 	Params []int  // The number of parameters this function accepts
+	ReturnsBool bool // Indicates if the function has a boolean return value
 }
 
 type ParseNode struct {
@@ -291,11 +292,12 @@ func (p *Parser) DefineOperator(token string, operands, assoc, precedence int) *
 	return op
 }
 
-// DefineFunction adds a function to the language
-// params is the number of parameters this function accepts
-func (p *Parser) DefineFunction(token string, params []int) *Function {
+// DefineFunction adds a function to the language.
+// - params is the number of parameters this function accepts
+// - returnsBool indicates if the function has a boolean return value
+func (p *Parser) DefineFunction(token string, params []int, returnsBool bool) *Function {
 	sort.Sort(sort.Reverse(sort.IntSlice(params)))
-	f := &Function{token, params}
+	f := &Function{token, params, returnsBool}
 	p.Functions[token] = f
 	return f
 }
@@ -304,6 +306,7 @@ func (p *Parser) DefineFunction(token string, params []int) *Function {
 type CustomFunctionInput struct {
 	Name      string // case-insensitive function name
 	NumParams []int  // number of allowed parameters
+	ReturnsBool bool // indicates if the function has a boolean return value
 }
 
 // DefineCustomFunctions introduces additional function names to be considered as legal function
@@ -322,7 +325,7 @@ func DefineCustomFunctions(functions []CustomFunctionInput) error {
 			return fmt.Errorf("custom function '%s' may not override odata operator", name)
 		}
 
-		GlobalExpressionParser.DefineFunction(name, v.NumParams)
+		GlobalExpressionParser.DefineFunction(name, v.NumParams, v.ReturnsBool)
 		funcNames = append(funcNames, name)
 	}
 
@@ -360,6 +363,29 @@ func (p *Parser) isFunction(token *Token) bool {
 func (p *Parser) isOperator(token *Token) bool {
 	_, ok := p.Operators[token.Value]
 	return ok
+}
+
+// isBooleanExpression returns True when the expression token 't' has a resulting boolean value
+func (p *Parser) isBooleanExpression(t *Token) bool {
+	switch t.Type {
+	case ExpressionTokenBoolean:
+		// Valid boolean expression
+	case ExpressionTokenLogical:
+		// eq|ne|gt|ge|lt|le|and|or|not|has|in
+		// Valid boolean expression
+	case ExpressionTokenFunc:
+		// Depends on function return type
+		f := p.Functions[t.Value]
+		if !f.ReturnsBool {
+			return false
+		}
+	case ExpressionTokenLambdaNav:
+		// Lambda Navigation.
+		// Valid boolean expression
+	default:
+		return false
+	}
+	return true
 }
 
 // InfixToPostfix parses the input string of tokens using the given definitions of operators
@@ -653,12 +679,31 @@ func (p *Parser) PostfixToTree(ctx context.Context, queue *tokenQueue) (*ParseNo
 				return nil, fmt.Errorf("expected list expression token, got '%v'", n.Token.Type)
 			}
 
-			// Get function parameters.
-			// Some functions, e.g. substring, can take a variable number of arguments.
-			for _, c := range n.Children {
-				c.Parent = node
+			if node.Token.Type == ExpressionTokenCase {
+				// Create argument pairs for case() statement by translating flat list into pairs
+				if len(n.Children)%2 != 0 {
+					return nil, fmt.Errorf("expected even number of comma-separated arguments to case statement")
+				}
+				for i:=0; i<len(n.Children); i+=2 {
+					if !p.isBooleanExpression(n.Children[i].Token) {
+						return nil, fmt.Errorf("expected boolean expression in case statement")
+					}
+					c := &ParseNode{
+						Token:    &Token{Type: ExpressionTokenCasePair},
+						Parent:   node,
+						Children: []*ParseNode{n.Children[i],n.Children[i+1]},
+					}
+					node.Children = append(node.Children, c)
+				}
+			} else {
+				// Collapse function arguments as direct children of function node
+				for _, c := range n.Children {
+					c.Parent = node
+				}
+				node.Children = n.Children
 			}
-			node.Children = n.Children
+
+			// Some functions, e.g. substring, can take a variable number of arguments. Enforce legal number of arguments
 			foundMatch := false
 			f := p.Functions[node.Token.Value]
 			for _, expectedArgCount := range f.Params {
