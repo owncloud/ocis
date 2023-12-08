@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-08-09-06-11]
+[#deprecation-note-2023-12-08-09-23-34]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -235,7 +235,7 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-12-08-09-06-11[Deprecation Note]
+xref:deprecation-note-2023-12-08-09-23-34[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
