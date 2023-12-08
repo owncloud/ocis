@@ -248,7 +248,30 @@ func (g Graph) updatePublicLinkPassword(ctx context.Context, permissionID string
 	return permission, nil
 }
 
-func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID string, info *providerv1beta1.ResourceInfo, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *providerv1beta1.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+
+	statResp, err := gatewayClient.Stat(
+		ctx,
+		&providerv1beta1.StatRequest{
+			Ref: &providerv1beta1.Reference{
+				ResourceId: itemID,
+				Path:       ".",
+			},
+		})
+	if err != nil {
+		g.logger.Error().Err(err).Msg("transport error, could not stat resource")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	if code := statResp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
+		g.logger.Debug().Interface("itemID", itemID).Msg(statResp.GetStatus().GetMessage())
+		return nil, errorcode.New(cs3StatusToErrCode(code), statResp.GetStatus().GetMessage())
+	}
+
 	if newPermission.HasExpirationDateTime() {
 		expirationDate := newPermission.GetExpirationDateTime()
 		update := &link.UpdatePublicShareRequest_Update{
@@ -279,7 +302,7 @@ func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID stri
 			libregraph.DriveItemCreateLink{
 				Type: &changedLink,
 			},
-			info.GetType(),
+			statResp.GetInfo().GetType(),
 		)
 		update := &link.UpdatePublicShareRequest_Update{
 			Type: link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS,

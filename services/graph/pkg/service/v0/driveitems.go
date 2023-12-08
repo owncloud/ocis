@@ -654,11 +654,18 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// We don't implement updating link permissions yet
+	// This is a public link
 	if _, ok := oldPermission.GetLinkOk(); ok {
-		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, "not implemented")
+		updatedPermission, err := g.updatePublicLinkPermission(ctx, permissionID, &itemID, permission)
+		if err != nil {
+			errorcode.RenderError(w, r, err)
+			return
+		}
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, &updatedPermission)
 		return
 	}
+
 	// This is a user share
 	updatedPermission, err := g.updateUserShare(ctx, permissionID, oldPermission, permission)
 	if err != nil {

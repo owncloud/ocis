@@ -47,6 +47,10 @@ func permission(v *validator.Validate) {
 			sl.ReportError(permission.Id, "Id", "Id", "readonly", "")
 		}
 
+		if _, ok := permission.GetHasPasswordOk(); ok {
+			sl.ReportError(permission.HasPassword, "hasPassword", "HasPassword", "readonly", "")
+		}
+
 		rolesAndActions(sl, permission.Roles, permission.LibreGraphPermissionsActions, true)
 	}, s)
 }
