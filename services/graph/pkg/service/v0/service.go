@@ -113,6 +113,7 @@ type Service interface {
 
 	Invite(w http.ResponseWriter, r *http.Request)
 	ListPermissions(w http.ResponseWriter, r *http.Request)
+	UpdatePermission(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
 
 	CreateUploadSession(w http.ResponseWriter, r *http.Request)
@@ -209,6 +210,17 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Get("/sharedByMe", svc.GetSharedByMe)
 					r.Get("/sharedWithMe", svc.ListSharedWithMe)
 				})
+			})
+			r.Route("/drives/{driveID}/items/{itemID}", func(r chi.Router) {
+				r.Post("/invite", svc.Invite)
+				r.Route("/permissions", func(r chi.Router) {
+					r.Get("/", svc.ListPermissions)
+					r.Route("/{permissionID}", func(r chi.Router) {
+						r.Delete("/", svc.DeletePermission)
+						r.Patch("/", svc.UpdatePermission)
+					})
+				})
+				r.Post("/createLink", svc.CreateLink)
 			})
 
 			r.Route("/drives", func(r chi.Router) {

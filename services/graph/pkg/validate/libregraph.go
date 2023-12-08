@@ -12,6 +12,7 @@ import (
 // initLibregraph initializes libregraph validation
 func initLibregraph(v *validator.Validate) {
 	driveItemInvite(v)
+	permission(v)
 }
 
 // driveItemInvite validates libregraph.DriveItemInvite
@@ -27,55 +28,79 @@ func driveItemInvite(v *validator.Validate) {
 	v.RegisterStructValidation(func(sl validator.StructLevel) {
 		driveItemInvite := sl.Current().Interface().(libregraph.DriveItemInvite)
 
-		totalRoles := len(driveItemInvite.Roles)
-		totalActions := len(driveItemInvite.LibreGraphPermissionsActions)
-
-		switch {
-		case totalRoles != 0 && totalActions != 0:
-			fallthrough
-		case totalRoles == totalActions:
-			sl.ReportError(driveItemInvite.Roles, "Roles", "Roles", "one_or_another", "")
-			sl.ReportError(driveItemInvite.LibreGraphPermissionsActions, "LibreGraphPermissionsActions", "LibreGraphPermissionsActions", "one_or_another", "")
-		}
-
-		var availableRoles []string
-		var availableActions []string
-		for _, definition := range append(
-			unifiedrole.GetBuiltinRoleDefinitionList(true),
-			unifiedrole.GetBuiltinRoleDefinitionList(false)...,
-		) {
-			if slices.Contains(availableRoles, definition.GetId()) {
-				continue
-			}
-
-			availableRoles = append(availableRoles, definition.GetId())
-
-			for _, permission := range definition.GetRolePermissions() {
-				for _, action := range permission.GetAllowedResourceActions() {
-					if slices.Contains(availableActions, action) {
-						continue
-					}
-
-					availableActions = append(availableActions, action)
-				}
-			}
-		}
-
-		for _, role := range driveItemInvite.Roles {
-			if slices.Contains(availableRoles, role) {
-				continue
-			}
-
-			sl.ReportError(driveItemInvite.Roles, "Roles", "Roles", "available_role", "")
-		}
-
-		for _, role := range driveItemInvite.LibreGraphPermissionsActions {
-			if slices.Contains(availableActions, role) {
-				continue
-			}
-
-			sl.ReportError(driveItemInvite.LibreGraphPermissionsActions, "LibreGraphPermissionsActions", "LibreGraphPermissionsActions", "available_action", "")
-		}
+		rolesAndActions(sl, driveItemInvite.Roles, driveItemInvite.LibreGraphPermissionsActions, false)
 
 	}, s)
+}
+
+// permission validates libregraph.Permission
+func permission(v *validator.Validate) {
+	s := libregraph.Permission{}
+
+	v.RegisterStructValidationMapRules(map[string]string{
+		"Roles": "max=1",
+	}, s)
+	v.RegisterStructValidation(func(sl validator.StructLevel) {
+		permission := sl.Current().Interface().(libregraph.Permission)
+
+		if _, ok := permission.GetIdOk(); ok {
+			sl.ReportError(permission.Id, "Id", "Id", "readonly", "")
+		}
+
+		rolesAndActions(sl, permission.Roles, permission.LibreGraphPermissionsActions, true)
+	}, s)
+}
+
+func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmpty bool) {
+	totalRoles := len(roles)
+	totalActions := len(actions)
+
+	switch {
+	case allowEmpty && totalRoles == 0 && totalActions == 0:
+		break
+	case totalRoles != 0 && totalActions != 0:
+		fallthrough
+	case totalRoles == totalActions:
+		sl.ReportError(roles, "Roles", "Roles", "one_or_another", "")
+		sl.ReportError(actions, "LibreGraphPermissionsActions", "LibreGraphPermissionsActions", "one_or_another", "")
+	}
+
+	var availableRoles []string
+	var availableActions []string
+	for _, definition := range append(
+		unifiedrole.GetBuiltinRoleDefinitionList(true),
+		unifiedrole.GetBuiltinRoleDefinitionList(false)...,
+	) {
+		if slices.Contains(availableRoles, definition.GetId()) {
+			continue
+		}
+
+		availableRoles = append(availableRoles, definition.GetId())
+
+		for _, permission := range definition.GetRolePermissions() {
+			for _, action := range permission.GetAllowedResourceActions() {
+				if slices.Contains(availableActions, action) {
+					continue
+				}
+
+				availableActions = append(availableActions, action)
+			}
+		}
+	}
+
+	for _, role := range roles {
+		if slices.Contains(availableRoles, role) {
+			continue
+		}
+
+		sl.ReportError(roles, "Roles", "Roles", "available_role", "")
+	}
+
+	for _, role := range actions {
+		if slices.Contains(availableActions, role) {
+			continue
+		}
+
+		sl.ReportError(actions, "LibreGraphPermissionsActions", "LibreGraphPermissionsActions", "available_action", "")
+	}
 }

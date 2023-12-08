@@ -124,63 +124,77 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 			}
 			item = *itemptr
 		}
-		perm := libregraph.Permission{}
-		perm.SetRoles([]string{})
-		perm.SetId(s.Id.OpaqueId)
-		grantedTo := libregraph.SharePointIdentitySet{}
-		var li libregraph.Identity
-		switch s.Grantee.Type {
-		case storageprovider.GranteeType_GRANTEE_TYPE_USER:
-			user, err := g.identityCache.GetUser(ctx, s.Grantee.GetUserId().GetOpaqueId())
-			switch {
-			case errors.Is(err, identity.ErrNotFound):
-				g.logger.Warn().Str("userid", s.Grantee.GetUserId().GetOpaqueId()).Msg("User not found by id")
-				// User does not seem to exist anymore, don't add a permission for this
-				continue
-			case err != nil:
-				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
-			default:
-				li.SetDisplayName(user.GetDisplayName())
-				li.SetId(user.GetId())
-				grantedTo.SetUser(li)
-			}
-		case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
-			group, err := g.identityCache.GetGroup(ctx, s.Grantee.GetGroupId().GetOpaqueId())
-			switch {
-			case errors.Is(err, identity.ErrNotFound):
-				g.logger.Warn().Str("groupid", s.Grantee.GetGroupId().GetOpaqueId()).Msg("Group not found by id")
-				// Group not seem to exist anymore, don't add a permission for this
-				continue
-			case err != nil:
-				return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
-			default:
-				li.SetDisplayName(group.GetDisplayName())
-				li.SetId(group.GetId())
-				grantedTo.SetGroup(li)
-			}
-		}
+		perm, err := g.cs3UserShareToPermission(ctx, s)
 
-		// set expiration date
-		if s.GetExpiration() != nil {
-			perm.SetExpirationDateTime(cs3TimestampToTime(s.GetExpiration()))
+		var errcode errorcode.Error
+		switch {
+		case errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound:
+			// The Grantee couldn't be found (user/group does not exist anymore)
+			continue
+		case err != nil:
+			return driveItems, err
 		}
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
-			*s.GetPermissions().GetPermissions(),
-			unifiedrole.UnifiedRoleConditionGrantee,
-			g.config.FilesSharing.EnableResharing,
-		)
-		if role != nil {
-			perm.SetRoles([]string{role.GetId()})
-		} else {
-			actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*s.GetPermissions().GetPermissions())
-			perm.SetLibreGraphPermissionsActions(actions)
-			perm.SetRoles(nil)
-		}
-		perm.SetGrantedToV2(grantedTo)
-		item.Permissions = append(item.Permissions, perm)
+		item.Permissions = append(item.Permissions, *perm)
 		driveItems[resIDStr] = item
 	}
 	return driveItems, nil
+}
+
+func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share) (*libregraph.Permission, error) {
+	perm := libregraph.Permission{}
+	perm.SetRoles([]string{})
+	perm.SetId(share.Id.OpaqueId)
+	grantedTo := libregraph.SharePointIdentitySet{}
+	var li libregraph.Identity
+	switch share.GetGrantee().GetType() {
+	case storageprovider.GranteeType_GRANTEE_TYPE_USER:
+		user, err := g.identityCache.GetUser(ctx, share.Grantee.GetUserId().GetOpaqueId())
+		switch {
+		case errors.Is(err, identity.ErrNotFound):
+			g.logger.Warn().Str("userid", share.Grantee.GetUserId().GetOpaqueId()).Msg("User not found by id")
+			// User does not seem to exist anymore, don't add a permission for this
+			return nil, errorcode.New(errorcode.ItemNotFound, "grantee does not exist")
+		case err != nil:
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		default:
+			li.SetDisplayName(user.GetDisplayName())
+			li.SetId(user.GetId())
+			grantedTo.SetUser(li)
+		}
+	case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+		group, err := g.identityCache.GetGroup(ctx, share.Grantee.GetGroupId().GetOpaqueId())
+		switch {
+		case errors.Is(err, identity.ErrNotFound):
+			g.logger.Warn().Str("groupid", share.Grantee.GetGroupId().GetOpaqueId()).Msg("Group not found by id")
+			// Group not seem to exist anymore, don't add a permission for this
+			return nil, errorcode.New(errorcode.ItemNotFound, "grantee does not exist")
+		case err != nil:
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		default:
+			li.SetDisplayName(group.GetDisplayName())
+			li.SetId(group.GetId())
+			grantedTo.SetGroup(li)
+		}
+	}
+
+	// set expiration date
+	if share.GetExpiration() != nil {
+		perm.SetExpirationDateTime(cs3TimestampToTime(share.GetExpiration()))
+	}
+	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+		*share.GetPermissions().GetPermissions(),
+		unifiedrole.UnifiedRoleConditionGrantee,
+		g.config.FilesSharing.EnableResharing,
+	)
+	if role != nil {
+		perm.SetRoles([]string{role.GetId()})
+	} else {
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*share.GetPermissions().GetPermissions())
+		perm.SetLibreGraphPermissionsActions(actions)
+		perm.SetRoles(nil)
+	}
+	perm.SetGrantedToV2(grantedTo)
+	return &perm, nil
 }
 
 func (g Graph) cs3PublicSharesToDriveItems(ctx context.Context, shares []*link.PublicShare, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
