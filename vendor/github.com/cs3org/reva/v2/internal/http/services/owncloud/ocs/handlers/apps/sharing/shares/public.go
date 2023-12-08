@@ -419,9 +419,15 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	// empty permissions mean internal link here - NOT denial. Hence we need an extra check
-	if !sufficientPermissions(statRes.GetInfo().GetPermissionSet(), newPermissions, true) {
-		response.WriteOCSError(w, r, http.StatusForbidden, "no share permission", nil)
-		return
+	if newPermissions != nil {
+		if !sufficientPermissions(statRes.GetInfo().GetPermissionSet(), newPermissions, true) {
+			response.WriteOCSError(w, r, http.StatusForbidden, "no share permission", nil)
+			return
+		}
+	} else {
+		statRes.GetInfo().GetPermissionSet()
+		p := decreasePermissionsIfNecessary(int(conversions.RoleFromResourcePermissions(statRes.GetInfo().GetPermissionSet(), false).OCSPermissions()))
+		permKey = &p
 	}
 
 	// ExpireDate
