@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
 * Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
 * Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
+* Enhancement - Update web to v8.0.0-alpha.13: [#7918](https://github.com/owncloud/ocis/pull/7918)
 
 ## Details
 
@@ -83,6 +84,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7782
    https://github.com/owncloud/ocis/pull/7887
+
+* Enhancement - Update web to v8.0.0-alpha.13: [#7918](https://github.com/owncloud/ocis/pull/7918)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog
+   (linked) for details on the web release.
+
+   ## Summary * Enhancement
+   [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link
+   modal
+
+   https://github.com/owncloud/ocis/pull/7918
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
 
 # Changelog for [4.0.4] (2023-12-07)
 
