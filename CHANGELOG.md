@@ -1,13 +1,17 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 5.0.0-alpha.5](#changelog-for-500-alpha5-2023-12-05)
+* [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
+* [Changelog for 4.0.2](#changelog-for-402-2023-09-28)
+* [Changelog for 4.0.1](#changelog-for-401-2023-09-01)
 * [Changelog for 4.0.0](#changelog-for-400-2023-08-21)
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -32,7 +36,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.5...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.4...master
 
 ## Summary
 
@@ -80,11 +84,31 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7782
    https://github.com/owncloud/ocis/pull/7887
 
+# Changelog for [4.0.4] (2023-12-07)
+
+The following sections list the changes for 4.0.4.
+
+[4.0.4]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.5...v4.0.4
+
+## Summary
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+## Details
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+   ## Changelog for reva 2.13.3
+
+  *   Enhancement [cs3org/reva#4377](https://github.com/cs3org/reva/pull/4377): Handle trashbin file listings concurrently
+
+   https://github.com/owncloud/ocis/pull/7858
+
 # Changelog for [5.0.0-alpha.5] (2023-12-05)
 
 The following sections list the changes for 5.0.0-alpha.5.
 
-[5.0.0-alpha.5]: https://github.com/owncloud/ocis/compare/v4.0.0...v5.0.0-alpha.5
+[5.0.0-alpha.5]: https://github.com/owncloud/ocis/compare/v4.0.3...v5.0.0-alpha.5
 
 ## Summary
 
@@ -1016,6 +1040,152 @@ The following sections list the changes for 5.0.0-alpha.5.
 
    https://github.com/owncloud/ocis/pull/7883
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
+
+# Changelog for [4.0.3] (2023-11-24)
+
+The following sections list the changes for 4.0.3.
+
+[4.0.3]: https://github.com/owncloud/ocis/compare/v4.0.2...v4.0.3
+
+## Summary
+
+* Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
+* Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
+
+## Details
+
+* Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
+
+  *   Bugfix [cs3org/reva#4251](https://github.com/cs3org/reva/pull/4251): ldap: fix GetUserByClaim for binary encoded UUIDs
+
+   https://github.com/owncloud/ocis/issues/7469
+   https://github.com/owncloud/ocis/pull/7512
+
+* Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
+
+   The token storage config in the config.json for web was missing when it was set
+   to `false`.
+
+   https://github.com/owncloud/ocis/issues/7462
+   https://github.com/owncloud/ocis/pull/7546
+
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+
+   AD FS `/adfs/.well-known/openid-configuration` has an optional
+   `access_token_issuer` which, in violation of the OpenID Connect spec, takes
+   precedence over `issuer`.
+
+   https://github.com/owncloud/ocis/pull/7138
+
+* Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
+
+   Tags: web
+
+   We updated ownCloud Web to v7.1.2. Please refer to the changelog (linked) for
+   details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#9833](https://github.com/owncloud/web/pull/9833): Resolving
+   external URLs * Bugfix
+   [owncloud/web#9868](https://github.com/owncloud/web/pull/9868): Respect
+   "details"-query on private links * Bugfix
+   [owncloud/web#9913](https://github.com/owncloud/web/pull/9913): Private link
+   resolving via share jail ID
+
+   https://github.com/owncloud/ocis/pull/7798
+   https://github.com/owncloud/web/releases/tag/v7.1.2
+
+# Changelog for [4.0.2] (2023-09-28)
+
+The following sections list the changes for 4.0.2.
+
+[4.0.2]: https://github.com/owncloud/ocis/compare/v4.0.1...v4.0.2
+
+## Summary
+
+* Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
+* Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+* Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
+* Bugfix - Bump reva to 2.16.1: [#7350](https://github.com/owncloud/ocis/pull/7350)
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+
+## Details
+
+* Bugfix - Actually pass PROXY_OIDC_SKIP_USER_INFO option to oidc client middleware: [#7220](https://github.com/owncloud/ocis/pull/7220)
+
+   https://github.com/owncloud/ocis/pull/7220
+
+* Bugfix - Disable username validation for keycloak example: [#7230](https://github.com/owncloud/ocis/pull/7230)
+
+   Set 'GRAPH_USERNAME_MATCH' to 'none'. To accept any username that is also valid
+   for keycloak.
+
+   https://github.com/owncloud/ocis/pull/7230
+
+* Bugfix - Bring back the USERS_LDAP_USER_SCHEMA_ID variable: [#7312](https://github.com/owncloud/ocis/issues/7312)
+
+   We reintroduced the USERS_LDAP_USER_SCHEMA_ID variable which was accidently
+   removed from the users service with the 4.0.0 release.
+
+   https://github.com/owncloud/ocis/issues/7312
+   https://github.com/owncloud/ocis-charts/issues/397
+
+* Bugfix - Do not reset received share state to pending: [#7319](https://github.com/owncloud/ocis/issues/7319)
+
+   We fixed a problem where the states of received shares were reset to PENDING in
+   the "ocis migrate rebuild-jsoncs3-indexes" command
+
+   https://github.com/owncloud/ocis/issues/7319
+
+* Bugfix - Bump reva to 2.16.1: [#7350](https://github.com/owncloud/ocis/pull/7350)
+
+  *   Bugfix [cs3org/reva#4194](https://github.com/cs3org/reva/pull/4194): Make appctx package compatible with go v1.21
+  *   Bugfix [cs3org/reva#4214](https://github.com/cs3org/reva/pull/4214): Always pass adjusted default nats options
+
+   https://github.com/owncloud/ocis/pull/7350
+
+* Bugfix - Check school number for duplicates before adding a school: [#7351](https://github.com/owncloud/ocis/pull/7351)
+
+   We fixed an issue that allowed to create two schools with the same school number
+
+   https://github.com/owncloud/enterprise/issues/6051
+   https://github.com/owncloud/ocis/pull/7351
+
+* Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
+
+   The enviroment variable `OCIS_LDAP_BIND_PASSWORD` was added to be more
+   consistent with all other global LDAP variables.
+
+   `LDAP_BIND_PASSWORD` is deprecated now and scheduled for removal with the 5.0.0
+   release.
+
+   We also deprecated `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` for removal with 5.0.0.
+   The replacement for it is `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`.
+
+   https://github.com/owncloud/ocis/issues/7176
+
+# Changelog for [4.0.1] (2023-09-01)
+
+The following sections list the changes for 4.0.1.
+
+[4.0.1]: https://github.com/owncloud/ocis/compare/v4.0.0...v4.0.1
+
+## Summary
+
+* Bugfix - Disallow sharee to search sharer files outside the share: [#7184](https://github.com/owncloud/ocis/pull/7184)
+
+## Details
+
+* Bugfix - Disallow sharee to search sharer files outside the share: [#7184](https://github.com/owncloud/ocis/pull/7184)
+
+   When a file was shared with user(sharee) and the sharee searched the shared file
+   the response contained unshared resources as well.
+
+   https://github.com/owncloud/ocis/pull/7184
 
 # Changelog for [4.0.0] (2023-08-21)
 
@@ -6166,7 +6336,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -6340,29 +6510,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -6535,6 +6687,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
