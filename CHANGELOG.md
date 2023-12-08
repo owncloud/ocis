@@ -1,3 +1,22 @@
+# Changelog for [4.0.4] (2023-12-07)
+
+The following sections list the changes for 4.0.4.
+
+[4.0.4]: https://github.com/owncloud/ocis/compare/v4.0.3...v4.0.4
+
+## Summary
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+## Details
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+   ## Changelog for reva 2.13.3
+
+  *   Enhancement [cs3org/reva#4377](https://github.com/cs3org/reva/pull/4377): Handle trashbin file listings concurrently
+
+   https://github.com/owncloud/ocis/pull/7858
 # Changelog for [4.0.3] (2023-11-24)
 
 The following sections list the changes for 4.0.3.
@@ -960,6 +979,7 @@ The following sections list the changes for 3.0.0.
 * Bugfix - Return 425 on Thumbnails: [#5300](https://github.com/owncloud/ocis/pull/5300)
 * Bugfix - Allow selected updates on graph users: [#6233](https://github.com/owncloud/ocis/pull/6233)
 * Bugfix - Disassociate users from deleted school: [#5343](https://github.com/owncloud/ocis/pull/5343)
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
 * Bugfix - Fix error message when disabling users: [#6435](https://github.com/owncloud/ocis/pull/6435)
 * Bugfix - Fix default role assignment for demo users: [#3432](https://github.com/owncloud/ocis/issues/3432)
 * Bugfix - Empty exact list while searching for a sharee: [#6398](https://github.com/owncloud/ocis/pull/6398)
@@ -1092,6 +1112,13 @@ The following sections list the changes for 3.0.0.
 
    https://github.com/owncloud/ocis/issues/5246
    https://github.com/owncloud/ocis/pull/5343
+
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
+
+   We fixed that current date is always printed.
+
+   https://github.com/owncloud/ocis/issues/6124
+   https://github.com/owncloud/ocis/pull/6132
 
 * Bugfix - Fix error message when disabling users: [#6435](https://github.com/owncloud/ocis/pull/6435)
 
@@ -5107,7 +5134,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -5275,28 +5302,11 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -5465,6 +5475,23 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
