@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/CiscoM31/godata v1.0.9
-	github.com/KimMachineGun/automemlimit v0.3.0
+	github.com/KimMachineGun/automemlimit v0.4.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
