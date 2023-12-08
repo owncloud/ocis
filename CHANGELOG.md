@@ -36,11 +36,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
 * Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
 * Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
 
 ## Details
+
+* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
+
+   We fixed a bug when normal users can update the public link to delete its
+   password if permission is not sent in data.
+
+   https://github.com/owncloud/ocis/issues/7821
+   https://github.com/owncloud/ocis/pull/7862
 
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
 
