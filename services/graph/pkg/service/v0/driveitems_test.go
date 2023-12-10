@@ -22,6 +22,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -250,11 +251,12 @@ var _ = Describe("Driveitems", func() {
 
 	Describe("UpdatePermission", func() {
 		var (
-			driveItemPermission        *libregraph.Permission
-			getShareMockResponse       *collaboration.GetShareResponse
-			getPublicShareMockResponse *link.GetPublicShareResponse
-			getUserMockResponse        *user.GetUserResponse
-			updateShareMockResponse    *collaboration.UpdateShareResponse
+			driveItemPermission           *libregraph.Permission
+			getShareMockResponse          *collaboration.GetShareResponse
+			getPublicShareMockResponse    *link.GetPublicShareResponse
+			getUserMockResponse           *user.GetUserResponse
+			updateShareMockResponse       *collaboration.UpdateShareResponse
+			updatePublicShareMockResponse *link.UpdatePublicShareResponse
 		)
 		BeforeEach(func() {
 			rr = httptest.NewRecorder()
@@ -317,6 +319,11 @@ var _ = Describe("Driveitems", func() {
 				Share:  share,
 			}
 
+			updatePublicShareMockResponse = &link.UpdatePublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share:  &link.PublicShare{DisplayName: "Test Link"},
+			}
+
 			getPublicShareMock := gatewayClient.On("GetPublicShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
@@ -335,13 +342,39 @@ var _ = Describe("Driveitems", func() {
 						OpaqueId:  "3",
 					},
 					Permissions: &link.PublicSharePermissions{
-						Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+						Permissions: linktype.NewViewLinkPermissionSet().GetPermissions(),
 					},
 					Token: "token",
 				},
 			}
 			getPublicShareMock.Return(getPublicShareMockResponse, nil)
 
+			statMock := gatewayClient.On("Stat",
+				mock.Anything,
+				mock.MatchedBy(func(req *provider.StatRequest) bool {
+					return utils.ResourceIDEqual(
+						req.GetRef().GetResourceId(),
+						&provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "2",
+							OpaqueId:  "3",
+						},
+					)
+				}))
+
+			statResponse := &provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				},
+			}
+
+			statMock.Return(statResponse, nil)
 		})
 		It("fails when no share is found", func() {
 			getShareMockResponse.Share = nil
@@ -359,10 +392,26 @@ var _ = Describe("Driveitems", func() {
 			Expect(rr.Code).To(Equal(http.StatusNotFound))
 		})
 		// Updating a public link will be implemented later
-		It("fails when trying to update a link permission", func() {
+		It("succeeds when trying to update a link permission with displayname", func() {
 			getShareMockResponse.Share = nil
 			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					if req.GetRef().GetId().GetOpaqueId() == "permissionid" {
+						return req.Update.GetDisplayName() == "Test Link"
+					}
+					return false
+				}),
+			)
+
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			link := libregraph.NewSharingLink()
+			link.SetLibreGraphDisplayName("Test Link")
+
+			driveItemPermission.SetLink(*link)
 			body, err := driveItemPermission.MarshalJSON()
 			Expect(err).To(BeNil())
 			svc.UpdatePermission(
@@ -370,7 +419,17 @@ var _ = Describe("Driveitems", func() {
 				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
 					WithContext(ctx),
 			)
-			Expect(rr.Code).To(Equal(http.StatusNotImplemented))
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Link).ToNot(BeNil())
+			Expect(res.Link.GetLibreGraphDisplayName() == "Test Link")
 		})
 		It("fails updating the id", func() {
 			driveItemPermission.SetId("permissionid")

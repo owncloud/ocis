@@ -31,6 +31,9 @@ func (l *LinkType) GetPermissions() *provider.ResourcePermissions {
 // SharingLinkTypeFromCS3Permissions creates a libregraph link type
 // It returns a list of libregraph actions when the conversion is not possible
 func SharingLinkTypeFromCS3Permissions(permissions *linkv1beta1.PublicSharePermissions) (*libregraph.SharingLinkType, []string) {
+	if permissions == nil {
+		return nil, nil
+	}
 	linkTypes := GetAvailableLinkTypes()
 	for _, linkType := range linkTypes {
 		if grants.PermissionsEqual(linkType.GetPermissions(), permissions.GetPermissions()) {
