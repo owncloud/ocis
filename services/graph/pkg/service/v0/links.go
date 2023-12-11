@@ -263,13 +263,9 @@ func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID stri
 				Path:       ".",
 			},
 		})
-	if err != nil {
-		g.logger.Error().Err(err).Msg("transport error, could not stat resource")
-		return nil, errorcode.New(errorcode.GeneralException, err.Error())
-	}
-	if code := statResp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
-		g.logger.Debug().Interface("itemID", itemID).Msg(statResp.GetStatus().GetMessage())
-		return nil, errorcode.New(cs3StatusToErrCode(code), statResp.GetStatus().GetMessage())
+
+	if errCode := errorcode.FromCS3Status(statResp.GetStatus(), err); errCode != nil {
+		return nil, *errCode
 	}
 
 	if newPermission.HasExpirationDateTime() {
