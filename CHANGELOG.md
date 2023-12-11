@@ -1,3 +1,26 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.4...master
+
+## Summary
+
+* Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+
+## Details
+
+* Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+
+   We set an empty Credentials chain for the frontend service now. In ocis all non-reva token
+   authentication is handled by the proxy. This avoids irritating error messages about the
+   missing 'auth-bearer' service.
+
+   https://github.com/owncloud/ocis/issues/6692
+   https://github.com/owncloud/ocis/pull/7934
+   https://github.com/owncloud/ocis/pull/7453
+   https://github.com/cs3org/reva/pull/4396
+   https://github.com/cs3org/reva/pull/4241
 # Changelog for [4.0.4] (2023-12-07)
 
 The following sections list the changes for 4.0.4.
