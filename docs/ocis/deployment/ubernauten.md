@@ -108,6 +108,8 @@ Make a backup of your data and make sure you have read and understood the releas
 
 Don't worry, you can always go back to the older version you had installed, there's a long list of older versions available for download.
 
+Mind that if you want to re-configure, re-install or start a new version of ocis, make sure you have stopped supervisorctl from restarting ocis. Enter `supervisorctl stop ocis`, followed by a `killall -9 ocis` to make sure no ocis version is still running.
+
 ### Wiping and Clean Restart from Scratch
 
 This little script is removing your ocis installation (and **all of your data!**), replacing it with a new, clean ocis installation. Be careful and only use it for testing purposes. Specify your desired ocis version in the curl command.
@@ -129,8 +131,6 @@ export PROXY_LOG_LEVEL=debug
 ```
 
 ### Troubleshooting
-
-* If you want to re-configure, re-install or start a new version of ocis, make sure you have stopped supervisorctl from restarting ocis. Enter `supervisorctl stop ocis`, followed by a `killall -9 ocis` to make sure no ocis version is still running.
 
 * Some older versions of Infinite Scale also needed this Environment variable to run.
 ```
