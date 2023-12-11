@@ -47,7 +47,9 @@ When a file is changed by a process outside of oCIS, this needs to be monitored 
 
 The collaborative storage driver needs a way to achieve that. The easiest way for an POSIX based collaborative storage is inotify, that needs to be set up recursively on a file tree to record changes. Additional it is a challenge to destinguish between changes that were done from external activity and the ones that oCIS creates by its own file operations.
 
-For GPFS, there should be an API function delivering that. [TBD]
+For GPFS, there is a subsystem called delivering that:
+
+https://www.ibm.com/docs/en/storage-scale/5.1.9?topic=reference-clustered-watch-folder]
 
 ## ETag Propagation
 
