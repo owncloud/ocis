@@ -98,6 +98,7 @@ ocis                             RUNNING   pid 9813, uptime 0:01:40
 No config updates to processes
 [owncloud@ocis ~]$ supervisorctl update
 ```
+Every Uberspace comes with its own HTTPS certificate via Letsencrypt. See the [Uberspace - HTTPS](https://manual.uberspace.de/web-https/) documentation for more details.
 
 ### Updating ownCloud Infinite Scale
 
@@ -106,6 +107,8 @@ Updating the ocis binary is simple: When a new version comes to life, just downl
 Make a backup of your data and make sure you have read and understood the release notes of your new version , especially the "breaking changes" section before starting the binary.
 
 Don't worry, you can always go back to the older version you had installed, there's a long list of older versions available for download.
+
+Mind that if you want to re-configure, re-install or start a new version of ocis, make sure you have stopped supervisorctl from restarting ocis. Enter `supervisorctl stop ocis`, followed by a `killall -9 ocis` to make sure no ocis version is still running.
 
 ### Wiping and Clean Restart from Scratch
 
