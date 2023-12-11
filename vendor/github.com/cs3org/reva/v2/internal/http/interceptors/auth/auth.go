@@ -109,10 +109,6 @@ func New(m map[string]interface{}, unprotected []string, tp trace.TracerProvider
 		conf.TokenManager = "jwt"
 	}
 
-	if len(conf.CredentialChain) == 0 {
-		conf.CredentialChain = []string{"basic", "bearer"}
-	}
-
 	if conf.CredentialsByUserAgent == nil {
 		conf.CredentialsByUserAgent = map[string]string{}
 	}
