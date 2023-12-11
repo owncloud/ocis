@@ -89,16 +89,19 @@ func Start(envMap map[string]any) {
 				retryCount++
 				maxRetry, _ := strconv.Atoi(config.Get("retry"))
 				if retryCount <= maxRetry {
+					close(outChan)
 					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
 					Start(envMap)
+					return
 				}
 			}
-			close(outChan)
 		}
 	}
+	close(outChan)
 }
 
 func Stop() {
+	log.Println("Stopping oCIS server...")
 	stopSignal = true
 
 	// SIGINT allows oCIS server to gracefully shutdown
@@ -161,6 +164,7 @@ func waitUntilCompleteShutdown() {
 	}
 	for strings.TrimSpace(string(output)) != "" {
 		output, _ = c.CombinedOutput()
+		log.Println("Process found. Waiting...")
 
 		if time.Since(startTime) >= timeout {
 			log.Println(fmt.Sprintf("Unable to kill oCIS server after %v seconds", int64(timeout.Seconds())))
@@ -170,9 +174,9 @@ func waitUntilCompleteShutdown() {
 }
 
 func Restart(envMap map[string]any) bool {
-	log.Println("Restarting oCIS server...")
 	Stop()
 
+	log.Println("Restarting oCIS server...")
 	common.Wg.Add(1)
 	go Start(envMap)
 
