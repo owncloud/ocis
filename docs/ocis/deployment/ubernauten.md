@@ -98,6 +98,7 @@ ocis                             RUNNING   pid 9813, uptime 0:01:40
 No config updates to processes
 [owncloud@ocis ~]$ supervisorctl update
 ```
+If you want to run ownCloud Infinite Scale for a longer time, you may have to take a deeper look into Let's Encrypt certificates and more, they have an expiry date.
 
 ### Updating ownCloud Infinite Scale
 
@@ -128,6 +129,8 @@ export PROXY_LOG_LEVEL=debug
 ```
 
 ### Troubleshooting
+
+* If you want to re-configure, re-install or start a new version of ocis, make sure you have stopped supervisorctl from restarting ocis. Enter `supervisorctl stop ocis`, followed by a `killall -9 ocis` to make sure no ocis version is still running.
 
 * Some older versions of Infinite Scale also needed this Environment variable to run.
 ```
