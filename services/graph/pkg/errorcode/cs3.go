@@ -45,7 +45,7 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *E
 	case code == cs3rpc.Code_CODE_ALREADY_EXISTS:
 		err.errorCode = NameAlreadyExists
 	case code == cs3rpc.Code_CODE_FAILED_PRECONDITION:
-		err.errorCode = PreconditionFailed
+		err.errorCode = InvalidRequest
 	case code == cs3rpc.Code_CODE_OUT_OF_RANGE:
 		err.errorCode = InvalidRange
 	case code == cs3rpc.Code_CODE_UNIMPLEMENTED:
