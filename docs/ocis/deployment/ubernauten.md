@@ -98,7 +98,7 @@ ocis                             RUNNING   pid 9813, uptime 0:01:40
 No config updates to processes
 [owncloud@ocis ~]$ supervisorctl update
 ```
-If you want to run ownCloud Infinite Scale for a longer time, you may have to take a deeper look into Let's Encrypt certificates and more, they have an expiry date.
+Every Uberspace comes with its own HTTPS certificate via Letsencrypt. See the [Uberspace - HTTPS](https://manual.uberspace.de/web-https/) documentation for more details.
 
 ### Updating ownCloud Infinite Scale
 
