@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-beta.1](#changelog-for-500-beta1-2023-12-12)
 * [Changelog for 5.0.0-alpha.6](#changelog-for-500-alpha6-2023-12-08)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
@@ -32,6 +33,38 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-beta.1...master
+
+## Summary
+
+* Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
+
+## Details
+
+* Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying
+   full video in their dimensions * Bugfix
+   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files
+   list previews cropped * Bugfix
+   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces
+   overview tile previews zoomed * Bugfix
+   [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
+   links without drive alias
+
+   https://github.com/owncloud/ocis/pull/7952
+   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
