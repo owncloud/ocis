@@ -98,7 +98,7 @@ ocis                             RUNNING   pid 9813, uptime 0:01:40
 No config updates to processes
 [owncloud@ocis ~]$ supervisorctl update
 ```
-You can find all information on Supervisord and `supervisorctl` on its website: [Running Supervisord] (http://supervisord.org/running.html).
+You can find all information on Supervisord and `supervisorctl` on its website: [Running Supervisord](http://supervisord.org/running.html).
 
 ### Updating ownCloud Infinite Scale
 
