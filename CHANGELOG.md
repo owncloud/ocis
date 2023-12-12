@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
 * Change - Remove PrivacyURL and ImprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 * Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
 
@@ -62,6 +63,13 @@ The following sections list the changes for unreleased.
    clients, not just Web, those should be configured via the theme.json file.
 
    https://github.com/owncloud/ocis/pull/7938/
+
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
+
+   The antivirus postprocessing step will now be retried for a configurable amount
+   of times in case it can't get a result from clamav.
+
+   https://github.com/owncloud/ocis/pull/7874
 
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 
