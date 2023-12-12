@@ -151,12 +151,11 @@ func (b MessagePackBackend) saveAttributes(ctx context.Context, path string, set
 		_, subspan := tracer.Start(ctx, "lockedfile.OpenFile")
 		f, err = lockedfile.OpenFile(lockPath, os.O_RDWR|os.O_CREATE, 0600)
 		subspan.End()
+		if err != nil {
+			return err
+		}
 		defer f.Close()
 	}
-	if err != nil {
-		return err
-	}
-
 	// Read current state
 	_, subspan := tracer.Start(ctx, "os.ReadFile")
 	var msgBytes []byte

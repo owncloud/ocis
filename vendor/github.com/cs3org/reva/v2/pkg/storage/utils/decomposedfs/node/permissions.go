@@ -97,6 +97,8 @@ func ServiceAccountPermissions() provider.ResourcePermissions {
 		RemoveGrant:          true, // for share expiry
 		ListRecycle:          true, // for purge-trash-bin command
 		PurgeRecycle:         true, // for purge-trash-bin command
+		RestoreRecycleItem:   true, // for cli restore command
+		Delete:               true, // for cli restore command with replace option
 	}
 }
 
