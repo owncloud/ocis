@@ -78,6 +78,7 @@ type SettingsService struct {
 }
 
 type FrontendService struct {
+	AppHandler     InsecureService `yaml:"app_handler"`
 	Archiver       InsecureService
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
@@ -408,6 +409,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
+		cfg.Frontend.AppHandler = _insecureService
 		cfg.Frontend.Archiver = _insecureService
 		cfg.Graph.Spaces = _insecureService
 		cfg.Graph.Events = _insecureEvents
