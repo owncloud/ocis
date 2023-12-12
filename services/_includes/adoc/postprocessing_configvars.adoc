@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-12-13-17-45]
+[#deprecation-note-2023-12-12-13-58-29]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -267,5 +267,23 @@ a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
 After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. If a duration is set but the keyword 'delay' is not explicitely added to 'POSTPROCESSING_STEPS', the delay step will be processed as last step. In such a case, a log entry will be written on service startup to remind the admin about that situation. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_RETRY_BACKOFF_DURATION` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++5s ++
+a| [subs=-attributes]
+The base for the exponential backoff duration before retrying a failed postprocessing step. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_MAX_RETRIES` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++14 ++
+a| [subs=-attributes]
+The maximum number of retries for a failed postprocessing step.
 |===
 

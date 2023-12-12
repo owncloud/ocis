@@ -32,3 +32,5 @@ postprocessing:
     enable_tls: false
   steps: []
   delayprocessing: 0s
+  retry_backoff_duration: 5s
+  max_retries: 14
