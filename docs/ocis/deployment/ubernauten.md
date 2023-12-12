@@ -89,7 +89,7 @@ export PROXY_LOG_LEVEL=debug
 /home/owncloud/ocis server
 ```
 
-There are four supervisorctl commands that you will find useful (many more can be found in its documentation). You can use `supervisorctl status` to check which services managed by supervisorctl are running, a `supervisorctl reread` will be necessary after you changed the `ini` files, an `update` is applying the changes, and `supervisorctl stop` will stop a running service:
+There are four supervisorctl commands that you will find useful (many more can be found in its documentation). You can use `supervisorctl status` to check which services managed by supervisorctl are running, a `supervisorctl reread` will be necessary after you changed the `ini` files, an `update` is applying changes, and `supervisorctl stop` will stop a running service:
 
 ```
 [owncloud@ocis ~]$ supervisorctl status
