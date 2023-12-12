@@ -9,7 +9,6 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -95,7 +94,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "list",
 		Usage:     "Print a list of all trash-bin items of a space.",
-		ArgsUsage: "['userID' required] ['spaceID' required]",
+		ArgsUsage: "['spaceID' required]",
 		Flags:     []cli.Flag{},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
@@ -106,14 +105,9 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			var userID, spaceID string
-			if c.NArg() > 1 {
-				userID = c.Args().Get(0)
-				spaceID = c.Args().Get(1)
-			}
-			if userID == "" {
-				_ = cli.ShowSubcommandHelp(c)
-				return fmt.Errorf("userID is requered")
+			var spaceID string
+			if c.NArg() > 0 {
+				spaceID = c.Args().Get(0)
 			}
 			if spaceID == "" {
 				_ = cli.ShowSubcommandHelp(c)
@@ -130,7 +124,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 				log.Error().Err(err).Msg("error selecting next gateway client")
 				return err
 			}
-			ctx, _, err := utils.Impersonate(&userv1beta1.UserId{OpaqueId: userID}, client, cfg.MachineAuthAPIKey)
+			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
 				log.Error().Err(err).Msg("could not impersonate")
 				return err
@@ -139,7 +133,6 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 			spanOpts := []trace.SpanStartOption{
 				trace.WithSpanKind(trace.SpanKindClient),
 				trace.WithAttributes(
-					attribute.KeyValue{Key: "userID", Value: attribute.StringValue(userID)},
 					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
 				),
 			}
@@ -177,7 +170,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "restore-all",
 		Usage:     "Restore all trash-bin items for a space.",
-		ArgsUsage: "['userID' required] ['spaceID' required]",
+		ArgsUsage: "['spaceID' required]",
 		Flags: []cli.Flag{
 			&optionFlag,
 		},
@@ -191,14 +184,9 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				return err
 			}
 			c.Lineage()
-			var userID, spaceID string
-			if c.NArg() > 1 {
-				userID = c.Args().Get(0)
-				spaceID = c.Args().Get(1)
-			}
-			if userID == "" {
-				_ = cli.ShowSubcommandHelp(c)
-				return cli.Exit("The userID is required", 1)
+			var spaceID string
+			if c.NArg() > 0 {
+				spaceID = c.Args().Get(0)
 			}
 			if spaceID == "" {
 				_ = cli.ShowSubcommandHelp(c)
@@ -225,7 +213,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				log.Error().Err(err).Msg("error selecting next gateway client")
 				return err
 			}
-			ctx, _, err := utils.Impersonate(&userv1beta1.UserId{OpaqueId: userID}, client, cfg.MachineAuthAPIKey)
+			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
 				log.Error().Err(err).Msg("could not impersonate")
 				return err
@@ -235,7 +223,6 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				trace.WithSpanKind(trace.SpanKindClient),
 				trace.WithAttributes(
 					attribute.KeyValue{Key: "option", Value: attribute.StringValue(optionFlagVal)},
-					attribute.KeyValue{Key: "userID", Value: attribute.StringValue(userID)},
 					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
 				),
 			}
@@ -295,7 +282,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "restore",
 		Usage:     "Restore a trash-bin item by ID.",
-		ArgsUsage: "['userId' required] ['spaceID' required] ['itemID' required]",
+		ArgsUsage: "['spaceID' required] ['itemID' required]",
 		Flags: []cli.Flag{
 			&optionFlag,
 		},
@@ -309,15 +296,10 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 				return err
 			}
 			c.Lineage()
-			var userID, spaceID, itemID string
-			if c.NArg() > 2 {
-				userID = c.Args().Get(0)
-				spaceID = c.Args().Get(1)
-				itemID = c.Args().Get(2)
-			}
-			if userID == "" {
-				_ = cli.ShowSubcommandHelp(c)
-				return fmt.Errorf("userID is requered")
+			var spaceID, itemID string
+			if c.NArg() > 1 {
+				spaceID = c.Args().Get(0)
+				itemID = c.Args().Get(1)
 			}
 			if spaceID == "" {
 				_ = cli.ShowSubcommandHelp(c)
@@ -348,7 +330,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 				log.Error().Err(err).Msg("error selecting gateway client")
 				return err
 			}
-			ctx, _, err := utils.Impersonate(&userv1beta1.UserId{OpaqueId: userID}, client, cfg.MachineAuthAPIKey)
+			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
 				log.Error().Err(err).Msg("could not impersonate")
 				return err
@@ -358,7 +340,6 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 				trace.WithSpanKind(trace.SpanKindClient),
 				trace.WithAttributes(
 					attribute.KeyValue{Key: "option", Value: attribute.StringValue(optionFlagVal)},
-					attribute.KeyValue{Key: "userID", Value: attribute.StringValue(userID)},
 					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
 					attribute.KeyValue{Key: "itemID", Value: attribute.StringValue(itemID)},
 				),

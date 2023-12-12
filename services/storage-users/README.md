@@ -100,11 +100,10 @@ The configuration for the `purge-expired` command is done by using the following
 
 #### List and Restore Trash-Bins Items
 
-To authenticate the cli command use `OCIS_MACHINE_AUTH_API_KEY=<some-ocis-machine-auth-api-key>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
+To authenticate the cli command use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
 service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
 
 The ID sources:
--   'userID' in a `https://{host}/graph/v1.0/me`
 -   personal 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+personal`
 -   project 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+project`
 
@@ -113,7 +112,7 @@ NAME:
    ocis storage-users trash-bin list - Print a list of all trash-bin items for a space.
 
 USAGE:
-   ocis storage-users trash-bin list command [command options] ['userID' required] ['spaceID' required]
+   ocis storage-users trash-bin list command [command options] ['spaceID' required]
 ```
 
 ```bash
@@ -121,7 +120,7 @@ NAME:
    ocis storage-users trash-bin restore-all - Restore all trash-bin items for a space.
 
 USAGE:
-   ocis storage-users trash-bin restore-all command [command options] ['userID' required] ['spaceID' required]
+   ocis storage-users trash-bin restore-all command [command options] ['spaceID' required]
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -135,7 +134,7 @@ NAME:
    ocis storage-users trash-bin restore - Restore a trash-bin item by ID.
 
 USAGE:
-   ocis storage-users trash-bin restore command [command options] ['userID' required] ['spaceID' required] ['itemID' required]
+   ocis storage-users trash-bin restore command [command options] ['spaceID' required] ['itemID' required]
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
