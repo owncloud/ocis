@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
+* Change - Remove PrivacyURL and ImprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 * Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
 
@@ -53,6 +54,14 @@ The following sections list the changes for unreleased.
    has been fixed.
 
    https://github.com/owncloud/ocis/pull/7930
+
+* Change - Remove PrivacyURL and ImprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+
+   We've removed the option PrivacyURL and ImprintURL from the config, since other
+   clients weren't able to consume these. In order to be accessible by other
+   clients, not just Web, those should be configured via the theme.json file.
+
+   https://github.com/owncloud/ocis/pull/7938/
 
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 
