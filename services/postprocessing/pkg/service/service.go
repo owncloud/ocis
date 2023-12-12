@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -89,24 +90,54 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 
 	switch ev := e.Event.(type) {
 	case events.BytesReceived:
-		pp = postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
+		pp = &postprocessing.Postprocessing{
+			ID:         ev.UploadID,
+			URL:        ev.URL,
+			User:       ev.ExecutingUser,
+			Filename:   ev.Filename,
+			Filesize:   ev.Filesize,
+			ResourceID: ev.ResourceID,
+			Steps:      pps.steps,
+		}
 		next = pp.Init(ev)
 	case events.PostprocessingStepFinished:
 		if ev.UploadID == "" {
 			// no current upload - this was an on demand scan
 			return nil
 		}
-		pp, err = getPP(pps.store, ev.UploadID)
+		pp, err = pps.getPP(pps.store, ev.UploadID)
 		if err != nil {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 			return fmt.Errorf("%w: cannot get upload", errEvent)
 		}
 		next = pp.NextStep(ev)
+
+		switch pp.Status.Outcome {
+		case events.PPOutcomeRetry:
+			// schedule retry
+			backoff := pp.BackoffDuration()
+			go func() {
+				time.Sleep(backoff)
+				retryEvent := events.StartPostprocessingStep{
+					UploadID:      pp.ID,
+					URL:           pp.URL,
+					ExecutingUser: pp.User,
+					Filename:      pp.Filename,
+					Filesize:      pp.Filesize,
+					ResourceID:    pp.ResourceID,
+					StepToStart:   pp.Status.CurrentStep,
+				}
+				err := events.Publish(ctx, pps.pub, retryEvent)
+				if err != nil {
+					pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot publish RestartPostprocessing event")
+				}
+			}()
+		}
 	case events.StartPostprocessingStep:
 		if ev.StepToStart != events.PPStepDelay {
 			return nil
 		}
-		pp, err = getPP(pps.store, ev.UploadID)
+		pp, err = pps.getPP(pps.store, ev.UploadID)
 		if err != nil {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 			return fmt.Errorf("%w: cannot get upload", errEvent)
@@ -119,7 +150,7 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			return fmt.Errorf("%w: cannot delete upload", errEvent)
 		}
 	case events.ResumePostprocessing:
-		pp, err = getPP(pps.store, ev.UploadID)
+		pp, err = pps.getPP(pps.store, ev.UploadID)
 		if err != nil {
 			if err == store.ErrNotFound {
 				if err := events.Publish(ctx, pps.pub, events.RestartPostprocessing{
@@ -175,7 +206,7 @@ func storePP(sto store.Store, pp *postprocessing.Postprocessing) error {
 	})
 }
 
-func getPP(sto store.Store, uploadID string) (*postprocessing.Postprocessing, error) {
+func (pps *PostprocessingService) getPP(sto store.Store, uploadID string) (*postprocessing.Postprocessing, error) {
 	recs, err := sto.Read(uploadID)
 	if err != nil {
 		return nil, err
@@ -185,6 +216,11 @@ func getPP(sto store.Store, uploadID string) (*postprocessing.Postprocessing, er
 		return nil, fmt.Errorf("expected only one result for '%s', got %d", uploadID, len(recs))
 	}
 
-	var pp postprocessing.Postprocessing
-	return &pp, json.Unmarshal(recs[0].Value, &pp)
+	pp := postprocessing.New(pps.c)
+	err = json.Unmarshal(recs[0].Value, pp)
+	if err != nil {
+		return nil, err
+	}
+
+	return pp, nil
 }

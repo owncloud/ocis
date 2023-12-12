@@ -1,11 +1,13 @@
 package postprocessing
 
 import (
+	"math"
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 )
 
 // Postprocessing handles postprocessing of a file
@@ -18,7 +20,9 @@ type Postprocessing struct {
 	ResourceID *provider.ResourceId
 	Steps      []events.Postprocessingstep
 	Status     Status
-	PPDelay    time.Duration
+	Failures   int
+
+	config config.Postprocessing
 }
 
 // Status is helper struct to show current postprocessing status
@@ -28,16 +32,9 @@ type Status struct {
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceID *provider.ResourceId, steps []events.Postprocessingstep, delay time.Duration) *Postprocessing {
+func New(config config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
-		ID:         uploadID,
-		URL:        uploadURL,
-		User:       user,
-		Filename:   filename,
-		Filesize:   filesize,
-		ResourceID: resourceID,
-		Steps:      steps,
-		PPDelay:    delay,
+		config: config,
 	}
 }
 
@@ -55,9 +52,14 @@ func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interfa
 	switch ev.Outcome {
 	case events.PPOutcomeContinue:
 		return pp.next(ev.FinishedStep)
+	case events.PPOutcomeRetry:
+		pp.Failures++
+		if pp.Failures > pp.config.MaxRetries {
+			return pp.finished(events.PPOutcomeAbort)
+		}
+		return pp.retry()
 	default:
 		return pp.finished(ev.Outcome)
-
 	}
 }
 
@@ -71,8 +73,13 @@ func (pp *Postprocessing) CurrentStep() interface{} {
 
 // Delay will sleep the configured time then continue
 func (pp *Postprocessing) Delay(ev events.StartPostprocessingStep) interface{} {
-	time.Sleep(pp.PPDelay)
+	time.Sleep(pp.config.Delayprocessing)
 	return pp.next(events.PPStepDelay)
+}
+
+// BackoffDuration calculates the duration for exponential backoff based on the number of failures.
+func (pp *Postprocessing) BackoffDuration() time.Duration {
+	return pp.config.RetryBackoffDuration * time.Duration(math.Pow(2, float64(pp.Failures-1)))
 }
 
 func (pp *Postprocessing) next(current events.Postprocessingstep) interface{} {
@@ -105,5 +112,16 @@ func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.
 		ExecutingUser: pp.User,
 		Filename:      pp.Filename,
 		Outcome:       outcome,
+	}
+}
+
+func (pp *Postprocessing) retry() events.PostprocessingRetry {
+	pp.Status.Outcome = events.PPOutcomeRetry
+	return events.PostprocessingRetry{
+		UploadID:        pp.ID,
+		ExecutingUser:   pp.User,
+		Filename:        pp.Filename,
+		Failures:        pp.Failures,
+		BackoffDuration: pp.BackoffDuration(),
 	}
 }
