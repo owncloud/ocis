@@ -41,9 +41,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+* Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
 
 ## Details
+
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
+
+   Updating and resetting the logo when using the new `theme.json` structure in Web
+   has been fixed.
+
+   https://github.com/owncloud/ocis/pull/7930
 
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 
@@ -51,6 +60,23 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6993
    https://github.com/owncloud/ocis/pull/7908/
+
+* Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Change
+   [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling *
+   Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111):
+   Registering right sidebar panels as extension * Enhancement
+   [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar
+   in viewer and editor apps
+
+   https://github.com/owncloud/ocis/pull/7930
+   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
 
 # Changelog for [5.0.0-alpha.6] (2023-12-08)
 
