@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-alpha.6](#changelog-for-500-alpha6-2023-12-08)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 5.0.0-alpha.5](#changelog-for-500-alpha5-2023-12-05)
@@ -31,6 +32,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.6...master
+
+## Summary
+
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+
+## Details
+
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+
+   We added the ability to edit public shares to the sharing NG endpoints.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7908/
 
 # Changelog for [5.0.0-alpha.6] (2023-12-08)
 
