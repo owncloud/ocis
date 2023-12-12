@@ -253,6 +253,15 @@ default:
         - WebDavLockingContext:
         - PublicWebDavContext:
 
+    apiShare:
+      paths:
+        - '%paths.base%/../features/apiShare'
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - ShareContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 

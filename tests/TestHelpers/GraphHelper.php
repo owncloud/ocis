@@ -99,6 +99,21 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public static function getBeta1FullUrl(string $baseUrl, string $path): string {
+		$fullUrl = $baseUrl;
+		if (\substr($fullUrl, -1) !== '/') {
+			$fullUrl .= '/';
+		}
+		$fullUrl .= 'graph/v1beta1/' . $path;
+		return $fullUrl;
+	}
+
+	/**
+	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $method
 	 * @param string $path
@@ -1491,5 +1506,34 @@ class GraphHelper {
 		$fullUrl = self::getFullUrl($baseUrl, 'me');
 		$payload['preferredLanguage'] = $language;
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PATCH', $user, $password, null, \json_encode($payload));
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $itemId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getPermissionsList(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $itemId
+	): ResponseInterface {
+		$url = self::getBeta1FullUrl($baseUrl, 'drives/' . $spaceId . '/items/' . $itemId . '/permissions');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
 	}
 }
