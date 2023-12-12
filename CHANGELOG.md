@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+* Enhancement - Add cli commands for trash-binq: [#7936](https://github.com/owncloud/ocis/pull/7936)
 
 ## Details
 
@@ -21,6 +22,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7453
    https://github.com/cs3org/reva/pull/4396
    https://github.com/cs3org/reva/pull/4241
+
+* Enhancement - Add cli commands for trash-binq: [#7936](https://github.com/owncloud/ocis/pull/7936)
+
+   We added the `list` and `restore` commands to the trash-bin items to the CLI
+
+   https://github.com/owncloud/ocis/issues/7845
+   https://github.com/owncloud/ocis/pull/7936
 # Changelog for [4.0.4] (2023-12-07)
 
 The following sections list the changes for 4.0.4.
