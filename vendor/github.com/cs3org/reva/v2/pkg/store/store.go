@@ -26,6 +26,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/store/etcd"
 	"github.com/cs3org/reva/v2/pkg/store/memory"
 	natsjs "github.com/go-micro/plugins/v4/store/nats-js"
+	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/go-micro/plugins/v4/store/redis"
 	redisopts "github.com/go-redis/redis/v8"
 	"github.com/nats-io/nats.go"
@@ -50,6 +51,8 @@ const (
 	TypeOCMem = "ocmem"
 	// TypeNatsJS represents nats-js stores
 	TypeNatsJS = "nats-js"
+	// TypeNatsJSKV represents nats-js-kv stores
+	TypeNatsJSKV = "nats-js-kv"
 )
 
 // Create initializes a new store
@@ -126,6 +129,16 @@ func Create(opts ...microstore.Option) microstore.Store {
 				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options
 				natsjs.DefaultTTL(ttl))...,
 		) // TODO test with ocis nats
+	case TypeNatsJSKV:
+		// NOTE: nats needs a DefaultTTL option as it does not support per Write TTL ...
+		ttl, _ := options.Context.Value(ttlContextKey{}).(time.Duration)
+		natsOptions := nats.GetDefaultOptions()
+		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
+		return natsjskv.NewStore(
+			append(opts,
+				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options
+				natsjs.DefaultTTL(ttl))...,
+		)
 	case TypeMemory, "mem", "": // allow existing short form and use as default
 		return microstore.NewMemoryStore(opts...)
 	default:
