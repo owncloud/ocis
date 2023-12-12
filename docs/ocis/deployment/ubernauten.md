@@ -89,7 +89,7 @@ export PROXY_LOG_LEVEL=debug
 /home/owncloud/ocis server
 ```
 
-There are three supervisorctl commands that you will find useful (many more can be found in its documentation). You can use `supervisorctl status` to check which services managed by supervisorctl are running, a `supervisorctl reread` will be necessary after you changed the `ini` files, and an `update` is applying the changes:
+There are four supervisorctl commands that you will find useful (many more can be found in its documentation). You can use `supervisorctl status` to check which services managed by supervisorctl are running, a `supervisorctl reread` will be necessary after you changed the `ini` files, an `update` is applying the changes, and `supervisorctl stop` will stop a running service:
 
 ```
 [owncloud@ocis ~]$ supervisorctl status
@@ -98,7 +98,7 @@ ocis                             RUNNING   pid 9813, uptime 0:01:40
 No config updates to processes
 [owncloud@ocis ~]$ supervisorctl update
 ```
-Every Uberspace comes with its own HTTPS certificate via Letsencrypt. See the [Uberspace - HTTPS](https://manual.uberspace.de/web-https/) documentation for more details.
+You can find all information on Supervisord and `supervisorctl` on its website: [Running Supervisord] (http://supervisord.org/running.html).
 
 ### Updating ownCloud Infinite Scale
 
@@ -132,13 +132,9 @@ export PROXY_LOG_LEVEL=debug
 
 ### Troubleshooting
 
-* Some older versions of Infinite Scale also needed this Environment variable to run.
-```
-export THUMBNAILS_WEBDAVSOURCEBASE_URL=http://localhost:9200/remote.php/webdav/
-```
-This should not be necessary for all versions starting with ownCloud Infinite Scale 3.0.
+* SSL/TLS Certificates: Every Uberspace comes with its own HTTPS certificate via Let's Encrypt. See the [Uberspace - HTTPS](https://manual.uberspace.de/web-https/) documentation for more details.
 
-* If you get the following error message, then you probably forgot to run the `ocis init` command. If `ocis server` find an configuration hasn't been set up, it will complain like this:
+* Error message about `jwt_secret`: If you get the following error message, then you probably forgot to run the `ocis init` command. If `ocis server` find an configuration hasn't been set up, it will complain like this:
 ```
 [owncloud@ocis ~]$ ./ocis server
 The jwt_secret has not been set properly in your config for ocis.
