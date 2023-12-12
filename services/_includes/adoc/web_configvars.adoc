@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-12-13-58-29]
+[#deprecation-note-2023-12-12-14-21-11]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -467,24 +467,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details.
 
-a|`WEB_OPTION_IMPRINT_URL` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Specifies the target URL for the imprint link valid for the ocis instance in the account menu.
-
-a|`WEB_OPTION_PRIVACY_URL` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Specifies the target URL for the privacy link valid for the ocis instance in the account menu.
-
 a|`WEB_OPTION_ACCESS_DENIED_HELP_URL` +
 
 a| [subs=-attributes]
@@ -519,7 +501,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Defines whether one ore more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.
+Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

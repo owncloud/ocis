@@ -128,8 +128,6 @@ web:
       logoutUrl: ""
       loginUrl: ""
       openLinksWithDefaultApp: true
-      imprintUrl: ""
-      privacyUrl: ""
       accessDeniedHelpUrl: ""
       tokenStorageLocal: true
       disabledExtensions: []
