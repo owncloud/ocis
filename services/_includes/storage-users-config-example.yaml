@@ -31,6 +31,8 @@ reva:
   tls:
     mode: ""
     cacert: ""
+gateway_addr: 127.0.0.1:9142
+machine_auth_api_key: ""
 skip_user_groups_in_token: false
 graceful_shutdown_timeout: 30
 driver: ocis
