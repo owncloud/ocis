@@ -29,7 +29,7 @@ func TestFromCS3Status(t *testing.T) {
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_UNAUTHENTICATED, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.Unauthenticated, "msg"))},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_INVALID_ARGUMENT, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, "msg"))},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_ALREADY_EXISTS, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.NameAlreadyExists, "msg"))},
-		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_FAILED_PRECONDITION, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.PreconditionFailed, "msg"))},
+		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_FAILED_PRECONDITION, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, "msg"))},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_UNIMPLEMENTED, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.NotSupported, "msg"))},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_INVALID, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, "msg"))},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_CANCELLED, Message: "msg"}, nil, nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, "msg"))},

@@ -22,6 +22,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -250,12 +252,14 @@ var _ = Describe("Driveitems", func() {
 
 	Describe("UpdatePermission", func() {
 		var (
-			driveItemPermission        *libregraph.Permission
-			getShareMockResponse       *collaboration.GetShareResponse
-			getPublicShareMockResponse *link.GetPublicShareResponse
-			getUserMockResponse        *user.GetUserResponse
-			updateShareMockResponse    *collaboration.UpdateShareResponse
+			driveItemPermission           *libregraph.Permission
+			getShareMockResponse          *collaboration.GetShareResponse
+			getPublicShareMockResponse    *link.GetPublicShareResponse
+			getUserMockResponse           *user.GetUserResponse
+			updateShareMockResponse       *collaboration.UpdateShareResponse
+			updatePublicShareMockResponse *link.UpdatePublicShareResponse
 		)
+		const TestLinkName = "Test Link"
 		BeforeEach(func() {
 			rr = httptest.NewRecorder()
 
@@ -317,6 +321,11 @@ var _ = Describe("Driveitems", func() {
 				Share:  share,
 			}
 
+			updatePublicShareMockResponse = &link.UpdatePublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share:  &link.PublicShare{DisplayName: TestLinkName},
+			}
+
 			getPublicShareMock := gatewayClient.On("GetPublicShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
@@ -335,13 +344,39 @@ var _ = Describe("Driveitems", func() {
 						OpaqueId:  "3",
 					},
 					Permissions: &link.PublicSharePermissions{
-						Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+						Permissions: linktype.NewViewLinkPermissionSet().GetPermissions(),
 					},
 					Token: "token",
 				},
 			}
 			getPublicShareMock.Return(getPublicShareMockResponse, nil)
 
+			statMock := gatewayClient.On("Stat",
+				mock.Anything,
+				mock.MatchedBy(func(req *provider.StatRequest) bool {
+					return utils.ResourceIDEqual(
+						req.GetRef().GetResourceId(),
+						&provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "2",
+							OpaqueId:  "3",
+						},
+					) && req.GetRef().GetPath() == "."
+				}))
+
+			statResponse := &provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				},
+			}
+
+			statMock.Return(statResponse, nil)
 		})
 		It("fails when no share is found", func() {
 			getShareMockResponse.Share = nil
@@ -358,11 +393,80 @@ var _ = Describe("Driveitems", func() {
 			)
 			Expect(rr.Code).To(Equal(http.StatusNotFound))
 		})
-		// Updating a public link will be implemented later
-		It("fails when trying to update a link permission", func() {
+		It("fails to update permission when no request body is sent", func() {
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("fails to update password when no request body is sent", func() {
+			svc.SetLinkPassword(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("fails to update password when itemID mismatches with the driveID", func() {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$4!3")
+			rctx.URLParams.Add("permissionID", "permissionid")
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.SetLinkPassword(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusNotFound))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Error.Code).To(Equal(errorcode.ItemNotFound.String()))
+			Expect(res.Error.Message).To(Equal("driveID and itemID do not match"))
+		})
+		It("fails to update permission when itemID mismatches with the driveID", func() {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$4!3")
+			rctx.URLParams.Add("permissionID", "permissionid")
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusNotFound))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Error.Code).To(Equal(errorcode.ItemNotFound.String()))
+			Expect(res.Error.Message).To(Equal("driveID and itemID do not match"))
+		})
+		It("fails to update permission when the resourceID mismatches with the shared resource's id", func() {
 			getShareMockResponse.Share = nil
 			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			getPublicShareMockResponse.Share.ResourceId = &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "4",
+			}
 
+			driveItemPermission.SetExpirationDateTime(time.Now().Add(time.Hour))
 			body, err := driveItemPermission.MarshalJSON()
 			Expect(err).To(BeNil())
 			svc.UpdatePermission(
@@ -370,10 +474,115 @@ var _ = Describe("Driveitems", func() {
 				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
 					WithContext(ctx),
 			)
-			Expect(rr.Code).To(Equal(http.StatusNotImplemented))
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+		})
+		It("fails to update public link password when the permissionID is not parseable", func() {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+			rctx.URLParams.Add("permissionID", "permi%ssionid")
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.SetLinkPassword(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+			Expect(res.Error.Message).To(Equal("invalid permissionID"))
+		})
+		It("fails to update permission when the permissionID is not parseable", func() {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+			rctx.URLParams.Add("permissionID", "permi%ssionid")
+
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
+			ctx = revactx.ContextSetUser(ctx, currentUser)
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", nil).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+			Expect(res.Error.Message).To(Equal("invalid permissionID"))
+		})
+		It("succeeds when trying to update a link permission with displayname", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					if req.GetRef().GetId().GetOpaqueId() == "permissionid" {
+						return req.Update.GetDisplayName() == TestLinkName
+					}
+					return false
+				}),
+			)
+
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			link := libregraph.NewSharingLink()
+			link.SetLibreGraphDisplayName(TestLinkName)
+
+			driveItemPermission.SetLink(*link)
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Link).ToNot(BeNil())
+			Expect(res.Link.GetLibreGraphDisplayName() == TestLinkName)
 		})
 		It("fails updating the id", func() {
 			driveItemPermission.SetId("permissionid")
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("fails updating the password flag", func() {
+			driveItemPermission.SetHasPassword(true)
 			body, err := driveItemPermission.MarshalJSON()
 			Expect(err).To(BeNil())
 			svc.UpdatePermission(
@@ -509,6 +718,153 @@ var _ = Describe("Driveitems", func() {
 			Expect(ok).To(BeFalse())
 			_, ok = res.GetLibreGraphPermissionsActionsOk()
 			Expect(ok).To(BeTrue())
+		})
+		It("updates the expiration date on a public share", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			expiration := time.Now().UTC().Add(time.Hour)
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share.Expiration = utils.TimeToTS(expiration)
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(expiration)
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.GetExpirationDateTime().Equal(expiration)).To(BeTrue())
+		})
+		It("updates the permissions on a public share", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			newLink := libregraph.NewSharingLink()
+			newLinkType, err := libregraph.NewSharingLinkTypeFromValue("edit")
+			Expect(err).ToNot(HaveOccurred())
+			newLink.SetType(*newLinkType)
+
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share.Permissions = &link.PublicSharePermissions{
+				Permissions: linktype.NewFolderEditLinkPermissionSet().Permissions,
+			}
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetLink(*newLink)
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			linkType := res.Link.GetType()
+			Expect(string(linkType)).To(Equal("edit"))
+		})
+		It("updates the password on a public share", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			newLinkPassword := libregraph.NewSharingLinkPassword()
+			newLinkPassword.SetPassword("OC123!")
+
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share.Permissions = &link.PublicSharePermissions{
+				Permissions: linktype.NewViewLinkPermissionSet().Permissions,
+			}
+			updatePublicShareMockResponse.Share.PasswordProtected = true
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			body, err := newLinkPassword.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.SetLinkPassword(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			linkType := res.Link.GetType()
+			Expect(string(linkType)).To(Equal("view"))
+			Expect(*res.HasPassword).To(BeTrue())
+		})
+		It("fails when updating the expiration date on a public share", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			expiration := time.Now().UTC().AddDate(0, 0, -1)
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share = nil
+			updatePublicShareMockResponse.Status = status.NewFailedPrecondition(ctx, nil, "expiration date is in the past")
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(expiration)
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.OdataError{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.GetError().Code).To(Equal(errorcode.InvalidRequest.String()))
+			Expect(res.GetError().Message).To(Equal("expiration date is in the past"))
 		})
 	})
 

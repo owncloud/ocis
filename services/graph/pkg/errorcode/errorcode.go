@@ -135,6 +135,8 @@ func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 		status = http.StatusMethodNotAllowed
 	case ItemIsLocked:
 		status = http.StatusLocked
+	case PreconditionFailed:
+		status = http.StatusPreconditionFailed
 	default:
 		status = http.StatusInternalServerError
 	}

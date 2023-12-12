@@ -14,6 +14,8 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -53,6 +55,52 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, *perm)
+}
+
+// SetLinkPassword sets public link password on the cs3 api
+func (g Graph) SetLinkPassword(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	password := &libregraph.SharingLinkPassword{}
+	if err := StrictJSONUnmarshal(r.Body, password); err != nil {
+		g.logger.Debug().Err(err).Interface("Body", r.Body).Msg("failed unmarshalling request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	// The resourceID of the shared resource need to match the item ID from the Request Path
+	// otherwise this is an invalid Request.
+	if !utils.ResourceIDEqual(publicShare.GetResourceId(), &itemID) {
+		g.logger.Debug().Msg("resourceID of shared does not match itemID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
+		return
+	}
+
+	newPermission, err := g.updatePublicLinkPassword(ctx, permissionID, password.GetPassword())
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, *newPermission)
 }
 
 func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (*link.PublicShare, error) {
@@ -146,6 +194,9 @@ func (g Graph) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicSh
 	if createdLink.GetExpiration() != nil {
 		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()).UTC())
 	}
+
+	perm.SetHasPassword(createdLink.GetPasswordProtected())
+
 	return perm, nil
 }
 
@@ -164,4 +215,130 @@ func parseAndFillUpTime(t *time.Time) *types.Timestamp {
 		Seconds: uint64(final / 1000000000),
 		Nanos:   uint32(final % 1000000000),
 	}
+}
+
+func (g Graph) updatePublicLinkPassword(ctx context.Context, permissionID string, password string) (*libregraph.Permission, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	changeLinkRes, err := gatewayClient.UpdatePublicShare(ctx, &link.UpdatePublicShareRequest{
+		Update: &link.UpdatePublicShareRequest_Update{
+			Type: link.UpdatePublicShareRequest_Update_TYPE_PASSWORD,
+			Grant: &link.Grant{
+				Password: password,
+			},
+		},
+		Ref: &link.PublicShareReference{
+			Spec: &link.PublicShareReference_Id{
+				Id: &link.PublicShareId{
+					OpaqueId: permissionID,
+				},
+			},
+		},
+	})
+	if errCode := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+	permission, err := g.libreGraphPermissionFromCS3PublicShare(changeLinkRes.GetShare())
+	if err != nil {
+		return nil, err
+	}
+	return permission, nil
+}
+
+func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *providerv1beta1.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+
+	statResp, err := gatewayClient.Stat(
+		ctx,
+		&providerv1beta1.StatRequest{
+			Ref: &providerv1beta1.Reference{
+				ResourceId: itemID,
+				Path:       ".",
+			},
+		})
+
+	if errCode := errorcode.FromCS3Status(statResp.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+
+	if newPermission.HasExpirationDateTime() {
+		expirationDate := newPermission.GetExpirationDateTime()
+		update := &link.UpdatePublicShareRequest_Update{
+			Type:  link.UpdatePublicShareRequest_Update_TYPE_EXPIRATION,
+			Grant: &link.Grant{Expiration: parseAndFillUpTime(&expirationDate)},
+		}
+		perm, err = g.updatePublicLink(ctx, permissionID, update)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if newPermission.HasLink() && newPermission.Link.HasLibreGraphDisplayName() {
+		changedLink := newPermission.GetLink()
+		update := &link.UpdatePublicShareRequest_Update{
+			Type:        link.UpdatePublicShareRequest_Update_TYPE_DISPLAYNAME,
+			DisplayName: changedLink.GetLibreGraphDisplayName(),
+		}
+		perm, err = g.updatePublicLink(ctx, permissionID, update)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if newPermission.HasLink() && newPermission.Link.HasType() {
+		changedLink := newPermission.Link.GetType()
+		permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(
+			libregraph.DriveItemCreateLink{
+				Type: &changedLink,
+			},
+			statResp.GetInfo().GetType(),
+		)
+		update := &link.UpdatePublicShareRequest_Update{
+			Type: link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS,
+			Grant: &link.Grant{
+				Permissions: &link.PublicSharePermissions{Permissions: permissions},
+			},
+		}
+		perm, err = g.updatePublicLink(ctx, permissionID, update)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return perm, err
+}
+
+func (g Graph) updatePublicLink(ctx context.Context, permissionID string, update *link.UpdatePublicShareRequest_Update) (*libregraph.Permission, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	changeLinkRes, err := gatewayClient.UpdatePublicShare(ctx, &link.UpdatePublicShareRequest{
+		Update: update,
+		Ref: &link.PublicShareReference{
+			Spec: &link.PublicShareReference_Id{
+				Id: &link.PublicShareId{
+					OpaqueId: permissionID,
+				},
+			},
+		},
+	})
+
+	if errCode := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+
+	permission, err := g.libreGraphPermissionFromCS3PublicShare(changeLinkRes.GetShare())
+	if err != nil {
+		return nil, err
+	}
+	return permission, nil
 }
