@@ -10,13 +10,13 @@ Starting with ocis version 3.0.0, the default backend for metadata switched to m
 
 Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
 
-IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network. 
+IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network.
 
 When hard-stopping Infinite Scale, for example with the `kill <pid>` command (SIGKILL), it is possible and likely that not all data from the decomposedfs (metadata) has been written to the storage which may result in an inconsistent decomposedfs. When gracefully shutting down Infinite Scale, using a command like SIGTERM, the process will no longer accept any write requests from _other_ services and will try to write the internal open  requests which can take an undefined duration based on many factors. To mitigate that situation, the following things have been implemented:
 
 *   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences, you must increase the default value.
 
-*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details. 
+*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details.
 
 ## CLI Commands
 
@@ -37,7 +37,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 Example cases for expired uploads
 
 *   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
-*   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed. 
+*   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
 There are two commands available to manage unfinished uploads
 
@@ -78,12 +78,13 @@ Cleaned uploads:
 
 <!-- referencing: https://github.com/owncloud/ocis/pull/5500 -->
 
-This command is about purging old trash-bin items of `project` spaces (spaces that have been created manually) and `personal` spaces.
+This command is about the trash-bin to get an overview of items, restore items and purging old items of `project` spaces (spaces that have been created manually) and `personal` spaces.
 
 ```bash
 ocis storage-users trash-bin <command>
 ```
 
+#### Purge-expired
 ```plaintext
 COMMANDS:
    purge-expired     Purge all expired items from the trashbin
@@ -96,6 +97,52 @@ The configuration for the `purge-expired` command is done by using the following
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+
+#### List and Restore Trash-Bins Items
+
+To authenticate the cli command use `OCIS_MACHINE_AUTH_API_KEY=<some-ocis-machine-auth-api-key>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
+service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
+
+The ID sources:
+-   'userID' in a `https://{host}/graph/v1.0/me`
+-   personal 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+personal`
+-   project 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+project`
+
+```bash
+NAME:
+   ocis storage-users trash-bin list - Print a list of all trash-bin items for a space.
+
+USAGE:
+   ocis storage-users trash-bin list command [command options] ['userID' required] ['spaceID' required]
+```
+
+```bash
+NAME:
+   ocis storage-users trash-bin restore-all - Restore all trash-bin items for a space.
+
+USAGE:
+   ocis storage-users trash-bin restore-all command [command options] ['userID' required] ['spaceID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.
+```
+
+```bash
+NAME:
+   ocis storage-users trash-bin restore - Restore a trash-bin item by ID.
+
+USAGE:
+   ocis storage-users trash-bin restore command [command options] ['userID' required] ['spaceID' required] ['itemID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.
+```
 
 ## Caching
 
