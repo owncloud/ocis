@@ -70,7 +70,7 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr      string                 `yaml:"addr" env:"GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
+	Addr      string                 `yaml:"addr" env:"OCIS_GATEWAY_GRPC_ADDR;GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
 	Protocol  string                 `yaml:"protocol" env:"GATEWAY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
