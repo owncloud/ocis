@@ -116,6 +116,7 @@ func DefaultConfig() *config.Config {
 			StatCacheTTL:                300 * time.Second,
 			ListOCMShares:               true,
 			PublicShareMustHavePassword: true,
+			IncludeOCMSharees:           false,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{

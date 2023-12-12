@@ -17,28 +17,46 @@ type DigestAuth struct {
 	digestParts map[string]string
 }
 
-// Type identifies the DigestAuthenticator
-func (d *DigestAuth) Type() string {
-	return "DigestAuth"
-}
-
-// User holds the DigestAuth username
-func (d *DigestAuth) User() string {
-	return d.user
-}
-
-// Pass holds the DigestAuth password
-func (d *DigestAuth) Pass() string {
-	return d.pw
+// NewDigestAuth creates a new instance of our Digest Authenticator
+func NewDigestAuth(login, secret string, rs *http.Response) (Authenticator, error) {
+	return &DigestAuth{user: login, pw: secret, digestParts: digestParts(rs)}, nil
 }
 
 // Authorize the current request
-func (d *DigestAuth) Authorize(req *http.Request, method string, path string) {
+func (d *DigestAuth) Authorize(c *http.Client, rq *http.Request, path string) error {
 	d.digestParts["uri"] = path
-	d.digestParts["method"] = method
+	d.digestParts["method"] = rq.Method
 	d.digestParts["username"] = d.user
 	d.digestParts["password"] = d.pw
-	req.Header.Set("Authorization", getDigestAuthorization(d.digestParts))
+	rq.Header.Set("Authorization", getDigestAuthorization(d.digestParts))
+	return nil
+}
+
+// Verify checks for authentication issues and may trigger a re-authentication
+func (d *DigestAuth) Verify(c *http.Client, rs *http.Response, path string) (redo bool, err error) {
+	if rs.StatusCode == 401 {
+		err = NewPathError("Authorize", path, rs.StatusCode)
+	}
+	return
+}
+
+// Close cleans up all resources
+func (d *DigestAuth) Close() error {
+	return nil
+}
+
+// Clone creates a copy of itself
+func (d *DigestAuth) Clone() Authenticator {
+	parts := make(map[string]string, len(d.digestParts))
+	for k, v := range d.digestParts {
+		parts[k] = v
+	}
+	return &DigestAuth{user: d.user, pw: d.pw, digestParts: parts}
+}
+
+// String toString
+func (d *DigestAuth) String() string {
+	return fmt.Sprintf("DigestAuth login: %s", d.user)
 }
 
 func digestParts(resp *http.Response) map[string]string {

@@ -350,3 +350,5 @@ require (
 replace github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
+
+replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231123085457-ff658b6ea159

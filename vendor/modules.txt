@@ -1721,7 +1721,7 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
-# github.com/studio-b12/gowebdav v0.0.0-20221015232716-17255f2e7423
+# github.com/studio-b12/gowebdav v0.0.0-20221015232716-17255f2e7423 => github.com/aduffeck/gowebdav v0.0.0-20231123085457-ff658b6ea159
 ## explicit; go 1.17
 github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.1
@@ -2299,3 +2299,4 @@ stash.kopano.io/kgol/oidc-go
 stash.kopano.io/kgol/rndm
 # github.com/go-micro/plugins/v4/store/nats-js => github.com/kobergj/plugins/v4/store/nats-js v1.2.1-0.20231020092801-9463c820c19a
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
+# github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231123085457-ff658b6ea159

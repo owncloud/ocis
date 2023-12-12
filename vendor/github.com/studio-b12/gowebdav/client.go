@@ -9,10 +9,14 @@ import (
 	"net/url"
 	"os"
 	pathpkg "path"
+	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
+
+const XInhibitRedirect = "X-Gowebdav-Inhibit-Redirect"
+
+var defaultProps = []string{"displayname", "resourcetype", "getcontentlength", "getcontenttype", "getetag", "getlastmodified"}
 
 // Client defines our structure
 type Client struct {
@@ -20,47 +24,28 @@ type Client struct {
 	headers     http.Header
 	interceptor func(method string, rq *http.Request)
 	c           *http.Client
-
-	authMutex sync.Mutex
-	auth      Authenticator
-}
-
-// Authenticator stub
-type Authenticator interface {
-	Type() string
-	User() string
-	Pass() string
-	Authorize(*http.Request, string, string)
-}
-
-// NoAuth structure holds our credentials
-type NoAuth struct {
-	user string
-	pw   string
-}
-
-// Type identifies the authenticator
-func (n *NoAuth) Type() string {
-	return "NoAuth"
-}
-
-// User returns the current user
-func (n *NoAuth) User() string {
-	return n.user
-}
-
-// Pass returns the current password
-func (n *NoAuth) Pass() string {
-	return n.pw
-}
-
-// Authorize the current request
-func (n *NoAuth) Authorize(req *http.Request, method string, path string) {
+	auth        Authorizer
 }
 
 // NewClient creates a new instance of client
 func NewClient(uri, user, pw string) *Client {
-	return &Client{FixSlash(uri), make(http.Header), nil, &http.Client{}, sync.Mutex{}, &NoAuth{user, pw}}
+	return NewAuthClient(uri, NewAutoAuth(user, pw))
+}
+
+// NewAuthClient creates a new client instance with a custom Authorizer
+func NewAuthClient(uri string, auth Authorizer) *Client {
+	c := &http.Client{
+		CheckRedirect: func(rq *http.Request, via []*http.Request) error {
+			if len(via) >= 10 {
+				return ErrTooManyRedirects
+			}
+			if via[0].Header.Get(XInhibitRedirect) != "" {
+				return http.ErrUseLastResponse
+			}
+			return nil
+		},
+	}
+	return &Client{root: FixSlash(uri), headers: make(http.Header), interceptor: nil, c: c, auth: auth}
 }
 
 // SetHeader lets us set arbitrary headers for a given client
@@ -83,6 +68,11 @@ func (c *Client) SetTransport(transport http.RoundTripper) {
 	c.c.Transport = transport
 }
 
+// SetJar exposes the ability to set a cookie jar to the client.
+func (c *Client) SetJar(jar http.CookieJar) {
+	c.c.Jar = jar
+}
+
 // Connect connects to our dav server
 func (c *Client) Connect() error {
 	rs, err := c.options("/")
@@ -96,29 +86,86 @@ func (c *Client) Connect() error {
 	}
 
 	if rs.StatusCode != 200 {
-		return newPathError("Connect", c.root, rs.StatusCode)
+		return NewPathError("Connect", c.root, rs.StatusCode)
 	}
 
 	return nil
 }
 
-type props struct {
-	Status      string   `xml:"DAV: status"`
-	Name        string   `xml:"DAV: prop>displayname,omitempty"`
-	Type        xml.Name `xml:"DAV: prop>resourcetype>collection,omitempty"`
-	Size        string   `xml:"DAV: prop>getcontentlength,omitempty"`
-	ContentType string   `xml:"DAV: prop>getcontenttype,omitempty"`
-	ETag        string   `xml:"DAV: prop>getetag,omitempty"`
-	Modified    string   `xml:"DAV: prop>getlastmodified,omitempty"`
+type Props struct {
+	m map[xml.Name]interface{}
+}
+
+func (c *Props) GetString(key xml.Name) string {
+	return fmt.Sprintf("%v", c.m[key])
+}
+
+func (c *Props) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	c.m = make(map[xml.Name]interface{})
+
+	type flatProp struct {
+		XMLName xml.Name
+		Content string `xml:",innerxml"`
+	}
+	type flatProps struct {
+		Props []flatProp `xml:",any"`
+	}
+	parsedProps := flatProps{}
+	if err := d.DecodeElement(&parsedProps, &start); err != nil {
+		return err
+	}
+	for _, v := range parsedProps.Props {
+		c.m[v.XMLName] = v.Content
+	}
+	return nil
+}
+
+type propstat struct {
+	Status string `xml:"DAV: status"`
+
+	Props Props `xml:"DAV: prop"`
+}
+
+func (p *propstat) Type() string {
+	if p.Props.GetString(xml.Name{Space: "DAV:", Local: "resourcetype"}) == "" {
+		return "file"
+	}
+	return "collection"
+}
+
+func (p *propstat) Name() string {
+	return p.Props.GetString(xml.Name{Space: "DAV:", Local: "displayname"})
+}
+
+func (p *propstat) ContentType() string {
+	return p.Props.GetString(xml.Name{Space: "DAV:", Local: "getcontenttype"})
+}
+
+func (p *propstat) Size() int64 {
+	if n, e := strconv.ParseInt(p.Props.GetString(xml.Name{Space: "DAV:", Local: "getcontentlength"}), 10, 64); e == nil {
+		return n
+	}
+	return 0
+}
+
+func (p *propstat) ETag() string {
+	return p.Props.GetString(xml.Name{Space: "DAV:", Local: "getetag"})
+}
+
+func (p *propstat) Modified() time.Time {
+	if t, e := time.Parse(time.RFC1123, p.Props.GetString(xml.Name{Space: "DAV:", Local: "getlastmodified"})); e == nil {
+		return t
+	}
+	return time.Unix(0, 0)
 }
 
 type response struct {
-	Href  string  `xml:"DAV: href"`
-	Props []props `xml:"DAV: propstat"`
+	Href      string     `xml:"DAV: href"`
+	Propstats []propstat `xml:"DAV: propstat"`
 }
 
-func getProps(r *response, status string) *props {
-	for _, prop := range r.Props {
+func getPropstat(r *response, status string) *propstat {
+	for _, prop := range r.Propstats {
 		if strings.Contains(prop.Status, status) {
 			return &prop
 		}
@@ -128,7 +175,16 @@ func getProps(r *response, status string) *props {
 
 // ReadDir reads the contents of a remote directory
 func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
-	path = FixSlashes(path)
+	return c.ReadDirWithProps(path, defaultProps)
+}
+
+// ReadDirWithProps reads the contents of the directory at the given path, along with the specified properties.
+func (c *Client) ReadDirWithProps(path string, props []string) ([]os.FileInfo, error) {
+	propfindprops := ""
+	if len(props) > 0 {
+		propfindprops = `<d:prop><d:` + strings.Join(props, "/><d:") + `/></d:prop>`
+	}
+
 	files := make([]os.FileInfo, 0)
 	skipSelf := true
 	parse := func(resp interface{}) error {
@@ -136,113 +192,76 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 
 		if skipSelf {
 			skipSelf = false
-			if p := getProps(r, "200"); p != nil && p.Type.Local == "collection" {
-				r.Props = nil
+			if p := getPropstat(r, "200"); p != nil && p.Type() == "collection" {
+				r.Propstats = nil
 				return nil
 			}
-			return newPathError("ReadDir", path, 405)
+			return NewPathError("ReadDir", path, 405)
 		}
 
-		if p := getProps(r, "200"); p != nil {
-			f := new(File)
+		if p := getPropstat(r, "200"); p != nil {
+			var name string
 			if ps, err := url.PathUnescape(r.Href); err == nil {
-				f.name = pathpkg.Base(ps)
+				name = pathpkg.Base(ps)
 			} else {
-				f.name = p.Name
+				name = p.Name()
 			}
-			f.path = path + f.name
-			f.modified = parseModified(&p.Modified)
-			f.etag = p.ETag
-			f.contentType = p.ContentType
-
-			if p.Type.Local == "collection" {
-				f.path += "/"
-				f.size = 0
-				f.isdir = true
-			} else {
-				f.size = parseInt64(&p.Size)
-				f.isdir = false
-			}
-
-			files = append(files, *f)
+			files = append(files, *newFile(path, name, p))
 		}
 
-		r.Props = nil
+		r.Propstats = nil
 		return nil
 	}
 
 	err := c.propfind(path, false,
-		`<d:propfind xmlns:d='DAV:'>
-			<d:prop>
-				<d:displayname/>
-				<d:resourcetype/>
-				<d:getcontentlength/>
-				<d:getcontenttype/>
-				<d:getetag/>
-				<d:getlastmodified/>
-			</d:prop>
-		</d:propfind>`,
+		`<d:propfind xmlns:d='DAV:'>`+propfindprops+`</d:propfind>`,
 		&response{},
 		parse)
 
 	if err != nil {
 		if _, ok := err.(*os.PathError); !ok {
-			err = newPathErrorErr("ReadDir", path, err)
+			err = NewPathErrorErr("ReadDir", path, err)
 		}
 	}
 	return files, err
 }
 
-// Stat returns the file stats for a specified path
+// Stat returns the file stats for a specified path with the default properties
 func (c *Client) Stat(path string) (os.FileInfo, error) {
+	return c.StatWithProps(path, defaultProps)
+}
+
+// StatWithProps returns the FileInfo for the specified path along with the specified properties.
+func (c *Client) StatWithProps(path string, props []string) (os.FileInfo, error) {
 	var f *File
 	parse := func(resp interface{}) error {
 		r := resp.(*response)
-		if p := getProps(r, "200"); p != nil && f == nil {
-			f = new(File)
-			f.name = p.Name
-			f.path = path
-			f.etag = p.ETag
-			f.contentType = p.ContentType
-
-			if p.Type.Local == "collection" {
-				if !strings.HasSuffix(f.path, "/") {
-					f.path += "/"
-				}
-				f.size = 0
-				f.modified = time.Unix(0, 0)
-				f.isdir = true
-			} else {
-				f.size = parseInt64(&p.Size)
-				f.modified = parseModified(&p.Modified)
-				f.isdir = false
-			}
+		if p := getPropstat(r, "200"); p != nil && f == nil {
+			f = newFile(".", path, p)
 		}
 
-		r.Props = nil
+		r.Propstats = nil
 		return nil
 	}
 
+	propXML := "<d:propfind xmlns:d='DAV:'><d:prop>"
+	for _, prop := range props {
+		propXML += "<d:" + prop + "/>"
+	}
+	propXML += "</d:prop></d:propfind>"
+
 	err := c.propfind(path, true,
-		`<d:propfind xmlns:d='DAV:'>
-			<d:prop>
-				<d:displayname/>
-				<d:resourcetype/>
-				<d:getcontentlength/>
-				<d:getcontenttype/>
-				<d:getetag/>
-				<d:getlastmodified/>
-			</d:prop>
-		</d:propfind>`,
+		propXML,
 		&response{},
 		parse)
 
 	if err != nil {
 		if _, ok := err.(*os.PathError); !ok {
-			err = newPathErrorErr("ReadDir", path, err)
+			return nil, NewPathErrorErr("ReadDir", path, err)
 		}
+		return nil, err
 	}
-	return f, err
+	return *f, err
 }
 
 // Remove removes a remote file
@@ -254,7 +273,7 @@ func (c *Client) Remove(path string) error {
 func (c *Client) RemoveAll(path string) error {
 	rs, err := c.req("DELETE", path, nil, nil)
 	if err != nil {
-		return newPathError("Remove", path, 400)
+		return NewPathError("Remove", path, 400)
 	}
 	err = rs.Body.Close()
 	if err != nil {
@@ -265,7 +284,7 @@ func (c *Client) RemoveAll(path string) error {
 		return nil
 	}
 
-	return newPathError("Remove", path, rs.StatusCode)
+	return NewPathError("Remove", path, rs.StatusCode)
 }
 
 // Mkdir makes a directory
@@ -279,7 +298,7 @@ func (c *Client) Mkdir(path string, _ os.FileMode) (err error) {
 		return nil
 	}
 
-	return newPathError("Mkdir", path, status)
+	return NewPathError("Mkdir", path, status)
 }
 
 // MkdirAll like mkdir -p, but for webdav
@@ -305,13 +324,13 @@ func (c *Client) MkdirAll(path string, _ os.FileMode) (err error) {
 				return
 			}
 			if status != 201 {
-				return newPathError("MkdirAll", sub, status)
+				return NewPathError("MkdirAll", sub, status)
 			}
 		}
 		return nil
 	}
 
-	return newPathError("MkdirAll", path, status)
+	return NewPathError("MkdirAll", path, status)
 }
 
 // Rename moves a file from A to B
@@ -346,7 +365,7 @@ func (c *Client) Read(path string) ([]byte, error) {
 func (c *Client) ReadStream(path string) (io.ReadCloser, error) {
 	rs, err := c.req("GET", path, nil, nil)
 	if err != nil {
-		return nil, newPathErrorErr("ReadStream", path, err)
+		return nil, NewPathErrorErr("ReadStream", path, err)
 	}
 
 	if rs.StatusCode == 200 {
@@ -354,7 +373,7 @@ func (c *Client) ReadStream(path string) (io.ReadCloser, error) {
 	}
 
 	rs.Body.Close()
-	return nil, newPathError("ReadStream", path, rs.StatusCode)
+	return nil, NewPathError("ReadStream", path, rs.StatusCode)
 }
 
 // ReadStreamRange reads the stream representing a subset of bytes for a given path,
@@ -374,7 +393,7 @@ func (c *Client) ReadStreamRange(path string, offset, length int64) (io.ReadClos
 		}
 	})
 	if err != nil {
-		return nil, newPathErrorErr("ReadStreamRange", path, err)
+		return nil, NewPathErrorErr("ReadStreamRange", path, err)
 	}
 
 	if rs.StatusCode == http.StatusPartialContent {
@@ -387,15 +406,15 @@ func (c *Client) ReadStreamRange(path string, offset, length int64) (io.ReadClos
 	if rs.StatusCode == 200 {
 		// discard first 'offset' bytes.
 		if _, err := io.Copy(io.Discard, io.LimitReader(rs.Body, offset)); err != nil {
-			return nil, newPathErrorErr("ReadStreamRange", path, err)
+			return nil, NewPathErrorErr("ReadStreamRange", path, err)
 		}
 
 		// return a io.ReadCloser that is limited to `length` bytes.
-		return &limitedReadCloser{rs.Body, int(length)}, nil
+		return &limitedReadCloser{rc: rs.Body, remaining: int(length)}, nil
 	}
 
 	rs.Body.Close()
-	return nil, newPathError("ReadStream", path, rs.StatusCode)
+	return nil, NewPathError("ReadStream", path, rs.StatusCode)
 }
 
 // Write writes data to a given path
@@ -425,7 +444,7 @@ func (c *Client) Write(path string, data []byte, _ os.FileMode) (err error) {
 		}
 	}
 
-	return newPathError("Write", path, s)
+	return NewPathError("Write", path, s)
 }
 
 // WriteStream writes a stream
@@ -446,6 +465,6 @@ func (c *Client) WriteStream(path string, stream io.Reader, _ os.FileMode) (err 
 		return nil
 
 	default:
-		return newPathError("WriteStream", path, s)
+		return NewPathError("WriteStream", path, s)
 	}
 }
