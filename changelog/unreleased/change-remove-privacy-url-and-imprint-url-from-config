@@ -1,0 +1,7 @@
+Change: remove PrivacyURL and ImprintURL from the config
+
+We've removed PrivacyURL and ImprintURL from the config, hence these were living in Web config options,
+other clients shouldn't consume those.
+In order to be accessible by other clients, not just Web, those should be configured via the theme.json file.
+
+https://github.com/owncloud/ocis/pull/7938/
