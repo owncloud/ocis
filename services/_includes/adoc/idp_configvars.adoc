@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-13-00-08-05]
+[#deprecation-note-2023-12-13-00-09-35]
 [caption=]
 .Deprecation notes for the idp service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -445,7 +445,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `IDP_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-12-13-00-08-05[Deprecation Note]
+xref:deprecation-note-2023-12-13-00-09-35[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
