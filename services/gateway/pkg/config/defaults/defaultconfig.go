@@ -47,7 +47,7 @@ func DefaultConfig() *config.Config {
 			ProviderCacheNodes:      []string{"127.0.0.1:9233"},
 			ProviderCacheDatabase:   "cache-providers",
 			ProviderCacheTTL:        300 * time.Second,
-			CreateHomeCacheStore:    "nats-js-kv",
+			CreateHomeCacheStore:    "memory",
 			CreateHomeCacheNodes:    []string{"127.0.0.1:9233"},
 			CreateHomeCacheDatabase: "cache-createhome",
 			CreateHomeCacheTTL:      300 * time.Second,

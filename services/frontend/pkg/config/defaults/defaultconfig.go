@@ -111,7 +111,7 @@ func DefaultConfig() *config.Config {
 			SharePrefix:                 "/Shares",
 			HomeNamespace:               "/users/{{.Id.OpaqueId}}",
 			AdditionalInfoAttribute:     "{{.Mail}}",
-			StatCacheType:               "nats-js-kv",
+			StatCacheType:               "memory",
 			StatCacheNodes:              []string{"127.0.0.1:9233"},
 			StatCacheDatabase:           "cache-stat",
 			StatCacheTTL:                300 * time.Second,
