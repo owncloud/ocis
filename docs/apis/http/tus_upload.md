@@ -17,6 +17,7 @@ This documentation shows some basic examples, refer [tus official site](https://
 
 The backend announces certain tus features to clients. WebDAV responses come with tus HTTP headers for the offical tus features, and additional, ownCloud specific features are announced via the capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabilities?format=json`).
 
+The following snippet shows the relevant part of the server capabilities of Infinite Scale that concerns the tus upload:
 ```json
 {
   "ocs": {
@@ -218,7 +219,7 @@ curl -ks -XPOST https://ocis.test/remote.php/dav/spaces/{space-id} \
 {{< /tabs >}}
 
 {{< hint type=warning title="Important Warning" >}}
-`Upload-Length` header should contain the exact byte as upload content.
+The `Upload-Length` header of the request has to contain the exact size of the upload content in byte.
 {{< /hint >}}
 
 ## Supported Upload-Metadata
