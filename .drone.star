@@ -77,6 +77,7 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
                 "apiLocks",
+                "apiSharingNg",
             ],
             "skip": False,
         },
