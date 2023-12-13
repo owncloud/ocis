@@ -6,11 +6,11 @@ It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also retu
 
 ## OpenID Connect Discovery
 
-Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fcloud.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
+Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fdrive.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
 
 ```json
 {
-    "subject": "acct:einstein@drive.ocis.test",
+    "subject": "https://drive.ocis.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
