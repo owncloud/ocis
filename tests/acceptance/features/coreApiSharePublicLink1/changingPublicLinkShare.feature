@@ -132,7 +132,7 @@ Feature: changing a public link share
     Then the HTTP status code should be "403"
     And as "Alice" file "PARENT/parent.txt" should exist
 
-
+  @skipOnReva
   Scenario Outline: normal user tries to remove password of a public link share (change/create permission)
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created a public link share with settings
@@ -153,7 +153,7 @@ Feature: changing a public link share
       | 1               | create      | 200              |
       | 2               | create      | 400              |
 
-  @issue-7821
+  @issue-7821 @skipOnReva
   Scenario Outline: normal user tries to remove password of a public link (update without sending permissions)
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created a public link share with settings
@@ -191,7 +191,7 @@ Feature: changing a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnReva # reva doesn't have a pre-created admin user
   Scenario Outline: administrator removes password of a read-only public link
     Given using OCS API version "<ocs_api_version>"
     And admin has created folder "/PARENT"
@@ -212,7 +212,7 @@ Feature: changing a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @skipOnReva # reva doesn't have a pre-created admin user
   Scenario Outline: administrator tries to remove password of a public link share (change/create permission)
     Given using OCS API version "<ocs_api_version>"
     And admin has created folder "/PARENT"
