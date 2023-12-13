@@ -42,9 +42,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
 ## Details
+
+* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+
+   We fixed the status code on SharingNG update permissions for public shares.
+
+   https://github.com/owncloud/ocis/pull/7952
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
