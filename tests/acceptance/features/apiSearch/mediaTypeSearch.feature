@@ -17,6 +17,10 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testavatar.png"
     And user "Alice" has uploaded file "filesForUpload/data.tar.gz" to "/data.tar.gz"
+    And user "Alice" has uploaded file "filesForUpload/data.tar" to "/data.tar"
+    And user "Alice" has uploaded file "filesForUpload/data.7z" to "/data.7z"
+    And user "Alice" has uploaded file "filesForUpload/data.rar" to "/data.rar"
+    And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "/data.tar.bz2"
     When user "Alice" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -29,6 +33,10 @@ Feature: media type search
       | *jpeg*  | /testavatar.jpg |
       | *png*   | /testavatar.png |
       | *gzip*  | /data.tar.gz    |
+      | *tar*   | /data.tar       |
+      | *7z*    | /data.7z        |
+      | *rar*   | /data.rar       |
+      | *bzip2* | /data.tar.bz2   |
 
 
   Scenario Outline: search for files inside sub folders using media type
@@ -38,6 +46,10 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/uploadFolder/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/uploadFolder/testavatar.png"
     And user "Alice" has uploaded file "filesForUpload/data.tar.gz" to "/uploadFolder/data.tar.gz"
+    And user "Alice" has uploaded file "filesForUpload/data.tar" to "/uploadFolder/data.tar"
+    And user "Alice" has uploaded file "filesForUpload/data.7z" to "/uploadFolder/data.7z"
+    And user "Alice" has uploaded file "filesForUpload/data.rar" to "/uploadFolder/data.rar"
+    And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "/uploadFolder/data.tar.bz2"
     When user "Alice" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -50,6 +62,10 @@ Feature: media type search
       | *jpeg*  | /uploadFolder/testavatar.jpg |
       | *png*   | /uploadFolder/testavatar.png |
       | *gzip*  | /uploadFolder/data.tar.gz    |
+      | *tar*   | /uploadFolder/data.tar       |
+      | *7z*    | /uploadFolder/data.7z        |
+      | *rar*   | /uploadFolder/data.rar       |
+      | *bzip2* | /uploadFolder/data.tar.bz2   |
 
 
   Scenario Outline: search for file inside project space using media type
@@ -60,6 +76,10 @@ Feature: media type search
     And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "find data"
     And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "find data"
     And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "find data"
     When user "Alice" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -72,6 +92,10 @@ Feature: media type search
       | *jpeg*  | /testavatar.jpg |
       | *png*   | /testavatar.png |
       | *gzip*  | /data.tar.gz    |
+      | *tar*   | /data.tar       |
+      | *7z*    | /data.7z        |
+      | *rar*   | /data.rar       |
+      | *bzip2* | /data.tar.bz2   |
 
 
   Scenario Outline: sharee searches for shared files using media type
@@ -81,6 +105,10 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/uploadFolder/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/uploadFolder/testavatar.png"
     And user "Alice" has uploaded file "filesForUpload/data.tar.gz" to "/uploadFolder/data.tar.gz"
+    And user "Alice" has uploaded file "filesForUpload/data.tar" to "/uploadFolder/data.tar"
+    And user "Alice" has uploaded file "filesForUpload/data.7z" to "/uploadFolder/data.7z"
+    And user "Alice" has uploaded file "filesForUpload/data.rar" to "/uploadFolder/data.rar"
+    And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "/uploadFolder/data.tar.bz2"
     And user "Alice" has shared folder "uploadFolder" with user "Brian"
     When user "Brian" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -94,6 +122,10 @@ Feature: media type search
       | *jpeg*  | /uploadFolder/testavatar.jpg |
       | *png*   | /uploadFolder/testavatar.png |
       | *gzip*  | /uploadFolder/data.tar.gz    |
+      | *tar*   | /uploadFolder/data.tar       |
+      | *7z*    | /uploadFolder/data.7z        |
+      | *rar*   | /uploadFolder/data.rar       |
+      | *bzip2* | /uploadFolder/data.tar.bz2   |
 
 
   Scenario Outline: sharee searches for files inside shared space using media type
@@ -104,6 +136,10 @@ Feature: media type search
     And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "find data"
     And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "find data"
     And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "find data"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "find data"
     And user "Alice" has shared a space "find data" with settings:
       | shareWith | Brian  |
       | role      | viewer |
@@ -119,3 +155,7 @@ Feature: media type search
       | *jpeg*  | /testavatar.jpg |
       | *png*   | /testavatar.png |
       | *gzip*  | /data.tar.gz    |
+      | *tar*   | /data.tar       |
+      | *7z*    | /data.7z        |
+      | *rar*   | /data.rar       |
+      | *bzip2* | /data.tar.bz2   |
