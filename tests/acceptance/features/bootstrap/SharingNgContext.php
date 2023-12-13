@@ -28,7 +28,7 @@ require_once 'bootstrap.php';
 /**
  * Acceptance test steps related to testing sharing ng features
  */
-class ShareContext implements Context {
+class SharingNgContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 
@@ -51,7 +51,7 @@ class ShareContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets permissions list for (folder|file)\s?"([^"]*)" of the space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" gets permissions list for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)

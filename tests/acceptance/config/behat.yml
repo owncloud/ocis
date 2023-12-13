@@ -253,14 +253,14 @@ default:
         - WebDavLockingContext:
         - PublicWebDavContext:
 
-    apiShare:
+    apiSharingNg:
       paths:
-        - '%paths.base%/../features/apiShare'
+        - '%paths.base%/../features/apiSharingNg'
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
-        - ShareContext:
+        - SharingNgContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

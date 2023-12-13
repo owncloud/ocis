@@ -103,7 +103,7 @@ class GraphHelper {
 	 *
 	 * @return string
 	 */
-	public static function getBeta1FullUrl(string $baseUrl, string $path): string {
+	public static function getBetaFullUrl(string $baseUrl, string $path): string {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
 			$fullUrl .= '/';
@@ -1527,7 +1527,7 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId
 	): ResponseInterface {
-		$url = self::getBeta1FullUrl($baseUrl, 'drives/' . $spaceId . '/items/' . $itemId . '/permissions');
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions");
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
