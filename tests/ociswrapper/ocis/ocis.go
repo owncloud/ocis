@@ -81,19 +81,25 @@ func Start(envMap map[string]any) {
 			// retry only if oCIS server exited with code > 0
 			// -1 exit code means that the process was killed by a signal (syscall.SIGINT)
 			if status.ExitStatus() > 0 && !stopSignal {
+				waitUntilCompleteShutdown()
+
 				log.Println(fmt.Sprintf("oCIS server exited with code %v", status.ExitStatus()))
 
 				// retry to start oCIS server
 				retryCount++
 				maxRetry, _ := strconv.Atoi(config.Get("retry"))
 				if retryCount <= maxRetry {
+					close(outChan)
 					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+					// wait 500 milliseconds before retrying
+					time.Sleep(500 * time.Millisecond)
 					Start(envMap)
+					return
 				}
 			}
-			close(outChan)
 		}
 	}
+	close(outChan)
 }
 
 func Stop() {
@@ -107,6 +113,7 @@ func Stop() {
 		}
 	}
 	cmd.Process.Wait()
+	waitUntilCompleteShutdown()
 }
 
 func WaitForConnection() bool {
@@ -143,6 +150,26 @@ func WaitForConnection() bool {
 
 			log.Println("oCIS server is ready to accept requests")
 			return true
+		}
+	}
+}
+
+func waitUntilCompleteShutdown() {
+	timeout := 30 * time.Second
+	startTime := time.Now()
+
+	c := exec.Command("sh", "-c", "ps ax | grep 'ocis server' | grep -v grep | awk '{print $1}'")
+	output, err := c.CombinedOutput()
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for strings.TrimSpace(string(output)) != "" {
+		output, _ = c.CombinedOutput()
+		log.Println("Process found. Waiting...")
+
+		if time.Since(startTime) >= timeout {
+			log.Println(fmt.Sprintf("Unable to kill oCIS server after %v seconds", int64(timeout.Seconds())))
+			break
 		}
 	}
 }
