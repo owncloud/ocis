@@ -55,7 +55,7 @@ require (
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
 	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
-	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
+	github.com/libregraph/idm v0.4.1-0.20231213140724-56a222fb4215
 	github.com/libregraph/lico v0.61.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.2.1
@@ -124,7 +124,7 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387 // indirect
+	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect

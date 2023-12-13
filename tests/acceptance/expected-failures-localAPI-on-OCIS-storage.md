@@ -90,10 +90,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getGroup.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L382)
 - [apiGraph/getGroup.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L383)
 
-#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/7044)
-
-- [apiGraph/editUser.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L67)
-
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 
 - [apiGraph/addUserToGroup.feature:285](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L285)

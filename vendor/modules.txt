@@ -74,7 +74,7 @@ github.com/agnivade/levenshtein
 # github.com/ajg/form v1.5.1
 ## explicit
 github.com/ajg/form
-# github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
+# github.com/alexedwards/argon2id v1.0.0
 ## explicit; go 1.12
 github.com/alexedwards/argon2id
 # github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964
@@ -1239,7 +1239,7 @@ github.com/leodido/go-urn
 ## explicit; go 1.13
 github.com/leonelquinteros/gotext
 github.com/leonelquinteros/gotext/plurals
-# github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
+# github.com/libregraph/idm v0.4.1-0.20231213140724-56a222fb4215
 ## explicit; go 1.18
 github.com/libregraph/idm
 github.com/libregraph/idm/pkg/ldapdn
