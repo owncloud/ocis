@@ -97,6 +97,7 @@ func (g Graph) SetLinkPassword(w http.ResponseWriter, r *http.Request) {
 	newPermission, err := g.updatePublicLinkPassword(ctx, permissionID, password.GetPassword())
 	if err != nil {
 		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	render.Status(r, http.StatusOK)
