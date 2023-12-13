@@ -91,6 +91,8 @@ func Start(envMap map[string]any) {
 				if retryCount <= maxRetry {
 					close(outChan)
 					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+					// wait 500 milliseconds before retrying
+					time.Sleep(500 * time.Millisecond)
 					Start(envMap)
 					return
 				}
@@ -104,7 +106,6 @@ func Stop() {
 	log.Println("Stopping oCIS server...")
 	stopSignal = true
 
-	// SIGINT allows oCIS server to gracefully shutdown
 	err := cmd.Process.Signal(syscall.SIGINT)
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "process already finished") {
