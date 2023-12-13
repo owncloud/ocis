@@ -148,18 +148,31 @@ func ServerApplyFilter(f *ber.Packet, entry *ldap.Entry) (bool, LDAPResultCode) 
 
 func ServerFilterScope(baseDN string, scope int, entry *ldap.Entry) (bool, LDAPResultCode) {
 	// constrained search scope
+	parsedBaseDn, err := ldap.ParseDN(baseDN)
+	if err != nil {
+		return false, ldap.LDAPResultOperationsError
+	}
+	parsedDn, err := ldap.ParseDN(entry.DN)
+	if err != nil {
+		return false, ldap.LDAPResultOperationsError
+	}
 	switch scope {
 	case ldap.ScopeWholeSubtree: // The scope is constrained to the entry named by baseObject and to all its subordinates.
 	case ldap.ScopeBaseObject: // The scope is constrained to the entry named by baseObject.
-		if entry.DN != baseDN {
+		if !parsedDn.EqualFold(parsedBaseDn) {
 			return false, ldap.LDAPResultSuccess
 		}
 	case ldap.ScopeSingleLevel: // The scope is constrained to the immediate subordinates of the entry named by baseObject.
 		parts := strings.Split(entry.DN, ",")
-		if len(parts) < 2 && entry.DN != baseDN {
+		if len(parts) < 2 && !parsedDn.EqualFold(parsedBaseDn) {
 			return false, ldap.LDAPResultSuccess
 		}
-		if dn := strings.Join(parts[1:], ","); dn != baseDN {
+		subDn := strings.Join(parts[1:], ",")
+		parsedSubDn, err := ldap.ParseDN(subDn)
+		if err != nil {
+			return false, ldap.LDAPResultOperationsError
+		}
+		if !parsedSubDn.EqualFold(parsedBaseDn) {
 			return false, ldap.LDAPResultSuccess
 		}
 	}

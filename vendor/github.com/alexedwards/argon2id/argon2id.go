@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 
 	"golang.org/x/crypto/argon2"
@@ -45,7 +46,7 @@ var (
 var DefaultParams = &Params{
 	Memory:      64 * 1024,
 	Iterations:  1,
-	Parallelism: 2,
+	Parallelism: uint8(runtime.NumCPU()),
 	SaltLength:  16,
 	KeyLength:   32,
 }
