@@ -104,12 +104,8 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getBetaFullUrl(string $baseUrl, string $path): string {
-		$fullUrl = $baseUrl;
-		if (\substr($fullUrl, -1) !== '/') {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= 'graph/v1beta1/' . $path;
-		return $fullUrl;
+		$baseUrl = rtrim($baseUrl, "/");
+		return $baseUrl . '/graph/v1beta1/' . $path;
 	}
 
 	/**
