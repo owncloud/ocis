@@ -19,8 +19,6 @@
 package cache
 
 import (
-	"time"
-
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 )
 
@@ -30,12 +28,12 @@ type createPersonalSpaceCache struct {
 }
 
 // NewCreatePersonalSpaceCache creates a new CreatePersonalSpaceCache
-func NewCreatePersonalSpaceCache(store string, nodes []string, database, table string, ttl time.Duration, size int) CreatePersonalSpaceCache {
+func NewCreatePersonalSpaceCache(cfg Config) CreatePersonalSpaceCache {
 	c := &createPersonalSpaceCache{}
-	c.s = getStore(store, nodes, database, table, ttl, size)
-	c.database = database
-	c.table = table
-	c.ttl = ttl
+	c.s = getStore(cfg)
+	c.database = cfg.Database
+	c.table = cfg.Table
+	c.ttl = cfg.TTL
 
 	return c
 }

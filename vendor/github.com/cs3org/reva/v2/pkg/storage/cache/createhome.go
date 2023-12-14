@@ -20,7 +20,6 @@ package cache
 
 import (
 	"strings"
-	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -32,12 +31,12 @@ type createHomeCache struct {
 }
 
 // NewCreateHomeCache creates a new CreateHomeCache
-func NewCreateHomeCache(store string, nodes []string, database, table string, ttl time.Duration, size int) CreateHomeCache {
+func NewCreateHomeCache(cfg Config) CreateHomeCache {
 	c := &createHomeCache{}
-	c.s = getStore(store, nodes, database, table, ttl, size)
-	c.database = database
-	c.table = table
-	c.ttl = ttl
+	c.s = getStore(cfg)
+	c.database = cfg.Database
+	c.table = cfg.Table
+	c.ttl = cfg.TTL
 
 	return c
 }

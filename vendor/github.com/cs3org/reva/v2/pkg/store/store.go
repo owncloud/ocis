@@ -119,6 +119,9 @@ func Create(opts ...microstore.Option) microstore.Store {
 		return *ocMemStore
 	case TypeNatsJS:
 		ttl, _ := options.Context.Value(ttlContextKey{}).(time.Duration)
+		if mem, _ := options.Context.Value(disablePersistanceContextKey{}).(bool); mem {
+			opts = append(opts, natsjs.DefaultMemory())
+		}
 		// TODO nats needs a DefaultTTL option as it does not support per Write TTL ...
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid
@@ -132,6 +135,10 @@ func Create(opts ...microstore.Option) microstore.Store {
 	case TypeNatsJSKV:
 		// NOTE: nats needs a DefaultTTL option as it does not support per Write TTL ...
 		ttl, _ := options.Context.Value(ttlContextKey{}).(time.Duration)
+		if mem, _ := options.Context.Value(disablePersistanceContextKey{}).(bool); mem {
+			opts = append(opts, natsjskv.DefaultMemory())
+		}
+
 		natsOptions := nats.GetDefaultOptions()
 		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
 		return natsjskv.NewStore(
