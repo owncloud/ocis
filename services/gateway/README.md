@@ -1,14 +1,14 @@
 # Gateway
 
-The gateway service is responsible for passing requests to the storage providers. Other services never talk to the storage providers directly but will always send their requests to the `gateway` service.
+The gateway service is responsible for passing requests to the storage providers. Other services never talk to the storage providers directly but will always send their requests via the `gateway` service.
 
 ## Caching
 
-The gateway services is using caching as it is highly frequented with the same requests. As of now it uses two different caches:
+The gateway service is using caching as it is highly frequented with the same requests. As of now it uses two different caches:
   -   the `provider cache` is caching requests to list or get storage providers.
   -   the `create home cache` is caching requests to create personal spaces (as they only need to be executed once).
 
-Both caches can be configured via the `OCIS_CACHE_*` envvars (or `GATEWAY_PROVIDER_CACHE_*` and `GATEWAY_CREATE_HOME_CACHE_*` respectively). See envvar section for details. @mmattel how to link?
+Both caches can be configured via the `OCIS_CACHE_*` envvars (or `GATEWAY_PROVIDER_CACHE_*` and `GATEWAY_CREATE_HOME_CACHE_*` respectively). See the [envvar section](/services/gateway/configuration/#environment-variables) for details.
 
 Use `OCIS_CACHE_STORE` (`GATEWAY_PROVIDER_CACHE_STORE`, `GATEWAY_CREATE_HOME_CACHE_STORE`) to define the type of cache to use:
   -   `memory`: Basic in-memory store and the default.
