@@ -58,7 +58,8 @@ func DefaultConfig() *config.Config {
 			SystemUserIDP:  "internal",
 			Cache: &config.Cache{
 				Store:          "memory",
-				Database:       "ocis",
+				Nodes:          []string{"127.0.0.1:9233"},
+				Database:       "settings-cache",
 				FileTable:      "settings_files",
 				DirectoryTable: "settings_dirs",
 				TTL:            time.Minute * 10,

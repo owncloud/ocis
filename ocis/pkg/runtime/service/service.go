@@ -64,6 +64,8 @@ import (
 var (
 	// runset keeps track of which services to start supervised.
 	runset map[string]struct{}
+	// time to wait after starting the preliminary services
+	_preliminaryDelay = 6 * time.Second
 	// time to wait between starting service groups (preliminary, main, delayed)
 	_startDelay = 2 * time.Second
 )
@@ -413,8 +415,8 @@ func Start(o ...Option) error {
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
 
-	// grace period for supervisor to get up
-	time.Sleep(_startDelay)
+	// grace period for preliminary services to get up
+	time.Sleep(_preliminaryDelay)
 
 	// schedule services that we are sure don't have interdependencies.
 	scheduleServiceTokens(s, s.ServicesRegistry)

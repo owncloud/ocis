@@ -53,7 +53,8 @@ func DefaultConfig() *config.Config {
 		},
 		FileMetadataCache: config.Cache{
 			Store:    "memory",
-			Database: "ocis",
+			Nodes:    []string{"127.0.0.1:9233"},
+			Database: "storage-system",
 			TTL:      24 * 60 * time.Second,
 		},
 	}

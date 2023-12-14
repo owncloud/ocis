@@ -39,14 +39,17 @@ func DefaultConfig() *config.Config {
 		DisableHomeCreationOnLogin: true,
 		TransferExpires:            24 * 60 * 60,
 		Cache: config.Cache{
-			StatCacheStore:          "noop",
+			StatCacheStore:          "noop", // NOTE: stat cache not working
 			StatCacheDatabase:       "ocis",
+			StatCacheNodes:          []string{"127.0.0.1:9233"},
 			StatCacheTTL:            300 * time.Second,
 			ProviderCacheStore:      "noop",
-			ProviderCacheDatabase:   "ocis",
+			ProviderCacheNodes:      []string{"127.0.0.1:9233"},
+			ProviderCacheDatabase:   "cache-providers",
 			ProviderCacheTTL:        300 * time.Second,
-			CreateHomeCacheStore:    "noop",
-			CreateHomeCacheDatabase: "ocis",
+			CreateHomeCacheStore:    "memory",
+			CreateHomeCacheNodes:    []string{"127.0.0.1:9233"},
+			CreateHomeCacheDatabase: "cache-createhome",
 			CreateHomeCacheTTL:      300 * time.Second,
 		},
 

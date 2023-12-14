@@ -128,7 +128,7 @@ func WaitForConnection() bool {
 		Transport: transport,
 	}
 
-	req, _ := http.NewRequest("GET", config.Get("url")+"/graph/v1.0/users/"+config.Get("adminUsername"), nil)
+	req, _ := http.NewRequest("GET", config.Get("url")+"/graph/v1.0/me/drives", nil)
 	req.SetBasicAuth(config.Get("adminUsername"), config.Get("adminPassword"))
 
 	timeout := time.After(timeoutValue)

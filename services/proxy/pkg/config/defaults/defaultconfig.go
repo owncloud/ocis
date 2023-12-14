@@ -44,8 +44,8 @@ func DefaultConfig() *config.Config {
 			SkipUserInfo:            false,
 			UserinfoCache: &config.Cache{
 				Store:    "memory",
-				Database: "ocis",
-				Table:    "userinfo",
+				Nodes:    []string{"127.0.0.1:9233"},
+				Database: "cache-userinfo",
 				TTL:      time.Second * 10,
 			},
 			JWKS: config.JWKS{

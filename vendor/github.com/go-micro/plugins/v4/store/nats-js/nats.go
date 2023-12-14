@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cornelk/hashmap"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4/store"
@@ -34,7 +35,7 @@ type natsStore struct {
 
 	conn    *nats.Conn
 	js      nats.JetStreamContext
-	buckets *sync.Map
+	buckets *hashmap.Map[string, nats.ObjectStore]
 }
 
 func init() {
@@ -55,7 +56,7 @@ func NewStore(opts ...store.Option) store.Store {
 		opts:            options,
 		jsopts:          []nats.JSOpt{},
 		objStoreConfigs: []*nats.ObjectStoreConfig{},
-		buckets:         &sync.Map{},
+		buckets:         hashmap.New[string, nats.ObjectStore](),
 		storageType:     nats.FileStorage,
 	}
 
@@ -103,7 +104,7 @@ func (n *natsStore) Init(opts ...store.Option) error {
 		if err != nil {
 			return errors.Wrapf(err, "Failed to create bucket (%s)", cfg.Bucket)
 		}
-		n.buckets.Store(cfg.Bucket, store)
+		n.buckets.Set(cfg.Bucket, store)
 	}
 
 	return nil
@@ -178,11 +179,10 @@ func (n *natsStore) Read(key string, opts ...store.ReadOption) ([]*store.Record,
 		opt.Table = n.opts.Table
 	}
 
-	b, ok := n.buckets.Load(opt.Database)
+	bucket, ok := n.buckets.Get(opt.Database)
 	if !ok {
 		return nil, ErrBucketNotFound
 	}
-	bucket := b.(nats.ObjectStore)
 
 	var keys []string
 
@@ -292,8 +292,7 @@ func (n *natsStore) Write(r *store.Record, opts ...store.WriteOption) error {
 		opt.Table = n.opts.Table
 	}
 
-	s, ok := n.buckets.Load(opt.Database)
-	store, _ := s.(nats.ObjectStore)
+	store, ok := n.buckets.Get(opt.Database)
 	// Create new bucket if not exists
 	if !ok {
 		var err error
@@ -345,19 +344,18 @@ func (n *natsStore) Delete(key string, opts ...store.DeleteOption) error {
 	}
 
 	if opt.Table == "DELETE_BUCKET" {
-		n.buckets.Delete(key)
+		n.buckets.Del(key)
 		if err := n.js.DeleteObjectStore(key); err != nil {
 			return errors.Wrap(err, "Failed to delete bucket")
 		}
 		return nil
 	}
 
-	s, ok := n.buckets.Load(opt.Database)
+	store, ok := n.buckets.Get(opt.Database)
 	if !ok {
 		return ErrBucketNotFound
 	}
 
-	store := s.(nats.ObjectStore)
 	if err := store.Delete(getKey(key, opt.Table)); err != nil {
 		return errors.Wrap(err, "Failed to delete data")
 	}
@@ -383,11 +381,10 @@ func (n *natsStore) List(opts ...store.ListOption) ([]string, error) {
 		opt.Table = n.opts.Table
 	}
 
-	s, ok := n.buckets.Load(opt.Database)
+	store, ok := n.buckets.Get(opt.Database)
 	if !ok {
 		return nil, ErrBucketNotFound
 	}
-	store := s.(nats.ObjectStore)
 
 	objects, err := store.List()
 	if err != nil {
@@ -405,13 +402,14 @@ func (n *natsStore) List(opts ...store.ListOption) ([]string, error) {
 		if !strings.HasSuffix(key, opt.Suffix) {
 			continue
 		}
-		keys = append(keys, key)
+
+		keys = append(keys, strings.TrimPrefix(key, getKey(opt.Prefix, opt.Table)))
 	}
 
-	if opt.Limit > 0 {
+	if opt.Limit > 0 && int(opt.Offset+opt.Limit) < len(keys) {
 		return keys[opt.Offset : opt.Offset+opt.Limit], nil
 	}
-	if opt.Offset > 0 {
+	if opt.Offset > 0 && int(opt.Offset) < len(keys) {
 		return keys[opt.Offset:], nil
 	}
 	return keys, nil
@@ -448,7 +446,7 @@ func (n *natsStore) createNewBucket(name string) (nats.ObjectStore, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create new bucket (%s)", name)
 	}
-	n.buckets.Store(name, store)
+	n.buckets.Set(name, store)
 	return store, err
 }
 
