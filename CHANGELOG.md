@@ -42,11 +42,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
+* Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
 ## Details
+
+* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
+
+   The nats-js cache was not working. It paniced and wrote a lot of error logs.
+   Both is fixed now.
+
+   https://github.com/owncloud/ocis/pull/7790
 
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -61,6 +70,12 @@ The following sections list the changes for unreleased.
    not just Web, it should be configured via the theme.json file.
 
    https://github.com/owncloud/ocis/pull/7970
+
+* Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/7793
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
