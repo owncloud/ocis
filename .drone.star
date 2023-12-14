@@ -896,9 +896,9 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                      {
                          "name": "wait-for-fakeoffice",
-                         "image": OC_CI_ALPINE,
+                         "image": OC_CI_WAIT_FOR,
                          "commands": [
-                             "curl -k --fail --retry-connrefused --retry 9 --retry-all-errors 'http://fakeoffice:8080'",
+                             "wait-for -it fakeoffice:8080 -t 300",
                          ],
                      },
                  ] +
@@ -916,9 +916,9 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                      {
                          "name": "wait-for-wopi-server",
-                         "image": OC_CI_ALPINE,
+                         "image": OC_CI_WAIT_FOR,
                          "commands": [
-                             "curl -k --fail --retry-connrefused --retry 9 --retry-all-errors 'http://wopiserver:8880/wopi'",
+                             "wait-for -it wopiserver:8880 -t 300",
                          ],
                      },
                      {
@@ -1968,7 +1968,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "name": "wait-for-ocis-server",
         "image": OC_CI_ALPINE,
         "commands": [
-            "curl -k -u admin:admin --fail --retry-connrefused --retry 7 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
+            # wait for ocis-server to be ready (5 minutes)
+            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin https://ocis-server:9200/graph/v1.0/users/admin -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
         ],
         "depends_on": depends_on,
     }
