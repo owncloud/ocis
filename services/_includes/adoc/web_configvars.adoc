@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-14-09-01-27]
+[#deprecation-note-2023-12-14-09-46-12]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -466,15 +466,6 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details.
-
-a|`WEB_OPTION_ACCESS_DENIED_HELP_URL` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.
 
 a|`WEB_OPTION_TOKEN_STORAGE_LOCAL` +
 

@@ -128,7 +128,6 @@ web:
       logoutUrl: ""
       loginUrl: ""
       openLinksWithDefaultApp: true
-      accessDeniedHelpUrl: ""
       tokenStorageLocal: true
       disabledExtensions: []
       embed: null
