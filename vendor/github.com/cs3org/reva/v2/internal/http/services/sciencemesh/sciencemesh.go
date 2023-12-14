@@ -63,8 +63,8 @@ type config struct {
 	Prefix           string                      `mapstructure:"prefix"`
 	SMTPCredentials  *smtpclient.SMTPCredentials `mapstructure:"smtp_credentials"   validate:"required"`
 	GatewaySvc       string                      `mapstructure:"gatewaysvc"         validate:"required"`
-	MeshDirectoryURL string                      `mapstructure:"mesh_directory_url" validate:"required"`
 	ProviderDomain   string                      `mapstructure:"provider_domain"    validate:"required"`
+	MeshDirectoryURL string                      `mapstructure:"mesh_directory_url"`
 	SubjectTemplate  string                      `mapstructure:"subject_template"`
 	BodyTemplatePath string                      `mapstructure:"body_template_path"`
 	OCMMountPoint    string                      `mapstructure:"ocm_mount_point"`

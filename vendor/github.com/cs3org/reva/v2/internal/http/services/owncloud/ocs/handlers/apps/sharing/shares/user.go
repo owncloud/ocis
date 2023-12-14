@@ -155,6 +155,106 @@ func (h *Handler) isUserShare(r *http.Request, oid string) (*collaboration.Share
 	return getShareRes.GetShare(), getShareRes.GetShare() != nil
 }
 
+func (h *Handler) isFederatedShare(r *http.Request, shareID string) bool {
+	log := appctx.GetLogger(r.Context())
+	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	if err != nil {
+		log.Err(err).Send()
+		return false
+	}
+
+	getShareRes, err := client.GetOCMShare(r.Context(), &ocmpb.GetOCMShareRequest{
+		Ref: &ocmpb.ShareReference{
+			Spec: &ocmpb.ShareReference_Id{
+				Id: &ocmpb.ShareId{
+					OpaqueId: shareID,
+				},
+			},
+		},
+	})
+	if err != nil {
+		log.Err(err).Send()
+		return false
+	}
+
+	return getShareRes.GetShare() != nil
+}
+
+func (h *Handler) removeFederatedShare(w http.ResponseWriter, r *http.Request, shareID string) {
+	ctx := r.Context()
+
+	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		return
+	}
+
+	shareRef := &ocmpb.ShareReference_Id{Id: &ocmpb.ShareId{OpaqueId: shareID}}
+	// Get the share, so that we can include it in the response.
+	getShareResp, err := client.GetOCMShare(ctx, &ocmpb.GetOCMShareRequest{Ref: &ocmpb.ShareReference{Spec: shareRef}})
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc delete share request", err)
+		return
+	}
+	if getShareResp.Status.Code != rpc.Code_CODE_OK {
+		if getShareResp.Status.Code == rpc.Code_CODE_NOT_FOUND {
+			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "not found", nil)
+			return
+		}
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "deleting share failed", err)
+		return
+	}
+
+	data, err := conversions.OCMShare2ShareData(getShareResp.Share)
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "deleting share failed", err)
+		return
+	}
+	// A deleted share should not have an ID.
+	data.ID = ""
+
+	uRes, err := client.RemoveOCMShare(ctx, &ocmpb.RemoveOCMShareRequest{Ref: &ocmpb.ShareReference{Spec: shareRef}})
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc delete share request", err)
+		return
+	}
+
+	if uRes.Status.Code != rpc.Code_CODE_OK {
+		if uRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
+			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "not found", nil)
+			return
+		}
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc delete share request failed", err)
+		return
+	}
+	response.WriteOCSSuccess(w, r, data)
+}
+
+func (h *Handler) isFederatedReceivedShare(r *http.Request, shareID string) bool {
+	log := appctx.GetLogger(r.Context())
+	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	if err != nil {
+		log.Err(err).Send()
+		return false
+	}
+
+	getShareRes, err := client.GetReceivedOCMShare(r.Context(), &ocmpb.GetReceivedOCMShareRequest{
+		Ref: &ocmpb.ShareReference{
+			Spec: &ocmpb.ShareReference_Id{
+				Id: &ocmpb.ShareId{
+					OpaqueId: shareID,
+				},
+			},
+		},
+	})
+	if err != nil {
+		log.Err(err).Send()
+		return false
+	}
+
+	return getShareRes.GetShare() != nil
+}
+
 func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, share *collaboration.Share) {
 	ctx := r.Context()
 

@@ -76,7 +76,7 @@ type token struct {
 	Token       string `json:"token"`
 	Description string `json:"description,omitempty"`
 	Expiration  uint64 `json:"expiration,omitempty"`
-	InviteLink  string `json:"invite_link"`
+	InviteLink  string `json:"invite_link,omitempty"`
 }
 
 // Generate generates an invitation token and if a recipient is specified,
@@ -122,7 +122,9 @@ func (h *tokenHandler) prepareGenerateTokenResponse(tkn *invitepb.InviteToken) *
 	res := &token{
 		Token:       tkn.Token,
 		Description: tkn.Description,
-		InviteLink:  h.meshDirectoryURL + "?token=" + tkn.Token + "&providerDomain=" + h.providerDomain,
+	}
+	if h.meshDirectoryURL != "" {
+		res.InviteLink = h.meshDirectoryURL + "?token=" + tkn.Token + "&providerDomain=" + h.providerDomain
 	}
 	if tkn.Expiration != nil {
 		res.Expiration = tkn.Expiration.Seconds
@@ -187,7 +189,7 @@ func (h *tokenHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 			reqres.WriteError(w, r, reqres.APIErrorAlreadyExist, "user already known", nil)
 			return
 		case rpc.Code_CODE_PERMISSION_DENIED:
-			reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "remove service not trusted", nil)
+			reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "remote service not trusted", nil)
 			return
 		default:
 			reqres.WriteError(w, r, reqres.APIErrorServerError, "unexpected error: "+forwardInviteResponse.Status.Message, errors.New(forwardInviteResponse.Status.Message))
