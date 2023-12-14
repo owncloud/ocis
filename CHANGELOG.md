@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
 ## Details
@@ -52,6 +53,14 @@ The following sections list the changes for unreleased.
    We fixed the status code on SharingNG update permissions for public shares.
 
    https://github.com/owncloud/ocis/pull/7952
+
+* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
+
+   We've removed the option accessDeniedHelpUrl from the config, since other
+   clients weren't able to consume it. In order to be accessible by other clients,
+   not just Web, it should be configured via the theme.json file.
+
+   https://github.com/owncloud/ocis/pull/7970
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -82,7 +91,7 @@ The following sections list the changes for 5.0.0-beta.1.
 ## Summary
 
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
-* Change - Remove PrivacyURL and ImprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
 * Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 * Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
@@ -97,9 +106,9 @@ The following sections list the changes for 5.0.0-beta.1.
 
    https://github.com/owncloud/ocis/pull/7930
 
-* Change - Remove PrivacyURL and ImprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
 
-   We've removed the option PrivacyURL and ImprintURL from the config, since other
+   We've removed the option privacyURL and imprintURL from the config, since other
    clients weren't able to consume these. In order to be accessible by other
    clients, not just Web, those should be configured via the theme.json file.
 
