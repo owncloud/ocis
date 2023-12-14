@@ -47,6 +47,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
+* Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -85,6 +86,14 @@ The following sections list the changes for unreleased.
    not just Web, it should be configured via the theme.json file.
 
    https://github.com/owncloud/ocis/pull/7970
+
+* Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
+
+   We added sciencemesh and ocm services to enable federation.
+
+   https://github.com/owncloud/ocis/pull/7576
+   https://github.com/owncloud/ocis/pull/7464
+   https://github.com/owncloud/ocis/pull/7463
 
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 
