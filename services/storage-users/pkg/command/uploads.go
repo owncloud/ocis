@@ -53,8 +53,8 @@ func ListUploads(cfg *config.Config) *cli.Command {
 				fmt.Fprintf(os.Stderr, "'%s' storage does not support listing expired uploads\n", cfg.Driver)
 				os.Exit(1)
 			}
-			falseValue := false
-			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &falseValue})
+			expired := false
+			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &expired})
 			if err != nil {
 				return err
 			}
@@ -98,9 +98,9 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
-			falseValue := false
-			trueValue := false
-			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &trueValue, Processing: &falseValue})
+			processing := false
+			expired := true
+			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &expired, Processing: &processing})
 			if err != nil {
 				return err
 			}
