@@ -111,7 +111,7 @@ type OCMCore struct {
 }
 type OCMStorageProvider struct {
 	Insecure    bool   `yaml:"insecure" env:"OCM_OCM_STORAGE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments."`
-	StorageRoot string `yaml:"insecure" env:"OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT" desc:"Directory where the ocm storage provider persists its data like tus upload info files."`
+	StorageRoot string `yaml:"storage_root" env:"OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT" desc:"Directory where the ocm storage provider persists its data like tus upload info files."`
 }
 
 type OCMCoreDrivers struct {
