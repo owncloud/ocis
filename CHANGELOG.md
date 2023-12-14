@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
@@ -62,6 +63,13 @@ The following sections list the changes for unreleased.
    We fixed the status code on SharingNG update permissions for public shares.
 
    https://github.com/owncloud/ocis/pull/7952
+
+* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
+
+   We fixed the issue that led to correct update but the 404 response code when
+   renaming an existing user to a string with capital letters.
+
+   https://github.com/owncloud/ocis/pull/7964
 
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 
