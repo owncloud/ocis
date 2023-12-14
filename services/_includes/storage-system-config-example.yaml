@@ -35,8 +35,9 @@ system_user_api_key: ""
 skip_user_groups_in_token: false
 cache:
   store: memory
-  nodes: []
-  database: ocis
+  nodes:
+  - 127.0.0.1:9233
+  database: storage-system
   ttl: 24m0s
   size: 0
 driver: ocis

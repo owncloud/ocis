@@ -52,9 +52,9 @@
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.|
 | FRONTEND_OCS_PERSONAL_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
-| OCIS_CACHE_STORE<br/>FRONTEND_OCS_STAT_CACHE_STORE | string | noop | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
-| OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
-| OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
+| OCIS_CACHE_STORE<br/>FRONTEND_OCS_STAT_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| OCIS_CACHE_DATABASE | string | cache-stat | The database name the configured store should use.|
 | FRONTEND_OCS_STAT_CACHE_TABLE | string |  | The database table the store should use.|
 | OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|

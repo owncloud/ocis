@@ -34,19 +34,22 @@ disable_home_creation_on_login: true
 transfer_secret: ""
 transfer_expires: 86400
 cache:
-  stat_cache_store: noop
-  stat_cache_nodes: []
+  statcachestore: noop
+  stat_cache_nodes:
+  - 127.0.0.1:9233
   stat_cache_database: ocis
   stat_cache_ttl: 5m0s
   stat_cache_size: 0
   provider_cache_store: noop
-  provider_cache_nodes: []
-  provider_cache_database: ocis
+  provider_cache_nodes:
+  - 127.0.0.1:9233
+  provider_cache_database: cache-providers
   provider_cache_ttl: 5m0s
   provider_cache_size: 0
-  create_home_cache_store: noop
-  create_home_cache_nodes: []
-  create_home_cache_database: ocis
+  create_home_cache_store: memory
+  create_home_cache_nodes:
+  - 127.0.0.1:9233
+  create_home_cache_database: cache-createhome
   create_home_cache_ttl: 5m0s
   create_home_cache_size: 0
 frontend_public_url: https://localhost:9200

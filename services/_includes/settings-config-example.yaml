@@ -55,8 +55,9 @@ metadata_config:
   system_user_api_key: ""
   cache:
     store: memory
-    addresses: []
-    database: ocis
+    addresses:
+    - 127.0.0.1:9233
+    database: settings-cache
     files_table: settings_files
     directories_table: settings_dirs
     ttl: 10m0s

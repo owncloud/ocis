@@ -13,9 +13,10 @@ log:
   file: ""
 cache:
   store: memory
-  nodes: []
-  database: ocis
-  table: roles
+  nodes:
+  - 127.0.0.1:9233
+  database: cache-roles
+  table: ""
   ttl: 336h0m0s
   size: 0
 debug:

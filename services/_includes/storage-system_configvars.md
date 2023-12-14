@@ -26,8 +26,8 @@
 | OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | OCIS_CACHE_STORE<br/>STORAGE_SYSTEM_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
-| OCIS_CACHE_STORE_NODES<br/>STORAGE_SYSTEM_CACHE_STORE_NODES | []string | [] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
-| OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
+| OCIS_CACHE_STORE_NODES<br/>STORAGE_SYSTEM_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| OCIS_CACHE_DATABASE | string | storage-system | The database name the configured store should use.|
 | OCIS_CACHE_TTL<br/>STORAGE_SYSTEM_CACHE_TTL | Duration | 24m0s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>STORAGE_SYSTEM_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service.|

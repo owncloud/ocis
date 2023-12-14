@@ -100,9 +100,10 @@ ocs:
   share_prefix: /Shares
   home_namespace: /users/{{.Id.OpaqueId}}
   additional_info_attribute: '{{.Mail}}'
-  stat_cache_type: noop
-  stat_cache_nodes: []
-  stat_cache_database: ocis
+  stat_cache_type: memory
+  stat_cache_nodes:
+  - 127.0.0.1:9233
+  stat_cache_database: cache-stat
   stat_cache_table: ""
   stat_cache_ttl: 5m0s
   stat_cache_size: 0

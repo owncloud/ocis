@@ -119,9 +119,10 @@ oidc:
   skip_user_info: false
   user_info_cache:
     store: memory
-    addresses: []
-    database: ocis
-    table: userinfo
+    addresses:
+    - 127.0.0.1:9233
+    database: cache-userinfo
+    table: ""
     ttl: 10s
     size: 0
   jwks:

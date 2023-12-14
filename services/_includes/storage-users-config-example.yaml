@@ -92,22 +92,25 @@ events:
   enable_tls: false
   num_consumers: 0
 stat_cache:
-  store: noop
-  nodes: []
+  store: memory
+  nodes:
+  - 127.0.0.1:9233
   database: ocis
   ttl: 5m0s
   size: 0
 filemetadata_cache:
   store: memory
-  nodes: []
-  database: ocis
+  nodes:
+  - 127.0.0.1:9233
+  database: storage-users
   ttl: 24m0s
   size: 0
 id_cache:
-  store: ""
-  nodes: []
-  database: ""
-  ttl: 0s
+  store: memory
+  nodes:
+  - 127.0.0.1:9233
+  database: ids-storage-users
+  ttl: 24m0s
   size: 0
 mount_id: ""
 expose_data_server: false

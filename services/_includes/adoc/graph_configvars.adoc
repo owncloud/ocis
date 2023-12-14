@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-14-10-17-36]
+[#deprecation-note-2023-12-14-10-52-03]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -127,7 +127,7 @@ a|`OCIS_CACHE_STORE_NODES` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
@@ -136,7 +136,7 @@ a|`GRAPH_CACHE_STORE_DATABASE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ocis ++
+++cache-roles ++
 a| [subs=-attributes]
 The database name the configured store should use.
 
@@ -145,7 +145,7 @@ a|`GRAPH_CACHE_STORE_TABLE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++roles ++
+++ ++
 a| [subs=-attributes]
 The database table the store should use.
 
@@ -497,7 +497,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-12-14-10-17-36[Deprecation Note]
+xref:deprecation-note-2023-12-14-10-52-03[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-14-10-17-36]
+[#deprecation-note-2023-12-14-10-52-03]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -258,7 +258,7 @@ a|`OCIS_CACHE_STORE_NODES` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
@@ -267,7 +267,7 @@ a|`OCIS_CACHE_DATABASE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ocis ++
+++storage-system ++
 a| [subs=-attributes]
 The database name the configured store should use.
 
