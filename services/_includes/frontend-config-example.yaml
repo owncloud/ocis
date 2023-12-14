@@ -111,6 +111,7 @@ ocs:
   list_ocm_shares: true
   public_sharing_share_must_have_password: true
   public_sharing_writeableshare_must_have_password: false
+  include_ocm_sharees: false
 checksums:
   supported_types:
   - sha1

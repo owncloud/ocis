@@ -80,25 +80,30 @@ ocmd:
   expose_recipient_display_name: false
 sciencemesh:
   prefix: sciencemesh
+  science_mesh_directory_url: ""
 ocm_invite_manager:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocminvites.json
+      file: ~/.ocis/storage/ocm/ocminvites.json
   insecure: false
 ocm_provider_authorizer_driver: json
 ocm_provider_authorizer_drivers:
   json:
-    providers: ~/.ocis/storage/ocmproviders.json
+    providers: ~/.ocis/storage/ocm/ocmproviders.json
     verify_request_hostname: false
 ocm_share_provider:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocmshares.json
+      file: ~/.ocis/storage/ocm/ocmshares.json
   insecure: false
+  webapp_template: ""
 ocm_core:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocmshares.json
+      file: ~/.ocis/storage/ocm/ocmshares.json
+ocm_storage_provider:
+  insecure: false
+  storage_root: ~/.ocis/storage/ocm

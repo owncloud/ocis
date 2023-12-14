@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-14-11-12-23]
+[#deprecation-note-2023-12-14-13-38-26]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -281,6 +281,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 URL path prefix for the ScienceMesh service. Note that the string must not start with '/'.
 
+a|`OCM_MESH_DIRECTORY_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+URL of the mesh directory service.
+
 a|`OCM_OCM_INVITE_MANAGER_DRIVER` +
 
 a| [subs=-attributes]
@@ -295,7 +304,7 @@ a|`OCM_OCM_INVITE_MANAGER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocminvites.json ++
+++~/.ocis/storage/ocm/ocminvites.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -322,7 +331,7 @@ a|`OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocmproviders.json ++
+++~/.ocis/storage/ocm/ocmproviders.json ++
 a| [subs=-attributes]
 Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -349,7 +358,7 @@ a|`OCM_OCM_SHAREPROVIDER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocmshares.json ++
+++~/.ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -361,6 +370,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disable TLS certificate validation for the OCM connections. Do not set this in production environments.
+
+a|`OCM_WEBAPP_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template for the webapp url.
 
 a|`OCM_OCM_CORE_DRIVER` +
 
@@ -376,8 +394,26 @@ a|`OCM_OCM_CORE_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocmshares.json ++
+++~/.ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+
+a|`OCM_OCM_STORAGE_PROVIDER_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable TLS certificate validation for the OCM connections. Do not set this in production environments.
+
+a|`OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/ocm ++
+a| [subs=-attributes]
+Directory where the ocm storage provider persists its data like tus upload info files.
 |===
 

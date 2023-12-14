@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-14-11-12-23]
+[#deprecation-note-2023-12-14-13-38-26]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -592,6 +592,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+
+a|`FRONTEND_OCS_INCLUDE_OCM_SHAREES` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Include OCM sharees when listing sharees.
 
 a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
 
