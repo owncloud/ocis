@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
@@ -59,6 +60,11 @@ The following sections list the changes for unreleased.
    Both is fixed now.
 
    https://github.com/owncloud/ocis/pull/7790
+
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
+
+   https://github.com/owncloud/ocis/pull/7859
+   https://github.com/owncloud/ocis/pull/7958
 
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
