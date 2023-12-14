@@ -162,11 +162,12 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_database": "system",
 			},
 			"filemetadatacache": map[string]interface{}{
-				"cache_store":    cfg.FileMetadataCache.Store,
-				"cache_nodes":    cfg.FileMetadataCache.Nodes,
-				"cache_database": cfg.FileMetadataCache.Database,
-				"cache_ttl":      cfg.FileMetadataCache.TTL / time.Second,
-				"cache_size":     cfg.FileMetadataCache.Size,
+				"cache_store":               cfg.FileMetadataCache.Store,
+				"cache_nodes":               cfg.FileMetadataCache.Nodes,
+				"cache_database":            cfg.FileMetadataCache.Database,
+				"cache_ttl":                 cfg.FileMetadataCache.TTL / time.Second,
+				"cache_size":                cfg.FileMetadataCache.Size,
+				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
 			},
 		},
 	}

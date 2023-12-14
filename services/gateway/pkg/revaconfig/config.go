@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -62,21 +61,33 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					// cache and TTLs
-					"stat_cache_store":           cfg.Cache.StatCacheStore,
-					"stat_cache_nodes":           cfg.Cache.StatCacheNodes,
-					"stat_cache_database":        cfg.Cache.StatCacheDatabase,
-					"stat_cache_ttl":             cfg.Cache.StatCacheTTL / time.Second,
-					"stat_cache_size":            cfg.Cache.StatCacheSize,
-					"provider_cache_store":       cfg.Cache.ProviderCacheStore,
-					"provider_cache_nodes":       cfg.Cache.ProviderCacheNodes,
-					"provider_cache_database":    cfg.Cache.ProviderCacheDatabase,
-					"provider_cache_ttl":         cfg.Cache.ProviderCacheTTL / time.Second,
-					"provider_cache_size":        cfg.Cache.ProviderCacheSize,
-					"create_home_cache_store":    cfg.Cache.CreateHomeCacheStore,
-					"create_home_cache_nodes":    cfg.Cache.CreateHomeCacheNodes,
-					"create_home_cache_database": cfg.Cache.CreateHomeCacheDatabase,
-					"create_home_cache_ttl":      cfg.Cache.CreateHomeCacheTTL / time.Second,
-					"create_home_cache_size":     cfg.Cache.CreateHomeCacheSize,
+					"stat_cache_config": map[string]interface{}{
+						"cache_store":              cfg.Cache.StatCacheStore,
+						"cache_nodes":              cfg.Cache.StatCacheNodes,
+						"cache_database":           cfg.Cache.StatCacheDatabase,
+						"cache_table":              "stat",
+						"cache_ttl":                cfg.Cache.StatCacheTTL,
+						"cache_size":               cfg.Cache.StatCacheSize,
+						"cache_disable_persistenc": cfg.Cache.StatCacheDisablePersistence,
+					},
+					"provider_cache_config": map[string]interface{}{
+						"cache_store":         cfg.Cache.ProviderCacheStore,
+						"cache_nodes":         cfg.Cache.ProviderCacheNodes,
+						"cache_database":      cfg.Cache.ProviderCacheDatabase,
+						"cache_table":         "provider",
+						"cache_ttl":           cfg.Cache.ProviderCacheTTL,
+						"cache_size":          cfg.Cache.ProviderCacheSize,
+						"disable_persistence": cfg.Cache.ProviderCacheDisablePersistence,
+					},
+					"create_home_cache_config": map[string]interface{}{
+						"cache_store":               cfg.Cache.CreateHomeCacheStore,
+						"cache_nodes":               cfg.Cache.CreateHomeCacheNodes,
+						"cache_database":            cfg.Cache.CreateHomeCacheDatabase,
+						"cache_table":               "create_home",
+						"cache_ttl":                 cfg.Cache.CreateHomeCacheTTL,
+						"cache_size":                cfg.Cache.CreateHomeCacheSize,
+						"cache_disable_persistence": cfg.Cache.CreateHomeCacheDisablePersistence,
+					},
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",

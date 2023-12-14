@@ -2,8 +2,6 @@
 package revaconfig
 
 import (
-	"time"
-
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 )
 
@@ -74,28 +72,31 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"nats_enable_tls":        cfg.Events.EnableTLS,
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
-							"cache_store":    cfg.StatCache.Store,
-							"cache_nodes":    cfg.StatCache.Nodes,
-							"cache_database": cfg.StatCache.Database,
-							"cache_ttl":      cfg.StatCache.TTL / time.Second,
-							"cache_size":     cfg.StatCache.Size,
-							"cache_table":    "stat",
+							"cache_store":               cfg.StatCache.Store,
+							"cache_nodes":               cfg.StatCache.Nodes,
+							"cache_database":            cfg.StatCache.Database,
+							"cache_ttl":                 cfg.StatCache.TTL,
+							"cache_size":                cfg.StatCache.Size,
+							"cache_table":               "stat",
+							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
 						},
 						"spaces": map[string]interface{}{
-							"cache_store":    cfg.StatCache.Store,
-							"cache_nodes":    cfg.StatCache.Nodes,
-							"cache_database": cfg.StatCache.Database,
-							"cache_ttl":      cfg.StatCache.TTL / time.Second,
-							"cache_size":     cfg.StatCache.Size,
-							"cache_table":    "stat",
+							"cache_store":               cfg.StatCache.Store,
+							"cache_nodes":               cfg.StatCache.Nodes,
+							"cache_database":            cfg.StatCache.Database,
+							"cache_ttl":                 cfg.StatCache.TTL,
+							"cache_size":                cfg.StatCache.Size,
+							"cache_table":               "stat",
+							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
 						},
 						"tus": map[string]interface{}{
-							"cache_store":    cfg.StatCache.Store,
-							"cache_nodes":    cfg.StatCache.Nodes,
-							"cache_database": cfg.StatCache.Database,
-							"cache_ttl":      cfg.StatCache.TTL / time.Second,
-							"cache_size":     cfg.StatCache.Size,
-							"cache_table":    "stat",
+							"cache_store":               cfg.StatCache.Store,
+							"cache_nodes":               cfg.StatCache.Nodes,
+							"cache_database":            cfg.StatCache.Database,
+							"cache_ttl":                 cfg.StatCache.TTL,
+							"cache_size":                cfg.StatCache.Size,
+							"cache_table":               "stat",
+							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
 						},
 					},
 				},

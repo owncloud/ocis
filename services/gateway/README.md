@@ -23,3 +23,4 @@ Note: The gateway service can only be scaled if not using `memory` store and the
 Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using `nats-js-kv` store it is possible to use `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache entries on disc.

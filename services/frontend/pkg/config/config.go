@@ -126,16 +126,18 @@ type DataGateway struct {
 }
 
 type OCS struct {
-	Prefix                               string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL path prefix for the OCS service. Note that the string must not start with '/'."`
-	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
-	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE" desc:"Homespace namespace identifier."`
-	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	StatCacheType                        string             `yaml:"stat_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	StatCacheNodes                       []string           `yaml:"stat_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_STAT_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
-	StatCacheDatabase                    string             `yaml:"stat_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
-	StatCacheTable                       string             `yaml:"stat_cache_table" env:"FRONTEND_OCS_STAT_CACHE_TABLE" desc:"The database table the store should use."`
-	StatCacheTTL                         time.Duration      `yaml:"stat_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_STAT_CACHE_TTL" desc:"Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
-	StatCacheSize                        int                `yaml:"stat_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_STAT_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
+	Prefix                      string        `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL path prefix for the OCS service. Note that the string must not start with '/'."`
+	SharePrefix                 string        `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
+	HomeNamespace               string        `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE" desc:"Homespace namespace identifier."`
+	AdditionalInfoAttribute     string        `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
+	StatCacheType               string        `yaml:"stat_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	StatCacheNodes              []string      `yaml:"stat_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_STAT_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
+	StatCacheDatabase           string        `yaml:"stat_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	StatCacheTable              string        `yaml:"stat_cache_table" env:"FRONTEND_OCS_STAT_CACHE_TABLE" desc:"The database table the store should use."`
+	StatCacheTTL                time.Duration `yaml:"stat_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_STAT_CACHE_TTL" desc:"Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
+	StatCacheSize               int           `yaml:"stat_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_STAT_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
+	StatCacheDisablePersistence bool          `yaml:"stat_cache_disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE" desc:"Disable persistence of the cache. Only applies when using the 'nats-js' store type. Defaults to false."`
+
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EnableDenials                        bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`
