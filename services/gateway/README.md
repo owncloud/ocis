@@ -1,19 +1,25 @@
 # Gateway
 
-The gateway service is an ...
+The gateway service is responsible for passing requests to the storage providers. Other services never talk to the storage providers directly but will always send their requests to the `gateway` service.
 
 ## Caching
 
-The `gateway` service can use a configured store via `GATEWAY_STAT_CACHE_STORE`. Possible stores are:
+The gateway services is using caching as it is highly frequented with the same requests. As of now it uses two different caches:
+  -   the `provider cache` is caching requests to list or get storage providers.
+  -   the `create home cache` is caching requests to create personal spaces (as they only need to be executed once).
+
+Both caches can be configured via the `OCIS_CACHE_*` envvars (or `GATEWAY_PROVIDER_CACHE_*` and `GATEWAY_CREATE_HOME_CACHE_*` respectively). See envvar section for details. @mmattel how to link?
+
+Use `OCIS_CACHE_STORE` (`GATEWAY_PROVIDER_CACHE_STORE`, `GATEWAY_CREATE_HOME_CACHE_STORE`) to define the type of cache to use:
   -   `memory`: Basic in-memory store and the default.
-  -   `ocmem`: Advanced in-memory store allowing max size.
-  -   `redis`: Stores data in a configured Redis cluster.
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `etcd`: Stores data in a configured etcd cluster.
-  -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
 
-1.  Note that in-memory stores are by nature not reboot-persistent.
-2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store apply.
-3.  The gateway service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
-4.  When using `redis-sentinel`, the Redis master to use is configured via `GATEWAY_STAT_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+Other store types may work but are not supported currently.
+
+Note: The gateway service can only be scaled if not using `memory` store and the stores are configured identically over all instances!
+
+Store specific notes:
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
