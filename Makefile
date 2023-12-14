@@ -39,6 +39,7 @@ OCIS_MODULES = \
 	services/nats \
 	services/notifications \
 	services/ocdav \
+	services/ocm \
 	services/ocs \
 	services/policies \
 	services/postprocessing \

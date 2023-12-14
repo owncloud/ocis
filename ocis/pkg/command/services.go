@@ -28,6 +28,7 @@ import (
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
+	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/command"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/command"
 	policies "github.com/owncloud/ocis/v2/services/policies/pkg/command"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/command"
@@ -148,6 +149,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.OCDav.Service.Name, ocdav.GetCommands(cfg.OCDav), func(c *config.Config) {
 			cfg.OCDav.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.OCM.Service.Name, ocm.GetCommands(cfg.OCM), func(c *config.Config) {
+			cfg.OCM.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {
