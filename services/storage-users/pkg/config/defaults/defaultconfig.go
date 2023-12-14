@@ -102,7 +102,7 @@ func DefaultConfig() *config.Config {
 		FilemetadataCache: config.FilemetadataCache{
 			Store:    "memory",
 			Nodes:    []string{"127.0.0.1:9233"},
-			Database: "cache-filemetadata",
+			Database: "storage-users",
 			TTL:      24 * 60 * time.Second,
 		},
 		IDCache: config.IDCache{
