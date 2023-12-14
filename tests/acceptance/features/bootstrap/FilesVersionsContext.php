@@ -102,6 +102,29 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
+	 * @When user :user gets the number of versions of file :resource using file-id path :endpoint
+	 * @When user :user tries to get the number of versions of file :resource using file-id path :endpoint
+	 *
+	 * @param string $user
+	 * @param string $endpoint
+	 *
+	 * @return void
+	 */
+	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $endpoint):void {
+		$this->featureContext->setResponse(
+			$this->featureContext->makeDavRequest(
+				$user,
+				"PROPFIND",
+				$endpoint,
+				null,
+				null,
+				null,
+				(string)$this->featureContext->getDavPathVersion()
+			)
+		);
+	}
+
+	/**
 	 * @When user :user gets the version metadata of file :file
 	 *
 	 * @param string $user
