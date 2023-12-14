@@ -1,9 +1,17 @@
 package gowebdav
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
+
+// ErrAuthChanged must be returned from the Verify method as an error
+// to trigger a re-authentication / negotiation with a new authenticator.
+var ErrAuthChanged = errors.New("authentication failed, change algorithm")
+
+// ErrTooManyRedirects will be used as return error if a request exceeds 10 redirects.
+var ErrTooManyRedirects = errors.New("stopped after 10 redirects")
 
 // StatusError implements error and wraps
 // an erroneous status code.
@@ -32,7 +40,7 @@ func IsErrNotFound(err error) bool {
 	return IsErrCode(err, 404)
 }
 
-func newPathError(op string, path string, statusCode int) error {
+func NewPathError(op string, path string, statusCode int) error {
 	return &os.PathError{
 		Op:   op,
 		Path: path,
@@ -40,7 +48,7 @@ func newPathError(op string, path string, statusCode int) error {
 	}
 }
 
-func newPathErrorErr(op string, path string, err error) error {
+func NewPathErrorErr(op string, path string, err error) error {
 	return &os.PathError{
 		Op:   op,
 		Path: path,

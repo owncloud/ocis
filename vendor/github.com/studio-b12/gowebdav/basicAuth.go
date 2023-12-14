@@ -1,7 +1,7 @@
 package gowebdav
 
 import (
-	"encoding/base64"
+	"fmt"
 	"net/http"
 )
 
@@ -11,24 +11,32 @@ type BasicAuth struct {
 	pw   string
 }
 
-// Type identifies the BasicAuthenticator
-func (b *BasicAuth) Type() string {
-	return "BasicAuth"
-}
-
-// User holds the BasicAuth username
-func (b *BasicAuth) User() string {
-	return b.user
-}
-
-// Pass holds the BasicAuth password
-func (b *BasicAuth) Pass() string {
-	return b.pw
-}
-
 // Authorize the current request
-func (b *BasicAuth) Authorize(req *http.Request, method string, path string) {
-	a := b.user + ":" + b.pw
-	auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(a))
-	req.Header.Set("Authorization", auth)
+func (b *BasicAuth) Authorize(c *http.Client, rq *http.Request, path string) error {
+	rq.SetBasicAuth(b.user, b.pw)
+	return nil
+}
+
+// Verify verifies if the authentication
+func (b *BasicAuth) Verify(c *http.Client, rs *http.Response, path string) (redo bool, err error) {
+	if rs.StatusCode == 401 {
+		err = NewPathError("Authorize", path, rs.StatusCode)
+	}
+	return
+}
+
+// Close cleans up all resources
+func (b *BasicAuth) Close() error {
+	return nil
+}
+
+// Clone creates a Copy of itself
+func (b *BasicAuth) Clone() Authenticator {
+	// no copy due to read only access
+	return b
+}
+
+// String toString
+func (b *BasicAuth) String() string {
+	return fmt.Sprintf("BasicAuth login: %s", b.user)
 }

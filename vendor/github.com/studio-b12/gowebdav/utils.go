@@ -5,9 +5,7 @@ import (
 	"encoding/xml"
 	"io"
 	"net/url"
-	"strconv"
 	"strings"
-	"time"
 )
 
 // PathEscape escapes all segments of a given path
@@ -47,27 +45,6 @@ func String(r io.Reader) string {
 	// TODO - make String return an error as well
 	_, _ = buf.ReadFrom(r)
 	return buf.String()
-}
-
-func parseUint(s *string) uint {
-	if n, e := strconv.ParseUint(*s, 10, 32); e == nil {
-		return uint(n)
-	}
-	return 0
-}
-
-func parseInt64(s *string) int64 {
-	if n, e := strconv.ParseInt(*s, 10, 64); e == nil {
-		return n
-	}
-	return 0
-}
-
-func parseModified(s *string) time.Time {
-	if t, e := time.Parse(time.RFC1123, *s); e == nil {
-		return t
-	}
-	return time.Unix(0, 0)
 }
 
 func parseXML(data io.Reader, resp interface{}, parse func(resp interface{}) error) error {

@@ -48,6 +48,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
@@ -643,6 +644,66 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if share == nil {
+		// check if we have a federated share
+		req := &ocm.GetOCMShareRequest{
+			Ref: &ocm.ShareReference{
+				Spec: &ocm.ShareReference_Id{
+					Id: &ocm.ShareId{
+						OpaqueId: shareID,
+					},
+				},
+			},
+		}
+		ocmShareResponse, err := client.GetOCMShare(ctx, req)
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc get ocm share request", err)
+			return
+		}
+
+		ocmShare := ocmShareResponse.GetShare()
+		if ocmShare != nil {
+			resourceID = ocmShare.ResourceId
+			share, err = conversions.OCMShare2ShareData(ocmShare)
+			if err != nil {
+				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
+				return
+			}
+		}
+	}
+
+	if share == nil {
+		// check if we have an incoming federated share
+		req := &ocm.GetReceivedOCMShareRequest{
+			Ref: &ocm.ShareReference{
+				Spec: &ocm.ShareReference_Id{
+					Id: &ocm.ShareId{
+						OpaqueId: shareID,
+					},
+				},
+			},
+		}
+		ocmShareResponse, err := client.GetReceivedOCMShare(ctx, req)
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc get ocm share request", err)
+			return
+		}
+
+		ocmShare := ocmShareResponse.GetShare()
+		if ocmShare != nil {
+			resourceID = &provider.ResourceId{
+				StorageId: utils.OCMStorageProviderID,
+				SpaceId:   ocmShare.Id.OpaqueId,
+				OpaqueId:  ocmShare.Id.OpaqueId,
+			}
+			share, err = conversions.ReceivedOCMShare2ShareData(ocmShare, h.ocmLocalMount(ocmShare))
+			if err != nil {
+				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
+				return
+			}
+		}
+	}
+
+	if share == nil {
 		sublog.Debug().Msg("no share found with this id")
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "share not found", nil)
 		return
@@ -855,6 +916,10 @@ func (h *Handler) RemoveShare(w http.ResponseWriter, r *http.Request) {
 	}
 	if share, ok := h.isUserShare(r, shareID); ok {
 		h.removeUserShare(w, r, share)
+		return
+	}
+	if h.isFederatedShare(r, shareID) {
+		h.removeFederatedShare(w, r, shareID)
 		return
 	}
 

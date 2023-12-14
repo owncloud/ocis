@@ -43,13 +43,39 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"prefix":             cfg.ScienceMesh.Prefix,
 					"smtp_credentials":   map[string]string{},
 					"gatewaysvc":         cfg.Reva.Address,
-					"mesh_directory_url": cfg.Commons.OcisURL,
+					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
 					"provider_domain":    cfg.Commons.OcisURL,
 				},
 				"ocmd": map[string]interface{}{
 					"prefix":                        cfg.OCMD.Prefix,
 					"gatewaysvc":                    cfg.Reva.Address,
 					"expose_recipient_display_name": cfg.OCMD.ExposeRecipientDisplayName,
+				},
+				"dataprovider": map[string]interface{}{
+					"prefix": "data",
+					"driver": "ocmreceived",
+					"drivers": map[string]interface{}{
+						"ocmreceived": map[string]interface{}{
+							"insecure": cfg.OCMStorageProvider.Insecure,
+						},
+					},
+					"data_txs": map[string]interface{}{
+						"simple": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"spaces": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"tus": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+					},
 				},
 			},
 		},
@@ -91,6 +117,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"gatewaysvc":      cfg.Reva.Address,
 					"provider_domain": cfg.Commons.OcisURL,
 					"webdav_endpoint": cfg.Commons.OcisURL,
+					"webapp_template": cfg.OCMShareProvider.WebappTemplate,
 					"client_insecure": cfg.OCMShareProvider.Insecure,
 				},
 				"ocmcore": map[string]interface{}{
@@ -100,6 +127,16 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"file": cfg.OCMCore.Drivers.JSON.File,
 						},
 					},
+				},
+				"storageprovider": map[string]interface{}{
+					"driver": "ocmreceived",
+					"drivers": map[string]interface{}{
+						"ocmreceived": map[string]interface{}{
+							"insecure":     cfg.OCMStorageProvider.Insecure,
+							"storage_root": cfg.OCMStorageProvider.StorageRoot,
+						},
+					},
+					"data_server_url": "http://" + cfg.HTTP.Addr + "/data",
 				},
 				"authprovider": map[string]interface{}{
 					"auth_manager": "ocmshares",

@@ -21,15 +21,19 @@ package conversions
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/mime"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/user"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -222,6 +226,7 @@ type MatchData struct {
 type MatchValueData struct {
 	ShareType               int    `json:"shareType" xml:"shareType"`
 	ShareWith               string `json:"shareWith" xml:"shareWith"`
+	ShareWithProvider       string `json:"shareWithProvider" xml:"shareWithProvider"`
 	ShareWithAdditionalInfo string `json:"shareWithAdditionalInfo" xml:"shareWithAdditionalInfo,omitempty"`
 	UserType                int    `json:"userType" xml:"userType"`
 }
@@ -325,6 +330,10 @@ func ReceivedOCMShare2ShareData(share *ocm.ReceivedShare, path string) (*ShareDa
 		return nil, errtypes.InternalError("webdav endpoint not in share")
 	}
 
+	opaqueid := base64.StdEncoding.EncodeToString([]byte("/"))
+
+	shareTarget := filepath.Join("/Shares", share.Name)
+
 	s := &ShareData{
 		ID:           share.Id.OpaqueId,
 		UIDOwner:     formatRemoteUser(share.Creator),
@@ -332,13 +341,18 @@ func ReceivedOCMShare2ShareData(share *ocm.ReceivedShare, path string) (*ShareDa
 		ShareWith:    share.Grantee.GetUserId().OpaqueId,
 		Permissions:  RoleFromResourcePermissions(webdav.GetPermissions().GetPermissions(), false).OCSPermissions(),
 		ShareType:    ShareTypeFederatedCloudShare,
-		Path:         path,
-		FileTarget:   path,
+		Path:         shareTarget,
+		FileTarget:   shareTarget,
 		MimeType:     mime.Detect(share.ResourceType == provider.ResourceType_RESOURCE_TYPE_CONTAINER, share.Name),
 		ItemType:     ResourceType(share.ResourceType).String(),
-		ItemSource:   path,
-		STime:        share.Ctime.Seconds,
-		Name:         share.Name,
+		ItemSource: storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: utils.OCMStorageProviderID,
+			SpaceId:   share.Id.OpaqueId,
+			OpaqueId:  opaqueid,
+		}),
+		STime:   share.Ctime.Seconds,
+		Name:    share.Name,
+		SpaceID: storagespace.FormatStorageID(utils.OCMStorageProviderID, share.Id.OpaqueId),
 	}
 
 	if share.Expiration != nil {

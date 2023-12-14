@@ -20,6 +20,8 @@ package ocm
 
 import (
 	"context"
+	"crypto/tls"
+	"encoding/base64"
 	"io"
 	"io/fs"
 	"net/http"
@@ -58,10 +60,37 @@ type driver struct {
 
 type config struct {
 	GatewaySVC string `mapstructure:"gatewaysvc"`
+	Insecure   bool   `mapstructure:"insecure"`
 }
 
 func (c *config) ApplyDefaults() {
 	c.GatewaySVC = sharedconf.GetGatewaySVC(c.GatewaySVC)
+}
+
+// BearerAuthenticator represents an authenticator that adds a Bearer token to the Authorization header of HTTP requests.
+type BearerAuthenticator struct {
+	token string
+}
+
+// Authorize adds the Bearer token to the Authorization header of the provided HTTP request.
+func (b BearerAuthenticator) Authorize(_ *http.Client, r *http.Request, _ string) error {
+	r.Header.Add("Authorization", "Bearer "+b.token)
+	return nil
+}
+
+// Verify is not implemented for the BearerAuthenticator. It always returns false and nil error.
+func (BearerAuthenticator) Verify(*http.Client, *http.Response, string) (bool, error) {
+	return false, nil
+}
+
+// Clone creates a new instance of the BearerAuthenticator.
+func (BearerAuthenticator) Clone() gowebdav.Authenticator {
+	return BearerAuthenticator{}
+}
+
+// Close is not implemented for the BearerAuthenticator. It always returns nil.
+func (BearerAuthenticator) Close() error {
+	return nil
 }
 
 // New creates an OCM storage driver.
@@ -95,7 +124,16 @@ func shareInfoFromReference(ref *provider.Reference) (*ocmpb.ShareId, string) {
 		return shareInfoFromPath(ref.Path)
 	}
 
-	return &ocmpb.ShareId{OpaqueId: ref.ResourceId.OpaqueId}, ref.Path
+	if ref.ResourceId.SpaceId == ref.ResourceId.OpaqueId {
+		return &ocmpb.ShareId{OpaqueId: ref.ResourceId.SpaceId}, ref.Path
+	}
+	decodedBytes, err := base64.StdEncoding.DecodeString(ref.ResourceId.OpaqueId)
+	if err != nil {
+		// this should never happen
+		return &ocmpb.ShareId{OpaqueId: ref.ResourceId.SpaceId}, ref.Path
+	}
+	return &ocmpb.ShareId{OpaqueId: ref.ResourceId.SpaceId}, filepath.Join(string(decodedBytes), ref.Path)
+
 }
 
 func (d *driver) getWebDAVFromShare(ctx context.Context, shareID *ocmpb.ShareId) (*ocmpb.ReceivedShare, string, string, error) {
@@ -150,8 +188,12 @@ func (d *driver) webdavClient(ctx context.Context, ref *provider.Reference) (*go
 
 	// FIXME: it's still not clear from the OCM APIs how to use the shared secret
 	// will use as a token in the bearer authentication as this is the reva implementation
-	c := gowebdav.NewClient(endpoint, "", "")
-	c.SetHeader("Authorization", "Bearer "+secret)
+	c := gowebdav.NewAuthClient(endpoint, gowebdav.NewPreemptiveAuth(BearerAuthenticator{token: secret}))
+	if d.c.Insecure {
+		c.SetTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		})
+	}
 
 	return c, share, rel, nil
 }
@@ -194,7 +236,7 @@ func getPathFromShareIDAndRelPath(shareID *ocmpb.ShareId, relPath string) string
 	return filepath.Join("/", shareID.OpaqueId, relPath)
 }
 
-func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *ocmpb.ReceivedShare, relPath string) *provider.ResourceInfo {
+func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *ocmpb.ReceivedShare) (*provider.ResourceInfo, error) {
 	t := provider.ResourceType_RESOURCE_TYPE_FILE
 	if f.IsDir() {
 		t = provider.ResourceType_RESOURCE_TYPE_CONTAINER
@@ -207,24 +249,36 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 		name = f.Name()
 	}
 
-	webdav, _ := getWebDAVProtocol(share.Protocols)
+	webdavFile, ok := f.(gowebdav.File)
+	if !ok {
+		return nil, errtypes.InternalError("could not get webdav props")
+	}
+	opaqueid := base64.StdEncoding.EncodeToString([]byte(webdavFile.Path()))
+
+	// ids are of the format <ocmstorageproviderid>$<shareid>!<opaqueid>
+	id := &provider.ResourceId{
+		StorageId: utils.OCMStorageProviderID,
+		SpaceId:   share.Id.OpaqueId,
+		OpaqueId:  opaqueid,
+	}
+	webdavProtocol, _ := getWebDAVProtocol(share.Protocols)
 
 	return &provider.ResourceInfo{
 		Type:     t,
-		Id:       ref.ResourceId,
+		Id:       id,
 		MimeType: mime.Detect(f.IsDir(), f.Name()),
-		Path:     relPath,
+		Path:     name,
 		Name:     name,
 		Size:     uint64(f.Size()),
 		Mtime: &typepb.Timestamp{
 			Seconds: uint64(f.ModTime().Unix()),
 		},
 		Owner:         share.Creator,
-		PermissionSet: webdav.Permissions.Permissions,
+		PermissionSet: webdavProtocol.Permissions.Permissions,
 		Checksum: &provider.ResourceChecksum{
 			Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_INVALID,
 		},
-	}
+	}, nil
 }
 
 func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string, _ []string) (*provider.ResourceInfo, error) {
@@ -233,7 +287,7 @@ func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string,
 		return nil, err
 	}
 
-	info, err := client.Stat(rel)
+	info, err := client.StatWithProps(rel, []string{}) // request all properties by giving an empty list
 	if err != nil {
 		if gowebdav.IsErrNotFound(err) {
 			return nil, errtypes.NotFound(ref.GetPath())
@@ -241,7 +295,7 @@ func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string,
 		return nil, err
 	}
 
-	return convertStatToResourceInfo(ref, info, share, rel), nil
+	return convertStatToResourceInfo(ref, info, share)
 }
 
 func (d *driver) ListFolder(ctx context.Context, ref *provider.Reference, _ []string, _ []string) ([]*provider.ResourceInfo, error) {
@@ -250,14 +304,18 @@ func (d *driver) ListFolder(ctx context.Context, ref *provider.Reference, _ []st
 		return nil, err
 	}
 
-	list, err := client.ReadDir(rel)
+	list, err := client.ReadDirWithProps(rel, []string{}) // request all properties by giving an empty list
 	if err != nil {
 		return nil, err
 	}
 
 	res := make([]*provider.ResourceInfo, 0, len(list))
 	for _, r := range list {
-		res = append(res, convertStatToResourceInfo(ref, r, share, utils.MakeRelativePath(filepath.Join(rel, r.Name()))))
+		info, err := convertStatToResourceInfo(ref, r, share)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, info)
 	}
 	return res, nil
 }
@@ -429,7 +487,7 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 		if k == "mountpoint" {
 			for _, share := range lrsRes.Shares {
 				root := &provider.ResourceId{
-					StorageId: utils.PublicStorageProviderID,
+					StorageId: utils.OCMStorageProviderID,
 					SpaceId:   share.Id.OpaqueId,
 					OpaqueId:  share.Id.OpaqueId,
 				}

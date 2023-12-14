@@ -3,6 +3,7 @@ package gowebdav
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -15,6 +16,31 @@ type File struct {
 	modified    time.Time
 	etag        string
 	isdir       bool
+	props       Props
+}
+
+func newFile(path, name string, p *propstat) *File {
+	f := &File{
+		props: p.Props,
+	}
+	path = FixSlashes(path)
+
+	f.name = name
+	f.path = filepath.Clean(filepath.Join(path, f.name))
+	f.modified = p.Modified()
+	f.etag = p.ETag()
+	f.contentType = p.ContentType()
+	f.props = p.Props
+
+	if p.Type() == "collection" {
+		f.path = filepath.Clean(f.path + "/")
+		f.size = 0
+		f.isdir = true
+	} else {
+		f.size = p.Size()
+		f.isdir = false
+	}
+	return f
 }
 
 // Path returns the full path of a file
@@ -64,7 +90,7 @@ func (f File) IsDir() bool {
 
 // Sys ????
 func (f File) Sys() interface{} {
-	return nil
+	return f.props
 }
 
 // String lets us see file information

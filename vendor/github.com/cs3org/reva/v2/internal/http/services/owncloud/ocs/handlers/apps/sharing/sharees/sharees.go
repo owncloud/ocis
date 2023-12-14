@@ -24,6 +24,8 @@ import (
 
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/config"
@@ -37,12 +39,14 @@ import (
 type Handler struct {
 	gatewayAddr             string
 	additionalInfoAttribute string
+	includeOCMSharees       bool
 }
 
 // Init initializes this and any contained handlers
 func (h *Handler) Init(c *config.Config) {
 	h.gatewayAddr = c.GatewaySvc
 	h.additionalInfoAttribute = c.AdditionalInfoAttribute
+	h.includeOCMSharees = c.IncludeOCMSharees
 }
 
 // FindSharees implements the /apps/files_sharing/api/v1/sharees endpoint
@@ -79,6 +83,27 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if h.includeOCMSharees {
+		remoteUsersRes, err := gwc.FindAcceptedUsers(r.Context(), &invitepb.FindAcceptedUsersRequest{Filter: term})
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error searching remote users", err)
+			return
+		}
+		if remoteUsersRes.Status.Code != rpc.Code_CODE_OK {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error searching remote users", nil)
+			return
+		}
+		for _, user := range remoteUsersRes.GetAcceptedUsers() {
+			match := h.userAsMatch(user)
+			log.Debug().Interface("user", user).Interface("match", match).Msg("mapped")
+			if h.isExactMatch(match, term) {
+				exactUserMatches = append(exactUserMatches, match)
+			} else {
+				userMatches = append(userMatches, match)
+			}
+		}
+	}
+
 	groupsRes, err := gwc.FindGroups(r.Context(), &grouppb.FindGroupsRequest{Filter: term, SkipFetchingMembers: true})
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error searching groups", err)
@@ -111,21 +136,27 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) userAsMatch(u *userpb.User) *conversions.MatchData {
-	var ocsUserType int
-	if u.Id.Type == userpb.UserType_USER_TYPE_GUEST || u.Id.Type == userpb.UserType_USER_TYPE_LIGHTWEIGHT {
-		ocsUserType = 1
+	data := &conversions.MatchValueData{
+		ShareType: int(conversions.ShareTypeUser),
+		// api compatibility with oc10: mark guest users in share invite dialogue
+		UserType: 0,
+		// api compatibility with oc10: always use the username
+		ShareWith:               u.Username,
+		ShareWithAdditionalInfo: h.getAdditionalInfoAttribute(u),
+	}
+
+	switch u.Id.Type {
+	case userpb.UserType_USER_TYPE_GUEST, userpb.UserType_USER_TYPE_LIGHTWEIGHT:
+		data.UserType = 1
+	case userpb.UserType_USER_TYPE_FEDERATED:
+		data.ShareType = int(conversions.ShareTypeFederatedCloudShare)
+		data.ShareWith = u.Id.OpaqueId
+		data.ShareWithProvider = u.Id.Idp
 	}
 
 	return &conversions.MatchData{
 		Label: u.DisplayName,
-		Value: &conversions.MatchValueData{
-			ShareType: int(conversions.ShareTypeUser),
-			// api compatibility with oc10: mark guest users in share invite dialogue
-			UserType: ocsUserType,
-			// api compatibility with oc10: always use the username
-			ShareWith:               u.Username,
-			ShareWithAdditionalInfo: h.getAdditionalInfoAttribute(u),
-		},
+		Value: data,
 	}
 }
 

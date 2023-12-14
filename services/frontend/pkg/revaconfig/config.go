@@ -347,6 +347,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							"productversion": version.GetString(),
 						},
 					},
+					"include_ocm_sharees": cfg.OCS.IncludeOCMSharees,
 				},
 			},
 		},

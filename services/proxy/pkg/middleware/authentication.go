@@ -25,6 +25,7 @@ var (
 
 	_publicPaths = [...]string{
 		"/dav/public-files/",
+		"/remote.php/dav/ocm/",
 		"/dav/ocm/",
 		"/ocm/",
 		"/remote.php/dav/public-files/",

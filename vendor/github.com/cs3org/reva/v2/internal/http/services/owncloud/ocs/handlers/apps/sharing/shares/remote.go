@@ -49,7 +49,7 @@ func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	shareWithUser, shareWithProvider := r.FormValue("shareWithUser"), r.FormValue("shareWithProvider")
+	shareWithUser, shareWithProvider := r.FormValue("shareWith"), r.FormValue("shareWithProvider")
 	if shareWithUser == "" || shareWithProvider == "" {
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing shareWith parameters", nil)
 		return
