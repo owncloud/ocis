@@ -101,7 +101,8 @@ The configuration for the `purge-expired` command is done by using the following
 #### List and Restore Trash-Bins Items
 
 To authenticate the cli command use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
-service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
+service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE`
+defines a maximum number of attempts to rename a file when the user restores the file with `--option keep-both` to existing destination with the same name.
 
 The ID sources:
 -   personal 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+personal`

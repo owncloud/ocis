@@ -17,12 +17,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mohae/deepcopy"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	zlog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/logging"
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -33,10 +33,10 @@ const (
 	REPLACE
 	KEEP_BOTH
 
-	retrievingErrorMsg = "trash-bin items retrieving error"
+	_retrievingErrorMsg = "trash-bin items retrieving error"
 )
 
-var optionFlagTmpl = cli.StringFlag{
+var _optionFlagTmpl = cli.StringFlag{
 	Name:        "option",
 	Value:       "skip",
 	Aliases:     []string{"o"},
@@ -113,7 +113,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return fmt.Errorf("spaceID is requered")
 			}
-			fmt.Printf("Getting trash-bin items for spaceID: '%s' ...\n", spaceID)
+			log.Info().Msgf("Getting trash-bin items for spaceID: '%s' ...\n", spaceID)
 
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
@@ -121,13 +121,11 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 			}
 			client, err := pool.GetGatewayServiceClient(cfg.RevaGatewayGRPCAddr)
 			if err != nil {
-				log.Error().Err(err).Msg("error selecting next gateway client")
-				return err
+				return fmt.Errorf("error selecting gateway client %w", err)
 			}
 			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
-				log.Error().Err(err).Msg("could not impersonate")
-				return err
+				return fmt.Errorf("could not get service user context %w", err)
 			}
 
 			spanOpts := []trace.SpanStartOption{
@@ -136,16 +134,15 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
 				),
 			}
-			ctx, span := tp.Tracer("storage-users trash-bin list").Start(ctx, "serve static asset", spanOpts...)
+			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "list", spanOpts...)
 			defer span.End()
 
 			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
 			if err != nil {
-				log.Error().Err(err).Msg(retrievingErrorMsg)
-				return err
+				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
 			}
 			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", retrievingErrorMsg, res.Status.Code)
+				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
 			}
 
 			if len(res.GetRecycleItems()) > 0 {
@@ -165,7 +162,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 	var optionFlagVal string
 	var overwriteOption int
-	optionFlag := optionFlagTmpl
+	optionFlag := _optionFlagTmpl
 	optionFlag.Destination = &optionFlagVal
 	return &cli.Command{
 		Name:      "restore-all",
@@ -203,20 +200,19 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return cli.Exit("The option flag is invalid", 1)
 			}
-			fmt.Printf("Restoring trash-bin items for spaceID: '%s' ...\n", spaceID)
+			log.Info().Msgf("Restoring trash-bin items for spaceID: '%s' ...\n", spaceID)
+
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
 				return err
 			}
 			client, err := pool.GetGatewayServiceClient(cfg.RevaGatewayGRPCAddr)
 			if err != nil {
-				log.Error().Err(err).Msg("error selecting next gateway client")
-				return err
+				return fmt.Errorf("error selecting gateway client %w", err)
 			}
 			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
-				log.Error().Err(err).Msg("could not impersonate")
-				return err
+				return fmt.Errorf("could not get service user context %w", err)
 			}
 
 			spanOpts := []trace.SpanStartOption{
@@ -226,16 +222,15 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
 				),
 			}
-			ctx, span := tp.Tracer("storage-users trash-bin restore-all").Start(ctx, "serve static asset", spanOpts...)
+			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "restore-all", spanOpts...)
 			defer span.End()
 
 			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
 			if err != nil {
-				log.Error().Err(err).Msg(retrievingErrorMsg)
-				return err
+				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
 			}
 			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", retrievingErrorMsg, res.Status.Code)
+				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
 			}
 			if len(res.GetRecycleItems()) == 0 {
 				return cli.Exit("The trash-bin is empty. Nothing to restore", 0)
@@ -263,9 +258,10 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 			fmt.Printf("\nRun restoring-all with option=%s\n", optionFlagVal)
 			for _, item := range res.GetRecycleItems() {
 				fmt.Printf("restoring itemID: '%s', path: '%s', type: '%s'\n", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()))
-				dstRes, err := restore(ctx, client, ref, item, overwriteOption)
+				dstRes, err := restore(ctx, client, ref, item, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 				if err != nil {
-					return err
+					log.Err(err).Msg("trash-bin item restoring error")
+					continue
 				}
 				fmt.Printf("itemID: '%s', path: '%s', restored as '%s'\n", item.GetKey(), item.GetRef().GetPath(), dstRes.GetPath())
 			}
@@ -277,7 +273,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 	var optionFlagVal string
 	var overwriteOption int
-	optionFlag := optionFlagTmpl
+	optionFlag := _optionFlagTmpl
 	optionFlag.Destination = &optionFlagVal
 	return &cli.Command{
 		Name:      "restore",
@@ -320,6 +316,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return cli.Exit("The option flag is invalid", 1)
 			}
+			log.Info().Msgf("Restoring trash-bin item for spaceID: '%s' itemID: '%s' ...\n", spaceID, itemID)
 
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
@@ -327,13 +324,11 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			}
 			client, err := pool.GetGatewayServiceClient(cfg.RevaGatewayGRPCAddr)
 			if err != nil {
-				log.Error().Err(err).Msg("error selecting gateway client")
-				return err
+				return fmt.Errorf("error selecting gateway client %w", err)
 			}
 			ctx, err := utils.GetServiceUserContext(cfg.ServiceAccount.ServiceAccountID, client, cfg.ServiceAccount.ServiceAccountSecret)
 			if err != nil {
-				log.Error().Err(err).Msg("could not impersonate")
-				return err
+				return fmt.Errorf("could not get service user context %w", err)
 			}
 
 			spanOpts := []trace.SpanStartOption{
@@ -344,16 +339,15 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 					attribute.KeyValue{Key: "itemID", Value: attribute.StringValue(itemID)},
 				),
 			}
-			ctx, span := tp.Tracer("storage-users trash-bin restore").Start(ctx, "serve static asset", spanOpts...)
+			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "restore", spanOpts...)
 			defer span.End()
 
 			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
 			if err != nil {
-				log.Error().Err(err).Msg(retrievingErrorMsg)
-				return err
+				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
 			}
 			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", retrievingErrorMsg, res.Status.Code)
+				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
 			}
 
 			var found bool
@@ -370,7 +364,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			}
 			fmt.Printf("\nRun restoring with option=%s\n", optionFlagVal)
 			fmt.Printf("restoring itemID: '%s', path: '%s', type: '%s'\n", itemRef.GetKey(), itemRef.GetRef().GetPath(), itemType(itemRef.GetType()))
-			dstRes, err := restore(ctx, client, ref, itemRef, overwriteOption)
+			dstRes, err := restore(ctx, client, ref, itemRef, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 			if err != nil {
 				return err
 			}
@@ -380,7 +374,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 	}
 }
 
-func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference, item *provider.RecycleItem, overwriteOption int) (*provider.Reference, error) {
+func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference, item *provider.RecycleItem, overwriteOption int, maxRenameAttempt int, log zlog.Logger) (*provider.Reference, error) {
 	dst, _ := deepcopy.Copy(ref).(provider.Reference)
 	dst.Path = utils.MakeRelativePath(item.GetRef().GetPath())
 	// Restore request
@@ -396,7 +390,7 @@ func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.
 	}
 
 	if exists {
-		fmt.Printf("destination '%s' exists.\n", dstStatRes.GetInfo().GetPath())
+		log.Info().Msgf("destination '%s' exists.\n", dstStatRes.GetInfo().GetPath())
 		switch overwriteOption {
 		case SKIP:
 			return &dst, nil
@@ -412,27 +406,29 @@ func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.
 			}
 		case KEEP_BOTH:
 			// modify the file name
-			req.RestoreRef, err = resolveDestination(ctx, client, dst)
+			req.RestoreRef, err = resolveDestination(ctx, client, dst, maxRenameAttempt)
 			if err != nil {
-				return &dst, fmt.Errorf("trash-bin item restoring error %w", err)
+				return &dst, err
 			}
 		}
 	}
 
 	res, err := client.RestoreRecycleItem(ctx, req)
 	if err != nil {
-		log.Error().Err(err).Msg("trash-bin item restoring error")
-		return req.RestoreRef, err
+		return req.RestoreRef, fmt.Errorf("restoring error  %w", err)
 	}
 	if res.Status.Code != rpc.Code_CODE_OK {
-		return req.RestoreRef, fmt.Errorf("trash-bin item restoring error %s", res.Status.Code)
+		return req.RestoreRef, fmt.Errorf("can not restore %s", res.Status.Code)
 	}
 	return req.RestoreRef, nil
 }
 
-func resolveDestination(ctx context.Context, client gateway.GatewayAPIClient, dstRef provider.Reference) (*provider.Reference, error) {
+func resolveDestination(ctx context.Context, client gateway.GatewayAPIClient, dstRef provider.Reference, maxRenameAttempt int) (*provider.Reference, error) {
 	dst := dstRef
-	for i := 1; i < 100; i++ {
+	if maxRenameAttempt < 100 {
+		maxRenameAttempt = 100
+	}
+	for i := 1; i < maxRenameAttempt; i++ {
 		dst.Path = modifyFilename(dstRef.Path, i)
 		exists, _, err := isDestinationExists(ctx, client, dst)
 		if err != nil {

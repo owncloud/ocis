@@ -18,10 +18,8 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
 
-	TokenManager        *TokenManager `yaml:"token_manager"`
-	Reva                *shared.Reva  `yaml:"reva"`
-	RevaGatewayGRPCAddr string        `yaml:"gateway_addr" env:"OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR" desc:"The bind address of the gateway GRPC address."`
-	MachineAuthAPIKey   string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	SkipUserGroupsInToken   bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 	GracefulShutdownTimeout int  `yaml:"graceful_shutdown_timeout" env:"STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT" desc:"The number of seconds to wait for the 'storage-users' service to shutdown cleanly before exiting with an error that gets logged. Note: This setting is only applicable when running the 'storage-users' service as a standalone service. See the text description for more details."`
@@ -42,6 +40,11 @@ type Config struct {
 	UploadExpiration  int64             `yaml:"upload_expiration" env:"STORAGE_USERS_UPLOAD_EXPIRATION" desc:"Duration in seconds after which uploads will expire. Note that when setting this to a low number, uploads could be cancelled before they are finished and return a 403 to the user."`
 	Tasks             Tasks             `yaml:"tasks"`
 	ServiceAccount    ServiceAccount    `yaml:"service_account"`
+
+	// CLI
+	RevaGatewayGRPCAddr      string `yaml:"gateway_addr" env:"OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR" desc:"The bind address of the gateway GRPC address."`
+	MachineAuthAPIKey        string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
+	CliMaxAttemptsRenameFile int    `yaml:"max_attempts_rename_file" env:"STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE" desc:"Maximum number of attempts to rename a file when user restores the file to existing destination with the same name. The minimum value is 100."`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
