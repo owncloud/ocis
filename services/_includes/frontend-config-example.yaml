@@ -107,6 +107,7 @@ ocs:
   stat_cache_table: ""
   stat_cache_ttl: 5m0s
   stat_cache_size: 0
+  stat_cache_disable_persistence: false
   enable_denials: false
   list_ocm_shares: true
   public_sharing_share_must_have_password: true

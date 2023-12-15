@@ -19,6 +19,7 @@ cache:
   table: ""
   ttl: 336h0m0s
   size: 0
+  disable_persistence: false
 debug:
   addr: 127.0.0.1:9124
   token: ""

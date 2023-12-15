@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-15-11-58-46]
+[#deprecation-note-2023-12-15-13-30-53]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -119,7 +119,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
 `GRAPH_CACHE_STORE_NODES` +
@@ -168,6 +168,16 @@ a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
 The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+
+a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
+`GRAPH_CACHE_DISABLE_PERSISTENCE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 
 a|`GRAPH_DEBUG_ADDR` +
 
@@ -497,7 +507,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2023-12-15-11-58-46[Deprecation Note]
+xref:deprecation-note-2023-12-15-13-30-53[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

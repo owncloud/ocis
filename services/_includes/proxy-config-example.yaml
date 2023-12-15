@@ -125,6 +125,7 @@ oidc:
     table: ""
     ttl: 10s
     size: 0
+    disable_persistence: false
   jwks:
     refresh_interval: 60
     refresh_timeout: 10

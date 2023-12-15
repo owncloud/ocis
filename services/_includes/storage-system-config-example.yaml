@@ -40,6 +40,7 @@ cache:
   database: storage-system
   ttl: 24m0s
   size: 0
+  disable_persistence: false
 driver: ocis
 drivers:
   ocis:
