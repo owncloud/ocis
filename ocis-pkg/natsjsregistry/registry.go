@@ -1,4 +1,4 @@
-// Package natsjsregistry implements a registry using natsjs object store
+// Package natsjsregistry implements a registry using natsjs kv store
 package natsjsregistry
 
 import (
@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	natsjs "github.com/go-micro/plugins/v4/store/nats-js"
+	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/store"
 	"go-micro.dev/v4/util/cmd"
@@ -30,7 +30,7 @@ func NewRegistry(opts ...registry.Option) registry.Registry {
 	exp, _ := options.Context.Value(expiryKey{}).(time.Duration)
 	return &storeregistry{
 		opts:   options,
-		store:  natsjs.NewStore(storeOptions(options)...),
+		store:  natsjskv.NewStore(storeOptions(options)...),
 		typ:    _registryName,
 		expiry: exp,
 	}
