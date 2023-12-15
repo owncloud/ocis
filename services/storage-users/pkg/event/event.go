@@ -8,7 +8,7 @@ import (
 
 // NewStream prepares the requested nats stream and returns it.
 func NewStream(cfg *config.Config) (events.Stream, error) {
-	return stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig{
+	return stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig{
 		Endpoint:             cfg.Events.Addr,
 		Cluster:              cfg.Events.ClusterID,
 		EnableTLS:            cfg.Events.EnableTLS,

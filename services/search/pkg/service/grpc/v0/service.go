@@ -75,7 +75,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig{
+	bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig{
 		Endpoint:             cfg.Events.Endpoint,
 		Cluster:              cfg.Events.Cluster,
 		EnableTLS:            cfg.Events.EnableTLS,

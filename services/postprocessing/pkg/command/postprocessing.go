@@ -30,7 +30,7 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			stream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Postprocessing.Events))
+			stream, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Postprocessing.Events))
 			if err != nil {
 				return err
 			}

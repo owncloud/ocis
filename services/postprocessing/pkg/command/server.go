@@ -54,7 +54,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				bus, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Postprocessing.Events))
+				bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Postprocessing.Events))
 				if err != nil {
 					return err
 				}

@@ -89,7 +89,7 @@ func Server(cfg *config.Config) *cli.Command {
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
 			}
-			client, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Notifications.Events))
+			client, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
 				return err
 			}
