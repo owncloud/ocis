@@ -21,7 +21,9 @@ package usershareprovider
 import (
 	"context"
 	"regexp"
+	"slices"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -34,20 +36,24 @@ import (
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/permission"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
+	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 func init() {
-	rgrpc.Register("usershareprovider", New)
+	rgrpc.Register("usershareprovider", NewDefault)
 }
 
 type config struct {
 	Driver                string                            `mapstructure:"driver"`
 	Drivers               map[string]map[string]interface{} `mapstructure:"drivers"`
+	GatewayAddr           string                            `mapstructure:"gateway_addr"`
 	AllowedPathsForShares []string                          `mapstructure:"allowed_paths_for_shares"`
 }
 
@@ -58,8 +64,8 @@ func (c *config) init() {
 }
 
 type service struct {
-	conf                  *config
 	sm                    share.Manager
+	gatewaySelector       pool.Selectable[gateway.GatewayAPIClient]
 	allowedPathsForShares []*regexp.Regexp
 }
 
@@ -92,8 +98,8 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 	return c, nil
 }
 
-// New creates a new user share provider svc
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+// New creates a new user share provider svc initialized from defaults
+func NewDefault(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 
 	c, err := parseConfig(m)
 	if err != nil {
@@ -116,13 +122,23 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		allowedPathsForShares = append(allowedPathsForShares, regex)
 	}
 
+	gatewaySelector, err := pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
+	if err != nil {
+		return nil, err
+	}
+
+	return New(gatewaySelector, sm, allowedPathsForShares), nil
+}
+
+// New creates a new user share provider svc
+func New(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], sm share.Manager, allowedPathsForShares []*regexp.Regexp) rgrpc.Service {
 	service := &service{
-		conf:                  c,
 		sm:                    sm,
+		gatewaySelector:       gatewaySelector,
 		allowedPathsForShares: allowedPathsForShares,
 	}
 
-	return service, nil
+	return service
 }
 
 func (s *service) isPathAllowed(path string) bool {
@@ -139,6 +155,24 @@ func (s *service) isPathAllowed(path string) bool {
 
 func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	// check if the user has the permission to create shares at all
+	ok, err := utils.CheckPermission(ctx, permission.WriteShare, gatewayClient)
+	if err != nil {
+		return &collaboration.CreateShareResponse{
+			Status: status.NewInternal(ctx, "failed check user permission to write public link"),
+		}, err
+	}
+	if !ok {
+		return &collaboration.CreateShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to create public links"),
+		}, nil
+	}
 
 	if req.GetGrant().GetGrantee().GetType() == provider.GranteeType_GRANTEE_TYPE_USER && req.GetGrant().GetGrantee().GetUserId().GetIdp() == "" {
 		// use logged in user Idp as default.
@@ -244,6 +278,78 @@ func (s *service) ListShares(ctx context.Context, req *collaboration.ListSharesR
 }
 
 func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+	log := appctx.GetLogger(ctx)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	// check if the user has the permission to create shares at all
+	ok, err := utils.CheckPermission(ctx, permission.WriteShare, gatewayClient)
+	if err != nil {
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewInternal(ctx, "failed check user permission to write share"),
+		}, err
+	}
+	if !ok {
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to create user share"),
+		}, nil
+	}
+
+	// Read share from backend. We need the shared resource's id for STATing it, it might not be in
+	// the incoming request
+	currentShare, err := s.sm.GetShare(ctx,
+		&collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Id{
+				Id: req.GetShare().GetId(),
+			},
+		},
+	)
+	if err != nil {
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, err.Error())
+		}
+		return &collaboration.UpdateShareResponse{
+			Status: st,
+		}, nil
+	}
+
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: currentShare.GetResourceId()}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", req.GetShare().GetResourceId()).Msg("failed to stat resource to share")
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+
+	// If this is a permissions update, check if user's permissions on the resource are sufficient to set the desired permissions
+	var newPermissions *provider.ResourcePermissions
+	if slices.Contains(req.GetUpdateMask().GetPaths(), "permissions") {
+		newPermissions = req.GetShare().GetPermissions().GetPermissions()
+	} else {
+		newPermissions = req.GetField().GetPermissions().GetPermissions()
+	}
+	if newPermissions != nil && !conversions.SufficientCS3Permissions(sRes.GetInfo().GetPermissionSet(), newPermissions) {
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "insufficient permissions to create that kind of share"),
+		}, nil
+	}
+
+	// check if the requested permission are plausible for the Resource
+	// do we need more here?
+	if sRes.GetInfo().GetType() == provider.ResourceType_RESOURCE_TYPE_FILE {
+		if newPermissions.GetCreateContainer() || newPermissions.GetMove() || newPermissions.GetDelete() {
+			return &collaboration.UpdateShareResponse{
+				Status: status.NewInvalid(ctx, "cannot set the requested permissions on that type of resource"),
+			}, nil
+		}
+	}
+
 	share, err := s.sm.UpdateShare(ctx, req.Ref, req.Field.GetPermissions(), req.Share, req.UpdateMask) // TODO(labkode): check what to update
 	if err != nil {
 		return &collaboration.UpdateShareResponse{

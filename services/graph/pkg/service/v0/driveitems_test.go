@@ -597,7 +597,7 @@ var _ = Describe("Driveitems", func() {
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					if req.GetRef().GetId().GetOpaqueId() == "permissionid" {
+					if req.GetShare().GetId().GetOpaqueId() == "permissionid" {
 						return expiration.Equal(utils.TSToTime(req.GetShare().GetExpiration()))
 					}
 					return false
@@ -628,7 +628,7 @@ var _ = Describe("Driveitems", func() {
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					if req.GetRef().GetId().GetOpaqueId() == "permissionid" {
+					if req.GetShare().GetId().GetOpaqueId() == "permissionid" {
 						return true
 					}
 					return false
@@ -659,7 +659,7 @@ var _ = Describe("Driveitems", func() {
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
 				}),
 			)
 			updateShareMock.Return(updateShareMockResponse, nil)
@@ -687,7 +687,7 @@ var _ = Describe("Driveitems", func() {
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
 				}),
 			)
 			updateShareMockResponse.Share.Permissions = &collaboration.SharePermissions{

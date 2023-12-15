@@ -670,6 +670,7 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	updatedPermission, err := g.updateUserShare(ctx, permissionID, oldPermission, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
+		return
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &updatedPermission)
@@ -800,14 +801,11 @@ func (g Graph) updateUserShare(ctx context.Context, permissionID string, oldPerm
 	}
 
 	cs3UpdateShareReq := &collaboration.UpdateShareRequest{
-		Ref: &collaboration.ShareReference{
-			Spec: &collaboration.ShareReference_Id{
-				Id: &collaboration.ShareId{
-					OpaqueId: permissionID,
-				},
+		Share: &collaboration.Share{
+			Id: &collaboration.ShareId{
+				OpaqueId: permissionID,
 			},
 		},
-		Share: &collaboration.Share{},
 	}
 	fieldmask := []string{}
 	if expiration, ok := newPermission.GetExpirationDateTimeOk(); ok {
