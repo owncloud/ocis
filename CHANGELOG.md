@@ -51,6 +51,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 
 ## Details
 
@@ -106,6 +107,7 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/7793
+   https://github.com/owncloud/ocis/pull/7978
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -126,6 +128,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7952
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
+
+* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
+
+   For Sharing NG, we needed validation in the implementing reva service to keep
+   the client implementation simple.
+
+   https://github.com/owncloud/ocis/pull/7978
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
