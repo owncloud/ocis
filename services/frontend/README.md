@@ -83,6 +83,8 @@ The validation against the banned passwords list can be configured via a text fi
 
 Following environment variables can be set to define the password policy behaviour:
 
+-   `OCIS_PASSWORD_POLICY_DISABLED`
+Disable the password policy
 -   `OCIS_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
 -   `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
