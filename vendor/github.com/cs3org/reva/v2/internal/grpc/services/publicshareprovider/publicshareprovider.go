@@ -20,6 +20,7 @@ package publicshareprovider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -301,7 +302,7 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 
 	// enforce password if needed
 	setPassword := grant.GetPassword()
-	if !isInternalLink && enforcePassword(grant, s.conf) && len(setPassword) == 0 {
+	if !isInternalLink && enforcePassword(false, grant.GetPermissions().GetPermissions(), s.conf) && len(setPassword) == 0 {
 		return &link.CreatePublicShareResponse{
 			Status: status.NewInvalidArg(ctx, "password protection is enforced"),
 		}, nil
@@ -316,13 +317,9 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 		}
 	}
 
-	u, ok := ctxpkg.ContextGetUser(ctx)
-	if !ok {
-		log.Error().Msg(getUserCtxErrMsg)
-	}
-
+	user := ctxpkg.ContextMustGetUser(ctx)
 	res := &link.CreatePublicShareResponse{}
-	share, err := s.sm.CreatePublicShare(ctx, u, req.GetResourceInfo(), req.GetGrant())
+	share, err := s.sm.CreatePublicShare(ctx, user, req.GetResourceInfo(), req.GetGrant())
 	switch {
 	case err != nil:
 		log.Error().Err(err).Interface("request", req).Msg("could not write public share")
@@ -462,12 +459,114 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	log := appctx.GetLogger(ctx)
 	log.Info().Str("publicshareprovider", "update").Msg("update public share")
 
-	u, ok := ctxpkg.ContextGetUser(ctx)
-	if !ok {
-		log.Error().Msg(getUserCtxErrMsg)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
 	}
 
-	updateR, err := s.sm.UpdatePublicShare(ctx, u, req)
+	user := ctxpkg.ContextMustGetUser(ctx)
+	ps, err := s.sm.GetPublicShare(ctx, user, req.GetRef(), false)
+	if err != nil {
+		return &link.UpdatePublicShareResponse{
+			Status: status.NewInternal(ctx, "error loading public share"),
+		}, err
+	}
+
+	isInternalLink := isInternalLink(req, ps)
+
+	// users should always be able to downgrade links to internal links
+	// when they are the creator of the link
+	// all other users should have the WritePublicLink permission
+	if !isInternalLink && !publicshare.IsCreatedByUser(*ps, user) {
+		canWriteLink, err := utils.CheckPermission(ctx, permission.WritePublicLink, gatewayClient)
+		if err != nil {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInternal(ctx, "error loading public share"),
+			}, err
+		}
+		if !canWriteLink {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "no permission to update public share"),
+			}, nil
+		}
+	}
+
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", ps.ResourceId).Msg("failed to stat shared resource")
+		return &link.UpdatePublicShareResponse{
+			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+
+	if !publicshare.IsCreatedByUser(*ps, user) {
+		if !sRes.GetInfo().GetPermissionSet().UpdateGrant {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "no permission to update public share"),
+			}, err
+		}
+	}
+
+	// check if the user can change the permissions to the desired permissions
+	updatePermissions := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS
+	if updatePermissions &&
+		!conversions.SufficientCS3Permissions(
+			sRes.GetInfo().GetPermissionSet(),
+			req.GetUpdate().GetGrant().GetPermissions().GetPermissions(),
+		) {
+		return &link.UpdatePublicShareResponse{
+			Status: status.NewInvalidArg(ctx, "insufficient permissions to update that kind of share"),
+		}, nil
+	}
+	if updatePermissions {
+		beforePerm, _ := json.Marshal(sRes.GetInfo().GetPermissionSet())
+		afterPerm, _ := json.Marshal(req.GetUpdate().GetGrant().GetPermissions())
+		log.Info().
+			Str("shares", "update").
+			Msgf("updating permissions from %v to: %v",
+				string(beforePerm),
+				string(afterPerm),
+			)
+	}
+
+	grant := req.GetUpdate().GetGrant()
+
+	// validate expiration date
+	if grant.GetExpiration() != nil {
+		expirationDateTime := utils.TSToTime(grant.GetExpiration()).UTC()
+		if expirationDateTime.Before(time.Now().UTC()) {
+			msg := fmt.Sprintf("expiration date is in the past: %s", expirationDateTime.Format(time.RFC3339))
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInvalidArg(ctx, msg),
+			}, nil
+		}
+	}
+
+	// enforce password if needed
+	canOptOut, err := utils.CheckPermission(ctx, permission.DeleteReadOnlyPassword, gatewayClient)
+	if err != nil {
+		return &link.UpdatePublicShareResponse{
+			Status: status.NewInternal(ctx, err.Error()),
+		}, nil
+	}
+	updatePassword := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PASSWORD
+	setPassword := grant.GetPassword()
+	if updatePassword && !isInternalLink && enforcePassword(canOptOut, ps.GetPermissions().GetPermissions(), s.conf) && len(setPassword) == 0 {
+		return &link.UpdatePublicShareResponse{
+			Status: status.NewInvalidArg(ctx, "password protection is enforced"),
+		}, nil
+	}
+
+	// validate password policy
+	if updatePassword && len(setPassword) > 0 {
+		if err := s.passwordValidator.Validate(setPassword); err != nil {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInvalidArg(ctx, err.Error()),
+			}, nil
+		}
+	}
+
+	updateR, err := s.sm.UpdatePublicShare(ctx, user, req)
 	if err != nil {
 		return &link.UpdatePublicShareResponse{
 			Status: status.NewInternal(ctx, err.Error()),
@@ -481,11 +580,25 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	return res, nil
 }
 
-func enforcePassword(grant *link.Grant, conf *config) bool {
+func isInternalLink(req *link.UpdatePublicShareRequest, ps *link.PublicShare) bool {
+	switch {
+	case req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS:
+		return grants.PermissionsEqual(req.GetUpdate().GetGrant().GetPermissions().GetPermissions(), &provider.ResourcePermissions{})
+	default:
+		return grants.PermissionsEqual(ps.GetPermissions().GetPermissions(), &provider.ResourcePermissions{})
+	}
+}
+
+func enforcePassword(canOptOut bool, permissions *provider.ResourcePermissions, conf *config) bool {
+	isReadOnly := conversions.SufficientCS3Permissions(conversions.NewViewerRole(true).CS3ResourcePermissions(), permissions)
+	if isReadOnly && canOptOut {
+		return false
+	}
+
 	if conf.PublicShareMustHavePassword {
 		return true
 	}
-	isReadOnly := conversions.SufficientCS3Permissions(conversions.NewViewerRole(true).CS3ResourcePermissions(), grant.GetPermissions().GetPermissions())
+
 	return !isReadOnly && conf.WriteableShareMustHavePassword
 }
 
