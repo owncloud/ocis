@@ -14,5 +14,7 @@ func NewStream(cfg *config.Config) (events.Stream, error) {
 		EnableTLS:            cfg.Events.EnableTLS,
 		TLSInsecure:          cfg.Events.TLSInsecure,
 		TLSRootCACertificate: cfg.Events.TLSRootCaCertPath,
+		AuthUsername:         cfg.Events.AuthUsername,
+		AuthPassword:         cfg.Events.AuthPassword,
 	})
 }
