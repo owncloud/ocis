@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
+* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
 
 ## Details
 
@@ -108,6 +109,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7793
    https://github.com/owncloud/ocis/pull/7978
+   https://github.com/owncloud/ocis/pull/7979
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -135,6 +137,12 @@ The following sections list the changes for unreleased.
    the client implementation simple.
 
    https://github.com/owncloud/ocis/pull/7978
+
+* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+
+   Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
+
+   https://github.com/owncloud/ocis/pull/7979
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
