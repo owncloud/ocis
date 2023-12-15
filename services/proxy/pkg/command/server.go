@@ -130,7 +130,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, traceProvider)
+				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, traceProvider, *m)
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
@@ -271,7 +271,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	render.JSON(w, r, nil)
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 	gatewaySelector, err := pool.GatewaySelector(
@@ -386,6 +386,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		),
 		middleware.Tracer(traceProvider),
 		pkgmiddleware.TraceContext,
+		middleware.Instrumenter(metrics),
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
 		middleware.AccessLog(logger),
