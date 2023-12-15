@@ -22,7 +22,6 @@ import (
 	"context"
 	"strings"
 	"sync"
-	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -40,12 +39,12 @@ func init() {
 }
 
 // NewStatCache creates a new StatCache
-func NewStatCache(store string, nodes []string, database, table string, ttl time.Duration, size int) StatCache {
+func NewStatCache(cfg Config) StatCache {
 	c := statCache{}
-	c.s = getStore(store, nodes, database, table, ttl, size)
-	c.database = database
-	c.table = table
-	c.ttl = ttl
+	c.s = getStore(cfg)
+	c.database = cfg.Database
+	c.table = cfg.Table
+	c.ttl = cfg.TTL
 	return &c
 }
 

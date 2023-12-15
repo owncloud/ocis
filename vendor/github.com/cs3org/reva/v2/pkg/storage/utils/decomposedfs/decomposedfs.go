@@ -138,11 +138,12 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 
 	tp := tree.New(lu, bs, o, store.Create(
 		store.Store(o.IDCache.Store),
-		store.TTL(time.Duration(o.IDCache.TTL)*time.Second),
+		store.TTL(o.IDCache.TTL),
 		store.Size(o.IDCache.Size),
 		microstore.Nodes(o.IDCache.Nodes...),
 		microstore.Database(o.IDCache.Database),
 		microstore.Table(o.IDCache.Table),
+		store.DisablePersistence(o.IDCache.DisablePersistence),
 	))
 
 	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
@@ -203,7 +204,7 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		p:               p,
 		chunkHandler:    chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
 		stream:          es,
-		cache:           cache.GetStatCache(o.StatCache.Store, o.StatCache.Nodes, o.StatCache.Database, "stat", time.Duration(o.StatCache.TTL)*time.Second, o.StatCache.Size),
+		cache:           cache.GetStatCache(o.StatCache),
 		UserCache:       ttlcache.NewCache(),
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,

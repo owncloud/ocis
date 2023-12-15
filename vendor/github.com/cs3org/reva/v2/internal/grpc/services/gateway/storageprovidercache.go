@@ -85,7 +85,6 @@ func (c *cachedRegistryClient) GetHome(ctx context.Context, in *registry.GetHome
 type cachedAPIClient struct {
 	c                        provider.ProviderAPIClient
 	statCache                cache.StatCache
-	createHomeCache          cache.CreateHomeCache
 	createPersonalSpaceCache cache.CreatePersonalSpaceCache
 }
 
@@ -121,10 +120,10 @@ func (c *cachedAPIClient) Stat(ctx context.Context, in *provider.StatRequest, op
 
 // CreateHome caches calls to CreateHome locally - anyways they only need to be called once per user
 func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHomeRequest, opts ...grpc.CallOption) (*provider.CreateHomeResponse, error) {
-	key := c.createHomeCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
+	key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
 	if key != "" {
 		s := &provider.CreateHomeResponse{}
-		if err := c.createHomeCache.PullFromCache(key, s); err == nil {
+		if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
 			return s, nil
 		}
 	}
@@ -137,7 +136,7 @@ func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHom
 	case key == "":
 		return resp, nil
 	default:
-		return resp, c.createHomeCache.PushToCache(key, resp)
+		return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
 	}
 }
 

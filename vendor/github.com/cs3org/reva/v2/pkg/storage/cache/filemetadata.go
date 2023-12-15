@@ -18,21 +18,17 @@
 
 package cache
 
-import (
-	"time"
-)
-
 type fileMetadataCache struct {
 	cacheStore
 }
 
 // NewFileMetadataCache creates a new FileMetadataCache
-func NewFileMetadataCache(store string, nodes []string, database, table string, ttl time.Duration, size int) FileMetadataCache {
+func NewFileMetadataCache(cfg Config) FileMetadataCache {
 	c := &fileMetadataCache{}
-	c.s = getStore(store, nodes, database, table, ttl, size)
-	c.database = database
-	c.table = table
-	c.ttl = ttl
+	c.s = getStore(cfg)
+	c.database = cfg.Database
+	c.table = cfg.Table
+	c.ttl = cfg.TTL
 
 	return c
 }

@@ -186,6 +186,7 @@ func NewService(opts ...Option) (Graph, error) {
 			microstore.Nodes(options.Config.Cache.Nodes...),
 			microstore.Database(options.Config.Cache.Database),
 			microstore.Table(options.Config.Cache.Table),
+			store.DisablePersistence(options.Config.Cache.DisablePersistence),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),

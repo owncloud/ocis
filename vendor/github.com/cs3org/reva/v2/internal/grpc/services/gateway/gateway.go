@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -64,26 +63,14 @@ type config struct {
 	TokenManager                  string `mapstructure:"token_manager"`
 	// ShareFolder is the location where to create shares in the recipient's storage provider.
 	// FIXME get rid of ShareFolder, there are findByPath calls in the ocmshareporvider.go and usershareprovider.go
-	ShareFolder                  string                            `mapstructure:"share_folder"`
-	DataTransfersFolder          string                            `mapstructure:"data_transfers_folder"`
-	TokenManagers                map[string]map[string]interface{} `mapstructure:"token_managers"`
-	AllowedUserAgents            map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
-	StatCacheStore               string                            `mapstructure:"stat_cache_store"`
-	StatCacheNodes               []string                          `mapstructure:"stat_cache_nodes"`
-	StatCacheDatabase            string                            `mapstructure:"stat_cache_database"`
-	StatCacheTTL                 int                               `mapstructure:"stat_cache_ttl"`
-	StatCacheSize                int                               `mapstructure:"stat_cache_size"`
-	CreateHomeCacheStore         string                            `mapstructure:"create_home_cache_store"`
-	CreateHomeCacheNodes         []string                          `mapstructure:"create_home_cache_nodes"`
-	CreateHomeCacheDatabase      string                            `mapstructure:"create_home_cache_database"`
-	CreateHomeCacheTTL           int                               `mapstructure:"create_home_cache_ttl"`
-	CreateHomeCacheSize          int                               `mapstructure:"create_home_cache_size"`
-	ProviderCacheStore           string                            `mapstructure:"provider_cache_store"`
-	ProviderCacheNodes           []string                          `mapstructure:"provider_cache_nodes"`
-	ProviderCacheDatabase        string                            `mapstructure:"provider_cache_database"`
-	ProviderCacheTTL             int                               `mapstructure:"provider_cache_ttl"`
-	ProviderCacheSize            int                               `mapstructure:"provider_cache_size"`
-	UseCommonSpaceRootShareLogic bool                              `mapstructure:"use_common_space_root_share_logic"`
+	ShareFolder                    string                            `mapstructure:"share_folder"`
+	DataTransfersFolder            string                            `mapstructure:"data_transfers_folder"`
+	TokenManagers                  map[string]map[string]interface{} `mapstructure:"token_managers"`
+	AllowedUserAgents              map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
+	StatCacheConfig                cache.Config                      `mapstructure:"stat_cache_config"`
+	CreatePersonalSpaceCacheConfig cache.Config                      `mapstructure:"create_personal_space_cache_config"`
+	ProviderCacheConfig            cache.Config                      `mapstructure:"provider_cache_config"`
+	UseCommonSpaceRootShareLogic   bool                              `mapstructure:"use_common_space_root_share_logic"`
 }
 
 // sets defaults
@@ -130,28 +117,28 @@ func (c *config) init() {
 	}
 
 	// caching needs to be explicitly enabled
-	if c.StatCacheStore == "" {
-		c.StatCacheStore = "noop"
+	if c.StatCacheConfig.Store == "" {
+		c.StatCacheConfig.Store = "noop"
 	}
 
-	if c.StatCacheDatabase == "" {
-		c.StatCacheDatabase = "reva"
+	if c.StatCacheConfig.Database == "" {
+		c.StatCacheConfig.Database = "reva"
 	}
 
-	if c.ProviderCacheStore == "" {
-		c.ProviderCacheStore = "noop"
+	if c.ProviderCacheConfig.Store == "" {
+		c.ProviderCacheConfig.Store = "noop"
 	}
 
-	if c.ProviderCacheDatabase == "" {
-		c.ProviderCacheDatabase = "reva"
+	if c.ProviderCacheConfig.Database == "" {
+		c.ProviderCacheConfig.Database = "reva"
 	}
 
-	if c.CreateHomeCacheStore == "" {
-		c.CreateHomeCacheStore = "noop"
+	if c.CreatePersonalSpaceCacheConfig.Store == "" {
+		c.CreatePersonalSpaceCacheConfig.Store = "noop"
 	}
 
-	if c.CreateHomeCacheDatabase == "" {
-		c.CreateHomeCacheDatabase = "reva"
+	if c.CreatePersonalSpaceCacheConfig.Database == "" {
+		c.CreatePersonalSpaceCacheConfig.Database = "reva"
 	}
 }
 
@@ -161,14 +148,13 @@ type svc struct {
 	tokenmgr                 token.Manager
 	statCache                cache.StatCache
 	providerCache            cache.ProviderCache
-	createHomeCache          cache.CreateHomeCache
 	createPersonalSpaceCache cache.CreatePersonalSpaceCache
 }
 
 // New creates a new gateway svc that acts as a proxy for any grpc operation.
 // The gateway is responsible for high-level controls: rate-limiting, coordination between svcs
 // like sharing and storage acls, asynchronous transactions, ...
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, _ *grpc.Server) (rgrpc.Service, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
@@ -191,10 +177,9 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		c:                        c,
 		dataGatewayURL:           *u,
 		tokenmgr:                 tokenManager,
-		statCache:                cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize),
-		providerCache:            cache.GetProviderCache(c.ProviderCacheStore, c.ProviderCacheNodes, c.ProviderCacheDatabase, "provider", time.Duration(c.ProviderCacheTTL)*time.Second, c.ProviderCacheSize),
-		createHomeCache:          cache.GetCreateHomeCache(c.CreateHomeCacheStore, c.CreateHomeCacheNodes, c.CreateHomeCacheDatabase, "createHome", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
-		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CreateHomeCacheStore, c.CreateHomeCacheNodes, c.CreateHomeCacheDatabase, "createPersonalSpace", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
+		statCache:                cache.GetStatCache(c.StatCacheConfig),
+		providerCache:            cache.GetProviderCache(c.ProviderCacheConfig),
+		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CreatePersonalSpaceCacheConfig),
 	}
 
 	return s, nil
@@ -207,7 +192,7 @@ func (s *svc) Register(ss *grpc.Server) {
 func (s *svc) Close() error {
 	s.statCache.Close()
 	s.providerCache.Close()
-	s.createHomeCache.Close()
+	s.createPersonalSpaceCache.Close()
 	return nil
 }
 

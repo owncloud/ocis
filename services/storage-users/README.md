@@ -10,13 +10,13 @@ Starting with ocis version 3.0.0, the default backend for metadata switched to m
 
 Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
 
-IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network. 
+IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network.
 
 When hard-stopping Infinite Scale, for example with the `kill <pid>` command (SIGKILL), it is possible and likely that not all data from the decomposedfs (metadata) has been written to the storage which may result in an inconsistent decomposedfs. When gracefully shutting down Infinite Scale, using a command like SIGTERM, the process will no longer accept any write requests from _other_ services and will try to write the internal open  requests which can take an undefined duration based on many factors. To mitigate that situation, the following things have been implemented:
 
 *   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences, you must increase the default value.
 
-*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details. 
+*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details.
 
 ## CLI Commands
 
@@ -37,7 +37,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 Example cases for expired uploads
 
 *   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
-*   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed. 
+*   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
 There are two commands available to manage unfinished uploads
 
@@ -101,13 +101,21 @@ The configuration for the `purge-expired` command is done by using the following
 
 The `storage-users` service caches stat, metadata and uuids of files and folders via the configured store in `STORAGE_USERS_STAT_CACHE_STORE`, `STORAGE_USERS_FILEMETADATA_CACHE_STORE` and `STORAGE_USERS_ID_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
-  -   `redis`: Stores metadata in a configured Redis cluster.
-  -   `redis-sentinel`: Stores metadata in a configured Redis Sentinel cluster.
-  -   `etcd`: Stores metadata in a configured etcd cluster.
-  -   `nats-js`: Stores metadata using the key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
+  -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
+  -   `ocmem`: Advanced in-memory store allowing max size. (deprecated)
+  -   `redis`: Stores data in a configured Redis cluster. (deprecated)
+  -   `etcd`: Stores data in a configured etcd cluster. (deprecated)
+  -   `nats-js`: Stores data using object-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/obj_store) (deprecated)
 
-1.  Note that in-memory stores are by nature not reboot-persistent.
-2.  Though usually not necessary, a database name can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`, `redis` and `redis-sentinel`. These settings are blank by default which means that the standard settings of the configured store apply.
-3.  The `storage-users` service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
-4.  When using `redis-sentinel`, the Redis master to use is configured via `STORAGE_USERS_STAT_CACHE_STORE_NODES`, `STORAGE_USERS_FILEMETADATA_CACHE_STORE_NODES` and `STORAGE_USERS_ID_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+Other store types may work but are not supported currently.
+
+Note: The service can only be scaled if not using `memory` store and the stores are configured identically over all instances!
+
+Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
+
+Store specific notes:
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.

@@ -20,7 +20,6 @@ package cache
 
 import (
 	"sync"
-	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -33,12 +32,12 @@ type providerCache struct {
 }
 
 // NewProviderCache creates a new ProviderCache
-func NewProviderCache(store string, nodes []string, database, table string, ttl time.Duration, size int) ProviderCache {
+func NewProviderCache(cfg Config) ProviderCache {
 	c := &providerCache{}
-	c.s = getStore(store, nodes, database, table, ttl, size)
-	c.database = database
-	c.table = table
-	c.ttl = ttl
+	c.s = getStore(cfg)
+	c.database = cfg.Database
+	c.table = cfg.Table
+	c.ttl = cfg.TTL
 
 	return c
 }

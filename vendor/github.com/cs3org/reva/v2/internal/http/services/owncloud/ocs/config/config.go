@@ -21,6 +21,7 @@ package config
 import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/data"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 )
 
 // Config holds the config options that need to be passed down to all ocs handlers
@@ -37,12 +38,7 @@ type Config struct {
 	AdditionalInfoAttribute               string                            `mapstructure:"additional_info_attribute"`
 	CacheWarmupDriver                     string                            `mapstructure:"cache_warmup_driver"`
 	CacheWarmupDrivers                    map[string]map[string]interface{} `mapstructure:"cache_warmup_drivers"`
-	StatCacheStore                        string                            `mapstructure:"stat_cache_store"`
-	StatCacheNodes                        []string                          `mapstructure:"stat_cache_nodes"`
-	StatCacheDatabase                     string                            `mapstructure:"stat_cache_database"`
-	StatCacheTable                        string                            `mapstructure:"stat_cache_table"`
-	StatCacheTTL                          int                               `mapstructure:"stat_cache_ttl"`
-	StatCacheSize                         int                               `mapstructure:"stat_cache_size"`
+	StatCacheConfig                       cache.Config                      `mapstructure:"stat_cache_config"`
 	UserIdentifierCacheTTL                int                               `mapstructure:"user_identifier_cache_ttl"`
 	MachineAuthAPIKey                     string                            `mapstructure:"machine_auth_apikey"`
 	SkipUpdatingExistingSharesMountpoints bool                              `mapstructure:"skip_updating_existing_shares_mountpoint"`

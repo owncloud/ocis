@@ -62,6 +62,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
 				microstore.Database(cfg.OIDC.UserinfoCache.Database),
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),
+				store.DisablePersistence(cfg.OIDC.UserinfoCache.DisablePersistence),
 			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

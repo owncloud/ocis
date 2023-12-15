@@ -20,7 +20,6 @@ package ocs
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/handlers/apps/sharing/sharees"
@@ -67,9 +66,9 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	if conf.CacheWarmupDriver == "first-request" && conf.StatCacheStore != "noop" {
+	if conf.CacheWarmupDriver == "first-request" && conf.StatCacheConfig.Store != "noop" {
 		s.warmupCacheTracker = ttlcache.NewCache()
-		_ = s.warmupCacheTracker.SetTTL(time.Second * time.Duration(conf.StatCacheTTL))
+		_ = s.warmupCacheTracker.SetTTL(conf.StatCacheConfig.TTL)
 	}
 
 	return s, nil
