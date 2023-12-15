@@ -176,7 +176,7 @@ type Events struct {
 
 // StatCache holds cache config
 type StatCache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details."`
 	Nodes              []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_USERS_STAT_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_STAT_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
@@ -186,7 +186,7 @@ type StatCache struct {
 
 // FilemetadataCache holds cache config
 type FilemetadataCache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_FILEMETADATA_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_FILEMETADATA_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details."`
 	Nodes              []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_USERS_FILEMETADATA_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_FILEMETADATA_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
@@ -196,7 +196,7 @@ type FilemetadataCache struct {
 
 // IDCache holds cache config
 type IDCache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_ID_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_ID_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details."`
 	Nodes              []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_USERS_ID_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_ID_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens have no expiration. Defaults to 300s which is derived from the underlaying package though not explicitly set as default. See the Environment Variable Types description for more details."`

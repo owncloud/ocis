@@ -44,17 +44,24 @@ You can find more details regarding available attributes at the [libre-graph-api
 
 The `frontend` service can use a configured store via `FRONTEND_OCS_STAT_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
-  -   `ocmem`: Advanced in-memory store allowing max size.
-  -   `redis`: Stores data in a configured Redis cluster.
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `etcd`: Stores data in a configured etcd cluster.
-  -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
+  -   `ocmem`: Advanced in-memory store allowing max size. (deprecated)
+  -   `redis`: Stores data in a configured Redis cluster. (deprecated)
+  -   `etcd`: Stores data in a configured etcd cluster. (deprecated)
+  -   `nats-js`: Stores data using object-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/obj_store) (deprecated)
 
-1.  Note that in-memory stores are by nature not reboot-persistent.
-2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store apply.
-3.  The frontend service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
-4.  When using `redis-sentinel`, the Redis master to use is configured via `FRONTEND_OCS_STAT_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+Other store types may work but are not supported currently.
+
+Note: The service can only be scaled if not using `memory` store and the stores are configured identically over all instances!
+
+Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
+
+Store specific notes:
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ## Event Handler
 
