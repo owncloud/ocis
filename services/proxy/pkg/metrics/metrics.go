@@ -14,8 +14,8 @@ var (
 
 // Metrics defines the available metrics of this service.
 type Metrics struct {
-	Counter   *prometheus.CounterVec
-	Latency   *prometheus.SummaryVec
+	Requests  *prometheus.CounterVec
+	Errors    *prometheus.CounterVec
 	Duration  *prometheus.HistogramVec
 	BuildInfo *prometheus.GaugeVec
 }
@@ -23,24 +23,24 @@ type Metrics struct {
 // New initializes the available metrics.
 func New() *Metrics {
 	m := &Metrics{
-		Counter: prometheus.NewCounterVec(prometheus.CounterOpts{
+		Requests: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,
-			Name:      "proxy_total",
-			Help:      "How many proxy requests processed",
-		}, []string{}),
-		Latency: prometheus.NewSummaryVec(prometheus.SummaryOpts{
+			Name:      "requests_total",
+			Help:      "How many requests processed in total",
+		}, []string{"method"}),
+		Errors: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,
-			Name:      "proxy_latency_microseconds",
-			Help:      "proxy request latencies in microseconds",
-		}, []string{}),
+			Name:      "errors_total",
+			Help:      "How many requests run into errors",
+		}, []string{"method"}),
 		Duration: prometheus.NewHistogramVec(prometheus.HistogramOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,
-			Name:      "proxy_duration_seconds",
-			Help:      "proxy method request time in seconds",
-		}, []string{}),
+			Name:      "duration_seconds",
+			Help:      "request duration in seconds",
+		}, []string{"method"}),
 		BuildInfo: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,
@@ -49,8 +49,8 @@ func New() *Metrics {
 		}, []string{"versions"}),
 	}
 
-	_ = prometheus.Register(m.Counter)
-	_ = prometheus.Register(m.Latency)
+	_ = prometheus.Register(m.Requests)
+	_ = prometheus.Register(m.Errors)
 	_ = prometheus.Register(m.Duration)
 	_ = prometheus.Register(m.BuildInfo)
 	return m
