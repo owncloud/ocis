@@ -1734,9 +1734,10 @@ func publicPwdEnforced(c *config.Config) passwordEnforced {
 
 func passwordPolicies(c *config.Config) password.Validator {
 	if c.Capabilities.Capabilities == nil || c.Capabilities.Capabilities.PasswordPolicy == nil {
-		return password.NewPasswordPolicy(0, 0, 0, 0, 0, nil)
+		return password.NewPasswordPolicy(true, 0, 0, 0, 0, 0, nil)
 	}
 	return password.NewPasswordPolicy(
+		c.Capabilities.Capabilities.PasswordPolicy.Disabled,
 		c.Capabilities.Capabilities.PasswordPolicy.MinCharacters,
 		c.Capabilities.Capabilities.PasswordPolicy.MinLowerCaseCharacters,
 		c.Capabilities.Capabilities.PasswordPolicy.MinUpperCaseCharacters,

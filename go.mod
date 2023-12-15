@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.9.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
-	github.com/cs3org/reva/v2 v2.17.1-0.20231215134723-5142bf31838d
+	github.com/cs3org/reva/v2 v2.17.1-0.20231215155002-7810e3d8be38
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -349,4 +349,4 @@ require (
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
 
-replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231123085457-ff658b6ea159
+replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215074047-b00689b28e5f

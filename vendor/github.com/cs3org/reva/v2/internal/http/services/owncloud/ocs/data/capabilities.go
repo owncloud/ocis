@@ -117,6 +117,7 @@ type CapabilitiesGraph struct {
 
 // CapabilitiesPasswordPolicy hold the password policy capabilities
 type CapabilitiesPasswordPolicy struct {
+	Disabled               bool                `json:"disabled" xml:"disabled" mapstructure:"disabled"`
 	MinCharacters          int                 `json:"min_characters" xml:"min_characters" mapstructure:"min_characters"`
 	MaxCharacters          int                 `json:"max_characters" xml:"max_characters" mapstructure:"max_characters"`
 	MinLowerCaseCharacters int                 `json:"min_lowercase_characters" xml:"min_lowercase_characters" mapstructure:"min_lowercase_characters"`
