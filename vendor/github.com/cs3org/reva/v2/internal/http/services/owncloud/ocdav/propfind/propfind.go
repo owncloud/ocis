@@ -1156,7 +1156,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 			appendToOK(
 				prop.Escaped("oc:id", sid),
 				prop.Escaped("oc:fileid", sid),
-				prop.Escaped("oc:spaceid", id.SpaceId),
+				prop.Escaped("oc:spaceid", storagespace.FormatStorageID(id.StorageId, id.SpaceId)),
 			)
 		}
 
@@ -1296,7 +1296,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "spaceid":
 					if id != nil {
-						appendToOK(prop.Escaped("oc:spaceid", id.SpaceId))
+						appendToOK(prop.Escaped("oc:spaceid", storagespace.FormatStorageID(id.StorageId, id.SpaceId)))
 					} else {
 						appendToNotFound(prop.Escaped("oc:spaceid", ""))
 					}

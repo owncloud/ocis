@@ -89,3 +89,17 @@ func DisablePersistence(val bool) store.Option {
 		o.Context = context.WithValue(o.Context, disablePersistanceContextKey{}, val)
 	}
 }
+
+type authenticationContextKey struct{}
+
+// Authentication configures the username and password to use for authentication.
+// Only supported by the `natsjskv` implementation.
+func Authentication(username, password string) store.Option {
+	return func(o *store.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
+
+		o.Context = context.WithValue(o.Context, authenticationContextKey{}, []string{username, password})
+	}
+}

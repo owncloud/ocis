@@ -51,6 +51,8 @@ type Config struct {
 	TTL                time.Duration `mapstructure:"cache_ttl"`
 	Size               int           `mapstructure:"cache_size"`
 	DisablePersistence bool          `mapstructure:"cache_disable_persistence"`
+	AuthUsername       string        `mapstructure:"cache_auth_username"`
+	AuthPassword       string        `mapstructure:"cache_auth_password"`
 }
 
 // Cache handles key value operations on caches
@@ -240,5 +242,6 @@ func getStore(cfg Config) microstore.Store {
 		store.TTL(cfg.TTL),
 		store.Size(cfg.Size),
 		store.DisablePersistence(cfg.DisablePersistence),
+		store.Authentication(cfg.AuthUsername, cfg.AuthPassword),
 	)
 }

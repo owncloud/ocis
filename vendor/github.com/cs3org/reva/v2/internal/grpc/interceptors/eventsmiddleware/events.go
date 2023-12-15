@@ -37,6 +37,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
@@ -223,17 +224,11 @@ func publisherFromConfig(m map[string]interface{}) (events.Publisher, error) {
 	default:
 		return nil, fmt.Errorf("stream type '%s' not supported", typ)
 	case "nats":
-		var tlsCert string
-		val, ok := m["tls-root-ca-cert"]
-		if ok {
-			tlsCert = val.(string)
+		var cfg stream.NatsConfig
+		if err := mapstructure.Decode(m, &cfg); err != nil {
+			return nil, err
 		}
-		return stream.NatsFromConfig(m["name"].(string), false, stream.NatsConfig{
-			Endpoint:             m["address"].(string),
-			Cluster:              m["clusterID"].(string),
-			EnableTLS:            m["enable-tls"].(bool),
-			TLSInsecure:          m["tls-insecure"].(bool),
-			TLSRootCACertificate: tlsCert,
-		})
+		name, _ := m["name"].(string)
+		return stream.NatsFromConfig(name, false, cfg)
 	}
 }
