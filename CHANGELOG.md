@@ -45,6 +45,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
@@ -73,6 +74,13 @@ The following sections list the changes for unreleased.
    We fixed the status code on SharingNG update permissions for public shares.
 
    https://github.com/owncloud/ocis/pull/7952
+
+* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
+
+   We fixed a bug where the permission validation was not working correctly.
+
+   https://github.com/owncloud/ocis/pull/7963
+   https://github.com/cs3org/reva/pull/4405
 
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 
@@ -110,6 +118,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7793
    https://github.com/owncloud/ocis/pull/7978
    https://github.com/owncloud/ocis/pull/7979
+   https://github.com/owncloud/ocis/pull/7963
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
