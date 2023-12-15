@@ -119,6 +119,9 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling UpdateShare")
 	}
+	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return res, nil
+	}
 
 	if s.c.CommitShareToStorageGrant {
 		creator := ctxpkg.ContextMustGetUser(ctx)
