@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  kpop>cldr: ''
+
 dependencies:
   '@fontsource/roboto':
     specifier: ^5.0.8
@@ -3402,7 +3405,6 @@ packages:
   /@xmldom/xmldom@0.8.10:
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
-    dev: true
 
   /@xtuc/ieee754@1.2.0:
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -4478,20 +4480,6 @@ packages:
     resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
     dev: false
 
-  /cldr@5.8.0:
-    resolution: {integrity: sha512-w0L5FX4X3txDX5G/YSbDAQuneVSFPSKjOXB2ehWh/J6BN7RJ+IUEVNG9hIGjuJoyYJcVGE2AoL0W0VSjirQPIg==}
-    dependencies:
-      escodegen: 2.1.0
-      esprima: 4.0.1
-      memoizeasync: 1.1.0
-      passerror: 1.1.1
-      pegjs: 0.10.0
-      seq: 0.3.5
-      unicoderegexp: 0.4.1
-      xmldom: 0.4.0
-      xpath: 0.0.32
-    dev: false
-
   /cldr@7.5.0:
     resolution: {integrity: sha512-2qy3ASYFbNToTujNnk5Y8ak++B4TH/G+S8AEOrN1xUFZhxhmqWDPUGnOFGyId61vD2Trf+yE65wVzIcdE/bpPg==}
     dependencies:
@@ -4504,7 +4492,6 @@ packages:
       seq: 0.3.5
       unicoderegexp: 0.4.1
       xpath: 0.0.33
-    dev: true
 
   /clean-css@4.2.4:
     resolution: {integrity: sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==}
@@ -12462,21 +12449,9 @@ packages:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
 
-  /xmldom@0.4.0:
-    resolution: {integrity: sha512-2E93k08T30Ugs+34HBSTQLVtpi6mCddaY8uO+pMNk1pqSjV5vElzn4mmh6KLxN3hki8rNcHSYzILoh3TEWORvA==}
-    engines: {node: '>=10.0.0'}
-    deprecated: Deprecated due to CVE-2021-21366 resolved in 0.5.0
-    dev: false
-
-  /xpath@0.0.32:
-    resolution: {integrity: sha512-rxMJhSIoiO8vXcWvSifKqhvV96GjiD5wYb8/QHdoRyQvraTpp4IEv944nhGausZZ3u7dhQXteZuZbaqfpB7uYw==}
-    engines: {node: '>=0.6.0'}
-    dev: false
-
   /xpath@0.0.33:
     resolution: {integrity: sha512-NNXnzrkDrAzalLhIUc01jO2mOzXGXh1JwPgkihcLLzw98c0WgYDmmjSh1Kl3wzaxSVWMuA+fe0WTWOBDWCBmNA==}
     engines: {node: '>=0.6.0'}
-    dev: true
 
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -12560,7 +12535,7 @@ packages:
       '@gluejs/glue': 0.3.0
       '@material-ui/core': 4.12.4(@types/react@17.0.65)(react-dom@17.0.2)(react@17.0.2)
       '@material-ui/icons': 4.11.3(@material-ui/core@4.12.4)(@types/react@17.0.65)(react-dom@17.0.2)(react@17.0.2)
-      cldr: 5.8.0
+      cldr: 7.5.0
       crc32: 0.2.2
       hsv-rgb: 1.0.0
       iso-639-1: 2.1.15
