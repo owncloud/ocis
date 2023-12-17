@@ -150,7 +150,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++noop ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -198,10 +198,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++24m0s ++
+++5m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -402,7 +402,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
 a| `OCIS_EVENTS_ENDPOINT`
 
@@ -450,7 +450,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
@@ -465,7 +465,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -633,7 +633,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the GATEWAY service.
+Whether to verify the server TLS certificates.
 
 a| `OCIS_JWT_SECRET`
 
@@ -700,7 +700,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -1558,7 +1558,7 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
@@ -1598,7 +1598,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
@@ -1613,7 +1613,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1919,10 +1919,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://127.0.0.1:9200 ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
