@@ -33,8 +33,8 @@ variables:
   description: ""
   do_ignore: true
 - rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:44
-  foundincode: false
+  path: ocis-pkg/registry/registry.go:46
+  foundincode: true
   name: MICRO_REGISTRY
   type: string
   default_value: ""
@@ -43,8 +43,8 @@ variables:
     Only change on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:42
-  foundincode: false
+  path: ocis-pkg/registry/registry.go:44
+  foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: ""
@@ -79,20 +79,4 @@ variables:
   type: ""
   default_value: ""
   description: false positive - code that extract envvars for config structs
-  do_ignore: true
-- rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:44
-  foundincode: true
-  name: registryAddressEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
-- rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:46
-  foundincode: true
-  name: registryEnv
-  type: ""
-  default_value: ""
-  description: ""
   do_ignore: true
