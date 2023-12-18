@@ -50,11 +50,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
 * Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
-* Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 
 ## Details
 
@@ -111,14 +111,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7970
 
-* Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
-
-   We added sciencemesh and ocm services to enable federation.
-
-   https://github.com/owncloud/ocis/pull/7576
-   https://github.com/owncloud/ocis/pull/7464
-   https://github.com/owncloud/ocis/pull/7463
-
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 
    Bumps reva version
@@ -160,6 +152,15 @@ The following sections list the changes for unreleased.
    Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
 
    https://github.com/owncloud/ocis/pull/7979
+
+* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
+
+   We added sciencemesh and ocm services to enable federation.
+
+   https://github.com/owncloud/ocis/pull/7998
+   https://github.com/owncloud/ocis/pull/7576
+   https://github.com/owncloud/ocis/pull/7464
+   https://github.com/owncloud/ocis/pull/7463
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
