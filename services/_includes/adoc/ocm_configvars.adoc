@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-18-08-21-59]
+[#deprecation-note-2023-12-18-09-07-09]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -226,6 +226,26 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The transport protocol of the GRPC service.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`OCM_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`OCM_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 
 a|`OCIS_REVA_GATEWAY` +
 
