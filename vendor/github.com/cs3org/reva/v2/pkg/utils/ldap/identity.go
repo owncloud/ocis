@@ -503,11 +503,12 @@ func (i *Identity) getUserFilter(uid string) (string, error) {
 		escapedUUID = ldap.EscapeFilter(uid)
 	}
 
-	return fmt.Sprintf("(&%s(objectclass=%s)(%s=%s))",
+	return fmt.Sprintf("(&%s(objectclass=%s)(%s=%s)%s)",
 		i.User.Filter,
 		i.User.Objectclass,
 		i.User.Schema.ID,
 		escapedUUID,
+		i.disabledFilter(),
 	), nil
 }
 

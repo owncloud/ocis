@@ -964,7 +964,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		}
 	}
 
-	etag, err := node.CalculateEtag(n, tmtime)
+	etag, err := node.CalculateEtag(n.ID, tmtime)
 	if err != nil {
 		return nil, err
 	}
