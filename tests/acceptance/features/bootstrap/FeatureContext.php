@@ -2783,6 +2783,22 @@ class FeatureContext extends BehatVariablesContext {
 					$this, "getGroupIdByGroupName"
 				],
 				"parameter" => [$group]
+			],
+			[
+				"code" => "%role_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%share_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getShareIdRegex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
