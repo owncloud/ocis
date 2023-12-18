@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 
 ## Details
@@ -152,6 +153,12 @@ The following sections list the changes for unreleased.
    Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
 
    https://github.com/owncloud/ocis/pull/7979
+
+* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
+
+   Replaces the nats object store with the nats kv store in the natsjs registry
+
+   https://github.com/owncloud/ocis/pull/7987
 
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 
