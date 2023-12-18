@@ -86,7 +86,6 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			CreatePublicLinkPermission(All),
 			CreateSharePermission(All),
 			CreateSpacesPermission(All),
-			CreateSpacesPermission(Own),
 			DeleteProjectSpacesPermission(All),
 			DeleteReadOnlyPublicLinkPasswordPermission(All),
 			DisableEmailNotificationsPermission(Own),
