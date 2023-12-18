@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -22,6 +23,10 @@ var retryCount = 0
 var stopSignal = false
 
 func Start(envMap map[string]any) {
+	// wait for the log scanner to finish
+	var wg sync.WaitGroup
+	wg.Add(2)
+
 	stopSignal = false
 	if retryCount == 0 {
 		defer common.Wg.Done()
@@ -57,12 +62,14 @@ func Start(envMap map[string]any) {
 
 	// Read the logs when the 'ocis server' command is running
 	go func() {
+		defer wg.Done()
 		for logScanner.Scan() {
 			outChan <- logScanner.Text()
 		}
 	}()
 
 	go func() {
+		defer wg.Done()
 		for outputScanner.Scan() {
 			outChan <- outputScanner.Text()
 		}
@@ -89,6 +96,7 @@ func Start(envMap map[string]any) {
 				retryCount++
 				maxRetry, _ := strconv.Atoi(config.Get("retry"))
 				if retryCount <= maxRetry {
+					wg.Wait()
 					close(outChan)
 					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
 					// wait 500 milliseconds before retrying
@@ -99,6 +107,7 @@ func Start(envMap map[string]any) {
 			}
 		}
 	}
+	wg.Wait()
 	close(outChan)
 }
 
