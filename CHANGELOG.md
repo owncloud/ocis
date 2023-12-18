@@ -49,6 +49,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
 * Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
+* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
@@ -104,6 +105,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7931
    https://github.com/owncloud/ocis/pull/7976
 
+* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
+
+   Configure sse streams to be non-durable. This functionality is not needed for
+   the sse service
+
+   https://github.com/owncloud/ocis/pull/7986
+
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 
    We've removed the option accessDeniedHelpUrl from the config, since other
@@ -120,6 +128,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7978
    https://github.com/owncloud/ocis/pull/7979
    https://github.com/owncloud/ocis/pull/7963
+   https://github.com/owncloud/ocis/pull/7986
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
