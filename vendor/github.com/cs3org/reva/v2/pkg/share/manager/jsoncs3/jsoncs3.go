@@ -175,7 +175,7 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 
 	var es events.Stream
 	if c.Events.Endpoint != "" {
-		es, err = stream.NatsFromConfig("jsoncs3-share-manager", stream.NatsConfig(c.Events))
+		es, err = stream.NatsFromConfig("jsoncs3-share-manager", false, stream.NatsConfig(c.Events))
 		if err != nil {
 			return nil, err
 		}

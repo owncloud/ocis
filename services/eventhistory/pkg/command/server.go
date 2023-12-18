@@ -60,7 +60,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
-			consumer, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
+			consumer, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
 				return err
 			}

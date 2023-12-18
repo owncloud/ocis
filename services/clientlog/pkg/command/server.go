@@ -57,7 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			stream, err := stream.NatsFromConfig(cfg.Service.Name, stream.NatsConfig(cfg.Events))
+			stream, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
 				return err
 			}

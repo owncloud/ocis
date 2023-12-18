@@ -53,7 +53,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	if options.Config.Events.Endpoint != "" {
 		var err error
-		publisher, err = stream.NatsFromConfig(options.Config.Service.Name, stream.NatsConfig(options.Config.Events))
+		publisher, err = stream.NatsFromConfig(options.Config.Service.Name, false, stream.NatsConfig(options.Config.Events))
 		if err != nil {
 			options.Logger.Error().
 				Err(err).

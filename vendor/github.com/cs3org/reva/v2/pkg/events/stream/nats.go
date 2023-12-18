@@ -25,7 +25,7 @@ type NatsConfig struct {
 }
 
 // NatsFromConfig returns a nats stream from the given config
-func NatsFromConfig(connName string, cfg NatsConfig) (events.Stream, error) {
+func NatsFromConfig(connName string, disableDurability bool, cfg NatsConfig) (events.Stream, error) {
 	var tlsConf *tls.Config
 	if cfg.EnableTLS {
 		var rootCAPool *x509.CertPool
@@ -48,13 +48,20 @@ func NatsFromConfig(connName string, cfg NatsConfig) (events.Stream, error) {
 			RootCAs:            rootCAPool,
 		}
 	}
-	return Nats(
+
+	opts := []natsjs.Option{
 		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(cfg.Endpoint),
 		natsjs.ClusterID(cfg.Cluster),
 		natsjs.SynchronousPublish(true),
 		natsjs.Name(connName),
-	)
+	}
+
+	if disableDurability {
+		opts = append(opts, natsjs.DisableDurableStreams())
+	}
+
+	return Nats(opts...)
 
 }
 

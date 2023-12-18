@@ -228,7 +228,7 @@ func publisherFromConfig(m map[string]interface{}) (events.Publisher, error) {
 		if ok {
 			tlsCert = val.(string)
 		}
-		return stream.NatsFromConfig(m["name"].(string), stream.NatsConfig{
+		return stream.NatsFromConfig(m["name"].(string), false, stream.NatsConfig{
 			Endpoint:             m["address"].(string),
 			Cluster:              m["clusterID"].(string),
 			EnableTLS:            m["enable-tls"].(bool),

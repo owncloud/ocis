@@ -41,6 +41,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/mime"
+	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/ace"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
@@ -1220,6 +1221,9 @@ func (n *Node) FindStorageSpaceRoot(ctx context.Context) error {
 
 // UnmarkProcessing removes the processing flag from the node
 func (n *Node) UnmarkProcessing(ctx context.Context, uploadID string) error {
+	// we currently have to decrease the counter for every processing run to match the incrases
+	metrics.UploadProcessing.Sub(1)
+
 	v, _ := n.XattrString(ctx, prefixes.StatusPrefix)
 	if v != ProcessingStatus+uploadID {
 		// file started another postprocessing later - do not remove

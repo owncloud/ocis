@@ -362,7 +362,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.17.1-0.20231215155002-7810e3d8be38
+# github.com/cs3org/reva/v2 v2.17.1-0.20231218091701-6a3a91e35514
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -904,7 +904,7 @@ github.com/go-logr/stdr
 # github.com/go-micro/plugins/v4/client/grpc v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/client/grpc
-# github.com/go-micro/plugins/v4/events/natsjs v1.2.2-0.20230807070816-bc05fb076ce7
+# github.com/go-micro/plugins/v4/events/natsjs v1.2.2-0.20231215124540-f7f8d3274bf9
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0

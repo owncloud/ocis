@@ -42,6 +42,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/utils/download"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
@@ -268,14 +269,18 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			case events.PPOutcomeAbort:
 				failed = true
 				keepUpload = true
+				metrics.UploadSessionsAborted.Inc()
 			case events.PPOutcomeContinue:
 				if err := up.Finalize(); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
 					keepUpload = true // should we keep the upload when assembling failed?
 					failed = true
+				} else {
+					metrics.UploadSessionsFinalized.Inc()
 				}
 			case events.PPOutcomeDelete:
 				failed = true
+				metrics.UploadSessionsDeleted.Inc()
 			}
 
 			getParent := func() *node.Node {
@@ -344,6 +349,9 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not create url")
 				continue
 			}
+
+			metrics.UploadSessionsRestarted.Inc()
+
 			// restart postprocessing
 			if err := events.Publish(ctx, fs.stream, events.BytesReceived{
 				UploadID:      up.Info.ID,
@@ -470,6 +478,8 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("resourceID", res.ResourceID).Msg("Failed to set scan results")
 				continue
 			}
+
+			metrics.UploadSessionsScanned.Inc()
 
 			// remove cache entry in gateway
 			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})

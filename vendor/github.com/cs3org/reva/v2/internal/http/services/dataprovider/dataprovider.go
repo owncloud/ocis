@@ -80,7 +80,7 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	if conf.NatsAddress == "" || conf.NatsClusterID == "" {
 		log.Warn().Msg("missing or incomplete nats configuration. Events will not be published.")
 	} else {
-		s, err := stream.NatsFromConfig("dataprovider", stream.NatsConfig{
+		s, err := stream.NatsFromConfig("dataprovider", false, stream.NatsConfig{
 			Endpoint:             conf.NatsAddress,
 			Cluster:              conf.NatsClusterID,
 			EnableTLS:            conf.NatsEnableTLS,
