@@ -19,8 +19,10 @@ import (
 )
 
 const (
-	registryEnv        = "MICRO_REGISTRY"
-	registryAddressEnv = "MICRO_REGISTRY_ADDRESS"
+	registryEnv         = "MICRO_REGISTRY"
+	registryAddressEnv  = "MICRO_REGISTRY_ADDRESS"
+	regisryUsernameEnv  = "MICRO_REGISTRY_AUTH_USERNAME"
+	registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
 )
 
 var (
@@ -68,9 +70,10 @@ func GetRegistry() mRegistry.Registry {
 			)
 		case "memory":
 			reg = memr.NewRegistry()
-		case "natsjs":
+		case "natsjs", "nats-js", "nats-js-kv": // for backwards compatibility - we will stick with one of those
 			reg = natsjsregistry.NewRegistry(
 				mRegistry.Addrs(addresses...),
+				natsjsregistry.Authenticate(os.Getenv(regisryUsernameEnv), os.Getenv(registryPasswordEnv)),
 			)
 		default:
 			reg = mdnsr.NewRegistry()
