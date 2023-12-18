@@ -237,6 +237,7 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
+        - FilesVersionsContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
