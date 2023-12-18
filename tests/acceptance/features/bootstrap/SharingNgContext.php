@@ -22,6 +22,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\GraphHelper;
+use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -63,7 +64,7 @@ class SharingNgContext implements Context {
 	 */
 	public function theUserPermissionsListOfResource(string $user, string $fileOrFolder, string $resource, string $space):void {
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-	
+
 		if ($fileOrFolder === 'folder') {
 			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
@@ -77,6 +78,41 @@ class SharingNgContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId,
 				$itemId
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table) {
+		$rows = $table->getRowsHash();
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
+
+		$itemId = ($rows['resourceType'] === 'folder')
+			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
+			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
+
+		$shareeId = ($rows['shareType'] === 'user')
+			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
+			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
+
+		$this->featureContext->setResponse(
+			GraphHelper::sendSharingInvitation(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				$shareeId,
+				$rows['role']
 			)
 		);
 	}
