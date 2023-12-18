@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
+* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Add ocm and sciencemesh services: [#7576](https://github.com/owncloud/ocis/pull/7576)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
@@ -94,6 +95,13 @@ The following sections list the changes for unreleased.
    We improved functionality of the OCM support.
 
    https://github.com/owncloud/ocis/pull/7973
+
+* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
+
+   We remove the redundant permissions of a role with duplicate ID.
+
+   https://github.com/owncloud/ocis/issues/7931
+   https://github.com/owncloud/ocis/pull/7976
 
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 
