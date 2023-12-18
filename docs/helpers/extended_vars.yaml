@@ -33,17 +33,17 @@ variables:
   description: ""
   do_ignore: true
 - rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:44
+  path: ocis-pkg/registry/registry.go:46
   foundincode: true
   name: MICRO_REGISTRY
   type: string
   default_value: ""
   description: 'Go micro registry type to use. Supported types are: ''nats'', ''kubernetes'',
-    ''etcd'', ''consul'', ''memory'' and ''mdns''. Will be selected automatically. Only change
-    on supervision of ownCloud Support.'
+    ''etcd'', ''consul'', ''memory'' and ''mdns''. Will be selected automatically.
+    Only change on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:42
+  path: ocis-pkg/registry/registry.go:44
   foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string

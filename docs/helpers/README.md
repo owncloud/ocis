@@ -78,13 +78,37 @@ It can happen that extended envvars are found but do not need to be published as
 
 IMPORTANT:
 
-- Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found in this folder but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
+- First Time Identification  
+Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found in this folder but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
 
-- Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build.
+- Item Naming  
+An extended envvar may not have the right naming. It may appear as `name: registryEnv`. In case, this envvar needs to be named properly like `name: MICRO_REGISTRY` which can only be done in close developer alignment.
 
-- The identification if an envvar is in the yaml file already present is made via the `rawname` and the `path` identifier which includes the line number. If there is a change in the source file shifting line numbers, new items will get added and the old ones not touched. Though technically ok, this can cause confusion to identify which items have a correct path reference. To get rid of items with wrong line numbers, correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphaned items can safely be deleted. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
+- Item Uniqueness  
+The identification if an envvar is already presentin the yaml file is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and the old ones not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed.
 
-- Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
+- Fix Items  
+If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one. You can double check by removing the newly added re-run a `make docs-generate`. In case the fix was correct, no new item of the same will re-appear.
+
+- Remove Orphaned Items  
+To get rid of items with wrong line numbers, check `rawname` the `path` and correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphaned items can safely be removed. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
+
+- Sort Ordering  
+Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
+
+- Mandatory Key Values  
+Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build. See the following example with all keys listed and populated:
+    ```
+    rawname: registryAddressEnv
+    path: ocis-pkg/registry/registry.go:44
+    foundincode: true
+    name: MICRO_REGISTRY_ADDRESS
+    type: string
+    default_value: ""
+    description: The bind address of the internal go micro framework. Only change on
+        supervision of ownCloud Support.
+    do_ignore: false
+    ```
 
 ### Extract Extended Envvars
 
