@@ -94,6 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Nodes(cfg.Persistence.Nodes...),
 				microstore.Database(cfg.Persistence.Database),
 				microstore.Table(cfg.Persistence.Table),
+				store.Authentication(cfg.Persistence.AuthUsername, cfg.Persistence.AuthPassword),
 			)
 
 			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)

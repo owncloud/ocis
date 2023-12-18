@@ -140,6 +140,7 @@ func (c *CachedMDC) Init(ctx context.Context, id string) error {
 		microstore.Database(c.cfg.Metadata.Cache.Database),
 		microstore.Table(c.cfg.Metadata.Cache.DirectoryTable),
 		store.DisablePersistence(c.cfg.Metadata.Cache.DisablePersistence),
+		store.Authentication(c.cfg.Metadata.Cache.AuthUsername, c.cfg.Metadata.Cache.AuthPassword),
 	)
 	c.filesCache = store.Create(
 		store.Store(c.cfg.Metadata.Cache.Store),
@@ -149,6 +150,7 @@ func (c *CachedMDC) Init(ctx context.Context, id string) error {
 		microstore.Database(c.cfg.Metadata.Cache.Database),
 		microstore.Table(c.cfg.Metadata.Cache.FileTable),
 		store.DisablePersistence(c.cfg.Metadata.Cache.DisablePersistence),
+		store.Authentication(c.cfg.Metadata.Cache.AuthUsername, c.cfg.Metadata.Cache.AuthPassword),
 	)
 	return c.next.Init(ctx, id)
 }
