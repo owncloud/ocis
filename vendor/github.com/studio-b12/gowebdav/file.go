@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+type FileInfo interface {
+	os.FileInfo
+	StatusCode() int
+}
+
 // File is our structure for a given file
 type File struct {
 	path        string
@@ -16,12 +21,13 @@ type File struct {
 	modified    time.Time
 	etag        string
 	isdir       bool
-	props       Props
+	propstat    propstat
+	status      int
 }
 
 func newFile(path, name string, p *propstat) *File {
 	f := &File{
-		props: p.Props,
+		propstat: *p,
 	}
 	path = FixSlashes(path)
 
@@ -30,7 +36,6 @@ func newFile(path, name string, p *propstat) *File {
 	f.modified = p.Modified()
 	f.etag = p.ETag()
 	f.contentType = p.ContentType()
-	f.props = p.Props
 
 	if p.Type() == "collection" {
 		f.path = filepath.Clean(f.path + "/")
@@ -90,7 +95,11 @@ func (f File) IsDir() bool {
 
 // Sys ????
 func (f File) Sys() interface{} {
-	return f.props
+	return f.propstat.Props
+}
+
+func (f File) StatusCode() int {
+	return f.propstat.StatusCode()
 }
 
 // String lets us see file information

@@ -30,6 +30,7 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
@@ -59,8 +60,11 @@ type driver struct {
 }
 
 type config struct {
-	GatewaySVC string `mapstructure:"gatewaysvc"`
-	Insecure   bool   `mapstructure:"insecure"`
+	GatewaySVC           string `mapstructure:"gatewaysvc"`
+	Insecure             bool   `mapstructure:"insecure"`
+	StorageRoot          string `mapstructure:"storage_root"`
+	ServiceAccountID     string `mapstructure:"service_account_id"`
+	ServiceAccountSecret string `mapstructure:"service_account_secret"`
 }
 
 func (c *config) ApplyDefaults() {
@@ -136,15 +140,19 @@ func shareInfoFromReference(ref *provider.Reference) (*ocmpb.ShareId, string) {
 
 }
 
-func (d *driver) getWebDAVFromShare(ctx context.Context, shareID *ocmpb.ShareId) (*ocmpb.ReceivedShare, string, string, error) {
+func (d *driver) getWebDAVFromShare(ctx context.Context, forUser *userpb.UserId, shareID *ocmpb.ShareId) (*ocmpb.ReceivedShare, string, string, error) {
 	// TODO: we may want to cache the share
-	res, err := d.gateway.GetReceivedOCMShare(ctx, &ocmpb.GetReceivedOCMShareRequest{
+	req := &ocmpb.GetReceivedOCMShareRequest{
 		Ref: &ocmpb.ShareReference{
 			Spec: &ocmpb.ShareReference_Id{
 				Id: shareID,
 			},
 		},
-	})
+	}
+	if forUser != nil {
+		req.Opaque = utils.AppendJSONToOpaque(nil, "userid", forUser)
+	}
+	res, err := d.gateway.GetReceivedOCMShare(ctx, req)
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -173,10 +181,10 @@ func getWebDAVProtocol(protocols []*ocmpb.Protocol) (*ocmpb.WebDAVProtocol, bool
 	return nil, false
 }
 
-func (d *driver) webdavClient(ctx context.Context, ref *provider.Reference) (*gowebdav.Client, *ocmpb.ReceivedShare, string, error) {
+func (d *driver) webdavClient(ctx context.Context, forUser *userpb.UserId, ref *provider.Reference) (*gowebdav.Client, *ocmpb.ReceivedShare, string, error) {
 	id, rel := shareInfoFromReference(ref)
 
-	share, endpoint, secret, err := d.getWebDAVFromShare(ctx, id)
+	share, endpoint, secret, err := d.getWebDAVFromShare(ctx, forUser, id)
 	if err != nil {
 		return nil, nil, "", err
 	}
@@ -199,7 +207,7 @@ func (d *driver) webdavClient(ctx context.Context, ref *provider.Reference) (*go
 }
 
 func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) error {
-	client, _, rel, err := d.webdavClient(ctx, ref)
+	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return err
 	}
@@ -207,7 +215,7 @@ func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) error {
 }
 
 func (d *driver) Delete(ctx context.Context, ref *provider.Reference) error {
-	client, _, rel, err := d.webdavClient(ctx, ref)
+	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return err
 	}
@@ -215,7 +223,7 @@ func (d *driver) Delete(ctx context.Context, ref *provider.Reference) error {
 }
 
 func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
-	client, _, rel, err := d.webdavClient(ctx, ref)
+	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return err
 	}
@@ -223,7 +231,7 @@ func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markpro
 }
 
 func (d *driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) error {
-	client, _, relOld, err := d.webdavClient(ctx, oldRef)
+	client, _, relOld, err := d.webdavClient(ctx, nil, oldRef)
 	if err != nil {
 		return err
 	}
@@ -263,7 +271,7 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 	}
 	webdavProtocol, _ := getWebDAVProtocol(share.Protocols)
 
-	return &provider.ResourceInfo{
+	ri := provider.ResourceInfo{
 		Type:     t,
 		Id:       id,
 		MimeType: mime.Detect(f.IsDir(), f.Name()),
@@ -278,11 +286,17 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 		Checksum: &provider.ResourceChecksum{
 			Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_INVALID,
 		},
-	}, nil
+	}
+
+	if f.(gowebdav.File).StatusCode() == 425 {
+		ri.Opaque = utils.AppendPlainToOpaque(ri.Opaque, "status", "processing")
+	}
+
+	return &ri, nil
 }
 
 func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string, _ []string) (*provider.ResourceInfo, error) {
-	client, share, rel, err := d.webdavClient(ctx, ref)
+	client, share, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +313,7 @@ func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string,
 }
 
 func (d *driver) ListFolder(ctx context.Context, ref *provider.Reference, _ []string, _ []string) ([]*provider.ResourceInfo, error) {
-	client, share, rel, err := d.webdavClient(ctx, ref)
+	client, share, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return nil, err
 	}
@@ -320,35 +334,8 @@ func (d *driver) ListFolder(ctx context.Context, ref *provider.Reference, _ []st
 	return res, nil
 }
 
-func (d *driver) InitiateUpload(ctx context.Context, ref *provider.Reference, _ int64, _ map[string]string) (map[string]string, error) {
-	shareID, rel := shareInfoFromReference(ref)
-	p := getPathFromShareIDAndRelPath(shareID, rel)
-
-	return map[string]string{
-		"simple": p,
-	}, nil
-}
-
-func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
-	client, _, rel, err := d.webdavClient(ctx, req.Ref)
-	if err != nil {
-		return provider.ResourceInfo{}, err
-	}
-	client.SetInterceptor(func(method string, rq *http.Request) {
-		// Set the content length on the request struct directly instead of the header.
-		// The content-length header gets reset by the golang http library before
-		// sendind out the request, resulting in chunked encoding to be used which
-		// breaks the quota checks in ocdav.
-		if method == "PUT" {
-			rq.ContentLength = req.Length
-		}
-	})
-
-	return provider.ResourceInfo{}, client.WriteStream(rel, req.Body, 0)
-}
-
 func (d *driver) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
-	client, _, rel, err := d.webdavClient(ctx, ref)
+	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
 		return nil, err
 	}

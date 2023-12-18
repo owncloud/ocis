@@ -17,11 +17,12 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	HTTP          HTTPConfig            `yaml:"http"`
-	Middleware    Middleware            `yaml:"middleware"`
-	GRPC          GRPCConfig            `yaml:"grpc"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	GrpcClient    client.Client         `yaml:"-"`
+	HTTP           HTTPConfig            `yaml:"http"`
+	Middleware     Middleware            `yaml:"middleware"`
+	GRPC           GRPCConfig            `yaml:"grpc"`
+	GRPCClientTLS  *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GrpcClient     client.Client         `yaml:"-"`
+	ServiceAccount ServiceAccount        `yaml:"service_account"`
 
 	Reva                         *shared.Reva                 `yaml:"reva"`
 	OCMD                         OCMD                         `yaml:"ocmd"`
@@ -54,6 +55,12 @@ type Middleware struct {
 // Auth configures reva http auth middleware.
 type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+}
+
+// ServiceAccount is the configuration for the used service account
+type ServiceAccount struct {
+	ID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;OCM_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
+	Secret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;OCM_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
 }
 
 // CORS defines the available cors configuration.

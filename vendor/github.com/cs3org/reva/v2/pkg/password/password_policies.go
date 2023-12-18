@@ -18,6 +18,7 @@ type Validator interface {
 
 // Policies represents a password validation rules
 type Policies struct {
+	disabled                bool
 	minCharacters           int
 	minLowerCaseCharacters  int
 	minUpperCaseCharacters  int
@@ -29,8 +30,9 @@ type Policies struct {
 }
 
 // NewPasswordPolicy returns a new NewPasswordPolicy instance
-func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int, bannedPasswordsList map[string]struct{}) Validator {
+func NewPasswordPolicy(disabled bool, minCharacters, minLowerCaseCharacters, minUpperCaseCharacters, minDigits, minSpecialCharacters int, bannedPasswordsList map[string]struct{}) Validator {
 	p := &Policies{
+		disabled:               disabled,
 		minCharacters:          minCharacters,
 		minLowerCaseCharacters: minLowerCaseCharacters,
 		minUpperCaseCharacters: minUpperCaseCharacters,
@@ -46,6 +48,9 @@ func NewPasswordPolicy(minCharacters, minLowerCaseCharacters, minUpperCaseCharac
 
 // Validate implements a password validation regarding the policy
 func (s Policies) Validate(str string) error {
+	if s.disabled {
+		return nil
+	}
 	var allErr error
 	if !utf8.ValidString(str) {
 		return fmt.Errorf("the password contains invalid characters")

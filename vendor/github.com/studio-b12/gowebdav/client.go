@@ -159,47 +159,63 @@ func (p *propstat) Modified() time.Time {
 	return time.Unix(0, 0)
 }
 
+func (p *propstat) StatusCode() int {
+	parts := strings.Split(p.Status, " ")
+	if len(parts) < 2 {
+		return -1
+	}
+
+	code, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return -1
+	}
+
+	return code
+}
+
 type response struct {
 	Href      string     `xml:"DAV: href"`
 	Propstats []propstat `xml:"DAV: propstat"`
 }
 
-func getPropstat(r *response, status string) *propstat {
+func getPropstat(r *response, statuses []string) *propstat {
 	for _, prop := range r.Propstats {
-		if strings.Contains(prop.Status, status) {
-			return &prop
+		for _, status := range statuses {
+			if strings.Contains(prop.Status, status) {
+				return &prop
+			}
 		}
 	}
 	return nil
 }
 
 // ReadDir reads the contents of a remote directory
-func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
+func (c *Client) ReadDir(path string) ([]FileInfo, error) {
 	return c.ReadDirWithProps(path, defaultProps)
 }
 
 // ReadDirWithProps reads the contents of the directory at the given path, along with the specified properties.
-func (c *Client) ReadDirWithProps(path string, props []string) ([]os.FileInfo, error) {
+func (c *Client) ReadDirWithProps(path string, props []string) ([]FileInfo, error) {
 	propfindprops := ""
 	if len(props) > 0 {
 		propfindprops = `<d:prop><d:` + strings.Join(props, "/><d:") + `/></d:prop>`
 	}
 
-	files := make([]os.FileInfo, 0)
+	files := make([]FileInfo, 0)
 	skipSelf := true
 	parse := func(resp interface{}) error {
 		r := resp.(*response)
 
 		if skipSelf {
 			skipSelf = false
-			if p := getPropstat(r, "200"); p != nil && p.Type() == "collection" {
+			if p := getPropstat(r, []string{"200", "425"}); p != nil && p.Type() == "collection" {
 				r.Propstats = nil
 				return nil
 			}
 			return NewPathError("ReadDir", path, 405)
 		}
 
-		if p := getPropstat(r, "200"); p != nil {
+		if p := getPropstat(r, []string{"200", "425"}); p != nil {
 			var name string
 			if ps, err := url.PathUnescape(r.Href); err == nil {
 				name = pathpkg.Base(ps)
@@ -227,17 +243,19 @@ func (c *Client) ReadDirWithProps(path string, props []string) ([]os.FileInfo, e
 }
 
 // Stat returns the file stats for a specified path with the default properties
-func (c *Client) Stat(path string) (os.FileInfo, error) {
+func (c *Client) Stat(path string) (FileInfo, error) {
 	return c.StatWithProps(path, defaultProps)
 }
 
 // StatWithProps returns the FileInfo for the specified path along with the specified properties.
-func (c *Client) StatWithProps(path string, props []string) (os.FileInfo, error) {
+func (c *Client) StatWithProps(path string, props []string) (FileInfo, error) {
 	var f *File
 	parse := func(resp interface{}) error {
 		r := resp.(*response)
-		if p := getPropstat(r, "200"); p != nil && f == nil {
+		if p := getPropstat(r, []string{"200", "425"}); p != nil && f == nil {
 			f = newFile(".", path, p)
+		} else {
+			return NewPathError("StatWithProps", path, 404)
 		}
 
 		r.Propstats = nil
@@ -257,9 +275,13 @@ func (c *Client) StatWithProps(path string, props []string) (os.FileInfo, error)
 
 	if err != nil {
 		if _, ok := err.(*os.PathError); !ok {
-			return nil, NewPathErrorErr("ReadDir", path, err)
+			return nil, NewPathErrorErr("StatWithProps", path, err)
 		}
 		return nil, err
+	}
+
+	if f == nil {
+		return nil, NewPathError("StatWithProps", path, 404)
 	}
 	return *f, err
 }

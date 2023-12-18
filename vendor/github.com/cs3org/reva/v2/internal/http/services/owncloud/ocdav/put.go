@@ -137,6 +137,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 
 	length, err := getContentLength(w, r)
 	if err != nil {
+		log.Error().Err(err).Msg("error getting the content length")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

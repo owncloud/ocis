@@ -56,7 +56,10 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"driver": "ocmreceived",
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
-							"insecure": cfg.OCMStorageProvider.Insecure,
+							"insecure":               cfg.OCMStorageProvider.Insecure,
+							"storage_root":           cfg.OCMStorageProvider.StorageRoot,
+							"service_account_id":     cfg.ServiceAccount.ID,
+							"service_account_secret": cfg.ServiceAccount.Secret,
 						},
 					},
 					"data_txs": map[string]interface{}{

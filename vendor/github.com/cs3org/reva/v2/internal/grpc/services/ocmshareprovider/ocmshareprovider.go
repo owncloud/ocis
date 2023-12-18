@@ -515,6 +515,14 @@ func (s *service) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateRec
 
 func (s *service) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedOCMShareRequest) (*ocm.GetReceivedOCMShareResponse, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
+	if user.Id.GetType() == userpb.UserType_USER_TYPE_SERVICE {
+		var uid userpb.UserId
+		_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &uid)
+		user = &userpb.User{
+			Id: &uid,
+		}
+	}
+
 	ocmshare, err := s.repo.GetReceivedShare(ctx, user, req.Ref)
 	if err != nil {
 		if errors.Is(err, share.ErrShareNotFound) {
@@ -523,7 +531,7 @@ func (s *service) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedO
 			}, nil
 		}
 		return &ocm.GetReceivedOCMShareResponse{
-			Status: status.NewInternal(ctx, "error getting received share"),
+			Status: status.NewInternal(ctx, "error getting received share: "+err.Error()),
 		}, nil
 	}
 
