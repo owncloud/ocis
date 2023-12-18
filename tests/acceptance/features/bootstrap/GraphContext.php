@@ -944,24 +944,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * create group with provided data
-	 *
-	 * @param string $group
-	 *
-	 * @return array
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function adminHasCreatedGroupUsingTheGraphApi(string $group): array {
-		$result = $this->createGroup($group);
-		if ($result->getStatusCode() === 201) {
-			return $this->featureContext->getJsonDecodedResponse($result);
-		} else {
-			$this->throwHttpException($result, "Could not create group '$group'.");
-		}
-	}
-
-	/**
 	 * @param ResponseInterface $response
 	 * @param string $errorMsg
 	 *

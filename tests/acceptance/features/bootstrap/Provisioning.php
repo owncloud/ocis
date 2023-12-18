@@ -3123,10 +3123,8 @@ trait Provisioning {
 		if ($method === null) {
 			if ($this->isTestingWithLdap()) {
 				$method = "ldap";
-			} elseif (OcisHelper::isTestingWithGraphApi()) {
-				$method = "graph";
 			} else {
-				$method = "api";
+				$method = "graph";
 			}
 		}
 		$group = \trim($group);
@@ -3134,23 +3132,6 @@ trait Provisioning {
 		$groupCanBeDeleted = false;
 		$groupId = null;
 		switch ($method) {
-			case "api":
-				$result = UserHelper::createGroup(
-					$this->getBaseUrl(),
-					$group,
-					$this->getAdminUsername(),
-					$this->getAdminPassword(),
-					$this->getStepLineRef()
-				);
-				if ($result->getStatusCode() === 200) {
-					$groupCanBeDeleted = true;
-				} else {
-					throw new Exception(
-						"could not create group '$group'. "
-						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				break;
 			case "ldap":
 				try {
 					$this->createLdapGroup($group);
@@ -3161,7 +3142,10 @@ trait Provisioning {
 				}
 				break;
 			case "graph":
-				$newGroup = $this->graphContext->adminHasCreatedGroupUsingTheGraphApi($group);
+				$newGroup = $this->graphContext->createGroup($group);
+				if ($newGroup->getStatusCode() === 201) {
+					$newGroup = $this->getJsonDecodedResponse($newGroup);
+				}
 				$groupCanBeDeleted = true;
 				$groupId = $newGroup["id"];
 				break;
@@ -3616,13 +3600,8 @@ trait Provisioning {
 			}
 			return false;
 		}
-		if (OcisHelper::isTestingWithGraphApi()) {
-			$base = '/graph/v1.0';
-		} else {
-			$base = '/ocs/v2.php/cloud';
-		}
 		$group = \rawurlencode($group);
-		$fullUrl = $this->getBaseUrl() . "$base/groups/$group";
+		$fullUrl = $this->getBaseUrl() . "/graph/v1.0/groups/$group";
 		$this->response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getStepLineRef(),
