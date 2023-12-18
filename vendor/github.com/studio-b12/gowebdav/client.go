@@ -196,11 +196,6 @@ func (c *Client) ReadDir(path string) ([]FileInfo, error) {
 
 // ReadDirWithProps reads the contents of the directory at the given path, along with the specified properties.
 func (c *Client) ReadDirWithProps(path string, props []string) ([]FileInfo, error) {
-	propfindprops := ""
-	if len(props) > 0 {
-		propfindprops = `<d:prop><d:` + strings.Join(props, "/><d:") + `/></d:prop>`
-	}
-
 	files := make([]FileInfo, 0)
 	skipSelf := true
 	parse := func(resp interface{}) error {
@@ -229,8 +224,21 @@ func (c *Client) ReadDirWithProps(path string, props []string) ([]FileInfo, erro
 		return nil
 	}
 
+	propXML := "<d:propfind xmlns:d='DAV:'>"
+	switch {
+	case len(props) > 0:
+		propXML += "<d:prop>"
+		for _, prop := range props {
+			propXML += "<d:" + prop + "/>"
+		}
+		propXML += "</d:prop>"
+	default:
+		propXML += "<allprop/>"
+	}
+	propXML += "</d:propfind>"
+
 	err := c.propfind(path, false,
-		`<d:propfind xmlns:d='DAV:'>`+propfindprops+`</d:propfind>`,
+		propXML,
 		&response{},
 		parse)
 
@@ -262,11 +270,18 @@ func (c *Client) StatWithProps(path string, props []string) (FileInfo, error) {
 		return nil
 	}
 
-	propXML := "<d:propfind xmlns:d='DAV:'><d:prop>"
-	for _, prop := range props {
-		propXML += "<d:" + prop + "/>"
+	propXML := "<d:propfind xmlns:d='DAV:'>"
+	switch {
+	case len(props) > 0:
+		propXML += "<d:prop>"
+		for _, prop := range props {
+			propXML += "<d:" + prop + "/>"
+		}
+		propXML += "</d:prop>"
+	default:
+		propXML += "<allprop/>"
 	}
-	propXML += "</d:prop></d:propfind>"
+	propXML += "</d:propfind>"
 
 	err := c.propfind(path, true,
 		propXML,
