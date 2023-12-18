@@ -1267,5 +1267,5 @@ func estreamFromConfig(c eventconfig) (events.Stream, error) {
 		return nil, nil
 	}
 
-	return stream.NatsFromConfig("storageprovider", stream.NatsConfig(c))
+	return stream.NatsFromConfig("storageprovider", false, stream.NatsConfig(c))
 }

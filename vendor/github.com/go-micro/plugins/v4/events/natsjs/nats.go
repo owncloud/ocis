@@ -1,3 +1,4 @@
+// Package natsjs provides a NATS Jetstream implementation of the events.Stream interface.
 package natsjs
 
 import (
@@ -33,11 +34,14 @@ func NewStream(opts ...Option) (events.Stream, error) {
 	}
 
 	s := &stream{opts: options}
+
 	natsJetStreamCtx, err := connectToNatsJetStream(options)
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to nats cluster %v: %v", options.ClusterID, err)
+		return nil, fmt.Errorf("error connecting to nats cluster %v: %w", options.ClusterID, err)
 	}
+
 	s.natsJetStreamCtx = natsJetStreamCtx
+
 	return s, nil
 }
 
@@ -52,6 +56,7 @@ func connectToNatsJetStream(options Options) (nats.JetStreamContext, error) {
 		nopts.Secure = true
 		nopts.TLSConfig = options.TLSConfig
 	}
+
 	if options.NkeyConfig != "" {
 		nopts.Nkey = options.NkeyConfig
 	}
@@ -63,14 +68,21 @@ func connectToNatsJetStream(options Options) (nats.JetStreamContext, error) {
 	if options.Name != "" {
 		nopts.Name = options.Name
 	}
+
+	if options.Username != "" && options.Password != "" {
+		nopts.User = options.Username
+		nopts.Password = options.Password
+	}
+
 	conn, err := nopts.Connect()
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to nats at %v with tls enabled (%v): %v", options.Address, nopts.TLSConfig != nil, err)
+		tls := nopts.TLSConfig != nil
+		return nil, fmt.Errorf("error connecting to nats at %v with tls enabled (%v): %w", options.Address, tls, err)
 	}
 
 	js, err := conn.JetStream()
 	if err != nil {
-		return nil, fmt.Errorf("error while obtaining JetStream context: %v", err)
+		return nil, fmt.Errorf("error while obtaining JetStream context: %w", err)
 	}
 
 	return js, nil
@@ -125,6 +137,7 @@ func (s *stream) Publish(topic string, msg interface{}, opts ...events.PublishOp
 		if err != nil {
 			err = errors.Wrap(err, "Error publishing message to topic")
 		}
+
 		return err
 	}
 
@@ -154,14 +167,14 @@ func (s *stream) Consume(topic string, opts ...events.ConsumeOption) (<-chan eve
 	}
 
 	// setup the subscriber
-	c := make(chan events.Event)
-	handleMsg := func(m *nats.Msg) {
+	channel := make(chan events.Event)
+	handleMsg := func(msg *nats.Msg) {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
 
 		// decode the message
 		var evt events.Event
-		if err := json.Unmarshal(m.Data, &evt); err != nil {
+		if err := json.Unmarshal(msg.Data, &evt); err != nil {
 			log.Logf(logger.ErrorLevel, "Error decoding message: %v", err)
 			// not acknowledging the message is the way to indicate an error occurred
 			return
@@ -170,23 +183,23 @@ func (s *stream) Consume(topic string, opts ...events.ConsumeOption) (<-chan eve
 		if !options.AutoAck {
 			// set up the ack funcs
 			evt.SetAckFunc(func() error {
-				return m.Ack()
+				return msg.Ack()
 			})
 			evt.SetNackFunc(func() error {
-				return m.Nak()
+				return msg.Nak()
 			})
 		}
 
 		// push onto the channel and wait for the consumer to take the event off before we acknowledge it.
-		c <- evt
+		channel <- evt
 
 		if !options.AutoAck {
 			return
 		}
-		if err := m.Ack(nats.Context(ctx)); err != nil {
+
+		if err := msg.Ack(nats.Context(ctx)); err != nil {
 			log.Logf(logger.ErrorLevel, "Error acknowledging message: %v", err)
 		}
-
 	}
 
 	// ensure that a stream exists for that topic
@@ -203,9 +216,7 @@ func (s *stream) Consume(topic string, opts ...events.ConsumeOption) (<-chan eve
 	}
 
 	// setup the options
-	subOpts := []nats.SubOpt{
-		nats.Durable(options.Group),
-	}
+	subOpts := []nats.SubOpt{}
 
 	if options.CustomRetries {
 		subOpts = append(subOpts, nats.MaxDeliver(options.GetRetryLimit()))
@@ -227,11 +238,18 @@ func (s *stream) Consume(topic string, opts ...events.ConsumeOption) (<-chan eve
 		subOpts = append(subOpts, nats.AckWait(options.AckWait))
 	}
 
-	// connect the subscriber
-	_, err = s.natsJetStreamCtx.QueueSubscribe(topic, options.Group, handleMsg, subOpts...)
+	// connect the subscriber via a queue group only if durable streams are enabled
+	if !s.opts.DisableDurableStreams {
+		subOpts = append(subOpts, nats.Durable(options.Group))
+		_, err = s.natsJetStreamCtx.QueueSubscribe(topic, options.Group, handleMsg, subOpts...)
+	} else {
+		subOpts = append(subOpts, nats.ConsumerName(options.Group))
+		_, err = s.natsJetStreamCtx.Subscribe(topic, handleMsg, subOpts...)
+	}
+
 	if err != nil {
 		return nil, errors.Wrap(err, "Error subscribing to topic")
 	}
 
-	return c, nil
+	return channel, nil
 }
