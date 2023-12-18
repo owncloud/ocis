@@ -110,10 +110,18 @@ The ID sources:
 
 ```bash
 NAME:
-   ocis storage-users trash-bin list - Print a list of all trash-bin items for a space.
+   ocis storage-users trash-bin list - Print a list of all trash-bin items of a space.
 
 USAGE:
    ocis storage-users trash-bin list command [command options] ['spaceID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --verbose, -v  Get more verbose output (default: false)
+   --help, -h     show help
+
 ```
 
 ```bash
@@ -127,7 +135,11 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 OPTIONS:
-   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
+   --verbose, -v             Get more verbose output (default: false)
+   --yes, -y                 Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively. (default: false)
+   --help, -h                show help
+
 ```
 
 ```bash
@@ -141,7 +153,9 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 OPTIONS:
-   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
+   --verbose, -v             Get more verbose output (default: false)
+   --help, -h                show help
 ```
 
 ## Caching

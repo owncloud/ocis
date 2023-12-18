@@ -3,8 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -16,24 +18,20 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mohae/deepcopy"
+	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	zlog "github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/logging"
+	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 const (
 	SKIP = iota
 	REPLACE
 	KEEP_BOTH
-
-	_retrievingErrorMsg = "trash-bin items retrieving error"
 )
 
 var _optionFlagTmpl = cli.StringFlag{
@@ -42,6 +40,18 @@ var _optionFlagTmpl = cli.StringFlag{
 	Aliases:     []string{"o"},
 	Usage:       "The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'.",
 	DefaultText: "The default value is 'skip' overwriting an existing file",
+}
+
+var _verboseFlagTmpl = cli.BoolFlag{
+	Name:    "verbose",
+	Aliases: []string{"v"},
+	Usage:   "Get more verbose output",
+}
+
+var _applyYesFlagTmpl = cli.BoolFlag{
+	Name:    "yes",
+	Aliases: []string{"y"},
+	Usage:   "Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively.",
 }
 
 // TrashBin wraps trash-bin related sub-commands.
@@ -91,20 +101,21 @@ func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 }
 
 func listTrashBinItems(cfg *config.Config) *cli.Command {
+	var verboseVal bool
+	verboseFlag := _verboseFlagTmpl
+	verboseFlag.Destination = &verboseVal
 	return &cli.Command{
 		Name:      "list",
 		Usage:     "Print a list of all trash-bin items of a space.",
 		ArgsUsage: "['spaceID' required]",
-		Flags:     []cli.Flag{},
+		Flags: []cli.Flag{
+			&verboseFlag,
+		},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			log := logging.Configure(cfg.Service.Name, cfg.Log)
-			tp, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-			if err != nil {
-				return err
-			}
+			log := cliLogger(verboseVal)
 			var spaceID string
 			if c.NArg() > 0 {
 				spaceID = c.Args().Get(0)
@@ -113,7 +124,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return fmt.Errorf("spaceID is requered")
 			}
-			log.Info().Msgf("Getting trash-bin items for spaceID: '%s' ...\n", spaceID)
+			log.Info().Msgf("Getting trash-bin items for spaceID: '%s' ...", spaceID)
 
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
@@ -127,33 +138,17 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return fmt.Errorf("could not get service user context %w", err)
 			}
-
-			spanOpts := []trace.SpanStartOption{
-				trace.WithSpanKind(trace.SpanKindClient),
-				trace.WithAttributes(
-					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
-				),
-			}
-			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "list", spanOpts...)
-			defer span.End()
-
-			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
+			res, err := listRecycle(ctx, client, ref)
 			if err != nil {
-				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
-			}
-			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
+				return err
 			}
 
-			if len(res.GetRecycleItems()) > 0 {
-				fmt.Println("The list of the trash-bin items. Use an itemID to restore.")
-			} else {
-				fmt.Println("The list is empty.")
-			}
-
+			table := itemsTable(len(res.GetRecycleItems()))
 			for _, item := range res.GetRecycleItems() {
-				fmt.Printf("itemID: '%s', path: '%s', type: '%s',  delited at :%s\n", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()), utils.TSToTime(item.GetDeletionTime()).UTC().Format(time.RFC3339))
+				table.Append([]string{item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()), utils.TSToTime(item.GetDeletionTime()).UTC().Format(time.RFC3339)})
 			}
+			table.Render()
+			fmt.Println("Use an itemID to restore an item.")
 			return nil
 		},
 	}
@@ -164,23 +159,26 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 	var overwriteOption int
 	optionFlag := _optionFlagTmpl
 	optionFlag.Destination = &optionFlagVal
+	var verboseVal bool
+	verboseFlag := _verboseFlagTmpl
+	verboseFlag.Destination = &verboseVal
+	var applyYesVal bool
+	applyYesFlag := _applyYesFlagTmpl
+	applyYesFlag.Destination = &applyYesVal
 	return &cli.Command{
 		Name:      "restore-all",
 		Usage:     "Restore all trash-bin items for a space.",
 		ArgsUsage: "['spaceID' required]",
 		Flags: []cli.Flag{
 			&optionFlag,
+			&verboseFlag,
+			&applyYesFlag,
 		},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			log := logging.Configure(cfg.Service.Name, cfg.Log)
-			tp, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-			if err != nil {
-				return err
-			}
-			c.Lineage()
+			log := cliLogger(verboseVal)
 			var spaceID string
 			if c.NArg() > 0 {
 				spaceID = c.Args().Get(0)
@@ -200,7 +198,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return cli.Exit("The option flag is invalid", 1)
 			}
-			log.Info().Msgf("Restoring trash-bin items for spaceID: '%s' ...\n", spaceID)
+			log.Info().Msgf("Restoring trash-bin items for spaceID: '%s' ...", spaceID)
 
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
@@ -214,50 +212,37 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return fmt.Errorf("could not get service user context %w", err)
 			}
-
-			spanOpts := []trace.SpanStartOption{
-				trace.WithSpanKind(trace.SpanKindClient),
-				trace.WithAttributes(
-					attribute.KeyValue{Key: "option", Value: attribute.StringValue(optionFlagVal)},
-					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
-				),
-			}
-			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "restore-all", spanOpts...)
-			defer span.End()
-
-			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
+			res, err := listRecycle(ctx, client, ref)
 			if err != nil {
-				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
-			}
-			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
-			}
-			if len(res.GetRecycleItems()) == 0 {
-				return cli.Exit("The trash-bin is empty. Nothing to restore", 0)
+				return err
 			}
 
-			for {
-				fmt.Printf("Foud %d items that could be restored, continue (Y/n), show the items list (s): ", len(res.GetRecycleItems()))
-				var i string
-				_, err := fmt.Scanf("%s", &i)
-				if err != nil {
-					log.Err(err).Send()
-					continue
-				}
-				if strings.ToLower(i) == "y" {
-					break
-				} else if strings.ToLower(i) == "n" {
-					return nil
-				} else if strings.ToLower(i) == "s" {
-					for _, item := range res.GetRecycleItems() {
-						fmt.Printf("itemID: '%s', path: '%s', type: '%s', delited at: %s\n", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()), utils.TSToTime(item.GetDeletionTime()).UTC().Format(time.RFC3339))
+			if !applyYesVal {
+				for {
+					fmt.Printf("Found %d items that could be restored, continue (Y/n), show the items list (s): ", len(res.GetRecycleItems()))
+					var i string
+					_, err := fmt.Scanf("%s", &i)
+					if err != nil {
+						log.Err(err).Send()
+						continue
+					}
+					if strings.ToLower(i) == "y" {
+						break
+					} else if strings.ToLower(i) == "n" {
+						return nil
+					} else if strings.ToLower(i) == "s" {
+						table := itemsTable(len(res.GetRecycleItems()))
+						for _, item := range res.GetRecycleItems() {
+							table.Append([]string{item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()), utils.TSToTime(item.GetDeletionTime()).UTC().Format(time.RFC3339)})
+						}
+						table.Render()
 					}
 				}
 			}
 
-			fmt.Printf("\nRun restoring-all with option=%s\n", optionFlagVal)
+			log.Info().Msgf("Run restoring-all with option=%s", optionFlagVal)
 			for _, item := range res.GetRecycleItems() {
-				fmt.Printf("restoring itemID: '%s', path: '%s', type: '%s'\n", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()))
+				log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s'", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()))
 				dstRes, err := restore(ctx, client, ref, item, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 				if err != nil {
 					log.Err(err).Msg("trash-bin item restoring error")
@@ -275,23 +260,22 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 	var overwriteOption int
 	optionFlag := _optionFlagTmpl
 	optionFlag.Destination = &optionFlagVal
+	var verboseVal bool
+	verboseFlag := _verboseFlagTmpl
+	verboseFlag.Destination = &verboseVal
 	return &cli.Command{
 		Name:      "restore",
 		Usage:     "Restore a trash-bin item by ID.",
 		ArgsUsage: "['spaceID' required] ['itemID' required]",
 		Flags: []cli.Flag{
 			&optionFlag,
+			&verboseFlag,
 		},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			log := logging.Configure(cfg.Service.Name, cfg.Log)
-			tp, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-			if err != nil {
-				return err
-			}
-			c.Lineage()
+			log := cliLogger(verboseVal)
 			var spaceID, itemID string
 			if c.NArg() > 1 {
 				spaceID = c.Args().Get(0)
@@ -316,7 +300,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 				_ = cli.ShowSubcommandHelp(c)
 				return cli.Exit("The option flag is invalid", 1)
 			}
-			log.Info().Msgf("Restoring trash-bin item for spaceID: '%s' itemID: '%s' ...\n", spaceID, itemID)
+			log.Info().Msgf("Restoring trash-bin item for spaceID: '%s' itemID: '%s' ...", spaceID, itemID)
 
 			ref, err := storagespace.ParseReference(spaceID)
 			if err != nil {
@@ -330,24 +314,9 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return fmt.Errorf("could not get service user context %w", err)
 			}
-
-			spanOpts := []trace.SpanStartOption{
-				trace.WithSpanKind(trace.SpanKindClient),
-				trace.WithAttributes(
-					attribute.KeyValue{Key: "option", Value: attribute.StringValue(optionFlagVal)},
-					attribute.KeyValue{Key: "spaceID", Value: attribute.StringValue(spaceID)},
-					attribute.KeyValue{Key: "itemID", Value: attribute.StringValue(itemID)},
-				),
-			}
-			ctx, span := tp.Tracer("storage-users trash-bin").Start(ctx, "restore", spanOpts...)
-			defer span.End()
-
-			res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
+			res, err := listRecycle(ctx, client, ref)
 			if err != nil {
-				return fmt.Errorf("%s %w", _retrievingErrorMsg, err)
-			}
-			if res.Status.Code != rpc.Code_CODE_OK {
-				return fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
+				return err
 			}
 
 			var found bool
@@ -362,8 +331,8 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			if !found {
 				return fmt.Errorf("itemID '%s' not found", itemID)
 			}
-			fmt.Printf("\nRun restoring with option=%s\n", optionFlagVal)
-			fmt.Printf("restoring itemID: '%s', path: '%s', type: '%s'\n", itemRef.GetKey(), itemRef.GetRef().GetPath(), itemType(itemRef.GetType()))
+			log.Info().Msgf("Run restoring with option=%s", optionFlagVal)
+			log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s", itemRef.GetKey(), itemRef.GetRef().GetPath(), itemType(itemRef.GetType()))
 			dstRes, err := restore(ctx, client, ref, itemRef, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 			if err != nil {
 				return err
@@ -372,6 +341,21 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+}
+
+func listRecycle(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference) (*provider.ListRecycleResponse, error) {
+	_retrievingErrorMsg := "trash-bin items retrieving error"
+	res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
+	if err != nil {
+		return nil, fmt.Errorf("%s %w", _retrievingErrorMsg, err)
+	}
+	if res.Status.Code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
+	}
+	if len(res.GetRecycleItems()) == 0 {
+		return res, cli.Exit("The trash-bin is empty. Nothing to restore", 0)
+	}
+	return res, nil
 }
 
 func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference, item *provider.RecycleItem, overwriteOption int, maxRenameAttempt int, log zlog.Logger) (*provider.Reference, error) {
@@ -390,7 +374,7 @@ func restore(ctx context.Context, client gateway.GatewayAPIClient, ref provider.
 	}
 
 	if exists {
-		log.Info().Msgf("destination '%s' exists.\n", dstStatRes.GetInfo().GetPath())
+		log.Info().Msgf("destination '%s' exists.", dstStatRes.GetInfo().GetPath())
 		switch overwriteOption {
 		case SKIP:
 			return &dst, nil
@@ -483,4 +467,22 @@ func itemType(it provider.ResourceType) string {
 		itemType = "folder"
 	}
 	return itemType
+}
+
+func itemsTable(total int) *tw.Table {
+	table := tw.NewWriter(os.Stdout)
+	table.SetHeader([]string{"itemID", "path", "type", "delete at"})
+	table.SetAutoFormatHeaders(false)
+	table.SetFooter([]string{"", "", "", "total count: " + strconv.Itoa(total)})
+	return table
+}
+
+func cliLogger(verbose bool) zlog.Logger {
+	logLvl := zerolog.ErrorLevel
+	if verbose {
+		logLvl = zerolog.InfoLevel
+	}
+	zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: true}
+	return zlog.Logger{zerolog.New(output).With().Timestamp().Logger().Level(logLvl)}
 }
