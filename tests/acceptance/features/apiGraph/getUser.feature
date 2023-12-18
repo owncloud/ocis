@@ -23,7 +23,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "displayName": {
@@ -45,6 +46,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -105,7 +110,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -123,6 +129,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -135,7 +145,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -153,6 +164,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -172,7 +187,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -190,6 +206,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -202,7 +222,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -220,6 +241,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [false]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -272,7 +297,8 @@ Feature: get users
           "mail",
           "onPremisesSamAccountName",
           "drive",
-          "accountEnabled"
+          "accountEnabled",
+          "userType"
         ],
         "properties": {
           "displayName": {
@@ -294,6 +320,10 @@ Feature: get users
           "accountEnabled": {
             "type": "boolean",
             "enum": [true]
+          },
+          "userType": {
+            "type": "string",
+            "enum": ["Member"]
           },
           "drive": {
             "type": "object",
@@ -395,7 +425,8 @@ Feature: get users
           "mail",
           "onPremisesSamAccountName",
           "drive",
-          "accountEnabled"
+          "accountEnabled",
+          "userType"
         ],
         "properties": {
           "displayName": {
@@ -417,6 +448,10 @@ Feature: get users
           "accountEnabled": {
             "type": "boolean",
             "enum": [true]
+          },
+          "userType": {
+            "type": "string",
+            "enum": ["Member"]
           },
           "drive": {
             "type": "object",
@@ -646,7 +681,8 @@ Feature: get users
                 "id",
                 "mail",
                 "onPremisesSamAccountName",
-                "accountEnabled"
+                "accountEnabled",
+                "userType"
               ],
               "properties": {
                 "id" : {
@@ -664,6 +700,10 @@ Feature: get users
                 "accountEnabled": {
                   "type": "boolean",
                   "enum": [true]
+                },
+                "userType": {
+                  "type": "string",
+                  "enum": ["Member"]
                 }
               }
             },
@@ -691,6 +731,10 @@ Feature: get users
                 "accountEnabled": {
                   "type": "boolean",
                   "enum": [true]
+                },
+                "userType": {
+                  "type": "string",
+                  "enum": ["Member"]
                 }
               }
             }
@@ -720,7 +764,8 @@ Feature: get users
                 "id",
                 "mail",
                 "onPremisesSamAccountName",
-                "accountEnabled"
+                "accountEnabled",
+                "userType"
               ],
               "properties": {
                 "id" : {
@@ -738,6 +783,10 @@ Feature: get users
                 "accountEnabled": {
                   "type": "boolean",
                   "enum": [true]
+                },
+                "userType": {
+                  "type": "string",
+                  "enum": ["Member"]
                 }
               }
             }
@@ -770,7 +819,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -788,6 +838,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -800,7 +854,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -818,6 +873,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -877,7 +936,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -895,6 +955,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -907,7 +971,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -925,6 +990,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
@@ -940,7 +1009,8 @@ Feature: get users
         "id",
         "mail",
         "onPremisesSamAccountName",
-        "accountEnabled"
+        "accountEnabled",
+        "userType"
       ],
       "properties": {
         "id" : {
@@ -958,6 +1028,10 @@ Feature: get users
         "accountEnabled": {
           "type": "boolean",
           "enum": [true]
+        },
+        "userType": {
+          "type": "string",
+          "enum": ["Member"]
         }
       }
     }
