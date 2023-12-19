@@ -17,16 +17,18 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
+
+	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
+
+	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
@@ -891,7 +893,7 @@ var _ = Describe("Driveitems", func() {
 
 			driveItemInvite = &libregraph.DriveItemInvite{
 				Recipients: []libregraph.DriveRecipient{
-					{ObjectId: libregraph.PtrString("1")},
+					{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 				},
 				Roles: []string{unifiedrole.NewViewerUnifiedRole(true).GetId()},
 			}
@@ -936,9 +938,35 @@ var _ = Describe("Driveitems", func() {
 			return strings.NewReader(string(driveItemInviteBytes))
 		}
 
-		It("creates user and group shares as expected (happy path)", func() {
+		It("creates user shares as expected (happy path)", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1")},
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			createShareResponse.Share = &collaboration.Share{
+				Id:         &collaboration.ShareId{OpaqueId: "123"},
+				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
+			}
+
+			svc.Invite(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
+					WithContext(ctx),
+			)
+
+			jsonData := gjson.Get(rr.Body.String(), "value")
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
+
+			Expect(jsonData.Get("0.id").Str).To(Equal("123"))
+			Expect(jsonData.Get("0.expirationDateTime").Str).To(Equal(driveItemInvite.ExpirationDateTime.Format(time.RFC3339Nano)))
+			Expect(jsonData.Get("#.grantedToV2.user.displayName").Array()[0].Str).To(Equal(getUserResponse.User.DisplayName))
+			Expect(jsonData.Get("#.grantedToV2.user.id").Array()[0].Str).To(Equal("1"))
+		})
+
+		It("creates group shares as expected (happy path)", func() {
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
 			}
 			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
@@ -956,17 +984,9 @@ var _ = Describe("Driveitems", func() {
 			jsonData := gjson.Get(rr.Body.String(), "value")
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			Expect(jsonData.Get("#").Num).To(Equal(float64(2)))
-
+			Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
 			Expect(jsonData.Get("0.id").Str).To(Equal("123"))
-			Expect(jsonData.Get("1.id").Str).To(Equal("123"))
-
 			Expect(jsonData.Get("0.expirationDateTime").Str).To(Equal(driveItemInvite.ExpirationDateTime.Format(time.RFC3339Nano)))
-			Expect(jsonData.Get("1.expirationDateTime").Str).To(Equal(driveItemInvite.ExpirationDateTime.Format(time.RFC3339Nano)))
-
-			Expect(jsonData.Get("#.grantedToV2.user.displayName").Array()[0].Str).To(Equal(getUserResponse.User.DisplayName))
-			Expect(jsonData.Get("#.grantedToV2.user.id").Array()[0].Str).To(Equal("1"))
-
 			Expect(jsonData.Get("#.grantedToV2.group.displayName").Array()[0].Str).To(Equal(getGroupResponse.Group.GroupName))
 			Expect(jsonData.Get("#.grantedToV2.group.id").Array()[0].Str).To(Equal("2"))
 		})
@@ -1049,10 +1069,10 @@ var _ = Describe("Driveitems", func() {
 			},
 			Entry("fails if not ok", func() {
 				getGroupResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
+			}, http.StatusBadRequest),
 			Entry("fails if errors", func() {
 				getGroupMock.Return(nil, errors.New("error"))
-			}, http.StatusInternalServerError),
+			}, http.StatusBadRequest),
 		)
 
 		DescribeTable("GetUser",
@@ -1069,11 +1089,11 @@ var _ = Describe("Driveitems", func() {
 				getUserMock.Parent.AssertNumberOfCalls(GinkgoT(), "GetUser", 1)
 			},
 			Entry("fails if not ok", func() {
-				getUserResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
+				getUserResponse.Status = status.NewInvalid(context.Background(), "")
+			}, http.StatusBadRequest),
 			Entry("fails if errors", func() {
 				getUserMock.Return(nil, errors.New("error"))
-			}, http.StatusInternalServerError),
+			}, http.StatusBadRequest),
 		)
 
 		DescribeTable("CreateShare",
@@ -1091,7 +1111,7 @@ var _ = Describe("Driveitems", func() {
 			},
 			Entry("fails if not ok", func() {
 				createShareResponse.Status = status.NewNotFound(context.Background(), "")
-			}, http.StatusInternalServerError),
+			}, http.StatusNotFound),
 			Entry("fails if errors", func() {
 				createShareMock.Return(nil, errors.New("error"))
 			}, http.StatusInternalServerError),

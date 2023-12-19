@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -26,7 +25,6 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/crypto/sha3"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/cs3org/reva/v2/pkg/publicshare"
@@ -472,142 +470,92 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createShareErrors := sync.Map{}
-	createShareSuccesses := sync.Map{}
+	driveRecipient := driveItemInvite.GetRecipients()[0]
 
-	shareCreateGroup, ctx := errgroup.WithContext(ctx)
+	objectId := driveRecipient.GetObjectId()
+	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
-	for _, driveRecipient := range driveItemInvite.GetRecipients() {
-		// not needed anymore with go 1.22 and higher
-		driveRecipient := driveRecipient // https://golang.org/doc/faq#closures_and_goroutines,
-
-		shareCreateGroup.Go(func() error {
-			objectId := driveRecipient.GetObjectId()
-
-			if objectId == "" {
-				return nil
-			}
-
-			cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
-
-			createShareRequest := &collaboration.CreateShareRequest{
-				ResourceInfo: statResponse.GetInfo(),
-				Grant: &collaboration.ShareGrant{
-					Permissions: &collaboration.SharePermissions{
-						Permissions: cs3ResourcePermissions,
-					},
-				},
-			}
-
-			permission := &libregraph.Permission{}
-			if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, unifiedrole.UnifiedRoleConditionGrantee, g.config.FilesSharing.EnableResharing); role != nil {
-				permission.Roles = []string{role.GetId()}
-			}
-
-			if len(permission.GetRoles()) == 0 {
-				permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(*cs3ResourcePermissions)
-			}
-
-			switch driveRecipient.GetLibreGraphRecipientType() {
-			case "group":
-				group, err := g.identityCache.GetGroup(ctx, objectId)
-				if err != nil {
-					g.logger.Debug().Err(err).Interface("groupId", objectId).Msg("failed group lookup")
-					createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
-					return nil
-				}
-				createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
-					Type: storageprovider.GranteeType_GRANTEE_TYPE_GROUP,
-					Id: &storageprovider.Grantee_GroupId{GroupId: &grouppb.GroupId{
-						OpaqueId: group.GetId(),
-					}},
-				}
-				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
-					Group: &libregraph.Identity{
-						DisplayName: group.GetDisplayName(),
-						Id:          conversions.ToPointer(group.GetId()),
-					},
-				}
-			default:
-				user, err := g.identityCache.GetUser(ctx, objectId)
-				if err != nil {
-					g.logger.Debug().Err(err).Interface("userId", objectId).Msg("failed user lookup")
-					createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
-					return nil
-				}
-				createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
-					Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
-					Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
-						OpaqueId: user.GetId(),
-					}},
-				}
-				permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
-					User: &libregraph.Identity{
-						DisplayName: user.GetDisplayName(),
-						Id:          conversions.ToPointer(user.GetId()),
-					},
-				}
-			}
-
-			if driveItemInvite.ExpirationDateTime != nil {
-				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*driveItemInvite.ExpirationDateTime)
-			}
-
-			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
-			switch {
-			case err != nil:
-				fallthrough
-			case createShareResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
-				g.logger.Debug().Err(err).Msg("share creation failed")
-				createShareErrors.Store(objectId, errorcode.GeneralException.CreateOdataError(r.Context(), http.StatusText(http.StatusInternalServerError)))
-				return nil
-			}
-
-			if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
-				permission.Id = conversions.ToPointer(id)
-			}
-
-			if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
-				permission.SetExpirationDateTime(utils.TSToTime(expiration))
-			}
-
-			createShareSuccesses.Store(objectId, permission)
-
-			return nil
-		})
+	createShareRequest := &collaboration.CreateShareRequest{
+		ResourceInfo: statResponse.GetInfo(),
+		Grant: &collaboration.ShareGrant{
+			Permissions: &collaboration.SharePermissions{
+				Permissions: cs3ResourcePermissions,
+			},
+		},
 	}
 
-	if err := shareCreateGroup.Wait(); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	permission := &libregraph.Permission{}
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, unifiedrole.UnifiedRoleConditionGrantee, g.config.FilesSharing.EnableResharing); role != nil {
+		permission.Roles = []string{role.GetId()}
+	}
+
+	if len(permission.GetRoles()) == 0 {
+		permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(*cs3ResourcePermissions)
+	}
+
+	switch driveRecipient.GetLibreGraphRecipientType() {
+	case "group":
+		group, err := g.identityCache.GetGroup(ctx, objectId)
+		if err != nil {
+			g.logger.Debug().Err(err).Interface("groupId", objectId).Msg("failed group lookup")
+			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+		createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
+			Type: storageprovider.GranteeType_GRANTEE_TYPE_GROUP,
+			Id: &storageprovider.Grantee_GroupId{GroupId: &grouppb.GroupId{
+				OpaqueId: group.GetId(),
+			}},
+		}
+		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
+			Group: &libregraph.Identity{
+				DisplayName: group.GetDisplayName(),
+				Id:          conversions.ToPointer(group.GetId()),
+			},
+		}
+	default:
+		user, err := g.identityCache.GetUser(ctx, objectId)
+		if err != nil {
+			g.logger.Debug().Err(err).Interface("userId", objectId).Msg("failed user lookup")
+			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
+			Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
+			Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
+				OpaqueId: user.GetId(),
+			}},
+		}
+		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
+			User: &libregraph.Identity{
+				DisplayName: user.GetDisplayName(),
+				Id:          conversions.ToPointer(user.GetId()),
+			},
+		}
+	}
+
+	if driveItemInvite.ExpirationDateTime != nil {
+		createShareRequest.GetGrant().Expiration = utils.TimeToTS(*driveItemInvite.ExpirationDateTime)
+	}
+
+	createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
+	if errCode := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); errCode != nil {
+		g.logger.Debug().Err(err).Msg("share creation failed")
+		errCode.Render(w, r)
 		return
 	}
 
-	value := make([]interface{}, 0, len(driveItemInvite.Recipients))
-
-	hasSuccesses := false
-	createShareSuccesses.Range(func(key, permission interface{}) bool {
-		value = append(value, permission)
-		hasSuccesses = true
-		return true
-	})
-
-	hasErrors := false
-	createShareErrors.Range(func(key, err interface{}) bool {
-		value = append(value, err)
-		hasErrors = true
-		return true
-	})
-
-	switch {
-	case hasErrors && hasSuccesses:
-		render.Status(r, http.StatusMultiStatus)
-	case hasSuccesses:
-		render.Status(r, http.StatusOK)
-	default:
-		render.Status(r, http.StatusInternalServerError)
+	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
+		permission.Id = conversions.ToPointer(id)
 	}
 
-	render.JSON(w, r, &ListResponse{Value: value})
+	if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
+		permission.SetExpirationDateTime(utils.TSToTime(expiration))
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
 }
 
 // UpdatePermission updates a Permission of a Drive item
