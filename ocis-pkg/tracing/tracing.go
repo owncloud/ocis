@@ -39,7 +39,13 @@ func GetServiceTraceProvider(c ConfigConverter, serviceName string) (trace.Trace
 	if cfg.Enabled {
 		return GetTraceProvider(cfg.Endpoint, cfg.Collector, serviceName, cfg.Type)
 	}
-	return trace.NewNoopTracerProvider(), nil
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.NeverSample()),
+	)
+	rtrace.SetDefaultTracerProvider(tp)
+
+	return tp, nil
 }
 
 // GetPropagator gets a configured propagator.
