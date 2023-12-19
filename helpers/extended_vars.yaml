@@ -81,7 +81,7 @@ variables:
   description: false positive - code that extract envvars for config structs
   do_ignore: true
 - rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:46
+  path: ocis-pkg/registry/registry.go:122
   foundincode: true
   name: registryAddressEnv
   type: ""
@@ -89,9 +89,25 @@ variables:
   description: ""
   do_ignore: false
 - rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:48
+  path: ocis-pkg/registry/registry.go:118
   foundincode: true
   name: registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryPasswordEnv
+  path: ocis-pkg/registry/registry.go:115
+  foundincode: true
+  name: registryPasswordEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryUsernameEnv
+  path: ocis-pkg/registry/registry.go:114
+  foundincode: true
+  name: registryUsernameEnv
   type: ""
   default_value: ""
   description: ""

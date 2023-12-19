@@ -68,4 +68,20 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
+
+a| `registryPasswordEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `registryUsernameEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
 |===
