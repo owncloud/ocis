@@ -296,6 +296,14 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 				},
 				DisplayValue: "Türkçe",
 			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "zh",
+					},
+				},
+				DisplayValue: "汉语",
+			},
 		},
 	},
 }
