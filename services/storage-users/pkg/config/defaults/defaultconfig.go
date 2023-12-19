@@ -44,6 +44,7 @@ func DefaultConfig() *config.Config {
 		Reva:                    shared.DefaultRevaConfig(),
 		DataServerURL:           "http://localhost:9158/data",
 		DataGatewayURL:          "https://localhost:9200/data",
+		RevaGatewayGRPCAddr:     "127.0.0.1:9142",
 		TransferExpires:         86400,
 		UploadExpiration:        24 * 60 * 60,
 		GracefulShutdownTimeout: 30,

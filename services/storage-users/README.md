@@ -78,12 +78,13 @@ Cleaned uploads:
 
 <!-- referencing: https://github.com/owncloud/ocis/pull/5500 -->
 
-This command is about purging old trash-bin items of `project` spaces (spaces that have been created manually) and `personal` spaces.
+This command is about the trash-bin to get an overview of items, restore items and purging old items of `project` spaces (spaces that have been created manually) and `personal` spaces.
 
 ```bash
 ocis storage-users trash-bin <command>
 ```
 
+#### Purge-expired
 ```plaintext
 COMMANDS:
    purge-expired     Purge all expired items from the trashbin
@@ -96,6 +97,66 @@ The configuration for the `purge-expired` command is done by using the following
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+
+#### List and Restore Trash-Bins Items
+
+To authenticate the cli command use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
+service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE`
+defines a maximum number of attempts to rename a file when the user restores the file with `--option keep-both` to existing destination with the same name.
+
+The ID sources:
+-   personal 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+personal`
+-   project 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+project`
+
+```bash
+NAME:
+   ocis storage-users trash-bin list - Print a list of all trash-bin items of a space.
+
+USAGE:
+   ocis storage-users trash-bin list command [command options] ['spaceID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --verbose, -v  Get more verbose output (default: false)
+   --help, -h     show help
+
+```
+
+```bash
+NAME:
+   ocis storage-users trash-bin restore-all - Restore all trash-bin items for a space.
+
+USAGE:
+   ocis storage-users trash-bin restore-all command [command options] ['spaceID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
+   --verbose, -v             Get more verbose output (default: false)
+   --yes, -y                 Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively. (default: false)
+   --help, -h                show help
+
+```
+
+```bash
+NAME:
+   ocis storage-users trash-bin restore - Restore a trash-bin item by ID.
+
+USAGE:
+   ocis storage-users trash-bin restore command [command options] ['spaceID' required] ['itemID' required]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+OPTIONS:
+   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
+   --verbose, -v             Get more verbose output (default: false)
+   --help, -h                show help
+```
 
 ## Caching
 
