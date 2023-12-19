@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
+* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
@@ -131,6 +132,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7979
    https://github.com/owncloud/ocis/pull/7963
    https://github.com/owncloud/ocis/pull/7986
+
+* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
+
+   We added the `list` and `restore` commands to the trash-bin items to the CLI
+
+   https://github.com/owncloud/ocis/issues/7845
+   https://github.com/owncloud/ocis/pull/7917
+   https://github.com/cs3org/reva/pull/4392
 
 * Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
