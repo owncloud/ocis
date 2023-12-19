@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -21,73 +22,110 @@ import (
 const (
 	registryEnv         = "MICRO_REGISTRY"
 	registryAddressEnv  = "MICRO_REGISTRY_ADDRESS"
-	regisryUsernameEnv  = "MICRO_REGISTRY_AUTH_USERNAME"
+	registryUsernameEnv = "MICRO_REGISTRY_AUTH_USERNAME"
 	registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
 )
 
 var (
-	once      sync.Once
-	regPlugin string
-	reg       mRegistry.Registry
+	_once sync.Once
+	_reg  mRegistry.Registry
 )
 
-// Configure configures the registry
-func Configure(plugin string) {
-	if reg == nil {
-		regPlugin = plugin
+// Config is the config for a registry
+type Config struct {
+	Type         string   `mapstructure:"type"`
+	Addresses    []string `mapstructure:"addresses"`
+	Username     string   `mapstructure:"username"`
+	Password     string   `mapstructure:"password"`
+	DisableCache bool     `mapstructure:"disable_cache"`
+}
+
+// Option allows configuring the registry
+type Option func(*Config)
+
+// Inmemory overrides env values to use an in-memory registry
+func Inmemory() Option {
+	return func(c *Config) {
+		c.Type = "memory"
 	}
 }
 
 // GetRegistry returns a configured micro registry based on Micro env vars.
 // It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
 // and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
-func GetRegistry() mRegistry.Registry {
-	once.Do(func() {
-		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
-		// prefer env of setting from Configure()
-		plugin := os.Getenv(registryEnv)
-		if plugin == "" {
-			plugin = regPlugin
-		}
+func GetRegistry(opts ...Option) mRegistry.Registry {
+	_once.Do(func() {
+		cfg := getEnvs(opts...)
 
-		switch plugin {
-		case "nats":
-			reg = natsr.NewRegistry(
-				mRegistry.Addrs(addresses...),
-				natsr.RegisterAction("put"),
+		switch cfg.Type {
+		default:
+			fmt.Println("Attention: unknown registry type, using default nats-js-kv")
+			fallthrough
+		case "natsjs", "nats-js", "nats-js-kv": // for backwards compatibility - we will stick with one of those
+			_reg = natsjsregistry.NewRegistry(
+				mRegistry.Addrs(cfg.Addresses...),
+				natsjsregistry.Authenticate(cfg.Username, cfg.Password),
 			)
 		case "kubernetes":
-			reg = kubernetesr.NewRegistry(
-				mRegistry.Addrs(addresses...),
-			)
-		case "etcd":
-			reg = etcdr.NewRegistry(
-				mRegistry.Addrs(addresses...),
-			)
-		case "consul":
-			reg = consulr.NewRegistry(
-				mRegistry.Addrs(addresses...),
+			_reg = kubernetesr.NewRegistry(
+				mRegistry.Addrs(cfg.Addresses...),
 			)
 		case "memory":
-			reg = memr.NewRegistry()
-		case "natsjs", "nats-js", "nats-js-kv": // for backwards compatibility - we will stick with one of those
-			reg = natsjsregistry.NewRegistry(
-				mRegistry.Addrs(addresses...),
-				natsjsregistry.Authenticate(os.Getenv(regisryUsernameEnv), os.Getenv(registryPasswordEnv)),
+			_reg = memr.NewRegistry()
+			cfg.DisableCache = true // no cache needed for in-memory registry
+		case "nats":
+			fmt.Println("Attention: nats registry is deprecated, use nats-js-kv instead")
+			_reg = natsr.NewRegistry(
+				mRegistry.Addrs(cfg.Addresses...),
+				natsr.RegisterAction("put"),
 			)
-		default:
-			reg = mdnsr.NewRegistry()
+		case "etcd":
+			fmt.Println("Attention: etcd registry is deprecated, use nats-js-kv instead")
+			_reg = etcdr.NewRegistry(
+				mRegistry.Addrs(cfg.Addresses...),
+			)
+		case "consul":
+			fmt.Println("Attention: consul registry is deprecated, use nats-js-kv instead")
+			_reg = consulr.NewRegistry(
+				mRegistry.Addrs(cfg.Addresses...),
+			)
+		case "mdns":
+			fmt.Println("Attention: mdns registry is deprecated, use nats-js-kv instead")
+			_reg = mdnsr.NewRegistry()
 		}
 
-		// No cache needed for in-memory registry
-		if plugin != "memory" {
-			reg = cache.New(reg, cache.WithTTL(30*time.Second))
+		// Disable cache if wanted
+		if !cfg.DisableCache {
+			_reg = cache.New(_reg, cache.WithTTL(30*time.Second))
 		}
 
 		// fixme: lazy initialization of reva registry, needs refactor to a explicit call per service
-		_ = rRegistry.Init(reg)
+		_ = rRegistry.Init(_reg)
 	})
 	// always use cached registry to prevent registry
 	// lookup for every request
-	return reg
+	return _reg
+}
+
+func getEnvs(opts ...Option) *Config {
+	cfg := &Config{
+		Type:      "nats-js-kv",
+		Addresses: []string{"127.0.0.1:9233"},
+		Username:  os.Getenv(registryUsernameEnv),
+		Password:  os.Getenv(registryPasswordEnv),
+	}
+
+	if s := os.Getenv(registryEnv); s != "" {
+		cfg.Type = s
+	}
+
+	if s := strings.Split(os.Getenv(registryAddressEnv), ","); len(s) > 0 {
+		cfg.Addresses = s
+	}
+
+	for _, o := range opts {
+		o(cfg)
+	}
+
+	return cfg
 }

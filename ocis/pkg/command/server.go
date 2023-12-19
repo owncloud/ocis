@@ -4,7 +4,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/owncloud/ocis/v2/ocis/pkg/runtime"
 	"github.com/urfave/cli/v2"
@@ -21,7 +20,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			// Prefer the in-memory registry as the default when running in single-binary mode
-			registry.Configure("memory")
 			r := runtime.New(cfg)
 			return r.Start()
 		},
