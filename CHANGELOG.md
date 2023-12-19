@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
+* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 
 ## Details
@@ -168,6 +169,13 @@ The following sections list the changes for unreleased.
    Replaces the nats object store with the nats kv store in the natsjs registry
 
    https://github.com/owncloud/ocis/pull/7987
+
+* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
+
+   Allow events, store and registry implementation to pass username/password to the
+   nats instance
+
+   https://github.com/owncloud/ocis/pull/7989
 
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 
