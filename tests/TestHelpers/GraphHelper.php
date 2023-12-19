@@ -61,6 +61,13 @@ class GraphHelper {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getShareIdRegex(): string {
+		return self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
+	}
+
+	/**
 	 * Key name can consist of @@@
 	 * This function separate such key and return its actual value from actual drive response which can be used for assertion
 	 *
@@ -1530,6 +1537,81 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * Get the role id by name
+	 *
+	 * @param string $role
+	 *
+	 * @return string
+	 *
+	 */
+	public static function getRoleIdByName(
+		string $role
+	): string {
+		switch ($role) {
+			case 'Viewer':
+				return 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5';
+			case 'Space Viewer':
+				return 'a8d5fe5e-96e3-418d-825b-534dbdf22b99';
+			case 'Editor':
+				return 'fb6c3e19-e378-47e5-b277-9732f9de6e21';
+			case 'Space Editor':
+				return '58c63c02-1d89-4572-916a-870abc5a1b7d';
+			case 'File Editor':
+				return '2d00ce52-1fc2-4dbc-8b95-a73b73395f5a';
+			case 'Co Owner':
+				return '3a4ba8e9-6a0d-4235-9140-0e7a34007abe';
+			case 'Uploader':
+				return '1c996275-f1c9-4e71-abdf-a42f6495e960';
+			case 'Manager':
+				return '312c0871-5ef7-4b3a-85b6-0e4074c64049';
+		}
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $itemId
+	 * @param string $shareeId
+	 * @param string|null $role
+	 *
+	 * @return ResponseInterface
+	 * @throws \JsonException
+	 */
+	public static function sendSharingInvitation(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $itemId,
+		string $shareeId,
+		?string $role
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
+		$body = [];
+
+		$recipients['objectId'] = $shareeId;
+		$body['recipients'] = [$recipients];
+
+		if ($role !== null) {
+			$roleId = self::getRoleIdByName($role);
+			$body['roles'] = [$roleId];
+		}
+
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($body)
 		);
 	}
 }
