@@ -220,39 +220,6 @@ class UserHelper {
 	/**
 	 *
 	 * @param string|null $baseUrl
-	 * @param string|null $group
-	 * @param string|null $adminUser
-	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
-	 * @param int|null $ocsApiVersion
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function deleteGroup(
-		?string $baseUrl,
-		?string $group,
-		?string $adminUser,
-		?string $adminPassword,
-		?string $xRequestId = '',
-		?int $ocsApiVersion = 2
-	):ResponseInterface {
-		$group = \rawurlencode($group);
-		return OcsApiHelper::sendRequest(
-			$baseUrl,
-			$adminUser,
-			$adminPassword,
-			"DELETE",
-			"/cloud/groups/" . $group,
-			$xRequestId,
-			[],
-			$ocsApiVersion
-		);
-	}
-
-	/**
-	 *
-	 * @param string|null $baseUrl
 	 * @param string|null $user
 	 * @param string|null $group
 	 * @param string|null $adminUser

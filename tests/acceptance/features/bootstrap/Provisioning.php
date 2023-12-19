@@ -2672,11 +2672,7 @@ trait Provisioning {
 	 */
 	public function cleanupGroup(string $group):void {
 		try {
-			if (OcisHelper::isTestingWithGraphApi()) {
-				$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
-			} else {
-				$this->deleteTheGroupUsingTheProvisioningApi($group);
-			}
+			$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
 		} catch (Exception $e) {
 			\error_log(
 				"INFORMATION: There was an unexpected problem trying to delete group " .
@@ -3468,23 +3464,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @param string $group group name
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws LdapException
-	 */
-	public function deleteGroup(string $group):void {
-		if ($this->groupExists($group)) {
-			if ($this->isTestingWithLdap() && \in_array($group, $this->ldapCreatedGroups)) {
-				$this->deleteLdapGroup($group);
-			} else {
-				$this->deleteTheGroupUsingTheProvisioningApi($group);
-			}
-		}
-	}
-
-	/**
 	 * @Given /^group "([^"]*)" has been deleted$/
 	 *
 	 * @param string $group
@@ -3494,94 +3473,12 @@ trait Provisioning {
 	 * @throws GuzzleException
 	 */
 	public function groupHasBeenDeleted(string $group):void {
-		if (OcisHelper::isTestingWithGraphApi()) {
-			$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
+		if ($this->groupExists($group) && $this->isTestingWithLdap()) {
+			$this->deleteLdapGroup($group);
 		} else {
-			$this->deleteGroup($group);
+			$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
 		}
 		$this->groupShouldNotExist($group);
-	}
-
-	/**
-	 * @When /^the administrator deletes group "([^"]*)" from the default user backend$/
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminDeletesGroup(string $group):void {
-		$this->deleteGroup($group);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @When /^the administrator deletes group "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function deleteTheGroupUsingTheProvisioningApi(string $group):void {
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
-		$this->response = UserHelper::deleteGroup(
-			$this->getBaseUrl(),
-			$group,
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
-		$this->pushToLastStatusCodesArrays();
-		if ($this->theGroupShouldExist($group)
-			&& $this->theGroupShouldBeAbleToBeDeleted($group)
-			&& ($this->response->getStatusCode() !== 200)
-		) {
-			\error_log(
-				"INFORMATION: could not delete group '$group'"
-				. $this->response->getStatusCode() . " " . $this->response->getBody()
-			);
-		}
-
-		$this->rememberThatGroupIsNotExpectedToExist($group);
-	}
-
-	/**
-	 * @When the administrator deletes the following groups using the provisioning API
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorDeletesTheFollowingGroupsUsingTheProvisioningApi(TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["groupname"]);
-		$groups = $table->getHash();
-		foreach ($groups as $group) {
-			$this->deleteTheGroupUsingTheProvisioningApi($group["groupname"]);
-		}
-	}
-
-	/**
-	 * @When user :user tries to delete group :group using the provisioning API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
-	public function userTriesToDeleteGroupUsingTheProvisioningApi(string $user, string $group):void {
-		$this->response = UserHelper::deleteGroup(
-			$this->getBaseUrl(),
-			$group,
-			$this->getActualUsername($user),
-			$this->getActualPassword($user),
-			$this->getStepLineRef(),
-			$this->ocsApiVersion
-		);
 	}
 
 	/**

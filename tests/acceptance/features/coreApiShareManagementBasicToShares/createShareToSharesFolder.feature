@@ -452,13 +452,13 @@ Feature: sharing
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with group "grp1" should include
-      | share_with  | grp1           |
-      | file_target | /textfile0.txt |
-      | path        | /textfile0.txt |
-      | uid_owner   | %username%     |
+      | share_with  | grp1                  |
+      | file_target | /Shares/textfile0.txt |
+      | path        | /textfile0.txt        |
+      | uid_owner   | %username%            |
     Then as "Brian" file "/Shares/textfile0.txt" should exist
     And as "Carol" file "/Shares/textfile0.txt" should exist
-    When the administrator deletes group "grp1" using the provisioning API
+    When the administrator deletes group "grp1" using the Graph API
     And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
