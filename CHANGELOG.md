@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 * Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
+* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
 
 ## Details
 
@@ -185,6 +186,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7576
    https://github.com/owncloud/ocis/pull/7464
    https://github.com/owncloud/ocis/pull/7463
+
+* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
+
+   The previously used default `mdns` is faulty. Deprecated it together with
+   `consul`, `nats` and `etcd` implementations.
+
+   https://github.com/owncloud/ocis/pull/8011
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
