@@ -3,11 +3,8 @@ package command
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"sync"
-	"time"
 
-	tusd "github.com/tus/tusd/pkg/handler"
 	"github.com/urfave/cli/v2"
 
 	"github.com/cs3org/reva/v2/pkg/storage"
@@ -51,20 +48,21 @@ func ListUploads(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			managingFS, ok := fs.(storage.UploadsManager)
+			managingFS, ok := fs.(storage.UploadSessionLister)
 			if !ok {
 				fmt.Fprintf(os.Stderr, "'%s' storage does not support listing expired uploads\n", cfg.Driver)
 				os.Exit(1)
 			}
-
-			uploads, err := managingFS.ListUploads()
+			expired := false
+			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &expired})
 			if err != nil {
 				return err
 			}
 
 			fmt.Println("Incomplete uploads:")
 			for _, u := range uploads {
-				fmt.Printf(" - %s (%s, Size: %d, Expires: %s)\n", u.ID, u.MetaData["filename"], u.Size, expiredString(u.MetaData["expires"]))
+				ref := u.Reference()
+				fmt.Printf(" - %s (Space: %s, Name: %s, Size: %d/%d, Expires: %s, Processing: %t)\n", ref.GetResourceId().GetSpaceId(), u.ID(), u.Filename(), u.Offset(), u.Size(), u.Expires(), u.IsProcessing())
 			}
 			return nil
 		},
@@ -92,7 +90,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			managingFS, ok := fs.(storage.UploadsManager)
+			managingFS, ok := fs.(storage.UploadSessionLister)
 			if !ok {
 				fmt.Fprintf(os.Stderr, "'%s' storage does not support clean expired uploads\n", cfg.Driver)
 				os.Exit(1)
@@ -100,18 +98,23 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
-			purgedChannel := make(chan tusd.FileInfo)
+			processing := false
+			expired := true
+			uploads, err := managingFS.ListUploadSessions(c.Context, storage.UploadSessionFilter{Expired: &expired, Processing: &processing})
+			if err != nil {
+				return err
+			}
 
-			fmt.Println("Cleaned uploads:")
+			fmt.Println("purging uploads:")
 			go func() {
-				for purged := range purgedChannel {
-					fmt.Printf(" - %s (%s, Size: %d, Expires: %s)\n", purged.ID, purged.MetaData["filename"], purged.Size, expiredString(purged.MetaData["expires"]))
+				for _, u := range uploads {
+					ref := u.Reference()
+					fmt.Printf(" - %s (Space: %s, Name: %s, Size: %d/%d, Expires: %s, Processing: %t)\n", ref.GetResourceId().GetSpaceId(), u.ID(), u.Filename(), u.Offset(), u.Size(), u.Expires(), u.IsProcessing())
+					u.Purge(c.Context)
 				}
 				wg.Done()
 			}()
 
-			err = managingFS.PurgeExpiredUploads(purgedChannel)
-			close(purgedChannel)
 			wg.Wait()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to clean expired uploads '%s'\n", err)
@@ -120,13 +123,4 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
-}
-
-func expiredString(e string) string {
-	expired := "N/A"
-	iExpires, err := strconv.Atoi(e)
-	if err == nil {
-		expired = time.Unix(int64(iExpires), 0).Format(time.RFC3339)
-	}
-	return expired
 }

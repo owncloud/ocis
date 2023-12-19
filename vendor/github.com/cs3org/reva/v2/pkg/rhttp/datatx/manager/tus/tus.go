@@ -23,13 +23,11 @@ import (
 	"log"
 	"net/http"
 	"path"
-	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/pkg/handler"
 
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -40,8 +38,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -103,33 +101,27 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		return nil, err
 	}
 
-	go func() {
-		for {
-			ev := <-handler.CompleteUploads
-			info := ev.Upload
-			spaceOwner := &userv1beta1.UserId{
-				OpaqueId: info.Storage["SpaceOwnerOrManager"],
-			}
-			owner := &userv1beta1.UserId{
-				Idp:      info.Storage["Idp"],
-				OpaqueId: info.Storage["UserId"],
-			}
-			ref := &provider.Reference{
-				ResourceId: &provider.ResourceId{
-					StorageId: info.MetaData["providerID"],
-					SpaceId:   info.Storage["SpaceRoot"],
-					OpaqueId:  info.Storage["SpaceRoot"],
-				},
-				Path: utils.MakeRelativePath(filepath.Join(info.MetaData["dir"], info.MetaData["filename"])),
-			}
-			datatx.InvalidateCache(owner, ref, m.statCache)
-			if m.publisher != nil {
-				if err := datatx.EmitFileUploadedEvent(spaceOwner, owner, ref, m.publisher); err != nil {
-					appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
+	if _, ok := fs.(storage.UploadSessionLister); ok {
+		// We can currently only send updates if the fs is decomposedfs as we read very specific keys from the storage map of the tus info
+		go func() {
+			for {
+				ev := <-handler.CompleteUploads
+				// We should be able to get the upload progress with fs.GetUploadProgress, but currently tus will erase the info files
+				// so we create a Progress instance here that is used to read the correct properties
+				up := upload.Progress{
+					Info: ev.Upload,
+				}
+				executant := up.Executant()
+				ref := up.Reference()
+				datatx.InvalidateCache(&executant, &ref, m.statCache)
+				if m.publisher != nil {
+					if err := datatx.EmitFileUploadedEvent(up.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
+						appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
+					}
 				}
 			}
-		}
-	}()
+		}()
+	}
 
 	h := handler.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		method := r.Method
