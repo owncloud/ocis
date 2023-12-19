@@ -72,6 +72,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Nodes(cfg.Store.Nodes...),
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
+				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
 			)
 
 			service := grpc.NewService(

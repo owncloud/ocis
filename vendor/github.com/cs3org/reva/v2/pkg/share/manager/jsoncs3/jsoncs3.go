@@ -133,6 +133,8 @@ type EventOptions struct {
 	TLSInsecure          bool   `mapstructure:"tlsinsecure"`
 	TLSRootCACertificate string `mapstructure:"tlsrootcacertificate"`
 	EnableTLS            bool   `mapstructure:"enabletls"`
+	AuthUsername         string `mapstructure:"authusername"`
+	AuthPassword         string `mapstructure:"authpassword"`
 }
 
 // Manager implements a share manager using a cs3 storage backend with local caching

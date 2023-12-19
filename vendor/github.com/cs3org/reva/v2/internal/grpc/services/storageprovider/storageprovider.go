@@ -76,6 +76,8 @@ type eventconfig struct {
 	TLSInsecure          bool   `mapstructure:"tls_insecure"  docs:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `mapstructure:"tls_root_ca_cert"  docs:"The root CA certificate used to validate the server's TLS certificate."`
 	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
+	AuthUsername         string `mapstructure:"nats_username" docs:"event stream username"`
+	AuthPassword         string `mapstructure:"nats_password" docs:"event stream password"`
 }
 
 func (c *config) init() {

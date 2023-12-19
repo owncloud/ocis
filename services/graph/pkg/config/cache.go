@@ -11,4 +11,6 @@ type Cache struct {
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;GRAPH_CACHE_TTL" desc:"Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details."`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;GRAPH_CACHE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default."`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;GRAPH_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false."`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;GRAPH_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured."`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;GRAPH_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured."`
 }

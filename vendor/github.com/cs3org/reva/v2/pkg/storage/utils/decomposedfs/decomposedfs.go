@@ -145,6 +145,7 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		microstore.Database(o.IDCache.Database),
 		microstore.Table(o.IDCache.Table),
 		store.DisablePersistence(o.IDCache.DisablePersistence),
+		store.Authentication(o.IDCache.AuthUsername, o.IDCache.AuthPassword),
 	))
 
 	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))

@@ -127,6 +127,10 @@ func Create(opts ...microstore.Option) microstore.Store {
 		// host, port, clusterid
 		natsOptions := nats.GetDefaultOptions()
 		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
+		if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
+			natsOptions.User = auth[0]
+			natsOptions.Password = auth[1]
+		}
 		return natsjs.NewStore(
 			append(opts,
 				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options
@@ -141,6 +145,10 @@ func Create(opts ...microstore.Option) microstore.Store {
 
 		natsOptions := nats.GetDefaultOptions()
 		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
+		if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
+			natsOptions.User = auth[0]
+			natsOptions.Password = auth[1]
+		}
 		return natsjskv.NewStore(
 			append(opts,
 				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options

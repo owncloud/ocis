@@ -8,6 +8,7 @@ import (
 	"time"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
+	"github.com/nats-io/nats.go"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/store"
 	"go-micro.dev/v4/util/cmd"
@@ -133,5 +134,11 @@ func storeOptions(opts registry.Options) []store.Option {
 	if so, ok := opts.Context.Value(storeOptionsKey{}).([]store.Option); ok {
 		storeoptions = append(storeoptions, so...)
 	}
-	return storeoptions
+	natsOptions := nats.GetDefaultOptions()
+	natsOptions.Name = "nats-js-kv-registry"
+	if auth, ok := opts.Context.Value(authKey{}).([]string); ok {
+		natsOptions.User = auth[0]
+		natsOptions.Password = auth[1]
+	}
+	return append(storeoptions, natsjskv.NatsOptions(natsOptions))
 }

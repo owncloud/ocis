@@ -17,11 +17,14 @@ import (
 
 // NatsConfig is the configuration needed for a NATS event stream
 type NatsConfig struct {
-	Endpoint             string // Endpoint of the nats server
-	Cluster              string // CluserID of the nats cluster
-	TLSInsecure          bool   // Whether to verify TLS certificates
-	TLSRootCACertificate string // The root CA certificate used to validate the TLS certificate
-	EnableTLS            bool   // Enable TLS
+	Endpoint             string `mapstructure:"address"`          // Endpoint of the nats server
+	Cluster              string `mapstructure:"clusterID"`        // CluserID of the nats cluster
+	TLSInsecure          bool   `mapstructure:"tls-insecure"`     // Whether to verify TLS certificates
+	TLSRootCACertificate string `mapstructure:"tls-root-ca-cert"` // The root CA certificate used to validate the TLS certificate
+	EnableTLS            bool   `mapstructure:"enable-tls"`       // Enable TLS
+	AuthUsername         string `mapstructure:"username"`         // Username for authentication
+	AuthPassword         string `mapstructure:"password"`         // Password for authentication
+
 }
 
 // NatsFromConfig returns a nats stream from the given config
@@ -55,6 +58,7 @@ func NatsFromConfig(connName string, disableDurability bool, cfg NatsConfig) (ev
 		natsjs.ClusterID(cfg.Cluster),
 		natsjs.SynchronousPublish(true),
 		natsjs.Name(connName),
+		natsjs.Authenticate(cfg.AuthUsername, cfg.AuthPassword),
 	}
 
 	if disableDurability {
@@ -62,7 +66,6 @@ func NatsFromConfig(connName string, disableDurability bool, cfg NatsConfig) (ev
 	}
 
 	return Nats(opts...)
-
 }
 
 // nats returns a nats streaming client
