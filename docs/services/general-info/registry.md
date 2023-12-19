@@ -18,20 +18,17 @@ The type of registry to use can be configured with the `MICRO_REGISTRY` environm
 
 Setting the environment variable to `memory` starts an inmemory registry. This only works with the single binary deployment.
 
-### `nats-js-kv`
+### `nats-js-kv` (Default)
 
-Set the environment variable to `nats-js-kv` (or leave it empty) to use a nats-js key value store as registry.
-- Note: If not running build-in nats, `MICRO_REGISTRY_ADDRESS` needs to be set to the address of the nats-js cluster. (Same as `OCIS_EVENTS_ENDPOINT`)
+Set the environment variable to `nats-js-kv` or leave it empty to use a nats-js key value store as registry.
+- Note: If not running build-in nats, `MICRO_REGISTRY_ADDRESS` needs to be set to the address of the nats-js cluster, which is the same value as `OCIS_EVENTS_ENDPOINT`.
 - Optional: Use `MICRO_REGISTRY_AUTH_USERNAME` and `MICRO_REGISTRY_AUTH_PASSWORD` to authenticate with the nats cluster.
-
-This is the default.
-
 ### `kubernetes`
 
 When deploying in a kubernetes cluster, the kubernetes registry can be used. Additionally the `MICRO_REGISTRY_ADDRESS` environment
 variable needs to be set to the url of the kubernetes registry.
 
-### Deprecated registries
+### Deprecated Registries
 
 These registries are currently working but will be removed in a later version. It is recommended to switch to a supported one.
 
