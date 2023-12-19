@@ -26,6 +26,8 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
+  username: ""
+  password: ""
 service_account:
   service_account_id: ""
   service_account_secret: ""

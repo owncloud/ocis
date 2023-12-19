@@ -26,6 +26,8 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
+  username: ""
+  password: ""
 store:
   store: memory
   nodes: []
@@ -33,3 +35,5 @@ store:
   table: events
   ttl: 336h0m0s
   size: 0
+  username: ""
+  password: ""

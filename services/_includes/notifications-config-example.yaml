@@ -33,6 +33,8 @@ notifications:
     tls_insecure: false
     tls_root_ca_certificate: ""
     enable_tls: false
+    username: ""
+    password: ""
   email_template_path: ""
   translation_path: ""
   default_language: ""

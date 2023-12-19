@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-19-08-43-00]
+[#deprecation-note-2023-12-19-10-25-37]
 [caption=]
 .Deprecation notes for the eventhistory service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -201,6 +201,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`EVENTHISTORY_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`EVENTHISTORY_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
 a|`OCIS_PERSISTENT_STORE` +
 `EVENTHISTORY_STORE` +
 
@@ -258,5 +278,25 @@ a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
 The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`EVENTHISTORY_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`EVENTHISTORY_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 |===
 

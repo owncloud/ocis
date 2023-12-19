@@ -19,6 +19,8 @@
 | OCIS_INSECURE<br/>SSE_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SSE_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SSE_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>SSE_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>SSE_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>SSE_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | SSE_HTTP_ADDR | string | 127.0.0.1:0 | The bind address of the HTTP service.|
 | SSE_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>SSE_CORS_ALLOW_ORIGINS | []string | [*] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|

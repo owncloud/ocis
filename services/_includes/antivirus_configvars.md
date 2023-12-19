@@ -20,6 +20,8 @@
 | OCIS_INSECURE<br/>ANTIVIRUS_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>ANTIVIRUS_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided ANTIVIRUS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>ANTIVIRUS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>ANTIVIRUS_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>ANTIVIRUS_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | ANTIVIRUS_SCANNER_TYPE | string | clamav | The antivirus scanner to use. Supported values are 'clamav' and 'icap'.|
 | ANTIVIRUS_CLAMAV_SOCKET | string | /run/clamav/clamd.ctl | The socket clamav is running on. Note the default value is an example which needs adaption according your OS.|
 | ANTIVIRUS_ICAP_TIMEOUT | int64 | 300 | Timeout for the ICAP client.|

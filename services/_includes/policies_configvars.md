@@ -12,6 +12,8 @@
 | OCIS_INSECURE<br/>POLICIES_EVENTS_TLS_INSECURE | bool | false | Whether the server should skip the client certificate verification during the TLS handshake.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>POLICIES_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>POLICIES_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>POLICIES_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>POLICIES_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_LOG_LEVEL<br/>POLICIES_LOG_LEVEL | string |  | The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.|
 | OCIS_LOG_PRETTY<br/>POLICIES_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>POLICIES_LOG_COLOR | bool | false | Activates colorized log output.|

@@ -17,6 +17,8 @@
 | OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>GRAPH_CACHE_DISABLE_PERSISTENCE | bool | false | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
+| OCIS_CACHE_AUTH_USERNAME<br/>GRAPH_CACHE_AUTH_USERNAME | string |  | The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+| OCIS_CACHE_AUTH_PASSWORD<br/>GRAPH_CACHE_AUTH_PASSWORD | string |  | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 | GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
@@ -93,6 +95,8 @@
 | OCIS_INSECURE<br/>GRAPH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>GRAPH_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>GRAPH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| OCIS_EVENTS_AUTH_USERNAME<br/>GRAPH_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>GRAPH_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | OCIS_KEYCLOAK_BASE_PATH<br/>GRAPH_KEYCLOAK_BASE_PATH | string |  | The URL to access keycloak.|
 | OCIS_KEYCLOAK_CLIENT_ID<br/>GRAPH_KEYCLOAK_CLIENT_ID | string |  | The client id to authenticate with keycloak.|
 | OCIS_KEYCLOAK_CLIENT_SECRET<br/>GRAPH_KEYCLOAK_CLIENT_SECRET | string |  | The client secret to use in authentication.|

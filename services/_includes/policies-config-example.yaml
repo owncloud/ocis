@@ -15,6 +15,8 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
+  username: ""
+  password: ""
 grpc_client_tls: null
 log:
   level: ""

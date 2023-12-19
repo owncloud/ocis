@@ -126,6 +126,8 @@ oidc:
     ttl: 10s
     size: 0
     disable_persistence: false
+    username: ""
+    password: ""
   jwks:
     refresh_interval: 60
     refresh_timeout: 10

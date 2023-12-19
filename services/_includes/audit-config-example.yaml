@@ -22,6 +22,8 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
+  username: ""
+  password: ""
 auditlog:
   log_to_console: true
   log_to_file: false

@@ -33,6 +33,8 @@
 | OCIS_CACHE_TTL<br/>PROXY_OIDC_USERINFO_CACHE_TTL | Duration | 10s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>PROXY_OIDC_USERINFO_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE | bool | false | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
+| OCIS_CACHE_AUTH_USERNAME<br/>PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME | string |  | The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+| OCIS_CACHE_AUTH_PASSWORD<br/>PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD | string |  | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 | PROXY_OIDC_JWKS_REFRESH_INTERVAL | uint64 | 60 | The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.|
 | PROXY_OIDC_JWKS_REFRESH_TIMEOUT | uint64 | 10 | The timeout in seconds for an outgoing JWKS request.|
 | PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT | uint64 | 60 | Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.|

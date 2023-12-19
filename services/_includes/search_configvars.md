@@ -27,6 +27,8 @@
 | OCIS_INSECURE<br/>SEARCH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>SEARCH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>SEARCH_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>SEARCH_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | SEARCH_ENGINE_TYPE | string | bleve | Defines which search engine to use. Defaults to 'bleve'. Supported values are: 'bleve'.|
 | SEARCH_ENGINE_BLEVE_DATA_PATH | string | ~/.ocis/search | The directory where the filesystem will store search data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/search.|
 | SEARCH_EXTRACTOR_TYPE | string | basic | Defines the content extraction engine. Defaults to 'basic'. Supported values are: 'basic' and 'tika'.|

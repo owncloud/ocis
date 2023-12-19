@@ -32,12 +32,16 @@
 | OCIS_INSECURE<br/>USERLOG_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>USERLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>USERLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| OCIS_EVENTS_AUTH_USERNAME<br/>USERLOG_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>USERLOG_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | OCIS_PERSISTENT_STORE<br/>USERLOG_STORE | string | memory | The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
 | OCIS_PERSISTENT_STORE_NODES<br/>USERLOG_STORE_NODES | []string | [] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | USERLOG_STORE_DATABASE | string | userlog | The database name the configured store should use.|
 | USERLOG_STORE_TABLE | string | events | The database table the store should use.|
 | OCIS_PERSISTENT_STORE_TTL<br/>USERLOG_STORE_TTL | Duration | 336h0m0s | Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
 | OCIS_PERSISTENT_STORE_SIZE<br/>USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
+| OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>USERLOG_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+| OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>USERLOG_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_DISABLE_SSE,USERLOG_DISABLE_SSE | bool | false | Disables server-sent events (sse). When disabled, clients will no longer receive sse notifications.|
 | USERLOG_GLOBAL_NOTIFICATIONS_SECRET | string |  | The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>USERLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|

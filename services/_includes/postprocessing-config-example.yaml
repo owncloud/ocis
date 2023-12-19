@@ -23,6 +23,8 @@ store:
   table: postprocessing
   ttl: 0s
   size: 0
+  username: ""
+  password: ""
 postprocessing:
   events:
     endpoint: 127.0.0.1:9233
@@ -30,6 +32,8 @@ postprocessing:
     tls_insecure: false
     tls_root_ca_certificate: ""
     enable_tls: false
+    username: ""
+    password: ""
   steps: []
   delayprocessing: 0s
   retry_backoff_duration: 5s

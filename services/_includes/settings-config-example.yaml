@@ -63,6 +63,8 @@ metadata_config:
     ttl: 10m0s
     size: 0
     disable_persistence: false
+    username: ""
+    password: ""
 bundles_path: ""
 admin_user_id: ""
 token_manager:
