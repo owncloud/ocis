@@ -104,3 +104,6 @@
 | STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. See the Environment Variable Types description for more details.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>STORAGE_USERS_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>STORAGE_USERS_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
+| OCIS_GATEWAY_GRPC_ADDR<br/>STORAGE_USERS_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the gateway GRPC address.|
+| OCIS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+| STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE | int | 0 | The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100.|

@@ -129,3 +129,6 @@ tasks:
 service_account:
   service_account_id: ""
   service_account_secret: ""
+gateway_addr: 127.0.0.1:9142
+machine_auth_api_key: ""
+max_attempts_rename_file: 0

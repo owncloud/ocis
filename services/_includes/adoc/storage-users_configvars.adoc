@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-19-12-58-44]
+[#deprecation-note-2023-12-19-14-46-37]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -984,5 +984,33 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The service account secret.
+
+a|`OCIS_GATEWAY_GRPC_ADDR` +
+`STORAGE_USERS_GATEWAY_GRPC_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9142 ++
+a| [subs=-attributes]
+The bind address of the gateway GRPC address.
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+
+a|`STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100.
 |===
 

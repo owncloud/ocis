@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-19-12-58-44]
+[#deprecation-note-2023-12-19-14-46-37]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -142,7 +142,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 
-a|`GATEWAY_GRPC_ADDR` +
+a|`OCIS_GATEWAY_GRPC_ADDR` +
+`GATEWAY_GRPC_ADDR` +
 
 a| [subs=-attributes]
 ++string ++

@@ -14,7 +14,7 @@
 | GATEWAY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | GATEWAY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | GATEWAY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|
+| OCIS_GATEWAY_GRPC_ADDR<br/>GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|
 | GATEWAY_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | OCIS_JWT_SECRET<br/>GATEWAY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | The CS3 gateway endpoint.|
