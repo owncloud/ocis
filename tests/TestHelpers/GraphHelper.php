@@ -1601,10 +1601,15 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		string $shareeId,
+		?string $shareType,
 		?string $role
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = [];
+
+		if ($shareType === 'group') {
+			$recipients['@libre.graph.recipient.type'] = 'group';
+		}
 
 		$recipients['objectId'] = $shareeId;
 		$body['recipients'] = [$recipients];
