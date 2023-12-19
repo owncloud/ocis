@@ -99,9 +99,15 @@ class SharingNgContext implements Context {
 			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
 			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
 
-		$shareeId = ($rows['shareType'] === 'user')
-			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
-			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
+        $sharee = array_map('trim', explode(',', $rows['sharee']));
+        $shareType = array_map('trim', explode(',', $rows['shareType']));
+
+        $shareeId = [];
+        for ($i = 0; $i < count($sharee); $i++) {
+            $shareeId[] = ($shareType[$i] === 'user')
+                ? $this->featureContext->getAttributeOfCreatedUser($sharee[$i], 'id')
+                : $this->featureContext->getAttributeOfCreatedGroup($sharee[$i], 'id');
+        }
 
 		$this->featureContext->setResponse(
 			GraphHelper::sendSharingInvitation(
@@ -112,7 +118,7 @@ class SharingNgContext implements Context {
 				$spaceId,
 				$itemId,
 				$shareeId,
-				$rows['shareType'],
+				$shareType,
 				$rows['role']
 			)
 		);

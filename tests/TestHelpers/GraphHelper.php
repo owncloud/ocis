@@ -1587,7 +1587,8 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
-	 * @param string $shareeId
+	 * @param array $shareeId
+     * @param array|null $shareType
 	 * @param string|null $role
 	 *
 	 * @return ResponseInterface
@@ -1600,19 +1601,25 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		string $shareeId,
-		?string $shareType,
+		array $shareeId,
+		?array $shareType,
 		?string $role
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = [];
 
-		if ($shareType === 'group') {
-			$recipients['@libre.graph.recipient.type'] = 'group';
-		}
-
-		$recipients['objectId'] = $shareeId;
-		$body['recipients'] = [$recipients];
+        for ($i = 0; $i < count($shareeId); $i++) {
+            if ($shareType[$i] === 'group') {
+                $body['recipients'][] = [
+                    "@libre.graph.recipient.type"=> "group",
+                    "objectId" => $shareeId[$i]
+                ];
+            } else {
+                $body['recipients'][] = [
+                    'objectId' => $shareeId[$i]
+                ];
+            }
+        }
 
 		if ($role !== null) {
 			$roleId = self::getRoleIdByName($baseUrl, $xRequestId, $user, $password, $role);
