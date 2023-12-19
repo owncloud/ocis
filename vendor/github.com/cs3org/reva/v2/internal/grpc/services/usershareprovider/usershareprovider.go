@@ -154,6 +154,7 @@ func (s *service) isPathAllowed(path string) bool {
 }
 
 func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
+	log := appctx.GetLogger(ctx)
 	user := ctxpkg.ContextMustGetUser(ctx)
 
 	gatewayClient, err := s.gatewaySelector.Next()
@@ -184,9 +185,22 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 		}
 	}
 
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: req.GetResourceInfo().GetId()}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", req.GetResourceInfo().GetId()).Msg("failed to stat resource to share")
+		return &collaboration.CreateShareResponse{
+			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+	// the user needs to have the AddGrant permissions on the Resource to be able to create a share
+	if !sRes.GetInfo().GetPermissionSet().AddGrant {
+		return &collaboration.CreateShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to add grants on shared resource"),
+		}, err
+	}
 	// check if the requested share creation has sufficient permissions to do so.
 	if shareCreationAllowed := conversions.SufficientCS3Permissions(
-		req.GetResourceInfo().GetPermissionSet(),
+		sRes.GetInfo().GetPermissionSet(),
 		req.GetGrant().GetPermissions().GetPermissions(),
 	); !shareCreationAllowed {
 		return &collaboration.CreateShareResponse{
@@ -214,11 +228,36 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 }
 
 func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShareRequest) (*collaboration.RemoveShareResponse, error) {
+	log := appctx.GetLogger(ctx)
+	user := ctxpkg.ContextMustGetUser(ctx)
 	share, err := s.sm.GetShare(ctx, req.Ref)
 	if err != nil {
 		return &collaboration.RemoveShareResponse{
 			Status: status.NewInternal(ctx, "error getting share"),
 		}, nil
+	}
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: share.GetResourceId()}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", share.GetResourceId()).Msg("failed to stat shared resource")
+		return &collaboration.RemoveShareResponse{
+			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+	// the requesting user needs to be either the Owner/Creator of the share or have the RemoveGrant permissions on the Resource
+	switch {
+	case utils.UserEqual(user.GetId(), share.GetCreator()) || utils.UserEqual(user.GetId(), share.GetOwner()):
+		fallthrough
+	case sRes.GetInfo().GetPermissionSet().RemoveGrant:
+		break
+	default:
+		return &collaboration.RemoveShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to remove grants on shared resource"),
+		}, err
 	}
 
 	err = s.sm.Unshare(ctx, req.Ref)
@@ -279,6 +318,7 @@ func (s *service) ListShares(ctx context.Context, req *collaboration.ListSharesR
 
 func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
 	log := appctx.GetLogger(ctx)
+	user := ctxpkg.ContextMustGetUser(ctx)
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
@@ -324,6 +364,17 @@ func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShar
 		log.Err(err).Interface("resource_id", req.GetShare().GetResourceId()).Msg("failed to stat resource to share")
 		return &collaboration.UpdateShareResponse{
 			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+	// the requesting user needs to be either the Owner/Creator of the share or have the UpdateGrant permissions on the Resource
+	switch {
+	case utils.UserEqual(user.GetId(), currentShare.GetCreator()) || utils.UserEqual(user.GetId(), currentShare.GetOwner()):
+		fallthrough
+	case sRes.GetInfo().GetPermissionSet().UpdateGrant:
+		break
+	default:
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to remove grants on shared resource"),
 		}, err
 	}
 
