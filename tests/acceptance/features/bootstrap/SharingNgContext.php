@@ -92,7 +92,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table) {
+	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
