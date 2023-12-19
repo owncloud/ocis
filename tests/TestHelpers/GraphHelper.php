@@ -1727,6 +1727,31 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function userGetsResourcesSharedWithThem(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body

@@ -2505,4 +2505,24 @@ class GraphContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When user :user lists the resources shared with him/her using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::userGetsResourcesSharedWithThem(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password']
+			)
+		);
+	}
 }
