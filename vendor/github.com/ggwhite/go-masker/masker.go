@@ -125,6 +125,9 @@ func (m *Masker) Struct(s interface{}) (interface{}, error) {
 	}
 
 	for i := 0; i < selem.NumField(); i++ {
+		if !selem.Type().Field(i).IsExported() {
+			continue
+		}
 		mtag := selem.Type().Field(i).Tag.Get(tagName)
 		if len(mtag) == 0 {
 			tptr.Elem().Field(i).Set(selem.Field(i))

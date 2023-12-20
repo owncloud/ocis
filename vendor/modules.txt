@@ -795,7 +795,7 @@ github.com/gabriel-vasile/mimetype/internal/magic
 # github.com/gdexlab/go-render v1.0.1
 ## explicit
 github.com/gdexlab/go-render/render
-# github.com/ggwhite/go-masker v1.0.9
+# github.com/ggwhite/go-masker v1.1.0
 ## explicit; go 1.17
 github.com/ggwhite/go-masker
 # github.com/go-acme/lego/v4 v4.4.0
