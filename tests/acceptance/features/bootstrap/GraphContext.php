@@ -2517,7 +2517,7 @@ class GraphContext implements Context {
 	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
-			GraphHelper::userGetsResourcesSharedWithThem(
+			GraphHelper::getSharesSharedWithMe(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$credentials['username'],

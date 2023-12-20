@@ -1731,7 +1731,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function userGetsResourcesSharedWithThem(
+	public static function getSharesSharedWithMe(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
