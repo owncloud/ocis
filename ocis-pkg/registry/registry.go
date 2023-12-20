@@ -119,7 +119,7 @@ func getEnvs(opts ...Option) *Config {
 		cfg.Type = s
 	}
 
-	if s := strings.Split(os.Getenv(registryAddressEnv), ","); len(s) > 0 {
+	if s := strings.Split(os.Getenv(registryAddressEnv), ","); len(s) > 0 && s[0] != "" {
 		cfg.Addresses = s
 	}
 
