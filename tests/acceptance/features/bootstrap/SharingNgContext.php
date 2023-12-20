@@ -21,6 +21,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
 
@@ -114,6 +115,52 @@ class SharingNgContext implements Context {
 				$shareeId,
 				$rows['shareType'],
 				$rows['role']
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates a share link for a (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API with settings:$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userCreatesAPublicLinkShareWithSettings($user, $fileOrFolder, $resource, $space, $body):void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		if ($fileOrFolder === 'folder') {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+		$bodyRows = $body->getRowsHash();
+		Assert::assertTrue(
+			\array_key_exists('password', $bodyRows),
+			'"Password" needs to be provided while creating a share link'
+		);
+		$bodyRows['displayName'] = \array_key_exists('displayName', $bodyRows) ? $bodyRows['displayName'] : null;
+		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? $bodyRows['expirationDateTime'] : null;
+		$body = [
+			'type' => $bodyRows['role'],
+			'displayName' => $bodyRows['displayName'],
+			'expirationDateTime' => $bodyRows['expirationDateTime'],
+			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+		];
+
+		$this->featureContext->setResponse(
+			GraphHelper::createShareLink(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				\json_encode($body)
 			)
 		);
 	}
