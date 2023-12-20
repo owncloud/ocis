@@ -21,6 +21,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
 
@@ -114,6 +115,50 @@ class SharingNgContext implements Context {
 				$shareeId,
 				$rows['shareType'],
 				$rows['role']
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates the following link share using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resourceType = $bodyRows['resourceType'];
+		$resource = $bodyRows['resource'];
+
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		if ($resourceType === 'folder') {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		$bodyRows['displayName'] = \array_key_exists('displayName', $bodyRows) ? $bodyRows['displayName'] : null;
+		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? $bodyRows['expirationDateTime'] : null;
+		$body = [
+			'type' => $bodyRows['role'],
+			'displayName' => $bodyRows['displayName'],
+			'expirationDateTime' => $bodyRows['expirationDateTime'],
+			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+		];
+
+		$this->featureContext->setResponse(
+			GraphHelper::createLinkShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				\json_encode($body)
 			)
 		);
 	}
