@@ -325,25 +325,24 @@ func (s *Server) getInterceptors(unprotected []string) ([]grpc.ServerOption, err
 		return nil, errors.Wrap(err, "rgrpc: error creating unary auth interceptor")
 	}
 
-	unaryInterceptors := []grpc.UnaryServerInterceptor{authUnary}
-	for _, t := range unaryTriples {
-		unaryInterceptors = append(unaryInterceptors, t.Interceptor)
-		s.log.Info().Msgf("rgrpc: chaining grpc unary interceptor %s with priority %d", t.Name, t.Priority)
-	}
-
-	unaryInterceptors = append(unaryInterceptors,
+	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		otelgrpc.UnaryServerInterceptor(
 			otelgrpc.WithTracerProvider(s.tracerProvider),
-			otelgrpc.WithPropagators(rtrace.Propagator)),
-	)
-
-	unaryInterceptors = append([]grpc.UnaryServerInterceptor{
+			otelgrpc.WithPropagators(rtrace.Propagator),
+		),
 		appctx.NewUnary(s.log, s.tracerProvider),
 		token.NewUnary(),
 		useragent.NewUnary(),
 		log.NewUnary(),
 		recovery.NewUnary(),
-	}, unaryInterceptors...)
+		authUnary,
+	}
+
+	for _, t := range unaryTriples {
+		unaryInterceptors = append(unaryInterceptors, t.Interceptor)
+		s.log.Info().Msgf("rgrpc: chaining grpc unary interceptor %s with priority %d", t.Name, t.Priority)
+	}
+
 	unaryChain := grpc_middleware.ChainUnaryServer(unaryInterceptors...)
 
 	streamTriples := []*streamInterceptorTriple{}
@@ -372,20 +371,23 @@ func (s *Server) getInterceptors(unprotected []string) ([]grpc.ServerOption, err
 		return nil, errors.Wrap(err, "rgrpc: error creating stream auth interceptor")
 	}
 
-	streamInterceptors := []grpc.StreamServerInterceptor{authStream}
-	for _, t := range streamTriples {
-		streamInterceptors = append(streamInterceptors, t.Interceptor)
-		s.log.Info().Msgf("rgrpc: chaining grpc streaming interceptor %s with priority %d", t.Name, t.Priority)
-	}
-
-	streamInterceptors = append([]grpc.StreamServerInterceptor{
-		authStream,
+	streamInterceptors := []grpc.StreamServerInterceptor{
+		otelgrpc.StreamServerInterceptor(
+			otelgrpc.WithTracerProvider(s.tracerProvider),
+			otelgrpc.WithPropagators(rtrace.Propagator),
+		),
 		appctx.NewStream(s.log, s.tracerProvider),
 		token.NewStream(),
 		useragent.NewStream(),
 		log.NewStream(),
 		recovery.NewStream(),
-	}, streamInterceptors...)
+		authStream,
+	}
+
+	for _, t := range streamTriples {
+		streamInterceptors = append(streamInterceptors, t.Interceptor)
+		s.log.Info().Msgf("rgrpc: chaining grpc streaming interceptor %s with priority %d", t.Name, t.Priority)
+	}
 	streamChain := grpc_middleware.ChainStreamServer(streamInterceptors...)
 
 	opts := []grpc.ServerOption{
