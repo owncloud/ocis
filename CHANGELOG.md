@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-beta.2](#changelog-for-500-beta2-2023-12-20)
 * [Changelog for 5.0.0-alpha.6](#changelog-for-500-alpha6-2023-12-08)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
@@ -32,6 +33,26 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-beta.2...master
+
+## Summary
+
+* Bugfix - Fix search by exact email: [#8035](https://github.com/owncloud/ocis/pull/8035)
+
+## Details
+
+* Bugfix - Fix search by exact email: [#8035](https://github.com/owncloud/ocis/pull/8035)
+
+   Users can be searched by exact email by using double quotes on the search
+   parameter. Note that double quotes are required because the "@" char is being
+   interpreted by the parser.
+
+   https://github.com/owncloud/ocis/pull/8035
 
 # Changelog for [5.0.0-beta.2] (2023-12-20)
 
