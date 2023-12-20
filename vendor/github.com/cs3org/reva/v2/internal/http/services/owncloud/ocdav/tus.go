@@ -175,7 +175,13 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if tfRes.Status.Code != rpc.Code_CODE_OK {
+		switch tfRes.Status.Code {
+		case rpc.Code_CODE_OK:
+			w.WriteHeader(http.StatusCreated)
+			return
+		case rpc.Code_CODE_ALREADY_EXISTS:
+			// Fall through to the tus case
+		default:
 			log.Error().Interface("status", tfRes.Status).Msg("error touching file")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
