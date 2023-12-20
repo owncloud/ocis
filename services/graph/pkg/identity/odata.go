@@ -1,6 +1,10 @@
 package identity
 
-import "github.com/CiscoM31/godata"
+import (
+	"strings"
+
+	"github.com/CiscoM31/godata"
+)
 
 // GetExpandValues extracts the values of the $expand query parameter and
 // returns them in a []string, rejects any $expand value that consists of more
@@ -37,5 +41,9 @@ func GetSearchValues(req *godata.GoDataQuery) (string, error) {
 		return "", godata.NotImplementedError("complex search queries are not supported")
 	}
 
-	return req.Search.Tree.Token.Value, nil
+	searchValue := req.Search.Tree.Token.Value
+	if strings.HasPrefix(searchValue, "\"") && strings.HasSuffix(searchValue, "\"") {
+		searchValue = strings.Trim(searchValue, "\"")
+	}
+	return searchValue, nil
 }
