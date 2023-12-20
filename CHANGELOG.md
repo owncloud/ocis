@@ -210,6 +210,7 @@ The following sections list the changes for unreleased.
    `consul`, `nats` and `etcd` implementations.
 
    https://github.com/owncloud/ocis/pull/8011
+   https://github.com/owncloud/ocis/pull/8027
 
 # Changelog for [5.0.0-beta.1] (2023-12-12)
 
