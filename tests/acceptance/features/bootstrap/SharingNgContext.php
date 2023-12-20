@@ -112,6 +112,7 @@ class SharingNgContext implements Context {
 				$spaceId,
 				$itemId,
 				$shareeId,
+				$rows['shareType'],
 				$rows['role']
 			)
 		);
