@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+* Bugfix - Fix trace ids: [#8026](https://github.com/owncloud/ocis/pull/8026)
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7941](https://github.com/owncloud/ocis/pull/7941)
 * Enhancement - Add cli commands for trash-binq: [#7936](https://github.com/owncloud/ocis/pull/7936)
 
@@ -23,6 +24,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7453
    https://github.com/cs3org/reva/pull/4396
    https://github.com/cs3org/reva/pull/4241
+
+* Bugfix - Fix trace ids: [#8026](https://github.com/owncloud/ocis/pull/8026)
+
+   We changed the default tracing to produce non-empty traceids and fixed a problem where traces
+   got disconnected further down the stack.
+
+   https://github.com/owncloud/ocis/pull/8026
 
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7941](https://github.com/owncloud/ocis/pull/7941)
 
