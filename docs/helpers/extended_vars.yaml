@@ -33,7 +33,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:46
+  path: ocis-pkg/registry/registry.go:118
   foundincode: true
   name: MICRO_REGISTRY
   type: string
@@ -43,13 +43,29 @@ variables:
     Only change on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:44
+  path: ocis-pkg/registry/registry.go:122
   foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string
-  default_value: ""
+  default_value: 127.0.0.1:9233
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
+  do_ignore: false
+- rawname: registryPasswordEnv
+  path: ocis-pkg/registry/registry.go:115
+  foundincode: true
+  name: MICRO_REGISTRY_AUTH_PASSWORD
+  type: ""
+  default_value: ""
+  description: Optional when using nats to authenticate with the nats cluster.
+  do_ignore: false
+- rawname: registryUsernameEnv
+  path: ocis-pkg/registry/registry.go:114
+  foundincode: true
+  name: MICRO_REGISTRY_AUTH_USERNAME
+  type: ""
+  default_value: ""
+  description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
 - rawname: OCIS_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
