@@ -41,9 +41,6 @@ func GetSearchValues(req *godata.GoDataQuery) (string, error) {
 		return "", godata.NotImplementedError("complex search queries are not supported")
 	}
 
-	searchValue := req.Search.Tree.Token.Value
-	if strings.HasPrefix(searchValue, "\"") && strings.HasSuffix(searchValue, "\"") {
-		searchValue = strings.Trim(searchValue, "\"")
-	}
+	searchValue := strings.Trim(req.Search.Tree.Token.Value, "\"")
 	return searchValue, nil
 }

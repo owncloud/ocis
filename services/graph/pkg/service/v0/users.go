@@ -223,7 +223,17 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	if !ctxHasFullPerms && (odataReq.Query == nil || odataReq.Query.Search == nil || len(odataReq.Query.Search.RawValue) < g.config.API.IdentitySearchMinLength) {
+	minSearchLength := g.config.API.IdentitySearchMinLength
+	searchHasAcceptableLength := false
+	if odataReq.Query != nil && odataReq.Query.Search != nil {
+		if strings.HasPrefix(odataReq.Query.Search.RawValue, "\"") {
+			// if search starts with double quotes then it must finish with double quotes
+			// add +2 to the minimum search length in this case
+			minSearchLength += 2
+		}
+		searchHasAcceptableLength = len(odataReq.Query.Search.RawValue) >= minSearchLength
+	}
+	if !ctxHasFullPerms && !searchHasAcceptableLength {
 		// for regular user the search term must have a minimum length
 		logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
 		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
