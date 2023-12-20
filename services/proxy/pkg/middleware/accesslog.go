@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // AccessLog is a middleware to log http requests at info level logging.
@@ -19,9 +20,11 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 			wrap := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 			next.ServeHTTP(wrap, r)
 
+			spanContext := trace.SpanContextFromContext(r.Context())
 			logger.Info().
 				Str("proto", r.Proto).
 				Str(log.RequestIDString, requestID).
+				Str("traceid", spanContext.TraceID().String()).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).
