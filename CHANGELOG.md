@@ -50,7 +50,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
 * Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
 * Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
-* Bugfix - Fix empty trace ids: [#8017](https://github.com/owncloud/ocis/pull/8017)
+* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
 * Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
@@ -116,10 +116,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7986
 
-* Bugfix - Fix empty trace ids: [#8017](https://github.com/owncloud/ocis/pull/8017)
+* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
 
    We changed the default tracing to produce non-empty traceids.
 
+   https://github.com/owncloud/ocis/pull/8023
    https://github.com/owncloud/ocis/pull/8017
 
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
