@@ -64,10 +64,11 @@ func main() {
 |ID          |MID          |id         |mask last 4 digits of ID number                                                                        |
 |CreditCard  |MCreditCard  |credit     |mask 6 digits from the 7'th digit                                                                      |
 |Struct      |MStruct      |struct     |mask the struct                                                                                        |
+|URL         |MURL         |url        |mask the password field if present, eg http://admin:mysecretpassword@localhost:1234/uri                |
 
 ## Mask the `String`
 
-`String` methomd requires two parameters, a mask type CONST and a string:
+`String` method requires two parameters, a mask type CONST and a string:
 ``` golang
 package main
 
