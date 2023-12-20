@@ -262,5 +262,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/createLink.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L301)
 - [apiSharingNg/createLink.feature:372](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L372)
 
+### [[sharing-ng] the parentReference field of /v1beta1/me/drive/sharedWithMe endpoint returns only driveId and not the driveType](https://github.com/owncloud/ocis/issues/8029)
+- [apiGraph/sharedWithMe.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/sharedWithMe.feature#L15)
+- [apiGraph/sharedWithMe.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/sharedWithMe.feature#L206)
+
 - Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
