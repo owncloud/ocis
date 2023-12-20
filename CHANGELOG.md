@@ -1,7 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-beta.1](#changelog-for-500-beta1-2023-12-12)
+* [Changelog for 5.0.0-beta.2](#changelog-for-500-beta2-2023-12-20)
 * [Changelog for 5.0.0-alpha.6](#changelog-for-500-alpha6-2023-12-08)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 5.0.0-alpha.5](#changelog-for-500-alpha5-2023-12-05)
@@ -34,16 +33,17 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [5.0.0-beta.2] (2023-12-20)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 5.0.0-beta.2.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-beta.1...master
+[5.0.0-beta.2]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.6...v5.0.0-beta.2
 
 ## Summary
 
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
 * Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
@@ -51,10 +51,13 @@ The following sections list the changes for unreleased.
 * Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
 * Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
 * Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
-* Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
 * Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
-* Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Enhancement - Update web to v8.0.0-beta.2: [#7930](https://github.com/owncloud/ocis/pull/7930)
+* Enhancement - Update reva to latest edge: [#7949](https://github.com/owncloud/ocis/pull/7949)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
@@ -75,6 +78,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7859
    https://github.com/owncloud/ocis/pull/7958
+
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
+
+   Updating and resetting the logo when using the new `theme.json` structure in Web
+   has been fixed.
+
+   https://github.com/owncloud/ocis/pull/7930
 
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 
@@ -123,6 +133,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8023
    https://github.com/owncloud/ocis/pull/8017
 
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+
+   We've removed the option privacyURL and imprintURL from the config, since other
+   clients weren't able to consume these. In order to be accessible by other
+   clients, not just Web, those should be configured via the theme.json file.
+
+   https://github.com/owncloud/ocis/pull/7938/
+
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 
    We've removed the option accessDeniedHelpUrl from the config, since other
@@ -131,15 +149,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/7970
 
-* Enhancement - Bump reva: [#7793](https://github.com/owncloud/ocis/pull/7793)
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
 
-   Bumps reva version
+   The antivirus postprocessing step will now be retried for a configurable amount
+   of times in case it can't get a result from clamav.
 
-   https://github.com/owncloud/ocis/pull/7793
-   https://github.com/owncloud/ocis/pull/7978
-   https://github.com/owncloud/ocis/pull/7979
-   https://github.com/owncloud/ocis/pull/7963
-   https://github.com/owncloud/ocis/pull/7986
+   https://github.com/owncloud/ocis/pull/7874
+
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+
+   We added the ability to edit public shares to the sharing NG endpoints.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7908/
 
 * Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
 
@@ -149,7 +171,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7917
    https://github.com/cs3org/reva/pull/4392
 
-* Enhancement - Update web to v8.0.0-beta.2: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Enhancement - Update web to v8.0.0-beta.2: [#7930](https://github.com/owncloud/ocis/pull/7930)
 
    Tags: web
 
@@ -166,102 +188,6 @@ The following sections list the changes for unreleased.
    [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
    links without drive alias
 
-   https://github.com/owncloud/ocis/pull/7952
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
-
-* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
-
-   For Sharing NG, we needed validation in the implementing reva service to keep
-   the client implementation simple.
-
-   https://github.com/owncloud/ocis/pull/7978
-
-* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
-
-   Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
-
-   https://github.com/owncloud/ocis/pull/7979
-
-* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
-
-   Replaces the nats object store with the nats kv store in the natsjs registry
-
-   https://github.com/owncloud/ocis/pull/7987
-
-* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
-
-   Allow events, store and registry implementation to pass username/password to the
-   nats instance
-
-   https://github.com/owncloud/ocis/pull/7989
-
-* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
-
-   We added sciencemesh and ocm services to enable federation.
-
-   https://github.com/owncloud/ocis/pull/7998
-   https://github.com/owncloud/ocis/pull/7576
-   https://github.com/owncloud/ocis/pull/7464
-   https://github.com/owncloud/ocis/pull/7463
-
-* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
-
-   The previously used default `mdns` is faulty. Deprecated it together with
-   `consul`, `nats` and `etcd` implementations.
-
-   https://github.com/owncloud/ocis/pull/8011
-   https://github.com/owncloud/ocis/pull/8027
-
-# Changelog for [5.0.0-beta.1] (2023-12-12)
-
-The following sections list the changes for 5.0.0-beta.1.
-
-[5.0.0-beta.1]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.6...v5.0.0-beta.1
-
-## Summary
-
-* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
-* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
-* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
-* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
-* Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
-* Enhancement - Update reva to v2.17.0: [#7949](https://github.com/owncloud/ocis/pull/7949)
-
-## Details
-
-* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
-
-   Updating and resetting the logo when using the new `theme.json` structure in Web
-   has been fixed.
-
-   https://github.com/owncloud/ocis/pull/7930
-
-* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
-
-   We've removed the option privacyURL and imprintURL from the config, since other
-   clients weren't able to consume these. In order to be accessible by other
-   clients, not just Web, those should be configured via the theme.json file.
-
-   https://github.com/owncloud/ocis/pull/7938/
-
-* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
-
-   The antivirus postprocessing step will now be retried for a configurable amount
-   of times in case it can't get a result from clamav.
-
-   https://github.com/owncloud/ocis/pull/7874
-
-* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
-
-   We added the ability to edit public shares to the sharing NG endpoints.
-
-   https://github.com/owncloud/ocis/issues/6993
-   https://github.com/owncloud/ocis/pull/7908/
-
-* Enhancement - Update web to v8.0.0-beta.1: [#7930](https://github.com/owncloud/ocis/pull/7930)
-
-   Tags: web
-
    We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
    for details on the web release.
 
@@ -273,9 +199,25 @@ The following sections list the changes for 5.0.0-beta.1.
    in viewer and editor apps
 
    https://github.com/owncloud/ocis/pull/7930
+   https://github.com/owncloud/ocis/pull/7952
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
+   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
 
-* Enhancement - Update reva to v2.17.0: [#7949](https://github.com/owncloud/ocis/pull/7949)
+* Enhancement - Update reva to latest edge: [#7949](https://github.com/owncloud/ocis/pull/7949)
+
+   Changelog for reva unreleased =============================
+
+  *   Bugfix [cs3org/reva#4407](https://github.com/cs3org/reva/pull/4407): Make ocdav return correct oc:spaceid
+  *   Bugfix [cs3org/reva#4410](https://github.com/cs3org/reva/pull/4410): Improve OCM support
+  *   Bugfix [cs3org/reva#4422](https://github.com/cs3org/reva/pull/4422): Fix disconnected traces
+  *   Bugfix [cs3org/reva#4424](https://github.com/cs3org/reva/pull/4424): Fixed panic in receivedsharecache pkg
+  *   Enhancement [cs3org/reva#4403](https://github.com/cs3org/reva/pull/4403): Add validation to update public share
+  *   Enhancement [cs3org/reva#4405](https://github.com/cs3org/reva/pull/4405): Check permissions before updating shares
+  *   Enhancement [cs3org/reva#4406](https://github.com/cs3org/reva/pull/4406): Rework cache configuration
+  *   Enhancement [cs3org/reva#4409](https://github.com/cs3org/reva/pull/4409): Disable the password policy
+  *   Enhancement [cs3org/reva#4411](https://github.com/cs3org/reva/pull/4411): Add option to configure streams non durable
+  *   Enhancement [cs3org/reva#4412](https://github.com/cs3org/reva/pull/4412): Allow authentication for nats connections
+  *   Enhancement [cs3org/reva#4414](https://github.com/cs3org/reva/pull/4414): Track more upload session metrics
 
    Changelog for reva 2.17.0 (2023-12-12) =======================================
 
@@ -350,6 +292,54 @@ The following sections list the changes for 5.0.0-beta.1.
   *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
    https://github.com/owncloud/ocis/pull/7949
+   https://github.com/owncloud/ocis/pull/7793
+   https://github.com/owncloud/ocis/pull/7978
+   https://github.com/owncloud/ocis/pull/7979
+   https://github.com/owncloud/ocis/pull/7963
+   https://github.com/owncloud/ocis/pull/7986
+
+* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
+
+   For Sharing NG, we needed validation in the implementing reva service to keep
+   the client implementation simple.
+
+   https://github.com/owncloud/ocis/pull/7978
+
+* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+
+   Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
+
+   https://github.com/owncloud/ocis/pull/7979
+
+* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
+
+   Replaces the nats object store with the nats kv store in the natsjs registry
+
+   https://github.com/owncloud/ocis/pull/7987
+
+* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
+
+   Allow events, store and registry implementation to pass username/password to the
+   nats instance
+
+   https://github.com/owncloud/ocis/pull/7989
+
+* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
+
+   We added sciencemesh and ocm services to enable federation.
+
+   https://github.com/owncloud/ocis/pull/7998
+   https://github.com/owncloud/ocis/pull/7576
+   https://github.com/owncloud/ocis/pull/7464
+   https://github.com/owncloud/ocis/pull/7463
+
+* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
+
+   The previously used default `mdns` is faulty. Deprecated it together with
+   `consul`, `nats` and `etcd` implementations.
+
+   https://github.com/owncloud/ocis/pull/8011
+   https://github.com/owncloud/ocis/pull/8027
 
 # Changelog for [5.0.0-alpha.6] (2023-12-08)
 
