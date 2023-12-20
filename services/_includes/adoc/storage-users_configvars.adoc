@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-20-04-44-45]
+[#deprecation-note-2023-12-20-08-14-48]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -354,7 +354,6 @@ a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
 a|`OCIS_ASYNC_UPLOADS` +
-`` +
 
 a| [subs=-attributes]
 ++bool ++
