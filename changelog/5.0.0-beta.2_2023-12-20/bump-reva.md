@@ -1,4 +1,19 @@
-Enhancement: Update reva to v2.17.0
+Enhancement: Update reva to latest edge
+
+Changelog for reva unreleased
+=============================
+
+*   Bugfix [cs3org/reva#4407](https://github.com/cs3org/reva/pull/4407): Make ocdav return correct oc:spaceid
+*   Bugfix [cs3org/reva#4410](https://github.com/cs3org/reva/pull/4410): Improve OCM support
+*   Bugfix [cs3org/reva#4422](https://github.com/cs3org/reva/pull/4422): Fix disconnected traces
+*   Bugfix [cs3org/reva#4424](https://github.com/cs3org/reva/pull/4424): Fixed panic in receivedsharecache pkg
+*   Enhancement [cs3org/reva#4403](https://github.com/cs3org/reva/pull/4403): Add validation to update public share
+*   Enhancement [cs3org/reva#4405](https://github.com/cs3org/reva/pull/4405): Check permissions before updating shares
+*   Enhancement [cs3org/reva#4406](https://github.com/cs3org/reva/pull/4406): Rework cache configuration
+*   Enhancement [cs3org/reva#4409](https://github.com/cs3org/reva/pull/4409): Disable the password policy
+*   Enhancement [cs3org/reva#4411](https://github.com/cs3org/reva/pull/4411): Add option to configure streams non durable
+*   Enhancement [cs3org/reva#4412](https://github.com/cs3org/reva/pull/4412): Allow authentication for nats connections
+*   Enhancement [cs3org/reva#4414](https://github.com/cs3org/reva/pull/4414): Track more upload session metrics
 
 Changelog for reva 2.17.0 (2023-12-12)
 =======================================
@@ -74,3 +89,8 @@ reva users. The changes are ordered by importance.
 *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
 https://github.com/owncloud/ocis/pull/7949
+https://github.com/owncloud/ocis/pull/7793
+https://github.com/owncloud/ocis/pull/7978
+https://github.com/owncloud/ocis/pull/7979
+https://github.com/owncloud/ocis/pull/7963
+https://github.com/owncloud/ocis/pull/7986
