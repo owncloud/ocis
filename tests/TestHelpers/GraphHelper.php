@@ -1580,7 +1580,7 @@ class GraphHelper {
 	 * @param string $itemId
 	 * @param string $shareeId
 	 * @param string $shareType
-   * @param string|null $role
+	 * @param string|null $role
 	 *
 	 * @return ResponseInterface
 	 * @throws \JsonException
