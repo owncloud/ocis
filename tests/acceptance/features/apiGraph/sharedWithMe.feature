@@ -32,6 +32,7 @@ Feature: an user gets the resources shared to them
         "required": [
           "name",
           "id",
+          "parentReference",
           "remoteItem"
         ],
         "properties": {
@@ -44,6 +45,23 @@ Feature: an user gets the resources shared to them
             "enum": [
               "textfile0.txt"
             ]
+          },
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%share_id_pattern%$"
+              },
+              "driveType" : {
+                "type": "string",
+                "enum": ["personal"]
+              }
+            }
           },
           "remoteItem": {
             "type": "object",
@@ -217,6 +235,23 @@ Feature: an user gets the resources shared to them
             "enum": [
               "folder"
             ]
+          },
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%share_id_pattern%$"
+              },
+              "driveType" : {
+                "type": "string",
+                "enum": ["personal"]
+              }
+            }
           },
           "remoteItem": {
             "type": "object",

@@ -359,5 +359,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
 
+### [[sharing-ng] the parentReference field of /v1beta1/me/drive/sharedWithMe endpoint returns only driveId and not the driveType](https://github.com/owncloud/ocis/issues/8029)
+- [apiGraph/sharedWithMe.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/sharedWithMe.feature#L15)
+- [apiGraph/sharedWithMe.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/sharedWithMe.feature#L206)
+
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
