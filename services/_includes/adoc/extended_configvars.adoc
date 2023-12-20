@@ -32,9 +32,25 @@ a| `MICRO_REGISTRY_ADDRESS` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++127.0.0.1:9233 ++
 a| [subs=-attributes]
 ++The bind address of the internal go micro framework. Only change on supervision of ownCloud Support. ++
+
+a| `MICRO_REGISTRY_AUTH_PASSWORD` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
+
+a| `MICRO_REGISTRY_AUTH_USERNAME` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
 
 a| `OCIS_BASE_DATA_PATH` +
 a| [subs=-attributes]
@@ -52,36 +68,4 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. Predefined to '/etc/ocis' for container images (inside the container) or '$HOME/.ocis/config' for binary releases. ++
     
-
-a| `registryAddressEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryPasswordEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryUsernameEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
 |===
