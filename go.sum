@@ -864,8 +864,8 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.13 h1:TYHggH/hwP7eArqiXSJUvtOPNzQDyQ7vwmwEqlFWhMc=
 github.com/crewjam/saml v0.4.13/go.mod h1:igEejV+fihTIlHXYP8zOec3V5A8y3lws5bQBFsTm4gA=
-github.com/cs3org/reva/v2 v2.16.4-0.20231212083844-00de22ceb749 h1:oCktbSObMu5VTGwcux3tlabQwQT+e0CycuheKvzbQow=
-github.com/cs3org/reva/v2 v2.16.4-0.20231212083844-00de22ceb749/go.mod h1:RvhuweTFqzezjUFU0SIdTXakrEx9vJlMvQ7znPXSP1g=
+github.com/cs3org/reva/v2 v2.16.4-0.20231220070538-82b93f6a66bc h1:IvoFfeOCbd8jFr7cXPuj9lt8aJjd4jLMhfZaoilpsNQ=
+github.com/cs3org/reva/v2 v2.16.4-0.20231220070538-82b93f6a66bc/go.mod h1:RvhuweTFqzezjUFU0SIdTXakrEx9vJlMvQ7znPXSP1g=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
