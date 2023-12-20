@@ -255,6 +255,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:456](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L456)
 - [apiLocks/lockFiles.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L457)
 
+### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
+- [apiSharingNg/createLink.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L78)
+- [apiSharingNg/createLink.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L147)
 
 - Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

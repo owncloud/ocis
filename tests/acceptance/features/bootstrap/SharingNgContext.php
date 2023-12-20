@@ -120,29 +120,27 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates a share link for a (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API with settings:$/
+	 * @When /^user "([^"]*)" creates the following link share using the Graph API:$/
 	 *
 	 * @param string $user
-	 * @param string $fileOrFolder (file|folder)
-	 * @param string $resource
-	 * @param string $space
 	 * @param TableNode|null $body
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userCreatesAPublicLinkShareWithSettings($user, $fileOrFolder, $resource, $space, $body):void {
+	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resourceType = $bodyRows['resourceType'];
+		$resource = $bodyRows['resource'];
+
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($fileOrFolder === 'folder') {
+		if ($resourceType === 'folder') {
 			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
 			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
-		$bodyRows = $body->getRowsHash();
-		Assert::assertTrue(
-			\array_key_exists('password', $bodyRows),
-			'"Password" needs to be provided while creating a share link'
-		);
+
 		$bodyRows['displayName'] = \array_key_exists('displayName', $bodyRows) ? $bodyRows['displayName'] : null;
 		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? $bodyRows['expirationDateTime'] : null;
 		$body = [
@@ -153,7 +151,7 @@ class SharingNgContext implements Context {
 		];
 
 		$this->featureContext->setResponse(
-			GraphHelper::createShareLink(
+			GraphHelper::createLinkShare(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$user,

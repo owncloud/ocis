@@ -1631,7 +1631,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function createShareLink(
+	public static function createLinkShare(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
