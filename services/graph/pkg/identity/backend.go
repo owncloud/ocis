@@ -37,7 +37,7 @@ type Backend interface {
 	// UpdateGroupName updates the group name
 	UpdateGroupName(ctx context.Context, groupID string, groupName string) error
 	GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error)
-	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
+	GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.Group, error)
 	// GetGroupMembers list all members of a group
 	GetGroupMembers(ctx context.Context, id string, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 	// AddMembersToGroup adds new members (reference by a slice of IDs) to supplied group in the identity backend.

@@ -55,19 +55,26 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 }
 
 // GetGroups implements the Backend Interface for the LDAP Backend
-func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
+func (i *LDAP) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroups")
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
+	search, err := GetSearchValues(oreq.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	var expandMembers bool
-	sel := strings.Split(queryParam.Get("$select"), ",")
-	exp := strings.Split(queryParam.Get("$expand"), ",")
-	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
+	exp, err := GetExpandValues(oreq.Query)
+	if err != nil {
+		return nil, err
+	}
+	sel, err := GetSelectValues(oreq.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(exp, "members") || slices.Contains(sel, "members") {
 		expandMembers = true
 	}
 

@@ -29,6 +29,23 @@ func GetExpandValues(req *godata.GoDataQuery) ([]string, error) {
 	return expand, nil
 }
 
+// GetSelectValues extracts the values of the $select query parameter and
+// returns them in a []string, rejects any $select value that consists of more
+// than just a single path segment
+func GetSelectValues(req *godata.GoDataQuery) ([]string, error) {
+	if req == nil || req.Select == nil {
+		return []string{}, nil
+	}
+	sel := make([]string, 0, len(req.Select.SelectItems))
+	for _, item := range req.Select.SelectItems {
+		if len(item.Segments) > 1 {
+			return []string{}, godata.NotImplementedError("multiple segments in $select not supported")
+		}
+		sel = append(sel, item.Segments[0].Value)
+	}
+	return sel, nil
+}
+
 // GetSearchValues extracts the value of the $search query parameter and returns
 // it as a string. Rejects any search query that is more than just a simple string
 func GetSearchValues(req *godata.GoDataQuery) (string, error) {

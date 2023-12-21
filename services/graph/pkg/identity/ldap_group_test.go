@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/stretchr/testify/assert"
@@ -219,15 +220,19 @@ func TestGetGroupReadOnlySubtree(t *testing.T) {
 
 func TestGetGroups(t *testing.T) {
 	lm := &mocks.Client{}
+	oDataReq, err := godata.ParseRequest(context.Background(), "", url.Values{})
+	if err != nil {
+		t.Errorf("Expected success, got '%s'", err.Error())
+	}
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
-	_, err := b.GetGroups(context.Background(), url.Values{})
+	_, err = b.GetGroups(context.Background(), oDataReq)
 	assert.ErrorContains(t, err, "itemNotFound:")
 
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetGroups(context.Background(), url.Values{})
+	g, err := b.GetGroups(context.Background(), oDataReq)
 	if err != nil {
 		t.Errorf("Expected success, got '%s'", err.Error())
 	} else if g == nil || len(g) != 0 {
@@ -239,7 +244,7 @@ func TestGetGroups(t *testing.T) {
 		Entries: []*ldap.Entry{groupEntry},
 	}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err = b.GetGroups(context.Background(), url.Values{})
+	g, err = b.GetGroups(context.Background(), oDataReq)
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
 	} else if *g[0].Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
@@ -264,11 +269,15 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	for _, param := range []url.Values{queryParamSelect, queryParamExpand} {
+		oDataReq, err := godata.ParseRequest(context.Background(), "", param)
+		if err != nil {
+			t.Errorf("Expected success, got '%s'", err.Error())
+		}
 		lm.On("Search", groupListSeachRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 		lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 		lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 		b, _ = getMockedBackend(lm, lconfig, &logger)
-		g, err = b.GetGroups(context.Background(), param)
+		g, err = b.GetGroups(context.Background(), oDataReq)
 		switch {
 		case err != nil:
 			t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
@@ -279,6 +288,32 @@ func TestGetGroups(t *testing.T) {
 		case g[0].Members[0].GetId() != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id):
 			t.Errorf("Expected GetGroup to return group with correct member")
 		}
+	}
+}
+
+func TestGetGroupsSearch(t *testing.T) {
+	lm := &mocks.Client{}
+	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
+		url.Values{
+			"$search": []string{"\"term\""},
+		},
+	)
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
+	}
+
+	// only match if the filter contains the search term unquoted
+	lm.On("Search", mock.MatchedBy(
+		func(req *ldap.SearchRequest) bool {
+			return req.Filter == "(&(objectClass=groupOfNames)(|(cn=*term*)(entryUUID=*term*)))"
+		})).
+		Return(&ldap.SearchResult{}, nil)
+	b, _ := getMockedBackend(lm, lconfig, &logger)
+	g, err := b.GetGroups(context.Background(), odataReqDefault)
+	if err != nil {
+		t.Errorf("Expected success, got '%s'", err.Error())
+	} else if g == nil || len(g) != 0 {
+		t.Errorf("Expected zero length user slice")
 	}
 }
 func TestUpdateGroupName(t *testing.T) {
