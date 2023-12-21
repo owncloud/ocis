@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-12-21-19-38-06]
+[#deprecation-note-2023-12-21-20-14-38]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -493,6 +493,24 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.
+
+a|`WEB_OPTION_CONCURRENT_REQUESTS_RESOURCE_BATCH_ACTIONS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Defines the maximum number of concurrent requests per file/folder/space batch action. Defaults to 4.
+
+a|`WEB_OPTION_CONCURRENT_REQUESTS_SSE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Defines the maximum number of concurrent requests in SSE event handlers. Defaults to 4.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

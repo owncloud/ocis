@@ -132,6 +132,10 @@ web:
       disabledExtensions: []
       embed: null
       userListRequiresFilter: false
+      concurrentRequests:
+        resourceBatchActions: 0
+        sse: 0
+        shares: null
     styles: []
     scripts: []
     custom_translations: []
