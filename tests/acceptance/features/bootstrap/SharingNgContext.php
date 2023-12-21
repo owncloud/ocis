@@ -141,9 +141,9 @@ class SharingNgContext implements Context {
 			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
 
-		$bodyRows['displayName'] = \array_key_exists('displayName', $bodyRows) ? $bodyRows['displayName'] : null;
-		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? $bodyRows['expirationDateTime'] : null;
-		$bodyRows['password'] = \array_key_exists('password', $bodyRows) ? $bodyRows['password'] : null;
+		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
+		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['password'] = $bodyRows['password'] ?? null;
 		$body = [
 			'type' => $bodyRows['role'],
 			'displayName' => $bodyRows['displayName'],

@@ -303,8 +303,8 @@ Feature: Create a share link for a resource
   @env-config
   Scenario Outline: create a link share of a file without password
     Given the following configs have been set:
-      | config                                                 | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
       | resourceType | file          |
