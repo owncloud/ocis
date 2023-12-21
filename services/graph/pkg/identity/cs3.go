@@ -112,7 +112,7 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 }
 
 // GetGroups implements the Backend Interface.
-func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
+func (i *CS3) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
 	gatewayClient, err := i.GatewaySelector.Next()
@@ -121,9 +121,9 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
+	search, err := GetSearchValues(oreq.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := gatewayClient.FindGroups(ctx, &cs3group.FindGroupsRequest{
