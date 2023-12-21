@@ -300,7 +300,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 										"enabled": true,
 									},
 									"mtime": map[string]interface{}{
-										"keywords": []string{"today", "yesterday", "this week", "last week", "last 7 days", "this month", "last month", "last 30 days", "this year", "last year"},
+										"keywords": []string{"today", "last 7 days", "last 30 days", "this year", "last year"},
 										"enabled":  true,
 									},
 									"size": map[string]interface{}{
