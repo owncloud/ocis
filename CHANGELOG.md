@@ -42,16 +42,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Fix search by exact email: [#8035](https://github.com/owncloud/ocis/pull/8035)
+* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 
 ## Details
 
-* Bugfix - Fix search by exact email: [#8035](https://github.com/owncloud/ocis/pull/8035)
+* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 
-   Users can be searched by exact email by using double quotes on the search
-   parameter. Note that double quotes are required because the "@" char is being
-   interpreted by the parser.
+   As the OData query parser interprets characters like '@' or '-' in a special
+   way. Search request for users or groups needs to be quoted. We fixed the
+   libregraph users and groups endpoints to handle quoted search terms correctly.
 
+   https://github.com/owncloud/ocis/issues/7990
+   https://github.com/owncloud/ocis/pull/8050
    https://github.com/owncloud/ocis/pull/8035
 
 # Changelog for [5.0.0-beta.2] (2023-12-20)
