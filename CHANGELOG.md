@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 * Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+* Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
 
 ## Details
 
@@ -74,6 +75,12 @@ The following sections list the changes for unreleased.
    in a prometheus compatible format and maybe secured by `PROXY_DEBUG_TOKEN`.
 
    https://github.com/owncloud/ocis/pull/7994
+
+* Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/8038
 
 # Changelog for [5.0.0-beta.2] (2023-12-20)
 
