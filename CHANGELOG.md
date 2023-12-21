@@ -42,12 +42,22 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 * Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
 * Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
 * Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
 
 ## Details
+
+* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
+
+   We've removed the outdated and apparently unused dependency `cldr` from the
+   `kpop` dependency inside the idp web ui. This resolves a security issue around
+   an oudated `xmldom` package version, originating from said `kpop` library.
+
+   https://github.com/owncloud/ocis/issues/7957
+   https://github.com/owncloud/ocis/pull/7988
 
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 
