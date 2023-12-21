@@ -46,6 +46,7 @@ func NewService(cfg *config.Config, logger log.Logger) settings.ServiceHandler {
 	case "metadata":
 		service.manager = metastore.New(cfg)
 	case "filesystem":
+		fmt.Println("WARNING: filesystem store is deprecated and will be removed in the future. Please use metadata store instead.")
 		service.manager = filestore.New(cfg)
 		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults/defaults.go instead using this duplicate
 		service.RegisterDefaultRoles()

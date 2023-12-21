@@ -37,7 +37,7 @@ type Config struct {
 
 	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS" desc:"The default role assignments the demo users should be setup."`
 
-	ServiceAccountIDAdmin string `yaml:"service_account_id_admin" env:"OCIS_SERVICE_ACCOUNT_ID;SETTINGS_SERVICE_ACCOUNT_ID_ADMIN" desc:"The ID of the service account having the admin role. See the 'auth-service' service description for more details."`
+	ServiceAccountIDs []string `yaml:"service_account_ids" env:"SETTINGS_SERVICE_ACCOUNT_IDS;OCIS_SERVICE_ACCOUNT_ID" desc:"The list of all service account IDs. These will be assigned the hidden 'service-account' role See the 'auth-service' service description for more details about service accounts."`
 
 	DefaultLanguage string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details."`
 
