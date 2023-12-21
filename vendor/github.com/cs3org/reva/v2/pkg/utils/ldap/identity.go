@@ -176,10 +176,10 @@ func (i *Identity) Setup() error {
 
 // GetLDAPUserByID looks up a user by the supplied Id. Returns the corresponding
 // ldap.Entry
-func (i *Identity) GetLDAPUserByID(log *zerolog.Logger, lc ldap.Client, id string) (*ldap.Entry, error) {
+func (i *Identity) GetLDAPUserByID(log *zerolog.Logger, lc ldap.Client, id string, returnDisabled bool) (*ldap.Entry, error) {
 	var filter string
 	var err error
-	if filter, err = i.getUserFilter(id); err != nil {
+	if filter, err = i.getUserFilter(id, returnDisabled); err != nil {
 		return nil, err
 	}
 	return i.GetLDAPUserByFilter(log, lc, filter)
@@ -490,7 +490,7 @@ func filterEscapeBinaryUUID(value uuid.UUID) string {
 	return filtered
 }
 
-func (i *Identity) getUserFilter(uid string) (string, error) {
+func (i *Identity) getUserFilter(uid string, returnDisabled bool) (string, error) {
 	var escapedUUID string
 	if i.User.Schema.IDIsOctetString {
 		id, err := uuid.Parse(uid)
@@ -503,11 +503,16 @@ func (i *Identity) getUserFilter(uid string) (string, error) {
 		escapedUUID = ldap.EscapeFilter(uid)
 	}
 
-	return fmt.Sprintf("(&%s(objectclass=%s)(%s=%s))",
+	disabledFilter := ""
+	if !returnDisabled {
+		disabledFilter = i.disabledFilter()
+	}
+	return fmt.Sprintf("(&%s(objectclass=%s)(%s=%s)%s)",
 		i.User.Filter,
 		i.User.Objectclass,
 		i.User.Schema.ID,
 		escapedUUID,
+		disabledFilter,
 	), nil
 }
 

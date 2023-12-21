@@ -37,6 +37,8 @@ const (
 	WriteFavorites string = "Favorites.Write"
 	// DeleteReadOnlyPassword is the hardcoded name for the ReadOnlyPublicLinkPassword.Delete permission
 	DeleteReadOnlyPassword string = "ReadOnlyPublicLinkPassword.Delete"
+	// ManageAccounts is the hardcoded name for the Accounts.ReadWrite permission
+	ManageAccounts string = "Accounts.ReadWrite"
 )
 
 // Manager defines the interface for the permission service driver

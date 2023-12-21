@@ -23,9 +23,13 @@ import (
 	"fmt"
 	"strconv"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/permission"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/user"
 	"github.com/cs3org/reva/v2/pkg/user/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -41,12 +45,14 @@ func init() {
 }
 
 type manager struct {
-	c          *config
-	ldapClient ldap.Client
+	c               *config
+	ldapClient      ldap.Client
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 type config struct {
 	utils.LDAPConn `mapstructure:",squash"`
+	GatewayAddr    string                `mapstructure:"gateway_addr"`
 	LDAPIdentity   ldapIdentity.Identity `mapstructure:",squash"`
 	Idp            string                `mapstructure:"idp"`
 	// Nobody specifies the fallback uid number for users that don't have a uidNumber set in LDAP
@@ -91,6 +97,10 @@ func (m *manager) Configure(ml map[string]interface{}) error {
 		return fmt.Errorf("error setting up Identity config: %w", err)
 	}
 	m.c = c
+	m.gatewaySelector, err = pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -104,7 +114,15 @@ func (m *manager) GetUser(ctx context.Context, uid *userpb.UserId, skipFetchingG
 		return nil, errtypes.NotFound("idp mismatch")
 	}
 
-	userEntry, err := m.c.LDAPIdentity.GetLDAPUserByID(log, m.ldapClient, uid.OpaqueId)
+	gatewayClient, err := m.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	returnDisabled, err := utils.CheckPermission(ctx, permission.ManageAccounts, gatewayClient)
+	if err != nil {
+		return nil, errtypes.InternalError("permission check failed")
+	}
+	userEntry, err := m.c.LDAPIdentity.GetLDAPUserByID(log, m.ldapClient, uid.OpaqueId, returnDisabled)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +132,10 @@ func (m *manager) GetUser(ctx context.Context, uid *userpb.UserId, skipFetchingG
 	u, err := m.ldapEntryToUser(userEntry)
 	if err != nil {
 		return nil, err
+	}
+
+	if !returnDisabled && m.c.LDAPIdentity.IsLDAPUserInDisabledGroup(log, m.ldapClient, userEntry) {
+		return nil, errtypes.NotFound("user is locally disabled")
 	}
 
 	if skipFetchingGroups {
@@ -204,7 +226,15 @@ func (m *manager) GetUserGroups(ctx context.Context, uid *userpb.UserId) ([]stri
 		log.Debug().Str("useridp", uid.Idp).Str("configured idp", m.c.Idp).Msg("IDP mismatch")
 		return nil, errtypes.NotFound("idp mismatch")
 	}
-	userEntry, err := m.c.LDAPIdentity.GetLDAPUserByID(log, m.ldapClient, uid.OpaqueId)
+	gatewayClient, err := m.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	returnDisabled, err := utils.CheckPermission(ctx, permission.ManageAccounts, gatewayClient)
+	if err != nil {
+		return nil, errtypes.InternalError("permission check failed")
+	}
+	userEntry, err := m.c.LDAPIdentity.GetLDAPUserByID(log, m.ldapClient, uid.OpaqueId, returnDisabled)
 	if err != nil {
 		log.Debug().Err(err).Interface("userid", uid).Msg("Failed to lookup user")
 		return []string{}, err

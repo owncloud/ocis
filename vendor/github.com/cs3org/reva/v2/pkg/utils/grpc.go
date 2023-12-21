@@ -168,16 +168,19 @@ func GetResource(ctx context.Context, ref *storageprovider.Reference, gwc gatewa
 
 // CheckPermission checks if the user role contains the given permission
 func CheckPermission(ctx context.Context, perm string, gwc gateway.GatewayAPIClient) (bool, error) {
-	user := ctxpkg.ContextMustGetUser(ctx)
-	resp, err := gwc.CheckPermission(ctx, &permissions.CheckPermissionRequest{
-		SubjectRef: &permissions.SubjectReference{
-			Spec: &permissions.SubjectReference_UserId{
-				UserId: user.Id,
+	if user, ok := ctxpkg.ContextGetUser(ctx); ok {
+		resp, err := gwc.CheckPermission(ctx, &permissions.CheckPermissionRequest{
+			SubjectRef: &permissions.SubjectReference{
+				Spec: &permissions.SubjectReference_UserId{
+					UserId: user.Id,
+				},
 			},
-		},
-		Permission: perm,
-	})
-	return resp.GetStatus().GetCode() == rpc.Code_CODE_OK, err
+			Permission: perm,
+		})
+		return resp.GetStatus().GetCode() == rpc.Code_CODE_OK, err
+	}
+	// No user in context, no permission
+	return false, nil
 }
 
 // IsStatusCodeError returns true if `err` was caused because of status code `code`
