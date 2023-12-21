@@ -188,3 +188,193 @@ Feature: Send a sharing invitations
       | Co Owner    | folder        | FolderToShare  |
       | Uploader    | folder        | FolderToShare  |
       | Manager     | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation for a file to user with different permissions
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType | file          |
+      | resource     | textfile1.txt |
+      | space        | Personal      |
+      | sharee       | Brian         |
+      | shareType    | user          |
+      | permission   | <permission>  |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "@libre.graph.permissions.actions",
+                "grantedToV2"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "@libre.graph.permissions.actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permission>$"
+                  }
+                },
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "displayName"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permission         |
+      | permissions/create |
+      | children/create    |
+      | upload/create      |
+      | path/read          |
+      | quota/read         |
+      | content/read       |
+      | permissions/read   |
+      | children/read      |
+      | versions/read      |
+      | deleted/read       |
+      | basic/read         |
+      | path/update        |
+      | versions/update    |
+      | deleted/update     |
+      | permissions/update |
+      | standard/delete    |
+      | permissions/delete |
+      | deleted/delete     |
+      | permissions/deny   |
+
+
+  Scenario Outline: send share invitation for a folder to user with different permissions
+    Given user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType | folder        |
+      | resource     | FolderToShare |
+      | space        | Personal      |
+      | sharee       | Brian         |
+      | shareType    | user          |
+      | permission   | <permission>  |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "@libre.graph.permissions.actions",
+                "grantedToV2"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "@libre.graph.permissions.actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permission>$"
+                  }
+                },
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "displayName"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permission         |
+      | permissions/create |
+      | children/create    |
+      | upload/create      |
+      | path/read          |
+      | quota/read         |
+      | content/read       |
+      | permissions/read   |
+      | children/read      |
+      | versions/read      |
+      | deleted/read       |
+      | basic/read         |
+      | path/update        |
+      | versions/update    |
+      | deleted/update     |
+      | permissions/update |
+      | standard/delete    |
+      | permissions/delete |
+      | deleted/delete     |
+      | permissions/deny   |
