@@ -6,7 +6,7 @@ Feature: Create a share link for a resource
       | username |
       | Alice    |
 
-
+  @issue-7879
   Scenario Outline: create a link share of a folder
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following link share using the Graph API:
@@ -77,7 +77,7 @@ Feature: Create a share link for a resource
       | createOnly     |
       | blocksDownload |
 
-
+  @issue-7879
   Scenario Outline: create a link share of a file
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
@@ -146,7 +146,7 @@ Feature: Create a share link for a resource
       | edit           |
       | blocksDownload |
 
-
+  @issue-7879
   Scenario Outline: create a link share of a folder with display name and expiry date
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following link share using the Graph API:
@@ -224,7 +224,7 @@ Feature: Create a share link for a resource
       | createOnly     |
       | blocksDownload |
 
-
+  @issue-7879
   Scenario Outline: create a link share of a file with display name and expiry date
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
