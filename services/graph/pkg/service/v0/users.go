@@ -223,9 +223,9 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	minSearchLength := g.config.API.IdentitySearchMinLength
 	searchHasAcceptableLength := false
 	if odataReq.Query != nil && odataReq.Query.Search != nil {
+		minSearchLength := g.config.API.IdentitySearchMinLength
 		if strings.HasPrefix(odataReq.Query.Search.RawValue, "\"") {
 			// if search starts with double quotes then it must finish with double quotes
 			// add +2 to the minimum search length in this case

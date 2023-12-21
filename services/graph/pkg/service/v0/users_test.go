@@ -278,6 +278,13 @@ var _ = Describe("Users", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusForbidden))
 		})
+		It("denies using to short quoted search terms for unprivileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=%22ab%22", nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
+		})
 		It("only returns a restricted set of attributes for unprivileged users", func() {
 			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 			user := &libregraph.User{}

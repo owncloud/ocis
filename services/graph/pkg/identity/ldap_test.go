@@ -286,6 +286,32 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
+func TestGetUsersSearch(t *testing.T) {
+	lm := &mocks.Client{}
+	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
+		url.Values{
+			"$search": []string{"\"term\""},
+		},
+	)
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
+	}
+
+	// only match if the filter contains the search term unquoted
+	lm.On("Search", mock.MatchedBy(
+		func(req *ldap.SearchRequest) bool {
+			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayname=*term*)))"
+		})).
+		Return(&ldap.SearchResult{}, nil)
+	b, _ := getMockedBackend(lm, lconfig, &logger)
+	g, err := b.GetUsers(context.Background(), odataReqDefault)
+	if err != nil {
+		t.Errorf("Expected success, got '%s'", err.Error())
+	} else if g == nil || len(g) != 0 {
+		t.Errorf("Expected zero length user slice")
+	}
+}
+
 func TestUpdateUser(t *testing.T) {
 	falseBool := false
 	trueBool := true
