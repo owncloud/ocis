@@ -153,5 +153,10 @@
     "webpack": "4.47.0",
     "webpack-manifest-plugin": "4.1.1",
     "workbox-webpack-plugin": "7.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "kpop>cldr": ""
+    }
   }
 }
