@@ -34,7 +34,7 @@ const (
 	bodyEndIndicator                = CRLF + "0" + CRLF
 	fullBodyEndIndicatorPreviewMode = "; ieof" + DoubleCRLF
 	icap100ContinueMsg              = "ICAP/1.0 100 Continue" + DoubleCRLF
-	icap204NoModsMsg                = "ICAP/1.0 204 No modifications"
+	icap204NoModsMsg                = "ICAP/1.0 204 Unmodified"
 	defaultChunkLength              = 512
 	defaultTimeout                  = 15 * time.Second
 )

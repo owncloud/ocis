@@ -1,6 +1,7 @@
 package icapclient
 
 import (
+	"bytes"
 	"net/http"
 	"strconv"
 	"time"
@@ -76,6 +77,10 @@ func (c *Client) DoRemaining(req *Request) (*Response, error) {
 		ds := string(data)
 		addHexaBodyByteNotations(&ds)
 		data = []byte(ds)
+	}
+
+	for !bytes.HasSuffix(data, []byte(DoubleCRLF)) {
+		data = append(data, []byte(CRLF)...)
 	}
 
 	if err := c.scktDriver.Send(data); err != nil {

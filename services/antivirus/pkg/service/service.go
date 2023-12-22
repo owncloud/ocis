@@ -16,14 +16,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var (
-	// ErrFatal is returned when a fatal error occurs and we want to exit.
+	// ErrFatal is returned when a fatal error occurs, and we want to exit.
 	ErrFatal = errors.New("fatal error")
 	// ErrEvent is returned when something went wrong with a specific event.
 	ErrEvent = errors.New("event error")
@@ -31,18 +32,27 @@ var (
 
 // Scanner is an abstraction for the actual virus scan
 type Scanner interface {
-	Scan(file io.Reader) (scanners.ScanResult, error)
+	Scan(body scanners.Input) (scanners.Result, error)
 }
 
 // NewAntivirus returns a service implementation for Service.
 func NewAntivirus(c *config.Config, l log.Logger, tp trace.TracerProvider) (Antivirus, error) {
-	av := Antivirus{c: c, l: l, tp: tp, client: rhttp.GetHTTPClient(rhttp.Insecure(true))}
 
+	var scanner Scanner
 	var err error
-	av.s, err = scanners.New(c)
-	if err != nil {
-		return av, err
+	switch c.Scanner.Type {
+	default:
+		return Antivirus{}, fmt.Errorf("unknown av scanner: '%s'", c.Scanner.Type)
+	case "clamav":
+		scanner = scanners.NewClamAV(c.Scanner.ClamAV.Socket)
+	case "icap":
+		scanner, err = scanners.NewICAP(c.Scanner.ICAP.URL, c.Scanner.ICAP.Service, time.Duration(c.Scanner.ICAP.Timeout)*time.Second)
 	}
+	if err != nil {
+		return Antivirus{}, err
+	}
+
+	av := Antivirus{c: c, l: l, tp: tp, s: scanner, client: rhttp.GetHTTPClient(rhttp.Insecure(true))}
 
 	switch o := events.PostprocessingOutcome(c.InfectedFileHandling); o {
 	case events.PPOutcomeContinue, events.PPOutcomeAbort, events.PPOutcomeDelete:
@@ -199,11 +209,11 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 }
 
 // process the scan
-func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.ScanResult, error) {
+func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.Result, error) {
 	if ev.Filesize == 0 || (0 < av.m && av.m < ev.Filesize) {
 		av.l.Info().Str("uploadid", ev.UploadID).Uint64("limit", av.m).Uint64("filesize", ev.Filesize).Msg("Skipping file to be virus scanned because its file size is higher than the defined limit.")
-		return scanners.ScanResult{
-			Scantime: time.Now(),
+		return scanners.Result{
+			ScanTime: time.Now(),
 		}, nil
 	}
 
@@ -218,12 +228,12 @@ func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.ScanRes
 	}
 	if err != nil {
 		av.l.Error().Err(err).Str("uploadid", ev.UploadID).Msg("error downloading file")
-		return scanners.ScanResult{}, err
+		return scanners.Result{}, err
 	}
 	defer rrc.Close()
 	av.l.Debug().Str("uploadid", ev.UploadID).Msg("Downloaded file successfully, starting virusscan")
 
-	res, err := av.s.Scan(rrc)
+	res, err := av.s.Scan(scanners.Input{Body: rrc, Size: int64(ev.Filesize), Url: ev.URL, Name: ev.Filename})
 	if err != nil {
 		av.l.Error().Err(err).Str("uploadid", ev.UploadID).Msg("error scanning file")
 	}
