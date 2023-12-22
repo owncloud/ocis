@@ -62,6 +62,7 @@ type DriveItem struct {
 	// The set of permissions for the item. Read-only. Nullable.
 	Permissions []Permission `json:"permissions,omitempty"`
 	Audio       *Audio       `json:"audio,omitempty"`
+	Video       *Video       `json:"video,omitempty"`
 }
 
 // NewDriveItem instantiates a new DriveItem object
@@ -977,6 +978,38 @@ func (o *DriveItem) SetAudio(v Audio) {
 	o.Audio = &v
 }
 
+// GetVideo returns the Video field value if set, zero value otherwise.
+func (o *DriveItem) GetVideo() Video {
+	if o == nil || IsNil(o.Video) {
+		var ret Video
+		return ret
+	}
+	return *o.Video
+}
+
+// GetVideoOk returns a tuple with the Video field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DriveItem) GetVideoOk() (*Video, bool) {
+	if o == nil || IsNil(o.Video) {
+		return nil, false
+	}
+	return o.Video, true
+}
+
+// HasVideo returns a boolean if a field has been set.
+func (o *DriveItem) HasVideo() bool {
+	if o != nil && !IsNil(o.Video) {
+		return true
+	}
+
+	return false
+}
+
+// SetVideo gets a reference to the given Video and assigns it to the Video field.
+func (o *DriveItem) SetVideo(v Video) {
+	o.Video = &v
+}
+
 func (o DriveItem) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -1070,6 +1103,9 @@ func (o DriveItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Audio) {
 		toSerialize["audio"] = o.Audio
+	}
+	if !IsNil(o.Video) {
+		toSerialize["video"] = o.Video
 	}
 	return toSerialize, nil
 }

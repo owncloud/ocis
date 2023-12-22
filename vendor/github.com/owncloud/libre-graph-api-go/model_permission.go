@@ -34,8 +34,6 @@ type Permission struct {
 	GrantedToIdentities []IdentitySet `json:"grantedToIdentities,omitempty"`
 	// Use this to create a permission with custom actions.
 	LibreGraphPermissionsActions []string `json:"@libre.graph.permissions.actions,omitempty"`
-	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
-	UIHidden *bool `json:"@UI.Hidden,omitempty"`
 }
 
 // NewPermission instantiates a new Permission object
@@ -325,38 +323,6 @@ func (o *Permission) SetLibreGraphPermissionsActions(v []string) {
 	o.LibreGraphPermissionsActions = v
 }
 
-// GetUIHidden returns the UIHidden field value if set, zero value otherwise.
-func (o *Permission) GetUIHidden() bool {
-	if o == nil || IsNil(o.UIHidden) {
-		var ret bool
-		return ret
-	}
-	return *o.UIHidden
-}
-
-// GetUIHiddenOk returns a tuple with the UIHidden field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Permission) GetUIHiddenOk() (*bool, bool) {
-	if o == nil || IsNil(o.UIHidden) {
-		return nil, false
-	}
-	return o.UIHidden, true
-}
-
-// HasUIHidden returns a boolean if a field has been set.
-func (o *Permission) HasUIHidden() bool {
-	if o != nil && !IsNil(o.UIHidden) {
-		return true
-	}
-
-	return false
-}
-
-// SetUIHidden gets a reference to the given bool and assigns it to the UIHidden field.
-func (o *Permission) SetUIHidden(v bool) {
-	o.UIHidden = &v
-}
-
 func (o Permission) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -390,9 +356,6 @@ func (o Permission) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.LibreGraphPermissionsActions) {
 		toSerialize["@libre.graph.permissions.actions"] = o.LibreGraphPermissionsActions
-	}
-	if !IsNil(o.UIHidden) {
-		toSerialize["@UI.Hidden"] = o.UIHidden
 	}
 	return toSerialize, nil
 }

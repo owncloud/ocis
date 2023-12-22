@@ -46,6 +46,8 @@ type RemoteItem struct {
 	CTag            *string        `json:"cTag,omitempty"`
 	ParentReference *ItemReference `json:"parentReference,omitempty"`
 	Shared          *Shared        `json:"shared,omitempty"`
+	// The set of permissions for the item. Read-only. Nullable.
+	Permissions []Permission `json:"permissions,omitempty"`
 	// Size of the remote item. Read-only.
 	Size          *int64         `json:"size,omitempty"`
 	SpecialFolder *SpecialFolder `json:"specialFolder,omitempty"`
@@ -53,6 +55,10 @@ type RemoteItem struct {
 	WebDavUrl *string `json:"webDavUrl,omitempty"`
 	// URL that displays the resource in the browser. Read-only.
 	WebUrl *string `json:"webUrl,omitempty"`
+	// Indicates if the item is synchronized with the underlying storage provider. Read-only.
+	ClientSynchronize *bool `json:"@client.synchronize,omitempty"`
+	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
+	UiHidden *bool `json:"@ui.hidden,omitempty"`
 }
 
 // NewRemoteItem instantiates a new RemoteItem object
@@ -616,6 +622,38 @@ func (o *RemoteItem) SetShared(v Shared) {
 	o.Shared = &v
 }
 
+// GetPermissions returns the Permissions field value if set, zero value otherwise.
+func (o *RemoteItem) GetPermissions() []Permission {
+	if o == nil || IsNil(o.Permissions) {
+		var ret []Permission
+		return ret
+	}
+	return o.Permissions
+}
+
+// GetPermissionsOk returns a tuple with the Permissions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RemoteItem) GetPermissionsOk() ([]Permission, bool) {
+	if o == nil || IsNil(o.Permissions) {
+		return nil, false
+	}
+	return o.Permissions, true
+}
+
+// HasPermissions returns a boolean if a field has been set.
+func (o *RemoteItem) HasPermissions() bool {
+	if o != nil && !IsNil(o.Permissions) {
+		return true
+	}
+
+	return false
+}
+
+// SetPermissions gets a reference to the given []Permission and assigns it to the Permissions field.
+func (o *RemoteItem) SetPermissions(v []Permission) {
+	o.Permissions = v
+}
+
 // GetSize returns the Size field value if set, zero value otherwise.
 func (o *RemoteItem) GetSize() int64 {
 	if o == nil || IsNil(o.Size) {
@@ -744,6 +782,70 @@ func (o *RemoteItem) SetWebUrl(v string) {
 	o.WebUrl = &v
 }
 
+// GetClientSynchronize returns the ClientSynchronize field value if set, zero value otherwise.
+func (o *RemoteItem) GetClientSynchronize() bool {
+	if o == nil || IsNil(o.ClientSynchronize) {
+		var ret bool
+		return ret
+	}
+	return *o.ClientSynchronize
+}
+
+// GetClientSynchronizeOk returns a tuple with the ClientSynchronize field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RemoteItem) GetClientSynchronizeOk() (*bool, bool) {
+	if o == nil || IsNil(o.ClientSynchronize) {
+		return nil, false
+	}
+	return o.ClientSynchronize, true
+}
+
+// HasClientSynchronize returns a boolean if a field has been set.
+func (o *RemoteItem) HasClientSynchronize() bool {
+	if o != nil && !IsNil(o.ClientSynchronize) {
+		return true
+	}
+
+	return false
+}
+
+// SetClientSynchronize gets a reference to the given bool and assigns it to the ClientSynchronize field.
+func (o *RemoteItem) SetClientSynchronize(v bool) {
+	o.ClientSynchronize = &v
+}
+
+// GetUiHidden returns the UiHidden field value if set, zero value otherwise.
+func (o *RemoteItem) GetUiHidden() bool {
+	if o == nil || IsNil(o.UiHidden) {
+		var ret bool
+		return ret
+	}
+	return *o.UiHidden
+}
+
+// GetUiHiddenOk returns a tuple with the UiHidden field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RemoteItem) GetUiHiddenOk() (*bool, bool) {
+	if o == nil || IsNil(o.UiHidden) {
+		return nil, false
+	}
+	return o.UiHidden, true
+}
+
+// HasUiHidden returns a boolean if a field has been set.
+func (o *RemoteItem) HasUiHidden() bool {
+	if o != nil && !IsNil(o.UiHidden) {
+		return true
+	}
+
+	return false
+}
+
+// SetUiHidden gets a reference to the given bool and assigns it to the UiHidden field.
+func (o *RemoteItem) SetUiHidden(v bool) {
+	o.UiHidden = &v
+}
+
 func (o RemoteItem) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -805,6 +907,9 @@ func (o RemoteItem) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Shared) {
 		toSerialize["shared"] = o.Shared
 	}
+	if !IsNil(o.Permissions) {
+		toSerialize["permissions"] = o.Permissions
+	}
 	if !IsNil(o.Size) {
 		toSerialize["size"] = o.Size
 	}
@@ -816,6 +921,12 @@ func (o RemoteItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.WebUrl) {
 		toSerialize["webUrl"] = o.WebUrl
+	}
+	if !IsNil(o.ClientSynchronize) {
+		toSerialize["@client.synchronize"] = o.ClientSynchronize
+	}
+	if !IsNil(o.UiHidden) {
+		toSerialize["@ui.hidden"] = o.UiHidden
 	}
 	return toSerialize, nil
 }
