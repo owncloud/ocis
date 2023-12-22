@@ -91,7 +91,7 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("error reading blobsize xattr, using 0")
 				}
 				rev.Size = uint64(blobSize)
-				etag, err := node.CalculateEtag(n, mtime)
+				etag, err := node.CalculateEtag(n.ID, mtime)
 				if err != nil {
 					return nil, errors.Wrapf(err, "error calculating etag")
 				}

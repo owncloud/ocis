@@ -302,7 +302,27 @@ func (s *service) GetPath(ctx context.Context, req *provider.GetPathRequest) (*p
 		}, nil
 	}
 
-	return nil, gstatus.Errorf(codes.Unimplemented, "method not implemented")
+	receivedShare, rpcStatus, err := s.resolveAcceptedShare(ctx, &provider.Reference{
+		ResourceId: req.ResourceId,
+	})
+	appctx.GetLogger(ctx).Debug().
+		Interface("resourceId", req.ResourceId).
+		Interface("received_share", receivedShare).
+		Msg("sharesstorageprovider: Got GetPath request")
+	if err != nil {
+		return nil, err
+	}
+	if rpcStatus.Code != rpc.Code_CODE_OK {
+		return &provider.GetPathResponse{
+			Status: rpcStatus,
+		}, nil
+	}
+
+	return &provider.GetPathResponse{
+		Status: status.NewOK(ctx),
+		Path:   receivedShare.MountPoint.Path,
+	}, nil
+
 }
 
 func (s *service) GetHome(ctx context.Context, req *provider.GetHomeRequest) (*provider.GetHomeResponse, error) {
