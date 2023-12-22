@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 * Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
 * Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
 * Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
 
 ## Details
@@ -92,6 +93,13 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/8038
+
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+
+   Use a hidden role for service accounts. It will not appear in ListRoles calls
+   but internally handled by settings service
+
+   https://github.com/owncloud/ocis/pull/8051
 
 * Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
 
