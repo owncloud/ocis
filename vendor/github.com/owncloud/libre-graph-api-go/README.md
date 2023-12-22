@@ -79,6 +79,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *ApplicationsApi* | [**GetApplication**](docs/ApplicationsApi.md#getapplication) | **Get** /v1.0/applications/{application-id} | Get application by id
 *ApplicationsApi* | [**ListApplications**](docs/ApplicationsApi.md#listapplications) | **Get** /v1.0/applications | Get all applications
+*DriveItemApi* | [**DeleteDriveItem**](docs/DriveItemApi.md#deletedriveitem) | **Delete** /v1beta1/drives/{drive-id}/items/{item-id} | Delete a DriveItem.
 *DrivesApi* | [**CreateDrive**](docs/DrivesApi.md#createdrive) | **Post** /v1.0/drives | Create a new drive of a specific type
 *DrivesApi* | [**DeleteDrive**](docs/DrivesApi.md#deletedrive) | **Delete** /v1.0/drives/{drive-id} | Delete a specific space
 *DrivesApi* | [**GetDrive**](docs/DrivesApi.md#getdrive) | **Get** /v1.0/drives/{drive-id} | Get drive by id
@@ -92,6 +93,7 @@ Class | Method | HTTP request | Description
 *DrivesPermissionsApi* | [**ListPermissions**](docs/DrivesPermissionsApi.md#listpermissions) | **Get** /v1beta1/drives/{drive-id}/items/{item-id}/permissions | List the effective sharing permissions on a driveItem.
 *DrivesPermissionsApi* | [**SetPermissionPassword**](docs/DrivesPermissionsApi.md#setpermissionpassword) | **Post** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id}/setPassword | Set sharing link password
 *DrivesPermissionsApi* | [**UpdatePermission**](docs/DrivesPermissionsApi.md#updatepermission) | **Patch** /v1beta1/drives/{drive-id}/items/{item-id}/permissions/{perm-id} | Update sharing permission
+*DrivesRootApi* | [**CreateDriveItem**](docs/DrivesRootApi.md#createdriveitem) | **Post** /v1beta1/drives/{drive-id}/root/children | Create a drive item
 *DrivesRootApi* | [**GetRoot**](docs/DrivesRootApi.md#getroot) | **Get** /v1.0/drives/{drive-id}/root | Get root from arbitrary space
 *EducationClassApi* | [**AddUserToClass**](docs/EducationClassApi.md#addusertoclass) | **Post** /v1.0/education/classes/{class-id}/members/$ref | Assign a user to a class
 *EducationClassApi* | [**CreateClass**](docs/EducationClassApi.md#createclass) | **Post** /v1.0/education/classes | Add new education class
@@ -180,18 +182,15 @@ Class | Method | HTTP request | Description
  - [CollectionOfUser](docs/CollectionOfUser.md)
  - [CollectionOfUsers](docs/CollectionOfUsers.md)
  - [Deleted](docs/Deleted.md)
- - [DirectoryObject](docs/DirectoryObject.md)
  - [Drive](docs/Drive.md)
  - [DriveItem](docs/DriveItem.md)
  - [DriveItemCreateLink](docs/DriveItemCreateLink.md)
  - [DriveItemInvite](docs/DriveItemInvite.md)
  - [DriveRecipient](docs/DriveRecipient.md)
  - [EducationClass](docs/EducationClass.md)
- - [EducationOrganization](docs/EducationOrganization.md)
  - [EducationSchool](docs/EducationSchool.md)
  - [EducationUser](docs/EducationUser.md)
  - [EducationUserReference](docs/EducationUserReference.md)
- - [Entity](docs/Entity.md)
  - [ExportPersonalDataRequest](docs/ExportPersonalDataRequest.md)
  - [FileSystemInfo](docs/FileSystemInfo.md)
  - [Folder](docs/Folder.md)
@@ -227,6 +226,7 @@ Class | Method | HTTP request | Description
  - [UnifiedRoleDefinition](docs/UnifiedRoleDefinition.md)
  - [UnifiedRolePermission](docs/UnifiedRolePermission.md)
  - [User](docs/User.md)
+ - [Video](docs/Video.md)
 
 
 ## Documentation For Authorization
