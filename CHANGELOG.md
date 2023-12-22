@@ -93,6 +93,7 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/8038
+   https://github.com/owncloud/ocis/pull/8056
 
 * Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
 
