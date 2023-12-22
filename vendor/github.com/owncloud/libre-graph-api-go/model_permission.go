@@ -34,8 +34,10 @@ type Permission struct {
 	GrantedToIdentities []IdentitySet `json:"grantedToIdentities,omitempty"`
 	// Use this to create a permission with custom actions.
 	LibreGraphPermissionsActions []string `json:"@libre.graph.permissions.actions,omitempty"`
+	// Indicates if the item is synchronized with the underlying storage provider. Read-only.
+	ClientSynchronize *bool `json:"@client.synchronize,omitempty"`
 	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
-	UIHidden *bool `json:"@UI.Hidden,omitempty"`
+	UiHidden *bool `json:"@ui.hidden,omitempty"`
 }
 
 // NewPermission instantiates a new Permission object
@@ -325,36 +327,68 @@ func (o *Permission) SetLibreGraphPermissionsActions(v []string) {
 	o.LibreGraphPermissionsActions = v
 }
 
-// GetUIHidden returns the UIHidden field value if set, zero value otherwise.
-func (o *Permission) GetUIHidden() bool {
-	if o == nil || IsNil(o.UIHidden) {
+// GetClientSynchronize returns the ClientSynchronize field value if set, zero value otherwise.
+func (o *Permission) GetClientSynchronize() bool {
+	if o == nil || IsNil(o.ClientSynchronize) {
 		var ret bool
 		return ret
 	}
-	return *o.UIHidden
+	return *o.ClientSynchronize
 }
 
-// GetUIHiddenOk returns a tuple with the UIHidden field value if set, nil otherwise
+// GetClientSynchronizeOk returns a tuple with the ClientSynchronize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Permission) GetUIHiddenOk() (*bool, bool) {
-	if o == nil || IsNil(o.UIHidden) {
+func (o *Permission) GetClientSynchronizeOk() (*bool, bool) {
+	if o == nil || IsNil(o.ClientSynchronize) {
 		return nil, false
 	}
-	return o.UIHidden, true
+	return o.ClientSynchronize, true
 }
 
-// HasUIHidden returns a boolean if a field has been set.
-func (o *Permission) HasUIHidden() bool {
-	if o != nil && !IsNil(o.UIHidden) {
+// HasClientSynchronize returns a boolean if a field has been set.
+func (o *Permission) HasClientSynchronize() bool {
+	if o != nil && !IsNil(o.ClientSynchronize) {
 		return true
 	}
 
 	return false
 }
 
-// SetUIHidden gets a reference to the given bool and assigns it to the UIHidden field.
-func (o *Permission) SetUIHidden(v bool) {
-	o.UIHidden = &v
+// SetClientSynchronize gets a reference to the given bool and assigns it to the ClientSynchronize field.
+func (o *Permission) SetClientSynchronize(v bool) {
+	o.ClientSynchronize = &v
+}
+
+// GetUiHidden returns the UiHidden field value if set, zero value otherwise.
+func (o *Permission) GetUiHidden() bool {
+	if o == nil || IsNil(o.UiHidden) {
+		var ret bool
+		return ret
+	}
+	return *o.UiHidden
+}
+
+// GetUiHiddenOk returns a tuple with the UiHidden field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Permission) GetUiHiddenOk() (*bool, bool) {
+	if o == nil || IsNil(o.UiHidden) {
+		return nil, false
+	}
+	return o.UiHidden, true
+}
+
+// HasUiHidden returns a boolean if a field has been set.
+func (o *Permission) HasUiHidden() bool {
+	if o != nil && !IsNil(o.UiHidden) {
+		return true
+	}
+
+	return false
+}
+
+// SetUiHidden gets a reference to the given bool and assigns it to the UiHidden field.
+func (o *Permission) SetUiHidden(v bool) {
+	o.UiHidden = &v
 }
 
 func (o Permission) MarshalJSON() ([]byte, error) {
@@ -391,8 +425,11 @@ func (o Permission) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.LibreGraphPermissionsActions) {
 		toSerialize["@libre.graph.permissions.actions"] = o.LibreGraphPermissionsActions
 	}
-	if !IsNil(o.UIHidden) {
-		toSerialize["@UI.Hidden"] = o.UIHidden
+	if !IsNil(o.ClientSynchronize) {
+		toSerialize["@client.synchronize"] = o.ClientSynchronize
+	}
+	if !IsNil(o.UiHidden) {
+		toSerialize["@ui.hidden"] = o.UiHidden
 	}
 	return toSerialize, nil
 }
