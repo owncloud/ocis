@@ -62,6 +62,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
+	tusd "github.com/tus/tusd/pkg/handler"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -104,6 +105,26 @@ type Tree interface {
 	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
 }
 
+// Session is the interface that OcisSession implements. By combining tus.Upload,
+// storage.UploadSession and custom functions we can reuse the same struct throughout
+// the whole upload lifecycle.
+//
+// Some functions that are only used by decomposedfs are not yet part of this interface.
+// They might be added after more refactoring.
+type Session interface {
+	tusd.Upload
+	storage.UploadSession
+	upload.Session
+	LockID() string
+}
+
+type SessionStore interface {
+	New(ctx context.Context) *upload.OcisSession
+	List(ctx context.Context) ([]*upload.OcisSession, error)
+	Get(ctx context.Context, id string) (*upload.OcisSession, error)
+	Cleanup(ctx context.Context, session upload.Session, failure bool, keepUpload bool)
+}
+
 // Decomposedfs provides the base for decomposed filesystem implementations
 type Decomposedfs struct {
 	lu           *lookup.Lookup
@@ -113,6 +134,7 @@ type Decomposedfs struct {
 	chunkHandler *chunking.ChunkHandler
 	stream       events.Stream
 	cache        cache.StatCache
+	sessionStore SessionStore
 
 	UserCache       *ttlcache.Cache
 	userSpaceIndex  *spaceidindex.Index
@@ -211,6 +233,7 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
 		spaceTypeIndex:  spaceTypeIndex,
+		sessionStore:    upload.NewSessionStore(lu, tp, o.Root, es, o.AsyncFileUploads, o.Tokens),
 	}
 
 	if o.AsyncFileUploads {
@@ -245,7 +268,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 	for event := range ch {
 		switch ev := event.Event.(type) {
 		case events.PostprocessingFinished:
-			up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
+			session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
 				continue // NOTE: since we can't get the upload, we can't delete the blob
@@ -256,12 +279,11 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				keepUpload bool
 			)
 
-			n, err := node.ReadNode(ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, true)
+			n, err := session.Node(ctx)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
 				continue
 			}
-			up.Node = n
 
 			switch ev.Outcome {
 			default:
@@ -272,7 +294,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				keepUpload = true
 				metrics.UploadSessionsAborted.Inc()
 			case events.PPOutcomeContinue:
-				if err := up.Finalize(); err != nil {
+				if err := session.Finalize(); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
 					keepUpload = true // should we keep the upload when assembling failed?
 					failed = true
@@ -285,7 +307,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			}
 
 			getParent := func() *node.Node {
-				p, err := up.Node.Parent(ctx)
+				p, err := n.Parent(ctx)
 				if err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read parent")
 					return nil
@@ -296,7 +318,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			now := time.Now()
 			if failed {
 				// propagate sizeDiff after failed postprocessing
-				if err := fs.tp.Propagate(ctx, up.Node, -up.SizeDiff); err != nil {
+				if err := fs.tp.Propagate(ctx, n, -session.SizeDiff()); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate tree size change")
 				}
 			} else if p := getParent(); p != nil {
@@ -307,7 +329,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				}
 			}
 
-			upload.Cleanup(up, failed, keepUpload)
+			fs.sessionStore.Cleanup(ctx, session, failed, keepUpload)
 
 			// remove cache entry in gateway
 			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
@@ -322,11 +344,11 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 					Filename:      ev.Filename,
 					FileRef: &provider.Reference{
 						ResourceId: &provider.ResourceId{
-							StorageId: up.Info.MetaData["providerID"],
-							SpaceId:   up.Info.Storage["SpaceRoot"],
-							OpaqueId:  up.Info.Storage["SpaceRoot"],
+							StorageId: session.ProviderID(),
+							SpaceId:   session.SpaceID(),
+							OpaqueId:  session.SpaceID(),
 						},
-						Path: utils.MakeRelativePath(filepath.Join(up.Info.MetaData["dir"], up.Info.MetaData["filename"])),
+						Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
 					},
 					Timestamp:  utils.TimeToTS(now),
 					SpaceOwner: n.SpaceOwnerOrManager(ctx),
@@ -335,17 +357,17 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish UploadReady event")
 			}
 		case events.RestartPostprocessing:
-			up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
+			session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
 				continue
 			}
-			n, err := node.ReadNode(ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, true)
+			n, err := session.Node(ctx)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
 				continue
 			}
-			s, err := up.URL(up.Ctx)
+			s, err := session.URL(ctx)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not create url")
 				continue
@@ -355,13 +377,13 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 
 			// restart postprocessing
 			if err := events.Publish(ctx, fs.stream, events.BytesReceived{
-				UploadID:      up.Info.ID,
+				UploadID:      session.ID(),
 				URL:           s,
-				SpaceOwner:    n.SpaceOwnerOrManager(up.Ctx),
+				SpaceOwner:    n.SpaceOwnerOrManager(ctx),
 				ExecutingUser: &user.User{Id: &user.UserId{OpaqueId: "postprocessing-restart"}}, // send nil instead?
 				ResourceID:    &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
-				Filename:      up.Info.Storage["NodeName"],
-				Filesize:      uint64(up.Info.Size),
+				Filename:      session.Filename(),
+				Filesize:      uint64(session.Size()),
 			}); err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish BytesReceived event")
 			}
@@ -460,19 +482,17 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				*/
 			default:
 				// uploadid is not empty -> this is an async upload
-				up, err := upload.Get(ctx, ev.UploadID, fs.lu, fs.tp, fs.o.Root, fs.stream, fs.o.AsyncFileUploads, fs.o.Tokens)
+				session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 				if err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
 					continue
 				}
 
-				no, err := node.ReadNode(up.Ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, false)
+				n, err = session.Node(ctx)
 				if err != nil {
 					log.Error().Err(err).Interface("uploadID", ev.UploadID).Msg("Failed to get node after scan")
 					continue
 				}
-
-				n = no
 			}
 
 			if err := n.SetScanData(ctx, res.Description, res.Scandate); err != nil {
@@ -1031,7 +1051,7 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: error getting mtime for '"+n.ID+"'")
 	}
-	currentEtag, err := node.CalculateEtag(n, mtime)
+	currentEtag, err := node.CalculateEtag(n.ID, mtime)
 	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: error calculating etag for '"+n.ID+"'")
 	}

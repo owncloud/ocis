@@ -37,7 +37,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/mitchellh/mapstructure"
 )
@@ -100,22 +99,25 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		return nil, err
 	}
 
-	if _, ok := fs.(storage.UploadSessionLister); ok {
+	if usl, ok := fs.(storage.UploadSessionLister); ok {
 		// We can currently only send updates if the fs is decomposedfs as we read very specific keys from the storage map of the tus info
 		go func() {
 			for {
 				ev := <-handler.CompleteUploads
 				// We should be able to get the upload progress with fs.GetUploadProgress, but currently tus will erase the info files
 				// so we create a Progress instance here that is used to read the correct properties
-				up := upload.Progress{
-					Info: ev.Upload,
-				}
-				executant := up.Executant()
-				ref := up.Reference()
-				datatx.InvalidateCache(&executant, &ref, m.statCache)
-				if m.publisher != nil {
-					if err := datatx.EmitFileUploadedEvent(up.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
-						appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
+				ups, err := usl.ListUploadSessions(context.Background(), storage.UploadSessionFilter{ID: &ev.Upload.ID})
+				if err != nil {
+					appctx.GetLogger(context.Background()).Error().Err(err).Str("session", ev.Upload.ID).Msg("failed to list upload session")
+				} else {
+					up := ups[0]
+					executant := up.Executant()
+					ref := up.Reference()
+					datatx.InvalidateCache(&executant, &ref, m.statCache)
+					if m.publisher != nil {
+						if err := datatx.EmitFileUploadedEvent(up.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
+							appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")
+						}
 					}
 				}
 			}

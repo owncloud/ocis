@@ -241,8 +241,10 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 		}, nil
 	}
 
-	// check if the user can share with the desired permissions
-	if !conversions.SufficientCS3Permissions(sRes.GetInfo().GetPermissionSet(), req.GetGrant().GetPermissions().GetPermissions()) {
+	// check if the user can share with the desired permissions. For internal links this is skipped,
+	// users can always create internal links provided they have the AddGrant permission, which was already
+	// checked above
+	if !isInternalLink && !conversions.SufficientCS3Permissions(sRes.GetInfo().GetPermissionSet(), req.GetGrant().GetPermissions().GetPermissions()) {
 		return &link.CreatePublicShareResponse{
 			Status: status.NewInvalidArg(ctx, "insufficient permissions to create that kind of share"),
 		}, nil
@@ -512,6 +514,7 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	// check if the user can change the permissions to the desired permissions
 	updatePermissions := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS
 	if updatePermissions &&
+		!isInternalLink &&
 		!conversions.SufficientCS3Permissions(
 			sRes.GetInfo().GetPermissionSet(),
 			req.GetUpdate().GetGrant().GetPermissions().GetPermissions(),
