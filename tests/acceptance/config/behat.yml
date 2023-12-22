@@ -262,6 +262,8 @@ default:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - SharingNgContext:
+        - OcisConfigContext:
+
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
