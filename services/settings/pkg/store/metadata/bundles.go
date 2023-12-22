@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
@@ -59,6 +60,11 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 
 // ReadBundle tries to find a bundle by the given id from the metadata service
 func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
+	// shortcut for service accounts
+	if bundleID == defaults.BundleUUIDServiceAccount {
+		return defaults.ServiceAccountBundle(), nil
+	}
+
 	s.Init()
 	ctx := context.TODO()
 	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))

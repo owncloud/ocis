@@ -10,10 +10,23 @@ import (
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
+	// shortcut for service accounts
+	for _, serviceAccountID := range s.cfg.ServiceAccountIDs {
+		if accountUUID == serviceAccountID {
+			return []*settingsmsg.UserRoleAssignment{
+				{
+					Id:          uuid.Must(uuid.NewV4()).String(), // should we hardcode this id too?
+					AccountUuid: accountUUID,
+					RoleId:      defaults.BundleUUIDServiceAccount,
+				},
+			}, nil
+		}
+	}
 	s.Init()
 	ctx := context.TODO()
 	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))

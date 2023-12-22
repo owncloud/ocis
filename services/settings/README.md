@@ -15,10 +15,9 @@ As an example, user profile settings that can be changed in the Web UI must be p
 The settings service supports two different backends for persisting the data. The backend can be set via the `SETTINGS_STORE_TYPE` environment variable. Supported values are:
 
 *   `metadata`: The default. This backend persists the settings data via the `storage-system` service.
-*   `filesystem`: This backend persists the settings data in a directory on the local filesystem.
+*   `filesystem`: (deprecated) This backend persists the settings data in a directory on the local filesystem.
   The directory can be configured with `SETTINGS_DATA_PATH`. This backend is **not** suitable for running
-  multiple intances of the `settings` service in a scale-out deployment and should be therefore considered
-  deprecated.
+  multiple intances of the `settings` service in a scale-out deployment and was therefore deprecated.
 
 <!--- Note: The diagramm is outdate, leaving it here for a future rework
 The diagram shows how the settings service integrates into oCIS:
@@ -72,7 +71,7 @@ Services can set or query Infinite Scale *setting values* of a user from setting
 
 ## Service Accounts
 
-The settings service needs to know the ID's of service accounts but it doesn't need their secrets. Currently only one service account can be configured which has the admin role. This can be set with the `SETTINGS_SERVICE_ACCOUNT_ID_ADMIN` envvar, but it will also pick up the global `OCIS_SERVICE_ACCOUNT_ID` environment variable. Also see the 'auth-service' service description for additional details.
+The settings service needs to know the IDs of service accounts but it doesn't need their secrets. They can be configured using the `SETTINGS_SERVICE_ACCOUNTS_IDS` envvar. When only using one service account `OCIS_SERVICE_ACCOUNT_ID` can also be used. All configured service accounts will get a hidden 'service-account' role. This role contains all permissions the service account needs but will not appear calls to the list roles endpoint. It is not possible to assign the 'service-account' role to a normal user.
 
 ## Default Language
 

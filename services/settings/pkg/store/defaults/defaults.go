@@ -14,8 +14,10 @@ const (
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
 	// BundleUUIDRoleUserLight represents the user light role.
 	BundleUUIDRoleUserLight = "38071a68-456a-4553-846a-fa67bf5596cc"
-	// BundleUUIDProfile represents the user profile
+	// BundleUUIDProfile represents the user profile.
 	BundleUUIDProfile = "2a506de7-99bd-4f0d-994e-c38e72c28fd9"
+	// BundleUUIDServiceAccount represents the service account role.
+	BundleUUIDServiceAccount = "bcceed81-c610-49cc-ab77-39a024e8da12"
 	// SettingUUIDProfileLanguage is the hardcoded setting UUID for the user profile language
 	SettingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 	// SettingUUIDProfileDisableNotifications is the hardcoded setting UUID for the disable notifications setting
@@ -32,6 +34,42 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 		generateBundleUserLightRole(),
 		generateBundleProfileRequest(),
 		generateBundleSpaceAdminRole(),
+	}
+}
+
+// ServiceAccountBundle returns the service account bundle
+func ServiceAccountBundle() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
+		Id:          BundleUUIDServiceAccount,
+		Name:        "service-account",
+		Type:        settingsmsg.Bundle_TYPE_ROLE,
+		Extension:   "ocis-roles",
+		DisplayName: "Service Account",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
+		},
+		Settings: []*settingsmsg.Setting{
+			AccountManagementPermission(All),
+			ChangeLogoPermission(All),
+			CreatePublicLinkPermission(All),
+			CreateSharePermission(All),
+			CreateSpacesPermission(All),
+			DeletePersonalSpacesPermission(All),
+			DeleteProjectSpacesPermission(All),
+			DeleteReadOnlyPublicLinkPasswordPermission(All),
+			GroupManagementPermission(All),
+			LanguageManagementPermission(All),
+			ListFavoritesPermission(All),
+			ListSpacesPermission(All),
+			ManageSpacePropertiesPermission(All),
+			RoleManagementPermission(All),
+			SetPersonalSpaceQuotaPermission(All),
+			SetProjectSpaceQuotaPermission(All),
+			SettingsManagementPermission(All),
+			SpaceAbilityPermission(All),
+			WriteFavoritesPermission(All),
+			// TODO: add more permissions? remove some?
+		},
 	}
 }
 
@@ -349,13 +387,6 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 		// default admin user
 		assignments = append(assignments, &settingsmsg.UserRoleAssignment{
 			AccountUuid: cfg.AdminUserID,
-			RoleId:      BundleUUIDRoleAdmin,
-		})
-	}
-
-	if cfg.ServiceAccountIDAdmin != "" {
-		assignments = append(assignments, &settingsmsg.UserRoleAssignment{
-			AccountUuid: cfg.ServiceAccountIDAdmin,
 			RoleId:      BundleUUIDRoleAdmin,
 		})
 	}
