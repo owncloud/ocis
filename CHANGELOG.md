@@ -127,6 +127,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8025
    https://github.com/owncloud/ocis/pull/8149
+* Bugfix - Fix Service Account Roles on external IDP: [#8077](https://github.com/owncloud/ocis/pull/8077)
+
+## Details
+
+* Bugfix - Fix Service Account Roles on external IDP: [#8077](https://github.com/owncloud/ocis/pull/8077)
+
+   Service Account Roles wouldn't work when using with external IDP
+
+   https://github.com/owncloud/ocis/pull/8077
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
