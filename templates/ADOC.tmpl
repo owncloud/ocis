@@ -1,0 +1,53 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: {{ .HasDeprecations }}
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-{{ .Timestamp }}]
+[caption=]
+.Deprecation notes for the {{ .ExtensionName }} service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+
+{{- range .Deprecations }}
+
+| {{ .DeprecationInfo }}
+| {{ .DeprecationVersion }}
+| {{ .RemovalVersion }}
+| {{ .DeprecationReplacement }}
+{{- end }}
+|===
+
+endif::[]
+
+[caption=]
+.Environment variables for the {{ .ExtensionName }} service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+{{- range .Fields}}
+
+a| {{- range $i, $value := .EnvVars }}{{- if $i }} +
+{{ end -}}
+`{{- $value }}`
+{{- end }} +
+{{ .DeprecationLink }}
+a| [subs=-attributes]
+++{{.Type}} ++
+a| [subs=-attributes]
+++{{.DefaultValue}} ++
+a| [subs=-attributes]
+{{.Description}}
+
+{{- end }}
+|===
+

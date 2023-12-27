@@ -1,0 +1,71 @@
+// collected through docs/helpers/extendedEnv.go
+
+[caption=]
+.Environment variables with extended scope not included in a service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+    
+    
+
+a| `MICRO_LOG_LEVEL` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Error ++
+a| [subs=-attributes]
+++Set the log level for the internal go micro framework. Only change on supervision of ownCloud Support. ++
+    
+
+a| `MICRO_REGISTRY` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++The Go micro registry type to use. Supported types are: 'memory', 'nats-js-kv' (default) and 'kubernetes'. Note that 'nats', 'etcd', 'consul' and 'mdns' are deprecated and will be removed in a later version. Only change on supervision of ownCloud Support. ++
+
+a| `MICRO_REGISTRY_ADDRESS` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+++The bind address of the internal go micro framework. Only change on supervision of ownCloud Support. ++
+
+a| `MICRO_REGISTRY_AUTH_PASSWORD` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
+
+a| `MICRO_REGISTRY_AUTH_USERNAME` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
+
+a| `OCIS_BASE_DATA_PATH` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++'/var/lib/ocis' or '$HOME/.ocis/' ++
+a| [subs=-attributes]
+++The base directory location used by several services and for user data. Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/' for binary releases. Services can have, if available, an individual setting with an own environment variable. ++
+
+a| `OCIS_CONFIG_DIR` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++'/etc/ocis' or '$HOME/.ocis/config' ++
+a| [subs=-attributes]
+++The default directory location for config files. Predefined to '/etc/ocis' for container images (inside the container) or '$HOME/.ocis/config' for binary releases. ++
+    
+|===
