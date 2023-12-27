@@ -1479,7 +1479,7 @@ def binaryRelease(ctx, name):
         "depends_on": depends_on,
         "trigger": {
             "ref": [
-                "refs/head/stable-*",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
