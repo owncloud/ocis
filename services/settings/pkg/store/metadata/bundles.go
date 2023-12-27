@@ -34,6 +34,10 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 	}
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
+		if id == defaults.BundleUUIDServiceAccount {
+			bundles = append(bundles, defaults.ServiceAccountBundle())
+			continue
+		}
 		b, err := s.mdc.SimpleDownload(ctx, bundlePath(id))
 		switch err.(type) {
 		case nil:

@@ -74,7 +74,7 @@ type IdmService struct {
 }
 
 type SettingsService struct {
-	ServiceAccountIDAdmin string `yaml:"service_account_id_admin"`
+	ServiceAccountIDs []string `yaml:"service_account_ids"`
 }
 
 type FrontendService struct {
@@ -400,7 +400,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			ServiceAccount: serviceAccount,
 		},
 		Settings: SettingsService{
-			ServiceAccountIDAdmin: serviceAccount.ServiceAccountID,
+			ServiceAccountIDs: []string{serviceAccount.ServiceAccountID},
 		},
 	}
 
