@@ -24,6 +24,8 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\GuzzleException;
 
 require_once 'bootstrap.php';
 
@@ -84,15 +86,14 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
-	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 *
-	 * @return void
-	 * @throws Exception
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
 	 */
-	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
@@ -107,20 +108,44 @@ class SharingNgContext implements Context {
 		$role = $rows['role'] ?? null;
 		$permission = $rows['permission'] ?? null;
 
-		$this->featureContext->setResponse(
-			GraphHelper::sendSharingInvitation(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$spaceId,
-				$itemId,
-				$shareeId,
-				$rows['shareType'],
-				$role,
-				$permission
-			)
+		return GraphHelper::sendSharingInvitation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			$shareeId,
+			$rows['shareType'],
+			$role,
+			$permission
 		);
+	}
+
+	/**
+	 * @Given user :user has sent the following share invitation using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userHasSentTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+		$response = $this->sendShareInvitation($user, $table);
+		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+		$this->featureContext->setResponse($this->sendShareInvitation($user, $table));
 	}
 
 	/**
