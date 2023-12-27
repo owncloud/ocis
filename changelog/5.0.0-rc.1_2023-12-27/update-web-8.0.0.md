@@ -1,6 +1,38 @@
-Enhancement: Update web to v8.0.0-alpha.12
+Enhancement: Update web to v8.0.0-rc.1
 
 Tags: web
+
+We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Enhancement [owncloud/web#10224](https://github.com/owncloud/web/issues/10224): Harmonize AppSwitcher icon colors
+* Bugfix [owncloud/web#10230](https://github.com/owncloud/web/issues/10230): Configurable concurrent requests
+* Bugfix [owncloud/web#10158](https://github.com/owncloud/web/issues/10158): GDPR export polling
+* Bugfix [owncloud/web#10220](https://github.com/owncloud/web/issues/10220): Loading indicator during conflict dialog
+* Bugfix [owncloud/web#10156](https://github.com/owncloud/web/issues/10156): Uploading the same files parallel
+* Bugfix [owncloud/web#10179](https://github.com/owncloud/web/issues/10179): Space navigate to trash missing
+* Bugfix [owncloud/web#10118](https://github.com/owncloud/web/issues/10118): Tilesview has whitespace
+* Bugfix [owncloud/web#10182](https://github.com/owncloud/web/issues/10182): Make versions panel readonly in viewers and editors
+
+We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Bugfix [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying full video in their dimensions
+* Bugfix [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files list previews cropped
+* Bugfix [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces overview tile previews zoomed
+* Bugfix [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving links without drive alias
+
+We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Change [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling
+* Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): Registering right sidebar panels as extension
+* Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar in viewer and editor apps
+
+We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Enhancement [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link modal
 
 We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog (linked) for details on the web release.
 
@@ -89,5 +121,13 @@ We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog (linke
 * Enhancement [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support mandatory filter while listing users
 * Enhancement [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering quick actions as extension
 
+https://github.com/owncloud/ocis/pull/8055
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
+https://github.com/owncloud/ocis/pull/7930
+https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
+https://github.com/owncloud/ocis/pull/7952
+https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
+https://github.com/owncloud/ocis/pull/7918
+https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
 https://github.com/owncloud/ocis/pull/7883
 https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
