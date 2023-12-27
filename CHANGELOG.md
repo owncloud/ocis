@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-rc.1](#changelog-for-500-rc1-2023-12-27)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
@@ -30,6 +31,24 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.1...master
+
+## Summary
+
+* Bugfix - Fix Service Account Roles on external IDP: [#8077](https://github.com/owncloud/ocis/pull/8077)
+
+## Details
+
+* Bugfix - Fix Service Account Roles on external IDP: [#8077](https://github.com/owncloud/ocis/pull/8077)
+
+   Service Account Roles wouldn't work when using with external IDP
+
+   https://github.com/owncloud/ocis/pull/8077
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
