@@ -1,10 +1,7 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-beta.2](#changelog-for-500-beta2-2023-12-20)
-* [Changelog for 5.0.0-alpha.6](#changelog-for-500-alpha6-2023-12-08)
+* [Changelog for 5.0.0-rc.1](#changelog-for-500-rc1-2023-12-27)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
-* [Changelog for 5.0.0-alpha.5](#changelog-for-500-alpha5-2023-12-05)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
 * [Changelog for 4.0.2](#changelog-for-402-2023-09-28)
 * [Changelog for 4.0.1](#changelog-for-401-2023-09-01)
@@ -12,8 +9,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -34,502 +31,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [5.0.0-rc.1] (2023-12-27)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 5.0.0-rc.1.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-beta.2...master
-
-## Summary
-
-* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
-* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
-* Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
-* Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
-* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
-* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
-
-## Details
-
-* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
-
-   We've removed the outdated and apparently unused dependency `cldr` from the
-   `kpop` dependency inside the idp web ui. This resolves a security issue around
-   an oudated `xmldom` package version, originating from said `kpop` library.
-
-   https://github.com/owncloud/ocis/issues/7957
-   https://github.com/owncloud/ocis/pull/7988
-
-* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
-
-   As the OData query parser interprets characters like '@' or '-' in a special
-   way. Search request for users or groups needs to be quoted. We fixed the
-   libregraph users and groups endpoints to handle quoted search terms correctly.
-
-   https://github.com/owncloud/ocis/issues/7990
-   https://github.com/owncloud/ocis/pull/8050
-   https://github.com/owncloud/ocis/pull/8035
-
-* Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
-
-   We added three new metrics to the metrics endpoint to support the RED method for
-   monitoring microservices.
-
-   - Request Rate: The number of requests per second. The total count of requests
-   is available under `ocis_proxy_requests_total`. - Error Rate: The number of
-   failed requests per second. The total count of failed requests is available
-   under `ocis_proxy_errors_total`. - Duration: The amount of time each request
-   takes. The duration of all requests is available under
-   `ocis_proxy_request_duration_seconds`. This is a histogram metric, so it also
-   provides information about the distribution of request durations.
-
-   The metrics are available under the following paths: `PROXY_DEBUG_ADDR/metrics`
-   in a prometheus compatible format and maybe secured by `PROXY_DEBUG_TOKEN`.
-
-   https://github.com/owncloud/ocis/pull/7994
-
-* Enhancement - Bump reva: [#8038](https://github.com/owncloud/ocis/pull/8038)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/8038
-   https://github.com/owncloud/ocis/pull/8056
-
-* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
-
-   Use a hidden role for service accounts. It will not appear in ListRoles calls
-   but internally handled by settings service
-
-   https://github.com/owncloud/ocis/pull/8051
-
-* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
-
-   Tags: web
-
-   We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10224](https://github.com/owncloud/web/issues/10224): Harmonize
-   AppSwitcher icon colors * Bugfix
-   [owncloud/web#10230](https://github.com/owncloud/web/issues/10230): Configurable
-   concurrent requests * Bugfix
-   [owncloud/web#10158](https://github.com/owncloud/web/issues/10158): GDPR export
-   polling * Bugfix
-   [owncloud/web#10220](https://github.com/owncloud/web/issues/10220): Loading
-   indicator during conflict dialog * Bugfix
-   [owncloud/web#10156](https://github.com/owncloud/web/issues/10156): Uploading
-   the same files parallel * Bugfix
-   [owncloud/web#10179](https://github.com/owncloud/web/issues/10179): Space
-   navigate to trash missing * Bugfix
-   [owncloud/web#10118](https://github.com/owncloud/web/issues/10118): Tilesview
-   has whitespace * Bugfix
-   [owncloud/web#10182](https://github.com/owncloud/web/issues/10182): Make
-   versions panel readonly in viewers and editors
-
-   https://github.com/owncloud/ocis/pull/8055
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
-
-# Changelog for [5.0.0-beta.2] (2023-12-20)
-
-The following sections list the changes for 5.0.0-beta.2.
-
-[5.0.0-beta.2]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.6...v5.0.0-beta.2
-
-## Summary
-
-* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
-* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
-* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
-* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
-* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
-* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
-* Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
-* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
-* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
-* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
-* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
-* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
-* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
-* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
-* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
-* Enhancement - Update web to v8.0.0-beta.2: [#7930](https://github.com/owncloud/ocis/pull/7930)
-* Enhancement - Update reva to latest edge: [#7949](https://github.com/owncloud/ocis/pull/7949)
-* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
-* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
-* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
-* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
-* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
-* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
-
-## Details
-
-* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
-
-   The nats-js cache was not working. It paniced and wrote a lot of error logs.
-   Both is fixed now.
-
-   https://github.com/owncloud/ocis/pull/7790
-
-* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
-
-   https://github.com/owncloud/ocis/pull/7859
-   https://github.com/owncloud/ocis/pull/7958
-
-* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
-
-   Updating and resetting the logo when using the new `theme.json` structure in Web
-   has been fixed.
-
-   https://github.com/owncloud/ocis/pull/7930
-
-* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
-
-   We fixed the status code on SharingNG update permissions for public shares.
-
-   https://github.com/owncloud/ocis/pull/7952
-
-* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
-
-   We fixed a bug where the permission validation was not working correctly.
-
-   https://github.com/owncloud/ocis/pull/7963
-   https://github.com/cs3org/reva/pull/4405
-
-* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
-
-   We fixed the issue that led to correct update but the 404 response code when
-   renaming an existing user to a string with capital letters.
-
-   https://github.com/owncloud/ocis/pull/7964
-
-* Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
-
-   We improved functionality of the OCM support.
-
-   https://github.com/owncloud/ocis/pull/7973
-
-* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
-
-   We remove the redundant permissions of a role with duplicate ID.
-
-   https://github.com/owncloud/ocis/issues/7931
-   https://github.com/owncloud/ocis/pull/7976
-
-* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
-
-   Configure sse streams to be non-durable. This functionality is not needed for
-   the sse service
-
-   https://github.com/owncloud/ocis/pull/7986
-
-* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
-
-   We changed the default tracing to produce non-empty traceids.
-
-   https://github.com/owncloud/ocis/pull/8023
-   https://github.com/owncloud/ocis/pull/8017
-
-* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
-
-   We've removed the option privacyURL and imprintURL from the config, since other
-   clients weren't able to consume these. In order to be accessible by other
-   clients, not just Web, those should be configured via the theme.json file.
-
-   https://github.com/owncloud/ocis/pull/7938/
-
-* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
-
-   We've removed the option accessDeniedHelpUrl from the config, since other
-   clients weren't able to consume it. In order to be accessible by other clients,
-   not just Web, it should be configured via the theme.json file.
-
-   https://github.com/owncloud/ocis/pull/7970
-
-* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
-
-   The antivirus postprocessing step will now be retried for a configurable amount
-   of times in case it can't get a result from clamav.
-
-   https://github.com/owncloud/ocis/pull/7874
-
-* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
-
-   We added the ability to edit public shares to the sharing NG endpoints.
-
-   https://github.com/owncloud/ocis/issues/6993
-   https://github.com/owncloud/ocis/pull/7908/
-
-* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
-
-   We added the `list` and `restore` commands to the trash-bin items to the CLI
-
-   https://github.com/owncloud/ocis/issues/7845
-   https://github.com/owncloud/ocis/pull/7917
-   https://github.com/cs3org/reva/pull/4392
-
-* Enhancement - Update web to v8.0.0-beta.2: [#7930](https://github.com/owncloud/ocis/pull/7930)
-
-   Tags: web
-
-   We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying
-   full video in their dimensions * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files
-   list previews cropped * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces
-   overview tile previews zoomed * Bugfix
-   [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
-   links without drive alias
-
-   We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Change
-   [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling *
-   Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111):
-   Registering right sidebar panels as extension * Enhancement
-   [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar
-   in viewer and editor apps
-
-   https://github.com/owncloud/ocis/pull/7930
-   https://github.com/owncloud/ocis/pull/7952
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
-
-* Enhancement - Update reva to latest edge: [#7949](https://github.com/owncloud/ocis/pull/7949)
-
-   Changelog for reva unreleased =============================
-
-  *   Bugfix [cs3org/reva#4407](https://github.com/cs3org/reva/pull/4407): Make ocdav return correct oc:spaceid
-  *   Bugfix [cs3org/reva#4410](https://github.com/cs3org/reva/pull/4410): Improve OCM support
-  *   Bugfix [cs3org/reva#4422](https://github.com/cs3org/reva/pull/4422): Fix disconnected traces
-  *   Bugfix [cs3org/reva#4424](https://github.com/cs3org/reva/pull/4424): Fixed panic in receivedsharecache pkg
-  *   Enhancement [cs3org/reva#4403](https://github.com/cs3org/reva/pull/4403): Add validation to update public share
-  *   Enhancement [cs3org/reva#4405](https://github.com/cs3org/reva/pull/4405): Check permissions before updating shares
-  *   Enhancement [cs3org/reva#4406](https://github.com/cs3org/reva/pull/4406): Rework cache configuration
-  *   Enhancement [cs3org/reva#4409](https://github.com/cs3org/reva/pull/4409): Disable the password policy
-  *   Enhancement [cs3org/reva#4411](https://github.com/cs3org/reva/pull/4411): Add option to configure streams non durable
-  *   Enhancement [cs3org/reva#4412](https://github.com/cs3org/reva/pull/4412): Allow authentication for nats connections
-  *   Enhancement [cs3org/reva#4414](https://github.com/cs3org/reva/pull/4414): Track more upload session metrics
-
-   Changelog for reva 2.17.0 (2023-12-12) =======================================
-
-   The following sections list the changes in reva 2.17.0 relevant to reva users.
-   The changes are ordered by importance.
-
-  *   Bugfix [cs3org/reva#4278](https://github.com/cs3org/reva/pull/4278): Disable DEPTH infinity in PROPFIND
-  *   Bugfix [cs3org/reva#4318](https://github.com/cs3org/reva/pull/4318): Do not allow moves between shares
-  *   Bugfix [cs3org/reva#4290](https://github.com/cs3org/reva/pull/4290): Prevent panic when trying to move a non-existent file
-  *   Bugfix [cs3org/reva#4241](https://github.com/cs3org/reva/pull/4241): Allow an empty credentials chain in the auth middleware
-  *   Bugfix [cs3org/reva#4216](https://github.com/cs3org/reva/pull/4216): Fix an error message
-  *   Bugfix [cs3org/reva#4324](https://github.com/cs3org/reva/pull/4324): Fix capabilities decoding
-  *   Bugfix [cs3org/reva#4267](https://github.com/cs3org/reva/pull/4267): Fix concurrency issue
-  *   Bugfix [cs3org/reva#4362](https://github.com/cs3org/reva/pull/4362): Fix concurrent lookup
-  *   Bugfix [cs3org/reva#4336](https://github.com/cs3org/reva/pull/4336): Fix definition of "file-editor" role
-  *   Bugfix [cs3org/reva#4302](https://github.com/cs3org/reva/pull/4302): Fix checking of filename length
-  *   Bugfix [cs3org/reva#4366](https://github.com/cs3org/reva/pull/4366): Fix CS3 status code when looking up non existing share
-  *   Bugfix [cs3org/reva#4299](https://github.com/cs3org/reva/pull/4299): Fix HTTP verb of the generate-invite endpoint
-  *   Bugfix [cs3org/reva#4249](https://github.com/cs3org/reva/pull/4249): GetUserByClaim not working with MSAD for claim "userid"
-  *   Bugfix [cs3org/reva#4217](https://github.com/cs3org/reva/pull/4217): Fix missing case for "hide" in UpdateShares
-  *   Bugfix [cs3org/reva#4140](https://github.com/cs3org/reva/pull/4140): Fix missing etag in shares jail
-  *   Bugfix [cs3org/reva#4229](https://github.com/cs3org/reva/pull/4229): Fix destroying the Personal and Project spaces data
-  *   Bugfix [cs3org/reva#4193](https://github.com/cs3org/reva/pull/4193): Fix overwrite a file with an empty file
-  *   Bugfix [cs3org/reva#4365](https://github.com/cs3org/reva/pull/4365): Fix create public share
-  *   Bugfix [cs3org/reva#4380](https://github.com/cs3org/reva/pull/4380): Fix the public link update
-  *   Bugfix [cs3org/reva#4250](https://github.com/cs3org/reva/pull/4250): Fix race condition
-  *   Bugfix [cs3org/reva#4345](https://github.com/cs3org/reva/pull/4345): Fix conversion of custom ocs permissions to roles
-  *   Bugfix [cs3org/reva#4134](https://github.com/cs3org/reva/pull/4134): Fix share jail
-  *   Bugfix [cs3org/reva#4335](https://github.com/cs3org/reva/pull/4335): Fix public shares cleanup config
-  *   Bugfix [cs3org/reva#4338](https://github.com/cs3org/reva/pull/4338): Fix unlock via space API
-  *   Bugfix [cs3org/reva#4341](https://github.com/cs3org/reva/pull/4341): Fix spaceID in meta endpoint response
-  *   Bugfix [cs3org/reva#4351](https://github.com/cs3org/reva/pull/4351): Fix 500 when open public link
-  *   Bugfix [cs3org/reva#4352](https://github.com/cs3org/reva/pull/4352): Fix the tgz mime type
-  *   Bugfix [cs3org/reva#4388](https://github.com/cs3org/reva/pull/4388): Allow UpdateUserShare() to update just the expiration date
-  *   Bugfix [cs3org/reva#4214](https://github.com/cs3org/reva/pull/4214): Always pass adjusted default nats options
-  *   Bugfix [cs3org/reva#4291](https://github.com/cs3org/reva/pull/4291): Release lock when expired
-  *   Bugfix [cs3org/reva#4386](https://github.com/cs3org/reva/pull/4386): Remove dead enable_home config
-  *   Bugfix [cs3org/reva#4292](https://github.com/cs3org/reva/pull/4292): Return 403 when user is not permitted to lock
-  *   Enhancement [cs3org/reva#4389](https://github.com/cs3org/reva/pull/4389): Add audio and location props
-  *   Enhancement [cs3org/reva#4337](https://github.com/cs3org/reva/pull/4337): Check permissions before creating shares
-  *   Enhancement [cs3org/reva#4326](https://github.com/cs3org/reva/pull/4326): Add search mediatype filter
-  *   Enhancement [cs3org/reva#4367](https://github.com/cs3org/reva/pull/4367): Add GGS mime type
-  *   Enhancement [cs3org/reva#4194](https://github.com/cs3org/reva/pull/4194): Add hide flag to shares
-  *   Enhancement [cs3org/reva#4358](https://github.com/cs3org/reva/pull/4358): Add default permissions capability for links
-  *   Enhancement [cs3org/reva#4133](https://github.com/cs3org/reva/pull/4133): Add more metadata to locks
-  *   Enhancement [cs3org/reva#4353](https://github.com/cs3org/reva/pull/4353): Add support for .docxf files
-  *   Enhancement [cs3org/reva#4363](https://github.com/cs3org/reva/pull/4363): Add nats-js-kv store
-  *   Enhancement [cs3org/reva#4197](https://github.com/cs3org/reva/pull/4197): Add the Banned-Passwords List
-  *   Enhancement [cs3org/reva#4190](https://github.com/cs3org/reva/pull/4190): Add the password policies
-  *   Enhancement [cs3org/reva#4384](https://github.com/cs3org/reva/pull/4384): Add a retry postprocessing outcome and event
-  *   Enhancement [cs3org/reva#4271](https://github.com/cs3org/reva/pull/4271): Add search capability
-  *   Enhancement [cs3org/reva#4119](https://github.com/cs3org/reva/pull/4119): Add sse event
-  *   Enhancement [cs3org/reva#4392](https://github.com/cs3org/reva/pull/4392): Add additional permissions to service accounts
-  *   Enhancement [cs3org/reva#4344](https://github.com/cs3org/reva/pull/4344): Add url extension to mime type list
-  *   Enhancement [cs3org/reva#4372](https://github.com/cs3org/reva/pull/4372): Add validation to the public share provider
-  *   Enhancement [cs3org/reva#4244](https://github.com/cs3org/reva/pull/4244): Allow listing reveived shares by service accounts
-  *   Enhancement [cs3org/reva#4129](https://github.com/cs3org/reva/pull/4129): Auto-Accept Shares through ServiceAccounts
-  *   Enhancement [cs3org/reva#4374](https://github.com/cs3org/reva/pull/4374): Handle trashbin file listings concurrently
-  *   Enhancement [cs3org/reva#4325](https://github.com/cs3org/reva/pull/4325): Enforce Permissions
-  *   Enhancement [cs3org/reva#4368](https://github.com/cs3org/reva/pull/4368): Extract log initialization
-  *   Enhancement [cs3org/reva#4375](https://github.com/cs3org/reva/pull/4375): Introduce UploadSessionLister interface
-  *   Enhancement [cs3org/reva#4268](https://github.com/cs3org/reva/pull/4268): Implement sharing roles
-  *   Enhancement [cs3org/reva#4160](https://github.com/cs3org/reva/pull/4160): Improve utils pkg
-  *   Enhancement [cs3org/reva#4335](https://github.com/cs3org/reva/pull/4335): Add sufficient permissions check function
-  *   Enhancement [cs3org/reva#4281](https://github.com/cs3org/reva/pull/4281): Port OCM changes from master
-  *   Enhancement [cs3org/reva#4270](https://github.com/cs3org/reva/pull/4270): Opt out of public link password enforcement
-  *   Enhancement [cs3org/reva#4181](https://github.com/cs3org/reva/pull/4181): Change the variable names for the password policy
-  *   Enhancement [cs3org/reva#4256](https://github.com/cs3org/reva/pull/4256): Rename hidden share variable name
-  *   Enhancement [cs3org/reva#3926](https://github.com/cs3org/reva/pull/3926): Service Accounts
-  *   Enhancement [cs3org/reva#4359](https://github.com/cs3org/reva/pull/4359): Update go-ldap to v3.4.6
-  *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
-  *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
-
-   https://github.com/owncloud/ocis/pull/7949
-   https://github.com/owncloud/ocis/pull/7793
-   https://github.com/owncloud/ocis/pull/7978
-   https://github.com/owncloud/ocis/pull/7979
-   https://github.com/owncloud/ocis/pull/7963
-   https://github.com/owncloud/ocis/pull/7986
-
-* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
-
-   For Sharing NG, we needed validation in the implementing reva service to keep
-   the client implementation simple.
-
-   https://github.com/owncloud/ocis/pull/7978
-
-* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
-
-   Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
-
-   https://github.com/owncloud/ocis/pull/7979
-
-* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
-
-   Replaces the nats object store with the nats kv store in the natsjs registry
-
-   https://github.com/owncloud/ocis/pull/7987
-
-* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
-
-   Allow events, store and registry implementation to pass username/password to the
-   nats instance
-
-   https://github.com/owncloud/ocis/pull/7989
-
-* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
-
-   We added sciencemesh and ocm services to enable federation.
-
-   https://github.com/owncloud/ocis/pull/7998
-   https://github.com/owncloud/ocis/pull/7576
-   https://github.com/owncloud/ocis/pull/7464
-   https://github.com/owncloud/ocis/pull/7463
-
-* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
-
-   The previously used default `mdns` is faulty. Deprecated it together with
-   `consul`, `nats` and `etcd` implementations.
-
-   https://github.com/owncloud/ocis/pull/8011
-   https://github.com/owncloud/ocis/pull/8027
-
-# Changelog for [5.0.0-alpha.6] (2023-12-08)
-
-The following sections list the changes for 5.0.0-alpha.6.
-
-[5.0.0-alpha.6]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-alpha.6
-
-## Summary
-
-* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
-* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
-* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
-* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
-* Enhancement - Update web to v8.0.0-alpha.13: [#7918](https://github.com/owncloud/ocis/pull/7918)
-
-## Details
-
-* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
-
-   We fixed a bug when normal users can update the public link to delete its
-   password if permission is not sent in data.
-
-   https://github.com/owncloud/ocis/issues/7821
-   https://github.com/owncloud/ocis/pull/7862
-
-* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
-
-   We changed the implementation of the public share provider in reva to do the
-   validation on the CS3 Api side. This makes the implementation on the graph side
-   smaller.
-
-   https://github.com/owncloud/ocis/issues/6993
-   https://github.com/owncloud/ocis/pull/7877
-
-* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
-
-   Location metadata is now extracted and stored by the search service. It is
-   available for driveItems in a folder listing using the Graph API.
-
-   https://github.com/owncloud/ocis/pull/7886
-
-* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
-
-   Regular users can search for other users and groups. The following limitations
-   apply:
-
-  * Only search queries are allowed (using the `$search=term` query parameter)
-  * The search term needs to have at least 3 characters
-  * for user searches the result set only contains the attributes `displayName`, `userType`, `mail` and `id`
-  * for group searches the result set only contains the attributes `displayName`, `groupTypes` and `id`
-
-   https://github.com/owncloud/ocis/issues/7782
-   https://github.com/owncloud/ocis/pull/7887
-
-* Enhancement - Update web to v8.0.0-alpha.13: [#7918](https://github.com/owncloud/ocis/pull/7918)
-
-   Tags: web
-
-   We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link
-   modal
-
-   https://github.com/owncloud/ocis/pull/7918
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
-
-# Changelog for [4.0.4] (2023-12-07)
-
-The following sections list the changes for 4.0.4.
-
-[4.0.4]: https://github.com/owncloud/ocis/compare/v5.0.0-alpha.5...v4.0.4
-
-## Summary
-
-* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
-
-## Details
-
-* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
-
-   ## Changelog for reva 2.13.3
-
-  *   Enhancement [cs3org/reva#4377](https://github.com/cs3org/reva/pull/4377): Handle trashbin file listings concurrently
-
-   https://github.com/owncloud/ocis/pull/7858
-
-# Changelog for [5.0.0-alpha.5] (2023-12-05)
-
-The following sections list the changes for 5.0.0-alpha.5.
-
-[5.0.0-alpha.5]: https://github.com/owncloud/ocis/compare/v4.0.3...v5.0.0-alpha.5
+[5.0.0-rc.1]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.1
 
 ## Summary
 
@@ -554,10 +60,25 @@ The following sections list the changes for 5.0.0-alpha.5.
 * Bugfix - Fix unlock via space API: [#7726](https://github.com/owncloud/ocis/pull/7726)
 * Bugfix - Disable DEPTH infinity in PROPFIND: [#7746](https://github.com/owncloud/ocis/pull/7746)
 * Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
+* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
+* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
+* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
+* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
+* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
+* Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
+* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
+* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
+* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
+* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
@@ -591,7 +112,6 @@ The following sections list the changes for 5.0.0-alpha.5.
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 * Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
-* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 * Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
@@ -599,7 +119,22 @@ The following sections list the changes for 5.0.0-alpha.5.
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
 * Enhancement - Add Sharing NG list permissions endpoint: [#7805](https://github.com/owncloud/ocis/pull/7805)
 * Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
-* Enhancement - Update web to v8.0.0-alpha.12: [#7883](https://github.com/owncloud/ocis/pull/7883)
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
+* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
+* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
+* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
+* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
+* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
+* Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
+* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
+* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
 
 ## Details
 
@@ -773,12 +308,105 @@ The following sections list the changes for 5.0.0-alpha.5.
    https://github.com/owncloud/ocis/issues/7744
    https://github.com/owncloud/ocis/pull/7772
 
+* Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
+
+   The nats-js cache was not working. It paniced and wrote a lot of error logs.
+   Both is fixed now.
+
+   https://github.com/owncloud/ocis/pull/7790
+
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
 
    The `search` service would sometimes not start correctly because config values
    are overwritten by default configuration.
 
    https://github.com/owncloud/ocis/pull/7795
+
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
+
+   https://github.com/owncloud/ocis/pull/7859
+   https://github.com/owncloud/ocis/pull/7958
+
+* Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
+
+   We fixed a bug when normal users can update the public link to delete its
+   password if permission is not sent in data.
+
+   https://github.com/owncloud/ocis/issues/7821
+   https://github.com/owncloud/ocis/pull/7862
+
+* Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
+
+   Updating and resetting the logo when using the new `theme.json` structure in Web
+   has been fixed.
+
+   https://github.com/owncloud/ocis/pull/7930
+
+* Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
+
+   We fixed the status code on SharingNG update permissions for public shares.
+
+   https://github.com/owncloud/ocis/pull/7952
+
+* Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
+
+   We've removed the outdated and apparently unused dependency `cldr` from the
+   `kpop` dependency inside the idp web ui. This resolves a security issue around
+   an oudated `xmldom` package version, originating from said `kpop` library.
+
+   https://github.com/owncloud/ocis/issues/7957
+   https://github.com/owncloud/ocis/pull/7988
+
+* Bugfix - Update permission validation: [#7963](https://github.com/owncloud/ocis/pull/7963)
+
+   We fixed a bug where the permission validation was not working correctly.
+
+   https://github.com/owncloud/ocis/pull/7963
+   https://github.com/cs3org/reva/pull/4405
+
+* Bugfix - Renaming a user to a string with capital letters: [#7964](https://github.com/owncloud/ocis/pull/7964)
+
+   We fixed the issue that led to correct update but the 404 response code when
+   renaming an existing user to a string with capital letters.
+
+   https://github.com/owncloud/ocis/pull/7964
+
+* Bugfix - Improve OCM support: [#7973](https://github.com/owncloud/ocis/pull/7973)
+
+   We improved functionality of the OCM support.
+
+   https://github.com/owncloud/ocis/pull/7973
+
+* Bugfix - Permissions of a role with duplicate ID: [#7976](https://github.com/owncloud/ocis/pull/7976)
+
+   We remove the redundant permissions of a role with duplicate ID.
+
+   https://github.com/owncloud/ocis/issues/7931
+   https://github.com/owncloud/ocis/pull/7976
+
+* Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
+
+   Configure sse streams to be non-durable. This functionality is not needed for
+   the sse service
+
+   https://github.com/owncloud/ocis/pull/7986
+
+* Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
+
+   We changed the default tracing to produce non-empty traceids.
+
+   https://github.com/owncloud/ocis/pull/8023
+   https://github.com/owncloud/ocis/pull/8017
+
+* Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
+
+   As the OData query parser interprets characters like '@' or '-' in a special
+   way. Search request for users or groups needs to be quoted. We fixed the
+   libregraph users and groups endpoints to handle quoted search terms correctly.
+
+   https://github.com/owncloud/ocis/issues/7990
+   https://github.com/owncloud/ocis/pull/8050
+   https://github.com/owncloud/ocis/pull/8035
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -811,6 +439,22 @@ The following sections list the changes for 5.0.0-alpha.5.
    old value by configuring it in your deployment.
 
    https://github.com/owncloud/ocis/pull/7273
+
+* Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
+
+   We've removed the option privacyURL and imprintURL from the config, since other
+   clients weren't able to consume these. In order to be accessible by other
+   clients, not just Web, those should be configured via the theme.json file.
+
+   https://github.com/owncloud/ocis/pull/7938/
+
+* Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
+
+   We've removed the option accessDeniedHelpUrl from the config, since other
+   clients weren't able to consume it. In order to be accessible by other clients,
+   not just Web, it should be configured via the theme.json file.
+
+   https://github.com/owncloud/ocis/pull/7970
 
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 
@@ -1226,14 +870,6 @@ The following sections list the changes for 5.0.0-alpha.5.
    https://github.com/owncloud/ocis/pull/7720
    https://github.com/owncloud/libre-graph-api/pull/130
 
-* Enhancement - Bump reva: [#7721](https://github.com/owncloud/ocis/pull/7721)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/7721
-   https://github.com/owncloud/ocis/pull/7727
-   https://github.com/owncloud/ocis/pull/7752
-
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
 
    We add two new filters to the user list endpoint. The `startswith` filter allows
@@ -1287,9 +923,286 @@ The following sections list the changes for 5.0.0-alpha.5.
 
    https://github.com/owncloud/ocis/pull/7866
 
-* Enhancement - Update web to v8.0.0-alpha.12: [#7883](https://github.com/owncloud/ocis/pull/7883)
+* Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
+
+   The antivirus postprocessing step will now be retried for a configurable amount
+   of times in case it can't get a result from clamav.
+
+   https://github.com/owncloud/ocis/pull/7874
+
+* Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+
+   We changed the implementation of the public share provider in reva to do the
+   validation on the CS3 Api side. This makes the implementation on the graph side
+   smaller.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7877
+
+* Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
+
+   Location metadata is now extracted and stored by the search service. It is
+   available for driveItems in a folder listing using the Graph API.
+
+   https://github.com/owncloud/ocis/pull/7886
+
+* Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
+
+   Regular users can search for other users and groups. The following limitations
+   apply:
+
+  * Only search queries are allowed (using the `$search=term` query parameter)
+  * The search term needs to have at least 3 characters
+  * for user searches the result set only contains the attributes `displayName`, `userType`, `mail` and `id`
+  * for group searches the result set only contains the attributes `displayName`, `groupTypes` and `id`
+
+   https://github.com/owncloud/ocis/issues/7782
+   https://github.com/owncloud/ocis/pull/7887
+
+* Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
+
+   We added the ability to edit public shares to the sharing NG endpoints.
+
+   https://github.com/owncloud/ocis/issues/6993
+   https://github.com/owncloud/ocis/pull/7908/
+
+* Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
+
+   We added the `list` and `restore` commands to the trash-bin items to the CLI
+
+   https://github.com/owncloud/ocis/issues/7845
+   https://github.com/owncloud/ocis/pull/7917
+   https://github.com/cs3org/reva/pull/4392
+
+* Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
+
+   For Sharing NG, we needed validation in the implementing reva service to keep
+   the client implementation simple.
+
+   https://github.com/owncloud/ocis/pull/7978
+
+* Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+
+   Adds envvars to keep nats-js-kv stores in memory and not persist them on disc.
+
+   https://github.com/owncloud/ocis/pull/7979
+
+* Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
+
+   Replaces the nats object store with the nats kv store in the natsjs registry
+
+   https://github.com/owncloud/ocis/pull/7987
+
+* Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
+
+   Allow events, store and registry implementation to pass username/password to the
+   nats instance
+
+   https://github.com/owncloud/ocis/pull/7989
+
+* Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+
+   We added three new metrics to the metrics endpoint to support the RED method for
+   monitoring microservices.
+
+   - Request Rate: The number of requests per second. The total count of requests
+   is available under `ocis_proxy_requests_total`. - Error Rate: The number of
+   failed requests per second. The total count of failed requests is available
+   under `ocis_proxy_errors_total`. - Duration: The amount of time each request
+   takes. The duration of all requests is available under
+   `ocis_proxy_request_duration_seconds`. This is a histogram metric, so it also
+   provides information about the distribution of request durations.
+
+   The metrics are available under the following paths: `PROXY_DEBUG_ADDR/metrics`
+   in a prometheus compatible format and maybe secured by `PROXY_DEBUG_TOKEN`.
+
+   https://github.com/owncloud/ocis/pull/7994
+
+* Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
+
+   We added sciencemesh and ocm services to enable federation.
+
+   https://github.com/owncloud/ocis/pull/7998
+   https://github.com/owncloud/ocis/pull/7576
+   https://github.com/owncloud/ocis/pull/7464
+   https://github.com/owncloud/ocis/pull/7463
+
+* Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
+
+   The previously used default `mdns` is faulty. Deprecated it together with
+   `consul`, `nats` and `etcd` implementations.
+
+   https://github.com/owncloud/ocis/pull/8011
+   https://github.com/owncloud/ocis/pull/8027
+
+* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
+
+   ## Changelog for reva 2.18.0 (2023-12-22)
+
+   The following sections list the changes in reva 2.18.0 relevant to reva users.
+   The changes are ordered by importance.
+
+  *   Bugfix [cs3org/reva#4424](https://github.com/cs3org/reva/pull/4424): Fixed panic in receivedsharecache pkg
+  *   Bugfix [cs3org/reva#4425](https://github.com/cs3org/reva/pull/4425): Fix overwriting files with empty files
+  *   Bugfix [cs3org/reva#4432](https://github.com/cs3org/reva/pull/4432): Fix /dav/meta endpoint for shares
+  *   Bugfix [cs3org/reva#4422](https://github.com/cs3org/reva/pull/4422): Fix disconnected traces
+  *   Bugfix [cs3org/reva#4429](https://github.com/cs3org/reva/pull/4429): Internal link creation
+  *   Bugfix [cs3org/reva#4407](https://github.com/cs3org/reva/pull/4407): Make ocdav return correct oc:spaceid
+  *   Bugfix [cs3org/reva#4410](https://github.com/cs3org/reva/pull/4410): Improve OCM support
+  *   Bugfix [cs3org/reva#4402](https://github.com/cs3org/reva/pull/4402): Refactor upload session
+  *   Enhancement [cs3org/reva#4421](https://github.com/cs3org/reva/pull/4421): Check permissions before adding, deleting or updating shares
+  *   Enhancement [cs3org/reva#4403](https://github.com/cs3org/reva/pull/4403): Add validation to update public share
+  *   Enhancement [cs3org/reva#4409](https://github.com/cs3org/reva/pull/4409): Disable the password policy
+  *   Enhancement [cs3org/reva#4412](https://github.com/cs3org/reva/pull/4412): Allow authentication for nats connections
+  *   Enhancement [cs3org/reva#4411](https://github.com/cs3org/reva/pull/4411): Add option to configure streams non durable
+  *   Enhancement [cs3org/reva#4406](https://github.com/cs3org/reva/pull/4406): Rework cache configuration
+  *   Enhancement [cs3org/reva#4414](https://github.com/cs3org/reva/pull/4414): Track more upload session metrics
+
+   ## Changelog for reva 2.17.0 (2023-12-12)
+
+   The following sections list the changes in reva 2.17.0 relevant to reva users.
+   The changes are ordered by importance.
+
+  *   Bugfix [cs3org/reva#4278](https://github.com/cs3org/reva/pull/4278): Disable DEPTH infinity in PROPFIND
+  *   Bugfix [cs3org/reva#4318](https://github.com/cs3org/reva/pull/4318): Do not allow moves between shares
+  *   Bugfix [cs3org/reva#4290](https://github.com/cs3org/reva/pull/4290): Prevent panic when trying to move a non-existent file
+  *   Bugfix [cs3org/reva#4241](https://github.com/cs3org/reva/pull/4241): Allow an empty credentials chain in the auth middleware
+  *   Bugfix [cs3org/reva#4216](https://github.com/cs3org/reva/pull/4216): Fix an error message
+  *   Bugfix [cs3org/reva#4324](https://github.com/cs3org/reva/pull/4324): Fix capabilities decoding
+  *   Bugfix [cs3org/reva#4267](https://github.com/cs3org/reva/pull/4267): Fix concurrency issue
+  *   Bugfix [cs3org/reva#4362](https://github.com/cs3org/reva/pull/4362): Fix concurrent lookup
+  *   Bugfix [cs3org/reva#4336](https://github.com/cs3org/reva/pull/4336): Fix definition of "file-editor" role
+  *   Bugfix [cs3org/reva#4302](https://github.com/cs3org/reva/pull/4302): Fix checking of filename length
+  *   Bugfix [cs3org/reva#4366](https://github.com/cs3org/reva/pull/4366): Fix CS3 status code when looking up non existing share
+  *   Bugfix [cs3org/reva#4299](https://github.com/cs3org/reva/pull/4299): Fix HTTP verb of the generate-invite endpoint
+  *   Bugfix [cs3org/reva#4249](https://github.com/cs3org/reva/pull/4249): GetUserByClaim not working with MSAD for claim "userid"
+  *   Bugfix [cs3org/reva#4217](https://github.com/cs3org/reva/pull/4217): Fix missing case for "hide" in UpdateShares
+  *   Bugfix [cs3org/reva#4140](https://github.com/cs3org/reva/pull/4140): Fix missing etag in shares jail
+  *   Bugfix [cs3org/reva#4229](https://github.com/cs3org/reva/pull/4229): Fix destroying the Personal and Project spaces data
+  *   Bugfix [cs3org/reva#4193](https://github.com/cs3org/reva/pull/4193): Fix overwrite a file with an empty file
+  *   Bugfix [cs3org/reva#4365](https://github.com/cs3org/reva/pull/4365): Fix create public share
+  *   Bugfix [cs3org/reva#4380](https://github.com/cs3org/reva/pull/4380): Fix the public link update
+  *   Bugfix [cs3org/reva#4250](https://github.com/cs3org/reva/pull/4250): Fix race condition
+  *   Bugfix [cs3org/reva#4345](https://github.com/cs3org/reva/pull/4345): Fix conversion of custom ocs permissions to roles
+  *   Bugfix [cs3org/reva#4134](https://github.com/cs3org/reva/pull/4134): Fix share jail
+  *   Bugfix [cs3org/reva#4335](https://github.com/cs3org/reva/pull/4335): Fix public shares cleanup config
+  *   Bugfix [cs3org/reva#4338](https://github.com/cs3org/reva/pull/4338): Fix unlock via space API
+  *   Bugfix [cs3org/reva#4341](https://github.com/cs3org/reva/pull/4341): Fix spaceID in meta endpoint response
+  *   Bugfix [cs3org/reva#4351](https://github.com/cs3org/reva/pull/4351): Fix 500 when open public link
+  *   Bugfix [cs3org/reva#4352](https://github.com/cs3org/reva/pull/4352): Fix the tgz mime type
+  *   Bugfix [cs3org/reva#4388](https://github.com/cs3org/reva/pull/4388): Allow UpdateUserShare() to update just the expiration date
+  *   Bugfix [cs3org/reva#4214](https://github.com/cs3org/reva/pull/4214): Always pass adjusted default nats options
+  *   Bugfix [cs3org/reva#4291](https://github.com/cs3org/reva/pull/4291): Release lock when expired
+  *   Bugfix [cs3org/reva#4386](https://github.com/cs3org/reva/pull/4386): Remove dead enable_home config
+  *   Bugfix [cs3org/reva#4292](https://github.com/cs3org/reva/pull/4292): Return 403 when user is not permitted to lock
+  *   Enhancement [cs3org/reva#4389](https://github.com/cs3org/reva/pull/4389): Add audio and location props
+  *   Enhancement [cs3org/reva#4337](https://github.com/cs3org/reva/pull/4337): Check permissions before creating shares
+  *   Enhancement [cs3org/reva#4326](https://github.com/cs3org/reva/pull/4326): Add search mediatype filter
+  *   Enhancement [cs3org/reva#4367](https://github.com/cs3org/reva/pull/4367): Add GGS mime type
+  *   Enhancement [cs3org/reva#4194](https://github.com/cs3org/reva/pull/4194): Add hide flag to shares
+  *   Enhancement [cs3org/reva#4358](https://github.com/cs3org/reva/pull/4358): Add default permissions capability for links
+  *   Enhancement [cs3org/reva#4133](https://github.com/cs3org/reva/pull/4133): Add more metadata to locks
+  *   Enhancement [cs3org/reva#4353](https://github.com/cs3org/reva/pull/4353): Add support for .docxf files
+  *   Enhancement [cs3org/reva#4363](https://github.com/cs3org/reva/pull/4363): Add nats-js-kv store
+  *   Enhancement [cs3org/reva#4197](https://github.com/cs3org/reva/pull/4197): Add the Banned-Passwords List
+  *   Enhancement [cs3org/reva#4190](https://github.com/cs3org/reva/pull/4190): Add the password policies
+  *   Enhancement [cs3org/reva#4384](https://github.com/cs3org/reva/pull/4384): Add a retry postprocessing outcome and event
+  *   Enhancement [cs3org/reva#4271](https://github.com/cs3org/reva/pull/4271): Add search capability
+  *   Enhancement [cs3org/reva#4119](https://github.com/cs3org/reva/pull/4119): Add sse event
+  *   Enhancement [cs3org/reva#4392](https://github.com/cs3org/reva/pull/4392): Add additional permissions to service accounts
+  *   Enhancement [cs3org/reva#4344](https://github.com/cs3org/reva/pull/4344): Add url extension to mime type list
+  *   Enhancement [cs3org/reva#4372](https://github.com/cs3org/reva/pull/4372): Add validation to the public share provider
+  *   Enhancement [cs3org/reva#4244](https://github.com/cs3org/reva/pull/4244): Allow listing reveived shares by service accounts
+  *   Enhancement [cs3org/reva#4129](https://github.com/cs3org/reva/pull/4129): Auto-Accept Shares through ServiceAccounts
+  *   Enhancement [cs3org/reva#4374](https://github.com/cs3org/reva/pull/4374): Handle trashbin file listings concurrently
+  *   Enhancement [cs3org/reva#4325](https://github.com/cs3org/reva/pull/4325): Enforce Permissions
+  *   Enhancement [cs3org/reva#4368](https://github.com/cs3org/reva/pull/4368): Extract log initialization
+  *   Enhancement [cs3org/reva#4375](https://github.com/cs3org/reva/pull/4375): Introduce UploadSessionLister interface
+  *   Enhancement [cs3org/reva#4268](https://github.com/cs3org/reva/pull/4268): Implement sharing roles
+  *   Enhancement [cs3org/reva#4160](https://github.com/cs3org/reva/pull/4160): Improve utils pkg
+  *   Enhancement [cs3org/reva#4335](https://github.com/cs3org/reva/pull/4335): Add sufficient permissions check function
+  *   Enhancement [cs3org/reva#4281](https://github.com/cs3org/reva/pull/4281): Port OCM changes from master
+  *   Enhancement [cs3org/reva#4270](https://github.com/cs3org/reva/pull/4270): Opt out of public link password enforcement
+  *   Enhancement [cs3org/reva#4181](https://github.com/cs3org/reva/pull/4181): Change the variable names for the password policy
+  *   Enhancement [cs3org/reva#4256](https://github.com/cs3org/reva/pull/4256): Rename hidden share variable name
+  *   Enhancement [cs3org/reva#3926](https://github.com/cs3org/reva/pull/3926): Service Accounts
+  *   Enhancement [cs3org/reva#4359](https://github.com/cs3org/reva/pull/4359): Update go-ldap to v3.4.6
+  *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
+  *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
+
+   https://github.com/owncloud/ocis/pull/8038
+   https://github.com/owncloud/ocis/pull/8056
+   https://github.com/owncloud/ocis/pull/7949
+   https://github.com/owncloud/ocis/pull/7793
+   https://github.com/owncloud/ocis/pull/7978
+   https://github.com/owncloud/ocis/pull/7979
+   https://github.com/owncloud/ocis/pull/7963
+   https://github.com/owncloud/ocis/pull/7986
+   https://github.com/owncloud/ocis/pull/7721
+   https://github.com/owncloud/ocis/pull/7727
+   https://github.com/owncloud/ocis/pull/7752
+
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+
+   Use a hidden role for service accounts. It will not appear in ListRoles calls
+   but internally handled by settings service
+
+   https://github.com/owncloud/ocis/pull/8051
+
+* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
 
    Tags: web
+
+   We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Enhancement
+   [owncloud/web#10224](https://github.com/owncloud/web/issues/10224): Harmonize
+   AppSwitcher icon colors * Bugfix
+   [owncloud/web#10230](https://github.com/owncloud/web/issues/10230): Configurable
+   concurrent requests * Bugfix
+   [owncloud/web#10158](https://github.com/owncloud/web/issues/10158): GDPR export
+   polling * Bugfix
+   [owncloud/web#10220](https://github.com/owncloud/web/issues/10220): Loading
+   indicator during conflict dialog * Bugfix
+   [owncloud/web#10156](https://github.com/owncloud/web/issues/10156): Uploading
+   the same files parallel * Bugfix
+   [owncloud/web#10179](https://github.com/owncloud/web/issues/10179): Space
+   navigate to trash missing * Bugfix
+   [owncloud/web#10118](https://github.com/owncloud/web/issues/10118): Tilesview
+   has whitespace * Bugfix
+   [owncloud/web#10182](https://github.com/owncloud/web/issues/10182): Make
+   versions panel readonly in viewers and editors
+
+   We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying
+   full video in their dimensions * Bugfix
+   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files
+   list previews cropped * Bugfix
+   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces
+   overview tile previews zoomed * Bugfix
+   [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
+   links without drive alias
+
+   We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Change
+   [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling *
+   Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111):
+   Registering right sidebar panels as extension * Enhancement
+   [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar
+   in viewer and editor apps
+
+   We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog
+   (linked) for details on the web release.
+
+   ## Summary * Enhancement
+   [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link
+   modal
 
    We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog
    (linked) for details on the web release.
@@ -1459,8 +1372,36 @@ The following sections list the changes for 5.0.0-alpha.5.
    [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
    quick actions as extension
 
+   https://github.com/owncloud/ocis/pull/8055
+   https://github.com/owncloud/ocis/pull/7930
+   https://github.com/owncloud/ocis/pull/7952
+   https://github.com/owncloud/ocis/pull/7918
    https://github.com/owncloud/ocis/pull/7883
+   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
+   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
+   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
+   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
+
+# Changelog for [4.0.4] (2023-12-07)
+
+The following sections list the changes for 4.0.4.
+
+[4.0.4]: https://github.com/owncloud/ocis/compare/v4.0.3...v4.0.4
+
+## Summary
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+## Details
+
+* Enhancement - Update reva to improve trashbin listing: [#7858](https://github.com/owncloud/ocis/pull/7858)
+
+   ## Changelog for reva 2.13.3
+
+  *   Enhancement [cs3org/reva#4377](https://github.com/cs3org/reva/pull/4377): Handle trashbin file listings concurrently
+
+   https://github.com/owncloud/ocis/pull/7858
 
 # Changelog for [4.0.3] (2023-11-24)
 
@@ -6757,7 +6698,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -6931,11 +6872,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -7108,24 +7067,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
