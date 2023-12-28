@@ -1547,6 +1547,7 @@ class GraphHelper {
 	 *
 	 * @return string
 	 *
+	 * @throws \Exception
 	 */
 	public static function getRoleIdByName(
 		string $role
@@ -1568,6 +1569,8 @@ class GraphHelper {
 				return '1c996275-f1c9-4e71-abdf-a42f6495e960';
 			case 'Manager':
 				return '312c0871-5ef7-4b3a-85b6-0e4074c64049';
+			default:
+				throw new \Exception('Role ' . $role . ' not found');
 		}
 	}
 
@@ -1581,9 +1584,11 @@ class GraphHelper {
 	 * @param string $shareeId
 	 * @param string $shareType
 	 * @param string|null $role
+	 * @param string|null $permission
 	 *
 	 * @return ResponseInterface
 	 * @throws \JsonException
+	 * @throws \Exception
 	 */
 	public static function sendSharingInvitation(
 		string $baseUrl,
@@ -1594,7 +1599,8 @@ class GraphHelper {
 		string $itemId,
 		string $shareeId,
 		string $shareType,
-		?string $role
+		?string $role,
+		?string $permission
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = [];
@@ -1607,6 +1613,10 @@ class GraphHelper {
 		if ($role !== null) {
 			$roleId = self::getRoleIdByName($role);
 			$body['roles'] = [$roleId];
+		}
+
+		if ($permission !== null) {
+			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permission];
 		}
 
 		return HttpRequestHelper::post(

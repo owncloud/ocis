@@ -104,6 +104,9 @@ class SharingNgContext implements Context {
 			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
 			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
 
+		$role = $rows['role'] ?? null;
+		$permission = $rows['permission'] ?? null;
+
 		$this->featureContext->setResponse(
 			GraphHelper::sendSharingInvitation(
 				$this->featureContext->getBaseUrl(),
@@ -114,7 +117,8 @@ class SharingNgContext implements Context {
 				$itemId,
 				$shareeId,
 				$rows['shareType'],
-				$rows['role']
+				$role,
+				$permission
 			)
 		);
 	}
