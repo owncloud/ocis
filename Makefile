@@ -267,6 +267,10 @@ endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+.PHONY: govulncheck
+govulncheck: $(GOVULNCHECK)
+	$(GOVULNCHECK) ./...
+
 .PHONY: l10n-push
 l10n-push:
 	@for extension in $(L10N_MODULES); do \
