@@ -318,7 +318,8 @@ def testOcisAndUploadResults(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    return [pipeline, scan_result_upload]
+    security_scan = scanOcis(ctx)
+    return [pipeline, scan_result_upload, security_scan]
 
 def testPipelines(ctx):
     pipelines = []
@@ -490,6 +491,38 @@ def testOcis(ctx):
         "kind": "pipeline",
         "type": "docker",
         "name": "linting_and_unitTests",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/pull/**",
+            ],
+        },
+        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
+        "volumes": [pipelineVolumeGo],
+    }
+
+def scanOcis(ctx):
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
+        {
+            "name": "govulncheck",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "make govulncheck",
+            ],
+            "environment": DRONE_HTTP_PROXY_ENV,
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "go-vulnerability-scanning",
         "platform": {
             "os": "linux",
             "arch": "amd64",
