@@ -30,12 +30,52 @@ Feature: an user gets the resources shared to them
           "items": {
             "type": "object",
             "required": [
-              "name",
+              "createdBy",
+              "eTag",
+              "file",
               "id",
+              "lastModifiedDateTime",
+              "name",
               "parentReference",
               "remoteItem"
             ],
             "properties": {
+              "createdBy": {
+                "type": "object",
+                "required": [
+                  "user"
+                ],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": ["displayName", "id"],
+                    "properties": {
+                      "displayName": {
+                        "type": "string",
+                        "enum": ["Alice Hansen"]
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^%user_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              },
+              "eTag": {
+                "type": "string",
+                "pattern": "%eTag%"
+              },
+              "file": {
+                "type": "object",
+                "required": ["mimeType"],
+                "properties": {
+                  "mimeType": {
+                    "type": "string",
+                    "enum": ["text/plain"]
+                  }
+                }
+              },
               "id": {
                 "type": "string",
                 "pattern": "^%share_id_pattern%$"
@@ -55,11 +95,11 @@ Feature: an user gets the resources shared to them
                 "properties": {
                   "driveId": {
                     "type": "string",
-                    "pattern": "^%share_id_pattern%$"
+                    "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
                     "type": "string",
-                    "enum": ["personal"]
+                    "enum": ["virtual"]
                   }
                 }
               },
@@ -67,9 +107,13 @@ Feature: an user gets the resources shared to them
                 "type": "object",
                 "required": [
                   "createdBy",
+                  "eTag",
                   "file",
                   "id",
+                  "lastModifiedDateTime",
                   "name",
+                  "parentReference",
+                  "permissions",
                   "shared",
                   "size"
                 ],
@@ -101,6 +145,10 @@ Feature: an user gets the resources shared to them
                       }
                     }
                   },
+                  "eTag": {
+                    "type": "string",
+                    "pattern": "%eTag%"
+                  },
                   "file": {
                     "type": "object",
                     "required": [
@@ -115,8 +163,7 @@ Feature: an user gets the resources shared to them
                   },
                   "id": {
                     "type": "string",
-                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-
+                    "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
                     "type": "string",
@@ -221,11 +268,47 @@ Feature: an user gets the resources shared to them
           "items": {
             "type": "object",
             "required": [
-              "name",
+              "createdBy",
+              "eTag",
+              "folder",
               "id",
+              "lastModifiedDateTime",
+              "name",
+              "parentReference",
               "remoteItem"
             ],
             "properties": {
+              "createdBy": {
+                "type": "object",
+                "required": [
+                  "user"
+                ],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": ["displayName", "id"],
+                    "properties": {
+                      "displayName": {
+                        "type": "string",
+                        "enum": ["Alice Hansen"]
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^%user_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              },
+              "eTag": {
+                "type": "string",
+                "pattern": "%eTag%"
+              },
+              "folder": {
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
               "id": {
                 "type": "string",
                 "pattern": "^%share_id_pattern%$"
@@ -245,11 +328,11 @@ Feature: an user gets the resources shared to them
                 "properties": {
                   "driveId": {
                     "type": "string",
-                    "pattern": "^%share_id_pattern%$"
+                    "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
                     "type": "string",
-                    "enum": ["personal"]
+                    "enum": ["virtual"]
                   }
                 }
               },
@@ -257,11 +340,14 @@ Feature: an user gets the resources shared to them
                 "type": "object",
                 "required": [
                   "createdBy",
+                  "eTag",
                   "folder",
                   "id",
+                  "lastModifiedDateTime",
                   "name",
-                  "shared",
-                  "size"
+                  "parentReference",
+                  "permissions",
+                  "shared"
                 ],
                 "properties": {
                   "createdBy": {
@@ -291,10 +377,25 @@ Feature: an user gets the resources shared to them
                       }
                     }
                   },
+                  "eTag": {
+                    "type": "string",
+                    "pattern": "%eTag%"
+                  },
+                  "file": {
+                    "type": "object",
+                    "required": [
+                      "mimeType"
+                    ],
+                    "properties": {
+                      "mimeType": {
+                        "type": "string",
+                        "pattern": "text/plain"
+                      }
+                    }
+                  },
                   "id": {
                     "type": "string",
-                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-
+                    "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
                     "type": "string",
@@ -364,12 +465,6 @@ Feature: an user gets the resources shared to them
                         }
                       }
                     }
-                  },
-                  "size": {
-                    "type": "number",
-                    "enum": [
-                      0
-                    ]
                   }
                 }
               }

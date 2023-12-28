@@ -2799,6 +2799,30 @@ class FeatureContext extends BehatVariablesContext {
 					"getPermissionsIdRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%file_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getFileIdRegex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%share_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getShareIdRegex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%eTag%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getEtagRegex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {

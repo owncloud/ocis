@@ -68,6 +68,27 @@ class GraphHelper {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getFileIdRegex(): string {
+		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!' . self::getUUIDv4Regex();
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getShareIdRegex(): string {
+		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getEtagRegex(): string {
+		return "^\\\"[a-f0-9:.]{1,32}\\\"$";
+	}
+
+	/**
 	 * Key name can consist of @@@
 	 * This function separate such key and return its actual value from actual drive response which can be used for assertion
 	 *
@@ -1719,31 +1740,6 @@ class GraphHelper {
 			$password,
 			self::getRequestHeaders(),
 			$body
-		);
-	}
-
-	/**
-	 * @param string $baseUrl
-	 * @param string $xRequestId
-	 * @param string $user
-	 * @param string $password
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function getSharesSharedWithMe(
-		string $baseUrl,
-		string $xRequestId,
-		string $user,
-		string $password
-	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
-		return HttpRequestHelper::get(
-			$url,
-			$xRequestId,
-			$user,
-			$password,
-			self::getRequestHeaders()
 		);
 	}
 
