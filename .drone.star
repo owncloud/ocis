@@ -2829,5 +2829,8 @@ def k6LoadTests(ctx):
             "event": [
                 "cron",
             ],
+            "ref": [
+                "refs/heads/master",
+            ],
         },
     }]
