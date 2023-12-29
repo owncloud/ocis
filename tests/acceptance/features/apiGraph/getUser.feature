@@ -1327,3 +1327,104 @@ Feature: get users
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario Outline: non-admin user tries to search for a user
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    When user "Brian" searches for user "<user>" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    { 
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "required": [
+            "displayName",
+            "id",
+            "mail",
+            "userType"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "enum": ["Alice Hansen"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            },
+            "mail": {
+              "type": "string",
+              "enum": ["alice@example.org"]
+            },
+            "userType": {
+              "type": "string",
+              "enum": ["Member"]
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | userRole    | role        | user |
+      | Space Admin | Space Admin | ali   |
+      | Space Admin | User        | ali   |
+      | Space Admin | User Light  | ali   |
+      | Space Admin | Admin       | ali   |
+      | User        | Space Admin | ali   |
+      | User        | User        | ali   | 
+      | User        | User Light  | ali   |
+      | User        | Admin       | ali   |
+      | User Light  | Space Admin | ali   |
+      | User Light  | User        | ali   |
+      | User Light  | User Light  | ali   |
+      | User Light  | Admin       | ali   |
+
+
+  Scenario Outline: non-admin user tries to search for a user with less characters
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    When user "Brian" searches for user "<user>" using Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["search term too short"]
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | userRole    | role        | user |
+      | Space Admin | Space Admin | al   |
+      | Space Admin | User        | al   |
+      | Space Admin | User Light  | al   |
+      | Space Admin | Admin       | al   |
+      | User        | Space Admin | al   |
+      | User        | User        | al   | 
+      | User        | User Light  | al   |
+      | User        | Admin       | al   |
+      | User Light  | Space Admin | al   |
+      | User Light  | User        | al   |
+      | User Light  | User Light  | al   |
+      | User Light  | Admin       | al   |

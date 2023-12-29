@@ -262,6 +262,32 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userName
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function searchUser(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $userName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . "?\$search=$userName");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $userPassword
 	 *
