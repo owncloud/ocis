@@ -281,6 +281,10 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		switch mRes.Status.Code {
 		case rpc.Code_CODE_ABORTED:
 			status = http.StatusPreconditionFailed
+		case rpc.Code_CODE_PERMISSION_DENIED:
+			status = http.StatusForbidden
+			// create oc10 compatible error message
+			m = "Destination directory is not writable"
 		case rpc.Code_CODE_UNIMPLEMENTED:
 			// We translate this into a Bad Gateway error as per https://www.rfc-editor.org/rfc/rfc4918#section-9.9.4
 			// > 502 (Bad Gateway) - This may occur when the destination is on another

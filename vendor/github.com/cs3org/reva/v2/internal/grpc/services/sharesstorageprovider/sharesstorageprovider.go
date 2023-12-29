@@ -666,7 +666,7 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 
 	if dstReceivedShare.Share.Id.OpaqueId != srcReceivedShare.Share.Id.OpaqueId {
 		return &provider.MoveResponse{
-			Status: status.NewUnimplemented(ctx, nil, "sharesstorageprovider: can not move between shares"),
+			Status: status.NewPermissionDenied(ctx, nil, "sharesstorageprovider: can not move between shares"),
 		}, nil
 	}
 
