@@ -73,6 +73,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 	for i, receivedShare := range receivedShares {
 		i, receivedShare := i, receivedShare
+
 		group.Go(func() error {
 			shareStat, err := doStat(receivedShare.GetShare().GetResourceId())
 			if shareStat == nil || err != nil {
@@ -81,6 +82,9 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			permission := libregraph.NewPermission()
 			{
+				permission.SetUIHidden(receivedShare.GetHidden())
+				permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
+
 				if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 					permission.SetId(id)
 				}
@@ -88,10 +92,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				if expiration := receivedShare.GetShare().GetExpiration(); expiration != nil {
 					permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
 				}
-
-				// todo: handle:
-				// - @UIUI.Hidden // why @UIUI?
-				// - @Client.Synchronize
 
 				if permissionSet := shareStat.GetInfo().GetPermissionSet(); permissionSet != nil {
 					if actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet); len(actions) > 0 {
@@ -169,6 +169,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 			// handle share state related stuff
 			switch receivedShare.GetState() {
 			case collaboration.ShareState_SHARE_STATE_ACCEPTED:
+				// fixMe: is this stat necessary? only mtime is used... anything else needed?
 				resourceId := &storageprovider.ResourceId{
 					StorageId: utils.ShareStorageProviderID,
 					OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
@@ -181,20 +182,12 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 				driveItem.SetId(storagespace.FormatResourceID(*resourceId))
 
-				if name := jailStat.GetInfo().GetName(); name != "" {
-					driveItem.SetName(name)
+				if name := receivedShare.GetMountPoint().GetPath(); name != "" {
+					driveItem.SetName(receivedShare.GetMountPoint().GetPath())
 				}
 
 				if etag := jailStat.GetInfo().GetEtag(); etag != "" {
 					driveItem.SetETag(etag)
-				}
-
-				if mTime := jailStat.GetInfo().GetMtime(); mTime != nil {
-					driveItem.SetLastModifiedDateTime(cs3TimestampToTime(mTime))
-				}
-
-				if size := jailStat.GetInfo().GetSize(); size != 0 {
-					remoteItem.SetSize(int64(size))
 				}
 			case collaboration.ShareState_SHARE_STATE_PENDING:
 				fallthrough
@@ -206,6 +199,20 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			// connect the dots
 			{
+				if mTime := shareStat.GetInfo().GetMtime(); mTime != nil {
+					t := cs3TimestampToTime(mTime)
+
+					driveItem.SetLastModifiedDateTime(t)
+					remoteItem.SetLastModifiedDateTime(t)
+				}
+
+				if size := shareStat.GetInfo().GetSize(); size != 0 {
+					s := int64(size)
+
+					driveItem.SetSize(s)
+					remoteItem.SetSize(s)
+				}
+
 				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
 					if user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId()); err != nil {
 						g.logger.Error().Err(err).Msg("could not get user")

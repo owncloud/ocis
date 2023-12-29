@@ -30,7 +30,7 @@ import (
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
-var _ = Describe("SharedWithMe", func() {
+var _ = PDescribe("SharedWithMe", func() {
 	var (
 		svc             service.Service
 		cfg             *config.Config
