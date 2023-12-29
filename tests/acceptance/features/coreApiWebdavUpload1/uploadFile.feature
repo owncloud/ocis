@@ -366,3 +366,71 @@ Feature: upload file
     Examples:
       | dav-path-version |
       | spaces           |
+
+
+  Scenario Outline: user updates a file with empty content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "file with content" to "/textfile.txt"
+    When user "Alice" uploads file with content "" to "/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "/textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: user updates a file inside a folder with empty content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "testFolder"
+    And user "Alice" has uploaded file with content "file with content" to "testFolder/textfile.txt"
+    When user "Alice" uploads file with content "" to "testFolder/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "testFolder/textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @skipOnReva
+  Scenario Outline: user updates a shared file with empty content
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "file with content" to "/textfile.txt"
+    And user "Alice" has shared file "/textfile.txt" with user "Brian" with permissions "read,update"
+    When user "Brian" uploads file with content "" to shared resource "Shares/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the content of the file "/test.txt" of the space "Shares" should be ""
+    And the content of file "/textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @skipOnReva
+  Scenario: user updates a file inside a project space with empty content
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "file with content" to "textfile.txt"
+    When user "Alice" uploads a file inside space "new-space" with content "" to "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
+
+  @skipOnReva
+  Scenario: user updates a file inside a shared space with empty content
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "file with content" to "textfile.txt"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    When user "Brian" uploads a file inside space "new-space" with content "" to "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be ""
+    And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
