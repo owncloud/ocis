@@ -84,7 +84,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/tidwall/gjson v1.17.0
 	github.com/tus/tusd v1.13.0
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.8
