@@ -153,6 +153,9 @@ class SharingNgContext implements Context {
 				? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
 				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
 		}
+		$role = $rows['role'] ?? null;
+		$permission = $rows['permission'] ?? null;
+		$expireDate = $rows["expireDate"] ?? null;
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
@@ -205,6 +208,19 @@ class SharingNgContext implements Context {
 	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $table)
+			GraphHelper::sendSharingInvitation(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				$shareeId,
+				$rows['shareType'],
+				$role,
+				$permission,
+				$expireDate
+			)
 		);
 	}
 
