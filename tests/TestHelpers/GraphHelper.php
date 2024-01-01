@@ -1585,6 +1585,7 @@ class GraphHelper {
 	 * @param string $shareType
 	 * @param string|null $role
 	 * @param string|null $permission
+	 * @param string|null $expireDate
 	 *
 	 * @return ResponseInterface
 	 * @throws \JsonException
@@ -1600,7 +1601,8 @@ class GraphHelper {
 		string $shareeId,
 		string $shareType,
 		?string $role,
-		?string $permission
+		?string $permission,
+		?string $expireDate
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = [];
@@ -1617,6 +1619,10 @@ class GraphHelper {
 
 		if ($permission !== null) {
 			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permission];
+		}
+
+		if ($expireDate !== null) {
+			$body['expirationDateTime'] = $expireDate;
 		}
 
 		return HttpRequestHelper::post(
