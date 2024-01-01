@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-12-31T00:04:44.41600188Z
+date: 2024-01-01T00:04:09.2453547Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
