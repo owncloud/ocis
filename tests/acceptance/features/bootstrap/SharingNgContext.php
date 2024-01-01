@@ -283,6 +283,51 @@ class SharingNgContext implements Context {
 		);
 	}
 
+
+    /**
+     * @When /^user "([^"]*)" sets password for the last public link share using the Graph API with$/
+     *
+     * @param string $user
+     * @param TableNode|null $body
+     *
+     * @return void
+     * @throws Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function clearuserSetsPasswordForLastPublicLinkShare(string $user, TableNode  $body):void {
+        $bodyRows = $body->getRowsHash();
+        $space = $bodyRows['space'];
+        $resourceType = $bodyRows['resourceType'];
+        $resource = $bodyRows['resource'];
+        $spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+        if ($resourceType === 'folder') {
+            $itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+        } else {
+            $itemId = $this->spacesContext->getFileId($user, $space, $resource);
+        }
+
+        if (\array_key_exists('password', $bodyRows)) {
+            $body = [
+                "password" => $this->featureContext->getActualPassword($bodyRows['password']),
+            ];
+        } else {
+            throw new Error('Password is missing to set for share link!');
+        }
+
+        $this->featureContext->setResponse(
+            GraphHelper::setPassword(
+                $this->featureContext->getBaseUrl(),
+                $this->featureContext->getStepLineRef(),
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $spaceId,
+                $itemId,
+                \json_encode($body),
+                $this->featureContext->shareNGGetLastCreatedPublicLinkShareID()
+            )
+        );
+    }
+
 	/**
 	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
