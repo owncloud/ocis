@@ -518,3 +518,69 @@ Feature: Create a share link for a resource
         }
       }
       """
+
+  @env-config
+  Scenario: set password for a file's link share
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    And user "Alice" has created the following link share:
+      | resourceType | file          |
+      | resource     | textfile1.txt |
+      | space        | Personal      |
+      | role         | view          |
+    When user "Alice" sets password for the last public link share using the Graph API with
+      | resourceType | file          |
+      | resource     | textfile1.txt |
+      | space        | Personal      |
+      | password     | %public%      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "enum": [true]
+          }
+        }
+      }
+      """
+    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" for sharingNG and the content should be "other data"
+
+
+  Scenario: update password for a file's link share
+    Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    And user "Alice" has created the following link share:
+      | resourceType | file          |
+      | resource     | textfile1.txt |
+      | space        | Personal      |
+      | role         | view          |
+      | password     | $heLlo*1234*  |
+    When user "Alice" sets password for the last public link share using the Graph API with
+      | resourceType | file          |
+      | resource     | textfile1.txt |
+      | space        | Personal      |
+      | password     | %public%      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "enum": [true]
+          }
+        }
+      }
+      """
+    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" for sharingNG and the content should be "other data"
