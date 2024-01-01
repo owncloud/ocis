@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-01-01T00:04:09.245007124Z
+date: 2024-01-01T11:07:38.616302759Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
