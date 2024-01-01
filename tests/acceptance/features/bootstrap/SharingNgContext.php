@@ -22,6 +22,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
 
@@ -50,6 +51,48 @@ class SharingNgContext implements Context {
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->spacesContext = $environment->getContext('SpacesContext');
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userCreatesAPublicLinkShare(string $user, TableNode $body): ResponseInterface {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resourceType = $bodyRows['resourceType'];
+		$resource = $bodyRows['resource'];
+
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		if ($resourceType === 'folder') {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
+		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['password'] = $bodyRows['password'] ?? null;
+		$body = [
+			'type' => $bodyRows['role'],
+			'displayName' => $bodyRows['displayName'],
+			'expirationDateTime' => $bodyRows['expirationDateTime'],
+			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+		];
+
+		return GraphHelper::createLinkShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body)
+		);
 	}
 
 	/**
@@ -132,14 +175,42 @@ class SharingNgContext implements Context {
 	 * @param TableNode|null $body
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
+		$response = $this->userCreatesAPublicLinkShare($user, $body);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created the following link share:$/
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userHasCreatedALinkShareWithSettings(string $user, TableNode  $body):void {
+		$response = $this->userCreatesAPublicLinkShare($user, $body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
+		$this->featureContext->shareNGAddToCreatedPublicShares($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" updates the last public link share using the Graph API with$/
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userUpdatesLastPublicLinkShareWithSettings(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
-
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 		if ($resourceType === 'folder') {
 			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
@@ -147,25 +218,37 @@ class SharingNgContext implements Context {
 			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
 
-		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
-		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
-		$bodyRows['password'] = $bodyRows['password'] ?? null;
-		$body = [
-			'type' => $bodyRows['role'],
-			'displayName' => $bodyRows['displayName'],
-			'expirationDateTime' => $bodyRows['expirationDateTime'],
-			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
-		];
+		if (\array_key_exists('role', $bodyRows) && \array_key_exists('expirationDateTime', $bodyRows)) {
+			$body = [
+				"expirationDateTime" => $bodyRows['expirationDateTime'],
+				"link" => [
+					"type" => $bodyRows['role']
+				]
+			];
+		} elseif (\array_key_exists('role', $bodyRows)) {
+			$body = [
+				"link" => [
+					"type" => $bodyRows['role']
+				]
+			];
+		} elseif (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body = [
+				"expirationDateTime" => $bodyRows['expirationDateTime']
+			];
+		} else {
+			throw new Error('Expiration date or role is missing to update for share link!');
+		}
 
 		$this->featureContext->setResponse(
-			GraphHelper::createLinkShare(
+			GraphHelper::updateLinkShare(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId,
 				$itemId,
-				\json_encode($body)
+				\json_encode($body),
+				$this->featureContext->shareNGGetLastCreatedPublicLinkShareID()
 			)
 		);
 	}
