@@ -106,6 +106,7 @@ class SharingNgContext implements Context {
 
 		$role = $rows['role'] ?? null;
 		$permission = $rows['permission'] ?? null;
+		$expireDate = $rows["expireDate"] ?? null;
 
 		$this->featureContext->setResponse(
 			GraphHelper::sendSharingInvitation(
@@ -118,7 +119,8 @@ class SharingNgContext implements Context {
 				$shareeId,
 				$rows['shareType'],
 				$role,
-				$permission
+				$permission,
+				$expireDate
 			)
 		);
 	}
