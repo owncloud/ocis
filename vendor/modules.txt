@@ -1,6 +1,9 @@
 # contrib.go.opencensus.io/exporter/prometheus v0.4.2
 ## explicit; go 1.13
 contrib.go.opencensus.io/exporter/prometheus
+# dario.cat/mergo v1.0.0
+## explicit; go 1.13
+dario.cat/mergo
 # github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
 ## explicit
 github.com/Azure/go-ntlmssp
@@ -41,7 +44,7 @@ github.com/Nerzal/gocloak/v13/pkg/jwx
 # github.com/OneOfOne/xxhash v1.2.8
 ## explicit; go 1.11
 github.com/OneOfOne/xxhash
-# github.com/ProtonMail/go-crypto v0.0.0-20220930113650-c6815a8c17ad
+# github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
 ## explicit; go 1.13
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
@@ -65,9 +68,6 @@ github.com/ProtonMail/go-crypto/openpgp/s2k
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
-# github.com/acomagu/bufpipe v1.0.3
-## explicit; go 1.12
-github.com/acomagu/bufpipe
 # github.com/agnivade/levenshtein v1.1.1
 ## explicit; go 1.13
 github.com/agnivade/levenshtein
@@ -721,6 +721,9 @@ github.com/cs3org/reva/v2/pkg/utils/cfg
 github.com/cs3org/reva/v2/pkg/utils/ldap
 github.com/cs3org/reva/v2/pkg/utils/list
 github.com/cs3org/reva/v2/tests/cs3mocks/mocks
+# github.com/cyphar/filepath-securejoin v0.2.4
+## explicit; go 1.13
+github.com/cyphar/filepath-securejoin
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
@@ -815,24 +818,25 @@ github.com/go-chi/cors
 # github.com/go-chi/render v1.0.3
 ## explicit; go 1.16
 github.com/go-chi/render
-# github.com/go-git/gcfg v1.5.0
-## explicit
+# github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376
+## explicit; go 1.13
 github.com/go-git/gcfg
 github.com/go-git/gcfg/scanner
 github.com/go-git/gcfg/token
 github.com/go-git/gcfg/types
-# github.com/go-git/go-billy/v5 v5.3.1
-## explicit; go 1.13
+# github.com/go-git/go-billy/v5 v5.5.0
+## explicit; go 1.19
 github.com/go-git/go-billy/v5
 github.com/go-git/go-billy/v5/helper/chroot
 github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git/v5 v5.4.2
-## explicit; go 1.13
+# github.com/go-git/go-git/v5 v5.11.0
+## explicit; go 1.19
 github.com/go-git/go-git/v5
 github.com/go-git/go-git/v5/config
+github.com/go-git/go-git/v5/internal/path_util
 github.com/go-git/go-git/v5/internal/revision
 github.com/go-git/go-git/v5/internal/url
 github.com/go-git/go-git/v5/plumbing
@@ -847,6 +851,7 @@ github.com/go-git/go-git/v5/plumbing/format/index
 github.com/go-git/go-git/v5/plumbing/format/objfile
 github.com/go-git/go-git/v5/plumbing/format/packfile
 github.com/go-git/go-git/v5/plumbing/format/pktline
+github.com/go-git/go-git/v5/plumbing/hash
 github.com/go-git/go-git/v5/plumbing/object
 github.com/go-git/go-git/v5/plumbing/protocol/packp
 github.com/go-git/go-git/v5/plumbing/protocol/packp/capability
@@ -873,6 +878,8 @@ github.com/go-git/go-git/v5/utils/merkletrie/filesystem
 github.com/go-git/go-git/v5/utils/merkletrie/index
 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
+github.com/go-git/go-git/v5/utils/sync
+github.com/go-git/go-git/v5/utils/trace
 # github.com/go-ini/ini v1.67.0
 ## explicit
 github.com/go-ini/ini
@@ -1591,6 +1598,11 @@ github.com/oxtoacart/bpool
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
+# github.com/pjbgf/sha1cd v0.3.0
+## explicit; go 1.19
+github.com/pjbgf/sha1cd
+github.com/pjbgf/sha1cd/internal
+github.com/pjbgf/sha1cd/ubc
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
@@ -1702,6 +1714,9 @@ github.com/shurcooL/vfsgen
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
+# github.com/skeema/knownhosts v1.2.1
+## explicit; go 1.17
+github.com/skeema/knownhosts
 # github.com/sony/gobreaker v0.5.0
 ## explicit; go 1.12
 github.com/sony/gobreaker
@@ -1761,7 +1776,7 @@ github.com/urfave/cli/v2
 # github.com/wk8/go-ordered-map v1.0.0
 ## explicit; go 1.14
 github.com/wk8/go-ordered-map
-# github.com/xanzy/ssh-agent v0.3.2
+# github.com/xanzy/ssh-agent v0.3.3
 ## explicit; go 1.16
 github.com/xanzy/ssh-agent
 # github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb
@@ -2000,6 +2015,7 @@ golang.org/x/crypto/cryptobyte/asn1
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/curve25519/internal/field
 golang.org/x/crypto/ed25519
+golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/md4
