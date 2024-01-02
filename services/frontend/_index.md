@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2024-01-02T13:23:27.679456278Z
+date: 2024-01-02T14:52:44.429235287Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -114,6 +114,8 @@ The validation against the banned passwords list can be configured via a text fi
 
 Following environment variables can be set to define the password policy behaviour:
 
+-   `OCIS_PASSWORD_POLICY_DISABLED`
+Disable the password policy
 -   `OCIS_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
 -   `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`

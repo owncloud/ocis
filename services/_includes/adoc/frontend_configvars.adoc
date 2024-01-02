@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-02-13-23-25]
+[#deprecation-note-2024-01-02-14-52-43]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -757,6 +757,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The service account secret.
 
+a|`OCIS_PASSWORD_POLICY_DISABLED` +
+`FRONTEND_PASSWORD_POLICY_DISABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the password policy. Defaults to false if not set.
+
 a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
 
@@ -765,7 +775,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++8 ++
 a| [subs=-attributes]
-Define the minimum password length. Defaults to 0 if not set.
+Define the minimum password length. Defaults to 8 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
@@ -775,7 +785,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of uppercase letters. Defaults to 0 if not set.
+Define the minimum number of uppercase letters. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
@@ -785,7 +795,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of lowercase letters. Defaults to 0 if not set.
+Define the minimum number of lowercase letters. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
 `FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
@@ -795,7 +805,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of digits. Defaults to 0 if not set.
+Define the minimum number of digits. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
@@ -805,7 +815,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.
+Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 `FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +

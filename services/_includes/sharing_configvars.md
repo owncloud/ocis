@@ -55,9 +55,10 @@
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.|
 | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|
-| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>SHARING_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| OCIS_PASSWORD_POLICY_DISABLED<br/>SHARING_PASSWORD_POLICY_DISABLED | bool | false | Disable the password policy. Defaults to false if not set.|
+| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 8 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>SHARING_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|

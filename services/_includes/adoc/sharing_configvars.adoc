@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-02-13-23-24]
+[#deprecation-note-2024-01-02-14-52-43]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -235,7 +235,7 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2024-01-02-13-23-24[Deprecation Note]
+xref:deprecation-note-2024-01-02-14-52-43[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -537,6 +537,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords on all public shares.
 
+a|`OCIS_PASSWORD_POLICY_DISABLED` +
+`SHARING_PASSWORD_POLICY_DISABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the password policy. Defaults to false if not set.
+
 a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_CHARACTERS` +
 
@@ -545,7 +555,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++8 ++
 a| [subs=-attributes]
-Define the minimum password length. Defaults to 0 if not set.
+Define the minimum password length. Defaults to 8 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
@@ -555,7 +565,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of uppercase letters. Defaults to 0 if not set.
+Define the minimum number of uppercase letters. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
@@ -565,7 +575,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of lowercase letters. Defaults to 0 if not set.
+Define the minimum number of lowercase letters. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
 `SHARING_PASSWORD_POLICY_MIN_DIGITS` +
@@ -575,7 +585,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of digits. Defaults to 0 if not set.
+Define the minimum number of digits. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
@@ -585,7 +595,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1 ++
 a| [subs=-attributes]
-Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.
+Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.
 
 a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 `SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
