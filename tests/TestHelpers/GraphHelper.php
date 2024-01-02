@@ -1541,6 +1541,42 @@ class GraphHelper {
 	}
 
 	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $userIdOfShareeUser
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $itemId
+	 *
+	 * @return string
+	 *
+	 * @throws GuzzleException
+	 * @throws \JsonException
+	 */
+	public static function getSharePermissionId(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $userIdOfShareeUser,
+		string $password,
+		string $spaceId,
+		string $itemId
+	): string {
+		$response = self::getPermissionsList($baseUrl, $xRequestId, $user, $password, $spaceId, $itemId);
+		$permissionList = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		foreach ($permissionList["value"] as $value) {
+			if ($value["grantedToV2"]["user"]["id"] === $userIdOfShareeUser) {
+				return $value["id"];
+			}
+		}
+		throw new \Exception(
+			__METHOD__
+			. " Cannot find share permission id for user '$user'"
+		);
+	}
+
+	/**
 	 * Get the role id by name
 	 *
 	 * @param string $permissionsRole
@@ -1709,30 +1745,28 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
-	 * @param mixed $body
-	 * @param string $permissionsId
+	 * @param string $permissionId
 	 *
 	 * @return ResponseInterface
+	 *
 	 * @throws GuzzleException
 	 */
-	public static function setLinkSharePassword(
+	public static function deleteSharePermission(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
 		string $password,
 		string $spaceId,
 		string $itemId,
-		$body,
-		string $permissionsId
+		string $permissionId
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId/setPassword");
-		return HttpRequestHelper::post(
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionId");
+		return HttpRequestHelper::delete(
 			$url,
 			$xRequestId,
 			$user,
 			$password,
-			self::getRequestHeaders(),
-			$body
+			self::getRequestHeaders()
 		);
 	}
 }
