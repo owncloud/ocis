@@ -1550,10 +1550,10 @@ class GraphHelper {
 	 * @param string $itemId
 	 *
 	 * @return string
+	 *
 	 * @throws GuzzleException
 	 * @throws \JsonException
 	 */
-
 	public static function getSharePermissionId(
 		string $baseUrl,
 		string $xRequestId,
@@ -1745,9 +1745,10 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
-	 * @param mixed $body
+	 * @param string $permissionId
 	 *
 	 * @return ResponseInterface
+	 *
 	 * @throws GuzzleException
 	 */
 	public static function deleteSharePermission(

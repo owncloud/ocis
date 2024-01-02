@@ -257,11 +257,13 @@ class SharingNgContext implements Context {
 	 * @When /^user "([^"]*)" removes the share permission of user "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
+	 * @param string $shareeUser
 	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 *
 	 * @return void
+	 * @throws JsonException
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function removeSharePermissionOfAResourceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
