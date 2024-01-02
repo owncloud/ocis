@@ -288,7 +288,7 @@ class PublicWebDavContext implements Context {
 	 * @param string $password
 	 * @param string $range ignored when empty
 	 * @param string $publicWebDAVAPIVersion
-     * @param bool $downloadForShareNG
+	 * @param bool $downloadForShareNG
 	 *
 	 * @return ResponseInterface
 	 */
@@ -297,15 +297,15 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $range,
 		string $publicWebDAVAPIVersion = "old",
-        bool $downloadForShareNG = false
+		bool $downloadForShareNG = false
 	):ResponseInterface {
 		$path = \ltrim($path, "/");
 		$password = $this->featureContext->getActualPassword($password);
-        if($downloadForShareNG) {
-            $token = $this->featureContext->shareNGGetLastCreatedPublicLinkShareToken();
-        } else {
-            $token = $this->featureContext->getLastCreatedPublicShareToken();
-        }
+		if ($downloadForShareNG) {
+			$token = $this->featureContext->shareNGGetLastCreatedPublicLinkShareToken();
+		} else {
+			$token = $this->featureContext->getLastCreatedPublicShareToken();
+		}
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,
@@ -919,38 +919,38 @@ class PublicWebDavContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
-    /**
-     * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)" for sharingNG and the content should be "([^"]*)"$/
-     *
-     * @param string $path
-     * @param string $publicWebDAVAPIVersion
-     * @param string $password
-     * @param string $content
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPasswordForSharingNGAndContentShouldBe(
-        string $path,
-        string $publicWebDAVAPIVersion,
-        string $password,
-        string $content
-    ):void {
-        if ($publicWebDAVAPIVersion === "old") {
-            return;
-        }
+	/**
+	 * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)" for sharingNG and the content should be "([^"]*)"$/
+	 *
+	 * @param string $path
+	 * @param string $publicWebDAVAPIVersion
+	 * @param string $password
+	 * @param string $content
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPasswordForSharingNGAndContentShouldBe(
+		string $path,
+		string $publicWebDAVAPIVersion,
+		string $password,
+		string $content
+	):void {
+		if ($publicWebDAVAPIVersion === "old") {
+			return;
+		}
 
-        $response = $this->downloadFileFromPublicFolder(
-            $path,
-            $password,
-            "",
-            $publicWebDAVAPIVersion,
-            true
-        );
-        $this->featureContext->checkDownloadedContentMatches($content, "", $response);
+		$response = $this->downloadFileFromPublicFolder(
+			$path,
+			$password,
+			"",
+			$publicWebDAVAPIVersion,
+			true
+		);
+		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 
-        $this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-    }
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
 
 	/**
 	 * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API without password and the content should be "([^"]*)"$/
@@ -997,6 +997,32 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
+	 * @Then /^the public download of file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)" for shareNg should fail with HTTP status code "([^"]*)"$/
+	 *
+	 * @param string $path
+	 * @param string $publicWebDAVAPIVersion
+	 * @param string $password
+	 * @param string $expectedHttpCode
+	 *
+	 * @return void
+	 */
+	public function shouldNotBeAbleToDownloadFileWithPasswordForShareNg(
+		string $path,
+		string $publicWebDAVAPIVersion,
+		string $password,
+		string $expectedHttpCode = "401"
+	):void {
+		$this->shouldNotBeAbleToDownloadRangeOfFileInsidePublicSharedFolderWithPassword(
+			"",
+			$path,
+			$publicWebDAVAPIVersion,
+			$password,
+			$expectedHttpCode,
+			true
+		);
+	}
+
+	/**
 	 * @Then /^the public should be able to download the range "([^"]*)" of file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)""$/
 	 *
 	 * @param string $range
@@ -1034,6 +1060,7 @@ class PublicWebDavContext implements Context {
 	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
 	 * @param string $expectedHttpCode
+	 * @param bool $downloadForShareNG
 	 *
 	 * @return void
 	 * @throws Exception
@@ -1043,7 +1070,8 @@ class PublicWebDavContext implements Context {
 		string $path,
 		string $publicWebDAVAPIVersion,
 		string $password,
-		string $expectedHttpCode = "401"
+		string $expectedHttpCode = "401",
+		bool $downloadForShareNG = false
 	):void {
 		if ($publicWebDAVAPIVersion === "old") {
 			return;
@@ -1053,7 +1081,8 @@ class PublicWebDavContext implements Context {
 			$path,
 			$password,
 			$range,
-			$publicWebDAVAPIVersion
+			$publicWebDAVAPIVersion,
+			$downloadForShareNG
 		);
 
 		$responseContent = $response->getBody()->getContents();
