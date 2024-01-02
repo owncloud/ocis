@@ -78,7 +78,7 @@ trait Sharing {
 	/**
 	 * @var array
 	 */
-	private array $shareNGCreatedPublicSharesCreated = [];
+	private array $shareNgCreatedLinkShares = [];
 
 	/**
 	 * @return string
@@ -108,15 +108,15 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function shareNGAddToCreatedPublicShares(ResponseInterface $response): void {
-		$this->shareNGCreatedPublicSharesCreated[] = $response;
+	public function shareNgAddToCreatedLinkShares(ResponseInterface $response): void {
+		$this->shareNgCreatedLinkShares[] = $response;
 	}
 
 	/**
 	 * @return ResponseInterface|null
 	 */
-	public function shareNGGetLastCreatedPublicShare():?ResponseInterface {
-		return \end($this->shareNGCreatedPublicSharesCreated);
+	public function shareNgGetLastCreatedLinkShare():?ResponseInterface {
+		return \end($this->shareNgCreatedLinkShares);
 	}
 
 	/**
@@ -176,8 +176,8 @@ trait Sharing {
 	/**
 	 * @return string
 	 */
-	public function shareNGGetLastCreatedPublicLinkShareID(): string {
-		$lastResponse = $this->shareNGGetLastCreatedPublicShare();
+	public function shareNgGetLastCreatedLinkShareID(): string {
+		$lastResponse = $this->shareNgGetLastCreatedLinkShare();
 		if (!isset($this->getJsonDecodedResponse($lastResponse)['id'])) {
 			throw new Error('Response did not contain share id ' . $this->getJsonDecodedResponse($lastResponse)['id'] . ' for the created public link');
 		}

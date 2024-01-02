@@ -61,7 +61,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userCreatesAPublicLinkShare(string $user, TableNode $body): ResponseInterface {
+	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resourceType = $bodyRows['resourceType'];
@@ -178,7 +178,7 @@ class SharingNgContext implements Context {
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
-		$response = $this->userCreatesAPublicLinkShare($user, $body);
+		$response = $this->createLinkShare($user, $body);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -191,10 +191,10 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userHasCreatedALinkShareWithSettings(string $user, TableNode  $body):void {
-		$response = $this->userCreatesAPublicLinkShare($user, $body);
+	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
+		$response = $this->createLinkShare($user, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
-		$this->featureContext->shareNGAddToCreatedPublicShares($response);
+		$this->featureContext->shareNgAddToCreatedLinkShares($response);
 	}
 
 	/**
@@ -206,7 +206,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userUpdatesLastPublicLinkShareWithSettings(string $user, TableNode  $body):void {
+	public function userUpdatesLastPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resourceType = $bodyRows['resourceType'];
@@ -248,7 +248,7 @@ class SharingNgContext implements Context {
 				$spaceId,
 				$itemId,
 				\json_encode($body),
-				$this->featureContext->shareNGGetLastCreatedPublicLinkShareID()
+				$this->featureContext->shareNgGetLastCreatedLinkShareID()
 			)
 		);
 	}
