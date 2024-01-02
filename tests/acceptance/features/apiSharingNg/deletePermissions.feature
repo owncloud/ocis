@@ -9,7 +9,7 @@ Feature: Delete access to a drive item
     And using spaces DAV path
 
 
-  Scenario Outline: user removes access from a resource
+  Scenario Outline: user removes access from a resource in the user share
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
@@ -36,7 +36,7 @@ Feature: Delete access to a drive item
       | Manager     | folder        | FolderToShare |
 
 
-  Scenario Outline: user removes access from a file inside of a project space
+  Scenario Outline: user removes access from a resource inside of a project space in the user share
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
