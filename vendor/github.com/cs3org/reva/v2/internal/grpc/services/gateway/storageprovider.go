@@ -709,7 +709,7 @@ func (s *svc) Move(ctx context.Context, req *provider.MoveRequest) (*provider.Mo
 
 	if sourceProviderInfo.Address != destProviderInfo.Address {
 		return &provider.MoveResponse{
-			Status: status.NewUnimplemented(ctx, nil, "gateway does not support cross storage move, use copy and delete"),
+			Status: status.NewPermissionDenied(ctx, nil, "cross storage moves are not permitted, use copy and delete"),
 		}, nil
 	}
 

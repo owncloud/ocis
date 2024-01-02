@@ -43,13 +43,10 @@ Feature: moving a share inside another share
     And user "Brian" has created folder "localFolder/subFolder"
     And user "Brian" has uploaded file with content "local text" to "/localFolder/localFile.txt"
     When user "Brian" moves folder "localFolder" to "Shares/folderA/localFolder" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And as "Alice" folder "/folderA/localFolder" should exist
-    And as "Brian" folder "/Shares/folderA/localFolder" should exist
-    And as "Alice" folder "/folderA/localFolder/subFolder" should exist
-    And as "Brian" folder "/Shares/folderA/localFolder/subFolder" should exist
-    And as "Alice" file "/folderA/localFolder/localFile.txt" should exist
-    And as "Brian" file "/Shares/folderA/localFolder/localFile.txt" should exist
+    Then the HTTP status code should be "403"
+    And as "Brian" folder "/Shares/folderA/localFolder" should not exist
+    And as "Alice" folder "/folderA/localFolder" should not exist
+    And as "Brian" folder "/localFolder" should exist
 
 
   Scenario: share receiver tries to move a whole share inside a local folder
