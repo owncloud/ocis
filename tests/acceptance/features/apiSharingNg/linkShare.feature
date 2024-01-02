@@ -562,7 +562,7 @@ Feature: Create a share link for a resource
       | space        | Personal      |
       | role         | view          |
       | password     | $heLlo*1234*  |
-    When user "Alice" sets password for the last public link share using the Graph API with
+    When user "Alice" updates password for the last public link share using the Graph API with
       | resourceType | file          |
       | resource     | textfile1.txt |
       | space        | Personal      |
@@ -584,3 +584,4 @@ Feature: Create a share link for a resource
       }
       """
     And the public should be able to download file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" for sharingNG and the content should be "other data"
+    And the public download of file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "$heLlo*1234*" for shareNg should fail with HTTP status code "401"
