@@ -95,6 +95,7 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
 					"public_share_must_have_password":    cfg.PublicShareMustHavePassword,
 					"password_policy": map[string]interface{}{
+						"disabled":                 cfg.PasswordPolicy.Disabled,
 						"min_digits":               cfg.PasswordPolicy.MinDigits,
 						"min_characters":           cfg.PasswordPolicy.MinCharacters,
 						"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
