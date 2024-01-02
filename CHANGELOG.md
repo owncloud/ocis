@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
 ## Details
@@ -50,6 +51,14 @@ The following sections list the changes for unreleased.
    Service Account Roles wouldn't work when using with external IDP
 
    https://github.com/owncloud/ocis/pull/8074
+
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
+
+   We add the environment variable that allow to disable the password policy.
+
+   https://github.com/owncloud/ocis/issues/7916
+   https://github.com/owncloud/ocis/pull/7985
+   https://github.com/cs3org/reva/pull/4409
 
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
