@@ -252,4 +252,43 @@ class SharingNgContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the share permission of user "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $resourceType
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function removeSharePermissionOfAResourceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = ($resourceType === 'folder')
+			? $this->spacesContext->getResourceId($user, $space, $resource)
+			: $this->spacesContext->getFileId($user, $space, $resource);
+		$userIdOfShareeUser = $this->featureContext->getUserIdByUserName($shareeUser);
+		$permId = GraphHelper::getSharePermissionId(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$userIdOfShareeUser,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId
+		);
+		$this->featureContext->setResponse(
+			GraphHelper::deleteSharePermission(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				$permId
+			)
+		);
+	}
 }
