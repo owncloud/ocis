@@ -15,7 +15,6 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
@@ -83,7 +82,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 			permission := libregraph.NewPermission()
 			{
 				permission.SetUIHidden(receivedShare.GetHidden())
-				permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
 
 				if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 					permission.SetId(id)
@@ -94,30 +92,49 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				}
 
 				if permissionSet := shareStat.GetInfo().GetPermissionSet(); permissionSet != nil {
-					if actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet); len(actions) > 0 {
-						permission.SetLibreGraphPermissionsActions(actions)
-					}
-
-					if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+					role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 						*permissionSet,
 						unifiedrole.UnifiedRoleConditionGrantee,
 						g.config.FilesSharing.EnableResharing,
-					); role != nil {
+					)
+
+					if role != nil {
 						permission.SetRoles([]string{role.GetId()})
+					}
+
+					actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
+
+					// actions only make sense if no role is set
+					if role == nil && len(actions) > 0 {
+						permission.SetLibreGraphPermissionsActions(actions)
 					}
 				}
 
 				switch grantee := receivedShare.GetShare().GetGrantee(); {
 				case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
+					user, err := g.identityCache.GetUser(ctx, grantee.GetUserId().GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get user")
+						return err
+					}
+
 					permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
 						User: &libregraph.Identity{
-							Id: conversions.ToPointer(grantee.GetUserId().GetOpaqueId()),
+							DisplayName: user.GetDisplayName(),
+							Id:          user.Id,
 						},
 					})
 				case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+					group, err := g.identityCache.GetGroup(ctx, grantee.GetGroupId().GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get group")
+						return err
+					}
+
 					permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
 						Group: &libregraph.Identity{
-							Id: conversions.ToPointer(grantee.GetGroupId().GetOpaqueId()),
+							DisplayName: group.GetDisplayName(),
+							Id:          group.Id,
 						},
 					})
 				}
@@ -169,24 +186,18 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 			// handle share state related stuff
 			switch receivedShare.GetState() {
 			case collaboration.ShareState_SHARE_STATE_ACCEPTED:
-				// fixMe: is this stat necessary? only mtime is used... anything else needed?
-				resourceId := &storageprovider.ResourceId{
+
+				driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
 					StorageId: utils.ShareStorageProviderID,
 					OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
 					SpaceId:   utils.ShareStorageSpaceID,
-				}
-				jailStat, err := doStat(resourceId)
-				if jailStat == nil || err != nil {
-					return err
-				}
-
-				driveItem.SetId(storagespace.FormatResourceID(*resourceId))
+				}))
 
 				if name := receivedShare.GetMountPoint().GetPath(); name != "" {
 					driveItem.SetName(receivedShare.GetMountPoint().GetPath())
 				}
 
-				if etag := jailStat.GetInfo().GetEtag(); etag != "" {
+				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
 					driveItem.SetETag(etag)
 				}
 			case collaboration.ShareState_SHARE_STATE_PENDING:
@@ -214,37 +225,40 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				}
 
 				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
-					if user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId()); err != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
 						g.logger.Error().Err(err).Msg("could not get user")
 						return err
-					} else {
-						identitySet := libregraph.IdentitySet{
-							User: &libregraph.Identity{
-								DisplayName: user.GetDisplayName(),
-								Id:          libregraph.PtrString(user.GetId()),
-							},
-						}
-
-						remoteItem.SetCreatedBy(identitySet)
-						shared.SetOwner(identitySet)
 					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
+					remoteItem.SetCreatedBy(identitySet)
+					shared.SetOwner(identitySet)
 				}
 
 				if userID := receivedShare.GetShare().GetCreator(); userID != nil {
-					if user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId()); err != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
 						g.logger.Error().Err(err).Msg("could not get user")
 						return err
-					} else {
-						identitySet := libregraph.IdentitySet{
-							User: &libregraph.Identity{
-								DisplayName: user.GetDisplayName(),
-								Id:          libregraph.PtrString(user.GetId()),
-							},
-						}
-
-						driveItem.SetCreatedBy(identitySet)
-						shared.SetSharedBy(identitySet)
 					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
+					driveItem.SetCreatedBy(identitySet)
+					shared.SetSharedBy(identitySet)
+
 				}
 
 				switch info := shareStat.GetInfo(); {
