@@ -256,11 +256,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L457)
 
 ### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
-- [apiSharingNg/createLink.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L78)
-- [apiSharingNg/createLink.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L147)
-- [apiSharingNg/createLink.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L225)
-- [apiSharingNg/createLink.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L301)
-- [apiSharingNg/createLink.feature:372](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/createLink.feature#L372)
-
+- [apiSharingNg/linkShare.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L78)
+- [apiSharingNg/linkShare.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L147)
+- [apiSharingNg/linkShare.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L225)
+- [apiSharingNg/linkShare.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L301)
+- [apiSharingNg/linkShare.feature:372](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L372)
+- [apiSharingNg/linkShare.feature:445](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L445)
+- [apiSharingNg/linkShare.feature:447](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L447)
+- [apiSharingNg/linkShare.feature:448](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L448)
+- [apiSharingNg/linkShare.feature:449](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L449)
 - Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
