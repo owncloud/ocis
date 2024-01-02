@@ -154,8 +154,8 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
     When user "Brian" moves a file "Shares/folder/sub-folder/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
-    Then the HTTP status code should be "502"
-    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "gateway does not support cross storage move, use copy and delete"
+    Then the HTTP status code should be "403"
+    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "cross storage moves are not permitted, use copy and delete"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
       | test.txt |
     And for user "Brian" folder "folder" of the space "Shares" should not contain these files:
@@ -177,8 +177,8 @@ Feature: moving/renaming file using file id
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
     When user "Brian" moves a file "/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
-    Then the HTTP status code should be "502"
-    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "gateway does not support cross storage move, use copy and delete"
+    Then the HTTP status code should be "403"
+    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "cross storage moves are not permitted, use copy and delete"
     And for user "Brian" folder "/" of the space "Personal" should contain these files:
       | test.txt |
     But for user "Alice" folder "folder" of the space "Personal" should not contain these files:
@@ -286,8 +286,8 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
     When user "Brian" renames a file "Shares/folder/test.txt" into "Shares/folder/sub-folder/renamed.txt" inside space "Shares" using file-id path "<dav-path>"
-    Then the HTTP status code should be "502"
-    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "gateway does not support cross storage move, use copy and delete"
+    Then the HTTP status code should be "403"
+    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "cross storage moves are not permitted, use copy and delete"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
       | test.txt |
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should not contain these files:

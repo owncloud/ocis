@@ -47,8 +47,8 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [moving a file into a shared folder as the sharee and as the sharer](https://github.com/owncloud/ocis/issues/1287)
 
--   [coreApiVersions/fileVersions.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#382)  Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
--   [coreApiVersions/fileVersions.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#383)  Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
+- [coreApiVersions/fileVersions.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#382) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
+- [coreApiVersions/fileVersions.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#383) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
 
 ### Sync
 
@@ -167,8 +167,6 @@ cannot share a folder with create permission
 - [coreApiWebdavMove2/moveShareOnOcis.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L30)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L93)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L95)
-- [coreApiWebdavMove2/moveShareOnOcis.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L161)
-- [coreApiWebdavMove2/moveShareOnOcis.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L162)
 
 #### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 
@@ -479,12 +477,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavOperations/downloadFile.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/downloadFile.feature#L183)
 - [coreApiWebdavOperations/downloadFile.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/downloadFile.feature#L184)
 - [coreApiWebdavOperations/downloadFile.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/downloadFile.feature#L189)
-
-#### [moveShareInsideAnotherShare behaves differently on oCIS than oC10](https://github.com/owncloud/ocis/issues/3047)
-
-- [coreApiShareManagementToShares/moveShareInsideAnotherShare.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/moveShareInsideAnotherShare.feature#L21)
-- [coreApiShareManagementToShares/moveShareInsideAnotherShare.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/moveShareInsideAnotherShare.feature#L41)
-- [coreApiShareManagementToShares/moveShareInsideAnotherShare.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/moveShareInsideAnotherShare.feature#L55)
 
 #### [Renaming resource to banned name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3099)
 

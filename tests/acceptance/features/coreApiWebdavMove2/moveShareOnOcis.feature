@@ -63,7 +63,7 @@ Feature: move (rename) file
       | permissions | change    |
       | shareWith   | Alice     |
     When user "Alice" moves file "/Shares/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "502"
+    Then the HTTP status code should be "403"
     And as "Alice" file "/Shares/testshare/testfile.txt" should exist
     And as "Brian" file "/testshare/testfile.txt" should exist
     Examples:
@@ -134,7 +134,7 @@ Feature: move (rename) file
       | permissions | change    |
       | shareWith   | Alice     |
     When user "Alice" moves folder "/Shares/testshare/testsubfolder" to "/testsubfolder" using the WebDAV API
-    Then the HTTP status code should be "502"
+    Then the HTTP status code should be "403"
     And as "Alice" folder "/Shares/testshare/testsubfolder" should exist
     And as "Brian" folder "/testshare/testsubfolder" should exist
     Examples:
