@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
 ## Details
 
@@ -49,6 +50,12 @@ The following sections list the changes for unreleased.
    Service Account Roles wouldn't work when using with external IDP
 
    https://github.com/owncloud/ocis/pull/8074
+
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   https://github.com/owncloud/ocis/pull/8100
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
