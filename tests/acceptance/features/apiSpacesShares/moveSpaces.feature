@@ -116,10 +116,13 @@ Feature: move (rename) file
       | role    | permissions |
       | manager | 31          |
       | editor  | 31          |
+      | viewer  | 31          |
       | manager | 17          |
       | editor  | 17          |
-      | viewer  | 31          |
       | viewer  | 17          |
+      | manager | 1           |
+      | editor  | 1           |
+      | viewer  | 1           |
 
 
   Scenario Outline: user moves a file from space personal to space project with different role
@@ -199,22 +202,37 @@ Feature: move (rename) file
       | manager | 17          |
       | editor  | 17          |
       | viewer  | 17          |
+      | manager | 1           |
+      | editor  | 1           |
+      | viewer  | 1           |
 
 
-  Scenario: user moves a file from space Shares with role editor to space Shares with role editor
+  Scenario Outline: user moves a file from space Shares to another space Shares with different role (permissions)
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "31"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
+    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<from_permissions>"
+    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "<to_permissions>"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "502"
     And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
       | testshare1.txt |
     But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
       | testshare1.txt |
+    Examples:
+      | from_permissions | to_permissions |
+      | 31               | 31             |
+      | 31               | 17             |
+      | 31               | 1              |
+      | 17               | 31             |
+      | 17               | 17             |
+      | 17               | 1              |
+      | 1                | 31             |
+      | 1                | 17             |
+      | 1                | 1              |
 
 
+<<<<<<< HEAD
   Scenario: user moves a file from space Shares with role editor to space Shares with role viewer
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
@@ -244,13 +262,12 @@ Feature: move (rename) file
 
 
   Scenario: moving a file out of a shared folder as a sharer
+=======
+  Scenario Outline: moving a file out of a shared folder as a sharer
+>>>>>>> 0f9f996aba ([tests-only] Extend API test coverage for MOVE between spaces (#8113))
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     When user "Brian" moves file "/testshare/testfile.txt" from space "Personal" to "/testfile.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/testfile.txt" for user "Brian" should be "test data"
@@ -258,19 +275,20 @@ Feature: move (rename) file
       | testfile.txt |
     And for user "Brian" folder "testshare" of the space "Personal" should not contain these entries:
       | testfile.txt |
+    Examples:
+      | permissions |
+      | 31          |
+      | 17          |
+      | 1           |
 
 
-  Scenario: moving a folder out of a shared folder as a sharer
+  Scenario Outline: moving a folder out of a shared folder as a sharer
     Given user "Brian" has created the following folders
       | path                     |
       | /testshare               |
       | /testshare/testsubfolder |
     And user "Brian" has uploaded file with content "test data" to "/testshare/testsubfolder/testfile.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     When user "Brian" moves folder "/testshare/testsubfolder" from space "Personal" to "/testsubfolder" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/testsubfolder/testfile.txt" for user "Brian" should be "test data"
@@ -278,19 +296,57 @@ Feature: move (rename) file
       | testsubfolder |
     And for user "Brian" folder "testshare" of the space "Personal" should not contain these entries:
       | testsubfolder |
+    Examples:
+      | permissions |
+      | 31          |
+      | 17          |
+      | 1           |
 
 
-  Scenario: overwriting a file while moving
-    Given user "Brian" has created folder "/folder"
-    And user "Brian" has uploaded file with content "some content" to "/folder/testfile.txt"
-    And user "Brian" has uploaded file with content "old data version 1" to "/testfile.txt"
-    And user "Brian" has uploaded file with content "new data version 2" to "/testfile.txt"
-    When user "Brian" overwrites file "/testfile.txt" from space "Personal" to "folder/testfile.txt" inside space "Personal" while moving using the WebDAV API
+  Scenario Outline: sharee moves a file within a Shares space (all/change permissions)
+    Given user "Brian" has created folder "testshare"
+    Given user "Brian" has created folder "testshare/child"
+    And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
+    And user "Brian" has shared folder "testshare" with user "Alice" with permissions "<permissions>"
+    When user "Alice" moves file "testshare/testfile.txt" from space "Shares" to "testshare/child/testfile.txt" inside space "Shares" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the content of the file "testshare/child/testfile.txt" of the space "Shares" should be "test file content"
+    And for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
+      | testfile.txt |
+    Examples:
+      | permissions |
+      | all         |
+      | change      |
+
+
+  Scenario: sharee moves a file within a Shares space (read permissions)
+    Given user "Brian" has created folder "testshare"
+    Given user "Brian" has created folder "testshare/child"
+    And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
+    And user "Brian" has shared folder "testshare" with user "Alice" with permissions "read"
+    When user "Alice" moves file "testshare/testfile.txt" from space "Shares" to "testshare/child/testfile.txt" inside space "Shares" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" folder "testshare/child" of the space "Shares" should not contain these entries:
+      | testfile.txt |
+    But for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
+      | testfile.txt |
+
+
+  Scenario: overwrite a file while moving in project space
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
+    And user "Brian" has created a folder "folder" in space "Project"
+    And user "Brian" has uploaded a file inside space "Project" with content "root file v1" to "testfile.txt"
+    And user "Brian" has uploaded a file inside space "Project" with content "root file v2" to "testfile.txt"
+    And user "Brian" has uploaded a file inside space "Project" with content "same name file" to "folder/testfile.txt"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | editor |
+    When user "Alice" overwrites file "testfile.txt" from space "Project" to "folder/testfile.txt" inside space "Project" while moving using the WebDAV API
     Then the HTTP status code should be "204"
-    And the content of file "/folder/testfile.txt" for user "Brian" should be "new data version 2"
-    And for user "Brian" the space "Personal" should not contain these entries:
-      | /testfile.txt |
-    When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "1" of the space "Personal" using the WebDAV API
+    And for user "Alice" the content of the file "folder/testfile.txt" of the space "Project" should be "root file v2"
+    And for user "Alice" the space "Project" should not contain these entries:
+      | testfile.txt |
+    When user "Brian" downloads version of the file "folder/testfile.txt" with the index "1" of the space "Project" using the WebDAV API
     Then the HTTP status code should be "200"
-    And the downloaded content should be "old data version 1"
-    And as "Brian" file "testfile.txt" should exist in the trashbin of the space "Personal"
+    And the downloaded content should be "root file v1"
