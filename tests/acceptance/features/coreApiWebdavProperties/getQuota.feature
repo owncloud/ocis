@@ -1,4 +1,4 @@
-@issue-1313 @skipOnGraph
+@issue-1313 @skipOnReva
 Feature: get quota
   As a user
   I want to be able to find out my available storage quota
@@ -13,7 +13,7 @@ Feature: get quota
     Given using <dav-path-version> DAV path
     When the administrator gives unlimited quota to user "Alice" using the provisioning API
     Then the HTTP status code should be "200"
-    And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "-3"
+    And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "0"
     Examples:
       | dav-path-version |
       | old              |
@@ -23,9 +23,9 @@ Feature: get quota
   @smokeTest
   Scenario Outline: retrieving folder quota when quota is set
     Given using <dav-path-version> DAV path
-    When the administrator sets the quota of user "Alice" to "10 MB" using the provisioning API
+    When the administrator sets the quota of user "Alice" to "10000" using the provisioning API
     Then the HTTP status code should be "200"
-    And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "10485406"
+    And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "10000"
     Examples:
       | dav-path-version |
       | old              |
@@ -37,52 +37,52 @@ Feature: get quota
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has been given unlimited quota
-    And the quota of user "Brian" has been set to "10 MB"
+    And the quota of user "Brian" has been set to "10000"
     And user "Brian" has created folder "/testquota"
     And user "Brian" has created a share with settings
       | path        | testquota |
       | shareType   | user      |
       | permissions | all       |
       | shareWith   | Alice     |
-    When user "Alice" gets the following properties of folder "/testquota" using the WebDAV API
+    When user "Alice" gets the following properties of folder "<folder-path>" inside space "Shares" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
-    Then the HTTP status code should be "200"
-    And the single response should contain a property "d:quota-available-bytes" with value "10485406"
+    Then the HTTP status code should be "207"
+    And the single response should contain a property "d:quota-available-bytes" with value "10000"
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | folder-path       |
+      | old              | /Shares/testquota |
+      | new              | /Shares/testquota |
+      | spaces           | /testquota        |
 
 
   Scenario Outline: retrieving folder quota when quota is set and a file was uploaded
     Given using <dav-path-version> DAV path
-    And the quota of user "Alice" has been set to "1 KB"
+    And the quota of user "Alice" has been set to "10000"
     And user "Alice" has uploaded file "/prueba.txt" of size 93 bytes
     When user "Alice" gets the following properties of folder "/" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
-    Then the HTTP status code should be "201"
-    And the single response should contain a property "d:quota-available-bytes" with value "577"
+    Then the HTTP status code should be "207"
+    And the single response should contain a property "d:quota-available-bytes" with value "10000"
     Examples:
       | dav-path-version |
       | old              |
       | new              |
       | spaces           |
 
-  @skipOnReva
+
   Scenario Outline: retrieving folder quota when quota is set and a file was received
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And the quota of user "Brian" has been set to "1 KB"
+    And the quota of user "Brian" has been set to "10000"
     And user "Alice" has uploaded file "/Alice.txt" of size 93 bytes
     And user "Alice" has shared file "Alice.txt" with user "Brian"
     When user "Brian" gets the following properties of folder "/" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
-    Then the HTTP status code should be "200"
-    And the single response should contain a property "d:quota-available-bytes" with value "670"
+    Then the HTTP status code should be "207"
+    And the single response should contain a property "d:quota-available-bytes" with value "10000"
     Examples:
       | dav-path-version |
       | old              |

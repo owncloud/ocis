@@ -4460,21 +4460,34 @@ trait Provisioning {
 	 */
 	public function adminSetsUserQuotaToUsingTheProvisioningApi(string $user, string $quota):void {
 		$user = $this->getActualUsername($user);
-		$body
-			= [
-			'key' => 'quota',
-			'value' => $quota,
-		];
-
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			"PUT",
-			"/cloud/users/$user",
-			$this->getStepLineRef(),
+		$adminUser = $this->getAdminUsername();
+		$bodyData = ["quota" => ["total" => (int)$quota]];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+		if (OcisHelper::isTestingWithGraphApi()) {
+			$spaceId = $this->spacesContext->getSpaceIdByName($user, "Personal");
+			$this->response = GraphHelper::updateSpace(
+				$this->getBaseUrl(),
+				$adminUser,
+				$this->getAdminPassword(),
+				$body,
+				$spaceId
+			);
+		} else {
 			$body
-		);
+				= [
+				'key' => 'quota',
+				'value' => $quota,
+			];
+			$this->response = OcsApiHelper::sendRequest(
+				$this->getBaseUrl(),
+				$this->getAdminUsername(),
+				$this->getAdminPassword(),
+				"PUT",
+				"/cloud/users/$user",
+				$this->getStepLineRef(),
+				$body
+			);
+		}
 	}
 
 	/**
