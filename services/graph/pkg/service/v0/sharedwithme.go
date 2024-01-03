@@ -81,8 +81,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			permission := libregraph.NewPermission()
 			{
-				permission.SetUIHidden(receivedShare.GetHidden())
-
 				if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 					permission.SetId(id)
 				}
@@ -160,6 +158,9 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			remoteItem := libregraph.NewRemoteItem()
 			{
+				remoteItem.SetUiHidden(receivedShare.GetHidden())
+				remoteItem.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
+
 				if id := shareStat.GetInfo().GetId(); id != nil {
 					remoteItem.SetId(storagespace.FormatResourceID(*id))
 				}
