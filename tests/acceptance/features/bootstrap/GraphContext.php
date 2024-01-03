@@ -1080,6 +1080,19 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator has deleted group :group using Graph API
+	 *
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasDeletedGroupUsingGraphApi(string $group): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$response = $this->userDeletesGroupWithGroupId($groupId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
+	}
+
+	/**
 	 * @Then the following users should be listed in the following groups
 	 *
 	 * @param TableNode $table
