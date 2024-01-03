@@ -47,8 +47,8 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [moving a file into a shared folder as the sharee and as the sharer](https://github.com/owncloud/ocis/issues/1287)
 
-- [coreApiVersions/fileVersions.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#382) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
-- [coreApiVersions/fileVersions.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#383) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
+- [coreApiVersions/fileVersions.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#L382) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
+- [coreApiVersions/fileVersions.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#L383) Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
 
 ### Sync
 
