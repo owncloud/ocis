@@ -232,39 +232,7 @@ Feature: move (rename) file
       | 1                | 1              |
 
 
-<<<<<<< HEAD
-  Scenario: user moves a file from space Shares with role editor to space Shares with role viewer
-    Given user "Brian" has created folder "/testshare1"
-    And user "Brian" has created folder "/testshare2"
-    And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "31"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "17"
-    When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "502"
-    And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
-      | testshare1.txt |
-    But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
-      | testshare1.txt |
-
-
-  Scenario: user moves a file from space Shares with role viewer to space Shares with role editor
-    Given user "Brian" has created folder "/testshare1"
-    And user "Brian" has created folder "/testshare2"
-    And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "17"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
-    When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "502"
-    And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
-      | testshare1.txt |
-    But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:
-      | testshare1.txt |
-
-
-  Scenario: moving a file out of a shared folder as a sharer
-=======
   Scenario Outline: moving a file out of a shared folder as a sharer
->>>>>>> 0f9f996aba ([tests-only] Extend API test coverage for MOVE between spaces (#8113))
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
