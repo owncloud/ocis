@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 )
 
@@ -35,7 +37,7 @@ func DefaultConfig() *config.Config {
 			ICAP: config.ICAP{
 				URL:     "icap://127.0.0.1:1344",
 				Service: "avscan",
-				Timeout: 300,
+				Timeout: 5 * time.Minute,
 			},
 		},
 	}
