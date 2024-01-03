@@ -920,7 +920,7 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)" for sharingNG and the content should be "([^"]*)"$/
+	 * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder for shareNg using the (old|new) public WebDAV API with password "([^"]*)" and the content should be "([^"]*)"$/
 	 *
 	 * @param string $path
 	 * @param string $publicWebDAVAPIVersion
@@ -997,7 +997,7 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^the public download of file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API with password "([^"]*)" for shareNg should fail with HTTP status code "([^"]*)"$/
+	 * @Then /^the public download of file "([^"]*)" from inside the last public link shared folder for shareNg using the (old|new) public WebDAV API with password "([^"]*)" should fail with HTTP status code "([^"]*)"$/
 	 *
 	 * @param string $path
 	 * @param string $publicWebDAVAPIVersion

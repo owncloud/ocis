@@ -551,7 +551,7 @@ Feature: Create a share link for a resource
         }
       }
       """
-    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" for sharingNG and the content should be "other data"
+    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "%public%" and the content should be "other data"
 
 
   Scenario: update password for a file's link share
@@ -583,5 +583,5 @@ Feature: Create a share link for a resource
         }
       }
       """
-    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" for sharingNG and the content should be "other data"
-    And the public download of file "textfile1.txt" from inside the last public link shared folder using the new public WebDAV API with password "$heLlo*1234*" for shareNg should fail with HTTP status code "401"
+    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "%public%" and the content should be "other data"
+    And the public download of file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "$heLlo*1234*" should fail with HTTP status code "401"
