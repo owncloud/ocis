@@ -367,7 +367,7 @@ Feature: upload file
       | dav-path-version |
       | spaces           |
 
-
+  @issue-7257
   Scenario Outline: user updates a file with empty content
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "file with content" to "/textfile.txt"
@@ -380,7 +380,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-
+  @issue-7257
   Scenario Outline: user updates a file inside a folder with empty content
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
@@ -394,7 +394,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @skipOnReva
+  @skipOnReva @issue-7257
   Scenario Outline: user updates a shared file with empty content
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -410,7 +410,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @skipOnReva
+  @skipOnReva @issue-7257
   Scenario: user updates a file inside a project space with empty content
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -420,7 +420,7 @@ Feature: upload file
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
 
-  @skipOnReva
+  @skipOnReva @issue-7257
   Scenario: user updates a file inside a shared space with empty content
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
