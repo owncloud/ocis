@@ -30,13 +30,16 @@ Feature: move (rename) file
   @smokeTest
   Scenario Outline: moving and overwriting a file
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0 v1" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0 v2" to "textfile0.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
     When user "Alice" moves file "/textfile0.txt" to "/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0 v2"
+    And the content of version index "1" of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0 v1"
+    And as "Alice" file "/textfile0.txt" should not exist
     Examples:
       | dav-path-version |
       | old              |
