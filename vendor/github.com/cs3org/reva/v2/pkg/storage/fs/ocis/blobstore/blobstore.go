@@ -20,6 +20,7 @@ package blobstore
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -49,8 +50,10 @@ func New(root string) (*Blobstore, error) {
 
 // Upload stores some data in the blobstore under the given key
 func (bs *Blobstore) Upload(node *node.Node, source string) error {
-
-	dest := bs.path(node)
+	dest, err := bs.path(node)
+	if err != nil {
+		return err
+	}
 	// ensure parent path exists
 	if err := os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
 		return errors.Wrap(err, "Decomposedfs: oCIS blobstore: error creating parent folders for blob")
@@ -69,13 +72,13 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 
 	f, err := os.OpenFile(dest, os.O_CREATE|os.O_WRONLY, 0700)
 	if err != nil {
-		return errors.Wrapf(err, "could not open blob '%s' for writing", bs.path(node))
+		return errors.Wrapf(err, "could not open blob '%s' for writing", dest)
 	}
 
 	w := bufio.NewWriter(f)
 	_, err = w.ReadFrom(file)
 	if err != nil {
-		return errors.Wrapf(err, "could not write blob '%s'", bs.path(node))
+		return errors.Wrapf(err, "could not write blob '%s'", dest)
 	}
 
 	return w.Flush()
@@ -83,26 +86,37 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 
 // Download retrieves a blob from the blobstore for reading
 func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
-	file, err := os.Open(bs.path(node))
+	dest, err := bs.path(node)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not read blob '%s'", bs.path(node))
+		return nil, err
+	}
+	file, err := os.Open(dest)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not read blob '%s'", dest)
 	}
 	return file, nil
 }
 
 // Delete deletes a blob from the blobstore
 func (bs *Blobstore) Delete(node *node.Node) error {
-	if err := utils.RemoveItem(bs.path(node)); err != nil {
-		return errors.Wrapf(err, "could not delete blob '%s'", bs.path(node))
+	dest, err := bs.path(node)
+	if err != nil {
+		return err
+	}
+	if err := utils.RemoveItem(dest); err != nil {
+		return errors.Wrapf(err, "could not delete blob '%s'", dest)
 	}
 	return nil
 }
 
-func (bs *Blobstore) path(node *node.Node) string {
+func (bs *Blobstore) path(node *node.Node) (string, error) {
+	if node.BlobID == "" {
+		return "", fmt.Errorf("blobstore: BlobID is empty")
+	}
 	return filepath.Join(
 		bs.root,
 		filepath.Clean(filepath.Join(
 			"/", "spaces", lookup.Pathify(node.SpaceID, 1, 2), "blobs", lookup.Pathify(node.BlobID, 4, 2)),
 		),
-	)
+	), nil
 }
