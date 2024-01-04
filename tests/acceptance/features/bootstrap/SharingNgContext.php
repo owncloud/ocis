@@ -127,15 +127,16 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
-	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 *
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 * @throws Exception
 	 */
-	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
@@ -151,20 +152,49 @@ class SharingNgContext implements Context {
 		$permission = $rows['permission'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
 
+		return  GraphHelper::sendSharingInvitation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			$shareeId,
+			$rows['shareType'],
+			$role,
+			$permission,
+			$expireDate
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has sent the following share invitation:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
+		$response = $this->sendShareInvitation($user, $table);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
-			GraphHelper::sendSharingInvitation(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$spaceId,
-				$itemId,
-				$shareeId,
-				$rows['shareType'],
-				$role,
-				$permission,
-				$expireDate
-			)
+			$this->sendShareInvitation($user, $table)
 		);
 	}
 
@@ -249,6 +279,47 @@ class SharingNgContext implements Context {
 				$itemId,
 				\json_encode($body),
 				$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the share permission of user "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $shareeUser
+	 * @param string $resourceType
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = ($resourceType === 'folder')
+			? $this->spacesContext->getResourceId($user, $space, $resource)
+			: $this->spacesContext->getFileId($user, $space, $resource);
+		$userIdOfShareeUser = $this->featureContext->getUserIdByUserName($shareeUser);
+		$permId = GraphHelper::getSharePermissionId(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$userIdOfShareeUser,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId
+		);
+		$this->featureContext->setResponse(
+			GraphHelper::deleteSharePermission(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				$permId
 			)
 		);
 	}
