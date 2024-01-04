@@ -46,7 +46,7 @@ Feature: move (rename) file
     But for user "Alice" the space "Project" should contain these entries:
       | insideSpace.txt |
 
-
+  @issue-8116
   Scenario Outline: user moves a file from a space project with different a role to a space project with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
@@ -76,7 +76,7 @@ Feature: move (rename) file
       | viewer    | editor  | 403               |
       | viewer    | viewer  | 403               |
 
-
+  @issue-7618
   Scenario Outline: user moves a file from a space project with different role to a space personal
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
@@ -124,7 +124,7 @@ Feature: move (rename) file
       | editor  | 1           |
       | viewer  | 1           |
 
-
+  @issue-7618
   Scenario Outline: user moves a file from space personal to space project with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API

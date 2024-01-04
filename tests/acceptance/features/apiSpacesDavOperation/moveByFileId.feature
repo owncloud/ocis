@@ -207,7 +207,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-8116
   Scenario Outline: move a file between two project spaces
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
@@ -330,7 +330,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-7618
   Scenario Outline: move a file from project to personal space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
@@ -348,7 +348,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-7618
   Scenario Outline: move a file from personal to project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
@@ -366,7 +366,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-7618
   Scenario Outline: move a file to different name from project space to personal space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
@@ -384,7 +384,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-7618
   Scenario Outline: move a file to different name from personal space to project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
@@ -402,7 +402,7 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-8116
   Scenario Outline: move a file to different name between project spaces
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
