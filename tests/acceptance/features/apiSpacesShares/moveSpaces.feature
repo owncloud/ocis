@@ -59,13 +59,13 @@ Feature: move (rename) file
       | shareWith | Alice       |
       | role      | <from_role> |
     When user "Alice" moves file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
-    Then the HTTP status code should be "<https_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the space "Project1" should contain these entries:
       | project1.txt |
     And for user "Alice" the space "Project2" should not contain these entries:
       | project1.txt |
     Examples:
-      | from_role | to_role | https_status_code |
+      | from_role | to_role | http-status-code  |
       | manager   | manager | 502               |
       | editor    | manager | 502               |
       | manager   | editor  | 502               |
@@ -85,13 +85,13 @@ Feature: move (rename) file
       | shareWith | Alice  |
       | role      | <role> |
     When user "Alice" moves file "project.txt" from space "Project" to "project.txt" inside space "Personal" using the WebDAV API
-    Then the HTTP status code should be "<https_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the space "Project" should contain these entries:
       | project.txt |
     And for user "Alice" the space "Personal" should not contain these entries:
       | project.txt |
     Examples:
-      | role    | https_status_code |
+      | role    | http-status-code  |
       | manager | 502               |
       | editor  | 502               |
       | viewer  | 403               |
@@ -114,15 +114,15 @@ Feature: move (rename) file
       | project.txt |
     Examples:
       | role    | permissions |
-      | manager | 31          |
-      | editor  | 31          |
-      | viewer  | 31          |
-      | manager | 17          |
-      | editor  | 17          |
-      | viewer  | 17          |
-      | manager | 1           |
-      | editor  | 1           |
-      | viewer  | 1           |
+      | manager | all         |
+      | editor  | all         |
+      | viewer  | all         |
+      | manager | change      |
+      | editor  | change      |
+      | viewer  | change      |
+      | manager | read        |
+      | editor  | read        |
+      | viewer  | read        |
 
   @issue-7618
   Scenario Outline: user moves a file from space personal to space project with different role
@@ -133,13 +133,13 @@ Feature: move (rename) file
       | role      | <role> |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" moves file "personal.txt" from space "Personal" to "personal.txt" inside space "Project" using the WebDAV API
-    Then the HTTP status code should be "<https_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the space "Personal" should contain these entries:
       | personal.txt |
     And for user "Alice" the space "Project" should not contain these entries:
       | personal.txt |
     Examples:
-      | role    | https_status_code |
+      | role    | http-status-code  |
       | manager | 502               |
       | editor  | 502               |
       | viewer  | 403               |
@@ -157,9 +157,9 @@ Feature: move (rename) file
       | project.txt |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
-      | 1           |
+      | all         |
+      | change      |
+      | read        |
 
 
   Scenario Outline: user moves a file from space Shares with different role (permissions) to space personal
@@ -174,9 +174,9 @@ Feature: move (rename) file
       | testshare.txt |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
-      | 1           |
+      | all         |
+      | change      |
+      | read        |
 
 
   Scenario Outline: user moves a file from space Shares with different role (permissions) to space project with different role
@@ -196,15 +196,15 @@ Feature: move (rename) file
       | testshare.txt |
     Examples:
       | role    | permissions |
-      | manager | 31          |
-      | editor  | 31          |
-      | viewer  | 31          |
-      | manager | 17          |
-      | editor  | 17          |
-      | viewer  | 17          |
-      | manager | 1           |
-      | editor  | 1           |
-      | viewer  | 1           |
+      | manager | all         |
+      | editor  | all         |
+      | viewer  | all         |
+      | manager | change      |
+      | editor  | change      |
+      | viewer  | change      |
+      | manager | read        |
+      | editor  | read        |
+      | viewer  | read        |
 
 
   Scenario Outline: user moves a file from space Shares to another space Shares with different role (permissions)
@@ -221,15 +221,15 @@ Feature: move (rename) file
       | testshare1.txt |
     Examples:
       | from_permissions | to_permissions |
-      | 31               | 31             |
-      | 31               | 17             |
-      | 31               | 1              |
-      | 17               | 31             |
-      | 17               | 17             |
-      | 17               | 1              |
-      | 1                | 31             |
-      | 1                | 17             |
-      | 1                | 1              |
+      | all              | all            |
+      | all              | change         |
+      | all              | read           |
+      | change           | all            |
+      | change           | change         |
+      | change           | read           |
+      | read             | all            |
+      | read             | change         |
+      | read             | read           |
 
 
   Scenario Outline: moving a file out of a shared folder as a sharer
@@ -245,9 +245,9 @@ Feature: move (rename) file
       | testfile.txt |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
-      | 1           |
+      | all         |
+      | change      |
+      | read        |
 
 
   Scenario Outline: moving a folder out of a shared folder as a sharer
@@ -266,9 +266,9 @@ Feature: move (rename) file
       | testsubfolder |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
-      | 1           |
+      | all         |
+      | change      |
+      | read        |
 
 
   Scenario Outline: sharee moves a file within a Shares space (all/change permissions)
