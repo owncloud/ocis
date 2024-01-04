@@ -1980,16 +1980,19 @@ class SpacesContext implements Context {
 	 */
 	public function userCopiesOrMovesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
 		// split the source when there are sub-folders
-		$sourceFile = explode("/", $sourceFile);
+		$sourceFile = \trim($sourceFile, "/");
+		$sourceFile = \explode("/", $sourceFile);
+		$sourceFile = \end($sourceFile);
+		$destinationFile = \trim($destinationFile, "/");
 		$fileDestination = '';
 		if ($actionType === 'copies' || $actionType === 'moves') {
-			$fileDestination = $this->escapePath(\ltrim($destinationFile, "/")) . '/' . $this->escapePath(\ltrim(end($sourceFile), "/"));
+			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
 		} elseif ($actionType === 'renames') {
 			$fileDestination = $destinationFile;
 		}
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if ($toSpaceName === 'Shares') {
-			$sharesPath = $this->featureContext->getMountSharesPath($user, $fileDestination);
+			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
 			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
 			$headers['Destination'] = $baseUrl . $davPath . $sharesPath;
 		} else {
