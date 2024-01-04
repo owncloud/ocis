@@ -253,7 +253,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user sets/updates password for the last public link share using the Graph API with
+	 * @When user :user sets/updates the following password for the last public link share using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -282,7 +282,7 @@ class SharingNgContext implements Context {
 			throw new Error('Password is missing to set for share link!');
 		}
 
-		$response = GraphHelper::setPassword(
+		$response = GraphHelper::setLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
