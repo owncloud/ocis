@@ -33,7 +33,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_PASSWORD`
 
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -129,7 +129,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -150,7 +150,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++noop ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -198,10 +198,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++24m0s ++
+++5m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -338,7 +338,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 
 a| `OCIS_EDITION`
 
@@ -402,7 +402,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a| `OCIS_EVENTS_ENDPOINT`
 
@@ -450,7 +450,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided ANTIVIRUS_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
@@ -465,7 +465,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the gateway GRPC address.
+The bind address of the GRPC service.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -1628,7 +1628,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1919,10 +1919,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://127.0.0.1:9200 ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+Base URL to load themes from. Will be prepended to the theme path.
 
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
