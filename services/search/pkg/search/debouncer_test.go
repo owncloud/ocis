@@ -1,6 +1,7 @@
 package search_test
 
 import (
+	"sync/atomic"
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -13,7 +14,8 @@ import (
 var _ = Describe("SpaceDebouncer", func() {
 	var (
 		debouncer *search.SpaceDebouncer
-		callCount map[string]int
+
+		callCount atomic.Int32
 
 		userId = &user.UserId{
 			OpaqueId: "user",
@@ -24,9 +26,11 @@ var _ = Describe("SpaceDebouncer", func() {
 	)
 
 	BeforeEach(func() {
-		callCount = map[string]int{}
+		callCount = atomic.Int32{}
 		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId, _ *user.UserId) {
-			callCount[id.OpaqueId] += 1
+			if id.OpaqueId == "spaceid" {
+				callCount.Add(1)
+			}
 		})
 	})
 
@@ -35,7 +39,7 @@ var _ = Describe("SpaceDebouncer", func() {
 		debouncer.Debounce(spaceid, userId)
 		debouncer.Debounce(spaceid, userId)
 		Eventually(func() int {
-			return callCount["spaceid"]
+			return int(callCount.Load())
 		}, "200ms").Should(Equal(1))
 	})
 
@@ -49,13 +53,15 @@ var _ = Describe("SpaceDebouncer", func() {
 		debouncer.Debounce(spaceid, userId)
 
 		Eventually(func() int {
-			return callCount["spaceid"]
+			return int(callCount.Load())
 		}, "200ms").Should(Equal(2))
 	})
 
 	It("doesn't trigger twice simultaneously", func() {
 		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId, _ *user.UserId) {
-			callCount[id.OpaqueId] += 1
+			if id.OpaqueId == "spaceid" {
+				callCount.Add(1)
+			}
 			time.Sleep(300 * time.Millisecond)
 		})
 		debouncer.Debounce(spaceid, userId)
@@ -63,10 +69,10 @@ var _ = Describe("SpaceDebouncer", func() {
 
 		debouncer.Debounce(spaceid, userId)
 		time.Sleep(100 * time.Millisecond) // shouldn't trigger as the other run is still in progress
-		Expect(callCount["spaceid"]).To(Equal(1))
+		Expect(int(callCount.Load())).To(Equal(1))
 
 		Eventually(func() int {
-			return callCount["spaceid"]
+			return int(callCount.Load())
 		}, "500ms").Should(Equal(2))
 	})
 })

@@ -2,6 +2,7 @@ package search_test
 
 import (
 	"context"
+	"sync/atomic"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -19,7 +20,7 @@ var _ = DescribeTable("events",
 	func(mcks []string, e interface{}, asyncUploads bool) {
 		var (
 			s     = &searchMocks.Searcher{}
-			calls int
+			calls atomic.Int32
 		)
 
 		bus, _ := mEvents.NewStream()
@@ -32,7 +33,7 @@ var _ = DescribeTable("events",
 
 		for _, mck := range mcks {
 			s.On(mck, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-				calls += 1
+				calls.Add(1)
 			})
 		}
 
@@ -40,7 +41,7 @@ var _ = DescribeTable("events",
 
 		Expect(err).To(BeNil())
 		Eventually(func() int {
-			return calls
+			return int(calls.Load())
 		}, "2s").Should(Equal(len(mcks)))
 	},
 	Entry("ItemTrashed", []string{"TrashItem", "IndexSpace"}, events.ItemTrashed{}, false),
