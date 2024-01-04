@@ -1543,11 +1543,12 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
-	 * @param string $user
-	 * @param string $userIdOfShareeUser
+	 * @param string $sharer
+	 * @param string $userIdOfShareeUser this is a uuidv4 of sharee
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
+	 * @param string $shareType (user|group)
 	 *
 	 * @return string
 	 *
@@ -1557,22 +1558,23 @@ class GraphHelper {
 	public static function getSharePermissionId(
 		string $baseUrl,
 		string $xRequestId,
-		string $user,
+		string $sharer,
 		string $userIdOfShareeUser,
 		string $password,
 		string $spaceId,
-		string $itemId
+		string $itemId,
+		string $shareType
 	): string {
-		$response = self::getPermissionsList($baseUrl, $xRequestId, $user, $password, $spaceId, $itemId);
+		$response = self::getPermissionsList($baseUrl, $xRequestId, $sharer, $password, $spaceId, $itemId);
 		$permissionList = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		foreach ($permissionList["value"] as $value) {
-			if ($value["grantedToV2"]["user"]["id"] === $userIdOfShareeUser) {
+			if ($value["grantedToV2"][$shareType]["id"] === $userIdOfShareeUser) {
 				return $value["id"];
 			}
 		}
 		throw new \Exception(
 			__METHOD__
-			. " Cannot find share permission id for user '$user'"
+			. " Cannot find share permission id for user"
 		);
 	}
 
@@ -1754,7 +1756,7 @@ class GraphHelper {
 	 *
 	 * @throws GuzzleException
 	 */
-	public static function deleteSharePermission(
+	public static function removeSharePermission(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
