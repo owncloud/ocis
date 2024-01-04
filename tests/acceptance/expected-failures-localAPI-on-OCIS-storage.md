@@ -282,5 +282,59 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L631)
 - [apiSpacesDavOperation/moveByFileId.feature:632](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L632)
 
+### [MOVE a file from Project space (manager/editor) to Personal space returns 502 code](https://github.com/owncloud/ocis/issues/7618)
+
+- [apiSpacesDavOperation/moveByFileId.feature:117](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L117)
+- [apiSpacesDavOperation/moveByFileId.feature:118](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L118)
+- [apiSpacesDavOperation/moveByFileId.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L120)
+- [apiSpacesDavOperation/moveByFileId.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L121)
+- [apiSpacesDavOperation/moveByFileId.feature:139](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L139)
+- [apiSpacesDavOperation/moveByFileId.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L140)
+- [apiSpacesDavOperation/moveByFileId.feature:362](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L362)
+- [apiSpacesDavOperation/moveByFileId.feature:363](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L363)
+- [apiSpacesDavOperation/moveByFileId.feature:365](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L365)
+- [apiSpacesDavOperation/moveByFileId.feature:366](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L366)
+- [apiSpacesDavOperation/moveByFileId.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L384)
+- [apiSpacesDavOperation/moveByFileId.feature:385](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L385)
+- [apiSpacesShares/moveSpaces.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L95)
+- [apiSpacesShares/moveSpaces.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L96)
+- [apiSpacesShares/moveSpaces.feature:143](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L143)
+- [apiSpacesShares/moveSpaces.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L144)
+
+### [MOVE a file from Project space (manager/editor) to Project space (manager/editor) returns 502 code](https://github.com/owncloud/ocis/issues/8116)
+
+- [apiSpacesDavOperation/moveByFileId.feature:264](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L264)
+- [apiSpacesDavOperation/moveByFileId.feature:265](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L265)
+- [apiSpacesDavOperation/moveByFileId.feature:266](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L266)
+- [apiSpacesDavOperation/moveByFileId.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L267)
+- [apiSpacesDavOperation/moveByFileId.feature:273](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L273)
+- [apiSpacesDavOperation/moveByFileId.feature:274](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L274)
+- [apiSpacesDavOperation/moveByFileId.feature:275](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L275)
+- [apiSpacesDavOperation/moveByFileId.feature:276](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L276)
+- [apiSpacesDavOperation/moveByFileId.feature:302](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L302)
+- [apiSpacesDavOperation/moveByFileId.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L303)
+- [apiSpacesShares/moveSpaces.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L69)
+- [apiSpacesShares/moveSpaces.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L70)
+- [apiSpacesShares/moveSpaces.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L71)
+- [apiSpacesShares/moveSpaces.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L72)
+
+### [sharee (editor role) MOVE a file by file-id into Personal space responds with 502 instead of 403](https://github.com/owncloud/ocis/issues/8124)
+
+- [apiSpacesDavOperation/moveByFileId.feature:486](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L486)
+- [apiSpacesDavOperation/moveByFileId.feature:487](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L487)
+- [apiSpacesDavOperation/moveByFileId.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L488)
+- [apiSpacesDavOperation/moveByFileId.feature:489](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L489)
+
+### [sharee (editor role) MOVE a file by file-id into Project space (manager/editor role) responds with 502 instead of 403](https://github.com/owncloud/ocis/issues/8125)
+
+- [apiSpacesDavOperation/moveByFileId.feature:513](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L513)
+- [apiSpacesDavOperation/moveByFileId.feature:514](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L514)
+- [apiSpacesDavOperation/moveByFileId.feature:516](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L516)
+- [apiSpacesDavOperation/moveByFileId.feature:517](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L517)
+- [apiSpacesDavOperation/moveByFileId.feature:522](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L522)
+- [apiSpacesDavOperation/moveByFileId.feature:523](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L523)
+- [apiSpacesDavOperation/moveByFileId.feature:525](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L525)
+- [apiSpacesDavOperation/moveByFileId.feature:526](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L526)
+
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
