@@ -93,7 +93,7 @@ Feature: upload to a public link share
       | path        | FOLDER   |
       | permissions | change   |
       | password    | %public% |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
     Then the HTTP status code should be "507"
 
@@ -103,7 +103,7 @@ Feature: upload to a public link share
       | path        | FOLDER   |
       | permissions | create   |
       | password    | %public% |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
     Then the HTTP status code should be "507"
 

@@ -11,7 +11,7 @@ Feature: get quota
 
   Scenario Outline: retrieving folder quota when no quota is set
     Given using <dav-path-version> DAV path
-    When the administrator gives unlimited quota to user "Alice" using the provisioning API
+    When user "Admin" changes the quota of the "Alice Hansen" space to "0"
     Then the HTTP status code should be "200"
     And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "0"
     Examples:
@@ -23,7 +23,7 @@ Feature: get quota
   @smokeTest
   Scenario Outline: retrieving folder quota when quota is set
     Given using <dav-path-version> DAV path
-    When the administrator sets the quota of user "Alice" to "10000" using the provisioning API
+    When user "Admin" changes the quota of the "Alice Hansen" space to "10000"
     Then the HTTP status code should be "200"
     And as user "Alice" folder "/" should contain a property "d:quota-available-bytes" with value "10000"
     Examples:
@@ -36,8 +36,8 @@ Feature: get quota
   Scenario Outline: retrieving folder quota of shared folder with quota when no quota is set for recipient
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has been given unlimited quota
-    And the quota of user "Brian" has been set to "10000"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
+    And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Brian" has created folder "/testquota"
     And user "Brian" has created a share with settings
       | path        | testquota |
@@ -58,7 +58,7 @@ Feature: get quota
 
   Scenario Outline: retrieving folder quota when quota is set and a file was uploaded
     Given using <dav-path-version> DAV path
-    And the quota of user "Alice" has been set to "10000"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
     And user "Alice" has uploaded file "/prueba.txt" of size 93 bytes
     When user "Alice" gets the following properties of folder "/" using the WebDAV API
       | propertyName            |
@@ -75,7 +75,7 @@ Feature: get quota
   Scenario Outline: retrieving folder quota when quota is set and a file was received
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And the quota of user "Brian" has been set to "10000"
+    And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Alice" has uploaded file "/Alice.txt" of size 93 bytes
     And user "Alice" has shared file "Alice.txt" with user "Brian"
     When user "Brian" gets the following properties of folder "/" using the WebDAV API
