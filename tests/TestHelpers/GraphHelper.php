@@ -1544,7 +1544,7 @@ class GraphHelper {
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $sharer
-	 * @param string $userIdOfShareeUser this is a uuidv4 of sharer
+	 * @param string $userIdOfShareeUser this is a uuidv4 of sharee
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
@@ -1753,7 +1753,7 @@ class GraphHelper {
 	 *
 	 * @throws GuzzleException
 	 */
-	public static function deleteSharePermission(
+	public static function removeSharePermission(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,

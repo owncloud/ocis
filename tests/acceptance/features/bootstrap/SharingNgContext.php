@@ -323,7 +323,7 @@ class SharingNgContext implements Context {
 			$shareType
 		);
 		$this->featureContext->setResponse(
-			GraphHelper::deleteSharePermission(
+			GraphHelper::removeSharePermission(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$sharer,
