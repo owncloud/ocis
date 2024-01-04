@@ -187,7 +187,7 @@ trait Sharing {
 	/**
 	 * @return string
 	 */
-	public function shareNGGetLastCreatedPublicLinkShareToken(): string {
+	public function shareNgGetLastCreatedLinkShareToken(): string {
 		$lastResponse = $this->shareNgGetLastCreatedLinkShare();
 		if (!isset($this->getJsonDecodedResponse($lastResponse)['link']['webUrl'])) {
 			throw new Error('Response did not contain share id ' . $this->getJsonDecodedResponse($lastResponse)['link']['webUrl'] . ' for the created public link');

@@ -520,7 +520,7 @@ Feature: Create a share link for a resource
       """
 
   @env-config
-  Scenario: set password for a file's link share
+  Scenario: set password on a file's link share
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -530,7 +530,7 @@ Feature: Create a share link for a resource
       | resource     | textfile1.txt |
       | space        | Personal      |
       | role         | view          |
-    When user "Alice" sets password for the last public link share using the Graph API with
+    When user "Alice" sets the following password for the last public link share using the Graph API:
       | resourceType | file          |
       | resource     | textfile1.txt |
       | space        | Personal      |
@@ -554,7 +554,7 @@ Feature: Create a share link for a resource
     And the public should be able to download file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "%public%" and the content should be "other data"
 
 
-  Scenario: update password for a file's link share
+  Scenario: update password of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following link share:
       | resourceType | file          |
@@ -562,7 +562,7 @@ Feature: Create a share link for a resource
       | space        | Personal      |
       | role         | view          |
       | password     | $heLlo*1234*  |
-    When user "Alice" updates password for the last public link share using the Graph API with
+    When user "Alice" updates the following password for the last public link share using the Graph API:
       | resourceType | file          |
       | resource     | textfile1.txt |
       | space        | Personal      |

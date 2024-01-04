@@ -288,7 +288,7 @@ class PublicWebDavContext implements Context {
 	 * @param string $password
 	 * @param string $range ignored when empty
 	 * @param string $publicWebDAVAPIVersion
-	 * @param bool $downloadForShareNG
+	 * @param bool $shareNg
 	 *
 	 * @return ResponseInterface
 	 */
@@ -297,12 +297,12 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $range,
 		string $publicWebDAVAPIVersion = "old",
-		bool $downloadForShareNG = false
+		bool $shareNg = false
 	):ResponseInterface {
 		$path = \ltrim($path, "/");
 		$password = $this->featureContext->getActualPassword($password);
-		if ($downloadForShareNG) {
-			$token = $this->featureContext->shareNGGetLastCreatedPublicLinkShareToken();
+		if ($shareNg) {
+			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
 		} else {
 			$token = $this->featureContext->getLastCreatedPublicShareToken();
 		}
@@ -947,9 +947,9 @@ class PublicWebDavContext implements Context {
 			$publicWebDAVAPIVersion,
 			true
 		);
-		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
 	}
 
 	/**
@@ -1060,7 +1060,7 @@ class PublicWebDavContext implements Context {
 	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
 	 * @param string $expectedHttpCode
-	 * @param bool $downloadForShareNG
+	 * @param bool $shareNg
 	 *
 	 * @return void
 	 * @throws Exception
@@ -1071,7 +1071,7 @@ class PublicWebDavContext implements Context {
 		string $publicWebDAVAPIVersion,
 		string $password,
 		string $expectedHttpCode = "401",
-		bool $downloadForShareNG = false
+		bool $shareNg = false
 	):void {
 		if ($publicWebDAVAPIVersion === "old") {
 			return;
@@ -1082,7 +1082,7 @@ class PublicWebDavContext implements Context {
 			$password,
 			$range,
 			$publicWebDAVAPIVersion,
-			$downloadForShareNG
+			$shareNg
 		);
 
 		$responseContent = $response->getBody()->getContents();
