@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
@@ -59,6 +60,14 @@ The following sections list the changes for unreleased.
    Service Account Roles wouldn't work when using with external IDP
 
    https://github.com/owncloud/ocis/pull/8074
+
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+
+   We fixed the upload postprocessing when the destination file does not exist
+   anymore.
+
+   https://github.com/owncloud/ocis/issues/7909
+   https://github.com/owncloud/ocis/pull/8117
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
