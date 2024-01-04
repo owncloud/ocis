@@ -4946,29 +4946,27 @@ trait WebDav {
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getMountSharesPath(
+	public function getSharesMountPath(
 		string $user,
 		string $path
 	): string {
 		$user = $this->getActualUsername($user);
 		$path = trim($path, "/");
 		$pathArray = explode("/", $path);
+		$sharedFolder = $pathArray[0] === "Shares" ? $pathArray[1] : $pathArray[0];
 
 		$shareMountId = GraphHelper::getShareMountId(
 			$this->getBaseUrl(),
 			$this->getStepLineRef(),
 			$user,
 			$this->getPasswordForUser($user),
-			$pathArray[1]
+			$sharedFolder
 		);
 
-		if (\count($pathArray) > 2) {
-			$pathArray = \array_slice($pathArray, 2);
-			$path = '/' . implode("/", array_map("strval", $pathArray));
-		} else {
-			$path = null;
-		}
-		return $shareMountId . $path;
+		$path = \array_slice($pathArray, array_search($sharedFolder, $pathArray) + 1);
+		$path = \implode("/", $path);
+
+		return "$shareMountId/$path";
 	}
 
 	/**
@@ -4997,7 +4995,7 @@ trait WebDav {
 		} else {
 			$urlParameter = null;
 		}
-		$sharesPath = $this->getMountSharesPath($user, $path) . '/?' . $urlParameter;
+		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
 		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
@@ -5024,7 +5022,7 @@ trait WebDav {
 		string $destination,
 		?string $content = null
 	): ResponseInterface {
-		$sharesPath = $this->getMountSharesPath($user, $destination);
+		$sharesPath = $this->getSharesMountPath($user, $destination);
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
 		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
