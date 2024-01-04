@@ -354,4 +354,4 @@ replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/pl
 
 replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 
-replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20231222140825-252b447113b1
+replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240104145059-f0d7f6236416

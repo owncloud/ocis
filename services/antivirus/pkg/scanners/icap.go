@@ -1,6 +1,7 @@
 package scanners
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -22,20 +23,22 @@ func NewICAP(icapURL string, icapService string, timeout time.Duration) (ICAP, e
 	endpoint.Scheme = "icap"
 	endpoint.Path = icapService
 
-	return ICAP{
-		endpoint: endpoint.String(),
-		timeout:  timeout,
-	}, nil
+	client, err := ic.NewClient(ic.Options{
+		Timeout: timeout,
+	})
+
+	return ICAP{client: client, url: *endpoint}, nil
 }
 
-// ICAP is a Scanner talking to an ICAP server
+// ICAP is responsible for scanning files using an ICAP server
 type ICAP struct {
-	timeout  time.Duration
-	endpoint string
+	client *ic.Client
+	url    url.URL
 }
 
-// Scan to fulfill Scanner interface
+// Scan scans a file using the ICAP server
 func (s ICAP) Scan(in Input) (Result, error) {
+	ctx := context.TODO()
 	result := Result{}
 
 	httpReq, err := http.NewRequest(http.MethodPost, in.Url, in.Body)
@@ -48,21 +51,17 @@ func (s ICAP) Scan(in Input) (Result, error) {
 		httpReq.Header.Set("Content-Type", mt)
 	}
 
-	optReq, err := ic.NewRequest(ic.MethodOPTIONS, s.endpoint, nil, nil)
+	optReq, err := ic.NewRequest(ctx, ic.MethodOPTIONS, s.url.String(), nil, nil)
 	if err != nil {
 		return result, err
 	}
 
-	client := &ic.Client{
-		Timeout: s.timeout,
-	}
-
-	optRes, err := client.Do(optReq)
+	optRes, err := s.client.Do(optReq)
 	if err != nil {
 		return result, err
 	}
 
-	req, err := ic.NewRequest(ic.MethodREQMOD, s.endpoint, httpReq, nil)
+	req, err := ic.NewRequest(ctx, ic.MethodREQMOD, s.url.String(), httpReq, nil)
 	if err != nil {
 		return result, err
 	}
@@ -72,7 +71,7 @@ func (s ICAP) Scan(in Input) (Result, error) {
 		return result, err
 	}
 
-	res, err := client.Do(req)
+	res, err := s.client.Do(req)
 	if err != nil {
 		return result, err
 	}
