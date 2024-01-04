@@ -284,10 +284,11 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of user "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
-	 * @param string $user
-	 * @param string $shareeUser
+	 * @param string $sharer
+	 * @param string $shareType (user|group)
+	 * @param string $sharee can be both user or group
 	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
@@ -296,27 +297,37 @@ class SharingNgContext implements Context {
 	 * @throws JsonException
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(
+		string $sharer,
+		string $shareType,
+		string $sharee,
+		string $resourceType,
+		string $resource,
+		string $space
+	): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
 		$itemId = ($resourceType === 'folder')
-			? $this->spacesContext->getResourceId($user, $space, $resource)
-			: $this->spacesContext->getFileId($user, $space, $resource);
-		$userIdOfShareeUser = $this->featureContext->getUserIdByUserName($shareeUser);
+			? $this->spacesContext->getResourceId($sharer, $space, $resource)
+			: $this->spacesContext->getFileId($sharer, $space, $resource);
+		$userIdOfSharee = ($shareType === 'user')
+		? $this->featureContext->getUserIdByUserName($sharee)
+			: $this->featureContext->getGroupIdByGroupName($sharee);
 		$permId = GraphHelper::getSharePermissionId(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$user,
-			$userIdOfShareeUser,
-			$this->featureContext->getPasswordForUser($user),
+			$sharer,
+			$userIdOfSharee,
+			$this->featureContext->getPasswordForUser($sharer),
 			$spaceId,
-			$itemId
+			$itemId,
+			$shareType
 		);
 		$this->featureContext->setResponse(
-			GraphHelper::deleteSharePermission(
+			GraphHelper::removeSharePermission(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
+				$sharer,
+				$this->featureContext->getPasswordForUser($sharer),
 				$spaceId,
 				$itemId,
 				$permId
