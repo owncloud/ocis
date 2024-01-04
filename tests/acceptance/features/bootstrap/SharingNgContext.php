@@ -136,7 +136,7 @@ class SharingNgContext implements Context {
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 * @throws Exception
 	 */
-	public function sendSharingInviteUsingGraphAPI(string $user, TableNode $table): ResponseInterface {
+	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
@@ -177,8 +177,8 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userHasSentShareInvitation(string $user, TableNode $table): void {
-		$response = $this->sendSharingInviteUsingGraphAPI($user, $table);
+	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
+		$response = $this->sendShareInvitation($user, $table);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -194,7 +194,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
-			$this->sendSharingInviteUsingGraphAPI($user, $table)
+			$this->sendShareInvitation($user, $table)
 		);
 	}
 
@@ -296,7 +296,7 @@ class SharingNgContext implements Context {
 	 * @throws JsonException
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function removeSharePermissionOfAResourceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
+	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(string $user, string $shareeUser, string $resourceType, string $resource, string $space): void {
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 		$itemId = ($resourceType === 'folder')
 			? $this->spacesContext->getResourceId($user, $space, $resource)
