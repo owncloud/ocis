@@ -40,11 +40,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
 ## Details
+
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
+
+   We fixed the race conditions in tests.
+
+   https://github.com/owncloud/ocis/issues/7846
+   https://github.com/owncloud/ocis/pull/7847
 
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
 
