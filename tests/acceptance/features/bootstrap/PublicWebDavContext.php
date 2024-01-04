@@ -920,10 +920,9 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^the public should be able to download file "([^"]*)" from inside the last public link shared folder for shareNg using the (old|new) public WebDAV API with password "([^"]*)" and the content should be "([^"]*)"$/
+	 * @Then /^the public should be able to download file "([^"]*)" from the last link share with password "([^"]*)" and the content should be "([^"]*)"$/
 	 *
 	 * @param string $path
-	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
 	 * @param string $content
 	 *
@@ -932,19 +931,14 @@ class PublicWebDavContext implements Context {
 	 */
 	public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPasswordForSharingNGAndContentShouldBe(
 		string $path,
-		string $publicWebDAVAPIVersion,
 		string $password,
 		string $content
 	):void {
-		if ($publicWebDAVAPIVersion === "old") {
-			return;
-		}
-
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
-			$publicWebDAVAPIVersion,
+			"new",
 			true
 		);
 
@@ -997,10 +991,9 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^the public download of file "([^"]*)" from inside the last public link shared folder for shareNg using the (old|new) public WebDAV API with password "([^"]*)" should fail with HTTP status code "([^"]*)"$/
+	 * @Then /^the public download of file "([^"]*)" from the last link share with password "([^"]*)" should fail with HTTP status code "([^"]*)" using shareNg$/
 	 *
 	 * @param string $path
-	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
 	 * @param string $expectedHttpCode
 	 *
@@ -1008,14 +1001,13 @@ class PublicWebDavContext implements Context {
 	 */
 	public function shouldNotBeAbleToDownloadFileWithPasswordForShareNg(
 		string $path,
-		string $publicWebDAVAPIVersion,
 		string $password,
 		string $expectedHttpCode = "401"
 	):void {
 		$this->shouldNotBeAbleToDownloadRangeOfFileInsidePublicSharedFolderWithPassword(
 			"",
 			$path,
-			$publicWebDAVAPIVersion,
+			"new",
 			$password,
 			$expectedHttpCode,
 			true

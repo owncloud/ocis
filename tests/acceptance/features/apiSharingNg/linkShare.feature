@@ -530,7 +530,7 @@ Feature: Create a share link for a resource
       | resource     | textfile1.txt |
       | space        | Personal      |
       | role         | view          |
-    When user "Alice" sets the following password for the last public link share using the Graph API:
+    When user "Alice" sets the following password for the last link share using the Graph API:
       | resourceType | file          |
       | resource     | textfile1.txt |
       | space        | Personal      |
@@ -551,8 +551,7 @@ Feature: Create a share link for a resource
         }
       }
       """
-    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "%public%" and the content should be "other data"
-
+    And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
 
   Scenario: update password of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
@@ -562,7 +561,7 @@ Feature: Create a share link for a resource
       | space        | Personal      |
       | role         | view          |
       | password     | $heLlo*1234*  |
-    When user "Alice" updates the following password for the last public link share using the Graph API:
+    When user "Alice" updates the following password for the last link share using the Graph API:
       | resourceType | file          |
       | resource     | textfile1.txt |
       | space        | Personal      |
@@ -583,5 +582,5 @@ Feature: Create a share link for a resource
         }
       }
       """
-    And the public should be able to download file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "%public%" and the content should be "other data"
-    And the public download of file "textfile1.txt" from inside the last public link shared folder for shareNg using the new public WebDAV API with password "$heLlo*1234*" should fail with HTTP status code "401"
+    And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
+    And the public download of file "textfile1.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg

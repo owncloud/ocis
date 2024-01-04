@@ -283,7 +283,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user sets/updates the following password for the last public link share using the Graph API:
+	 * @When user :user sets/updates the following password for the last link share using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -292,7 +292,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userSetsOrUpdatesPasswordForPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
+	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resourceType = $bodyRows['resourceType'];
