@@ -1,7 +1,6 @@
 package scanners
 
 import (
-	"io"
 	"time"
 
 	"github.com/dutchcoders/go-clamd"
@@ -20,16 +19,16 @@ type ClamAV struct {
 }
 
 // Scan to fulfill Scanner interface
-func (s ClamAV) Scan(file io.Reader) (ScanResult, error) {
-	ch, err := s.clamd.ScanStream(file, make(chan bool))
+func (s ClamAV) Scan(in Input) (Result, error) {
+	ch, err := s.clamd.ScanStream(in.Body, make(chan bool))
 	if err != nil {
-		return ScanResult{}, err
+		return Result{}, err
 	}
 
 	r := <-ch
-	return ScanResult{
+	return Result{
 		Infected:    r.Status == clamd.RES_FOUND,
 		Description: r.Description,
-		Scantime:    time.Now(),
+		ScanTime:    time.Now(),
 	}, nil
 }
