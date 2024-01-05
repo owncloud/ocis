@@ -81,6 +81,11 @@ trait Sharing {
 	private array $shareNgCreatedLinkShares = [];
 
 	/**
+	 * @var array
+	 */
+	private array $shareNgCreatedUserGroupShares = [];
+
+	/**
 	 * @return string
 	 */
 	public function getLastCreatedPublicShareToken():string {
@@ -117,6 +122,22 @@ trait Sharing {
 	 */
 	public function shareNgGetLastCreatedLinkShare():?ResponseInterface {
 		return \end($this->shareNgCreatedLinkShares);
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return void
+	 */
+	public function shareNgAddToCreatedUserGroupShares(ResponseInterface $response): void {
+		$this->shareNgCreatedUserGroupShares[] = $response;
+	}
+
+	/**
+	 * @return ResponseInterface|null
+	 */
+	public function shareNgGetLastCreatedUserGroupShare():?ResponseInterface {
+		return \end($this->shareNgCreatedUserGroupShares);
 	}
 
 	/**
@@ -179,7 +200,7 @@ trait Sharing {
 	public function shareNgGetLastCreatedLinkShareID(): string {
 		$lastResponse = $this->shareNgGetLastCreatedLinkShare();
 		if (!isset($this->getJsonDecodedResponse($lastResponse)['id'])) {
-			throw new Error('Response did not contain share id ' . $this->getJsonDecodedResponse($lastResponse)['id'] . ' for the created public link');
+			throw new Error('Response did not contain share id for the created public link');
 		}
 		return $this->getJsonDecodedResponse($lastResponse)['id'];
 	}
@@ -194,6 +215,17 @@ trait Sharing {
 		}
 		$last_created_link_webURL =  $this->getJsonDecodedResponse($lastResponse)['link']['webUrl'];
 		return substr(strrchr($last_created_link_webURL, "/"), 1);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function shareNgGetLastCreatedUserShareShareID(): string {
+		$lastResponse = $this->shareNgGetLastCreatedUserGroupShare();
+		if (!isset($this->getJsonDecodedResponse($lastResponse)['value'][0]['id'])) {
+			throw new Error('Response did not contain share id for the last created share.');
+		}
+		return $this->getJsonDecodedResponse($lastResponse)['value'][0]['id'];
 	}
 
 	/**
