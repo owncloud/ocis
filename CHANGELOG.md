@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 * Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
 * Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
@@ -68,6 +69,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7909
    https://github.com/owncloud/ocis/pull/8117
+
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
+
+   Registers the registry under the correct name
+
+   https://github.com/owncloud/ocis/pull/8140
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
