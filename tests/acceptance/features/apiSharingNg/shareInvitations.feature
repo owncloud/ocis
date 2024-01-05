@@ -1239,3 +1239,50 @@ Feature: Send a sharing invitations
       | resource-type | path           |
       | file          | /textfile1.txt |
       | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation with empty user id
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | shareeId        |                 |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].ObjectId' Error:Field validation for 'ObjectId' failed on the 'ne' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
