@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2024-01-05T08:15:01.193907572Z
+date: 2024-01-05T14:24:24.19696232Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
