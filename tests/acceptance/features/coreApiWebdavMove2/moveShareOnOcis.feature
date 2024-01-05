@@ -275,6 +275,7 @@ Feature: move (rename) file
       | shareWith   | Alice         |
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
+    And as "Brian" the file with original path "testshare/testfile.txt" should not exist in the trashbin
     And the content of file "Shares/testshare/testfile.txt" for user "Alice" should be "test data"
     And the content of file "testshare/testfile.txt" for user "Brian" should be "test data"
     Examples:

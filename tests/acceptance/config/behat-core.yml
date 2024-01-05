@@ -287,6 +287,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
         - FilesVersionsContext:
+        - TrashbinContext:
 
     coreApiWebdavOperations:
       paths:

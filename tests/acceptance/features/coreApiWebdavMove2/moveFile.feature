@@ -113,6 +113,7 @@ Feature: move (rename) file
     And user "Alice" has uploaded file with content "ownCloud test text file" to "testfile.txt"
     When user "Alice" moves file "testfile.txt" to "testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
+    And as "Alice" the file with original path "testfile.txt" should not exist in the trashbin
     And the content of file "testfile.txt" for user "Alice" should be "ownCloud test text file"
     Examples:
       | dav-path-version |

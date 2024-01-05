@@ -56,6 +56,7 @@ Feature: move (rename) file
       | role      | <role> |
     When user "Alice" moves file "insideSpace.txt" from space "Project" to "insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
+    And as "Brian" file "insideSpace.txt" should not exist in the trashbin of the space "Project"
     And for user "Alice" the content of the file "insideSpace.txt" of the space "Project" should be "some content"
     Examples:
       | role    |
@@ -323,10 +324,9 @@ Feature: move (rename) file
     And user "Brian" has shared folder "testshare" with user "Alice" with permissions "<permissions>"
     When user "Alice" moves file "testshare/testfile.txt" from space "Shares" to "testshare/testfile.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
-      | testfile.txt |
-    And for user "Brian" folder "testshare" of the space "Personal" should contain these entries:
-      | testfile.txt |
+    And as "Brian" file "testfile.txt" should not exist in the trashbin of the space "Personal"
+    And for user "Alice" the content of the file "testshare/testfile.txt" of the space "Shares" should be "test file content"
+    And for user "Brian" the content of the file "testshare/testfile.txt" of the space "Personal" should be "test file content"
     Examples:
       | permissions |
       | all         |
