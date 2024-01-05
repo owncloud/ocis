@@ -1,120 +1,89 @@
 package icapclient
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"net/http"
-	"strconv"
-	"time"
+	"strings"
 )
 
 // Client represents the icap client who makes the icap server calls
 type Client struct {
-	scktDriver *Driver
-	Timeout    time.Duration
+	conn Conn
 }
 
-// Do makes  does everything required to make a call to the ICAP server
-func (c *Client) Do(req *Request) (*Response, error) {
-
-	if c.scktDriver == nil { // create a new socket driver if one wasn't explicitly created
-		port, err := strconv.Atoi(req.URL.Port())
-
-		if err != nil {
-			return nil, err
-		}
-		c.scktDriver = NewDriver(req.URL.Hostname(), port)
+// NewClient creates a new icap client
+func NewClient(options ...ConfigOption) (Client, error) {
+	config := DefaultConfig()
+	for _, option := range options {
+		option(&config)
 	}
 
-	c.setDefaultTimeouts() // assinging default timeouts if not set already
-
-	if req.ctx != nil { // connect with the given context if context is set
-		if err := c.scktDriver.ConnectWithContext(*req.ctx); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := c.scktDriver.Connect(); err != nil {
-			return nil, err
-		}
-	}
-
-	defer c.scktDriver.Close() // closing the socket connection
-
-	req.SetDefaultRequestHeaders() // assigning default headers if not set already
-
-	logDebug("The request headers: ")
-	dumpDebug(req.Header)
-
-	d, err := DumpRequest(req) // getting the byte representation of the ICAP request
-
+	conn, err := NewICAPConn(config.ICAPConn)
 	if err != nil {
-		return nil, err
+		return Client{}, err
 	}
 
-	if err := c.scktDriver.Send(d); err != nil { // sending the entire TCP message of the ICAP client to the server connected
-		return nil, err
-	}
-
-	resp, err := c.scktDriver.Receive() // taking the response
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode == http.StatusContinue && !req.bodyFittedInPreview && req.previewSet { // this block suggests that the ICAP request contained preview body bytes and whole body did not fit in the preview, so the serber responded with 100 Continue and the client is to send the remaining body bytes only
-		logDebug("Making request for the rest of the remaining body bytes after preview, as received 100 Continue from the server...")
-		return c.DoRemaining(req)
-	}
-
-	return resp, nil
+	return Client{
+		conn: conn,
+	}, nil
 }
 
-// DoRemaining requests an ICAP server with the remaining body bytes which did not fit in the preview in the original request
-func (c *Client) DoRemaining(req *Request) (*Response, error) {
+// Do is the main function of the client that makes the ICAP request
+func (c *Client) Do(req Request) (Response, error) {
+	var err error
 
+	// establish connection to the icap server
+	err = c.conn.Connect(req.ctx, req.URL.Host)
+	if err != nil {
+		return Response{}, err
+	}
+	defer func() {
+		err = errors.Join(err, c.conn.Close())
+	}()
+
+	req.setDefaultRequestHeaders()
+
+	// convert the request to icap message
+	message, err := toICAPRequest(req)
+	if err != nil {
+		return Response{}, err
+	}
+
+	// send the icap message to the server
+	dataRes, err := c.conn.Send(message)
+	if err != nil {
+		return Response{}, err
+	}
+
+	resp, err := toClientResponse(bufio.NewReader(strings.NewReader(string(dataRes))))
+	if err != nil {
+		return Response{}, err
+	}
+
+	// check if the message is fully done scanning or if it needs to be sent another chunk
+	done := !(resp.StatusCode == http.StatusContinue && !req.bodyFittedInPreview && req.previewSet)
+	if done {
+		return resp, nil
+	}
+
+	// get the remaining body bytes
 	data := req.remainingPreviewBytes
-
-	if !bodyAlreadyChunked(string(data)) { // if the body is not already chunke, then add the basic hexa body bytes notation
-		ds := string(data)
-		addHexaBodyByteNotations(&ds)
-		data = []byte(ds)
+	if !bodyIsChunked(string(data)) {
+		data = []byte(addHexBodyByteNotations(string(data)))
 	}
 
-	for !bytes.HasSuffix(data, []byte(DoubleCRLF)) {
-		data = append(data, []byte(CRLF)...)
+	// hydrate the icap message with closing doubleCRLF suffix
+	if !bytes.HasSuffix(data, []byte(doubleCRLF)) {
+		data = append(data, []byte(crlf)...)
 	}
 
-	if err := c.scktDriver.Send(data); err != nil {
-		return nil, err
-	}
-
-	resp, err := c.scktDriver.Receive()
-
+	// send the remaining body bytes to the server
+	dataRes, err = c.conn.Send(data)
 	if err != nil {
-		return nil, err
+		return Response{}, err
 	}
 
-	return resp, nil
-}
-
-// SetDriver sets a new socket driver with the client
-func (c *Client) SetDriver(d *Driver) {
-	c.scktDriver = d
-}
-
-func (c *Client) setDefaultTimeouts() {
-	if c.Timeout == 0 {
-		c.Timeout = defaultTimeout
-	}
-
-	if c.scktDriver.DialerTimeout == 0 {
-		c.scktDriver.DialerTimeout = c.Timeout
-	}
-
-	if c.scktDriver.ReadTimeout == 0 {
-		c.scktDriver.ReadTimeout = c.Timeout
-	}
-
-	if c.scktDriver.WriteTimeout == 0 {
-		c.scktDriver.WriteTimeout = c.Timeout
-	}
+	return toClientResponse(bufio.NewReader(strings.NewReader(string(dataRes))))
 }
