@@ -24,7 +24,8 @@
 | OCIS_EVENTS_AUTH_PASSWORD<br/>ANTIVIRUS_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | ANTIVIRUS_SCANNER_TYPE | string | clamav | The antivirus scanner to use. Supported values are 'clamav' and 'icap'.|
 | ANTIVIRUS_CLAMAV_SOCKET | string | /run/clamav/clamd.ctl | The socket clamav is running on. Note the default value is an example which needs adaption according your OS.|
-| ANTIVIRUS_ICAP_TIMEOUT | int64 | 300 | Timeout for the ICAP client.|
+| ANTIVIRUS_ICAP_TIMEOUT | int64 | 0 | Timeout for the ICAP client.|
+| ANTIVIRUS_ICAP_SCAN_TIMEOUT | Duration | 5m0s | Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.|
 | ANTIVIRUS_ICAP_URL | string | icap://127.0.0.1:1344 | URL of the ICAP server.|
 | ANTIVIRUS_ICAP_SERVICE | string | avscan | The name of the ICAP service.|
 | ANTIVIRUS_MAX_SCAN_SIZE | string |  | The maximum scan size the virusscanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.|
