@@ -76,7 +76,7 @@ Feature: edit user
       | displayName | sam             |
       | email       | sam@example.com |
       | password    | 1234            |
-    And the user "Alice" has disabled user "Brian" using the Graph API
+    And the user "Alice" has disabled user "Brian"
     When the user "Alice" changes the user name of user "sam" to "Brian" using the Graph API
     Then the HTTP status code should be "409"
     And the user information of "sam" should match this JSON schema
@@ -410,7 +410,7 @@ Feature: edit user
 
 
   Scenario: admin user enables disabled user
-    Given the user "Alice" has disabled user "Brian" using the Graph API
+    Given the user "Alice" has disabled user "Brian"
     When the user "Alice" enables user "Brian" using the Graph API
     Then the HTTP status code should be "200"
     When user "Alice" gets information of user "Brian" using Graph API
@@ -454,7 +454,7 @@ Feature: edit user
 
   Scenario Outline: normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
-    And the user "Alice" has disabled user "Carol" using the Graph API
+    And the user "Alice" has disabled user "Carol"
     And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Brian" tries to enable user "Carol" using the Graph API
     Then the HTTP status code should be "401"
