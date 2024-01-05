@@ -23,16 +23,16 @@ func NewICAP(icapURL string, icapService string, timeout time.Duration) (ICAP, e
 	endpoint.Scheme = "icap"
 	endpoint.Path = icapService
 
-	client, err := ic.NewClient(ic.Options{
-		Timeout: timeout,
-	})
+	client, err := ic.NewClient(
+		ic.WithICAPConnectionTimeout(timeout),
+	)
 
 	return ICAP{client: client, url: *endpoint}, nil
 }
 
 // ICAP is responsible for scanning files using an ICAP server
 type ICAP struct {
-	client *ic.Client
+	client ic.Client
 	url    url.URL
 }
 
@@ -76,6 +76,7 @@ func (s ICAP) Scan(in Input) (Result, error) {
 		return result, err
 	}
 
+	// TODO: make header configurable. See oc10 documentation: https://doc.owncloud.com/server/10.12/admin_manual/configuration/server/virus-scanner-support.html
 	if data, infected := res.Header["X-Infection-Found"]; infected {
 		result.Infected = infected
 
