@@ -591,7 +591,7 @@ Feature: Send a sharing invitations
       | space           | Personal                 |
       | sharee          | Brian                    |
       | shareType       | user                     |
-      | permissionsRole | <permissionsRole>        |
+      | permissionsRole | <permissions-role>       |
       | expireDate      | 2043-07-15T14:00:00.000Z |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -664,16 +664,16 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsRole | resource-type | path           |
-      | Viewer          | file          | /textfile1.txt |
-      | File Editor     | file          | /textfile1.txt |
-      | Co Owner        | file          | /textfile1.txt |
-      | Manager         | file          | /textfile1.txt |
-      | Viewer          | folder        | FolderToShare  |
-      | Editor          | folder        | FolderToShare  |
-      | Co Owner        | folder        | FolderToShare  |
-      | Uploader        | folder        | FolderToShare  |
-      | Manager         | folder        | FolderToShare  |
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Co Owner         | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation with expiration date to group with different roles
@@ -691,7 +691,7 @@ Feature: Send a sharing invitations
       | space           | Personal                 |
       | sharee          | grp1                     |
       | shareType       | group                    |
-      | permissionsRole | <permissionsRole>        |
+      | permissionsRole | <permissions-role>       |
       | expireDate      | 2043-07-15T14:00:00.000Z |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -764,13 +764,100 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsRole | resource-type | path           |
-      | Viewer          | file          | /textfile1.txt |
-      | File Editor     | file          | /textfile1.txt |
-      | Co Owner        | file          | /textfile1.txt |
-      | Manager         | file          | /textfile1.txt |
-      | Viewer          | folder        | FolderToShare  |
-      | Editor          | folder        | FolderToShare  |
-      | Co Owner        | folder        | FolderToShare  |
-      | Uploader        | folder        | FolderToShare  |
-      | Manager         | folder        | FolderToShare  |
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Co Owner         | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
+
+  @issue-7962
+  Scenario Outline: send share invitation to disabled user
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And the user "Admin" has disabled user "Brian"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "roles",
+                "grantedToV2"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                },
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "displayName"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Co Owner         | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
