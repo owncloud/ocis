@@ -144,9 +144,15 @@ class SharingNgContext implements Context {
 			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
 			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
 
-		$shareeId = ($rows['shareType'] === 'user')
-			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
-			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
+		if (\array_key_exists('shareeId', $rows)) {
+			$shareeId = $rows['shareeId'];
+		} else {
+			if ($rows['shareType'] === 'user') {
+				$shareeId = $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id');
+			} else {
+				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
+			}
+		}
 
 		$role = $rows['role'] ?? null;
 		$permission = $rows['permission'] ?? null;
@@ -184,6 +190,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 * @When /^user "([^"]*)" tries to send the following share invitation using the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
