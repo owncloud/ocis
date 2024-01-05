@@ -46,6 +46,23 @@ Feature: move (rename) file
     But for user "Alice" the space "Project" should contain these entries:
       | insideSpace.txt |
 
+  @issue-1976
+  Scenario Outline: try to move a file within a project space into a folder with same name
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
+    And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
+    When user "Alice" moves file "insideSpace.txt" from space "Project" to "insideSpace.txt" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" the content of the file "insideSpace.txt" of the space "Project" should be "some content"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
   @issue-8116
   Scenario Outline: user moves a file from a space project with different a role to a space project with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
@@ -298,6 +315,23 @@ Feature: move (rename) file
       | testfile.txt |
     But for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
       | testfile.txt |
+
+  @issue-1976
+  Scenario Outline: sharee tries to move a file into same shared folder with same name
+    Given user "Brian" has created folder "testshare"
+    And user "Brian" has uploaded file with content "test file content" to "testshare/testfile.txt"
+    And user "Brian" has shared folder "testshare" with user "Alice" with permissions "<permissions>"
+    When user "Alice" moves file "testshare/testfile.txt" from space "Shares" to "testshare/testfile.txt" inside space "Shares" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
+      | testfile.txt |
+    And for user "Brian" folder "testshare" of the space "Personal" should contain these entries:
+      | testfile.txt |
+    Examples:
+      | permissions |
+      | all         |
+      | change      |
+      | read        |
 
 
   Scenario: overwrite a file while moving in project space

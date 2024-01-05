@@ -493,5 +493,15 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L22)
 - [coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L23)
 
+### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
+
+- [coreApiWebdavMove2/moveFile.feature:119](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L119)
+- [coreApiWebdavMove2/moveFile.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L120)
+- [coreApiWebdavMove2/moveFile.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L125)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:282](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L282)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L283)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:285](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L285)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:286](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L286)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

@@ -336,5 +336,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:525](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L525)
 - [apiSpacesDavOperation/moveByFileId.feature:526](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L526)
 
+### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
+
+- [apiSpacesShares/moveSpaces.feature:315](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L315)
+- [apiSpacesShares/moveSpaces.feature:316](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L316)
+- [apiSpacesShares/moveSpaces.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L62)
+- [apiSpacesShares/moveSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L63)
+
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
