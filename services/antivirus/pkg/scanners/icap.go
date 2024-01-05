@@ -66,9 +66,11 @@ func (s ICAP) Scan(in Input) (Result, error) {
 		return result, err
 	}
 
-	err = req.SetPreview(optRes.PreviewBytes)
-	if err != nil {
-		return result, err
+	if optRes.PreviewBytes > 0 {
+		err = req.SetPreview(optRes.PreviewBytes)
+		if err != nil {
+			return result, err
+		}
 	}
 
 	res, err := s.client.Do(req)
