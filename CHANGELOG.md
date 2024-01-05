@@ -45,6 +45,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
 * Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
 ## Details
@@ -83,6 +84,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7916
    https://github.com/owncloud/ocis/pull/7985
    https://github.com/cs3org/reva/pull/4409
+
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
+
+   We update the antivirus icap client library and optimize the antivirus scanning
+   service. ANTIVIRUS_ICAP_TIMEOUT is now deprecated and
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT should be used instead.
+
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT supports human durations like `1s`, `1m`, `1h` and
+   `1d`.
+
+   https://github.com/owncloud/ocis/issues/6764
+   https://github.com/owncloud/ocis/pull/8062
 
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 
