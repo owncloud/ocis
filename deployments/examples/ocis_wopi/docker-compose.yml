@@ -127,6 +127,9 @@ services:
     logging:
       driver: "local"
     restart: always
+    depends_on:
+      collabora:
+        condition: service_healthy
 
   ocis-appprovider-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -209,6 +212,13 @@ services:
     logging:
       driver: "local"
     restart: always
+    healthcheck:
+      test: curl --fail http://localhost:9980 || exit 1
+      interval: 10s
+      retries: 12
+      start_period: 20s
+      timeout: 10s
+
 
   onlyoffice:
     image: onlyoffice/documentserver:7.5.0
