@@ -36,8 +36,5 @@ type cs3Session struct {
 
 // User returns the cs3 user of the session
 func (s *cs3Session) User() *cs3user.User {
-	if s == nil {
-		return nil
-	}
 	return s.u
 }
