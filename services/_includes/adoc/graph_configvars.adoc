@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-07-00-06-03]
+[#deprecation-note-2024-01-08-04-01-26]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -527,7 +527,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2024-01-07-00-06-03[Deprecation Note]
+xref:deprecation-note-2024-01-08-04-01-26[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
