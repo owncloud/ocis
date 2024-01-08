@@ -138,8 +138,10 @@ Feature: add users to group
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
@@ -172,8 +174,10 @@ Feature: add users to group
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message" : {
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
