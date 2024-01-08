@@ -63,7 +63,7 @@ class GraphHelper {
 	/**
 	 * @return string
 	 */
-	public static function getShareIdRegex(): string {
+	public static function getPermissionsIdRegex(): string {
 		return self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
 	}
 
@@ -1543,16 +1543,16 @@ class GraphHelper {
 	/**
 	 * Get the role id by name
 	 *
-	 * @param string $role
+	 * @param string $permissionsRole
 	 *
 	 * @return string
 	 *
 	 * @throws \Exception
 	 */
-	public static function getRoleIdByName(
-		string $role
+	public static function getPermissionsRoleIdByName(
+		string $permissionsRole
 	): string {
-		switch ($role) {
+		switch ($permissionsRole) {
 			case 'Viewer':
 				return 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5';
 			case 'Space Viewer':
@@ -1570,7 +1570,7 @@ class GraphHelper {
 			case 'Manager':
 				return '312c0871-5ef7-4b3a-85b6-0e4074c64049';
 			default:
-				throw new \Exception('Role ' . $role . ' not found');
+				throw new \Exception('Role ' . $permissionsRole . ' not found');
 		}
 	}
 
@@ -1583,8 +1583,8 @@ class GraphHelper {
 	 * @param string $itemId
 	 * @param string $shareeId
 	 * @param string $shareType
-	 * @param string|null $role
-	 * @param string|null $permission
+	 * @param string|null $permissionsRole
+	 * @param string|null $permissionsAction
 	 * @param string|null $expireDate
 	 *
 	 * @return ResponseInterface
@@ -1600,8 +1600,8 @@ class GraphHelper {
 		string $itemId,
 		string $shareeId,
 		string $shareType,
-		?string $role,
-		?string $permission,
+		?string $permissionsRole,
+		?string $permissionsAction,
 		?string $expireDate
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
@@ -1612,13 +1612,13 @@ class GraphHelper {
 
 		$body['recipients'] = [$recipients];
 
-		if ($role !== null) {
-			$roleId = self::getRoleIdByName($role);
+		if ($permissionsRole !== null) {
+			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
 			$body['roles'] = [$roleId];
 		}
 
-		if ($permission !== null) {
-			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permission];
+		if ($permissionsAction !== null) {
+			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permissionsAction];
 		}
 
 		if ($expireDate !== null) {
@@ -1675,7 +1675,7 @@ class GraphHelper {
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body
-	 * @param string $shareId
+	 * @param string $permissionsId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1688,9 +1688,9 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		$body,
-		string $shareId
+		string $permissionsId
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$shareId");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId");
 		return HttpRequestHelper::sendRequestOnce(
 			$url,
 			$xRequestId,
@@ -1710,7 +1710,7 @@ class GraphHelper {
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body
-	 * @param string $shareId
+	 * @param string $permissionsId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1723,9 +1723,9 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		$body,
-		string $shareId
+		string $permissionsId
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$shareId/setPassword");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId/setPassword");
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,
