@@ -104,9 +104,10 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
+    user: "0" # needed for apk add in entrypoint script
     entrypoint:
       - /bin/sh
-    command: ["-c", "curl -k --fail https://${COLLABORA_DOMAIN:-collabora.owncloud.test} || exit 1 && ocis app-provider server" ]
+    command: ["-c", "/entrypoint-override.sh https://${COLLABORA_DOMAIN:-collabora.owncloud.test}"]
     environment:
       # use the internal service name of the gateway
       REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
@@ -125,6 +126,7 @@ services:
       # share the registry with the ocis container
       MICRO_REGISTRY: "mdns"
     volumes:
+      - ./config/ocis-appprovider/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
     logging:
       driver: "local"
@@ -139,8 +141,7 @@ services:
     user: "0" # needed for apk add in entrypoint script
     entrypoint:
       - /bin/sh
-      - /entrypoint-override.sh
-    #command: app-provider server
+    command: ["-c", "/entrypoint-override.sh https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}"]
     environment:
       # use the internal service name of the gateway
       REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
@@ -159,7 +160,7 @@ services:
       # share the registry with the ocis container
       MICRO_REGISTRY: "mdns"
     volumes:
-      - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
+      - ./config/ocis-appprovider/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
     logging:
       driver: "local"
