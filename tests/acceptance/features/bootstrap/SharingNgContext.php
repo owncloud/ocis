@@ -269,18 +269,60 @@ class SharingNgContext implements Context {
 			throw new Error('Expiration date or role is missing to update for share link!');
 		}
 
-		$this->featureContext->setResponse(
-			GraphHelper::updateLinkShare(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$spaceId,
-				$itemId,
-				\json_encode($body),
-				$this->featureContext->shareNgGetLastCreatedLinkShareID()
-			)
+		$response = GraphHelper::updateLinkShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body),
+			$this->featureContext->shareNgGetLastCreatedLinkShareID()
 		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user sets/updates the following password for the last link share using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resourceType = $bodyRows['resourceType'];
+		$resource = $bodyRows['resource'];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		if ($resourceType === 'folder') {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		if (\array_key_exists('password', $bodyRows)) {
+			$body = [
+				"password" => $this->featureContext->getActualPassword($bodyRows['password']),
+			];
+		} else {
+			throw new Error('Password is missing to set for share link!');
+		}
+
+		$response = GraphHelper::setPassword(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body),
+			$this->featureContext->shareNgGetLastCreatedLinkShareID()
+		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

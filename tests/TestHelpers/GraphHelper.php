@@ -1747,6 +1747,40 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
+	 * @param mixed $body
+	 * @param string $shareId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function setPassword(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $itemId,
+		$body,
+		string $shareId
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$shareId/setPassword");
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			$body
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $itemId
 	 * @param string $permissionId
 	 *
 	 * @return ResponseInterface
