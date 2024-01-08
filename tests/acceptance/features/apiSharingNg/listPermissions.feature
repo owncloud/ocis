@@ -22,31 +22,28 @@ Feature: List a sharing permissions
         "properties": {
           "@libre.graph.permissions.actions.allowedValues": {
             "type": "array",
-            "items": [
-              {
-                "type": "string",
-                "required": [
-                  "libre.graph/driveItem/permissions/create",
-                  "libre.graph/driveItem/children/create",
-                  "libre.graph/driveItem/standard/delete",
-                  "libre.graph/driveItem/path/read",
-                  "libre.graph/driveItem/quota/read",
-                  "libre.graph/driveItem/content/read",
-                  "libre.graph/driveItem/upload/create",
-                  "libre.graph/driveItem/permissions/read",
-                  "libre.graph/driveItem/children/read",
-                  "libre.graph/driveItem/versions/read",
-                  "libre.graph/driveItem/deleted/read",
-                  "libre.graph/driveItem/path/update",
-                  "libre.graph/driveItem/permissions/delete",
-                  "libre.graph/driveItem/deleted/delete",
-                  "libre.graph/driveItem/versions/update",
-                  "libre.graph/driveItem/deleted/update",
-                  "libre.graph/driveItem/basic/read",
-                  "libre.graph/driveItem/permissions/update",
-                  "libre.graph/driveItem/permissions/deny"
-                ]
-              }
+            "enum": [
+              [
+                "libre.graph/driveItem/permissions/create",
+                "libre.graph/driveItem/children/create",
+                "libre.graph/driveItem/standard/delete",
+                "libre.graph/driveItem/path/read",
+                "libre.graph/driveItem/quota/read",
+                "libre.graph/driveItem/content/read",
+                "libre.graph/driveItem/upload/create",
+                "libre.graph/driveItem/permissions/read",
+                "libre.graph/driveItem/children/read",
+                "libre.graph/driveItem/versions/read",
+                "libre.graph/driveItem/deleted/read",
+                "libre.graph/driveItem/path/update",
+                "libre.graph/driveItem/permissions/delete",
+                "libre.graph/driveItem/deleted/delete",
+                "libre.graph/driveItem/versions/update",
+                "libre.graph/driveItem/deleted/update",
+                "libre.graph/driveItem/basic/read",
+                "libre.graph/driveItem/permissions/update",
+                "libre.graph/driveItem/permissions/deny"
+              ]
             ]
           },
           "@libre.graph.permissions.roles.allowedValues": {
