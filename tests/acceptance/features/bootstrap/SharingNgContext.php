@@ -160,8 +160,8 @@ class SharingNgContext implements Context {
 			$itemId,
 			$shareeId,
 			$rows['shareType'],
-			$role,
-			$permission,
+			$permissionsRole,
+			$permissionsAction,
 			$expireDate
 		);
 		if ($response->getStatusCode() === 200) {
@@ -354,7 +354,7 @@ class SharingNgContext implements Context {
 		$itemId = ($resourceType === 'folder')
 			? $this->spacesContext->getResourceId($sharer, $space, $resource)
 			: $this->spacesContext->getFileId($sharer, $space, $resource);
-		$permId = $this->featureContext->shareNgGetLastCreatedUserShareShareID();
+		$permId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
 			GraphHelper::deleteSharePermission(
 				$this->featureContext->getBaseUrl(),
