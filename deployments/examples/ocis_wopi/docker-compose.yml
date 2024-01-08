@@ -130,8 +130,7 @@ services:
       driver: "local"
     restart: always
     depends_on:
-      collabora:
-        condition: service_healthy
+      - collabora
 
   ocis-appprovider-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
