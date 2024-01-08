@@ -355,7 +355,7 @@ class SharingNgContext implements Context {
 		$itemId = ($resourceType === 'folder')
 			? $this->spacesContext->getResourceId($sharer, $space, $resource)
 			: $this->spacesContext->getFileId($sharer, $space, $resource);
-		$permId = $this->featureContext->shareNgGetLastCreatedUserShareShareID();
+		$permId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
 			GraphHelper::deleteSharePermission(
 				$this->featureContext->getBaseUrl(),

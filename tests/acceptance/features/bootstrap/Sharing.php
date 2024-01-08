@@ -220,7 +220,7 @@ trait Sharing {
 	/**
 	 * @return string
 	 */
-	public function shareNgGetLastCreatedUserShareShareID(): string {
+	public function shareNgGetLastCreatedUserGroupShareID(): string {
 		$lastResponse = $this->shareNgGetLastCreatedUserGroupShare();
 		if (!isset($this->getJsonDecodedResponse($lastResponse)['value'][0]['id'])) {
 			throw new Error('Response did not contain share id for the last created share.');
