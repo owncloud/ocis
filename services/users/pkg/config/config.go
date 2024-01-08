@@ -67,7 +67,7 @@ type LDAPDriver struct {
 	CACert                   string          `yaml:"ca_cert" env:"OCIS_LDAP_CACERT;USERS_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm."`
 	Insecure                 bool            `yaml:"insecure" env:"OCIS_LDAP_INSECURE;USERS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
 	BindDN                   string          `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;USERS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
-	BindPassword             string          `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." deprecationVersion:"4.0.2" removalVersion:"5.0.0" deprecationInfo:"LDAP_BIND_PASSWORD changing name for consistency" deprecationReplacement:"OCIS_LDAP_BIND_PASSWORD"`
+	BindPassword             string          `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
 	UserBaseDN               string          `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users."`
 	GroupBaseDN              string          `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
 	UserScope                string          `yaml:"user_scope" env:"OCIS_LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'."`
@@ -87,7 +87,7 @@ type LDAPDriver struct {
 
 type LDAPUserSchema struct {
 	ID              string `yaml:"id" env:"OCIS_LDAP_USER_SCHEMA_ID;USERS_LDAP_USER_SCHEMA_ID" desc:"LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID."`
-	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's." deprecationVersion:"4.0.2" removalVersion:"5.0.0" deprecationInfo:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's."`
 	Mail            string `yaml:"mail" env:"OCIS_LDAP_USER_SCHEMA_MAIL;USERS_LDAP_USER_SCHEMA_MAIL" desc:"LDAP Attribute to use for the email address of users."`
 	DisplayName     string `yaml:"display_name" env:"OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;USERS_LDAP_USER_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of users."`
 	Username        string `yaml:"user_name" env:"OCIS_LDAP_USER_SCHEMA_USERNAME;USERS_LDAP_USER_SCHEMA_USERNAME" desc:"LDAP Attribute to use for username of users."`

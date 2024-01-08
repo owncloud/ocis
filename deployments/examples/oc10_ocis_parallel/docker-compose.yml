@@ -84,7 +84,7 @@ services:
       OCIS_LDAP_URI: "ldaps://openldap"
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       # LDAP user settings
       PROXY_USER_OIDC_CLAIM: ocis.user.uuid # claim was added in Keycloak
       PROXY_USER_CS3_CLAIM: userid # equals LDAP_USER_SCHEMA_ID

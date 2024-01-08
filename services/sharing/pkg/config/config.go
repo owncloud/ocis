@@ -151,7 +151,7 @@ type Events struct {
 	Addr              string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
 	ClusterID         string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;SHARING_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 	TLSInsecure       bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;SHARING_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
-	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERT" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false." deprecationVersion:"4.0.3" removalVersion:"5.0.0" deprecationInfo:"SHARING_EVENTS_TLS_ROOT_CA_CERT changing name for consistency" deprecationReplacement:"SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE"`
+	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false."`
 	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;SHARING_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
 }
 
