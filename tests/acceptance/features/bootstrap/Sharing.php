@@ -218,7 +218,6 @@ trait Sharing {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * @return string
 	 */
 	public function shareNgGetLastCreatedUserGroupShareID(): string {
@@ -230,8 +229,6 @@ trait Sharing {
 	}
 
 	/**
-=======
->>>>>>> 85d4598907 ([tests-only][full-ci]Added tests for setting password in a public share (#8079) (#8138))
 	 * Split given permissions string each separated with "," into array of strings
 	 *
 	 * @param string $str

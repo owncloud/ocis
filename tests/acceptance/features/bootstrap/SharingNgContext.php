@@ -160,7 +160,6 @@ class SharingNgContext implements Context {
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
-
 		$response = GraphHelper::sendSharingInvitation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -511,21 +510,9 @@ class SharingNgContext implements Context {
 		$itemId = ($resourceType === 'folder')
 			? $this->spacesContext->getResourceId($sharer, $space, $resource)
 			: $this->spacesContext->getFileId($sharer, $space, $resource);
-		$userIdOfSharee = ($shareType === 'user')
-		? $this->featureContext->getUserIdByUserName($sharee)
-			: $this->featureContext->getGroupIdByGroupName($sharee);
-		$permId = GraphHelper::getSharePermissionId(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$sharer,
-			$userIdOfSharee,
-			$this->featureContext->getPasswordForUser($sharer),
-			$spaceId,
-			$itemId,
-			$shareType
-		);
+		$permId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
-			GraphHelper::removeSharePermission(
+			GraphHelper::deleteSharePermission(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$sharer,
