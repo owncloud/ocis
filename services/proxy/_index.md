@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2024-01-09T06:09:23.210316168Z
+date: 2024-01-09T07:54:17.311301123Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -26,6 +26,11 @@ The proxy service is the only service communicating to the outside and needs the
 * [Recommendations for Production Deployments](#recommendations-for-production-deployments)
 * [Caching](#caching)
 * [Special Settings](#special-settings)
+* [Metrics](#metrics)
+  * [1) Single Process Mode](#1)-single-process-mode)
+  * [2) Standalone Mode](#2)-standalone-mode)
+  * [Available Metrics](#available-metrics)
+  * [Prometheus Configuration](#prometheus-configuration)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Authentication
@@ -140,6 +145,38 @@ When using the ocis IDP service instead of an external IDP:
 -   Use the environment variable `OCIS_URL` to define how ocis can be accessed, mandatory use `https` as protocol for the URL.
 -   If no reverse proxy is set up, the `PROXY_TLS` environment variable **must** be set to `true` because the embedded `libreConnect` shipped with the IDP service has a hard check if the connection is on TLS and uses the HTTPS protocol. If this mismatches, an error will be logged and no connection from the client can be established.
 -   `PROXY_TLS` **can** be set to `false` if a reverse proxy is used and the https connection is terminated at the reverse proxy. When setting to `false`, the communication between the reverse proxy and ocis is not secured. If set to `true`, you must provide certificates.
+
+## Metrics
+
+The proxy service in ocis has the ability to expose metrics in the prometheus format. The metrics are exposed on the `/metrics` endpoint. There are two ways to run the ocis proxy service which has an impact on the number of metrics exposed.
+
+### 1) Single Process Mode
+In the single process mode, all ocis services are running inside a single process. This is the default mode when using the `ocis server` command to start the services. In this mode, the proxy service exposes metrics about the proxy service itself and about the ocis services it is proxying. This is due to the nature of the prometheus registry which is a singleton. The metrics exposed by the proxy service itself are prefixed with `ocis_proxy_` and the metrics exposed by other ocis services are prefixed with `ocis_<service-name>_`.
+
+### 2) Standalone Mode
+In this mode, the proxy service only exposes its own metrics. The metrics of the other ocis services are exposed on their own metrics endpoints.
+
+### Available Metrics
+The following metrics are exposed by the proxy service:
+
+| Metric Name                      | Description                                                                                                                                                                                                                   | Labels                                |
+|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| `ocis_proxy_requests_total`      | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests.                                                                                   | `method`: HTTP method of the request  |
+| `ocis_proxy_errors_total`        | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests which have failed. That counts all response codes >= 500                           | `method`: HTTP method of the request  |
+| `ocis_proxy_duration_seconds`    | [Histogram](https://prometheus.io/docs/tutorials/understanding_metric_types/#histogram) of the time (in seconds) each request took. A histogram metric uses buckets to count the number of events that fall into each bucket. | `method`: HTTP method of the request  |
+| `ocis_proxy_build_info{version}` | A metric with a constant `1` value labeled by version, exposing the version of the ocis proxy service.                                                                                                                        | `version`: Build version of the proxy |
+
+### Prometheus Configuration
+The following is an example prometheus configuration for the single process mode. It assumes that the proxy service is configured to bind on all interfaces `PROXY_HTTP_ADDR=0.0.0.0:9205` and that the proxy is available via the `ocis` service name (typically in docker-compose). The prometheus service detects the `/metrics` endpoint automatically and scrapes it every 15 seconds.
+
+```yaml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: ocis_proxy
+    static_configs:
+    - targets: ["ocis:9205"]
+```
 ## Example Yaml Config
 {{< include file="services/_includes/proxy-config-example.yaml"  language="yaml" >}}
 
