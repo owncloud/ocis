@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-09-08-13-49]
+[#deprecation-note-2024-01-09-12-41-35]
 [caption=]
 .Deprecation notes for the groups service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -263,7 +263,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `GROUPS_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2024-01-09-08-13-49[Deprecation Note]
+xref:deprecation-note-2024-01-09-12-41-35[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
