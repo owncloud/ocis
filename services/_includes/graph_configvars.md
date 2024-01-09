@@ -54,7 +54,7 @@
 | OCIS_LDAP_CACERT<br/>GRAPH_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
 | OCIS_LDAP_INSECURE<br/>GRAPH_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
 | OCIS_LDAP_BIND_DN<br/>GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
-| OCIS_LDAP_BIND_PASSWORD<br/>LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| OCIS_LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
 | GRAPH_LDAP_SERVER_UUID | bool | false | If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute.|
 | GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP | bool | true | Use the 'Password Modify Extended Operation' for updating user passwords.|
 | OCIS_LDAP_SERVER_WRITE_ENABLED<br/>GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).|

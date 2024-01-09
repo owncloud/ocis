@@ -23,7 +23,7 @@
 | OCIS_EVENTS_ENDPOINT<br/>SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>SHARING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>SHARING_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
-| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>SHARING_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | SHARING_USER_DRIVER | string | jsoncs3 | Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' and 'owncloudsql'.|
