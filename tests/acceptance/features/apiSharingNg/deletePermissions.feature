@@ -126,7 +126,6 @@ Feature: Remove access to a drive item
       | Uploader        | folder        | FolderToShare |
       | Manager         | folder        | FolderToShare |
 
-
   Scenario Outline: user removes access to a folder in link share
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has created the following link share:

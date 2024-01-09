@@ -1713,7 +1713,7 @@ class GraphHelper {
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body
-	 * @param string $shareId
+	 * @param string $permissionsId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1726,9 +1726,9 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		$body,
-		string $shareId
+		string $permissionsId
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$shareId/setPassword");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId/setPassword");
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,
