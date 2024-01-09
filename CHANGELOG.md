@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 
 ## Details
 
@@ -110,6 +111,14 @@ The following sections list the changes for unreleased.
    We update reva to the latest edge version to get the latest fixes and features.
 
    https://github.com/owncloud/ocis/pull/8100
+
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
+
+   We have removed all deprecated environment variables that have been marked for
+   removal for 5.0.0
+
+   https://github.com/owncloud/ocis/issues/8025
+   https://github.com/owncloud/ocis/pull/8149
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
