@@ -261,3 +261,28 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
+
+  @issue-1976
+  Scenario Outline: sharee tries to move a file into same shared folder with same name
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "testshare"
+    And user "Brian" has uploaded file with content "test data" to "testshare/testfile.txt"
+    And user "Brian" has created a share with settings
+      | path        | testshare     |
+      | shareType   | user          |
+      | permissions | <permissions> |
+      | shareWith   | Alice         |
+    When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And as "Brian" the file with original path "testshare/testfile.txt" should not exist in the trashbin
+    And the content of file "Shares/testshare/testfile.txt" for user "Alice" should be "test data"
+    And the content of file "testshare/testfile.txt" for user "Brian" should be "test data"
+    Examples:
+      | dav-path-version | permissions |
+      | old              | all         |
+      | old              | change      |
+      | old              | read        |
+      | new              | all         |
+      | new              | change      |
+      | new              | read        |

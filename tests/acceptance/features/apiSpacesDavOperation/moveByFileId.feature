@@ -73,6 +73,19 @@ Feature: moving/renaming file using file id
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
+  @issue-1976
+  Scenario Outline: try to move a file into same folder with same name
+    And user "Alice" has uploaded file with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" moves a file "textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
+    Then the HTTP status code should be "403"
+    And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "Personal"
+    And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "some data"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
 
   Scenario Outline: move a file from personal to share space
     Given user "Brian" has been created with default attributes and without skeleton files
@@ -162,6 +175,29 @@ Feature: moving/renaming file using file id
       | editor  | /remote.php/dav/spaces/<<FILEID>> |
       | manager | /dav/spaces/<<FILEID>>            |
       | editor  | /dav/spaces/<<FILEID>>            |
+
+  @issue-1976
+  Scenario Outline: try to move a file within a project space into a folder with same name
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has shared a space "project-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
+    When user "Brian" moves a file "textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "403"
+    And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "project-space"
+    And for user "Brian" the content of the file "textfile.txt" of the space "project-space" should be "some data"
+    Examples:
+      | role    | dav-path                          |
+      | manager | /remote.php/dav/spaces/<<FILEID>> |
+      | editor  | /remote.php/dav/spaces/<<FILEID>> |
+      | viewer  | /remote.php/dav/spaces/<<FILEID>> |
+      | manager | /dav/spaces/<<FILEID>>            |
+      | editor  | /dav/spaces/<<FILEID>>            |
+      | viewer  | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: try to move a file into a folder inside project space (viewer)
@@ -408,6 +444,27 @@ Feature: moving/renaming file using file id
       | all         | /dav/spaces/<<FILEID>>            |
       | change      | /remote.php/dav/spaces/<<FILEID>> |
       | change      | /dav/spaces/<<FILEID>>            |
+
+  @issue-1976
+  Scenario Outline: sharee tries to move a file into same shared folder with same name
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "folder"
+    And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
+    And we save it into "FILEID"
+    And user "Alice" has shared folder "folder" with user "Brian" with permissions "<permissions>"
+    When user "Brian" moves a file "Shares/folder/test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
+    Then the HTTP status code should be "403"
+    And as "Alice" file "test.txt" should not exist in the trashbin of the space "Personal"
+    And for user "Brian" the content of the file "folder/test.txt" of the space "Shares" should be "some data"
+    And for user "Alice" the content of the file "folder/test.txt" of the space "Personal" should be "some data"
+    Examples:
+      | permissions | dav-path                          |
+      | all         | /remote.php/dav/spaces/<<FILEID>> |
+      | all         | /dav/spaces/<<FILEID>>            |
+      | change      | /remote.php/dav/spaces/<<FILEID>> |
+      | change      | /dav/spaces/<<FILEID>>            |
+      | read        | /remote.php/dav/spaces/<<FILEID>> |
+      | read        | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: try to move a file into a folder within a shared folder (read permissions)
