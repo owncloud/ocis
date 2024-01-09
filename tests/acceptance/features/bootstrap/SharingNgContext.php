@@ -21,7 +21,6 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
@@ -78,7 +77,7 @@ class SharingNgContext implements Context {
 		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
 		$bodyRows['password'] = $bodyRows['password'] ?? null;
 		$body = [
-			'type' => $bodyRows['role'],
+			'type' => $bodyRows['permissionsRole'],
 			'displayName' => $bodyRows['displayName'],
 			'expirationDateTime' => $bodyRows['expirationDateTime'],
 			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
@@ -148,8 +147,8 @@ class SharingNgContext implements Context {
 			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
 			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
 
-		$role = $rows['role'] ?? null;
-		$permission = $rows['permission'] ?? null;
+		$permissionsRole = $rows['permissionsRole'] ?? null;
+		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
 
 		$response = GraphHelper::sendSharingInvitation(
@@ -161,8 +160,8 @@ class SharingNgContext implements Context {
 			$itemId,
 			$shareeId,
 			$rows['shareType'],
-			$role,
-			$permission,
+			$permissionsRole,
+			$permissionsAction,
 			$expireDate
 		);
 		if ($response->getStatusCode() === 200) {
@@ -256,13 +255,13 @@ class SharingNgContext implements Context {
 			$body = [
 				"expirationDateTime" => $bodyRows['expirationDateTime'],
 				"link" => [
-					"type" => $bodyRows['role']
+					"type" => $bodyRows['permissionsRole']
 				]
 			];
-		} elseif (\array_key_exists('role', $bodyRows)) {
+		} elseif (\array_key_exists('permissionsRole', $bodyRows)) {
 			$body = [
 				"link" => [
-					"type" => $bodyRows['role']
+					"type" => $bodyRows['permissionsRole']
 				]
 			];
 		} elseif (\array_key_exists('expirationDateTime', $bodyRows)) {
@@ -287,7 +286,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user sets/updates the following password for the last link share using the Graph API:
+	 * @When user :user sets the following password for the last link share using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body

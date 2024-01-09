@@ -13,27 +13,27 @@ Feature: Remove access to a drive item
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType | <resource-type> |
-      | resource     | <path>          |
-      | space        | Personal        |
-      | sharee       | Brian           |
-      | shareType    | user            |
-      | role         | <role>          |
+      | resourceType    | <resource-type>   |
+      | resource        | <path>            |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | <permissionsRole> |
     When user "Alice" removes the share permission of user "Brian" from <resource-type> "<path>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <path> |
     Examples:
-      | role        | resource-type | path          |
-      | Viewer      | file          | textfile.txt  |
-      | File Editor | file          | textfile.txt  |
-      | Co Owner    | file          | textfile.txt  |
-      | Manager     | file          | textfile.txt  |
-      | Viewer      | folder        | FolderToShare |
-      | Editor      | folder        | FolderToShare |
-      | Co Owner    | folder        | FolderToShare |
-      | Uploader    | folder        | FolderToShare |
-      | Manager     | folder        | FolderToShare |
+      | permissionsRole | resource-type | path          |
+      | Viewer          | file          | textfile.txt  |
+      | File Editor     | file          | textfile.txt  |
+      | Co Owner        | file          | textfile.txt  |
+      | Manager         | file          | textfile.txt  |
+      | Viewer          | folder        | FolderToShare |
+      | Editor          | folder        | FolderToShare |
+      | Co Owner        | folder        | FolderToShare |
+      | Uploader        | folder        | FolderToShare |
+      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to resource inside of a project space in the user share
@@ -42,27 +42,27 @@ Feature: Remove access to a drive item
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType | <resource-type> |
-      | resource     | <path>          |
-      | space        | NewSpace        |
-      | sharee       | Brian           |
-      | shareType    | user            |
-      | role         | <role>          |
+      | resourceType    | <resource-type>   |
+      | resource        | <path>            |
+      | space           | NewSpace          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | <permissionsRole> |
     When user "Alice" removes the share permission of user "Brian" from <resource-type> "<path>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <path> |
     Examples:
-      | role        | resource-type | path          |
-      | Viewer      | file          | textfile.txt  |
-      | File Editor | file          | textfile.txt  |
-      | Co Owner    | file          | textfile.txt  |
-      | Manager     | file          | textfile.txt  |
-      | Viewer      | folder        | FolderToShare |
-      | Editor      | folder        | FolderToShare |
-      | Co Owner    | folder        | FolderToShare |
-      | Uploader    | folder        | FolderToShare |
-      | Manager     | folder        | FolderToShare |
+      | permissionsRole | resource-type | path          |
+      | Viewer          | file          | textfile.txt  |
+      | File Editor     | file          | textfile.txt  |
+      | Co Owner        | file          | textfile.txt  |
+      | Manager         | file          | textfile.txt  |
+      | Viewer          | folder        | FolderToShare |
+      | Editor          | folder        | FolderToShare |
+      | Co Owner        | folder        | FolderToShare |
+      | Uploader        | folder        | FolderToShare |
+      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource in a group share
@@ -72,27 +72,27 @@ Feature: Remove access to a drive item
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType | <resource-type> |
-      | resource     | <path>          |
-      | space        | Personal        |
-      | sharee       | group1          |
-      | shareType    | group           |
-      | role         | <role>          |
+      | resourceType    | <resource-type>   |
+      | resource        | <path>            |
+      | space           | Personal          |
+      | sharee          | group1            |
+      | shareType       | group             |
+      | permissionsRole | <permissionsRole> |
     When user "Alice" removes the share permission of group "group1" from <resource-type> "<path>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <path> |
     Examples:
-      | role        | resource-type | path          |
-      | Viewer      | file          | textfile.txt  |
-      | File Editor | file          | textfile.txt  |
-      | Co Owner    | file          | textfile.txt  |
-      | Manager     | file          | textfile.txt  |
-      | Viewer      | folder        | FolderToShare |
-      | Editor      | folder        | FolderToShare |
-      | Co Owner    | folder        | FolderToShare |
-      | Uploader    | folder        | FolderToShare |
-      | Manager     | folder        | FolderToShare |
+      | permissionsRole | resource-type | path          |
+      | Viewer          | file          | textfile.txt  |
+      | File Editor     | file          | textfile.txt  |
+      | Co Owner        | file          | textfile.txt  |
+      | Manager         | file          | textfile.txt  |
+      | Viewer          | folder        | FolderToShare |
+      | Editor          | folder        | FolderToShare |
+      | Co Owner        | folder        | FolderToShare |
+      | Uploader        | folder        | FolderToShare |
+      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource inside of a project space in group share
@@ -104,24 +104,24 @@ Feature: Remove access to a drive item
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
     And user "Alice" has sent the following share invitation:
-      | resourceType | <resource-type> |
-      | resource     | <path>          |
-      | space        | NewSpace        |
-      | sharee       | group1          |
-      | shareType    | group           |
-      | role         | <role>          |
+      | resourceType    | <resource-type>   |
+      | resource        | <path>            |
+      | space           | NewSpace          |
+      | sharee          | group1            |
+      | shareType       | group             |
+      | permissionsRole | <permissionsRole> |
     When user "Alice" removes the share permission of group "group1" from <resource-type> "<path>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <path> |
     Examples:
-      | role        | resource-type | path          |
-      | Viewer      | file          | textfile.txt  |
-      | File Editor | file          | textfile.txt  |
-      | Co Owner    | file          | textfile.txt  |
-      | Manager     | file          | textfile.txt  |
-      | Viewer      | folder        | FolderToShare |
-      | Editor      | folder        | FolderToShare |
-      | Co Owner    | folder        | FolderToShare |
-      | Uploader    | folder        | FolderToShare |
-      | Manager     | folder        | FolderToShare |
+      | permissionsRole | resource-type | path          |
+      | Viewer          | file          | textfile.txt  |
+      | File Editor     | file          | textfile.txt  |
+      | Co Owner        | file          | textfile.txt  |
+      | Manager         | file          | textfile.txt  |
+      | Viewer          | folder        | FolderToShare |
+      | Editor          | folder        | FolderToShare |
+      | Co Owner        | folder        | FolderToShare |
+      | Uploader        | folder        | FolderToShare |
+      | Manager         | folder        | FolderToShare |

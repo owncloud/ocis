@@ -2793,10 +2793,10 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%share_id_pattern%",
+				"code" => "%permissions_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getShareIdRegex"
+					"getPermissionsIdRegex"
 				],
 				"parameter" => []
 			]
