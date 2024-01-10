@@ -359,8 +359,8 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
   @skipOnReva
-  Scenario Outline: moving a file (with versions) into a shared folder as the sharee and as the sharer
-    Given using <dav-path-version> DAV path
+  Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
+    Given using new DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a share with settings
@@ -369,6 +369,7 @@ Feature: dav-versions
       | permissions | change    |
       | shareWith   | Alice     |
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
+    And we save it into "FILEID"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
     When user "Brian" moves file "/testfile.txt" to "/testshare/testfile.txt" using the WebDAV API
@@ -376,11 +377,8 @@ Feature: dav-versions
     And the content of file "/Shares/testshare/testfile.txt" for user "Alice" should be "test data 3"
     And the content of file "/testshare/testfile.txt" for user "Brian" should be "test data 3"
     And as "Brian" file "/testfile.txt" should not exist
-    And the version folder of file "/Shares/testshare/testfile.txt" for user "Alice" should contain "2" elements
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
+    When user "Alice" tries to get the number of versions of file "/Shares/testshare/testfile.txt" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "403"
 
 
   Scenario Outline: moving a file (with versions) out of a shared folder as the sharee and as the sharer

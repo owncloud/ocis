@@ -58,3 +58,35 @@ Feature: checking file versions using file id
     And using new DAV path
     When user "Brian" tries to get the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "403"
+
+
+  Scenario Outline: check the versions of a file after moving to a shared folder inside a project space as editor/viewer
+    Given user "Alice" has created a folder "testFolder" in space "Project1"
+    And user "Alice" has created a share inside of space "Project1" with settings:
+      | path      | testFolder |
+      | shareWith | Brian      |
+      | role      | <role>     |
+    And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
+    And using new DAV path
+    When user "Alice" gets the number of versions of file "/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "207"
+    And the number of versions should be "1"
+    When user "Brian" tries to get the number of versions of file "/Shares/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "403"
+    Examples:
+      | role   |
+      | editor |
+      | viewer |
+
+
+  Scenario: check the versions of a file after moving it to a shared folder of a project space shared with all permissions
+    Given user "Alice" has created a folder "testFolder" in space "Project1"
+    And user "Alice" has created a share inside of space "Project1" with settings:
+      | path      | testFolder |
+      | shareWith | Brian      |
+      | role      | all        |
+    And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
+    And using new DAV path
+    When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "207"
+    And the number of versions should be "1"
