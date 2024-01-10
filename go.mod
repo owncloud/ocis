@@ -356,6 +356,8 @@ replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20
 
 replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240105150744-9c2d8aff3ef2
 
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.18.1-0.20240110134553-5a602364c6d4
+
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible

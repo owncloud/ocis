@@ -150,25 +150,27 @@ type Session interface {
 	ID() string
 	Node(ctx context.Context) (*node.Node, error)
 	Context(ctx context.Context) context.Context
-	Cleanup(cleanNode, cleanBin, cleanInfo bool)
+	Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool)
 }
 
 // Cleanup cleans upload metadata, binary data and processing status as necessary
-func (store OcisStore) Cleanup(ctx context.Context, session Session, failure bool, keepUpload bool) {
+func (store OcisStore) Cleanup(ctx context.Context, session Session, revertNodeMetadata, keepUpload, unmarkPostprocessing bool) {
 	ctx, span := tracer.Start(session.Context(ctx), "Cleanup")
 	defer span.End()
-	session.Cleanup(failure, !keepUpload, !keepUpload)
+	session.Cleanup(revertNodeMetadata, !keepUpload, !keepUpload)
 
 	// unset processing status
-	n, err := session.Node(ctx)
-	if err != nil {
-		appctx.GetLogger(ctx).Info().Str("session", session.ID()).Err(err).Msg("could not read node")
-		return
-	}
-	// FIXME: after cleanup the node might already be deleted ...
-	if n != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
-		if err := n.UnmarkProcessing(ctx, session.ID()); err != nil {
-			appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
+	if unmarkPostprocessing {
+		n, err := session.Node(ctx)
+		if err != nil {
+			appctx.GetLogger(ctx).Info().Str("session", session.ID()).Err(err).Msg("could not read node")
+			return
+		}
+		// FIXME: after cleanup the node might already be deleted ...
+		if n != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
+			if err := n.UnmarkProcessing(ctx, session.ID()); err != nil {
+				appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
+			}
 		}
 	}
 }
