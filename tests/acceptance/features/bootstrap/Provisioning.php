@@ -2672,7 +2672,11 @@ trait Provisioning {
 	 */
 	public function cleanupGroup(string $group):void {
 		try {
-			$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
+			if (OcisHelper::isTestingWithGraphApi()) {
+				$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
+			} else {
+				$this->deleteLdapGroup($group);
+			}
 		} catch (Exception $e) {
 			\error_log(
 				"INFORMATION: There was an unexpected problem trying to delete group " .
@@ -3473,10 +3477,10 @@ trait Provisioning {
 	 * @throws GuzzleException
 	 */
 	public function groupHasBeenDeleted(string $group):void {
-		if ($this->groupExists($group) && $this->isTestingWithLdap()) {
+		if ($this->isTestingWithLdap()) {
 			$this->deleteLdapGroup($group);
 		} else {
-			$this->graphContext->adminHasDeletedGroupUsingTheGraphApi($group);
+			$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
 		}
 		$this->groupShouldNotExist($group);
 	}

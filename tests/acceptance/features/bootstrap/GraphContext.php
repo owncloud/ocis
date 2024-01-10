@@ -326,18 +326,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function adminHasDeletedGroupUsingTheGraphApi(string $group): void {
-		$this->adminDeletesGroupUsingTheGraphApi($group);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
-	}
-
-	/**
 	 * sends a request to delete a user using the Graph API
 	 *
 	 * @param string $user username is used as the id
