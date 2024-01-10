@@ -1581,8 +1581,8 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
-	 * @param string $shareeId
-	 * @param string $shareType
+	 * @param array $shareeIds
+	 * @param array $shareTypes
 	 * @param string|null $permissionsRole
 	 * @param string|null $permissionsAction
 	 * @param string|null $expireDate
@@ -1598,8 +1598,8 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		string $shareeId,
-		string $shareType,
+		array $shareeIds,
+		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
 		?string $expireDate
@@ -1607,10 +1607,13 @@ class GraphHelper {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = [];
 
-		$recipients['objectId'] = $shareeId;
-		$recipients['@libre.graph.recipient.type'] = $shareType;
-
-		$body['recipients'] = [$recipients];
+		foreach ($shareeIds as $index => $shareeId) {
+			$shareType = $shareTypes[$index];
+			$body['recipients'][] = [
+				"@libre.graph.recipient.type" => $shareType,
+				"objectId" => $shareeId
+			];
+		}
 
 		if ($permissionsRole !== null) {
 			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
