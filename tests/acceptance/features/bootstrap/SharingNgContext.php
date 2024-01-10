@@ -143,9 +143,16 @@ class SharingNgContext implements Context {
 			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
 			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
 
-		$shareeId = ($rows['shareType'] === 'user')
-			? $this->featureContext->getAttributeOfCreatedUser($rows['sharee'], 'id')
-			: $this->featureContext->getAttributeOfCreatedGroup($rows['sharee'], 'id');
+		$sharees = array_map('trim', explode(',', $rows['sharee']));
+		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+
+		$shareeIds = [];
+		foreach ($sharees as $index => $sharee) {
+			$shareType = $shareTypes[$index];
+			$shareeIds[] = ($shareType === 'user')
+				? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
+				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+		}
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
@@ -158,8 +165,8 @@ class SharingNgContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
 			$itemId,
-			$shareeId,
-			$rows['shareType'],
+			$shareeIds,
+			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
 			$expireDate
