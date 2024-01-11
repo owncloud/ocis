@@ -840,7 +840,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 		m, _ := changes.ToMap() // always returns nil error
 		if len(m) == 1 {
 			oldUserValues.PreferredLanguage = preferredLanguage
-			g.patchUserResponse(w, r, oldUserValues, nameOrID, features)
+			g.patchUserResponse(w, r, oldUserValues, features)
 			return
 		}
 	}
@@ -886,12 +886,12 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 	}
 
 	u.PreferredLanguage = preferredLanguage
-	g.patchUserResponse(w, r, u, nameOrID, features)
+	g.patchUserResponse(w, r, u, features)
 }
 
-func (g *Graph) patchUserResponse(w http.ResponseWriter, r *http.Request, user *libregraph.User, id string, features []events.UserFeature) {
+func (g *Graph) patchUserResponse(w http.ResponseWriter, r *http.Request, user *libregraph.User, features []events.UserFeature) {
 	e := events.UserFeatureChanged{
-		UserID:    id,
+		UserID:    *user.Id,
 		Features:  features,
 		Timestamp: utils.TSNow(),
 	}
