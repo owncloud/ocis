@@ -126,15 +126,16 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
-	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 *
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 * @throws Exception
 	 */
-	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
@@ -150,20 +151,53 @@ class SharingNgContext implements Context {
 		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
 
+		$response = GraphHelper::sendSharingInvitation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			$shareeId,
+			$rows['shareType'],
+			$permissionsRole,
+			$permissionsAction,
+			$expireDate
+		);
+		if ($response->getStatusCode() === 200) {
+			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+		}
+		return $response;
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has sent the following share invitation:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
+		$response = $this->sendShareInvitation($user, $table);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
-			GraphHelper::sendSharingInvitation(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$spaceId,
-				$itemId,
-				$shareeId,
-				$rows['shareType'],
-				$permissionsRole,
-				$permissionsAction,
-				$expireDate
-			)
+			$this->sendShareInvitation($user, $table)
 		);
 	}
 
@@ -292,5 +326,45 @@ class SharingNgContext implements Context {
 			$this->featureContext->shareNgGetLastCreatedLinkShareID()
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $shareType (user|group)
+	 * @param string $sharee can be both user or group
+	 * @param string $resourceType
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(
+		string $sharer,
+		string $shareType,
+		string $sharee,
+		string $resourceType,
+		string $resource,
+		string $space
+	): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
+		$itemId = ($resourceType === 'folder')
+			? $this->spacesContext->getResourceId($sharer, $space, $resource)
+			: $this->spacesContext->getFileId($sharer, $space, $resource);
+		$permId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$this->featureContext->setResponse(
+			GraphHelper::deleteSharePermission(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$sharer,
+				$this->featureContext->getPasswordForUser($sharer),
+				$spaceId,
+				$itemId,
+				$permId
+			)
+		);
 	}
 }
