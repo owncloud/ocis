@@ -79,63 +79,9 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				return err
 			}
 
-			permission := libregraph.NewPermission()
-			{
-				if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
-					permission.SetId(id)
-				}
-
-				if expiration := receivedShare.GetShare().GetExpiration(); expiration != nil {
-					permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
-				}
-
-				if permissionSet := shareStat.GetInfo().GetPermissionSet(); permissionSet != nil {
-					role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
-						*permissionSet,
-						unifiedrole.UnifiedRoleConditionGrantee,
-						g.config.FilesSharing.EnableResharing,
-					)
-
-					if role != nil {
-						permission.SetRoles([]string{role.GetId()})
-					}
-
-					actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
-
-					// actions only make sense if no role is set
-					if role == nil && len(actions) > 0 {
-						permission.SetLibreGraphPermissionsActions(actions)
-					}
-				}
-
-				switch grantee := receivedShare.GetShare().GetGrantee(); {
-				case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
-					user, err := g.identityCache.GetUser(ctx, grantee.GetUserId().GetOpaqueId())
-					if err != nil {
-						g.logger.Error().Err(err).Msg("could not get user")
-						return err
-					}
-
-					permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
-						User: &libregraph.Identity{
-							DisplayName: user.GetDisplayName(),
-							Id:          user.Id,
-						},
-					})
-				case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
-					group, err := g.identityCache.GetGroup(ctx, grantee.GetGroupId().GetOpaqueId())
-					if err != nil {
-						g.logger.Error().Err(err).Msg("could not get group")
-						return err
-					}
-
-					permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
-						Group: &libregraph.Identity{
-							DisplayName: group.GetDisplayName(),
-							Id:          group.Id,
-						},
-					})
-				}
+			permission, err := g.cs3ShareToLibreGraphPermissions(ctx, receivedShare.GetShare(), shareStat.GetInfo())
+			if err != nil {
+				return err
 			}
 
 			parentReference := libregraph.NewItemReference()
@@ -313,4 +259,64 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 	return slices.Clip(slices.DeleteFunc(driveItems, func(item libregraph.DriveItem) bool {
 		return reflect.ValueOf(item).IsZero()
 	})), err
+}
+
+func (g Graph) cs3ShareToLibreGraphPermissions(ctx context.Context, share *collaboration.Share, shareStatInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	permission := libregraph.NewPermission()
+	if id := share.GetId().GetOpaqueId(); id != "" {
+		permission.SetId(id)
+	}
+
+	if expiration := share.GetExpiration(); expiration != nil {
+		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
+	}
+
+	if permissionSet := shareStatInfo.GetPermissionSet(); permissionSet != nil {
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+			*permissionSet,
+			unifiedrole.UnifiedRoleConditionGrantee,
+			g.config.FilesSharing.EnableResharing,
+		)
+
+		if role != nil {
+			permission.SetRoles([]string{role.GetId()})
+		}
+
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
+
+		// actions only make sense if no role is set
+		if role == nil && len(actions) > 0 {
+			permission.SetLibreGraphPermissionsActions(actions)
+		}
+	}
+
+	switch grantee := share.GetGrantee(); {
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
+		user, err := g.identityCache.GetUser(ctx, grantee.GetUserId().GetOpaqueId())
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get user")
+			return nil, err
+		}
+
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+			User: &libregraph.Identity{
+				DisplayName: user.GetDisplayName(),
+				Id:          user.Id,
+			},
+		})
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+		group, err := g.identityCache.GetGroup(ctx, grantee.GetGroupId().GetOpaqueId())
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get group")
+			return nil, err
+		}
+
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+			Group: &libregraph.Identity{
+				DisplayName: group.GetDisplayName(),
+				Id:          group.Id,
+			},
+		})
+	}
+	return permission, nil
 }
