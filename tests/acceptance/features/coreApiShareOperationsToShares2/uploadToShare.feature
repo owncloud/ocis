@@ -140,7 +140,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @smokeTest @skipOnGraph
+  @smokeTest
   Scenario Outline: check quota of owners parent directory of a shared file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -162,7 +162,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -172,7 +172,7 @@ Feature: sharing
       | shareType   | user   |
       | permissions | change |
       | shareWith   | Brian  |
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -193,7 +193,7 @@ Feature: sharing
       | shareType   | group  |
       | permissions | change |
       | shareWith   | grp1   |
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -202,7 +202,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -212,7 +212,7 @@ Feature: sharing
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -221,7 +221,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -233,7 +233,7 @@ Feature: sharing
       | shareType   | group  |
       | permissions | create |
       | shareWith   | grp1   |
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
