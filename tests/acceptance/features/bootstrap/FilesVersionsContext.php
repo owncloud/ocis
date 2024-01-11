@@ -118,7 +118,7 @@ class FilesVersionsContext implements Context {
 				$endpoint,
 				null,
 				null,
-				null,
+				"versions",
 				(string)$this->featureContext->getDavPathVersion()
 			)
 		);
@@ -216,6 +216,28 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
+	 * assert file versions count
+	 *
+	 * @param string $user
+	 * @param string $fileId
+	 * @param int $expectedCount
+	 *
+	 * @throws Exception
+	 */
+	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount):void {
+		$responseXml = $this->listVersionFolder($user, $fileId, 1);
+		$actualCount = \count($responseXml->xpath("//d:prop/d:getetag")) - 1;
+		if ($actualCount === -1) {
+			$actualCount = 0;
+		}
+		Assert::assertEquals(
+			$expectedCount,
+			$actualCount,
+			"Expected $count versions but found $actualCount in \n" . $responseXml->asXML()
+		);
+	}
+
+	/**
 	 * @Then the version folder of file :path for user :user should contain :count element(s)
 	 *
 	 * @param string $path
@@ -232,8 +254,8 @@ class FilesVersionsContext implements Context {
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . " file $path user $user not found (the file may not exist)");
-		$this->theVersionFolderOfFileIdShouldContainElements($fileId, $user, $count);
+		Assert::assertNotNull($fileId, __METHOD__ . " file '$path' for user '$user' not found (the file may not exist)");
+		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
 	/**
@@ -251,13 +273,7 @@ class FilesVersionsContext implements Context {
 		string $user,
 		int $count
 	):void {
-		$responseXml = $this->listVersionFolder($user, $fileId, 1);
-		$xmlPart = $responseXml->xpath("//d:prop/d:getetag");
-		Assert::assertEquals(
-			$count,
-			\count($xmlPart) - 1,
-			"could not find $count version element(s) in \n" . $responseXml->asXML()
-		);
+		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
 	/**
