@@ -786,6 +786,15 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 		}
 	}
 
+	var features []events.UserFeature
+	addfeature := func(name string, value string, oldvalue *string) {
+		features = append(features, events.UserFeature{
+			Name:     name,
+			Value:    value,
+			OldValue: oldvalue,
+		})
+	}
+
 	preferredLanguage, ok := changes.GetPreferredLanguageOk()
 	if ok {
 		_, vID, err := getUserLanguage(r.Context(), g.valueService, oldUserValues.GetId())
@@ -825,9 +834,17 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 			return
 		}
 
+		addfeature("preferredLanguage", *preferredLanguage, nil) // do we need to get the old value?
+
+		// if there are no more changes we can exit here
+		m, _ := changes.ToMap() // always returns nil error
+		if len(m) == 1 {
+			oldUserValues.PreferredLanguage = preferredLanguage
+			g.patchUserResponse(w, r, oldUserValues, nameOrID, features)
+			return
+		}
 	}
 
-	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
 			logger.Debug().Str("mail", *mail).Msg("could not update user: email is not a valid email address")
@@ -835,19 +852,11 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
 		}
-		features = append(features, events.UserFeature{
-			Name:     "email",
-			Value:    *mail,
-			OldValue: oldUserValues.Mail,
-		})
+		addfeature("email", *mail, oldUserValues.Mail)
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
-		features = append(features, events.UserFeature{
-			Name:     "displayname",
-			Value:    *name,
-			OldValue: oldUserValues.DisplayName,
-		})
+		addfeature("displayname", *name, oldUserValues.DisplayName)
 	}
 
 	if userType, ok := changes.GetUserTypeOk(); ok {
@@ -856,26 +865,16 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
 			return
 		}
-		features = append(features, events.UserFeature{
-			Name:     "changeUserType",
-			Value:    *userType,
-			OldValue: oldUserValues.UserType,
-		})
+		addfeature("userType", *userType, oldUserValues.UserType)
 	}
 
 	if accEnabled, ok := changes.GetAccountEnabledOk(); ok {
 		oldAccVal := strconv.FormatBool(oldUserValues.GetAccountEnabled())
-		features = append(features, events.UserFeature{
-			Name:     "accountEnabled",
-			Value:    strconv.FormatBool(*accEnabled),
-			OldValue: &oldAccVal,
-		})
+		addfeature("accountEnabled", strconv.FormatBool(*accEnabled), &oldAccVal)
 	}
 
 	if changes.HasPasswordProfile() {
-		features = append(features, events.UserFeature{
-			Name: "passwordChanged",
-		})
+		addfeature("passwordChanged", "", nil)
 	}
 
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
@@ -885,20 +884,26 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 		errorcode.RenderError(w, r, err)
 		return
 	}
-	u.PreferredLanguage = preferredLanguage
 
+	u.PreferredLanguage = preferredLanguage
+	g.patchUserResponse(w, r, u, nameOrID, features)
+}
+
+func (g *Graph) patchUserResponse(w http.ResponseWriter, r *http.Request, user *libregraph.User, id string, features []events.UserFeature) {
 	e := events.UserFeatureChanged{
-		UserID:    nameOrID,
+		UserID:    id,
 		Features:  features,
 		Timestamp: utils.TSNow(),
 	}
+
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
+
 	g.publishEvent(r.Context(), e)
 
-	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used
-	render.JSON(w, r, u)
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, user)
 }
 
 const (
