@@ -186,6 +186,22 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					}
 
 					remoteItem.SetCreatedBy(identitySet)
+				}
+
+				if userID := receivedShare.GetShare().GetOwner(); userID != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get user")
+						return err
+					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
 					shared.SetOwner(identitySet)
 				}
 
