@@ -176,7 +176,7 @@ Feature: get users
 
   Scenario: admin user gets all users include disabled users
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the user "Alice" has disabled user "Brian" using the Graph API
+    And the user "Alice" has disabled user "Brian"
     When user "Alice" gets all users using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Alice Hansen" in the item 'value', the user-details should match
@@ -656,7 +656,7 @@ Feature: get users
   Scenario: admin user gets all users of certain groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes and without skeleton files
-    And the user "Alice" has disabled user "Carol" using the Graph API
+    And the user "Alice" has disabled user "Carol"
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And user "Alice" has been added to group "tea-lover"

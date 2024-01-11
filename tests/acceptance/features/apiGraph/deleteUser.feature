@@ -112,7 +112,7 @@ Feature: delete user
   Scenario: admin user deletes a disabled user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
-    And the user "Alice" has disabled user "Brian" using the Graph API
+    And the user "Alice" has disabled user "Brian"
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not exist
@@ -124,7 +124,7 @@ Feature: delete user
     And user "Carol" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And the administrator has assigned the role "<userRole>" to user "Carol" using the Graph API
-    And the user "Alice" has disabled user "Brian" using the Graph API
+    And the user "Alice" has disabled user "Brian"
     When the user "Carol" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
     And user "Brian" should exist
