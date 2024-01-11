@@ -233,7 +233,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					permissions := []libregraph.Permission{*permission}
 
 					remoteItem.Permissions = permissions
-					driveItem.Permissions = permissions
 				}
 
 				if !reflect.ValueOf(*parentReference).IsZero() {
