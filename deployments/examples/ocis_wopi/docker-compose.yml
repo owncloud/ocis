@@ -84,7 +84,9 @@ services:
       NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
       NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
       # make the registry available to the app provider containers
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ocis-config:/etc/ocis
@@ -121,7 +123,7 @@ services:
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # share the registry with the ocis container
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
       - ocis-config:/etc/ocis
     logging:
@@ -153,7 +155,7 @@ services:
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # share the registry with the ocis container
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
       - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
