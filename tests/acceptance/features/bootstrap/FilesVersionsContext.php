@@ -222,6 +222,7 @@ class FilesVersionsContext implements Context {
 	 * @param string $fileId
 	 * @param int $expectedCount
 	 *
+	 * @return void
 	 * @throws Exception
 	 */
 	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount):void {
@@ -233,7 +234,7 @@ class FilesVersionsContext implements Context {
 		Assert::assertEquals(
 			$expectedCount,
 			$actualCount,
-			"Expected $count versions but found $actualCount in \n" . $responseXml->asXML()
+			"Expected $expectedCount versions but found $actualCount in \n" . $responseXml->asXML()
 		);
 	}
 
