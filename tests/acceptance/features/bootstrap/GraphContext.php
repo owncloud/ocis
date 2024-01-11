@@ -163,7 +163,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Given /^the user "([^"]*)" has disabled user "([^"]*)" using the Graph API$/
+	 * @Given /^the user "([^"]*)" has disabled user "([^"]*)"$/
 	 *
 	 * @param string $byUser
 	 * @param string $user
@@ -172,7 +172,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserHasDisabledUserToUsingTheGraphApi(string $byUser, string $user): void {
+	public function theUserHasDisabledUser(string $byUser, string $user): void {
 		$this->theUserDisablesUserToUsingTheGraphApi($byUser, $user);
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}

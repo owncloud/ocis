@@ -276,7 +276,7 @@ Feature: add users to group
     Given these groups have been created:
       | groupname | comment      |
       | sales     | normal group |
-    And the user "Admin" has disabled user "Alice" using the Graph API
+    And the user "Admin" has disabled user "Alice"
     When the administrator adds the following users to the following groups using the Graph API
       | username | groupname |
       | Alice    | sales     |

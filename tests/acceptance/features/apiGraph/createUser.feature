@@ -68,7 +68,7 @@ Feature: create user
   Scenario: user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the user "Alice" has disabled user "Brian" using the Graph API
+    And the user "Alice" has disabled user "Brian"
     When the user "Alice" creates a new user with the following attributes using the Graph API:
       | userName       | Brian                 |
       | displayName    | This is another Brian |

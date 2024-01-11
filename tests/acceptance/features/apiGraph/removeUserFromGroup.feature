@@ -202,7 +202,7 @@ Feature: remove a user from a group
     And the following users have been added to the following groups
       | username | groupname       |
       | Alice    | brand-new-group |
-    And the user "Admin" has disabled user "Alice" using the Graph API
+    And the user "Admin" has disabled user "Alice"
     When the administrator removes the following users from the following groups using the Graph API
       | username | groupname       |
       | Alice    | brand-new-group |
