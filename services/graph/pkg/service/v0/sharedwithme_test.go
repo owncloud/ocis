@@ -30,7 +30,7 @@ import (
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
-var _ = PDescribe("SharedWithMe", func() {
+var _ = Describe("SharedWithMe", func() {
 	var (
 		svc             service.Service
 		cfg             *config.Config
@@ -142,9 +142,12 @@ var _ = PDescribe("SharedWithMe", func() {
 			Expect(tape.Code, errorcode.ItemNotFound)
 		})
 
-		It("ignores hidden received shares by default", func() {
+		It("includes hidden shares", func() {
 			listReceivedSharesResponse.Shares = append(listReceivedSharesResponse.Shares, &collaborationv1beta1.ReceivedShare{
 				Hidden: true,
+				Share: &collaborationv1beta1.Share{
+					ResourceId: toResourceID("7$8!9"),
+				},
 			})
 
 			svc.ListSharedWithMe(
@@ -155,34 +158,21 @@ var _ = PDescribe("SharedWithMe", func() {
 			jsonData := gjson.Get(tape.Body.String(), "value")
 
 			Expect(len(listReceivedSharesResponse.Shares)).To(Equal(2))
-			Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
-		})
-
-		It("includes hidden shares if explicitly stated", func() {
-			listReceivedSharesResponse.Shares = append(listReceivedSharesResponse.Shares, &collaborationv1beta1.ReceivedShare{
-				Hidden: true,
-				Share: &collaborationv1beta1.Share{
-					ResourceId: toResourceID("7$8!9"),
-				},
-			})
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe?show-hidden=true", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value")
-
-			Expect(len(listReceivedSharesResponse.Shares)).To(Equal(2))
 			Expect(jsonData.Get("#").Num).To(Equal(float64(2)))
 		})
 
-		It("populates the driveItem properties", func() {
+		// TODO clarify which of the various properties should actually be set on the driveItem and what
+		//      semantics those properties have
+		// createdDateTime: is this the share creation time or the creation time of the shared item (there is not ctime in the stat response)?
+		// lastModifiedDateTime: see above
+		// owner: Should this be the owner of the shared item, the creator of the share, or the owner of the sharejail?
+		// etag: should this just equal the etag of the inner remote item?
+		PIt("populates the driveItem properties", func() {
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
-			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4000}
-			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
+			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
+			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40002}
 
 			etag := "5ffb8e4bec7026050af7fde9482b289a"
 
@@ -204,7 +194,7 @@ var _ = PDescribe("SharedWithMe", func() {
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
 		})
 
-		It("populates the driveItem parentReference properties", func() {
+		PIt("populates the driveItem parentReference properties", func() {
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
 
@@ -219,13 +209,16 @@ var _ = PDescribe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem remoteItem properties", func() {
-
 			share := listReceivedSharesResponse.Shares[0].Share
+			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
+			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
+			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40002}
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Name = "some folder"
 			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
 			resourceInfo.Size = 500
+			resourceInfo.Etag = "\"5ffb8e4bec7026050af7fde9482b289a\""
 
 			svc.ListSharedWithMe(
 				tape,
@@ -234,6 +227,7 @@ var _ = PDescribe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem")
 
+			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
 			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(*share.ResourceId)))
 			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
@@ -255,25 +249,6 @@ var _ = PDescribe("SharedWithMe", func() {
 
 			Expect(jsonData.Get("user.displayName").String()).To(Equal(driveOwner.DisplayName))
 			Expect(jsonData.Get("user.id").String()).To(Equal(driveOwner.Id.OpaqueId))
-		})
-
-		It("populates the driveItem.remoteItem.fileSystemInfo properties", func() {
-
-			share := listReceivedSharesResponse.Shares[0].Share
-			share.Ctime = &typesv1beta1.Timestamp{Seconds: 400}
-
-			resourceInfo := statResponse.Info
-			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 4000}
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.fileSystemInfo")
-
-			Expect(jsonData.Get("createdDateTime").String()).To(Equal(utils.TSToTime(share.Ctime).Format(time.RFC3339Nano)))
-			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
 		})
 
 		It("populates the driveItem.remoteItem.folder properties", func() {
@@ -305,20 +280,6 @@ var _ = PDescribe("SharedWithMe", func() {
 			Expect(jsonData.Get("file.mimeType").String()).To(Equal(resourceInfo.MimeType))
 		})
 
-		It("populates the driveItem.remoteItem.folder properties", func() {
-			resourceInfo := statResponse.Info
-			resourceInfo.Type = providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem")
-
-			Expect(jsonData.Get("folder").Exists()).To(BeTrue())
-		})
-
 		It("populates the driveItem.remoteItem.shared properties", func() {
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4000}
@@ -334,10 +295,10 @@ var _ = PDescribe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.shared.owner properties", func() {
-			shareCreator := getUserResponse.User
+			shareOwner := getUserResponse.User
 
 			share := listReceivedSharesResponse.Shares[0].Share
-			share.Creator = shareCreator.Id
+			share.Owner = shareOwner.Id
 
 			svc.ListSharedWithMe(
 				tape,
@@ -346,8 +307,8 @@ var _ = PDescribe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.shared.owner")
 
-			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareCreator.DisplayName))
-			Expect(jsonData.Get("user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
+			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareOwner.DisplayName))
+			Expect(jsonData.Get("user.id").String()).To(Equal(shareOwner.Id.OpaqueId))
 		})
 
 		It("populates the driveItem.remoteItem.shared.sharedBy properties", func() {
