@@ -23,6 +23,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
+use TestHelpers\WebDavHelper;
 use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
@@ -149,9 +150,10 @@ class SharingNgContext implements Context {
 		$shareeIds = [];
 		foreach ($sharees as $index => $sharee) {
 			$shareType = $shareTypes[$index];
-			$shareeIds[] = ($shareType === 'user')
+			// for non-exiting group or user, generate random id
+			$shareeIds[] = (($shareType === 'user')
 				? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
-				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id')) ?: WebDavHelper::generateUUIDv4();
 		}
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
