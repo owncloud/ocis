@@ -329,6 +329,46 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @param string $sharer
+	 * @param string $shareType (user|group)
+	 * @param string $resourceType
+	 * @param string $resource
+	 * @param string $space
+	 * @param string|null $sharee can be both user or group
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function removeSharePermission(
+		string $sharer,
+		string $shareType,
+		string $resourceType,
+		string $resource,
+		string $space,
+		?string $sharee = null
+	): ResponseInterface {
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
+		$itemId = ($resourceType === 'folder')
+			? $this->spacesContext->getResourceId($sharer, $space, $resource)
+			: $this->spacesContext->getFileId($sharer, $space, $resource);
+
+		$permId = ($shareType === 'link')
+			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
+			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		return
+			GraphHelper::deleteSharePermission(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$sharer,
+				$this->featureContext->getPasswordForUser($sharer),
+				$spaceId,
+				$itemId,
+				$permId
+			);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
@@ -350,21 +390,31 @@ class SharingNgContext implements Context {
 		string $resource,
 		string $space
 	): void {
-		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
-		$itemId = ($resourceType === 'folder')
-			? $this->spacesContext->getResourceId($sharer, $space, $resource)
-			: $this->spacesContext->getFileId($sharer, $space, $resource);
-		$permId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
-			GraphHelper::deleteSharePermission(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$sharer,
-				$this->featureContext->getPasswordForUser($sharer),
-				$spaceId,
-				$itemId,
-				$permId
-			)
+			$this->removeSharePermission($sharer, $shareType, $resourceType, $resource, $space)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the share permission of link from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $resourceType
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userRemovesSharePermissionOfAResourceInLinkShareUsingGraphAPI(
+		string $sharer,
+		string $resourceType,
+		string $resource,
+		string $space
+	):void {
+		$this->featureContext->setResponse(
+			$this->removeSharePermission($sharer, 'link', $resourceType, $resource, $space)
 		);
 	}
 }
