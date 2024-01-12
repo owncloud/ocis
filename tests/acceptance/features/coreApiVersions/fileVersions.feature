@@ -369,6 +369,7 @@ Feature: dav-versions
       | permissions | <permissions> |
       | shareWith   | Alice         |
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
+    And we save it into "FILEID"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
     When user "Brian" moves file "/testfile.txt" to "/testshare/testfile.txt" using the WebDAV API

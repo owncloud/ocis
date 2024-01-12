@@ -57,6 +57,7 @@ Feature: checking file versions using file id
     Then the HTTP status code should be "403"
 
   @issue-7738
+
   Scenario Outline: check the versions of a file after moving to a shared folder inside a project space as editor/viewer
     Given user "Alice" has created a folder "testFolder" in space "Project1"
     And user "Alice" has created a share inside of space "Project1" with settings:
@@ -75,6 +76,7 @@ Feature: checking file versions using file id
       | viewer |
 
   @issue-7738
+
   Scenario: check the versions of a file after moving it to a shared folder of a project space shared with all permissions
     Given user "Alice" has created a folder "testFolder" in space "Project1"
     And user "Alice" has created a share inside of space "Project1" with settings:
