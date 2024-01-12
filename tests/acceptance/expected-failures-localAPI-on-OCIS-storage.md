@@ -265,6 +265,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/linkShare.feature:447](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L447)
 - [apiSharingNg/linkShare.feature:448](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L448)
 - [apiSharingNg/linkShare.feature:449](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L449)
+- [apiSharingNg/deletePermissions.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L146)
+- [apiSharingNg/deletePermissions.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L163)
+- [apiSharingNg/deletePermissions.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L184)
+- [apiSharingNg/deletePermissions.feature:203](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L203)
 
 ### [Share invitation to deleted user or group gives 500 (Fixed on master)](https://github.com/owncloud/ocis/issues/7962)
 - [apiSharingNg/shareInvitations.feature:918](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L918)

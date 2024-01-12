@@ -125,3 +125,79 @@ Feature: Remove access to a drive item
       | Co Owner        | folder        | FolderToShare |
       | Uploader        | folder        | FolderToShare |
       | Manager         | folder        | FolderToShare |
+
+
+  Scenario Outline: user removes access to a folder in link share
+    Given user "Alice" has created folder "FolderToShare"
+    And user "Alice" has created the following link share:
+      | resourceType    | folder        |
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | <role>        |
+      | password        | %public%      |
+    When user "Alice" removes the share permission of link from folder "FolderToShare" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    Examples:
+      | role           |
+      | view           |
+      | edit           |
+      | upload         |
+      | createOnly     |
+      | blocksDownload |
+
+
+  Scenario Outline: user removes access to a file in link share
+    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
+    And user "Alice" has created the following link share:
+      | resourceType    | file              |
+      | resource        | textfile.txt      |
+      | space           | Personal          |
+      | permissionsRole | <permissionsRole> |
+      | password        | %public%          |
+    When user "Alice" removes the share permission of link from file "textfile.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    Examples:
+      | permissionsRole |
+      | view            |
+      | edit            |
+      | blocksDownload  |
+
+
+  Scenario Outline: user removes access to a folder in project space in link share
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has created the following link share:
+      | resourceType    | folder        |
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | <role>        |
+      | password        | %public%      |
+    When user "Alice" removes the share permission of link from folder "FolderToShare" of space "NewSpace" using the Graph API
+    Then the HTTP status code should be "204"
+    Examples:
+      | role           |
+      | view           |
+      | edit           |
+      | upload         |
+      | createOnly     |
+      | blocksDownload |
+
+
+  Scenario Outline: user removes access to a file in project space in link share
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
+    And user "Alice" has created the following link share:
+      | resourceType    | file              |
+      | resource        | textfile.txt      |
+      | space           | NewSpace          |
+      | permissionsRole | <permissionsRole> |
+      | password        | %public%          |
+    When user "Alice" removes the share permission of link from file "textfile.txt" of space "NewSpace" using the Graph API
+    Then the HTTP status code should be "204"
+    Examples:
+      | permissionsRole |
+      | view            |
+      | edit            |
+      | blocksDownload  |
