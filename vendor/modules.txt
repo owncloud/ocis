@@ -2035,7 +2035,7 @@ golang.org/x/crypto/ssh/knownhosts
 # golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 ## explicit; go 1.20
 golang.org/x/exp/maps
-# golang.org/x/image v0.14.0
+# golang.org/x/image v0.15.0
 ## explicit; go 1.18
 golang.org/x/image/bmp
 golang.org/x/image/ccitt
