@@ -431,7 +431,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Given /^the user "([^"]*)" has deleted a user "([^"]*)" using the Graph API$/
+	 * @Given /^the user "([^"]*)" has deleted a user "([^"]*)"$/
 	 *
 	 * @param string $byUser
 	 * @param string $user
@@ -440,7 +440,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function theUserHasDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
+	public function theUserHasDeletedAUser(string $byUser, string $user): void {
 		$response = $this->adminDeletesUserUsingTheGraphApi($user, $byUser);
 		$this->featureContext->theHttpStatusCodeShouldBe(204, "", $response);
 	}
@@ -1077,6 +1077,19 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has deleted group :group
+	 *
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasDeletedGroup(string $group): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$response = $this->userDeletesGroupWithGroupId($groupId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
