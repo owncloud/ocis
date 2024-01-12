@@ -87,7 +87,7 @@ Feature: checking file versions using file id
     And the number of versions should be "1"
 
   @issue-777
-  Scenario Outline: check file versions after moving to-and-fro folder in personal space
+  Scenario Outline: check file versions after moving to-and-from folder in personal space
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "<from>textfile.txt"
     And user "Alice" has uploaded file with content "some data - edited" to "<from>textfile.txt"
@@ -102,7 +102,7 @@ Feature: checking file versions using file id
       | folder/ | /       |
 
   @issue-777
-  Scenario Outline: check file versions after moving to-and-fro folder in personal space (MOVE using file-id)
+  Scenario Outline: check file versions after moving to-and-from folder in personal space (MOVE using file-id)
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "<from>textfile.txt"
     And user "Alice" has uploaded file with content "some data - edited" to "<from>textfile.txt"
@@ -118,7 +118,7 @@ Feature: checking file versions using file id
       | folder/ | /       |
 
   @issue-777
-  Scenario Outline: check file versions after moving to-and-fro folder in project space
+  Scenario Outline: check file versions after moving to-and-from folder in project space
     Given user "Alice" has created a folder "folder" in space "Project1"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data" to "<from>textfile.txt"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data - edited" to "<from>textfile.txt"
@@ -133,7 +133,7 @@ Feature: checking file versions using file id
       | folder/ | /       |
 
   @issue-777
-  Scenario Outline: check file versions after moving to-and-fro folder in project space (MOVE using file-id)
+  Scenario Outline: check file versions after moving to-and-from folder in project space (MOVE using file-id)
     And user "Alice" has created a folder "folder" in space "Project1"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data" to "<from>textfile.txt"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data - edited" to "<from>textfile.txt"
