@@ -72,9 +72,11 @@ var _ = Describe("SharedWithMe", func() {
 
 	Describe("ListSharedWithMe", func() {
 		var (
-			listReceivedSharesResponse *collaborationv1beta1.ListReceivedSharesResponse
-			statResponse               *providerv1beta1.StatResponse
-			getUserResponse            *userv1beta1.GetUserResponse
+			listReceivedSharesResponse     *collaborationv1beta1.ListReceivedSharesResponse
+			statResponse                   *providerv1beta1.StatResponse
+			getUserResponseDefault         *userv1beta1.GetUserResponse
+			getUserResponseResourceCreator *userv1beta1.GetUserResponse
+			getUserResponseShareCreator    *userv1beta1.GetUserResponse
 		)
 
 		toResourceID := func(in string) *providerv1beta1.ResourceId {
@@ -86,7 +88,7 @@ var _ = Describe("SharedWithMe", func() {
 
 		BeforeEach(func() {
 
-			getUserResponse = &userv1beta1.GetUserResponse{
+			getUserResponseDefault = &userv1beta1.GetUserResponse{
 				Status: status.NewOK(ctx),
 				User: &userv1beta1.User{
 					Id: &userv1beta1.UserId{
@@ -95,13 +97,51 @@ var _ = Describe("SharedWithMe", func() {
 					DisplayName: "John Romero",
 				},
 			}
+			getUserResponseResourceCreator = &userv1beta1.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userv1beta1.User{
+					Id: &userv1beta1.UserId{
+						OpaqueId: "resource-creator-id",
+					},
+					DisplayName: "Resource Creator",
+				},
+			}
+			getUserResponseShareCreator = &userv1beta1.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userv1beta1.User{
+					Id: &userv1beta1.UserId{
+						OpaqueId: "share-creator-id",
+					},
+					DisplayName: "Share Creator",
+				},
+			}
 
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.MatchedBy(
+				func(req *userv1beta1.GetUserRequest) bool {
+					return req.UserId.OpaqueId == "resource-creator-id"
+				})).
+				Return(getUserResponseResourceCreator, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.MatchedBy(
+				func(req *userv1beta1.GetUserRequest) bool {
+					return req.UserId.OpaqueId == "share-creator-id"
+				})).
+				Return(getUserResponseShareCreator, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponseDefault, nil)
 
 			listReceivedSharesResponse = &collaborationv1beta1.ListReceivedSharesResponse{
 				Status: status.NewOK(ctx),
 				Shares: []*collaborationv1beta1.ReceivedShare{
-					{Share: &collaborationv1beta1.Share{ResourceId: toResourceID("1$2!3")}},
+					{
+						Share: &collaborationv1beta1.Share{ResourceId: toResourceID("1$2!3")},
+						MountPoint: &providerv1beta1.Reference{
+							ResourceId: &providerv1beta1.ResourceId{
+								StorageId: utils.ShareStorageProviderID,
+								SpaceId:   utils.ShareStorageSpaceID,
+							},
+							Path: "some folder",
+						},
+						State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+					},
 				},
 			}
 
@@ -161,24 +201,23 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(jsonData.Get("#").Num).To(Equal(float64(2)))
 		})
 
-		// TODO clarify which of the various properties should actually be set on the driveItem and what
-		//      semantics those properties have
-		// createdDateTime: is this the share creation time or the creation time of the shared item (there is not ctime in the stat response)?
-		// lastModifiedDateTime: see above
-		// owner: Should this be the owner of the shared item, the creator of the share, or the owner of the sharejail?
-		// etag: should this just equal the etag of the inner remote item?
-		PIt("populates the driveItem properties", func() {
+		It("populates the driveItem properties", func() {
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
 			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
-			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40002}
-
-			etag := "5ffb8e4bec7026050af7fde9482b289a"
+			share.Mtime = &typesv1beta1.Timestamp{Seconds: 4002}
+			share.Creator = &userv1beta1.UserId{
+				OpaqueId: "share-creator-id",
+			}
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Name = "some folder"
-			resourceInfo.Etag = "\"" + etag + "\""
+			resourceInfo.Etag = "\"5ffb8e4bec7026050af7fde9482b289a\""
+			resourceInfo.Owner = &userv1beta1.UserId{
+				OpaqueId: "resource-creator-id",
+			}
+			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
 
 			svc.ListSharedWithMe(
 				tape,
@@ -187,14 +226,21 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0")
 
-			Expect(jsonData.Get("createdDateTime").String()).To(Equal(utils.TSToTime(share.Ctime).Format(time.RFC3339Nano)))
-			Expect(jsonData.Get("eTag").String()).To(Equal(etag))
-			Expect(jsonData.Get("id").String()).To(Equal(share.Id.OpaqueId))
-			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(share.Mtime).Format(time.RFC3339Nano)))
+			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
+			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(
+				providerv1beta1.ResourceId{
+					StorageId: utils.ShareStorageProviderID,
+					SpaceId:   utils.ShareStorageSpaceID,
+					OpaqueId:  share.Id.OpaqueId,
+				},
+			)))
+			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
+			Expect(jsonData.Get("createdBy.user.id").String()).To(Equal(resourceInfo.Owner.OpaqueId))
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
+
 		})
 
-		PIt("populates the driveItem parentReference properties", func() {
+		It("populates the driveItem parentReference properties", func() {
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
 
@@ -205,7 +251,7 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.parentReference")
 
-			Expect(jsonData.Get("driveId").String()).To(Equal(share.Id.OpaqueId))
+			Expect(jsonData.Get("driveId").String()).To(Equal(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID)))
 		})
 
 		It("populates the driveItem remoteItem properties", func() {
@@ -235,7 +281,7 @@ var _ = Describe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.createdBy properties", func() {
-			driveOwner := getUserResponse.User
+			driveOwner := getUserResponseDefault.User
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Owner = driveOwner.Id
@@ -295,7 +341,7 @@ var _ = Describe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.shared.owner properties", func() {
-			shareOwner := getUserResponse.User
+			shareOwner := getUserResponseDefault.User
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Owner = shareOwner.Id
@@ -312,7 +358,7 @@ var _ = Describe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.shared.sharedBy properties", func() {
-			shareCreator := getUserResponse.User
+			shareCreator := getUserResponseDefault.User
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Creator = shareCreator.Id
