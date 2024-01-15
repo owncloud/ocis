@@ -84,17 +84,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				return err
 			}
 
-			parentReference := libregraph.NewItemReference()
-			{
-				if spaceType := shareStat.GetInfo().GetSpace().GetSpaceType(); spaceType != "" {
-					parentReference.SetDriveType(spaceType)
-				}
-
-				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
-					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
-				}
-			}
-
 			shared := libregraph.NewShared()
 			{
 				if cTime := receivedShare.GetShare().GetCtime(); cTime != nil {
@@ -123,6 +112,19 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				if size := shareStat.GetInfo().GetSize(); size != 0 {
 					remoteItem.SetSize(int64(size))
 				}
+
+				parentReference := libregraph.NewItemReference()
+				if spaceType := shareStat.GetInfo().GetSpace().GetSpaceType(); spaceType != "" {
+					parentReference.SetDriveType(spaceType)
+				}
+
+				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
+					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
+				}
+				if !reflect.ValueOf(*parentReference).IsZero() {
+					remoteItem.ParentReference = parentReference
+				}
+
 			}
 
 			driveItem := libregraph.NewDriveItem()
@@ -144,6 +146,18 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
 					driveItem.SetETag(etag)
 				}
+
+				// parentReference of the out driveItem should be the drive containing the mountpoint
+				// i.e. the share jail
+				driveItem.ParentReference = libregraph.NewItemReference()
+				driveItem.ParentReference.SetDriveType("virtual")
+				driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
+				driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+					StorageId: utils.ShareStorageProviderID,
+					OpaqueId:  utils.ShareStorageSpaceID,
+					SpaceId:   utils.ShareStorageSpaceID,
+				}))
+
 			case collaboration.ShareState_SHARE_STATE_PENDING:
 				fallthrough
 			case collaboration.ShareState_SHARE_STATE_REJECTED:
@@ -183,6 +197,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					}
 
 					remoteItem.SetCreatedBy(identitySet)
+					driveItem.SetCreatedBy(identitySet)
 				}
 
 				if userID := receivedShare.GetShare().GetOwner(); userID != nil {
@@ -216,7 +231,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 						},
 					}
 
-					driveItem.SetCreatedBy(identitySet)
 					shared.SetSharedBy(identitySet)
 
 				}
@@ -246,11 +260,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					permissions := []libregraph.Permission{*permission}
 
 					remoteItem.Permissions = permissions
-				}
-
-				if !reflect.ValueOf(*parentReference).IsZero() {
-					remoteItem.ParentReference = parentReference
-					driveItem.ParentReference = parentReference
 				}
 
 				if !reflect.ValueOf(*remoteItem).IsZero() {
