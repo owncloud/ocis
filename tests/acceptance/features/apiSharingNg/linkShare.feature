@@ -584,3 +584,103 @@ Feature: Create a share link for a resource
       """
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
     And the public download of file "textfile1.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
+
+
+  Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And user "Alice" has uploaded file with content "other data" to "text.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resourceType    | file             |
+      | resource        | text.txt         |
+      | space           | Personal         |
+      | permissionsRole | view             |
+      | password        | <bannedPassword> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | bannedPassword |
+      | 123            |
+      | password       |
+      | ownCloud       |
+
+
+  Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And user "Alice" has uploaded file with content "other data" to "text.txt"
+    And user "Alice" has created the following link share:
+      | resourceType    | file     |
+      | resource        | text.txt |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    When user "Alice" sets the following password for the last link share using the Graph API:
+      | resourceType    | file             |
+      | resource        | text.txt         |
+      | space           | Personal         |
+      | permissionsRole | view             |
+      | password        | <bannedPassword> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | bannedPassword |
+      | 123            |
+      | password       |
+      | ownCloud       |
