@@ -1,6 +1,6 @@
 ---
 title: Eventhistory
-date: 2024-01-14T00:06:58.283686468Z
+date: 2024-01-15T00:04:28.16969267Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/eventhistory
