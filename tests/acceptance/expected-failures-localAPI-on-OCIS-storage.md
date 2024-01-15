@@ -289,5 +289,16 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/shareInvitations.feature:979](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L979)
 - [apiSharingNg/shareInvitations.feature:980](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L980)
 - [apiSharingNg/shareInvitations.feature:981](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L981)
+
+### [Share invitation to multiple recipients returns 200 (Fixed on master)](https://github.com/owncloud/ocis/issues/7962)
+- [apiSharingNg/shareInvitations.feature:1040](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1040)
+- [apiSharingNg/shareInvitations.feature:1041](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1041)
+- [apiSharingNg/shareInvitations.feature:1042](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1042)
+- [apiSharingNg/shareInvitations.feature:1043](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1043)
+- [apiSharingNg/shareInvitations.feature:1044](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1044)
+- [apiSharingNg/shareInvitations.feature:1045](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1045)
+- [apiSharingNg/shareInvitations.feature:1046](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1046)
+- [apiSharingNg/shareInvitations.feature:1047](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1047)
+- [apiSharingNg/shareInvitations.feature:1048](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1048)
 - Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
