@@ -79,7 +79,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				return err
 			}
 
-			permission, err := g.cs3ShareToLibreGraphPermissions(ctx, receivedShare.GetShare(), shareStat.GetInfo())
+			permission, err := g.cs3ReceivedShareToLibreGraphPermissions(ctx, receivedShare, shareStat.GetInfo())
 			if err != nil {
 				return err
 			}
@@ -104,9 +104,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			remoteItem := libregraph.NewRemoteItem()
 			{
-				remoteItem.SetUiHidden(receivedShare.GetHidden())
-				remoteItem.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
-
 				if id := shareStat.GetInfo().GetId(); id != nil {
 					remoteItem.SetId(storagespace.FormatResourceID(*id))
 				}
@@ -276,13 +273,13 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 	})), err
 }
 
-func (g Graph) cs3ShareToLibreGraphPermissions(ctx context.Context, share *collaboration.Share, shareStatInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, receivedShare *collaboration.ReceivedShare, shareStatInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
-	if id := share.GetId().GetOpaqueId(); id != "" {
+	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
 	}
 
-	if expiration := share.GetExpiration(); expiration != nil {
+	if expiration := receivedShare.GetShare().GetExpiration(); expiration != nil {
 		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
 	}
 
@@ -305,7 +302,7 @@ func (g Graph) cs3ShareToLibreGraphPermissions(ctx context.Context, share *colla
 		}
 	}
 
-	switch grantee := share.GetGrantee(); {
+	switch grantee := receivedShare.GetShare().GetGrantee(); {
 	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
 		user, err := g.identityCache.GetUser(ctx, grantee.GetUserId().GetOpaqueId())
 		if err != nil {
@@ -333,5 +330,8 @@ func (g Graph) cs3ShareToLibreGraphPermissions(ctx context.Context, share *colla
 			},
 		})
 	}
+	permission.SetUiHidden(receivedShare.GetHidden())
+	permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
+
 	return permission, nil
 }
