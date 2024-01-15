@@ -979,3 +979,70 @@ Feature: Send a sharing invitations
       | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
       | Manager          | folder        | FolderToShare  |
+
+
+  Scenario Outline: try to send sharing invitation to multiple groups
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Carol    |
+      | Bob      |
+    And group "grp1" has been created
+    And group "grp2" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp2      |
+      | Bob      | grp2      |
+    And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | grp1, grp2         |
+      | shareType       | group, group       |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalidRequest"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Co Owner         | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
