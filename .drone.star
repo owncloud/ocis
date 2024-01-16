@@ -68,6 +68,7 @@ config = {
                 "apiArchiver",
                 "apiContract",
                 "apiGraph",
+                "apiGraphUserGroup",
                 "apiSpaces",
                 "apiSpacesShares",
                 "apiCors",
@@ -77,6 +78,7 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
                 "apiLocks",
+                "apiSearch2",
                 "apiSharingNg",
             ],
             "skip": False,
@@ -118,9 +120,9 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
-        "apiSearch": {
+        "apiSearch1": {
             "suites": [
-                "apiSearch",
+                "apiSearch1",
             ],
             "skip": False,
             "tikaNeeded": True,
