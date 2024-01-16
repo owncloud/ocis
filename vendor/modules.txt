@@ -1107,11 +1107,11 @@ github.com/google/uuid
 # github.com/gookit/color v1.5.4
 ## explicit; go 1.18
 github.com/gookit/color
-# github.com/gookit/config/v2 v2.2.4
+# github.com/gookit/config/v2 v2.2.5
 ## explicit; go 1.19
 github.com/gookit/config/v2
 github.com/gookit/config/v2/yaml
-# github.com/gookit/goutil v0.6.14
+# github.com/gookit/goutil v0.6.15
 ## explicit; go 1.19
 github.com/gookit/goutil
 github.com/gookit/goutil/arrutil
