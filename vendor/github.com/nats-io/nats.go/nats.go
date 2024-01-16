@@ -47,7 +47,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.31.0"
+	Version                   = "1.32.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -4298,6 +4298,12 @@ func (nc *Conn) removeSub(s *Subscription) {
 		}
 	}
 
+	if s.typ != AsyncSubscription {
+		done := s.pDone
+		if done != nil {
+			done(s.Subject)
+		}
+	}
 	// Mark as invalid
 	s.closed = true
 	if s.pCond != nil {

@@ -1,4 +1,4 @@
-// Copyright 2021-2022 The NATS Authors
+// Copyright 2021-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -377,13 +377,16 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 
 	defer jetStream.(*js).cleanupReplySub()
 
-	purgePartial := func() {
+	purgePartial := func() error {
 		// wait until all pubs are complete or up to default timeout before attempting purge
 		select {
 		case <-jetStream.PublishAsyncComplete():
 		case <-time.After(obs.js.opts.wait):
 		}
-		obs.js.purgeStream(obs.stream, &StreamPurgeRequest{Subject: chunkSubj})
+		if err := obs.js.purgeStream(obs.stream, &StreamPurgeRequest{Subject: chunkSubj}); err != nil {
+			return fmt.Errorf("could not cleanup bucket after erronous put operation: %w", err)
+		}
+		return nil
 	}
 
 	m, h := NewMsg(chunkSubj), sha256.New()
@@ -404,7 +407,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 			default:
 			}
 			if err != nil {
-				purgePartial()
+				if purgeErr := purgePartial(); purgeErr != nil {
+					return nil, errors.Join(err, purgeErr)
+				}
 				return nil, err
 			}
 		}
@@ -415,7 +420,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 
 		// Handle all non EOF errors
 		if readErr != nil && readErr != io.EOF {
-			purgePartial()
+			if purgeErr := purgePartial(); purgeErr != nil {
+				return nil, errors.Join(readErr, purgeErr)
+			}
 			return nil, readErr
 		}
 
@@ -427,11 +434,15 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 
 			// Send msg itself.
 			if _, err := jetStream.PublishMsgAsync(m); err != nil {
-				purgePartial()
+				if purgeErr := purgePartial(); purgeErr != nil {
+					return nil, errors.Join(err, purgeErr)
+				}
 				return nil, err
 			}
 			if err := getErr(); err != nil {
-				purgePartial()
+				if purgeErr := purgePartial(); purgeErr != nil {
+					return nil, errors.Join(err, purgeErr)
+				}
 				return nil, err
 			}
 			// Update totals.
@@ -455,7 +466,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 	mm.Data, err = json.Marshal(info)
 	if err != nil {
 		if r != nil {
-			purgePartial()
+			if purgeErr := purgePartial(); purgeErr != nil {
+				return nil, errors.Join(err, purgeErr)
+			}
 		}
 		return nil, err
 	}
@@ -464,7 +477,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 	_, err = jetStream.PublishMsgAsync(mm)
 	if err != nil {
 		if r != nil {
-			purgePartial()
+			if purgeErr := purgePartial(); purgeErr != nil {
+				return nil, errors.Join(err, purgeErr)
+			}
 		}
 		return nil, err
 	}
@@ -474,7 +489,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 	case <-jetStream.PublishAsyncComplete():
 		if err := getErr(); err != nil {
 			if r != nil {
-				purgePartial()
+				if purgeErr := purgePartial(); purgeErr != nil {
+					return nil, errors.Join(err, purgeErr)
+				}
 			}
 			return nil, err
 		}
@@ -487,7 +504,9 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 	// Delete any original chunks.
 	if einfo != nil && !einfo.Deleted {
 		echunkSubj := fmt.Sprintf(objChunksPreTmpl, obs.name, einfo.NUID)
-		obs.js.purgeStream(obs.stream, &StreamPurgeRequest{Subject: echunkSubj})
+		if err := obs.js.purgeStream(obs.stream, &StreamPurgeRequest{Subject: echunkSubj}); err != nil {
+			return info, err
+		}
 	}
 
 	// TODO would it be okay to do this to return the info with the correct time?
@@ -626,7 +645,7 @@ func (obs *obs) Get(name string, opts ...GetObjectOpt) (ObjectResult, error) {
 		if ctx != nil {
 			select {
 			case <-ctx.Done():
-				if ctx.Err() == context.Canceled {
+				if errors.Is(ctx.Err(), context.Canceled) {
 					err = ctx.Err()
 				} else {
 					err = ErrTimeout
@@ -926,7 +945,7 @@ func (obs *obs) GetInfo(name string, opts ...GetObjectInfoOpt) (*ObjectInfo, err
 
 	m, err := obs.js.GetLastMsg(stream, metaSubj)
 	if err != nil {
-		if err == ErrMsgNotFound {
+		if errors.Is(err, ErrMsgNotFound) {
 			err = ErrObjectNotFound
 		}
 		return nil, err
