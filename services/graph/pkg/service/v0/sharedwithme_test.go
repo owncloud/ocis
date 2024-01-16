@@ -11,6 +11,7 @@ import (
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -28,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 var _ = Describe("SharedWithMe", func() {
@@ -324,6 +326,24 @@ var _ = Describe("SharedWithMe", func() {
 
 			Expect(jsonData.Get("folder").Exists()).To(BeFalse())
 			Expect(jsonData.Get("file.mimeType").String()).To(Equal(resourceInfo.MimeType))
+		})
+
+		It("populates the driveItem.remoteItem.permissions properties", func() {
+			resourceInfo := statResponse.Info
+			resourceInfo.PermissionSet = roleconversions.NewViewerRole(true).CS3ResourcePermissions()
+
+			svc.ListSharedWithMe(
+				tape,
+				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
+			)
+
+			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.permissions.0")
+
+			Expect(jsonData.Get("roles.0").String()).To(Equal(unifiedrole.UnifiedRoleViewerID))
+			Expect(jsonData.Get("@ui\\.hidden").Exists()).To(BeTrue())
+			Expect(jsonData.Get("@ui\\.hidden").Bool()).To(BeFalse())
+			Expect(jsonData.Get("@client\\.synchronize").Exists()).To(BeTrue())
+			Expect(jsonData.Get("@client\\.synchronize").Bool()).To(BeTrue())
 		})
 
 		It("populates the driveItem.remoteItem.shared properties", func() {
