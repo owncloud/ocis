@@ -2672,10 +2672,10 @@ trait Provisioning {
 	 */
 	public function cleanupGroup(string $group):void {
 		try {
-			if (OcisHelper::isTestingWithGraphApi()) {
-				$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
-			} else {
+			if ($this->isTestingWithLdap()) {
 				$this->deleteLdapGroup($group);
+			} else {
+				$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
 			}
 		} catch (Exception $e) {
 			\error_log(

@@ -287,21 +287,15 @@ class GraphContext implements Context {
 
 	/**
 	 * @param string $groupId
-	 * @param bool $checkResult
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function adminDeletesGroupWithGroupId(
-		string $groupId,
-		bool $checkResult = false
+		string $groupId
 	): void {
-		$this->featureContext->setResponse(
-			$this->userDeletesGroupWithGroupId($groupId)
-		);
-		if ($checkResult) {
-			$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
-		}
+		$response = $this->userDeletesGroupWithGroupId($groupId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
@@ -315,14 +309,7 @@ class GraphContext implements Context {
 		string $group
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		if ($groupId) {
-			$this->adminDeletesGroupWithGroupId($groupId);
-		} else {
-			throw new Exception(
-				"Group id does not exist for '$group' in the created list."
-				. " Cannot delete group without id when using the Graph API."
-			);
-		}
+		$this->adminDeletesGroupWithGroupId($groupId);
 	}
 
 	/**
