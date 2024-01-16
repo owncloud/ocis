@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
 * Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
 * Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
@@ -93,6 +94,13 @@ The following sections list the changes for unreleased.
    is set to `read-only`. This makes no sense as language is stored elsewhere.
 
    https://github.com/owncloud/ocis/pull/8182
+
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
+
+   We fixed a bug when admin tried to update or reset the logo.
+
+   https://github.com/owncloud/ocis/issues/8101
+   https://github.com/owncloud/ocis/pull/8211
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
