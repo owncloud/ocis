@@ -139,20 +139,9 @@ class SharingNgContext implements Context {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
-		// for resharing a resource, "item-id" in API endpoint takes shareMountId
-		if ($rows['space'] === 'Shares') {
-			$itemId = GraphHelper::getShareMountId(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$rows['resource']
-			);
-		} else {
-			$itemId = ($rows['resourceType'] === 'folder')
-				? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
-				: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
-		}
+		$itemId = ($rows['resourceType'] === 'folder')
+			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
+			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
 
 		$sharees = array_map('trim', explode(',', $rows['sharee']));
 		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
