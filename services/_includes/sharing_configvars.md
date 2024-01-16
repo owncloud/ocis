@@ -23,7 +23,7 @@
 | OCIS_EVENTS_ENDPOINT<br/>SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>SHARING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>SHARING_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
-| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>SHARING_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | SHARING_USER_DRIVER | string | jsoncs3 | Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' and 'owncloudsql'.|
@@ -55,9 +55,10 @@
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.|
 | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|
-| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>SHARING_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| OCIS_PASSWORD_POLICY_DISABLED<br/>SHARING_PASSWORD_POLICY_DISABLED | bool | false | Disable the password policy. Defaults to false if not set.|
+| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 8 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>SHARING_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|

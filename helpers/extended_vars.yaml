@@ -34,7 +34,7 @@ variables:
   do_ignore: true
 - rawname: registryEnv
   path: ocis-pkg/registry/registry.go:118
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY
   type: string
   default_value: ""
@@ -45,7 +45,7 @@ variables:
   do_ignore: false
 - rawname: registryAddressEnv
   path: ocis-pkg/registry/registry.go:122
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: 127.0.0.1:9233
@@ -54,7 +54,7 @@ variables:
   do_ignore: false
 - rawname: registryPasswordEnv
   path: ocis-pkg/registry/registry.go:115
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_PASSWORD
   type: ""
   default_value: ""
@@ -62,7 +62,7 @@ variables:
   do_ignore: false
 - rawname: registryUsernameEnv
   path: ocis-pkg/registry/registry.go:114
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_USERNAME
   type: ""
   default_value: ""
@@ -97,3 +97,35 @@ variables:
   default_value: ""
   description: false positive - code that extract envvars for config structs
   do_ignore: true
+- rawname: registryAddressEnv
+  path: ocis-pkg/registry/registry.go:123
+  foundincode: true
+  name: registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryEnv
+  path: ocis-pkg/registry/registry.go:119
+  foundincode: true
+  name: registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryPasswordEnv
+  path: ocis-pkg/registry/registry.go:116
+  foundincode: true
+  name: registryPasswordEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryUsernameEnv
+  path: ocis-pkg/registry/registry.go:115
+  foundincode: true
+  name: registryUsernameEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false

@@ -26,7 +26,7 @@
 | OCIS_LDAP_CACERT<br/>USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
 | OCIS_LDAP_INSECURE<br/>USERS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
 | OCIS_LDAP_BIND_DN<br/>USERS_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
-| OCIS_LDAP_BIND_PASSWORD<br/>LDAP_BIND_PASSWORD<br/>USERS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| OCIS_LDAP_BIND_PASSWORD<br/>USERS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
 | OCIS_LDAP_USER_BASE_DN<br/>USERS_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
 | OCIS_LDAP_GROUP_BASE_DN<br/>USERS_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
 | OCIS_LDAP_USER_SCOPE<br/>USERS_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.|
@@ -41,7 +41,7 @@
 | OCIS_LDAP_USER_SCHEMA_USER_TYPE<br/>USERS_LDAP_USER_TYPE_ATTRIBUTE | string | ownCloudUserType | LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.|
 | OCIS_LDAP_DISABLED_USERS_GROUP_DN<br/>USERS_LDAP_DISABLED_USERS_GROUP_DN | string | cn=DisabledUsersGroup,ou=groups,o=libregraph-idm | The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.|
 | OCIS_LDAP_USER_SCHEMA_ID<br/>USERS_LDAP_USER_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.|
-| OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
+| OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
 | OCIS_LDAP_USER_SCHEMA_MAIL<br/>USERS_LDAP_USER_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of users.|
 | OCIS_LDAP_USER_SCHEMA_DISPLAYNAME<br/>USERS_LDAP_USER_SCHEMA_DISPLAYNAME | string | displayname | LDAP Attribute to use for the displayname of users.|
 | OCIS_LDAP_USER_SCHEMA_USERNAME<br/>USERS_LDAP_USER_SCHEMA_USERNAME | string | uid | LDAP Attribute to use for username of users.|

@@ -26,7 +26,7 @@
 | OCIS_LDAP_CACERT<br/>GROUPS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
 | OCIS_LDAP_INSECURE<br/>GROUPS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
 | OCIS_LDAP_BIND_DN<br/>GROUPS_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
-| OCIS_LDAP_BIND_PASSWORD<br/>LDAP_BIND_PASSWORD<br/>GROUPS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| OCIS_LDAP_BIND_PASSWORD<br/>GROUPS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
 | OCIS_LDAP_USER_BASE_DN<br/>GROUPS_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
 | OCIS_LDAP_GROUP_BASE_DN<br/>GROUPS_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
 | OCIS_LDAP_USER_SCOPE<br/>GROUPS_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.|

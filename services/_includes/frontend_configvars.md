@@ -79,9 +79,10 @@
 | FRONTEND_AUTO_ACCEPT_SHARES | bool | true | Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>FRONTEND_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>FRONTEND_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 0 if not set.|
-| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set.|
+| OCIS_PASSWORD_POLICY_DISABLED<br/>FRONTEND_PASSWORD_POLICY_DISABLED | bool | false | Disable the password policy. Defaults to false if not set.|
+| OCIS_PASSWORD_POLICY_MIN_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS | int | 8 | Define the minimum password length. Defaults to 8 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | int | 1 | Define the minimum number of uppercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 1 if not set.|
+| OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|

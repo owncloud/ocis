@@ -46,7 +46,7 @@
 | OCIS_LDAP_URI<br/>IDP_LDAP_URI | string | ldaps://localhost:9235 | Url of the LDAP service to use as IDP.|
 | OCIS_LDAP_CACERT<br/>IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.|
 | OCIS_LDAP_BIND_DN<br/>IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
-| OCIS_LDAP_BIND_PASSWORD<br/>LDAP_BIND_PASSWORD<br/>IDP_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| OCIS_LDAP_BIND_PASSWORD<br/>IDP_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
 | OCIS_LDAP_USER_BASE_DN<br/>IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
 | OCIS_LDAP_USER_SCOPE<br/>IDP_LDAP_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.|
 | IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | LDAP User attribute to use for login like 'uid'.|
