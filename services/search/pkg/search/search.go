@@ -88,13 +88,17 @@ func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector 
 		logger.Error().Err(err).Msg("failed to stat the moved resource")
 		return nil, err
 	}
-	if res.Status.Code != rpc.Code_CODE_OK {
+	switch res.Status.Code {
+	case rpc.Code_CODE_OK:
+		return res, nil
+	case rpc.Code_CODE_NOT_FOUND:
+		// Resource was moved or deleted in the meantime. ignore.
+		return nil, err
+	default:
 		err := errors.New("failed to stat the moved resource")
 		logger.Error().Interface("res", res).Msg(err.Error())
 		return nil, err
 	}
-
-	return res, nil
 }
 
 // NOTE: this converts CS3 to WebDAV permissions
