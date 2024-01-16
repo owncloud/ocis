@@ -227,14 +227,16 @@ type js struct {
 	opts *jsOpts
 
 	// For async publish context.
-	mu           sync.RWMutex
-	rpre         string
-	rsub         *Subscription
-	pafs         map[string]*pubAckFuture
-	stc          chan struct{}
-	dch          chan struct{}
-	rr           *rand.Rand
-	connStatusCh chan (Status)
+	mu             sync.RWMutex
+	rpre           string
+	rsub           *Subscription
+	pafs           map[string]*pubAckFuture
+	stc            chan struct{}
+	dch            chan struct{}
+	rr             *rand.Rand
+	connStatusCh   chan (Status)
+	replyPrefix    string
+	replyPrefixLen int
 }
 
 type jsOpts struct {
@@ -283,6 +285,12 @@ func (nc *Conn) JetStream(opts ...JSOpt) (JetStreamContext, error) {
 			maxpa: defaultAsyncPubAckInflight,
 		},
 	}
+	inboxPrefix := InboxPrefix
+	if js.nc.Opts.InboxPrefix != _EMPTY_ {
+		inboxPrefix = js.nc.Opts.InboxPrefix + "."
+	}
+	js.replyPrefix = inboxPrefix
+	js.replyPrefixLen = len(js.replyPrefix) + aReplyTokensize + 1
 
 	for _, opt := range opts {
 		if err := opt.configureJSContext(js.opts); err != nil {
@@ -537,7 +545,7 @@ func (js *js) PublishMsg(m *Msg, opts ...PubOpt) (*PubAck, error) {
 	}
 
 	if err != nil {
-		for r, ttl := 0, o.ttl; err == ErrNoResponders && (r < o.rnum || o.rnum < 0); r++ {
+		for r, ttl := 0, o.ttl; errors.Is(err, ErrNoResponders) && (r < o.rnum || o.rnum < 0); r++ {
 			// To protect against small blips in leadership changes etc, if we get a no responders here retry.
 			if o.ctx != nil {
 				select {
@@ -559,7 +567,7 @@ func (js *js) PublishMsg(m *Msg, opts ...PubOpt) (*PubAck, error) {
 			}
 		}
 		if err != nil {
-			if err == ErrNoResponders {
+			if errors.Is(err, ErrNoResponders) {
 				err = ErrNoStreamResponse
 			}
 			return nil, err
@@ -641,7 +649,6 @@ func (paf *pubAckFuture) Msg() *Msg {
 }
 
 // For quick token lookup etc.
-const aReplyPreLen = 14
 const aReplyTokensize = 6
 
 func (js *js) newAsyncReply() string {
@@ -654,11 +661,7 @@ func (js *js) newAsyncReply() string {
 		for i := 0; i < aReplyTokensize; i++ {
 			b[i] = rdigits[int(b[i]%base)]
 		}
-		inboxPrefix := InboxPrefix
-		if js.nc.Opts.InboxPrefix != _EMPTY_ {
-			inboxPrefix = js.nc.Opts.InboxPrefix + "."
-		}
-		js.rpre = fmt.Sprintf("%s%s.", inboxPrefix, b[:aReplyTokensize])
+		js.rpre = fmt.Sprintf("%s%s.", js.replyPrefix, b[:aReplyTokensize])
 		sub, err := js.nc.Subscribe(fmt.Sprintf("%s*", js.rpre), js.handleAsyncReply)
 		if err != nil {
 			js.mu.Unlock()
@@ -767,10 +770,10 @@ func (js *js) asyncStall() <-chan struct{} {
 
 // Handle an async reply from PublishAsync.
 func (js *js) handleAsyncReply(m *Msg) {
-	if len(m.Subject) <= aReplyPreLen {
+	if len(m.Subject) <= js.replyPrefixLen {
 		return
 	}
-	id := m.Subject[aReplyPreLen:]
+	id := m.Subject[js.replyPrefixLen:]
 
 	js.mu.Lock()
 	paf := js.getPAF(id)
@@ -916,7 +919,7 @@ func (js *js) PublishMsgAsync(m *Msg, opts ...PubOpt) (PubAckFuture, error) {
 		return nil, errors.New("nats: error creating async reply handler")
 	}
 
-	id := m.Reply[aReplyPreLen:]
+	id := m.Reply[js.replyPrefixLen:]
 	paf := &pubAckFuture{msg: m, st: time.Now()}
 	numPending, maxPending := js.registerPAF(id, paf)
 
@@ -1238,6 +1241,10 @@ func (sub *Subscription) deleteConsumer() error {
 	sub.mu.Lock()
 	jsi := sub.jsi
 	if jsi == nil {
+		sub.mu.Unlock()
+		return nil
+	}
+	if jsi.stream == _EMPTY_ || jsi.consumer == _EMPTY_ {
 		sub.mu.Unlock()
 		return nil
 	}
@@ -1594,7 +1601,7 @@ func (js *js) subscribe(subj, queue string, cb MsgHandler, ch chan *Msg, isSync,
 	if consumer != _EMPTY_ && !o.skipCInfo {
 		info, err = js.ConsumerInfo(stream, consumer)
 		notFoundErr = errors.Is(err, ErrConsumerNotFound)
-		lookupErr = err == ErrJetStreamNotEnabled || err == ErrTimeout || err == context.DeadlineExceeded
+		lookupErr = err == ErrJetStreamNotEnabled || errors.Is(err, ErrTimeout) || errors.Is(err, context.DeadlineExceeded)
 	}
 
 	switch {
@@ -1808,7 +1815,9 @@ func (js *js) subscribe(subj, queue string, cb MsgHandler, ch chan *Msg, isSync,
 		if bl < DefaultSubPendingBytesLimit {
 			bl = DefaultSubPendingBytesLimit
 		}
-		sub.SetPendingLimits(maxap, bl)
+		if err := sub.SetPendingLimits(maxap, bl); err != nil {
+			return nil, err
+		}
 	}
 
 	// Do heartbeats last if needed.
@@ -2047,7 +2056,16 @@ func (sub *Subscription) resetOrderedConsumer(sseq uint64) {
 		js := jsi.js
 		sub.mu.Unlock()
 
-		consName := nuid.Next()
+		sub.mu.Lock()
+		// Attempt to delete the existing consumer.
+		// We don't wait for the response since even if it's unsuccessful,
+		// inactivity threshold will kick in and delete it.
+		if jsi.consumer != _EMPTY_ {
+			go js.DeleteConsumer(jsi.stream, jsi.consumer)
+		}
+		jsi.consumer = ""
+		sub.mu.Unlock()
+		consName := getHash(nuid.Next())
 		cinfo, err := js.upsertConsumer(jsi.stream, consName, cfg)
 		if err != nil {
 			var apiErr *APIError
@@ -2813,7 +2831,7 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 		// are no messages.
 		msg, err = sub.nextMsgWithContext(ctx, true, false)
 		if err != nil {
-			if err == errNoMessages {
+			if errors.Is(err, errNoMessages) {
 				err = nil
 			}
 			break
@@ -2893,13 +2911,13 @@ func (sub *Subscription) Fetch(batch int, opts ...PullOpt) ([]*Msg, error) {
 				usrMsg, err = checkMsg(msg, true, noWait)
 				if err == nil && usrMsg {
 					msgs = append(msgs, msg)
-				} else if noWait && (err == errNoMessages || err == errRequestsPending) && len(msgs) == 0 {
+				} else if noWait && (errors.Is(err, errNoMessages) || errors.Is(err, errRequestsPending)) && len(msgs) == 0 {
 					// If we have a 404/408 for our "no_wait" request and have
 					// not collected any message, then resend request to
 					// wait this time.
 					noWait = false
 					err = sendReq()
-				} else if err == ErrTimeout && len(msgs) == 0 {
+				} else if errors.Is(err, ErrTimeout) && len(msgs) == 0 {
 					// If we get a 408, we will bail if we already collected some
 					// messages, otherwise ignore and go back calling nextMsg.
 					err = nil
@@ -3082,7 +3100,7 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 		// are no messages.
 		msg, err := sub.nextMsgWithContext(ctx, true, false)
 		if err != nil {
-			if err == errNoMessages {
+			if errors.Is(err, errNoMessages) {
 				err = nil
 			}
 			result.err = err
@@ -3159,7 +3177,7 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 
 			usrMsg, err = checkMsg(msg, true, false)
 			if err != nil {
-				if err == ErrTimeout {
+				if errors.Is(err, ErrTimeout) {
 					if reqID != "" && !subjectMatchesReqID(msg.Subject, reqID) {
 						// ignore timeout message from server if it comes from a different pull request
 						continue
@@ -3188,7 +3206,7 @@ func (sub *Subscription) FetchBatch(batch int, opts ...PullOpt) (MessageBatch, e
 
 // checkCtxErr is used to determine whether ErrTimeout should be returned in case of context timeout
 func (o *pullOpts) checkCtxErr(err error) error {
-	if o.ctx == nil && err == context.DeadlineExceeded {
+	if o.ctx == nil && errors.Is(err, context.DeadlineExceeded) {
 		return ErrTimeout
 	}
 	return err
@@ -3204,7 +3222,7 @@ func (js *js) getConsumerInfoContext(ctx context.Context, stream, consumer strin
 	ccInfoSubj := fmt.Sprintf(apiConsumerInfoT, stream, consumer)
 	resp, err := js.apiRequestWithContext(ctx, js.apiSubj(ccInfoSubj), nil)
 	if err != nil {
-		if err == ErrNoResponders {
+		if errors.Is(err, ErrNoResponders) {
 			err = ErrJetStreamNotEnabled
 		}
 		return nil, err

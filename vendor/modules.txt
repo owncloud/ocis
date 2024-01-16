@@ -1107,11 +1107,11 @@ github.com/google/uuid
 # github.com/gookit/color v1.5.4
 ## explicit; go 1.18
 github.com/gookit/color
-# github.com/gookit/config/v2 v2.2.4
+# github.com/gookit/config/v2 v2.2.5
 ## explicit; go 1.19
 github.com/gookit/config/v2
 github.com/gookit/config/v2/yaml
-# github.com/gookit/goutil v0.6.14
+# github.com/gookit/goutil v0.6.15
 ## explicit; go 1.19
 github.com/gookit/goutil
 github.com/gookit/goutil/arrutil
@@ -1401,7 +1401,7 @@ github.com/nats-io/nats-server/v2/server/certidp
 github.com/nats-io/nats-server/v2/server/certstore
 github.com/nats-io/nats-server/v2/server/pse
 github.com/nats-io/nats-server/v2/server/sysmem
-# github.com/nats-io/nats.go v1.31.0
+# github.com/nats-io/nats.go v1.32.0
 ## explicit; go 1.20
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
@@ -1590,7 +1590,7 @@ github.com/opentracing/opentracing-go/log
 # github.com/orcaman/concurrent-map v1.0.0
 ## explicit
 github.com/orcaman/concurrent-map
-# github.com/owncloud/libre-graph-api-go v1.0.5-0.20231201125350-a08244876423
+# github.com/owncloud/libre-graph-api-go v1.0.5-0.20240115110609-b018a896364e
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c

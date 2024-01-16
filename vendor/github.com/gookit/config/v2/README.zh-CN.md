@@ -21,14 +21,20 @@
 - 支持从 OS ENV 变量数据加载配置
 - 支持从远程 URL 加载配置数据
 - 支持从命令行参数(`flags`)设置配置数据
-- 支持在配置数据更改时触发事件
-  - 可用事件: `set.value`, `set.data`, `load.data`, `clean.data`, `reload.data`
-- 支持数据覆盖合并，加载多份数据时将按key自动合并
+- 数据自动覆盖合并，加载多份数据时将按`key`自动合并
+- 支持丰富的自定义选项设置
+  - `Readonly` 支持设置配置数据只读
+  - `EnableCache` 支持设置配置数据缓存
+  - `ParseEnv` 支持获取时自动解析string值里的ENV变量(`shell: ${SHELL}` -> `shell: /bin/zsh`)
+  - `ParseDefault` 支持在绑定数据到结构体时解析默认值 (tag: `default:"def_value"`, 配合ParseEnv也支持ENV变量)
+  - `ParseTime` 支持绑定数据到struct时自动转换 `10s`,`2m` 为 `time.Duration`
+  - 完整选项设置请查看 `config.Options`
 - 支持将全部或部分配置数据绑定到结构体 `config.BindStruct("key", &s)`
   - 支持通过结构体标签 `default` 解析并设置默认值. eg: `default:"def_value"`
   - 支持从 ENV 初始化设置字段值 `default:"${APP_ENV | dev}"`
 - 支持通过 `.` 分隔符来按路径获取子级值，也支持自定义分隔符。 e.g `map.key` `arr.2`
-- 支持解析ENV变量名称。 like `shell: ${SHELL}` -> `shell: /bin/zsh`
+- 支持在配置数据更改时触发事件
+  - 可用事件: `set.value`, `set.data`, `load.data`, `clean.data`, `reload.data`
 - 简洁的使用API `Get` `Int` `Uint` `Int64` `String` `Bool` `Ints` `IntMap` `Strings` `StringMap` ...
 - 完善的单元测试(code coverage > 95%)
 
@@ -88,7 +94,7 @@ import (
 
 // go run ./examples/yaml.go
 func main() {
-	// 设置选项支持 ENV 解析
+	// 设置选项支持ENV变量解析：当获取的值为string类型时，会尝试解析其中的ENV变量
 	config.WithOptions(config.ParseEnv)
 
 	// 添加驱动程序以支持yaml内容解析（除了JSON是默认支持，其他的则是按需使用）
@@ -334,7 +340,7 @@ ioutil.WriteFile("my-config.yaml", buf.Bytes(), 0755)
 ```go
 // Options config options
 type Options struct {
-	// parse env value. like: "${EnvName}" "${EnvName|default}"
+	// parse env in string value. like: "${EnvName}" "${EnvName|default}"
 	ParseEnv bool
     // ParseTime parses a duration string to time.Duration
     // eg: 10s, 2m
@@ -345,8 +351,6 @@ type Options struct {
 	EnableCache bool
 	// parse key, allow find value by key path. default is True eg: 'key.sub' will find `map[key]sub`
 	ParseKey bool
-	// tag name for binding data to struct
-	TagName string
 	// the delimiter char for split key, when `FindByPath=true`. default is '.'
 	Delimiter byte
 	// default write format. default is JSON
@@ -360,6 +364,15 @@ type Options struct {
 	// ParseDefault tag on binding data to struct. tag: default
 	ParseDefault bool
 }
+```
+
+Examples for set options:
+
+```go
+config.WithOptions(config.WithTagName("mytag"))
+config.WithOptions(func(opt *Options) {
+    opt.SetTagNames("config")
+})
 ```
 
 ### 选项: 解析默认值
