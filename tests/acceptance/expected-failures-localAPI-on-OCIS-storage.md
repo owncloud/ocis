@@ -120,6 +120,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [API requests for a non-existent resources should return 404](https://github.com/owncloud/ocis/issues/5939)
 
+
 - [apiGraph/addUserToGroup.feature:205](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L205)
 - [apiGraph/addUserToGroup.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L206)
 - [apiGraph/addUserToGroup.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L207)
@@ -212,6 +213,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:369](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L369)
 
 ### [Anonymous users can unlock a file shared to them through a public link if they get the lock token](https://github.com/owncloud/ocis/issues/7761)
+
 - [apiLocks/unlockFiles.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L40)
 - [apiLocks/unlockFiles.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L41)
 - [apiLocks/unlockFiles.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L42)
@@ -220,6 +222,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L45)
 
 ### [Trying to unlock a shared file with sharer's lock token gives 500](https://github.com/owncloud/ocis/issues/7767)
+
 - [apiLocks/unlockFiles.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L107)
 - [apiLocks/unlockFiles.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L108)
 - [apiLocks/unlockFiles.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L109)
@@ -234,6 +237,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L134)
 
 ### [Anonymous user trying lock a file shared to them through a public link gives 405](https://github.com/owncloud/ocis/issues/7790)
+
 - [apiLocks/lockFiles.feature:474](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L474)
 - [apiLocks/lockFiles.feature:475](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L475)
 - [apiLocks/lockFiles.feature:476](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L476)
@@ -248,6 +252,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L501)
 
 ### [anonymous user with viewer role in public link of a folder can lock a file inside it](https://github.com/owncloud/ocis/issues/7785)
+
 - [apiLocks/lockFiles.feature:452](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L452)
 - [apiLocks/lockFiles.feature:453](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L453)
 - [apiLocks/lockFiles.feature:454](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L454)
@@ -256,6 +261,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L457)
 
 ### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
+
 - [apiSharingNg/linkShare.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L78)
 - [apiSharingNg/linkShare.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L147)
 - [apiSharingNg/linkShare.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L225)
@@ -270,44 +276,89 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/deletePermissions.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L184)
 - [apiSharingNg/deletePermissions.feature:203](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L203)
 
-### [Share invitation to deleted user or group gives 500 (Fixed on master)](https://github.com/owncloud/ocis/issues/7962)
-- [apiSharingNg/shareInvitations.feature:918](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L918)
-- [apiSharingNg/shareInvitations.feature:919](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L919)
-- [apiSharingNg/shareInvitations.feature:920](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L920)
-- [apiSharingNg/shareInvitations.feature:921](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L921)
-- [apiSharingNg/shareInvitations.feature:922](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L922)
-- [apiSharingNg/shareInvitations.feature:923](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L923)
-- [apiSharingNg/shareInvitations.feature:924](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L924)
-- [apiSharingNg/shareInvitations.feature:925](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L925)
-- [apiSharingNg/shareInvitations.feature:926](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L926)
-- [apiSharingNg/shareInvitations.feature:973](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L973)
-- [apiSharingNg/shareInvitations.feature:974](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L974)
-- [apiSharingNg/shareInvitations.feature:975](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L975)
-- [apiSharingNg/shareInvitations.feature:976](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L976)
-- [apiSharingNg/shareInvitations.feature:977](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L977)
-- [apiSharingNg/shareInvitations.feature:978](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L978)
-- [apiSharingNg/shareInvitations.feature:979](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L979)
-- [apiSharingNg/shareInvitations.feature:980](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L980)
-- [apiSharingNg/shareInvitations.feature:981](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L981)
+### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
-### [Share invitation to multiple recipients returns 200 (Fixed on master)](https://github.com/owncloud/ocis/issues/7962)
-- [apiSharingNg/shareInvitations.feature:1040](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1040)
-- [apiSharingNg/shareInvitations.feature:1041](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1041)
-- [apiSharingNg/shareInvitations.feature:1042](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1042)
-- [apiSharingNg/shareInvitations.feature:1043](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1043)
-- [apiSharingNg/shareInvitations.feature:1044](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1044)
-- [apiSharingNg/shareInvitations.feature:1045](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1045)
-- [apiSharingNg/shareInvitations.feature:1046](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1046)
-- [apiSharingNg/shareInvitations.feature:1047](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1047)
-- [apiSharingNg/shareInvitations.feature:1048](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1048)
-- [apiSharingNg/shareInvitations.feature:1105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1105)
-- [apiSharingNg/shareInvitations.feature:1106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1106)
-- [apiSharingNg/shareInvitations.feature:1107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1107)
-- [apiSharingNg/shareInvitations.feature:1108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1108)
-- [apiSharingNg/shareInvitations.feature:1109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1109)
-- [apiSharingNg/shareInvitations.feature:1110](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1110)
-- [apiSharingNg/shareInvitations.feature:1111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1111)
-- [apiSharingNg/shareInvitations.feature:1112](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1112)
-- [apiSharingNg/shareInvitations.feature:1113](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1113)
+- [apiSpacesDavOperation/moveByFileId.feature:443](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L443)
+- [apiSpacesDavOperation/moveByFileId.feature:444](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L444)
+- [apiSpacesDavOperation/moveByFileId.feature:445](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L445)
+- [apiSpacesDavOperation/moveByFileId.feature:446](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L446)
+- [apiSpacesDavOperation/moveByFileId.feature:686](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L686)
+- [apiSpacesDavOperation/moveByFileId.feature:687](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L687)
+- [apiSpacesDavOperation/moveByFileId.feature:688](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L688)
+- [apiSpacesDavOperation/moveByFileId.feature:689](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L689)
+
+### [MOVE a file from Project space (manager/editor) to Personal space returns 502 code](https://github.com/owncloud/ocis/issues/7618)
+
+- [apiSpacesDavOperation/moveByFileId.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L130)
+- [apiSpacesDavOperation/moveByFileId.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L131)
+- [apiSpacesDavOperation/moveByFileId.feature:133](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L133)
+- [apiSpacesDavOperation/moveByFileId.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L134)
+- [apiSpacesDavOperation/moveByFileId.feature:152](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L152)
+- [apiSpacesDavOperation/moveByFileId.feature:153](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L153)
+- [apiSpacesDavOperation/moveByFileId.feature:398](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L398)
+- [apiSpacesDavOperation/moveByFileId.feature:399](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L399)
+- [apiSpacesDavOperation/moveByFileId.feature:401](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L401)
+- [apiSpacesDavOperation/moveByFileId.feature:402](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L402)
+- [apiSpacesDavOperation/moveByFileId.feature:420](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L420)
+- [apiSpacesDavOperation/moveByFileId.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L421)
+- [apiSpacesShares/moveSpaces.feature:113](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L113)
+- [apiSpacesShares/moveSpaces.feature:114](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L114)
+- [apiSpacesShares/moveSpaces.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L161)
+- [apiSpacesShares/moveSpaces.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L162)
+
+### [MOVE a file from Project space (manager/editor) to Project space (manager/editor) returns 502 code](https://github.com/owncloud/ocis/issues/8116)
+
+- [apiSpacesDavOperation/moveByFileId.feature:300](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L300)
+- [apiSpacesDavOperation/moveByFileId.feature:301](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L301)
+- [apiSpacesDavOperation/moveByFileId.feature:302](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L302)
+- [apiSpacesDavOperation/moveByFileId.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L303)
+- [apiSpacesDavOperation/moveByFileId.feature:309](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L309)
+- [apiSpacesDavOperation/moveByFileId.feature:310](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L310)
+- [apiSpacesDavOperation/moveByFileId.feature:311](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L311)
+- [apiSpacesDavOperation/moveByFileId.feature:312](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L312)
+- [apiSpacesDavOperation/moveByFileId.feature:338](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L338)
+- [apiSpacesDavOperation/moveByFileId.feature:339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L339)
+- [apiSpacesShares/moveSpaces.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L87)
+- [apiSpacesShares/moveSpaces.feature:88](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L88)
+- [apiSpacesShares/moveSpaces.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L89)
+- [apiSpacesShares/moveSpaces.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L90)
+
+### [sharee (editor role) MOVE a file by file-id into Personal space responds with 502 instead of 403](https://github.com/owncloud/ocis/issues/8124)
+
+- [apiSpacesDavOperation/moveByFileId.feature:543](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L543)
+- [apiSpacesDavOperation/moveByFileId.feature:544](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L544)
+- [apiSpacesDavOperation/moveByFileId.feature:545](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L545)
+- [apiSpacesDavOperation/moveByFileId.feature:546](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L546)
+
+### [sharee (editor role) MOVE a file by file-id into Project space (manager/editor role) responds with 502 instead of 403](https://github.com/owncloud/ocis/issues/8125)
+
+- [apiSpacesDavOperation/moveByFileId.feature:570](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L570)
+- [apiSpacesDavOperation/moveByFileId.feature:571](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L571)
+- [apiSpacesDavOperation/moveByFileId.feature:573](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L573)
+- [apiSpacesDavOperation/moveByFileId.feature:574](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L574)
+- [apiSpacesDavOperation/moveByFileId.feature:579](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L579)
+- [apiSpacesDavOperation/moveByFileId.feature:580](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L580)
+- [apiSpacesDavOperation/moveByFileId.feature:582](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L582)
+- [apiSpacesDavOperation/moveByFileId.feature:583](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L583)
+
+### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
+
+- [apiSpacesShares/moveSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L63)
+- [apiSpacesShares/moveSpaces.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L64)
+- [apiSpacesShares/moveSpaces.feature:332](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L332)
+- [apiSpacesShares/moveSpaces.feature:333](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L333)
+- [apiSpacesDavOperation/moveByFileId.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L86)
+- [apiSpacesDavOperation/moveByFileId.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L87)
+- [apiSpacesDavOperation/moveByFileId.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L195)
+- [apiSpacesDavOperation/moveByFileId.feature:196](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L196)
+- [apiSpacesDavOperation/moveByFileId.feature:197](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L197)
+- [apiSpacesDavOperation/moveByFileId.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L198)
+- [apiSpacesDavOperation/moveByFileId.feature:199](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L199)
+- [apiSpacesDavOperation/moveByFileId.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L200)
+- [apiSpacesDavOperation/moveByFileId.feature:462](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L462)
+- [apiSpacesDavOperation/moveByFileId.feature:463](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L463)
+- [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
+- [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
+
 - Note: always have an empty line at the end of this file.
-The bash script that processes this file requires that the last line has a newline on the end.
+  The bash script that processes this file requires that the last line has a newline on the end.

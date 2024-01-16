@@ -470,7 +470,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-2146 @issue-764 @issue-7555
+  @issue-764 @issue-7555
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
     Given these users have been created with default attributes and without skeleton files:
       | username |
@@ -481,11 +481,11 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
+    And user "Alice" has uploaded file with content "ownCloud" to "/textfile0.txt"
     And user "Alice" has shared folder "common" with group "grp1"
-    And user "Brian" has uploaded file with content "ownCloud" to "/textfile0.txt"
-    And user "Brian" has shared file "textfile0.txt" with user "Carol"
-    And user "Brian" has moved file "/textfile0.txt" to "/Shares/common/textfile0.txt"
-    And user "Brian" has moved file "/Shares/common/textfile0.txt" to "/Shares/common/sub/textfile0.txt"
+    And user "Alice" has shared file "textfile0.txt" with user "Carol"
+    And user "Alice" has moved file "/textfile0.txt" to "/common/textfile0.txt"
+    And user "Alice" has moved file "/common/textfile0.txt" to "/common/sub/textfile0.txt"
     When user "Carol" uploads file "filesForUpload/file_to_overwrite.txt" to "/Shares/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/common/sub/textfile0.txt" for user "Carol" should be "BLABLABLA" plus end-of-line

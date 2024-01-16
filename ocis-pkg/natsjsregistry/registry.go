@@ -14,7 +14,7 @@ import (
 	"go-micro.dev/v4/util/cmd"
 )
 
-var _registryName = "natsjs"
+var _registryName = "nats-js-kv"
 
 func init() {
 	cmd.DefaultRegistries[_registryName] = NewRegistry

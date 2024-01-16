@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 )
 
 // Config combines all available configuration parts.
@@ -70,9 +71,10 @@ type ClamAV struct {
 	Socket string `yaml:"socket" env:"ANTIVIRUS_CLAMAV_SOCKET" desc:"The socket clamav is running on. Note the default value is an example which needs adaption according your OS."`
 }
 
-// ICAP provides configuration option for ICAP
+// ICAP provides configuration options for icap
 type ICAP struct {
-	Timeout int64  `yaml:"timeout" env:"ANTIVIRUS_ICAP_TIMEOUT" desc:"Timeout for the ICAP client."`
-	URL     string `yaml:"url" env:"ANTIVIRUS_ICAP_URL" desc:"URL of the ICAP server."`
-	Service string `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"The name of the ICAP service."`
+	DeprecatedTimeout int64         `yaml:"timeout" env:"ANTIVIRUS_ICAP_TIMEOUT" desc:"Timeout for the ICAP client." deprecationVersion:"5.0" removalVersion:"6.0" deprecationInfo:"Changing the envvar type for consistency reasons." deprecationReplacement:"ANTIVIRUS_ICAP_SCAN_TIMEOUT"`
+	Timeout           time.Duration `yaml:"scan_timeout" env:"ANTIVIRUS_ICAP_SCAN_TIMEOUT" desc:"Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details."`
+	URL               string        `yaml:"url" env:"ANTIVIRUS_ICAP_URL" desc:"URL of the ICAP server."`
+	Service           string        `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"The name of the ICAP service."`
 }

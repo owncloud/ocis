@@ -460,7 +460,7 @@ Feature: share resources where the sharee receives the share in multiple ways
     And as "Brian" file "Shares/sharedParent/child/lorem.txt" should exist
 
   @issue-7555
-  Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions 
+  Scenario Outline: share receiver renames a group share and receives same resource through user share with additional permissions
     Given using OCS API version "<ocs_api_version>"
     And group "grp" has been created
     And user "Brian" has been added to group "grp"
