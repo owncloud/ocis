@@ -252,56 +252,58 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 	// for creation-with-upload extension forward bytes to dataprovider
 	// TODO check this really streams
 	if r.Header.Get(net.HeaderContentType) == "application/offset+octet-stream" {
-		length, err := strconv.ParseInt(r.Header.Get(net.HeaderContentLength), 10, 64)
-		if err != nil {
-			log.Debug().Err(err).Msg("wrong request")
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		var httpRes *http.Response
+		finishUpload := true
+		if uploadLength > 0 {
+			var httpRes *http.Response
 
-		httpReq, err := rhttp.NewRequest(ctx, http.MethodPatch, ep, r.Body)
-		if err != nil {
-			log.Debug().Err(err).Msg("wrong request")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
+			httpReq, err := rhttp.NewRequest(ctx, http.MethodPatch, ep, r.Body)
+			if err != nil {
+				log.Debug().Err(err).Msg("wrong request")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
-		httpReq.Header.Set(net.HeaderContentType, r.Header.Get(net.HeaderContentType))
-		httpReq.Header.Set(net.HeaderContentLength, r.Header.Get(net.HeaderContentLength))
-		if r.Header.Get(net.HeaderUploadOffset) != "" {
-			httpReq.Header.Set(net.HeaderUploadOffset, r.Header.Get(net.HeaderUploadOffset))
-		} else {
-			httpReq.Header.Set(net.HeaderUploadOffset, "0")
-		}
-		httpReq.Header.Set(net.HeaderTusResumable, r.Header.Get(net.HeaderTusResumable))
+			httpReq.Header.Set(net.HeaderContentType, r.Header.Get(net.HeaderContentType))
+			httpReq.Header.Set(net.HeaderContentLength, r.Header.Get(net.HeaderContentLength))
+			if r.Header.Get(net.HeaderUploadOffset) != "" {
+				httpReq.Header.Set(net.HeaderUploadOffset, r.Header.Get(net.HeaderUploadOffset))
+			} else {
+				httpReq.Header.Set(net.HeaderUploadOffset, "0")
+			}
+			httpReq.Header.Set(net.HeaderTusResumable, r.Header.Get(net.HeaderTusResumable))
 
-		httpRes, err = s.client.Do(httpReq)
-		if err != nil {
-			log.Error().Err(err).Msg("error doing PATCH request to data gateway")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		defer httpRes.Body.Close()
+			httpRes, err = s.client.Do(httpReq)
+			if err != nil || httpRes == nil {
+				log.Error().Err(err).Msg("error doing PATCH request to data gateway")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			defer httpRes.Body.Close()
 
-		w.Header().Set(net.HeaderUploadOffset, httpRes.Header.Get(net.HeaderUploadOffset))
-		w.Header().Set(net.HeaderTusResumable, httpRes.Header.Get(net.HeaderTusResumable))
-		w.Header().Set(net.HeaderTusUploadExpires, httpRes.Header.Get(net.HeaderTusUploadExpires))
-		if httpRes.StatusCode != http.StatusNoContent {
-			w.WriteHeader(httpRes.StatusCode)
-			return
-		}
+			if httpRes.StatusCode != http.StatusNoContent {
+				w.WriteHeader(httpRes.StatusCode)
+				return
+			}
 
-		// check if upload was fully completed
-		if length == 0 || httpRes.Header.Get(net.HeaderUploadOffset) == r.Header.Get(net.HeaderUploadLength) {
-			// get uploaded file metadata
+			w.Header().Set(net.HeaderUploadOffset, httpRes.Header.Get(net.HeaderUploadOffset))
+			w.Header().Set(net.HeaderTusResumable, httpRes.Header.Get(net.HeaderTusResumable))
+			w.Header().Set(net.HeaderTusUploadExpires, httpRes.Header.Get(net.HeaderTusUploadExpires))
+			if httpRes.Header.Get(net.HeaderOCMtime) != "" {
+				w.Header().Set(net.HeaderOCMtime, httpRes.Header.Get(net.HeaderOCMtime))
+			}
 
 			if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
 				sReq.Ref = &provider.Reference{
 					ResourceId: &resid,
 				}
 			}
+			finishUpload = httpRes.Header.Get(net.HeaderUploadOffset) == r.Header.Get(net.HeaderUploadLength)
+		}
+
+		// check if upload was fully completed
+		if uploadLength == 0 || finishUpload {
+			// get uploaded file metadata
 
 			sRes, err := client.Stat(ctx, sReq)
 			if err != nil {
@@ -311,7 +313,6 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			}
 
 			if sRes.Status.Code != rpc.Code_CODE_OK && sRes.Status.Code != rpc.Code_CODE_NOT_FOUND {
-
 				if sRes.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 					// the token expired during upload, so the stat failed
 					// and we can't do anything about it.
@@ -329,10 +330,6 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				log.Error().Msg("No info found for uploaded file")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
-			}
-			if httpRes != nil && httpRes.Header != nil && httpRes.Header.Get(net.HeaderOCMtime) != "" {
-				// set the "accepted" value if returned in the upload response headers
-				w.Header().Set(net.HeaderOCMtime, httpRes.Header.Get(net.HeaderOCMtime))
 			}
 
 			// get WebDav permissions for file

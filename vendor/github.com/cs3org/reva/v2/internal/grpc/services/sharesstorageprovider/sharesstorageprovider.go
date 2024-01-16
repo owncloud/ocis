@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	gstatus "google.golang.org/grpc/status"
@@ -397,7 +398,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 	var shareInfo map[string]*provider.ResourceInfo
 	var err error
 	if fetchShares {
-		receivedShares, shareInfo, err = s.fetchShares(ctx)
+		receivedShares, shareInfo, err = s.fetchShares(ctx, req.Opaque, []string{}, &fieldmaskpb.FieldMask{ /*TODO mtime and etag only?*/ })
 		if err != nil {
 			return nil, errors.Wrap(err, "sharesstorageprovider: error calling ListReceivedSharesRequest")
 		}
@@ -708,7 +709,7 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		if !ok {
 			return nil, fmt.Errorf("missing user in context")
 		}
-		receivedShares, shareMd, err := s.fetchShares(ctx)
+		receivedShares, shareMd, err := s.fetchShares(ctx, req.Opaque, req.ArbitraryMetadataKeys, req.FieldMask)
 		if err != nil {
 			return nil, err
 		}
@@ -804,7 +805,7 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 		// The root is empty, it is filled by mountpoints
 		// so, when accessing the root via /dav/spaces, we need to list the accepted shares with their mountpoint
 
-		receivedShares, _, err := s.fetchShares(ctx)
+		receivedShares, shareMd, err := s.fetchShares(ctx, req.Opaque, req.ArbitraryMetadataKeys, req.FieldMask)
 		if err != nil {
 			return nil, errors.Wrap(err, "sharesstorageprovider: error calling ListReceivedSharesRequest")
 		}
@@ -820,31 +821,38 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 				continue
 			}
 
-			statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
-				Opaque: req.Opaque,
-				Ref: &provider.Reference{
-					ResourceId: share.Share.ResourceId,
-					Path:       ".",
-				},
-				ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
-			})
-			switch {
-			case err != nil:
-				appctx.GetLogger(ctx).Error().
-					Err(err).
-					Interface("share", share).
-					Msg("sharesstorageprovider: could not make stat request when listing virtual root, skipping")
-				continue
-			case statRes.Status.Code != rpc.Code_CODE_OK:
-				appctx.GetLogger(ctx).Debug().
-					Interface("share", share).
-					Interface("status", statRes.Status).
-					Msg("sharesstorageprovider: could not stat share when listing virtual root, skipping")
-				continue
+			info := shareMd[share.GetShare().GetId().GetOpaqueId()]
+			if info == nil {
+				if share.GetShare().GetResourceId().GetSpaceId() == "" {
+					// convert backwards compatible share id
+					share.Share.ResourceId.StorageId, share.Share.ResourceId.SpaceId = storagespace.SplitStorageID(share.GetShare().GetResourceId().GetSpaceId())
+				}
+				statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+					Opaque: req.Opaque,
+					Ref: &provider.Reference{
+						ResourceId: share.Share.ResourceId,
+						Path:       ".",
+					},
+					ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
+				})
+				switch {
+				case err != nil:
+					appctx.GetLogger(ctx).Error().
+						Err(err).
+						Interface("share", share).
+						Msg("sharesstorageprovider: could not make stat request when listing virtual root, skipping")
+					continue
+				case statRes.Status.Code != rpc.Code_CODE_OK:
+					appctx.GetLogger(ctx).Debug().
+						Interface("share", share).
+						Interface("status", statRes.Status).
+						Msg("sharesstorageprovider: could not stat share when listing virtual root, skipping")
+					continue
+				}
+				info = statRes.Info
 			}
 
-			// override info
-			info := statRes.Info
+			// override resource id info
 			info.Id = &provider.ResourceId{
 				StorageId: utils.ShareStorageProviderID,
 				SpaceId:   utils.ShareStorageSpaceID,
@@ -1067,7 +1075,13 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 		// look up share for this resourceid
 		lsRes, err := sharingCollaborationClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 			Filters: []*collaboration.Filter{
-				// FIXME filter by accepted ... and by mountpoint?
+				{
+					Type: collaboration.Filter_TYPE_STATE,
+					Term: &collaboration.Filter_State{
+						State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
+					},
+				},
+				// TODO filter by mountpoint?
 			},
 		})
 		if err != nil {
@@ -1077,6 +1091,7 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 			return nil, lsRes.Status, nil
 		}
 		for _, receivedShare := range lsRes.Shares {
+			// make sure to skip unaccepted shares
 			if receivedShare.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
 				continue
 			}
@@ -1121,7 +1136,7 @@ func (s *service) rejectReceivedShare(ctx context.Context, receivedShare *collab
 	return errtypes.NewErrtypeFromStatus(res.Status)
 }
 
-func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedShare, map[string]*provider.ResourceInfo, error) {
+func (s *service) fetchShares(ctx context.Context, opaque *typesv1beta1.Opaque, arbitraryMetadataKeys []string, fieldMask *field_mask.FieldMask) ([]*collaboration.ReceivedShare, map[string]*provider.ResourceInfo, error) {
 	sharingCollaborationClient, err := s.sharingCollaborationSelector.Next()
 	if err != nil {
 		return nil, nil, err
@@ -1152,7 +1167,12 @@ func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedSha
 			// convert backwards compatible share id
 			rs.Share.ResourceId.StorageId, rs.Share.ResourceId.SpaceId = storagespace.SplitStorageID(rs.Share.ResourceId.StorageId)
 		}
-		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: rs.Share.ResourceId}})
+		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+			Opaque:                opaque,
+			Ref:                   &provider.Reference{ResourceId: rs.Share.ResourceId},
+			ArbitraryMetadataKeys: arbitraryMetadataKeys,
+			FieldMask:             fieldMask,
+		})
 		if err != nil {
 			appctx.GetLogger(ctx).Error().
 				Err(err).

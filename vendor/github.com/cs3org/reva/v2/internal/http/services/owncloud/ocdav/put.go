@@ -292,58 +292,58 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	}
 
 	// ony send actual PUT request if file has bytes. Otherwise the initiate file upload request creates the file
-	// if length != 0 { // FIXME bring back 0 byte file upload handling, see https://github.com/owncloud/ocis/issues/2609
-
-	var ep, token string
-	for _, p := range uRes.Protocols {
-		if p.Protocol == "simple" {
-			ep, token = p.UploadEndpoint, p.Token
+	if length != 0 {
+		var ep, token string
+		for _, p := range uRes.Protocols {
+			if p.Protocol == "simple" {
+				ep, token = p.UploadEndpoint, p.Token
+			}
 		}
-	}
 
-	httpReq, err := rhttp.NewRequest(ctx, http.MethodPut, ep, r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
-	httpReq.Header.Set(datagateway.TokenTransportHeader, token)
-
-	httpRes, err := s.client.Do(httpReq)
-	if err != nil {
-		log.Error().Err(err).Msg("error doing PUT request to data service")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	defer httpRes.Body.Close()
-	if httpRes.StatusCode != http.StatusOK {
-		if httpRes.StatusCode == http.StatusPartialContent {
-			w.WriteHeader(http.StatusPartialContent)
+		httpReq, err := rhttp.NewRequest(ctx, http.MethodPut, ep, r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if httpRes.StatusCode == errtypes.StatusChecksumMismatch {
-			w.WriteHeader(http.StatusBadRequest)
-			b, err := errors.Marshal(http.StatusBadRequest, "The computed checksum does not match the one received from the client.", "")
-			errors.HandleWebdavError(&log, w, b, err)
+		Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
+		httpReq.Header.Set(datagateway.TokenTransportHeader, token)
+
+		httpRes, err := s.client.Do(httpReq)
+		if err != nil {
+			log.Error().Err(err).Msg("error doing PUT request to data service")
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Error().Err(err).Msg("PUT request to data server failed")
-		w.WriteHeader(httpRes.StatusCode)
-		return
-	}
+		defer httpRes.Body.Close()
+		if httpRes.StatusCode != http.StatusOK {
+			if httpRes.StatusCode == http.StatusPartialContent {
+				w.WriteHeader(http.StatusPartialContent)
+				return
+			}
+			if httpRes.StatusCode == errtypes.StatusChecksumMismatch {
+				w.WriteHeader(http.StatusBadRequest)
+				b, err := errors.Marshal(http.StatusBadRequest, "The computed checksum does not match the one received from the client.", "")
+				errors.HandleWebdavError(&log, w, b, err)
+				return
+			}
+			log.Error().Err(err).Msg("PUT request to data server failed")
+			w.WriteHeader(httpRes.StatusCode)
+			return
+		}
 
-	// copy headers if they are present
-	if httpRes.Header.Get(net.HeaderETag) != "" {
-		w.Header().Set(net.HeaderETag, httpRes.Header.Get(net.HeaderETag))
-	}
-	if httpRes.Header.Get(net.HeaderOCETag) != "" {
-		w.Header().Set(net.HeaderOCETag, httpRes.Header.Get(net.HeaderOCETag))
-	}
-	if httpRes.Header.Get(net.HeaderOCFileID) != "" {
-		w.Header().Set(net.HeaderOCFileID, httpRes.Header.Get(net.HeaderOCFileID))
-	}
-	if httpRes.Header.Get(net.HeaderLastModified) != "" {
-		w.Header().Set(net.HeaderLastModified, httpRes.Header.Get(net.HeaderLastModified))
+		// copy headers if they are present
+		if httpRes.Header.Get(net.HeaderETag) != "" {
+			w.Header().Set(net.HeaderETag, httpRes.Header.Get(net.HeaderETag))
+		}
+		if httpRes.Header.Get(net.HeaderOCETag) != "" {
+			w.Header().Set(net.HeaderOCETag, httpRes.Header.Get(net.HeaderOCETag))
+		}
+		if httpRes.Header.Get(net.HeaderOCFileID) != "" {
+			w.Header().Set(net.HeaderOCFileID, httpRes.Header.Get(net.HeaderOCFileID))
+		}
+		if httpRes.Header.Get(net.HeaderLastModified) != "" {
+			w.Header().Set(net.HeaderLastModified, httpRes.Header.Get(net.HeaderLastModified))
+		}
 	}
 
 	// file was new
