@@ -145,12 +145,7 @@ func (p Web) getLogoPath(r io.Reader) (string, error) {
 	var m map[string]interface{}
 	_ = json.NewDecoder(r).Decode(&m)
 
-	webCfg, ok := m["clients"].(map[string]interface{})["web"].(map[string]interface{})
-	if !ok {
-		return "", errInvalidThemeConfig
-	}
-
-	logoCfg, ok := webCfg["defaults"].(map[string]interface{})["logo"].(map[string]interface{})
+	logoCfg, ok := extractMap(m, "clients", "web", "defaults", "logo")
 	if !ok {
 		return "", errInvalidThemeConfig
 	}
@@ -175,18 +170,13 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	_ = json.NewDecoder(f).Decode(&m)
 
 	// change logo in common part
-	commonCfg, ok := m["common"].(map[string]interface{})
+	commonCfg, ok := extractMap(m, "common")
 	if !ok {
 		return errInvalidThemeConfig
 	}
 	commonCfg["logo"] = logoPath
 
-	webCfg, ok := m["clients"].(map[string]interface{})["web"].(map[string]interface{})
-	if !ok {
-		return errInvalidThemeConfig
-	}
-
-	logoCfg, ok := webCfg["defaults"].(map[string]interface{})["logo"].(map[string]interface{})
+	logoCfg, ok := extractMap(m, "clients", "web", "defaults", "logo")
 	if !ok {
 		return errInvalidThemeConfig
 	}
@@ -208,4 +198,17 @@ func allowedFiletype(filename, mediatype string) bool {
 	// Check if we allow that extension and if the mediatype matches the extension
 	mt, ok := _allowedExtensionMediatypes[ext]
 	return ok && mt == mediatype
+}
+
+// extractMap extracts embedded map[string]interface{} by the keys chain
+func extractMap(data map[string]interface{}, keys ...string) (map[string]interface{}, bool) {
+	last := data
+	var ok bool
+	for _, key := range keys {
+		last, ok = last[key].(map[string]interface{})
+		if !ok {
+			return nil, false
+		}
+	}
+	return last, true
 }
