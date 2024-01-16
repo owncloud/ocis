@@ -300,5 +300,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/shareInvitations.feature:1046](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1046)
 - [apiSharingNg/shareInvitations.feature:1047](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1047)
 - [apiSharingNg/shareInvitations.feature:1048](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1048)
+- [apiSharingNg/shareInvitations.feature:1105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1105)
+- [apiSharingNg/shareInvitations.feature:1106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1106)
+- [apiSharingNg/shareInvitations.feature:1107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1107)
+- [apiSharingNg/shareInvitations.feature:1108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1108)
+- [apiSharingNg/shareInvitations.feature:1109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1109)
+- [apiSharingNg/shareInvitations.feature:1110](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1110)
+- [apiSharingNg/shareInvitations.feature:1111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1111)
+- [apiSharingNg/shareInvitations.feature:1112](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1112)
+- [apiSharingNg/shareInvitations.feature:1113](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/shareInvitations.feature#L1113)
 - Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
