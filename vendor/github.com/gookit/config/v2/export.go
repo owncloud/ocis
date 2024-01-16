@@ -121,7 +121,7 @@ func (c *Config) Structure(key string, dst any) (err error) {
 	return err
 }
 
-// ToJSON string
+// ToJSON string, will ignore error
 func (c *Config) ToJSON() string {
 	buf := &bytes.Buffer{}
 
@@ -129,7 +129,6 @@ func (c *Config) ToJSON() string {
 	if err != nil {
 		return ""
 	}
-
 	return buf.String()
 }
 
@@ -168,7 +167,6 @@ func (c *Config) DumpTo(out io.Writer, format string) (n int64, err error) {
 
 	// write content to out
 	num, _ := fmt.Fprintln(out, string(encoded))
-
 	return int64(num), nil
 }
 

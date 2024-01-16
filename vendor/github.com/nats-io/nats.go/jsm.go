@@ -1,4 +1,4 @@
-// Copyright 2021-2022 The NATS Authors
+// Copyright 2021-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -252,11 +252,13 @@ type AccountInfo struct {
 }
 
 type Tier struct {
-	Memory    uint64        `json:"memory"`
-	Store     uint64        `json:"storage"`
-	Streams   int           `json:"streams"`
-	Consumers int           `json:"consumers"`
-	Limits    AccountLimits `json:"limits"`
+	Memory         uint64        `json:"memory"`
+	Store          uint64        `json:"storage"`
+	ReservedMemory uint64        `json:"reserved_memory"`
+	ReservedStore  uint64        `json:"reserved_storage"`
+	Streams        int           `json:"streams"`
+	Consumers      int           `json:"consumers"`
+	Limits         AccountLimits `json:"limits"`
 }
 
 // APIStats reports on API calls to JetStream for this account.
@@ -297,7 +299,7 @@ func (js *js) AccountInfo(opts ...JSOpt) (*AccountInfo, error) {
 	resp, err := js.apiRequestWithContext(o.ctx, js.apiSubj(apiAccountInfo), nil)
 	if err != nil {
 		// todo maybe nats server should never have no responder on this subject and always respond if they know there is no js to be had
-		if err == ErrNoResponders {
+		if errors.Is(err, ErrNoResponders) {
 			err = ErrJetStreamNotEnabled
 		}
 		return nil, err
@@ -415,7 +417,7 @@ func (js *js) upsertConsumer(stream, consumerName string, cfg *ConsumerConfig, o
 
 	resp, err := js.apiRequestWithContext(o.ctx, js.apiSubj(ccSubj), req)
 	if err != nil {
-		if err == ErrNoResponders {
+		if errors.Is(err, ErrNoResponders) {
 			err = ErrJetStreamNotEnabled
 		}
 		return nil, err
@@ -1623,7 +1625,7 @@ func (jsc *js) StreamNameBySubject(subj string, opts ...JSOpt) (string, error) {
 
 	resp, err := jsc.apiRequestWithContext(o.ctx, jsc.apiSubj(apiStreams), j)
 	if err != nil {
-		if err == ErrNoResponders {
+		if errors.Is(err, ErrNoResponders) {
 			err = ErrJetStreamNotEnabled
 		}
 		return _EMPTY_, err

@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"dario.cat/mergo"
 	"github.com/gookit/goutil/errorx"
 	"github.com/gookit/goutil/fsutil"
-	"github.com/imdario/mergo"
 )
 
 // LoadFiles load one or multi files, will fire OnLoadData event
@@ -103,10 +103,8 @@ func (c *Config) LoadOSEnv(keys []string, keyToLower bool) {
 		if keyToLower {
 			key = strings.ToLower(key)
 		}
-
 		_ = c.Set(key, val)
 	}
-
 	c.fireHook(OnLoadData)
 }
 
@@ -195,7 +193,7 @@ func LoadData(dataSource ...any) error { return dc.LoadData(dataSource...) }
 
 // LoadData load data from map OR struct
 //
-// The dataSources can be:
+// The dataSources type allow:
 //   - map[string]any
 //   - map[string]string
 func (c *Config) LoadData(dataSources ...any) (err error) {
@@ -203,19 +201,24 @@ func (c *Config) LoadData(dataSources ...any) (err error) {
 		c.opts.Delimiter = defaultDelimiter
 	}
 
+	var loaded bool
 	for _, ds := range dataSources {
 		if smp, ok := ds.(map[string]string); ok {
+			loaded = true
 			c.LoadSMap(smp)
 			continue
 		}
 
-		err = mergo.Merge(&c.data, ds, mergo.WithOverride)
+		err = mergo.Merge(&c.data, ds, c.opts.MergeOptions...)
 		if err != nil {
 			return errorx.WithStack(err)
 		}
+		loaded = true
 	}
 
-	c.fireHook(OnLoadData)
+	if loaded {
+		c.fireHook(OnLoadData)
+	}
 	return
 }
 
@@ -237,8 +240,8 @@ func LoadSources(format string, src []byte, more ...[]byte) error {
 // Usage:
 //
 //	config.LoadSources(config.Yaml, []byte(`
-//	name: blog
-//	arr:
+//	  name: blog
+//	  arr:
 //		key: val
 //
 // `))
@@ -308,6 +311,24 @@ func (c *Config) LoadExistsByFormat(format string, configFiles ...string) (err e
 	return
 }
 
+// LoadOptions for load config from dir.
+type LoadOptions struct {
+	// DataKey use for load config from dir.
+	// see https://github.com/gookit/config/issues/173
+	DataKey string
+}
+
+// LoadOptFn type func
+type LoadOptFn func(lo *LoadOptions)
+
+func newLoadOptions(loFns []LoadOptFn) *LoadOptions {
+	lo := &LoadOptions{}
+	for _, fn := range loFns {
+		fn(lo)
+	}
+	return lo
+}
+
 // LoadFromDir Load custom format files from the given directory, the file name will be used as the key.
 //
 // Example:
@@ -317,24 +338,30 @@ func (c *Config) LoadExistsByFormat(format string, configFiles ...string) (err e
 //
 //	// after load
 //	Config.data = map[string]any{"task": file data}
-func LoadFromDir(dirPath, format string) error {
-	return dc.LoadFromDir(dirPath, format)
+func LoadFromDir(dirPath, format string, loFns ...LoadOptFn) error {
+	return dc.LoadFromDir(dirPath, format, loFns...)
 }
 
 // LoadFromDir Load custom format files from the given directory, the file name will be used as the key.
 //
+// NOTE: will not be reloaded on call ReloadFiles(), if data loaded by the method.
+//
 // Example:
 //
-//	// file: /somedir/task.json
+//	// file: /somedir/task.json , will use filename 'task' as key
 //	Config.LoadFromDir("/somedir", "json")
 //
-//	// after load
-//	Config.data = map[string]any{"task": file data}
-func (c *Config) LoadFromDir(dirPath, format string) (err error) {
+//	// after load, the data will be:
+//	Config.data = map[string]any{"task": {file data}}
+func (c *Config) LoadFromDir(dirPath, format string, loFns ...LoadOptFn) (err error) {
 	extName := "." + format
 	extLen := len(extName)
 
-	return fsutil.FindInDir(dirPath, func(fPath string, ent fs.DirEntry) error {
+	lo := newLoadOptions(loFns)
+	dirData := make(map[string]any)
+	dataList := make([]map[string]any, 0, 8)
+
+	err = fsutil.FindInDir(dirPath, func(fPath string, ent fs.DirEntry) error {
 		baseName := ent.Name()
 		if strings.HasSuffix(baseName, extName) {
 			data, err := c.parseSourceToMap(format, fsutil.MustReadFile(fPath))
@@ -342,18 +369,31 @@ func (c *Config) LoadFromDir(dirPath, format string) (err error) {
 				return err
 			}
 
+			// filename without ext.
 			onlyName := baseName[:len(baseName)-extLen]
-			err = c.loadDataMap(map[string]any{onlyName: data})
+			if lo.DataKey != "" {
+				dataList = append(dataList, data)
+			} else {
+				dirData[onlyName] = data
+			}
 
-			// use file name as key, it cannot be reloaded. SO, cannot append to loadedFiles
-			// if err == nil {
-			// 	c.loadedFiles = append(c.loadedFiles, fPath)
-			// }
-
-			return err
+			// TODO use file name as key, it cannot be reloaded. So, cannot append to loadedFiles
+			// c.loadedFiles = append(c.loadedFiles, fPath)
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+	if lo.DataKey != "" {
+		dirData[lo.DataKey] = dataList
+	}
+
+	if len(dirData) == 0 {
+		return nil
+	}
+	return c.loadDataMap(dirData)
 }
 
 // ReloadFiles reload config data use loaded files
@@ -440,7 +480,7 @@ func (c *Config) loadDataMap(data map[string]any) (err error) {
 		c.data = data
 	} else {
 		// again ... will merge data
-		err = mergo.Merge(&c.data, data, mergo.WithOverride, mergo.WithTypeCheck)
+		err = mergo.Merge(&c.data, data, c.opts.MergeOptions...)
 	}
 
 	if !c.reloading && err == nil {

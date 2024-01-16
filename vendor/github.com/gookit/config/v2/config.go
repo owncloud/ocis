@@ -111,23 +111,24 @@ type Config struct {
 	sMapCache map[string]strMap
 }
 
-// New config instance, default add JSON driver
+// New config instance with custom options, default with JSON driver
 func New(name string, opts ...OptionFn) *Config {
-	return NewEmpty(name).WithDriver(JSONDriver).WithOptions(opts...)
+	return NewEmpty(name, opts...).WithDriver(JSONDriver)
 }
 
-// NewEmpty config instance
-func NewEmpty(name string) *Config {
-	return &Config{
+// NewEmpty create config instance with custom options
+func NewEmpty(name string, opts ...OptionFn) *Config {
+	c := &Config{
 		name: name,
 		opts: newDefaultOption(),
 		data: make(map[string]any),
-
 		// don't add any drivers
 		encoders: map[string]Encoder{},
 		decoders: map[string]Decoder{},
 		aliasMap: make(map[string]string),
 	}
+
+	return c.WithOptions(opts...)
 }
 
 // NewWith create config instance, and you can call some init func

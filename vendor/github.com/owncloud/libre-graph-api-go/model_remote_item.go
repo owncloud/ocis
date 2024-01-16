@@ -46,6 +46,8 @@ type RemoteItem struct {
 	CTag            *string        `json:"cTag,omitempty"`
 	ParentReference *ItemReference `json:"parentReference,omitempty"`
 	Shared          *Shared        `json:"shared,omitempty"`
+	// The set of permissions for the item. Read-only. Nullable.
+	Permissions []Permission `json:"permissions,omitempty"`
 	// Size of the remote item. Read-only.
 	Size          *int64         `json:"size,omitempty"`
 	SpecialFolder *SpecialFolder `json:"specialFolder,omitempty"`
@@ -616,6 +618,38 @@ func (o *RemoteItem) SetShared(v Shared) {
 	o.Shared = &v
 }
 
+// GetPermissions returns the Permissions field value if set, zero value otherwise.
+func (o *RemoteItem) GetPermissions() []Permission {
+	if o == nil || IsNil(o.Permissions) {
+		var ret []Permission
+		return ret
+	}
+	return o.Permissions
+}
+
+// GetPermissionsOk returns a tuple with the Permissions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RemoteItem) GetPermissionsOk() ([]Permission, bool) {
+	if o == nil || IsNil(o.Permissions) {
+		return nil, false
+	}
+	return o.Permissions, true
+}
+
+// HasPermissions returns a boolean if a field has been set.
+func (o *RemoteItem) HasPermissions() bool {
+	if o != nil && !IsNil(o.Permissions) {
+		return true
+	}
+
+	return false
+}
+
+// SetPermissions gets a reference to the given []Permission and assigns it to the Permissions field.
+func (o *RemoteItem) SetPermissions(v []Permission) {
+	o.Permissions = v
+}
+
 // GetSize returns the Size field value if set, zero value otherwise.
 func (o *RemoteItem) GetSize() int64 {
 	if o == nil || IsNil(o.Size) {
@@ -804,6 +838,9 @@ func (o RemoteItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Shared) {
 		toSerialize["shared"] = o.Shared
+	}
+	if !IsNil(o.Permissions) {
+		toSerialize["permissions"] = o.Permissions
 	}
 	if !IsNil(o.Size) {
 		toSerialize["size"] = o.Size

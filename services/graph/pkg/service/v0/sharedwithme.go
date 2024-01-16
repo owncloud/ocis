@@ -3,17 +3,20 @@ package svc
 import (
 	"context"
 	"net/http"
-	"strings"
+	"reflect"
+	"slices"
 
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"golang.org/x/sync/errgroup"
+
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 // ListSharedWithMe lists the files shared with the current user.
@@ -30,6 +33,7 @@ func (g Graph) ListSharedWithMe(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: driveItems})
 }
 
+// listSharedWithMe is a helper function that lists the drive items shared with the current user.
 func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
@@ -38,189 +42,305 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 	}
 
 	listReceivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{})
-	if err != nil {
+	if errCode := errorcode.FromCS3Status(listReceivedSharesResponse.GetStatus(), err); errCode != nil {
 		g.logger.Error().Err(err).Msg("listing shares failed")
-		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		return nil, *errCode
 	}
 
-	switch listReceivedSharesResponse.Status.Code {
-	case rpc.Code_CODE_NOT_FOUND:
-		return nil, identity.ErrNotFound
+	// doStat is a helper function that stat a resource.
+	doStat := func(resourceId *storageprovider.ResourceId) (*storageprovider.StatResponse, error) {
+		shareStat, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
+			Ref: &storageprovider.Reference{ResourceId: resourceId},
+		})
+		switch errCode := errorcode.FromCS3Status(shareStat.GetStatus(), err); {
+		case errCode == nil:
+			break
+		// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
+		case errCode.GetCode() == errorcode.ItemNotFound:
+			return nil, nil
+		default:
+			g.logger.Error().Err(errCode).Msg("could not stat")
+			return nil, errCode
+		}
+
+		return shareStat, nil
 	}
 
-	var driveItems []libregraph.DriveItem
-	for _, receivedShare := range listReceivedSharesResponse.GetShares() {
-		share := receivedShare.GetShare()
-		if share == nil {
-			g.logger.Error().Interface("ListReceivedShares", listReceivedSharesResponse).Msg("unexpected empty ReceivedShare.Share")
-			continue
-		}
+	group := new(errgroup.Group)
+	receivedShares := listReceivedSharesResponse.GetShares()
+	driveItems := make([]libregraph.DriveItem, len(receivedShares))
 
-		driveItem := &libregraph.DriveItem{}
+	for i, receivedShare := range receivedShares {
+		i, receivedShare := i, receivedShare
 
-		statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: share.GetResourceId()}})
-		if err != nil {
-			g.logger.Error().Err(err).Msg("could not stat")
-			continue
-		}
-		if statResponse.GetStatus().GetCode() != rpc.Code_CODE_OK {
-			g.logger.Error().Err(err).Msg("invalid stat response")
-			continue
-		}
-		resourceInfo := statResponse.GetInfo()
-
-		var driveOwner *libregraph.Identity
-		if userID := statResponse.GetInfo().GetOwner(); userID != nil {
-			if user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId()); err != nil {
-				g.logger.Error().Err(err).Msg("could not get user")
-				continue
-			} else {
-				driveOwner = &libregraph.Identity{
-					DisplayName: user.GetDisplayName(),
-					Id:          libregraph.PtrString(user.GetId()),
-				}
-			}
-		}
-
-		var shareCreator *libregraph.Identity
-		if userID := share.GetCreator(); userID != nil {
-			if user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId()); err != nil {
-				g.logger.Error().Err(err).Msg("could not get user")
-				continue
-			} else {
-				shareCreator = &libregraph.Identity{
-					DisplayName: user.GetDisplayName(),
-					Id:          libregraph.PtrString(user.GetId()),
-				}
-			}
-		}
-
-		if cTime := share.GetCtime(); cTime != nil {
-			driveItem.CreatedDateTime = libregraph.PtrTime(cs3TimestampToTime(cTime))
-		}
-
-		driveItem.ETag = libregraph.PtrString(strings.Trim(statResponse.GetInfo().GetEtag(), "\""))
-
-		if id := share.GetId().GetOpaqueId(); id != "" {
-			driveItem.Id = libregraph.PtrString(id)
-		}
-
-		if mTime := share.GetMtime(); mTime != nil {
-			driveItem.LastModifiedDateTime = libregraph.PtrTime(cs3TimestampToTime(mTime))
-		}
-
-		if name := resourceInfo.GetName(); name != "" {
-			driveItem.Name = libregraph.PtrString(name)
-		}
-
-		{
-			addParentReference := false
-			parentReference := &libregraph.ItemReference{}
-
-			if id := share.GetId().GetOpaqueId(); id != "" {
-				parentReference.DriveId = libregraph.PtrString(id)
-				addParentReference = true
+		group.Go(func() error {
+			shareStat, err := doStat(receivedShare.GetShare().GetResourceId())
+			if shareStat == nil || err != nil {
+				return err
 			}
 
-			if addParentReference {
-				driveItem.ParentReference = parentReference
-			}
-		}
-
-		{
-			remoteItem := &libregraph.RemoteItem{}
-
-			if id := resourceInfo.GetId(); id != nil {
-				remoteItem.Id = libregraph.PtrString(storagespace.FormatResourceID(*id))
+			permission, err := g.cs3ReceivedShareToLibreGraphPermissions(ctx, receivedShare, shareStat.GetInfo())
+			if err != nil {
+				return err
 			}
 
-			if mTime := resourceInfo.GetMtime(); mTime != nil {
-				remoteItem.LastModifiedDateTime = libregraph.PtrTime(cs3TimestampToTime(mTime))
-			}
-
-			if name := resourceInfo.GetName(); name != "" {
-				remoteItem.Name = libregraph.PtrString(name)
-			}
-
-			// fixMe:
-			// - negative permission could distort the size, am i right?
-			remoteItem.Size = libregraph.PtrInt64(int64(resourceInfo.GetSize()))
-
-			remoteItem.CreatedBy = &libregraph.IdentitySet{
-				User: driveOwner,
-			}
-
+			shared := libregraph.NewShared()
 			{
-
-				addFileSystemInfo := false
-				fileSystemInfo := &libregraph.FileSystemInfo{}
-
-				if cTime := share.GetCtime(); cTime != nil {
-					// fixMe:
-					// - ms uses the root resource ctime for that,
-					//   the stat response does not contain any information about this, use share instead?
-					fileSystemInfo.CreatedDateTime = libregraph.PtrTime(cs3TimestampToTime(cTime))
-					addFileSystemInfo = true
-				}
-
-				if mTime := resourceInfo.GetMtime(); mTime != nil {
-					fileSystemInfo.LastModifiedDateTime = libregraph.PtrTime(cs3TimestampToTime(mTime))
-					addFileSystemInfo = true
-				}
-
-				if addFileSystemInfo {
-					remoteItem.FileSystemInfo = fileSystemInfo
+				if cTime := receivedShare.GetShare().GetCtime(); cTime != nil {
+					shared.SetSharedDateTime(cs3TimestampToTime(cTime))
 				}
 			}
 
-			switch resourceInfo.GetType() {
-			case storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
-				remoteItem.Folder = &libregraph.Folder{}
-			case storageprovider.ResourceType_RESOURCE_TYPE_FILE:
-				openGraphFile := &libregraph.OpenGraphFile{}
-
-				if mimeType := resourceInfo.GetMimeType(); mimeType != "" {
-					openGraphFile.MimeType = libregraph.PtrString(mimeType)
-				}
-
-				remoteItem.File = openGraphFile
-			case storageprovider.ResourceType_RESOURCE_TYPE_INVALID:
-				g.logger.Error().Msg("invalid resource type")
-				continue
-			}
-
+			remoteItem := libregraph.NewRemoteItem()
 			{
-				addShared := false
-				shared := &libregraph.Shared{
-					Owner: &libregraph.IdentitySet{
-						User: shareCreator,
-					},
-					SharedBy: &libregraph.IdentitySet{
-						User: shareCreator,
-					},
+				if id := shareStat.GetInfo().GetId(); id != nil {
+					remoteItem.SetId(storagespace.FormatResourceID(*id))
 				}
 
-				if cTime := share.GetCtime(); cTime != nil {
-					shared.SharedDateTime = libregraph.PtrTime(cs3TimestampToTime(cTime))
-					addShared = true
+				if name := shareStat.GetInfo().GetName(); name != "" {
+					remoteItem.SetName(name)
 				}
 
-				if shareCreator != nil {
-					shared.Owner.User = shareCreator
-					shared.SharedBy.User = shareCreator
-					addShared = true
+				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
+					remoteItem.SetETag(etag)
 				}
 
-				if addShared {
+				if mTime := shareStat.GetInfo().GetMtime(); mTime != nil {
+					remoteItem.SetLastModifiedDateTime(cs3TimestampToTime(mTime))
+				}
+
+				if size := shareStat.GetInfo().GetSize(); size != 0 {
+					remoteItem.SetSize(int64(size))
+				}
+
+				parentReference := libregraph.NewItemReference()
+				if spaceType := shareStat.GetInfo().GetSpace().GetSpaceType(); spaceType != "" {
+					parentReference.SetDriveType(spaceType)
+				}
+
+				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
+					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
+				}
+				if !reflect.ValueOf(*parentReference).IsZero() {
+					remoteItem.ParentReference = parentReference
+				}
+
+			}
+
+			driveItem := libregraph.NewDriveItem()
+
+			// handle share state related stuff
+			switch receivedShare.GetState() {
+			case collaboration.ShareState_SHARE_STATE_ACCEPTED:
+
+				driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+					StorageId: utils.ShareStorageProviderID,
+					OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
+					SpaceId:   utils.ShareStorageSpaceID,
+				}))
+
+				if name := receivedShare.GetMountPoint().GetPath(); name != "" {
+					driveItem.SetName(receivedShare.GetMountPoint().GetPath())
+				}
+
+				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
+					driveItem.SetETag(etag)
+				}
+
+				// parentReference of the out driveItem should be the drive containing the mountpoint
+				// i.e. the share jail
+				driveItem.ParentReference = libregraph.NewItemReference()
+				driveItem.ParentReference.SetDriveType("virtual")
+				driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
+				driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+					StorageId: utils.ShareStorageProviderID,
+					OpaqueId:  utils.ShareStorageSpaceID,
+					SpaceId:   utils.ShareStorageSpaceID,
+				}))
+
+			case collaboration.ShareState_SHARE_STATE_PENDING:
+				fallthrough
+			case collaboration.ShareState_SHARE_STATE_REJECTED:
+				if name := shareStat.GetInfo().GetName(); name != "" {
+					driveItem.SetName(name)
+				}
+			}
+
+			// connect the dots
+			{
+				if mTime := shareStat.GetInfo().GetMtime(); mTime != nil {
+					t := cs3TimestampToTime(mTime)
+
+					driveItem.SetLastModifiedDateTime(t)
+					remoteItem.SetLastModifiedDateTime(t)
+				}
+
+				if size := shareStat.GetInfo().GetSize(); size != 0 {
+					s := int64(size)
+
+					driveItem.SetSize(s)
+					remoteItem.SetSize(s)
+				}
+
+				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get user")
+						return err
+					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
+					remoteItem.SetCreatedBy(identitySet)
+					driveItem.SetCreatedBy(identitySet)
+				}
+
+				if userID := receivedShare.GetShare().GetOwner(); userID != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get user")
+						return err
+					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
+					shared.SetOwner(identitySet)
+				}
+
+				if userID := receivedShare.GetShare().GetCreator(); userID != nil {
+					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					if err != nil {
+						g.logger.Error().Err(err).Msg("could not get user")
+						return err
+					}
+
+					identitySet := libregraph.IdentitySet{
+						User: &libregraph.Identity{
+							DisplayName: user.GetDisplayName(),
+							Id:          libregraph.PtrString(user.GetId()),
+						},
+					}
+
+					shared.SetSharedBy(identitySet)
+
+				}
+
+				switch info := shareStat.GetInfo(); {
+				case info.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
+					folder := libregraph.NewFolder()
+
+					remoteItem.Folder = folder
+					driveItem.Folder = folder
+				case info.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE:
+					file := libregraph.NewOpenGraphFile()
+
+					if mimeType := info.GetMimeType(); mimeType != "" {
+						file.MimeType = &mimeType
+					}
+
+					remoteItem.File = file
+					driveItem.File = file
+				}
+
+				if !reflect.ValueOf(*shared).IsZero() {
 					remoteItem.Shared = shared
 				}
+
+				if !reflect.ValueOf(*permission).IsZero() {
+					permissions := []libregraph.Permission{*permission}
+
+					remoteItem.Permissions = permissions
+				}
+
+				if !reflect.ValueOf(*remoteItem).IsZero() {
+					driveItem.RemoteItem = remoteItem
+				}
 			}
 
-			driveItem.RemoteItem = remoteItem
-		}
+			driveItems[i] = *driveItem
 
-		driveItems = append(driveItems, *driveItem)
+			return nil
+		})
 	}
 
-	return driveItems, nil
+	// wait for concurrent requests to finish
+	err = group.Wait()
+
+	// filter out empty drive items
+	return slices.Clip(slices.DeleteFunc(driveItems, func(item libregraph.DriveItem) bool {
+		return reflect.ValueOf(item).IsZero()
+	})), err
+}
+
+func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, receivedShare *collaboration.ReceivedShare, shareStatInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	permission := libregraph.NewPermission()
+	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
+		permission.SetId(id)
+	}
+
+	if expiration := receivedShare.GetShare().GetExpiration(); expiration != nil {
+		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
+	}
+
+	if permissionSet := shareStatInfo.GetPermissionSet(); permissionSet != nil {
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+			*permissionSet,
+			unifiedrole.UnifiedRoleConditionGrantee,
+			g.config.FilesSharing.EnableResharing,
+		)
+
+		if role != nil {
+			permission.SetRoles([]string{role.GetId()})
+		}
+
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
+
+		// actions only make sense if no role is set
+		if role == nil && len(actions) > 0 {
+			permission.SetLibreGraphPermissionsActions(actions)
+		}
+	}
+
+	switch grantee := receivedShare.GetShare().GetGrantee(); {
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
+		user, err := g.identityCache.GetUser(ctx, grantee.GetUserId().GetOpaqueId())
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get user")
+			return nil, err
+		}
+
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+			User: &libregraph.Identity{
+				DisplayName: user.GetDisplayName(),
+				Id:          user.Id,
+			},
+		})
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+		group, err := g.identityCache.GetGroup(ctx, grantee.GetGroupId().GetOpaqueId())
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get group")
+			return nil, err
+		}
+
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+			Group: &libregraph.Identity{
+				DisplayName: group.GetDisplayName(),
+				Id:          group.Id,
+			},
+		})
+	}
+	permission.SetUiHidden(receivedShare.GetHidden())
+	permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
+
+	return permission, nil
 }

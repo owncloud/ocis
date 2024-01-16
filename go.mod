@@ -47,7 +47,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-tika v0.3.0
 	github.com/google/uuid v1.5.0
-	github.com/gookit/config/v2 v2.2.4
+	github.com/gookit/config/v2 v2.2.5
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
@@ -61,7 +61,7 @@ require (
 	github.com/mna/pigeon v1.2.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.10.9
-	github.com/nats-io/nats.go v1.31.0
+	github.com/nats-io/nats.go v1.32.0
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
@@ -69,7 +69,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/open-policy-agent/opa v0.60.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v1.0.5-0.20231201125350-a08244876423
+	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240115110609-b018a896364e
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/client_golang v1.18.0
@@ -223,7 +223,7 @@ require (
 	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
-	github.com/gookit/goutil v0.6.14 // indirect
+	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect

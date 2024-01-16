@@ -89,6 +89,7 @@ import (
 
 // go run ./examples/yaml.go
 func main() {
+	// config.ParseEnv: will parse env var in string value. eg: shell: ${SHELL}
 	config.WithOptions(config.ParseEnv)
 
 	// add driver for support yaml content
@@ -350,7 +351,7 @@ ioutil.WriteFile("my-config.yaml", buf.Bytes(), 0755)
 ```go
 // Options config options
 type Options struct {
-	// parse env value. like: "${EnvName}" "${EnvName|default}"
+	// parse env in string value. like: "${EnvName}" "${EnvName|default}"
 	ParseEnv bool
     // ParseTime parses a duration string to time.Duration
     // eg: 10s, 2m
@@ -361,10 +362,6 @@ type Options struct {
 	EnableCache bool
 	// parse key, allow find value by key path. default is True eg: 'key.sub' will find `map[key]sub`
 	ParseKey bool
-	// tag name for binding data to struct
-	// Deprecated
-	// please set tag name by DecoderConfig
-	TagName string
 	// the delimiter char for split key path, if `FindByPath=true`. default is '.'
 	Delimiter byte
 	// default write format
@@ -378,6 +375,15 @@ type Options struct {
 	// ParseDefault tag on binding data to struct. tag: default
 	ParseDefault bool
 }
+```
+
+Examples for set options:
+
+```go
+config.WithOptions(config.WithTagName("mytag"))
+config.WithOptions(func(opt *Options) {
+    opt.SetTagNames("config")
+})
 ```
 
 ### Options: Parse default

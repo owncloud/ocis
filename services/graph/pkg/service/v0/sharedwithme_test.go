@@ -11,6 +11,7 @@ import (
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -28,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 var _ = Describe("SharedWithMe", func() {
@@ -72,9 +74,11 @@ var _ = Describe("SharedWithMe", func() {
 
 	Describe("ListSharedWithMe", func() {
 		var (
-			listReceivedSharesResponse *collaborationv1beta1.ListReceivedSharesResponse
-			statResponse               *providerv1beta1.StatResponse
-			getUserResponse            *userv1beta1.GetUserResponse
+			listReceivedSharesResponse     *collaborationv1beta1.ListReceivedSharesResponse
+			statResponse                   *providerv1beta1.StatResponse
+			getUserResponseDefault         *userv1beta1.GetUserResponse
+			getUserResponseResourceCreator *userv1beta1.GetUserResponse
+			getUserResponseShareCreator    *userv1beta1.GetUserResponse
 		)
 
 		toResourceID := func(in string) *providerv1beta1.ResourceId {
@@ -86,7 +90,7 @@ var _ = Describe("SharedWithMe", func() {
 
 		BeforeEach(func() {
 
-			getUserResponse = &userv1beta1.GetUserResponse{
+			getUserResponseDefault = &userv1beta1.GetUserResponse{
 				Status: status.NewOK(ctx),
 				User: &userv1beta1.User{
 					Id: &userv1beta1.UserId{
@@ -95,13 +99,51 @@ var _ = Describe("SharedWithMe", func() {
 					DisplayName: "John Romero",
 				},
 			}
+			getUserResponseResourceCreator = &userv1beta1.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userv1beta1.User{
+					Id: &userv1beta1.UserId{
+						OpaqueId: "resource-creator-id",
+					},
+					DisplayName: "Resource Creator",
+				},
+			}
+			getUserResponseShareCreator = &userv1beta1.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userv1beta1.User{
+					Id: &userv1beta1.UserId{
+						OpaqueId: "share-creator-id",
+					},
+					DisplayName: "Share Creator",
+				},
+			}
 
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.MatchedBy(
+				func(req *userv1beta1.GetUserRequest) bool {
+					return req.UserId.OpaqueId == "resource-creator-id"
+				})).
+				Return(getUserResponseResourceCreator, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.MatchedBy(
+				func(req *userv1beta1.GetUserRequest) bool {
+					return req.UserId.OpaqueId == "share-creator-id"
+				})).
+				Return(getUserResponseShareCreator, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponseDefault, nil)
 
 			listReceivedSharesResponse = &collaborationv1beta1.ListReceivedSharesResponse{
 				Status: status.NewOK(ctx),
 				Shares: []*collaborationv1beta1.ReceivedShare{
-					{Share: &collaborationv1beta1.Share{ResourceId: toResourceID("1$2!3")}},
+					{
+						Share: &collaborationv1beta1.Share{ResourceId: toResourceID("1$2!3")},
+						MountPoint: &providerv1beta1.Reference{
+							ResourceId: &providerv1beta1.ResourceId{
+								StorageId: utils.ShareStorageProviderID,
+								SpaceId:   utils.ShareStorageSpaceID,
+							},
+							Path: "some folder",
+						},
+						State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+					},
 				},
 			}
 
@@ -142,23 +184,7 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(tape.Code, errorcode.ItemNotFound)
 		})
 
-		It("ignores hidden received shares by default", func() {
-			listReceivedSharesResponse.Shares = append(listReceivedSharesResponse.Shares, &collaborationv1beta1.ReceivedShare{
-				Hidden: true,
-			})
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value")
-
-			Expect(len(listReceivedSharesResponse.Shares)).To(Equal(2))
-			Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
-		})
-
-		It("includes hidden shares if explicitly stated", func() {
+		It("includes hidden shares", func() {
 			listReceivedSharesResponse.Shares = append(listReceivedSharesResponse.Shares, &collaborationv1beta1.ReceivedShare{
 				Hidden: true,
 				Share: &collaborationv1beta1.Share{
@@ -168,7 +194,7 @@ var _ = Describe("SharedWithMe", func() {
 
 			svc.ListSharedWithMe(
 				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe?show-hidden=true", nil),
+				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
 			)
 
 			jsonData := gjson.Get(tape.Body.String(), "value")
@@ -181,14 +207,19 @@ var _ = Describe("SharedWithMe", func() {
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
-			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4000}
-			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
-
-			etag := "5ffb8e4bec7026050af7fde9482b289a"
+			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
+			share.Mtime = &typesv1beta1.Timestamp{Seconds: 4002}
+			share.Creator = &userv1beta1.UserId{
+				OpaqueId: "share-creator-id",
+			}
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Name = "some folder"
-			resourceInfo.Etag = "\"" + etag + "\""
+			resourceInfo.Etag = "\"5ffb8e4bec7026050af7fde9482b289a\""
+			resourceInfo.Owner = &userv1beta1.UserId{
+				OpaqueId: "resource-creator-id",
+			}
+			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
 
 			svc.ListSharedWithMe(
 				tape,
@@ -197,11 +228,18 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0")
 
-			Expect(jsonData.Get("createdDateTime").String()).To(Equal(utils.TSToTime(share.Ctime).Format(time.RFC3339Nano)))
-			Expect(jsonData.Get("eTag").String()).To(Equal(etag))
-			Expect(jsonData.Get("id").String()).To(Equal(share.Id.OpaqueId))
-			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(share.Mtime).Format(time.RFC3339Nano)))
+			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
+			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(
+				providerv1beta1.ResourceId{
+					StorageId: utils.ShareStorageProviderID,
+					SpaceId:   utils.ShareStorageSpaceID,
+					OpaqueId:  share.Id.OpaqueId,
+				},
+			)))
+			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
+			Expect(jsonData.Get("createdBy.user.id").String()).To(Equal(resourceInfo.Owner.OpaqueId))
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
+
 		})
 
 		It("populates the driveItem parentReference properties", func() {
@@ -215,17 +253,20 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.parentReference")
 
-			Expect(jsonData.Get("driveId").String()).To(Equal(share.Id.OpaqueId))
+			Expect(jsonData.Get("driveId").String()).To(Equal(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID)))
 		})
 
 		It("populates the driveItem remoteItem properties", func() {
-
 			share := listReceivedSharesResponse.Shares[0].Share
+			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
+			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
+			share.Mtime = &typesv1beta1.Timestamp{Seconds: 40002}
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Name = "some folder"
 			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 40000}
 			resourceInfo.Size = 500
+			resourceInfo.Etag = "\"5ffb8e4bec7026050af7fde9482b289a\""
 
 			svc.ListSharedWithMe(
 				tape,
@@ -234,6 +275,7 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem")
 
+			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
 			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(*share.ResourceId)))
 			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
@@ -241,7 +283,7 @@ var _ = Describe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.createdBy properties", func() {
-			driveOwner := getUserResponse.User
+			driveOwner := getUserResponseDefault.User
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Owner = driveOwner.Id
@@ -255,25 +297,6 @@ var _ = Describe("SharedWithMe", func() {
 
 			Expect(jsonData.Get("user.displayName").String()).To(Equal(driveOwner.DisplayName))
 			Expect(jsonData.Get("user.id").String()).To(Equal(driveOwner.Id.OpaqueId))
-		})
-
-		It("populates the driveItem.remoteItem.fileSystemInfo properties", func() {
-
-			share := listReceivedSharesResponse.Shares[0].Share
-			share.Ctime = &typesv1beta1.Timestamp{Seconds: 400}
-
-			resourceInfo := statResponse.Info
-			resourceInfo.Mtime = &typesv1beta1.Timestamp{Seconds: 4000}
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.fileSystemInfo")
-
-			Expect(jsonData.Get("createdDateTime").String()).To(Equal(utils.TSToTime(share.Ctime).Format(time.RFC3339Nano)))
-			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
 		})
 
 		It("populates the driveItem.remoteItem.folder properties", func() {
@@ -305,18 +328,22 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(jsonData.Get("file.mimeType").String()).To(Equal(resourceInfo.MimeType))
 		})
 
-		It("populates the driveItem.remoteItem.folder properties", func() {
+		It("populates the driveItem.remoteItem.permissions properties", func() {
 			resourceInfo := statResponse.Info
-			resourceInfo.Type = providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER
+			resourceInfo.PermissionSet = roleconversions.NewViewerRole(true).CS3ResourcePermissions()
 
 			svc.ListSharedWithMe(
 				tape,
 				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
 			)
 
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem")
+			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.permissions.0")
 
-			Expect(jsonData.Get("folder").Exists()).To(BeTrue())
+			Expect(jsonData.Get("roles.0").String()).To(Equal(unifiedrole.UnifiedRoleViewerID))
+			Expect(jsonData.Get("@ui\\.hidden").Exists()).To(BeTrue())
+			Expect(jsonData.Get("@ui\\.hidden").Bool()).To(BeFalse())
+			Expect(jsonData.Get("@client\\.synchronize").Exists()).To(BeTrue())
+			Expect(jsonData.Get("@client\\.synchronize").Bool()).To(BeTrue())
 		})
 
 		It("populates the driveItem.remoteItem.shared properties", func() {
@@ -334,10 +361,10 @@ var _ = Describe("SharedWithMe", func() {
 		})
 
 		It("populates the driveItem.remoteItem.shared.owner properties", func() {
-			shareCreator := getUserResponse.User
+			shareOwner := getUserResponseDefault.User
 
 			share := listReceivedSharesResponse.Shares[0].Share
-			share.Creator = shareCreator.Id
+			share.Owner = shareOwner.Id
 
 			svc.ListSharedWithMe(
 				tape,
@@ -346,12 +373,12 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.shared.owner")
 
-			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareCreator.DisplayName))
-			Expect(jsonData.Get("user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
+			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareOwner.DisplayName))
+			Expect(jsonData.Get("user.id").String()).To(Equal(shareOwner.Id.OpaqueId))
 		})
 
 		It("populates the driveItem.remoteItem.shared.sharedBy properties", func() {
-			shareCreator := getUserResponse.User
+			shareCreator := getUserResponseDefault.User
 
 			share := listReceivedSharesResponse.Shares[0].Share
 			share.Creator = shareCreator.Id
