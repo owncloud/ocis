@@ -33,8 +33,6 @@ func serveCmd() *cobra.Command {
 			ocisConfig.Set("bin", cmd.Flag("bin").Value.String())
 			ocisConfig.Set("url", cmd.Flag("url").Value.String())
 			ocisConfig.Set("retry", cmd.Flag("retry").Value.String())
-			ocisConfig.Set("adminUsername", cmd.Flag("admin-username").Value.String())
-			ocisConfig.Set("adminPassword", cmd.Flag("admin-password").Value.String())
 
 			go ocis.Start(nil)
 			go wrapper.Start(cmd.Flag("port").Value.String())
@@ -47,8 +45,6 @@ func serveCmd() *cobra.Command {
 	serveCmd.Flags().StringP("url", "", ocisConfig.Get("url"), "oCIS server url")
 	serveCmd.Flags().StringP("retry", "", ocisConfig.Get("retry"), "Number of retries to start oCIS server")
 	serveCmd.Flags().StringP("port", "p", wrapperConfig.Get("port"), "Wrapper API server port")
-	serveCmd.Flags().StringP("admin-username", "", ocisConfig.Get("adminUsername"), "admin username for oCIS server")
-	serveCmd.Flags().StringP("admin-password", "", ocisConfig.Get("adminPassword"), "admin password for oCIS server")
 
 	return serveCmd
 }

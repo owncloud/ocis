@@ -11,16 +11,21 @@ import (
 
 // initLibregraph initializes libregraph validation
 func initLibregraph(v *validator.Validate) {
-	driveItemInvite(v)
-	permission(v)
+	for _, f := range []func(*validator.Validate){
+		libregraphDriveItemInvite,
+		libregraphDriveRecipient,
+		libregraphPermission,
+	} {
+		f(v)
+	}
 }
 
-// driveItemInvite validates libregraph.DriveItemInvite
-func driveItemInvite(v *validator.Validate) {
+// libregraphDriveItemInvite validates libregraph.DriveItemInvite
+func libregraphDriveItemInvite(v *validator.Validate) {
 	s := libregraph.DriveItemInvite{}
 
 	v.RegisterStructValidationMapRules(map[string]string{
-		"Recipients":         "min=1",
+		"Recipients":         "len=1,dive",
 		"Roles":              "max=1",
 		"ExpirationDateTime": "omitnil,gt",
 	}, s)
@@ -29,12 +34,19 @@ func driveItemInvite(v *validator.Validate) {
 		driveItemInvite := sl.Current().Interface().(libregraph.DriveItemInvite)
 
 		rolesAndActions(sl, driveItemInvite.Roles, driveItemInvite.LibreGraphPermissionsActions, false)
-
 	}, s)
 }
 
-// permission validates libregraph.Permission
-func permission(v *validator.Validate) {
+// libregraphDriveRecipient validates libregraph.DriveRecipient
+func libregraphDriveRecipient(v *validator.Validate) {
+	v.RegisterStructValidationMapRules(map[string]string{
+		"ObjectId":                "ne=",
+		"LibreGraphRecipientType": "oneof=user group",
+	}, libregraph.DriveRecipient{})
+}
+
+// libregraphPermission validates libregraph.Permission
+func libregraphPermission(v *validator.Validate) {
 	s := libregraph.Permission{}
 
 	v.RegisterStructValidationMapRules(map[string]string{

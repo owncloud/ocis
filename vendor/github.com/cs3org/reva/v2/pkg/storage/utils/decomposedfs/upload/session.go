@@ -162,11 +162,7 @@ func (s *OcisSession) HeaderIfUnmodifiedSince() string {
 
 // Node returns the node for the session
 func (s *OcisSession) Node(ctx context.Context) (*node.Node, error) {
-	n, err := node.ReadNode(ctx, s.store.lu, s.SpaceID(), s.info.Storage["NodeId"], false, nil, true)
-	if err != nil {
-		return nil, err
-	}
-	return n, nil
+	return node.ReadNode(ctx, s.store.lu, s.SpaceID(), s.info.Storage["NodeId"], false, nil, true)
 }
 
 // ID returns the upload session id

@@ -329,6 +329,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"password_policy": map[string]interface{}{
 								"max_characters":           72,
+								"disabled":                 cfg.PasswordPolicy.Disabled,
 								"min_characters":           cfg.PasswordPolicy.MinCharacters,
 								"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
 								"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,

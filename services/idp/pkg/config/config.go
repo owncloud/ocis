@@ -36,7 +36,7 @@ type Ldap struct {
 	TLSCACert string `yaml:"cacert" env:"OCIS_LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp."`
 
 	BindDN       string `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
-	BindPassword string `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." deprecationVersion:"4.0.2" removalVersion:"5.0.0" deprecationInfo:"LDAP_BIND_PASSWORD changing name for consistency" deprecationReplacement:"OCIS_LDAP_BIND_PASSWORD"`
+	BindPassword string `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
 
 	BaseDN string `yaml:"base_dn" env:"OCIS_LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN" desc:"Search base DN for looking up LDAP users."`
 	Scope  string `yaml:"scope" env:"OCIS_LDAP_USER_SCOPE;IDP_LDAP_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'."`

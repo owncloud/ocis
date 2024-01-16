@@ -1,13 +1,15 @@
 package scanners
 
 import (
+	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"time"
 
+	"github.com/cs3org/reva/v2/pkg/mime"
 	ic "github.com/egirna/icap-client"
 )
 
@@ -21,49 +23,71 @@ func NewICAP(icapURL string, icapService string, timeout time.Duration) (ICAP, e
 	endpoint.Scheme = "icap"
 	endpoint.Path = icapService
 
-	return ICAP{
-		client: &ic.Client{
-			Timeout: timeout,
-		},
-		endpoint: endpoint.String(),
-	}, nil
+	client, err := ic.NewClient(
+		ic.WithICAPConnectionTimeout(timeout),
+	)
+
+	return ICAP{client: client, url: *endpoint}, nil
 }
 
-// ICAP is a Scanner talking to an ICAP server
+// ICAP is responsible for scanning files using an ICAP server
 type ICAP struct {
-	client   *ic.Client
-	endpoint string
+	client ic.Client
+	url    url.URL
 }
 
-// Scan to fulfill Scanner interface
-func (s ICAP) Scan(file io.Reader) (ScanResult, error) {
-	sr := ScanResult{}
+// Scan scans a file using the ICAP server
+func (s ICAP) Scan(in Input) (Result, error) {
+	ctx := context.TODO()
+	result := Result{}
 
-	httpReq, err := http.NewRequest(http.MethodGet, "http://localhost", file)
+	httpReq, err := http.NewRequest(http.MethodPost, in.Url, in.Body)
 	if err != nil {
-		return sr, err
+		return result, err
 	}
 
-	req, err := ic.NewRequest(ic.MethodREQMOD, s.endpoint, httpReq, nil)
-	if err != nil {
-		return sr, err
+	httpReq.ContentLength = in.Size
+	if mt := mime.Detect(path.Ext(in.Name) == "", in.Name); mt != "" {
+		httpReq.Header.Set("Content-Type", mt)
 	}
 
-	resp, err := s.client.Do(req)
+	optReq, err := ic.NewRequest(ctx, ic.MethodOPTIONS, s.url.String(), nil, nil)
 	if err != nil {
-		return sr, err
+		return result, err
 	}
 
-	// TODO: make header configurable. See oc10 documentation: https://doc.owncloud.com/server/10.12/admin_manual/configuration/server/virus-scanner-support.html
-	if data, infected := resp.Header["X-Infection-Found"]; infected {
-		sr.Infected = infected
-		re := regexp.MustCompile(`Threat=(.*);`)
-		match := re.FindStringSubmatch(fmt.Sprint(data))
+	optRes, err := s.client.Do(optReq)
+	if err != nil {
+		return result, err
+	}
 
-		if len(match) > 1 {
-			sr.Description = match[1]
+	req, err := ic.NewRequest(ctx, ic.MethodREQMOD, s.url.String(), httpReq, nil)
+	if err != nil {
+		return result, err
+	}
+
+	if optRes.PreviewBytes > 0 {
+		err = req.SetPreview(optRes.PreviewBytes)
+		if err != nil {
+			return result, err
 		}
 	}
 
-	return sr, nil
+	res, err := s.client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	// TODO: make header configurable. See oc10 documentation: https://doc.owncloud.com/server/10.12/admin_manual/configuration/server/virus-scanner-support.html
+	if data, infected := res.Header["X-Infection-Found"]; infected {
+		result.Infected = infected
+
+		match := regexp.MustCompile(`Threat=(.*);`).FindStringSubmatch(fmt.Sprint(data))
+
+		if len(match) > 1 {
+			result.Description = match[1]
+		}
+	}
+
+	return result, nil
 }

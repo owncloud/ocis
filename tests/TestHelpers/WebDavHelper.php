@@ -728,18 +728,22 @@ class WebDavHelper {
 		?string $spaceId = null
 	):string {
 		$newTrashbinDavPath = "remote.php/dav/trash-bin/$user/";
-		if ($type === "public-files" || $type === "public-files-old") {
-			return "public.php/webdav/";
+
+		switch ($type) {
+			case 'public-files':
+			case 'public-files-old':
+				return "public.php/webdav/";
+			case 'public-files-new':
+				return "remote.php/dav/public-files/$user/";
+			case 'archive':
+				return "remote.php/dav/archive/$user/files";
+			case 'versions':
+			case 'customgroups':
+				return "remote.php/dav/";
+			default:
+				break;
 		}
-		if ($type === "public-files-new") {
-			return "remote.php/dav/public-files/$user/";
-		}
-		if ($type === "archive") {
-			return "remote.php/dav/archive/$user/files";
-		}
-		if ($type === "customgroups") {
-			return "remote.php/dav/";
-		}
+
 		if ($davPathVersionToUse === self::DAV_VERSION_SPACES) {
 			// return spaces root path if spaceid is null
 			// REPORT request uses spaces root path

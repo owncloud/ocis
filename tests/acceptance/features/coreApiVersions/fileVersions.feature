@@ -359,50 +359,34 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
   @skipOnReva
-  Scenario: moving a file (with versions) into a shared folder as the sharee and as the sharer
-    Given using new DAV path
+  Scenario Outline: moving a file (with versions) into a shared folder as the sharer
+    Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+      | path        | testshare     |
+      | shareType   | user          |
+      | permissions | <permissions> |
+      | shareWith   | Alice         |
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
     And we save it into "FILEID"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
     When user "Brian" moves file "/testfile.txt" to "/testshare/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
+    And as "Brian" file "/testfile.txt" should not exist
     And the content of file "/Shares/testshare/testfile.txt" for user "Alice" should be "test data 3"
     And the content of file "/testshare/testfile.txt" for user "Brian" should be "test data 3"
-    And as "Brian" file "/testfile.txt" should not exist
-    When user "Alice" tries to get the number of versions of file "/Shares/testshare/testfile.txt" using file-id path "/meta/<<FILEID>>/v"
-    Then the HTTP status code should be "403"
-
-
-  Scenario Outline: moving a file (with versions) out of a shared folder as the sharee and as the sharer
-    Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "test data 1" to "/testshare/testfile.txt"
-    And user "Brian" has uploaded file with content "test data 2" to "/testshare/testfile.txt"
-    And user "Brian" has uploaded file with content "test data 3" to "/testshare/testfile.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
-    When user "Brian" moves file "/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/testfile.txt" for user "Brian" should be "test data 3"
-    And as "Alice" file "/Shares/testshare/testfile.txt" should not exist
-    And as "Brian" file "/testshare/testfile.txt" should not exist
-    And the version folder of file "/testfile.txt" for user "Brian" should contain "2" elements
+    And the version folder of file "Shares/testshare/testfile.txt" for user "Alice" should contain "0" elements
+    And the version folder of file "testshare/testfile.txt" for user "Brian" should contain "2" elements
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
+      | dav-path-version | permissions |
+      | old              | read        |
+      | old              | change      |
+      | old              | all         |
+      | new              | read        |
+      | new              | change      |
+      | new              | all         |
 
 
   Scenario: sharee tries to get file versions of file not shared by the sharer

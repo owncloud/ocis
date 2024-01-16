@@ -375,6 +375,7 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 	// Spawn workers that'll concurrently work the queue
 	for i := 0; i < numWorkers; i++ {
 		g.Go(func() error {
+			var err error
 			for name := range work {
 				path := filepath.Join(dir, name)
 				nodeID := getNodeIDFromCache(ctx, path, t.idCache)

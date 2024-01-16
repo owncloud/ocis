@@ -322,7 +322,7 @@ class SharingNgContext implements Context {
 			throw new Error('Password is missing to set for share link!');
 		}
 
-		$response = GraphHelper::setPassword(
+		$response = GraphHelper::setLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,

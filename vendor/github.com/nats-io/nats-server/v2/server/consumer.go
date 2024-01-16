@@ -1,4 +1,4 @@
-// Copyright 2019-2023 The NATS Authors
+// Copyright 2019-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -128,30 +128,37 @@ const (
 )
 
 const (
-	actionUpdateString         = "update"
-	actionCreateString         = "create"
-	actionCreateOrUpdateString = ""
+	actionUpdateJSONString         = `"update"`
+	actionCreateJSONString         = `"create"`
+	actionCreateOrUpdateJSONString = `""`
+)
+
+var (
+	actionUpdateJSONBytes         = []byte(actionUpdateJSONString)
+	actionCreateJSONBytes         = []byte(actionCreateJSONString)
+	actionCreateOrUpdateJSONBytes = []byte(actionCreateOrUpdateJSONString)
 )
 
 func (a ConsumerAction) String() string {
 	switch a {
 	case ActionCreateOrUpdate:
-		return actionCreateOrUpdateString
+		return actionCreateOrUpdateJSONString
 	case ActionCreate:
-		return actionCreateString
+		return actionCreateJSONString
 	case ActionUpdate:
-		return actionUpdateString
+		return actionUpdateJSONString
 	}
-	return actionCreateOrUpdateString
+	return actionCreateOrUpdateJSONString
 }
+
 func (a ConsumerAction) MarshalJSON() ([]byte, error) {
 	switch a {
 	case ActionCreate:
-		return json.Marshal(actionCreateString)
+		return actionCreateJSONBytes, nil
 	case ActionUpdate:
-		return json.Marshal(actionUpdateString)
+		return actionUpdateJSONBytes, nil
 	case ActionCreateOrUpdate:
-		return json.Marshal(actionCreateOrUpdateString)
+		return actionCreateOrUpdateJSONBytes, nil
 	default:
 		return nil, fmt.Errorf("can not marshal %v", a)
 	}
@@ -159,11 +166,11 @@ func (a ConsumerAction) MarshalJSON() ([]byte, error) {
 
 func (a *ConsumerAction) UnmarshalJSON(data []byte) error {
 	switch string(data) {
-	case jsonString("create"):
+	case actionCreateJSONString:
 		*a = ActionCreate
-	case jsonString("update"):
+	case actionUpdateJSONString:
 		*a = ActionUpdate
-	case jsonString(""):
+	case actionCreateOrUpdateJSONString:
 		*a = ActionCreateOrUpdate
 	default:
 		return fmt.Errorf("unknown consumer action: %v", string(data))
@@ -249,9 +256,9 @@ const (
 func (r ReplayPolicy) String() string {
 	switch r {
 	case ReplayInstant:
-		return "instant"
+		return replayInstantPolicyJSONString
 	default:
-		return "original"
+		return replayOriginalPolicyJSONString
 	}
 }
 
@@ -386,12 +393,13 @@ type consumer struct {
 
 // A single subject filter.
 type subjectFilter struct {
-	subject     string
-	nextSeq     uint64
-	currentSeq  uint64
-	pmsg        *jsPubMsg
-	err         error
-	hasWildcard bool
+	subject          string
+	nextSeq          uint64
+	currentSeq       uint64
+	pmsg             *jsPubMsg
+	err              error
+	hasWildcard      bool
+	tokenizedSubject []string
 }
 
 type subjectFilters []*subjectFilter
@@ -699,15 +707,15 @@ func (mset *stream) addConsumer(config *ConsumerConfig) (*consumer, error) {
 }
 
 func (mset *stream) addConsumerWithAssignment(config *ConsumerConfig, oname string, ca *consumerAssignment, isRecovering bool, action ConsumerAction) (*consumer, error) {
-	mset.mu.RLock()
-	s, jsa, tierName, cfg, acc, closed := mset.srv, mset.jsa, mset.tier, mset.cfg, mset.acc, mset.closed
-	retention := cfg.Retention
-	mset.mu.RUnlock()
-
 	// Check if this stream has closed.
-	if closed {
+	if mset.closed.Load() {
 		return nil, NewJSStreamInvalidError()
 	}
+
+	mset.mu.RLock()
+	s, jsa, tierName, cfg, acc := mset.srv, mset.jsa, mset.tier, mset.cfg, mset.acc
+	retention := cfg.Retention
+	mset.mu.RUnlock()
 
 	// If we do not have the consumer currently assigned to us in cluster mode we will proceed but warn.
 	// This can happen on startup with restored state where on meta replay we still do not have
@@ -936,8 +944,9 @@ func (mset *stream) addConsumerWithAssignment(config *ConsumerConfig, oname stri
 	subjects := gatherSubjectFilters(o.cfg.FilterSubject, o.cfg.FilterSubjects)
 	for _, filter := range subjects {
 		sub := &subjectFilter{
-			subject:     filter,
-			hasWildcard: subjectHasWildcard(filter),
+			subject:          filter,
+			hasWildcard:      subjectHasWildcard(filter),
+			tokenizedSubject: tokenizeSubjectIntoSlice(nil, filter),
 		}
 		o.subjf = append(o.subjf, sub)
 	}
@@ -1858,8 +1867,9 @@ func (o *consumer) updateConfig(cfg *ConsumerConfig) error {
 		newSubjf := make(subjectFilters, 0, len(newSubjects))
 		for _, newFilter := range newSubjects {
 			fs := &subjectFilter{
-				subject:     newFilter,
-				hasWildcard: subjectHasWildcard(newFilter),
+				subject:          newFilter,
+				hasWildcard:      subjectHasWildcard(newFilter),
+				tokenizedSubject: tokenizeSubjectIntoSlice(nil, newFilter),
 			}
 			// If given subject was present, we will retain its fields values
 			// so `getNextMgs` can take advantage of already buffered `pmsgs`.
@@ -3347,7 +3357,7 @@ func (o *consumer) notifyDeliveryExceeded(sseq, dc uint64) {
 	o.sendAdvisory(o.deliveryExcEventT, j)
 }
 
-// Check to see if the candidate subject matches a filter if its present.
+// Check if the candidate subject matches a filter if its present.
 // Lock should be held.
 func (o *consumer) isFilteredMatch(subj string) bool {
 	// No filter is automatic match.
@@ -3361,9 +3371,29 @@ func (o *consumer) isFilteredMatch(subj string) bool {
 	}
 	// It's quicker to first check for non-wildcard filters, then
 	// iterate again to check for subset match.
-	// TODO(dlc) at speed might be better to just do a sublist with L2 and/or possibly L1.
+	tsa := [32]string{}
+	tts := tokenizeSubjectIntoSlice(tsa[:0], subj)
 	for _, filter := range o.subjf {
-		if subjectIsSubsetMatch(subj, filter.subject) {
+		if isSubsetMatchTokenized(tts, filter.tokenizedSubject) {
+			return true
+		}
+	}
+	return false
+}
+
+// Check if the candidate filter subject is equal to or a subset match
+// of one of the filter subjects.
+// Lock should be held.
+func (o *consumer) isEqualOrSubsetMatch(subj string) bool {
+	for _, filter := range o.subjf {
+		if !filter.hasWildcard && subj == filter.subject {
+			return true
+		}
+	}
+	tsa := [32]string{}
+	tts := tokenizeSubjectIntoSlice(tsa[:0], subj)
+	for _, filter := range o.subjf {
+		if isSubsetMatchTokenized(filter.tokenizedSubject, tts) {
 			return true
 		}
 	}
@@ -3945,8 +3975,10 @@ func (o *consumer) loopAndGatherMsgs(qch chan struct{}) {
 			}
 		} else {
 			if o.subjf != nil {
+				tsa := [32]string{}
+				tts := tokenizeSubjectIntoSlice(tsa[:0], pmsg.subj)
 				for i, filter := range o.subjf {
-					if subjectIsSubsetMatch(pmsg.subj, filter.subject) {
+					if isSubsetMatchTokenized(tts, filter.tokenizedSubject) {
 						o.subjf[i].currentSeq--
 						o.subjf[i].nextSeq--
 						break
