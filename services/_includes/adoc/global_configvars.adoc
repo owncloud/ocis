@@ -589,7 +589,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SSE_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
@@ -604,7 +604,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -1656,7 +1656,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The identity provider href for the openid-discovery relation.
 
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
@@ -1854,10 +1854,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. See the Environment Variable Types description for more details.
+Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
 
 a| `OCIS_REVA_GATEWAY`
 
@@ -2317,7 +2317,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The public facing URL of the oCIS frontend.
 
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
