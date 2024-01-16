@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
 * Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
 * Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
 * Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -94,6 +95,14 @@ The following sections list the changes for unreleased.
    is set to `read-only`. This makes no sense as language is stored elsewhere.
 
    https://github.com/owncloud/ocis/pull/8182
+
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
+
+   We changed the search service to not log cases where resources that were about
+   to be indexed can no longer be found. Those are expected cases, e.g. when the
+   file in question has already been deleted or renamed meanwhile.
+
+   https://github.com/owncloud/ocis/pull/8200
 
 * Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
 
