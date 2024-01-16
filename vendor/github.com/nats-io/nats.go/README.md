@@ -14,6 +14,8 @@ A [Go](http://golang.org) client for the [NATS messaging system](https://nats.io
 [Coverage-Url]: https://coveralls.io/r/nats-io/nats.go?branch=main
 [Coverage-image]: https://coveralls.io/repos/github/nats-io/nats.go/badge.svg?branch=main
 
+**Check out [NATS by example](https://natsbyexample.com) - An evolving collection of runnable, cross-client reference examples for NATS.**
+
 ## Installation
 
 ```bash
@@ -29,7 +31,7 @@ When using or transitioning to Go modules support:
 ```bash
 # Go client latest or explicit version
 go get github.com/nats-io/nats.go/@latest
-go get github.com/nats-io/nats.go/@v1.31.0
+go get github.com/nats-io/nats.go/@v1.32.0
 
 # For latest NATS Server, add /v2 at the end
 go get github.com/nats-io/nats-server/v2
