@@ -274,16 +274,21 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				continue // NOTE: since we can't get the upload, we can't delete the blob
 			}
 
-			var (
-				failed     bool
-				keepUpload bool
-			)
-
 			n, err := session.Node(ctx)
 			if err != nil {
 				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
 				continue
 			}
+			if !n.Exists {
+				log.Debug().Str("uploadID", ev.UploadID).Str("nodeID", session.NodeID()).Msg("node no longer exists")
+				fs.sessionStore.Cleanup(ctx, session, false, false)
+				continue
+			}
+
+			var (
+				failed     bool
+				keepUpload bool
+			)
 
 			switch ev.Outcome {
 			default:

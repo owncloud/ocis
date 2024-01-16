@@ -184,10 +184,11 @@ type ServiceAccount struct {
 
 // PasswordPolicy configures reva password policy
 type PasswordPolicy struct {
-	MinCharacters          int    `yaml:"min_characters,omitempty" env:"OCIS_PASSWORD_POLICY_MIN_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 0 if not set."`
-	MinLowerCaseCharacters int    `yaml:"min_lowercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 0 if not set."`
-	MinUpperCaseCharacters int    `yaml:"min_uppercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 0 if not set."`
-	MinDigits              int    `yaml:"min_digits" env:"OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 0 if not set."`
-	MinSpecialCharacters   int    `yaml:"min_special_characters" env:"OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 0 if not set."`
+	Disabled               bool   `yaml:"disabled,omitempty" env:"OCIS_PASSWORD_POLICY_DISABLED;FRONTEND_PASSWORD_POLICY_DISABLED" desc:"Disable the password policy. Defaults to false if not set."`
+	MinCharacters          int    `yaml:"min_characters,omitempty" env:"OCIS_PASSWORD_POLICY_MIN_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 8 if not set."`
+	MinLowerCaseCharacters int    `yaml:"min_lowercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 1 if not set."`
+	MinUpperCaseCharacters int    `yaml:"min_uppercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 1 if not set."`
+	MinDigits              int    `yaml:"min_digits" env:"OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 1 if not set."`
+	MinSpecialCharacters   int    `yaml:"min_special_characters" env:"OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set."`
 	BannedPasswordsList    string `yaml:"banned_passwords_list" env:"OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" desc:"Path to the 'banned passwords list' file. See the documentation for more details."`
 }

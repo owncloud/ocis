@@ -36,7 +36,7 @@ func startTestServer() {
 
 	log.Println("Starting ICAP test server...")
 
-	signal.Notify(stop, syscall.SIGKILL, syscall.SIGINT, syscall.SIGQUIT)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
 	go func() {
 		if err := icap.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
@@ -78,8 +78,6 @@ func respmodHandler(w icap.ResponseWriter, req *icap.Request) {
 			w.WriteHeader(http.StatusNoContent, nil, false)
 			return
 		}
-
-		// log.Println("The preview data: ", string(req.Preview))
 
 		buf := &bytes.Buffer{}
 
@@ -123,8 +121,6 @@ func reqmodHandler(w icap.ResponseWriter, req *icap.Request) {
 			w.WriteHeader(http.StatusNoContent, nil, false)
 			return
 		}
-
-		// log.Println("The preview data: ", string(req.Preview))
 
 		fileURL := req.Request.RequestURI
 

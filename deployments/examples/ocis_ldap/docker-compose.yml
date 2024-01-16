@@ -63,7 +63,7 @@ services:
       OCIS_LDAP_URI: ldaps://ldap-server:1636
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"

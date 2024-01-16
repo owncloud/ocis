@@ -318,7 +318,8 @@ def testOcisAndUploadResults(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    return [pipeline, scan_result_upload]
+    security_scan = scanOcis(ctx)
+    return [pipeline, scan_result_upload, security_scan]
 
 def testPipelines(ctx):
     pipelines = []
@@ -497,6 +498,38 @@ def testOcis(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
+                "refs/pull/**",
+            ],
+        },
+        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
+        "volumes": [pipelineVolumeGo],
+    }
+
+def scanOcis(ctx):
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
+        {
+            "name": "govulncheck",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "make govulncheck",
+            ],
+            "environment": DRONE_HTTP_PROXY_ENV,
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "go-vulnerability-scanning",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
                 "refs/pull/**",
             ],
         },
@@ -1910,7 +1943,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": True,
         "OCIS_EVENTS_ENABLE_TLS": False,
-        "MICRO_REGISTRY": "natsjs",
+        "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
     }
 
@@ -2778,6 +2811,35 @@ def logRequests():
     }]
 
 def k6LoadTests(ctx):
+    ocis_remote_environment = {
+        "SSH_OCIS_REMOTE": {
+            "from_secret": "ssh_ocis_remote",
+        },
+        "SSH_OCIS_USERNAME": {
+            "from_secret": "ssh_ocis_user",
+        },
+        "SSH_OCIS_PASSWORD": {
+            "from_secret": "ssh_ocis_pass",
+        },
+        "TEST_SERVER_URL": {
+            "from_secret": "ssh_ocis_server_url",
+        },
+    }
+    k6_remote_environment = {
+        "SSH_K6_REMOTE": {
+            "from_secret": "ssh_k6_remote",
+        },
+        "SSH_K6_USERNAME": {
+            "from_secret": "ssh_k6_user",
+        },
+        "SSH_K6_PASSWORD": {
+            "from_secret": "ssh_k6_pass",
+        },
+    }
+    environment = {}
+    environment.update(ocis_remote_environment)
+    environment.update(k6_remote_environment)
+
     if "skip" in config["k6LoadTests"] and config["k6LoadTests"]["skip"]:
         return []
 
@@ -2794,33 +2856,21 @@ def k6LoadTests(ctx):
             {
                 "name": "k6-load-test",
                 "image": OC_CI_ALPINE,
-                "environment": {
-                    "SSH_OCIS_REMOTE": {
-                        "from_secret": "ssh_ocis_remote",
-                    },
-                    "SSH_OCIS_USERNAME": {
-                        "from_secret": "ssh_ocis_user",
-                    },
-                    "SSH_OCIS_PASSWORD": {
-                        "from_secret": "ssh_ocis_pass",
-                    },
-                    "TEST_SERVER_URL": {
-                        "from_secret": "ssh_ocis_server_url",
-                    },
-                    "SSH_K6_REMOTE": {
-                        "from_secret": "ssh_k6_remote",
-                    },
-                    "SSH_K6_USERNAME": {
-                        "from_secret": "ssh_k6_user",
-                    },
-                    "SSH_K6_PASSWORD": {
-                        "from_secret": "ssh_k6_pass",
-                    },
-                },
+                "environment": environment,
                 "commands": [
                     "curl -s -o run_k6_tests.sh %s" % script_link,
                     "apk add --no-cache openssh-client sshpass",
                     "sh %s/run_k6_tests.sh" % (dirs["base"]),
+                ],
+            },
+            {
+                "name": "ocis-log",
+                "image": OC_CI_ALPINE,
+                "environment": ocis_remote_environment,
+                "commands": [
+                    "curl -s -o run_k6_tests.sh %s" % script_link,
+                    "apk add --no-cache openssh-client sshpass",
+                    "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
                 ],
             },
         ],

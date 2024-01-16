@@ -1718,7 +1718,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function setPassword(
+	public static function setLinkSharePassword(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
@@ -1738,7 +1738,7 @@ class GraphHelper {
 			$body
 		);
 	}
-
+	
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
