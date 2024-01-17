@@ -32,7 +32,7 @@ auth_provider: ldap
 auth_providers:
   ldap:
     uri: ldaps://localhost:9235
-    ca_cert: ~/.ocis/idm/ldap.crt
+    ca_cert: /var/lib/ocis/idm/ldap.crt
     insecure: false
     bind_dn: uid=reva,ou=sysusers,o=libregraph-idm
     bind_password: ""

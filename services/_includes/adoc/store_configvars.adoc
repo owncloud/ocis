@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-17-09-59-27]
+[#deprecation-note-2024-01-17-12-55-31]
 [caption=]
 .Deprecation notes for the store service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -156,7 +156,7 @@ a|`STORE_DATA_PATH` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/store ++
+++/var/lib/ocis/store ++
 a| [subs=-attributes]
 The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
 |===

@@ -40,7 +40,7 @@ thumbnail:
   - 4320x7680
   - 7680x4320
   filesystem_storage:
-    root_directory: ~/.ocis/thumbnails
+    root_directory: /var/lib/ocis/thumbnails
   webdav_allow_insecure: false
   cs3_allow_insecure: false
   reva_gateway: com.owncloud.api.gateway

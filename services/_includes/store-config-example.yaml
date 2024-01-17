@@ -20,4 +20,4 @@ grpc:
   addr: 127.0.0.1:9460
   tls: null
 grpc_client_tls: null
-data_path: ~/.ocis/store
+data_path: /var/lib/ocis/store

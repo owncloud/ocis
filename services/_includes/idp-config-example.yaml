@@ -19,8 +19,8 @@ debug:
 http:
   addr: 127.0.0.1:9130
   root: /
-  tls_cert: ~/.ocis/idp/server.crt
-  tls_key: ~/.ocis/idp/server.key
+  tls_cert: /var/lib/ocis/idp/server.crt
+  tls_key: /var/lib/ocis/idp/server.key
   tls: false
 reva:
   address: com.owncloud.api.gateway
@@ -42,7 +42,7 @@ idp:
   allow_scope: []
   allow_client_guests: false
   allow_dynamic_client_registration: false
-  encrypt_secret_file: ~/.ocis/idp/encryption.key
+  encrypt_secret_file: /var/lib/ocis/idp/encryption.key
   listen: ""
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
@@ -51,7 +51,7 @@ idp:
   signing_kid: private-key
   signing_method: PS256
   signing_private_key_files:
-  - ~/.ocis/idp/private-key.pem
+  - /var/lib/ocis/idp/private-key.pem
   validation_keys_path: ""
   cookiebackenduri: ""
   cookienames: []
@@ -98,7 +98,7 @@ clients:
   application_type: native
 ldap:
   uri: ldaps://localhost:9235
-  cacert: ~/.ocis/idm/ldap.crt
+  cacert: /var/lib/ocis/idm/ldap.crt
   bind_dn: uid=idp,ou=sysusers,o=libregraph-idm
   bind_password: ""
   base_dn: ou=users,o=libregraph-idm

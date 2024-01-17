@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-17-09-59-27]
+[#deprecation-note-2024-01-17-12-55-31]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -324,7 +324,7 @@ a|`OCM_OCM_INVITE_MANAGER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocm/ocminvites.json ++
+++/var/lib/ocis/storage/ocm/ocminvites.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -351,7 +351,7 @@ a|`OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocm/ocmproviders.json ++
+++/var/lib/ocis/storage/ocm/ocmproviders.json ++
 a| [subs=-attributes]
 Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -378,7 +378,7 @@ a|`OCM_OCM_SHAREPROVIDER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocm/ocmshares.json ++
+++/var/lib/ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -414,7 +414,7 @@ a|`OCM_OCM_CORE_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocm/ocmshares.json ++
+++/var/lib/ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -432,7 +432,7 @@ a|`OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/ocm ++
+++/var/lib/ocis/storage/ocm ++
 a| [subs=-attributes]
 Directory where the ocm storage provider persists its data like tus upload info files.
 |===

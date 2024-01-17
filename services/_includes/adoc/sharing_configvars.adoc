@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-17-09-59-27]
+[#deprecation-note-2024-01-17-12-55-31]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -318,7 +318,7 @@ a|`SHARING_USER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/shares.json ++
+++/var/lib/ocis/storage/shares.json ++
 a| [subs=-attributes]
 Path to the JSON file where shares will be persisted. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -429,7 +429,7 @@ a|`SHARING_PUBLIC_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/publicshares.json ++
+++/var/lib/ocis/storage/publicshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 

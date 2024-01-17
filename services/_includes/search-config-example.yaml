@@ -41,7 +41,7 @@ events:
 engine:
   type: bleve
   bleve:
-    data_path: ~/.ocis/search
+    data_path: /var/lib/ocis/search
 extractor:
   type: basic
   cs3_allow_insecure: false

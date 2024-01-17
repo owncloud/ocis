@@ -46,7 +46,7 @@ grpc:
   tls: null
 grpc_client_tls: null
 store_type: metadata
-data_path: ~/.ocis/settings
+data_path: /var/lib/ocis/settings
 metadata_config:
   gateway_addr: com.owncloud.api.storage-system
   storage_addr: com.owncloud.api.storage-system

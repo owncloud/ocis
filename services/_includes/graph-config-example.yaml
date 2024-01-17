@@ -82,7 +82,7 @@ identity:
   backend: ldap
   ldap:
     uri: ldaps://localhost:9235
-    cacert: ~/.ocis/idm/ldap.crt
+    cacert: /var/lib/ocis/idm/ldap.crt
     insecure: false
     bind_dn: uid=libregraph,ou=sysusers,o=libregraph-idm
     bind_password: ""

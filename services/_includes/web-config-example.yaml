@@ -67,7 +67,7 @@ http:
     - X-HTTP-Method-Override
     allow_credentials: true
 asset:
-  path: ~/.ocis/web/assets
+  path: /var/lib/ocis/web/assets
 file: ""
 web:
   theme_server: https://localhost:9200
