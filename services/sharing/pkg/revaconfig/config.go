@@ -14,15 +14,10 @@ import (
 
 // SharingConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]interface{}, error) {
-	var bannedPasswordsList map[string]struct{}
-	var err error
-	if cfg.PasswordPolicy.BannedPasswordsList != "" {
-		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
-		if err != nil {
-			err = fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
-			logger.Err(err).Send()
-			return nil, err
-		}
+	passwordPolicyCfg, err := passwordPolicyConfig(cfg)
+	if err != nil {
+		logger.Err(err).Send()
+		return nil, err
 	}
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{
@@ -94,16 +89,8 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"gateway_addr":                       cfg.Reva.Address,
 					"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
 					"public_share_must_have_password":    cfg.PublicShareMustHavePassword,
-					"password_policy": map[string]interface{}{
-						"disabled":                 cfg.PasswordPolicy.Disabled,
-						"min_digits":               cfg.PasswordPolicy.MinDigits,
-						"min_characters":           cfg.PasswordPolicy.MinCharacters,
-						"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
-						"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
-						"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
-						"banned_passwords_list":    bannedPasswordsList,
-					},
-					"driver": cfg.PublicSharingDriver,
+					"password_policy":                    passwordPolicyCfg,
+					"driver":                             cfg.PublicSharingDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
 							"file":         cfg.PublicSharingDrivers.JSON.File,
@@ -184,4 +171,31 @@ func fileExists(path string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func passwordPolicyConfig(cfg *config.Config) (map[string]interface{}, error) {
+	_maxCharacters := 72
+	if cfg.PasswordPolicy.Disabled {
+		return map[string]interface{}{
+			"max_characters":        _maxCharacters,
+			"banned_passwords_list": nil,
+		}, nil
+	}
+	var bannedPasswordsList map[string]struct{}
+	var err error
+	if cfg.PasswordPolicy.BannedPasswordsList != "" {
+		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
+		}
+	}
+	return map[string]interface{}{
+		"max_characters":           _maxCharacters,
+		"min_digits":               cfg.PasswordPolicy.MinDigits,
+		"min_characters":           cfg.PasswordPolicy.MinCharacters,
+		"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
+		"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
+		"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
+		"banned_passwords_list":    bannedPasswordsList,
+	}, nil
 }
