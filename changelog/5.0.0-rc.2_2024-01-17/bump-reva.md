@@ -1,4 +1,17 @@
-Enhancement: Update Reva to version 2.18.0
+Enhancement: Update reva to latest edge version
+
+We update reva to the latest edge version to get the latest fixes and features.
+
+## Changelog for reva edge
+
+*   Bugfix [cs3org/reva#4434](https://github.com/cs3org/reva/pull/4434): Fix the upload postprocessing
+*   Bugfix [cs3org/reva#4443](https://github.com/cs3org/reva/pull/4443): Fixed wrong status code when moving a file to a denied path
+*   Bugfix [cs3org/reva#4446](https://github.com/cs3org/reva/pull/4446): Disallow to delete a file during the processing
+*   Bugfix [cs3org/reva#4448](https://github.com/cs3org/reva/pull/4448): Fix truncating existing files
+*   Bugfix [cs3org/reva#4449](https://github.com/cs3org/reva/pull/4449): Keep failed processing status
+*   Bugfix [cs3org/reva#4452](https://github.com/cs3org/reva/pull/4452): More efficient share jail
+*   Bugfix [cs3org/reva#4456](https://github.com/cs3org/reva/pull/4456): Do not lose revisions when restoring the first revision
+*   Bugfix [cs3org/reva#4457](https://github.com/cs3org/reva/pull/4457): Fix concurrent map access in sharecache
 
 ## Changelog for reva 2.18.0 (2023-12-22)
 
@@ -93,6 +106,7 @@ reva users. The changes are ordered by importance.
 *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
 *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
+https://github.com/owncloud/ocis/pull/8100
 https://github.com/owncloud/ocis/pull/8038
 https://github.com/owncloud/ocis/pull/8056
 https://github.com/owncloud/ocis/pull/7949

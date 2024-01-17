@@ -4,3 +4,4 @@ Use a hidden role for service accounts. It will not appear in ListRoles calls bu
 by settings service
 
 https://github.com/owncloud/ocis/pull/8051
+https://github.com/owncloud/ocis/pull/8074
