@@ -273,17 +273,17 @@ default:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
 
-    coreApiWebdavProperties1:
+    coreApiWebdavProperties:
       paths:
-        - "%paths.base%/../features/coreApiWebdavProperties1"
+        - "%paths.base%/../features/coreApiWebdavProperties"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
 
-    coreApiWebdavUpload1:
+    coreApiWebdavUpload:
       paths:
-        - "%paths.base%/../features/coreApiWebdavUpload1"
+        - "%paths.base%/../features/coreApiWebdavUpload"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
