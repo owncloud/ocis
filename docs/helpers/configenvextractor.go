@@ -63,7 +63,7 @@ func generateIntermediateCode(templatePath string, intermediateCodePath string, 
 
 func runIntermediateCode(intermediateCodePath string) {
 	fmt.Println("Running intermediate go code for " + intermediateCodePath)
-	defaultPath := "~/.ocis"
+	defaultPath := "/etc/ocis"
 	os.Setenv("OCIS_BASE_DATA_PATH", defaultPath)
 	os.Setenv("OCIS_CONFIG_DIR", path.Join(defaultPath, "config"))
 	out, err := exec.Command("go", "run", intermediateCodePath).Output()
