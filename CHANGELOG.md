@@ -48,6 +48,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
 * Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
 * Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
@@ -111,6 +113,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8101
    https://github.com/owncloud/ocis/pull/8211
+
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+
+   Main fix is using proto getters to avoid panics. But some other code
+   improvements were also done
+
+   https://github.com/owncloud/ocis/pull/8228
+
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
+
+   Now uses proto getters to avoid panics.
+
+   https://github.com/owncloud/ocis/pull/8230
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
