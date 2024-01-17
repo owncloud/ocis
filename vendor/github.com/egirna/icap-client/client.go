@@ -31,9 +31,7 @@ func NewClient(options ...ConfigOption) (Client, error) {
 }
 
 // Do is the main function of the client that makes the ICAP request
-func (c *Client) Do(req Request) (Response, error) {
-	var err error
-
+func (c *Client) Do(req Request) (res Response, err error) {
 	// establish connection to the icap server
 	err = c.conn.Connect(req.ctx, req.URL.Host)
 	if err != nil {
@@ -57,15 +55,15 @@ func (c *Client) Do(req Request) (Response, error) {
 		return Response{}, err
 	}
 
-	resp, err := toClientResponse(bufio.NewReader(strings.NewReader(string(dataRes))))
+	res, err = toClientResponse(bufio.NewReader(strings.NewReader(string(dataRes))))
 	if err != nil {
 		return Response{}, err
 	}
 
 	// check if the message is fully done scanning or if it needs to be sent another chunk
-	done := !(resp.StatusCode == http.StatusContinue && !req.bodyFittedInPreview && req.previewSet)
+	done := !(res.StatusCode == http.StatusContinue && !req.bodyFittedInPreview && req.previewSet)
 	if done {
-		return resp, nil
+		return res, nil
 	}
 
 	// get the remaining body bytes
