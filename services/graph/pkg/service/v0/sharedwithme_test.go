@@ -393,5 +393,35 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareCreator.DisplayName))
 			Expect(jsonData.Get("user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
 		})
+
+		It("returns shares created on project space", func() {
+			shareCreator := getUserResponseDefault.User
+
+			ownerID := &userv1beta1.UserId{
+				OpaqueId: "project-space-id",
+				Type:     userv1beta1.UserType_USER_TYPE_SPACE_OWNER,
+			}
+			share := listReceivedSharesResponse.Shares[0].Share
+			share.Creator = shareCreator.Id
+			share.Owner = ownerID
+			resourceInfo := statResponse.Info
+			resourceInfo.Owner = ownerID
+
+			svc.ListSharedWithMe(
+				tape,
+				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
+			)
+
+			jsonData := gjson.Get(tape.Body.String(), "value.0.createdBy")
+
+			Expect(jsonData.Get("user.displayName").String()).To(Equal(""))
+			Expect(jsonData.Get("user.id").String()).To(Equal(ownerID.OpaqueId))
+
+			jsonData = gjson.Get(tape.Body.String(), "value.0.remoteItem.shared")
+			Expect(jsonData.Get("sharedBy.user.displayName").String()).To(Equal(shareCreator.DisplayName))
+			Expect(jsonData.Get("sharedBy.user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
+			Expect(jsonData.Get("owner.user.displayName").String()).To(Equal(""))
+			Expect(jsonData.Get("owner.user.id").String()).To(Equal(ownerID.OpaqueId))
+		})
 	})
 })
