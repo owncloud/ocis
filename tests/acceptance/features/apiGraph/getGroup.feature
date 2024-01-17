@@ -42,8 +42,10 @@ Feature: get groups and their members
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
           }
         }
       }
@@ -91,8 +93,10 @@ Feature: get groups and their members
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
@@ -255,8 +259,10 @@ Feature: get groups and their members
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
           }
         }
       }
@@ -369,8 +375,10 @@ Feature: get groups and their members
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
@@ -444,3 +452,117 @@ Feature: get groups and their members
   Scenario: admin user tries to get group information of non-existing group
     When user "Alice" gets details of the group "non-existing" using the Graph API
     Then the HTTP status code should be "404"
+
+
+  Scenario Outline: non-admin user search for a group by group name
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And group "tea-lover" has been created
+    When user "Brian" searches for group "<group>" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    { 
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "required": [
+            "displayName",
+            "id",
+            "groupTypes"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "enum": ["tea-lover"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "%group_id_pattern%"
+            },
+            "groupTypes": {
+              "type": "array",
+              "enum": []
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | group      |
+      | tea        |
+      | %22tea-%22 |
+
+
+  Scenario: non-admin user tries to search for a group by group name with less than 3 characters
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And group "tea-lover" has been created
+    When user "Brian" tries to search for group "te" using Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message":{
+              "type": "string",
+              "enum": ["search term too short"]
+            }
+          }
+        }
+      }
+    }
+    """
+
+  @issue-7990
+  Scenario Outline: non-admin user tries to search for a group by group name with invalid characters/token
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And group "<group>" has been created
+    When user "Brian" tries to search for group "<group>" using Graph API
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "enum": ["Token '<token>' is invalid"]
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+    | group      | token   |
+    | tea-lovers | -lovers |
+    | tea@lovers | @lovers |

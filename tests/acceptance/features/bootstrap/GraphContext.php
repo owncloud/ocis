@@ -1901,6 +1901,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When user :user tries to search for group :searchTerm using Graph API
+	 * @When user :user searches for group :searchTerm using Graph API
+	 *
+	 * @param string $user
+	 * @param string $searchTerm
+	 *
+	 * @return void
+	 */
+	public function userSearchesForGroupUsingGraphApi($user, $searchTerm):void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::searchGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$searchTerm
+			)
+		);
+	}
+
+	/**
 	 * @Then /^the JSON data of the response should (not )?contain the user "([^"]*)" in the item 'value'(?:, the user-details should match)?$/
 	 * @Then /^the JSON data of the response should (not )?contain the group "([^"]*)" in the item 'value'(?:, the group-details should match)?$/
 	 *
