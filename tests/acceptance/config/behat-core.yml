@@ -145,16 +145,6 @@ default:
         - WebDavPropertiesContext:
         - OcisConfigContext:
 
-    coreApiSharePublicLink3:
-      paths:
-        - "%paths.base%/../features/coreApiSharePublicLink3"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
     coreApiShareReshareToShares1:
       paths:
         - "%paths.base%/../features/coreApiShareReshareToShares1"
@@ -168,16 +158,6 @@ default:
     coreApiShareReshareToShares2:
       paths:
         - "%paths.base%/../features/coreApiShareReshareToShares2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
-    coreApiShareReshareToShares3:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToShares3"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -301,14 +281,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
 
-    coreApiWebdavProperties2:
-      paths:
-        - "%paths.base%/../features/coreApiWebdavProperties2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - WebDavPropertiesContext:
-
     coreApiWebdavUpload1:
       paths:
         - "%paths.base%/../features/coreApiWebdavUpload1"
@@ -317,14 +289,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - PublicWebDavContext:
         - WebDavPropertiesContext:
-
-    coreApiWebdavUpload2:
-      paths:
-        - "%paths.base%/../features/coreApiWebdavUpload2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - PublicWebDavContext:
 
     coreApiWebdavUploadTUS:
       paths:
