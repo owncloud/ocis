@@ -24,6 +24,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use Behat\Gherkin\Node\TableNode;
+use PHPUnit\Framework\Assert;
 
 require_once 'bootstrap.php';
 
@@ -423,5 +424,35 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->removeSharePermission($sharer, 'link', $resourceType, $resource, $space)
 		);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the space Shares should (not|)\s?contain these (files|entries):$/
+	 *
+	 * @param string $user
+	 * @param string $shouldOrNot
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function forUserTheSpaceSharesShouldContainTheseEntries(string $user, string $shouldOrNot, TableNode $table): void {
+		$should = $shouldOrNot !== 'not';
+		$rows = $table->getRows();
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$contents = \json_decode($response->getBody()->getContents(), true);
+
+		$fileFound = !empty(array_intersect(array_column($rows, 0), array_column($contents['value'], 'name')));
+
+		$assertMessage = $should
+			? "Response does not contain the entry."
+			: "Response does contain the entry but should not.";
+
+		Assert::assertSame($should, $fileFound, $assertMessage);
 	}
 }
