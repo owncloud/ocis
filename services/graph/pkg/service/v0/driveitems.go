@@ -616,7 +616,7 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// This is a user share
-	updatedPermission, err := g.updateUserShare(ctx, permissionID, oldPermission, permission)
+	updatedPermission, err := g.updateUserShare(ctx, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -740,7 +740,7 @@ func (g Graph) getCS3UserShareByID(ctx context.Context, permissionID string) (*c
 	return getShareResp.GetShare(), nil
 }
 
-func (g Graph) updateUserShare(ctx context.Context, permissionID string, _, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
+func (g Graph) updateUserShare(ctx context.Context, permissionID string, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
