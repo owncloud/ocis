@@ -129,7 +129,7 @@ config = {
         },
     },
     "apiTests": {
-        "numberOfParts": 10,
+        "numberOfParts": 9,
         "skip": False,
         "skipExceptParts": [],
     },
