@@ -1,7 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-rc.1](#changelog-for-500-rc1-2023-12-27)
+* [Changelog for 5.0.0-rc.2](#changelog-for-500-rc2-2024-01-17)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
 * [Changelog for 4.0.2](#changelog-for-402-2023-09-28)
@@ -10,8 +9,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -32,370 +31,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [5.0.0-rc.2] (2024-01-17)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 5.0.0-rc.2.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.1...master
-
-## Summary
-
-* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
-* Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
-* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
-* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
-* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
-* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
-* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
-* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
-* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
-* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
-* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
-* Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
-
-## Details
-
-* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
-
-   We fixed the race conditions in tests.
-
-   https://github.com/owncloud/ocis/issues/7846
-   https://github.com/owncloud/ocis/pull/7847
-
-* Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
-
-   Service Account Roles wouldn't work when using with external IDP
-
-   https://github.com/owncloud/ocis/pull/8074
-
-* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
-
-   We fixed the upload postprocessing when the destination file does not exist
-   anymore.
-
-   https://github.com/owncloud/ocis/issues/7909
-   https://github.com/owncloud/ocis/pull/8117
-
-* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
-
-   Registers the registry under the correct name
-
-   https://github.com/owncloud/ocis/pull/8140
-
-* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
-
-   We now correctly reinitialize the CS3 backend session after the IDP has been
-   restarted.
-
-   https://github.com/owncloud/ocis/pull/8142
-
-* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
-
-   User would not be able to patch their preferred language when the ldap backend
-   is set to `read-only`. This makes no sense as language is stored elsewhere.
-
-   https://github.com/owncloud/ocis/pull/8182
-
-* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
-
-   We changed the search service to not log cases where resources that were about
-   to be indexed can no longer be found. Those are expected cases, e.g. when the
-   file in question has already been deleted or renamed meanwhile.
-
-   https://github.com/owncloud/ocis/pull/8200
-
-* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
-
-   We fixed a bug when admin tried to update or reset the logo.
-
-   https://github.com/owncloud/ocis/issues/8101
-   https://github.com/owncloud/ocis/pull/8211
-
-* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
-
-   We add the environment variable that allow to disable the password policy.
-
-   https://github.com/owncloud/ocis/issues/7916
-   https://github.com/owncloud/ocis/pull/7985
-   https://github.com/cs3org/reva/pull/4409
-
-* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
-
-   We update the antivirus icap client library and optimize the antivirus scanning
-   service. ANTIVIRUS_ICAP_TIMEOUT is now deprecated and
-   ANTIVIRUS_ICAP_SCAN_TIMEOUT should be used instead.
-
-   ANTIVIRUS_ICAP_SCAN_TIMEOUT supports human durations like `1s`, `1m`, `1h` and
-   `1d`.
-
-   https://github.com/owncloud/ocis/issues/6764
-   https://github.com/owncloud/ocis/pull/8062
-
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
-
-   We update reva to the latest edge version to get the latest fixes and features.
-
-   https://github.com/owncloud/ocis/pull/8100
-
-* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
-
-   We have removed all deprecated environment variables that have been marked for
-   removal for 5.0.0
-
-   https://github.com/owncloud/ocis/issues/8025
-   https://github.com/owncloud/ocis/pull/8149
-
-* Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
-
-   Tags: web
-
-   We updated ownCloud Web to v8.0.0-rc.2. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10176](https://github.com/owncloud/web/pull/10176): Turned off
-   file extensions not always respected * Bugfix
-   [owncloud/web#10232](https://github.com/owncloud/web/pull/10232): Skip searchbar
-   preview fetch on reload
-
-   We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10224](https://github.com/owncloud/web/issues/10224): Harmonize
-   AppSwitcher icon colors * Bugfix
-   [owncloud/web#10230](https://github.com/owncloud/web/issues/10230): Configurable
-   concurrent requests * Bugfix
-   [owncloud/web#10158](https://github.com/owncloud/web/issues/10158): GDPR export
-   polling * Bugfix
-   [owncloud/web#10220](https://github.com/owncloud/web/issues/10220): Loading
-   indicator during conflict dialog * Bugfix
-   [owncloud/web#10156](https://github.com/owncloud/web/issues/10156): Uploading
-   the same files parallel * Bugfix
-   [owncloud/web#10179](https://github.com/owncloud/web/issues/10179): Space
-   navigate to trash missing * Bugfix
-   [owncloud/web#10118](https://github.com/owncloud/web/issues/10118): Tilesview
-   has whitespace * Bugfix
-   [owncloud/web#10182](https://github.com/owncloud/web/issues/10182): Make
-   versions panel readonly in viewers and editors
-
-   We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying
-   full video in their dimensions * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files
-   list previews cropped * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces
-   overview tile previews zoomed * Bugfix
-   [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
-   links without drive alias
-
-   We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Change
-   [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling *
-   Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111):
-   Registering right sidebar panels as extension * Enhancement
-   [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar
-   in viewer and editor apps
-
-   We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link
-   modal
-
-   We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#9257](https://github.com/owncloud/web/issues/9257): Filter out
-   shares without display name * Bugfix
-   [owncloud/web#9483](https://github.com/owncloud/web/issues/9483): PDF loading
-   Safari * Bugfix [owncloud/web#9513](https://github.com/owncloud/web/pull/9513):
-   Set or remove expiration date on group share not possible * Bugfix
-   [owncloud/web#9529](https://github.com/owncloud/web/pull/9529): Shared with
-   action menu label alignment * Bugfix
-   [owncloud/web#9587](https://github.com/owncloud/web/pull/9587): Internal public
-   link resolving * Bugfix
-   [owncloud/web#9593](https://github.com/owncloud/web/issues/9593): Audio- &
-   video-loading on Shared with me page * Bugfix
-   [owncloud/web#9649](https://github.com/owncloud/web/pull/9649): Add project
-   space filter * Bugfix
-   [owncloud/web#9663](https://github.com/owncloud/web/pull/9663): Respect the
-   open-in-new-tab-config for external apps * Bugfix
-   [owncloud/web#9670](https://github.com/owncloud/web/pull/9670): Tiles view
-   accessibility * Bugfix
-   [owncloud/web#9694](https://github.com/owncloud/web/issues/9694): Special
-   characters in username * Bugfix
-   [owncloud/web#9788](https://github.com/owncloud/web/issues/9788): Create .space
-   folder if it does not exist * Bugfix
-   [owncloud/web#9799](https://github.com/owncloud/web/issues/9799): Link resolving
-   into default app * Bugfix
-   [owncloud/web#9832](https://github.com/owncloud/web/pull/9832): Copy quicklinks
-   for webkit navigator * Bugfix
-   [owncloud/web#9843](https://github.com/owncloud/web/pull/9843): Fix display path
-   on resources * Bugfix
-   [owncloud/web#9844](https://github.com/owncloud/web/pull/9844): Upload space
-   image * Bugfix [owncloud/web#9861](https://github.com/owncloud/web/pull/9861):
-   Duplicated file search request * Bugfix
-   [owncloud/web#9873](https://github.com/owncloud/web/pull/9873): Tags are no
-   longer editable for a locked file * Bugfix
-   [owncloud/web#9881](https://github.com/owncloud/web/pull/9881): Prevent
-   rendering of old/wrong set of resources in search list * Bugfix
-   [owncloud/web#9915](https://github.com/owncloud/web/pull/9915): Keep both
-   folders conflict in same-named folders * Bugfix
-   [owncloud/web#9931](https://github.com/owncloud/web/pull/9931): Enabling "invite
-   people" for password-protected folder/file * Bugfix
-   [owncloud/web#10031](https://github.com/owncloud/web/issues/10031): Icon
-   extension mapping * Bugfix
-   [owncloud/web#10065](https://github.com/owncloud/web/pull/10065): Logout page
-   after token expiry * Bugfix
-   [owncloud/web#10083](https://github.com/owncloud/web/pull/10083): Disable
-   expiration date for alias link (internal) * Bugfix
-   [owncloud/web#10092](https://github.com/owncloud/web/pull/10092): Allow empty
-   search query in "in-here" search * Bugfix
-   [owncloud/web#10096](https://github.com/owncloud/web/pull/10096): Remove
-   password buttons on input if disabled * Change
-   [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove
-   deprecated code * Enhancement
-   [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317): Make login url
-   configurable * Enhancement
-   [owncloud/web#7497](https://github.com/owncloud/ocis/issues/7497): Permission
-   checks for shares and favorites * Enhancement
-   [owncloud/web#7600](https://github.com/owncloud/web/issues/7600): Scroll to
-   newly created folder * Enhancement
-   [owncloud/web#9302](https://github.com/owncloud/web/issues/9302): Application
-   unification * Enhancement
-   [owncloud/web#9423](https://github.com/owncloud/web/pull/9423): Show local
-   loading spinner in sharing button * Enhancement
-   [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): File versions
-   tooltip with absolute date * Enhancement
-   [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): Disabling
-   extensions * Enhancement
-   [owncloud/web#9451](https://github.com/owncloud/web/pull/9451): Add SSE to get
-   notifications instantly * Enhancement
-   [owncloud/web#9525](https://github.com/owncloud/web/pull/9525): Tags form
-   improved * Enhancement
-   [owncloud/web#9527](https://github.com/owncloud/web/pull/9527): Don't display
-   confirmation dialog on file deletion * Enhancement
-   [owncloud/web#9531](https://github.com/owncloud/web/issues/9531): Personal
-   shares can be shown and hidden * Enhancement
-   [owncloud/web#9552](https://github.com/owncloud/web/pull/9552): Upload
-   preparation time * Enhancement
-   [owncloud/web#9561](https://github.com/owncloud/web/pull/9561): Indicate
-   processing state * Enhancement
-   [owncloud/web#9566](https://github.com/owncloud/web/pull/9566): Display locking
-   information * Enhancement
-   [owncloud/web#9584](https://github.com/owncloud/web/pull/9584): Moving share's
-   "set expiration date" function * Enhancement
-   [owncloud/web#9625](https://github.com/owncloud/web/pull/9625): Add keyboard
-   navigation to spaces overview * Enhancement
-   [owncloud/web#9627](https://github.com/owncloud/web/pull/9627): Add batch
-   actions to spaces * Enhancement
-   [owncloud/web#9653](https://github.com/owncloud/web/pull/9653): Keyword Query
-   Language (KQL) search syntax * Enhancement
-   [owncloud/web#9671](https://github.com/owncloud/web/pull/9671): OcModal set
-   buttons to same width * Enhancement
-   [owncloud/web#9682](https://github.com/owncloud/web/pull/9682): Add password
-   policy compatibility * Enhancement
-   [owncloud/web#9691](https://github.com/owncloud/web/pull/9691): Password
-   generator for public links * Enhancement
-   [owncloud/web#9696](https://github.com/owncloud/web/pull/9696): Added app banner
-   for mobile devices * Enhancement
-   [owncloud/web#9706](https://github.com/owncloud/web/pull/9706): Unify sharing
-   expiration date menu items * Enhancement
-   [owncloud/web#9727](https://github.com/owncloud/web/pull/9727): Show error if
-   password is on a banned password list * Enhancement
-   [owncloud/web#9771](https://github.com/owncloud/web/pull/9771): Handle
-   postprocessing state via Server Sent Events * Enhancement
-   [owncloud/web#9806](https://github.com/owncloud/web/pull/9806): Preview image
-   presentation * Enhancement
-   [owncloud/web#9809](https://github.com/owncloud/web/pull/9809): Add editors to
-   the application menu * Enhancement
-   [owncloud/web#9814](https://github.com/owncloud/web/pull/9814): Registering nav
-   items as extension * Enhancement
-   [owncloud/web#9815](https://github.com/owncloud/web/pull/9815): Add new portal
-   into runtime to include footer * Enhancement
-   [owncloud/web#9818](https://github.com/owncloud/web/pull/9818): Add `mode`
-   config option * Enhancement
-   [owncloud/web#9831](https://github.com/owncloud/web/pull/9831): Last modified
-   filter chips * Enhancement
-   [owncloud/web#9841](https://github.com/owncloud/web/pull/9841): Add embed mode
-   actions * Enhancement
-   [owncloud/web#9847](https://github.com/owncloud/web/issues/9847): Provide vendor
-   neutral file icons * Enhancement
-   [owncloud/web#9853](https://github.com/owncloud/web/pull/9853): Show only create
-   folder button in embed mode * Enhancement
-   [owncloud/web#9854](https://github.com/owncloud/web/pull/9854): Search query
-   term linking * Enhancement
-   [owncloud/web#9857](https://github.com/owncloud/web/pull/9857): Add permission
-   to delete link passwords when password is enforced * Enhancement
-   [owncloud/web#9858](https://github.com/owncloud/web/pull/9858): Remove settings
-   icon from searchbar * Enhancement
-   [owncloud/web#9863](https://github.com/owncloud/web/pull/9863): Location picker
-   in embed mode * Enhancement
-   [owncloud/web#9864](https://github.com/owncloud/web/pull/9864): Search tags
-   filter chips style aligned * Enhancement
-   [owncloud/web#9884](https://github.com/owncloud/web/pull/9884): Enable dark
-   theme on importer * Enhancement
-   [owncloud/web#9890](https://github.com/owncloud/web/pull/9890): Create shortcuts
-   * Enhancement [owncloud/web#9905](https://github.com/owncloud/web/pull/9905):
-   Manage tags in details panel * Enhancement
-   [owncloud/web#9906](https://github.com/owncloud/web/pull/9906): Reorganize "New"
-   menu * Enhancement
-   [owncloud/web#9912](https://github.com/owncloud/web/pull/9912): Add media type
-   filter chip * Enhancement
-   [owncloud/web#9940](https://github.com/owncloud/web/pull/9940): Display error
-   message for upload to locked folder * Enhancement
-   [owncloud/web#9966](https://github.com/owncloud/web/issues/9966): Support more
-   audio formats with correct icon * Enhancement
-   [owncloud/web#10007](https://github.com/owncloud/web/issues/10007): Additional
-   languages * Enhancement
-   [owncloud/web#10013](https://github.com/owncloud/web/issues/10013): Shared by
-   filter * Enhancement
-   [owncloud/web#10014](https://github.com/owncloud/web/issues/10014): Share search
-   filter * Enhancement
-   [owncloud/web#10024](https://github.com/owncloud/web/pull/10024): Duplicate
-   space * Enhancement
-   [owncloud/web#10037](https://github.com/owncloud/web/pull/10037): Default link
-   permission * Enhancement
-   [owncloud/web#10047](https://github.com/owncloud/web/pull/10047): Add explaining
-   contextual helper to spaces overview * Enhancement
-   [owncloud/web#10057](https://github.com/owncloud/web/pull/10057): Folder tree
-   creation during upload * Enhancement
-   [owncloud/web#10062](https://github.com/owncloud/web/pull/10062): Show webdav
-   information in details view * Enhancement
-   [owncloud/web#10072](https://github.com/owncloud/web/issues/10072): Add
-   authentication delegation in the Embed mode * Enhancement
-   [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support
-   mandatory filter while listing users * Enhancement
-   [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
-   quick actions as extension
-
-   https://github.com/owncloud/ocis/pull/8154
-   https://github.com/owncloud/ocis/pull/8055
-   https://github.com/owncloud/ocis/pull/7930
-   https://github.com/owncloud/ocis/pull/7952
-   https://github.com/owncloud/ocis/pull/7918
-   https://github.com/owncloud/ocis/pull/7883
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
-
-# Changelog for [5.0.0-rc.1] (2023-12-27)
-
-The following sections list the changes for 5.0.0-rc.1.
-
-[5.0.0-rc.1]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.1
+[5.0.0-rc.2]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.2
 
 ## Summary
 
@@ -422,6 +62,7 @@ The following sections list the changes for 5.0.0-rc.1.
 * Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 * Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
@@ -434,6 +75,12 @@ The following sections list the changes for 5.0.0-rc.1.
 * Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
 * Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
+* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
@@ -487,14 +134,18 @@ The following sections list the changes for 5.0.0-rc.1.
 * Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 * Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
 * Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 * Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
-* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
 * Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
-* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
+* Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
 
 ## Details
 
@@ -682,6 +333,13 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/7795
 
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
+
+   We fixed the race conditions in tests.
+
+   https://github.com/owncloud/ocis/issues/7846
+   https://github.com/owncloud/ocis/pull/7847
+
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 
    https://github.com/owncloud/ocis/pull/7859
@@ -767,6 +425,49 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/7990
    https://github.com/owncloud/ocis/pull/8050
    https://github.com/owncloud/ocis/pull/8035
+
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+
+   We fixed the upload postprocessing when the destination file does not exist
+   anymore.
+
+   https://github.com/owncloud/ocis/issues/7909
+   https://github.com/owncloud/ocis/pull/8117
+
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
+
+   Registers the registry under the correct name
+
+   https://github.com/owncloud/ocis/pull/8140
+
+* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+
+   We now correctly reinitialize the CS3 backend session after the IDP has been
+   restarted.
+
+   https://github.com/owncloud/ocis/pull/8142
+
+* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+
+   User would not be able to patch their preferred language when the ldap backend
+   is set to `read-only`. This makes no sense as language is stored elsewhere.
+
+   https://github.com/owncloud/ocis/pull/8182
+
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
+
+   We changed the search service to not log cases where resources that were about
+   to be indexed can no longer be found. Those are expected cases, e.g. when the
+   file in question has already been deleted or renamed meanwhile.
+
+   https://github.com/owncloud/ocis/pull/8200
+
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
+
+   We fixed a bug when admin tried to update or reset the logo.
+
+   https://github.com/owncloud/ocis/issues/8101
+   https://github.com/owncloud/ocis/pull/8211
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -1347,6 +1048,14 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/7979
 
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
+
+   We add the environment variable that allow to disable the password policy.
+
+   https://github.com/owncloud/ocis/issues/7916
+   https://github.com/owncloud/ocis/pull/7985
+   https://github.com/cs3org/reva/pull/4409
+
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 
    Replaces the nats object store with the nats kv store in the natsjs registry
@@ -1395,7 +1104,46 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/pull/8011
    https://github.com/owncloud/ocis/pull/8027
 
-* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+
+   Use a hidden role for service accounts. It will not appear in ListRoles calls
+   but internally handled by settings service
+
+   https://github.com/owncloud/ocis/pull/8051
+   https://github.com/owncloud/ocis/pull/8074
+
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
+
+   We update the antivirus icap client library and optimize the antivirus scanning
+   service. ANTIVIRUS_ICAP_TIMEOUT is now deprecated and
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT should be used instead.
+
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT supports human durations like `1s`, `1m`, `1h` and
+   `1d`.
+
+   https://github.com/owncloud/ocis/issues/6764
+   https://github.com/owncloud/ocis/pull/8062
+
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   https://github.com/owncloud/ocis/pull/8100
+
+* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   ## Changelog for reva edge
+
+  *   Bugfix [cs3org/reva#4434](https://github.com/cs3org/reva/pull/4434): Fix the upload postprocessing
+  *   Bugfix [cs3org/reva#4443](https://github.com/cs3org/reva/pull/4443): Fixed wrong status code when moving a file to a denied path
+  *   Bugfix [cs3org/reva#4446](https://github.com/cs3org/reva/pull/4446): Disallow to delete a file during the processing
+  *   Bugfix [cs3org/reva#4448](https://github.com/cs3org/reva/pull/4448): Fix truncating existing files
+  *   Bugfix [cs3org/reva#4449](https://github.com/cs3org/reva/pull/4449): Keep failed processing status
+  *   Bugfix [cs3org/reva#4452](https://github.com/cs3org/reva/pull/4452): More efficient share jail
+  *   Bugfix [cs3org/reva#4456](https://github.com/cs3org/reva/pull/4456): Do not lose revisions when restoring the first revision
+  *   Bugfix [cs3org/reva#4457](https://github.com/cs3org/reva/pull/4457): Fix concurrent map access in sharecache
 
    ## Changelog for reva 2.18.0 (2023-12-22)
 
@@ -1490,6 +1238,7 @@ The following sections list the changes for 5.0.0-rc.1.
   *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
   *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
+   https://github.com/owncloud/ocis/pull/8100
    https://github.com/owncloud/ocis/pull/8038
    https://github.com/owncloud/ocis/pull/8056
    https://github.com/owncloud/ocis/pull/7949
@@ -1502,16 +1251,26 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/pull/7727
    https://github.com/owncloud/ocis/pull/7752
 
-* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 
-   Use a hidden role for service accounts. It will not appear in ListRoles calls
-   but internally handled by settings service
+   We have removed all deprecated environment variables that have been marked for
+   removal for 5.0.0
 
-   https://github.com/owncloud/ocis/pull/8051
+   https://github.com/owncloud/ocis/issues/8025
+   https://github.com/owncloud/ocis/pull/8149
 
-* Enhancement - Update web to v8.0.0-rc.1: [#8055](https://github.com/owncloud/ocis/pull/8055)
+* Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
 
    Tags: web
+
+   We updated ownCloud Web to v8.0.0-rc.2. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#10176](https://github.com/owncloud/web/pull/10176): Turned off
+   file extensions not always respected * Bugfix
+   [owncloud/web#10232](https://github.com/owncloud/web/pull/10232): Skip searchbar
+   preview fetch on reload
 
    We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked)
    for details on the web release.
@@ -1732,11 +1491,13 @@ The following sections list the changes for 5.0.0-rc.1.
    [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
    quick actions as extension
 
+   https://github.com/owncloud/ocis/pull/8154
    https://github.com/owncloud/ocis/pull/8055
    https://github.com/owncloud/ocis/pull/7930
    https://github.com/owncloud/ocis/pull/7952
    https://github.com/owncloud/ocis/pull/7918
    https://github.com/owncloud/ocis/pull/7883
+   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
@@ -7058,7 +6819,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -7232,11 +6993,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -7409,24 +7188,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
