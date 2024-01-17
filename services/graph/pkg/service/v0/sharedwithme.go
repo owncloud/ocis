@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"slices"
 
+	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -183,55 +184,36 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				}
 
 				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
-					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					identity, err := g.cs3UserIdToIdentity(ctx, userID)
 					if err != nil {
-						g.logger.Error().Err(err).Msg("could not get user")
-						return err
+						// TODO: define a proper error behavior here. We don't
+						// want the whole request to fail just because a single
+						// resource owner couldn't be resolved. But, should be
+						// really return the affect share in the response?
+						// For now we just log a warning. The returned
+						// identitySet will just contain the userid.
+						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get owner of shared resource")
 					}
 
-					identitySet := libregraph.IdentitySet{
-						User: &libregraph.Identity{
-							DisplayName: user.GetDisplayName(),
-							Id:          libregraph.PtrString(user.GetId()),
-						},
-					}
-
-					remoteItem.SetCreatedBy(identitySet)
-					driveItem.SetCreatedBy(identitySet)
+					remoteItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
+					driveItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
 				}
 
 				if userID := receivedShare.GetShare().GetOwner(); userID != nil {
-					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					identity, err := g.cs3UserIdToIdentity(ctx, userID)
 					if err != nil {
-						g.logger.Error().Err(err).Msg("could not get user")
-						return err
+						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get owner of the share")
 					}
-
-					identitySet := libregraph.IdentitySet{
-						User: &libregraph.Identity{
-							DisplayName: user.GetDisplayName(),
-							Id:          libregraph.PtrString(user.GetId()),
-						},
-					}
-
-					shared.SetOwner(identitySet)
+					shared.SetOwner(libregraph.IdentitySet{User: &identity})
 				}
 
 				if userID := receivedShare.GetShare().GetCreator(); userID != nil {
-					user, err := g.identityCache.GetUser(ctx, userID.GetOpaqueId())
+					identity, err := g.cs3UserIdToIdentity(ctx, userID)
 					if err != nil {
-						g.logger.Error().Err(err).Msg("could not get user")
-						return err
+						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get creator of the share")
 					}
 
-					identitySet := libregraph.IdentitySet{
-						User: &libregraph.Identity{
-							DisplayName: user.GetDisplayName(),
-							Id:          libregraph.PtrString(user.GetId()),
-						},
-					}
-
-					shared.SetSharedBy(identitySet)
+					shared.SetSharedBy(libregraph.IdentitySet{User: &identity})
 
 				}
 
@@ -343,4 +325,19 @@ func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, rece
 	permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
 
 	return permission, nil
+}
+
+func (g Graph) cs3UserIdToIdentity(ctx context.Context, cs3UserID *cs3User.UserId) (libregraph.Identity, error) {
+	identity := libregraph.Identity{
+		Id: libregraph.PtrString(cs3UserID.GetOpaqueId()),
+	}
+	var err error
+	if cs3UserID.GetType() != cs3User.UserType_USER_TYPE_SPACE_OWNER {
+		var user libregraph.User
+		user, err = g.identityCache.GetUser(ctx, cs3UserID.GetOpaqueId())
+		if err == nil {
+			identity.SetDisplayName(user.GetDisplayName())
+		}
+	}
+	return identity, err
 }
