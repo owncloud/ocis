@@ -29,22 +29,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - AuthContext:
-
-    coreApiAuthOcs:
-      paths:
-        - "%paths.base%/../features/coreApiAuthOcs"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - AuthContext:
-
-    coreApiAuthWebDav:
-      paths:
-        - "%paths.base%/../features/coreApiAuthWebDav"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
         - SearchContext:
         - PublicWebDavContext:
         - WebDavPropertiesContext:
