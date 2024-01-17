@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2024-01-17T06:28:25.984979652Z
+date: 2024-01-17T08:12:24.718196466Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -105,6 +105,8 @@ When setting the `FRONTEND_AUTO_ACCEPT_SHARES` to `true`, all incoming shares wi
 ## The password policy
 
 Note that the password policy currently impacts only **public link password validation**.
+
+In Infinite Scale, the password policy is always enabled because the max-length restriction is always applying and should be taken into account by the clients.
 
 With the password policy, mandatory criteria for the password can be defined via the environment variables listed below.
 
