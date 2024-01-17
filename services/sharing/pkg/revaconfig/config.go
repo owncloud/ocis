@@ -81,6 +81,8 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 								"natsclusterid":        cfg.Events.ClusterID,
 								"tlsinsecure":          cfg.Events.TLSInsecure,
 								"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
+								"authusername":         cfg.Events.AuthUsername,
+								"authpassword":         cfg.Events.AuthPassword,
 							},
 						},
 					},
@@ -134,6 +136,8 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
 					"enable-tls":       cfg.Events.EnableTLS,
 					"name":             "sharing-eventsmiddleware",
+					"username":         cfg.Events.AuthUsername,
+					"password":         cfg.Events.AuthPassword,
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",

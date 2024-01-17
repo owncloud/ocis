@@ -157,11 +157,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 		},
 		"events": map[string]interface{}{
-			"natsaddress":          cfg.Events.Addr,
-			"natsclusterid":        cfg.Events.ClusterID,
-			"tlsinsecure":          cfg.Events.TLSInsecure,
-			"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
-			"numconsumers":         cfg.Events.NumConsumers,
+			"numconsumers": cfg.Events.NumConsumers,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -284,11 +280,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 		},
 		"events": map[string]interface{}{
-			"natsaddress":          cfg.Events.Addr,
-			"natsclusterid":        cfg.Events.ClusterID,
-			"tlsinsecure":          cfg.Events.TLSInsecure,
-			"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
-			"numconsumers":         cfg.Events.NumConsumers,
+			"numconsumers": cfg.Events.NumConsumers,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
