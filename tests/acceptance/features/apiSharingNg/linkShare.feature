@@ -73,6 +73,7 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
+      | internal        |
       | upload          |
       | createOnly      |
       | blocksDownload  |
@@ -144,6 +145,7 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
+      | internal        |
       | blocksDownload  |
 
   @issue-7879
@@ -220,6 +222,7 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
+      | internal        |
       | upload          |
       | createOnly      |
       | blocksDownload  |
@@ -298,6 +301,7 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
+      | internal        |
       | blocksDownload  |
 
   @env-config @issue-7879
@@ -369,6 +373,7 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
+      | internal        |
       | blocksDownload  |
 
   @issue-7879
@@ -442,11 +447,14 @@ Feature: Create a share link for a resource
     Examples:
       | previousPermissionsRole | newPermissionsRole |
       | view                    | edit               |
+      | view                    | internal           |
       | view                    | blocksDownload     |
       | edit                    | view               |
       | edit                    | blocksDownload     |
+      | view                    | internal           |
       | blocksDownload          | edit               |
       | blocksDownload          | blocksDownload     |
+      | view                    | internal           |
 
 
   Scenario: update expiration date of a file's link share
