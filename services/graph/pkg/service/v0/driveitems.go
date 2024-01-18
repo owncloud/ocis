@@ -460,6 +460,12 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			return
 		}
+		// FIXME: When setting permissions on a space, we need to use UnifiedRoleConditionOwner here
+		allowedResourceActions := unifiedrole.GetAllowedResourceActions(role, unifiedrole.UnifiedRoleConditionGrantee)
+		if len(allowedResourceActions) == 0 {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "role not applicable to this resource")
+			return
+		}
 
 		unifiedRolePermissions = append(unifiedRolePermissions, conversions.ToPointerSlice(role.GetRolePermissions())...)
 	}
