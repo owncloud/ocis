@@ -590,11 +590,11 @@ Feature: Create a share link for a resource
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     When user "Alice" creates the following link share using the Graph API:
-      | resourceType    | file             |
-      | resource        | text.txt         |
-      | space           | Personal         |
-      | permissionsRole | view             |
-      | password        | <bannedPassword> |
+      | resourceType    | file              |
+      | resource        | text.txt          |
+      | space           | Personal          |
+      | permissionsRole | view              |
+      | password        | <banned-password> |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -627,10 +627,10 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | bannedPassword |
-      | 123            |
-      | password       |
-      | ownCloud       |
+      | banned-password |
+      | 123             |
+      | password        |
+      | ownCloud        |
 
 
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List
@@ -643,11 +643,11 @@ Feature: Create a share link for a resource
       | permissionsRole | view     |
       | password        | %public% |
     When user "Alice" sets the following password for the last link share using the Graph API:
-      | resourceType    | file             |
-      | resource        | text.txt         |
-      | space           | Personal         |
-      | permissionsRole | view             |
-      | password        | <bannedPassword> |
+      | resourceType    | file              |
+      | resource        | text.txt          |
+      | space           | Personal          |
+      | permissionsRole | view              |
+      | password        | <banned-password> |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -680,7 +680,7 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | bannedPassword |
-      | 123            |
-      | password       |
-      | ownCloud       |
+      | banned-password |
+      | 123             |
+      | password        |
+      | ownCloud        |
