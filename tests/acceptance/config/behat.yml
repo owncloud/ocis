@@ -225,9 +225,9 @@ default:
         - PublicWebDavContext:
         - ArchiverContext:
 
-    apiSearch1:
+    apiSearch:
       paths:
-        - "%paths.base%/../features/apiSearch1"
+        - "%paths.base%/../features/apiSearch"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -245,9 +245,9 @@ default:
         - TUSContext:
         - OcisConfigContext:
 
-    apiSearch2:
+    apiSearchContent:
       paths:
-        - "%paths.base%/../features/apiSearch2"
+        - "%paths.base%/../features/apiSearchContent"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:

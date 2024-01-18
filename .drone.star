@@ -78,7 +78,7 @@ config = {
                 "apiSpacesDavOperation",
                 "apiDepthInfinity",
                 "apiLocks",
-                "apiSearch2",
+                "apiSearch",
                 "apiSharingNg",
             ],
             "skip": False,
@@ -120,16 +120,16 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
-        "apiSearch1": {
+        "apiSearchContent": {
             "suites": [
-                "apiSearch1",
+                "apiSearchContent",
             ],
             "skip": False,
             "tikaNeeded": True,
         },
     },
     "apiTests": {
-        "numberOfParts": 9,
+        "numberOfParts": 10,
         "skip": False,
         "skipExceptParts": [],
     },
