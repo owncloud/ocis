@@ -75,8 +75,10 @@ Feature: get users
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message":{
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
@@ -269,8 +271,10 @@ Feature: get users
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
           }
         }
       }
@@ -359,14 +363,16 @@ Feature: get users
                   "user"
                 ],
                 "properties": {
-                  "user": "string",
-                  "required": [
-                    "id"
-                  ],
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "enum": ["%user_id_pattern%"]
+                  "user": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "%user_id_pattern%"
+                      }
                     }
                   }
                 }
@@ -630,8 +636,10 @@ Feature: get users
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message: {
+              "type": "string",
+              "enum": ["Unauthorized"]
+            }
           }
         }
       }
@@ -905,8 +913,10 @@ Feature: get users
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
           }
         }
       }
@@ -1057,8 +1067,10 @@ Feature: get users
             "message"
           ],
           "properties": {
-            "type": "string",
-            "enum": ["Unauthorized"]
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
           }
         }
       }
@@ -1327,3 +1339,107 @@ Feature: get users
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario: non-admin user searches other users by display name
+    When user "Brian" searches for user "ali" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "required": [
+            "displayName",
+            "id",
+            "mail",
+            "userType"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "enum": ["Alice Hansen"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            },
+            "mail": {
+              "type": "string",
+              "enum": ["alice@example.org"]
+            },
+            "userType": {
+              "type": "string",
+              "enum": ["Member"]
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: non-admin user tries to search for a user by display name with less than 3 characters
+    When user "Brian" tries to search for user "al" using Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "enum": ["search term too short"]
+            }
+          }
+        }
+      }
+    }
+    """
+
+  @issue-7990
+  Scenario Outline: non-admin user tries to search for a user by display name with invalid characters/token
+    Given user "<user>" has been created with default attributes and without skeleton files
+    When user "Brian" tries to search for user "<user>" using Graph API
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "enum": ["Token '<errorToken>' is invalid"]
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | user                  | errorToken       |
+      | Alice-From-Wonderland | -From-Wonderland |
+      | Alice@From@Wonderland | @From@Wonderland |

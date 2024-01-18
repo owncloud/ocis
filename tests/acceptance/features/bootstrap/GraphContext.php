@@ -1253,6 +1253,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When user :byUser tries to search for user :searchTerm using Graph API
+	 * @When user :byUser searches for user :searchTerm using Graph API
+	 *
+	 * @param string $byUser
+	 * @param string $searchTerm
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSearchesForUserUsingGraphApi(string $byUser, string $searchTerm): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$response = GraphHelper::searchUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$searchTerm,
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user tries to get all users using the Graph API
 	 * @When user :user gets all users using the Graph API
 	 *
@@ -1871,6 +1893,28 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				$groupName
+			)
+		);
+	}
+
+	/**
+	 * @When user :user tries to search for group :searchTerm using Graph API
+	 * @When user :user searches for group :searchTerm using Graph API
+	 *
+	 * @param string $user
+	 * @param string $searchTerm
+	 *
+	 * @return void
+	 */
+	public function userSearchesForGroupUsingGraphApi($user, $searchTerm):void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::searchGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$searchTerm
 			)
 		);
 	}

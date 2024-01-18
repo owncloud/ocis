@@ -262,6 +262,32 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $searchTerm
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function searchUser(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $searchTerm
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, "users?\$search=$searchTerm");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $userPassword
 	 *
@@ -550,6 +576,32 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $searchTerm
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function searchGroup(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $searchTerm
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, "groups?\$search=$searchTerm");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
 			self::getRequestHeaders()
 		);
 	}
