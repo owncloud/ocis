@@ -125,10 +125,14 @@ cannot share a folder with create permission
 - [coreApiSharePublicLink2/uploadToPublicLinkShare.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/uploadToPublicLinkShare.feature#L13)
 - [coreApiSharePublicLink2/uploadToPublicLinkShare.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/uploadToPublicLinkShare.feature#L121)
 
-#### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
+#### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
-- [coreApiSharePublicLink2/uploadToPublicLinkShare.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/uploadToPublicLinkShare.feature#L91)
-- [coreApiSharePublicLink2/uploadToPublicLinkShare.feature:101](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/uploadToPublicLinkShare.feature#L101)
+- [coreApiWebdavProperties1/getQuota.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:55)
+- [coreApiWebdavProperties1/getQuota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:56)
+- [coreApiWebdavProperties1/getQuota.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/ccoreApiWebdavProperties1/getQuota.feature:57)
+- [coreApiWebdavProperties1/getQuota.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:71)
+- [coreApiWebdavProperties1/getQuota.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:72)
+- [coreApiWebdavProperties1/getQuota.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:73)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 

@@ -32,13 +32,14 @@ Feature: get quota
       | new              |
       | spaces           |
 
-
+  @issue-8197
   Scenario Outline: retrieving folder quota of shared folder with quota when no quota is set for recipient
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Brian" has created folder "/testquota"
+    And user "Brian" has uploaded file "/testquota/Brian.txt" of size 1000 bytes
     And user "Brian" has created a share with settings
       | path        | testquota |
       | shareType   | user      |
@@ -48,23 +49,23 @@ Feature: get quota
       | propertyName            |
       | d:quota-available-bytes |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "d:quota-available-bytes" with value "10000"
+    And the single response should contain a property "d:quota-available-bytes" with value "9000"
     Examples:
       | dav-path-version | folder-path       |
       | old              | /Shares/testquota |
       | new              | /Shares/testquota |
       | spaces           | /testquota        |
 
-
+  @issue-8197
   Scenario Outline: retrieving folder quota when quota is set and a file was uploaded
     Given using <dav-path-version> DAV path
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
-    And user "Alice" has uploaded file "/prueba.txt" of size 93 bytes
+    And user "Alice" has uploaded file "/prueba.txt" of size 1000 bytes
     When user "Alice" gets the following properties of folder "/" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "d:quota-available-bytes" with value "10000"
+    And the single response should contain a property "d:quota-available-bytes" with value "9000"
     Examples:
       | dav-path-version |
       | old              |
