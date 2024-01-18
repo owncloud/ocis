@@ -225,9 +225,9 @@ default:
         - PublicWebDavContext:
         - ArchiverContext:
 
-    apiSearch:
+    apiSearch1:
       paths:
-        - "%paths.base%/../features/apiSearch"
+        - "%paths.base%/../features/apiSearch1"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -236,14 +236,24 @@ default:
         - PublicWebDavContext:
         - FeatureContext: *common_feature_context_params
         - SearchContext:
-        - CapabilitiesContext:
-        - FilesVersionsContext:
+        - OCSContext:
+        - TagContext:
+        - SpacesTUSContext:
+
+    apiSearch2:
+      paths:
+        - "%paths.base%/../features/apiSearch2"
+      context: *common_ldap_suite_context
+      contexts:
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - SearchContext:
         - OCSContext:
         - TrashbinContext:
         - TagContext:
         - SpacesTUSContext:
-        - TUSContext:
-        - OcisConfigContext:
 
     apiSearchContent:
       paths:
