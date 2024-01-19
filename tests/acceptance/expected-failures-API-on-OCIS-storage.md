@@ -127,12 +127,12 @@ cannot share a folder with create permission
 
 #### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
-- [coreApiWebdavProperties1/getQuota.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:55)
-- [coreApiWebdavProperties1/getQuota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:56)
-- [coreApiWebdavProperties1/getQuota.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/ccoreApiWebdavProperties1/getQuota.feature:57)
-- [coreApiWebdavProperties1/getQuota.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:71)
-- [coreApiWebdavProperties1/getQuota.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:72)
-- [coreApiWebdavProperties1/getQuota.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/getQuota.feature:73)
+- [coreApiWebdavProperties/getQuota.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L55)
+- [coreApiWebdavProperties/getQuota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L56)
+- [coreApiWebdavProperties/getQuota.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L57)
+- [coreApiWebdavProperties/getQuota.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L71)
+- [coreApiWebdavProperties/getQuota.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L72)
+- [coreApiWebdavProperties/getQuota.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L73)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
