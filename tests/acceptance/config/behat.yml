@@ -237,8 +237,9 @@ default:
         - FeatureContext: *common_feature_context_params
         - SearchContext:
         - OCSContext:
-        - TagContext:
         - SpacesTUSContext:
+        - TagContext:
+        - TUSContext:
 
     apiSearch2:
       paths:
@@ -249,11 +250,13 @@ default:
         - GraphContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
+        - FilesVersionsContext:
         - SearchContext:
         - OCSContext:
         - TrashbinContext:
-        - TagContext:
         - SpacesTUSContext:
+        - TagContext:
+        - TUSContext:
 
     apiSearchContent:
       paths:
