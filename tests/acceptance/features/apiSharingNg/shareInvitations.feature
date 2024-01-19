@@ -23,6 +23,8 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
     And the JSON data of the response should match
       """
       {
@@ -1111,29 +1113,3 @@ Feature: Send a sharing invitations
       | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
       | Manager          | folder        | FolderToShare  |
-
-
-  Scenario Outline: send share invitation to normal user
-    And user "Alice" has created folder "FolderToShare"
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
-      | resource        | <path>             |
-      | space           | Personal           |
-      | sharee          | Brian              |
-      | shareType       | user               |
-      | permissionsRole | <permissions-role> |
-    Then the HTTP status code should be "200"
-    And for user "Brian" the space Shares should contain these entries:
-      | <path> |
-    Examples:
-      | permissions-role | resource-type | path          |
-      | Viewer           | file          | textfile.txt  |
-      | File Editor      | file          | textfile.txt  |
-      | Co Owner         | file          | textfile.txt  |
-      | Manager          | file          | textfile.txt  |
-      | Viewer           | folder        | FolderToShare |
-      | Editor           | folder        | FolderToShare |
-      | Co Owner         | folder        | FolderToShare |
-      | Uploader         | folder        | FolderToShare |
-      | Manager          | folder        | FolderToShare |

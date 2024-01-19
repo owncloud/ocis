@@ -447,7 +447,7 @@ class SharingNgContext implements Context {
 		);
 		$contents = \json_decode($response->getBody()->getContents(), true);
 
-		$fileFound = !empty(array_intersect(array_column($rows, 0), array_column($contents['value'], 'name')));
+		$fileFound = empty(array_diff(array_map(fn ($row) => trim($row[0], '/'), $rows), array_column($contents['value'], 'name')));
 
 		$assertMessage = $should
 			? "Response does not contain the entry."
