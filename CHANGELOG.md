@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
 * Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
 * Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
@@ -65,6 +66,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7846
    https://github.com/owncloud/ocis/pull/7847
+
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
+
+   Removes jwt config of policies service
+
+   https://github.com/owncloud/ocis/pull/7893
 
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
 
