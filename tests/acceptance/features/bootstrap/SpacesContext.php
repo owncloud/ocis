@@ -544,19 +544,22 @@ class SpacesContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $query
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function listAllAvailableSpacesOfUser(string $user, string $query = ''): ResponseInterface {
+	public function listAllAvailableSpacesOfUser(string $user, string $query = '', array $headers = []): ResponseInterface {
 		$response = GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			"?" . $query,
-			$this->featureContext->getStepLineRef()
+			$this->featureContext->getStepLineRef(),
+			[],
+			$headers
 		);
 		$this->rememberTheAvailableSpaces($response);
 		return $response;
@@ -576,6 +579,28 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUser($user, $query));
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists all available spaces with headers using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param TableNode $headersTable
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserListsAllHisAvailableSpacesWithHeadersUsingTheGraphApi(string $user, TableNode $headersTable): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$headersTable,
+			['header', 'value']
+		);
+		foreach ($headersTable as $row) {
+			$headers[$row['header']] = $row ['value'];
+		}
+		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUser($user, '', $headers));
 	}
 
 	/**
@@ -3529,16 +3554,43 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" with headers using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param TableNode $headersTable
+	 *
+	 * @return void
+	 *
+	 * @throws JsonException
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userSendsPropfindRequestToSpaceWithHeaders(string $user, string $spaceName, $headersTable): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$headersTable,
+			['header', 'value']
+		);
+		foreach ($headersTable as $row) {
+			$headers[$row['header']] = $row ['value'];
+		}
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers)
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string|null $resource
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 *
 	 * @throws JsonException
 	 */
-	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): ResponseInterface {
+	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = []): ResponseInterface {
 		$this->setSpaceIDByName($user, $spaceName);
 		$properties = ['oc:permissions','oc:file-parent','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype','oc:tags','d:lockdiscovery','d:activelock'];
 		return  WebDavHelper::propfind(
@@ -3550,7 +3602,9 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			"0",
 			"files",
-			WebDavHelper::DAV_VERSION_SPACES
+			WebDavHelper::DAV_VERSION_SPACES,
+			"",
+			$headers
 		);
 	}
 

@@ -179,6 +179,7 @@ class WebDavHelper {
 	 * @param string|null $type
 	 * @param int|null $davPathVersionToUse
 	 * @param string|null $doDavRequestAsUser
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
@@ -194,7 +195,8 @@ class WebDavHelper {
 		?string $folderDepth = '1',
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
-		?string $doDavRequestAsUser = null
+		?string $doDavRequestAsUser = null,
+		?array $headers = []
 	):ResponseInterface {
 		$body = self::getBodyForPropfind($properties);
 		$folderDepth = (string) $folderDepth;
