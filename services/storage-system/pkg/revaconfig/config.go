@@ -168,6 +168,8 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_ttl":                 cfg.FileMetadataCache.TTL / time.Second,
 				"cache_size":                cfg.FileMetadataCache.Size,
 				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
+				"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
+				"cache_auth_password":       cfg.FileMetadataCache.AuthPassword,
 			},
 		},
 	}

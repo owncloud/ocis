@@ -83,6 +83,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"cache_size":                cfg.StatCache.Size,
 							"cache_table":               "stat",
 							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+							"cache_auth_username":       cfg.StatCache.AuthUsername,
+							"cache_auth_password":       cfg.StatCache.AuthPassword,
 						},
 						"spaces": map[string]interface{}{
 							"cache_store":               cfg.StatCache.Store,
@@ -92,6 +94,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"cache_size":                cfg.StatCache.Size,
 							"cache_table":               "stat",
 							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+							"cache_auth_username":       cfg.StatCache.AuthUsername,
+							"cache_auth_password":       cfg.StatCache.AuthPassword,
 						},
 						"tus": map[string]interface{}{
 							"cache_store":               cfg.StatCache.Store,
@@ -101,6 +105,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"cache_size":                cfg.StatCache.Size,
 							"cache_table":               "stat",
 							"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+							"cache_auth_username":       cfg.StatCache.AuthUsername,
+							"cache_auth_password":       cfg.StatCache.AuthPassword,
 						},
 					},
 				},

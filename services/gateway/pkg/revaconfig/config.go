@@ -69,6 +69,8 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_ttl":                cfg.Cache.StatCacheTTL,
 						"cache_size":               cfg.Cache.StatCacheSize,
 						"cache_disable_persistenc": cfg.Cache.StatCacheDisablePersistence,
+						"cache_auth_username":      cfg.Cache.StatCacheAuthUsername,
+						"cache_auth_password":      cfg.Cache.StatCacheAuthPassword,
 					},
 					"provider_cache_config": map[string]interface{}{
 						"cache_store":         cfg.Cache.ProviderCacheStore,
@@ -78,6 +80,8 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_ttl":           cfg.Cache.ProviderCacheTTL,
 						"cache_size":          cfg.Cache.ProviderCacheSize,
 						"disable_persistence": cfg.Cache.ProviderCacheDisablePersistence,
+						"cache_auth_username": cfg.Cache.ProviderCacheAuthUsername,
+						"cache_auth_password": cfg.Cache.ProviderCacheAuthPassword,
 					},
 					"create_home_cache_config": map[string]interface{}{
 						"cache_store":               cfg.Cache.CreateHomeCacheStore,
@@ -87,6 +91,8 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_ttl":                 cfg.Cache.CreateHomeCacheTTL,
 						"cache_size":                cfg.Cache.CreateHomeCacheSize,
 						"cache_disable_persistence": cfg.Cache.CreateHomeCacheDisablePersistence,
+						"cache_auth_username":       cfg.Cache.CreateHomeCacheAuthUsername,
+						"cache_auth_password":       cfg.Cache.CreateHomeCacheAuthPassword,
 					},
 				},
 				"authregistry": map[string]interface{}{

@@ -139,6 +139,8 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.StatCache.TTL,
 			"cache_size":                cfg.StatCache.Size,
 			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+			"cache_auth_username":       cfg.StatCache.AuthUsername,
+			"cache_auth_password":       cfg.StatCache.AuthPassword,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -147,6 +149,8 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -155,6 +159,8 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
 			"numconsumers": cfg.Events.NumConsumers,
@@ -196,6 +202,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.StatCache.TTL,
 			"cache_size":                cfg.StatCache.Size,
 			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+			"cache_auth_username":       cfg.StatCache.AuthUsername,
+			"cache_auth_password":       cfg.StatCache.AuthPassword,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -204,6 +212,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -212,6 +222,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 	}
 }
@@ -262,6 +274,8 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.StatCache.TTL,
 			"cache_size":                cfg.StatCache.Size,
 			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+			"cache_auth_username":       cfg.StatCache.AuthUsername,
+			"cache_auth_password":       cfg.StatCache.AuthPassword,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -270,6 +284,8 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -278,6 +294,8 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
 			"numconsumers": cfg.Events.NumConsumers,
@@ -323,6 +341,8 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.StatCache.TTL,
 			"cache_size":                cfg.StatCache.Size,
 			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
+			"cache_auth_username":       cfg.StatCache.AuthUsername,
+			"cache_auth_password":       cfg.StatCache.AuthPassword,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -331,6 +351,8 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -339,6 +361,8 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 	}
 }
