@@ -1,11 +1,11 @@
 default:
   autoload:
-    '': '%paths.base%/../features/bootstrap'
+    "": "%paths.base%/../features/bootstrap"
 
   suites:
     apiAccountsHashDifficulty:
       paths:
-        - '%paths.base%/../features/apiAccountsHashDifficulty'
+        - "%paths.base%/../features/apiAccountsHashDifficulty"
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -30,7 +30,7 @@ default:
 
     apiSpaces:
       paths:
-        - '%paths.base%/../features/apiSpaces'
+        - "%paths.base%/../features/apiSpaces"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -50,7 +50,7 @@ default:
 
     apiSpacesShares:
       paths:
-        - '%paths.base%/../features/apiSpacesShares'
+        - "%paths.base%/../features/apiSpacesShares"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -72,7 +72,7 @@ default:
 
     apiContract:
       paths:
-        - '%paths.base%/../features/apiContract'
+        - "%paths.base%/../features/apiContract"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -89,7 +89,7 @@ default:
 
     apiArchiver:
       paths:
-        - '%paths.base%/../features/apiArchiver'
+        - "%paths.base%/../features/apiArchiver"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -104,7 +104,25 @@ default:
 
     apiGraph:
       paths:
-        - '%paths.base%/../features/apiGraph'
+        - "%paths.base%/../features/apiGraph"
+      context: *common_ldap_suite_context
+      contexts:
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - CapabilitiesContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - PublicWebDavContext:
+        - TUSContext:
+        - SpacesTUSContext:
+        - OcisConfigContext:
+        - TrashbinContext:
+
+    apiGraphUserGroup:
+      paths:
+        - "%paths.base%/../features/apiGraphUserGroup"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -122,7 +140,7 @@ default:
 
     apiCors:
       paths:
-        - '%paths.base%/../features/apiCors'
+        - "%paths.base%/../features/apiCors"
       context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
@@ -134,7 +152,7 @@ default:
 
     apiDepthInfinity:
       paths:
-        - '%paths.base%/../features/apiDepthInfinity'
+        - "%paths.base%/../features/apiDepthInfinity"
       context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
@@ -147,7 +165,7 @@ default:
 
     apiAsyncUpload:
       paths:
-        - '%paths.base%/../features/apiAsyncUpload'
+        - "%paths.base%/../features/apiAsyncUpload"
       context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
@@ -160,7 +178,7 @@ default:
 
     apiNotification:
       paths:
-        - '%paths.base%/../features/apiNotification'
+        - "%paths.base%/../features/apiNotification"
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:
@@ -174,7 +192,7 @@ default:
 
     apiAntivirus:
       paths:
-        - '%paths.base%/../features/apiAntivirus'
+        - "%paths.base%/../features/apiAntivirus"
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:
@@ -189,7 +207,7 @@ default:
 
     apiDownloads:
       paths:
-        - '%paths.base%/../features/apiDownloads'
+        - "%paths.base%/../features/apiDownloads"
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:
@@ -207,9 +225,42 @@ default:
         - PublicWebDavContext:
         - ArchiverContext:
 
-    apiSearch:
+    apiSearch1:
       paths:
-        - '%paths.base%/../features/apiSearch'
+        - "%paths.base%/../features/apiSearch1"
+      context: *common_ldap_suite_context
+      contexts:
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - PublicWebDavContext:
+        - FeatureContext: *common_feature_context_params
+        - SearchContext:
+        - OCSContext:
+        - SpacesTUSContext:
+        - TagContext:
+        - TUSContext:
+
+    apiSearch2:
+      paths:
+        - "%paths.base%/../features/apiSearch2"
+      context: *common_ldap_suite_context
+      contexts:
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - FilesVersionsContext:
+        - SearchContext:
+        - OCSContext:
+        - TrashbinContext:
+        - SpacesTUSContext:
+        - TagContext:
+        - TUSContext:
+
+    apiSearchContent:
+      paths:
+        - "%paths.base%/../features/apiSearchContent"
       context: *common_ldap_suite_context
       contexts:
         - SettingsContext:
@@ -229,7 +280,7 @@ default:
 
     apiReshare:
       paths:
-        - '%paths.base%/../features/apiReshare'
+        - "%paths.base%/../features/apiReshare"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -237,7 +288,7 @@ default:
 
     apiSpacesDavOperation:
       paths:
-        - '%paths.base%/../features/apiSpacesDavOperation'
+        - "%paths.base%/../features/apiSpacesDavOperation"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -246,7 +297,7 @@ default:
 
     apiLocks:
       paths:
-        - '%paths.base%/../features/apiLocks'
+        - "%paths.base%/../features/apiLocks"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -256,7 +307,7 @@ default:
 
     apiSharingNg:
       paths:
-        - '%paths.base%/../features/apiSharingNg'
+        - "%paths.base%/../features/apiSharingNg"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -264,7 +315,6 @@ default:
         - SharingNgContext:
         - PublicWebDavContext:
         - OcisConfigContext:
-
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
