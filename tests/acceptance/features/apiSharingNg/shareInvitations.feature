@@ -93,9 +93,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation to group with different roles
@@ -187,9 +185,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation for a file to user with different permissions
@@ -665,9 +661,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation with expiration date to group with different roles
@@ -763,9 +757,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
   @issue-7962
   Scenario Outline: send share invitation to disabled user
@@ -848,9 +840,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to a deleted group with different roles
@@ -909,9 +899,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation to deleted user
@@ -962,9 +950,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: try to send sharing invitation to multiple groups
@@ -1090,9 +1076,7 @@ Feature: Send a sharing invitations
       | File Editor      | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to non-existing group
