@@ -338,6 +338,8 @@ require (
 
 replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
 
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20240123083806-e05e6fdc903c
+
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
