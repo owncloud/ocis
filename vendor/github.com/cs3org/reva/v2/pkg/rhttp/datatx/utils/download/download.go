@@ -159,6 +159,8 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 		w.Header().Set("Accept-Ranges", "bytes")
 	}
 
+	w.Header().Set(net.HeaderContentType, strings.Join([]string{md.MimeType, "charset=UTF-8"}, "; "))
+
 	if len(ranges) > 0 {
 		sublog.Debug().Int64("start", ranges[0].Start).Int64("length", ranges[0].Length).Msg("range request")
 		if s == nil {
@@ -200,7 +202,7 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 			defer pr.Close() // cause writing goroutine to fail and exit if CopyN doesn't finish.
 			go func() {
 				for _, ra := range ranges {
-					part, err := mw.CreatePart(ra.MimeHeader(md.MimeType, int64(md.Size)))
+					part, err := mw.CreatePart(ra.MimeHeader(md.MimeType+"; charset=UTF-8", int64(md.Size)))
 					if err != nil {
 						_ = pw.CloseWithError(err) // CloseWithError always returns nil
 						return
@@ -224,7 +226,6 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 		w.Header().Set(net.HeaderContentLength, strconv.FormatInt(sendSize, 10))
 	}
 
-	w.Header().Set(net.HeaderContentType, md.MimeType)
 	w.Header().Set(net.HeaderContentDisposistion, net.ContentDispositionAttachment(path.Base(md.Path)))
 	w.Header().Set(net.HeaderETag, md.Etag)
 	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*md.Id))
