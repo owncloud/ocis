@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-22-10-10-38]
+[#deprecation-note-2024-01-22-13-06-29]
 [caption=]
 .Deprecation notes for the invitations service
 [width="100%",cols="~,~,~,~",options="header"]
