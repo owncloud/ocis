@@ -6,7 +6,7 @@
 * [ ] DEV/QA: Kickoff meeting [Kickoff meeting] (https://confluence.owncloud.com/display/QA/Technical+release+3.0.0+Overview)
 * [ ] DEV/QA: Define client versions and provide list of breaking changes for desktop/mobile team
 * [ ] DEV/QA: Check new strings and align with clients
-* [ ] DEV/DOCS: Create list of pending docks tasks 
+* [ ] DEV/DOCS: Create list of pending docs tasks 
 * [ ] DEV: Create branch `release-x.x.x-rc.x` -> CODEFREEZE
   * [ ] DEV: bump ocis version in necessary files
   * [ ] DEV: `changelog/CHANGELOG.tmpl`
