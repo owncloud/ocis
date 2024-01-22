@@ -281,11 +281,7 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, share 
 		},
 	}
 
-	data, err := conversions.CS3Share2ShareData(ctx, share)
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "deleting share failed", err)
-		return
-	}
+	data := conversions.CS3Share2ShareData(ctx, share)
 	// A deleted share should not have an ID.
 	data.ID = ""
 
@@ -337,11 +333,7 @@ func (h *Handler) listUserShares(r *http.Request, filters []*collaboration.Filte
 
 		// build OCS response payload
 		for _, s := range lsUserSharesResponse.Shares {
-			data, err := conversions.CS3Share2ShareData(ctx, s)
-			if err != nil {
-				log.Debug().Interface("share", s).Interface("shareData", data).Err(err).Msg("could not CS3Share2ShareData, skipping")
-				continue
-			}
+			data := conversions.CS3Share2ShareData(ctx, s)
 
 			info, status, err := h.getResourceInfoByID(ctx, client, s.ResourceId)
 			if err != nil || status.Code != rpc.Code_CODE_OK {
