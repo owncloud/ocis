@@ -209,7 +209,8 @@ class TUSContext implements Context {
 
 		$client = new Client(
 			$this->featureContext->getBaseUrl(),
-			['verify' => false,
+			[
+				'verify' => false,
 				'headers' => $headers
 			]
 		);
@@ -230,6 +231,8 @@ class TUSContext implements Context {
 
 		if ($bytes !== null) {
 			$client->file($sourceFile, $destination)->createWithUpload($client->getKey(), $bytes);
+		} elseif (\filesize($sourceFile) === 0) {
+			$client->file($sourceFile, $destination)->createWithUpload($client->getKey(), 0);
 		} elseif ($noOfChunks === 1) {
 			$client->file($sourceFile, $destination)->upload();
 		} else {

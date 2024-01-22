@@ -208,3 +208,39 @@ Feature: upload file
       | spaces           | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | spaces           | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | spaces           | "my\\file"              | bXkMaWxl                     |
+
+
+  Scenario Outline: upload a zero-byte file
+    Given using <dav-path-version> DAV path
+    When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "textfile.txt" using the TUS protocol on the WebDAV API
+    Then the content of file "textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-8003
+  Scenario Outline: replace a file with zero-byte file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "This is TUS upload" to "textfile.txt"
+    When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "textfile.txt" using the TUS protocol on the WebDAV API
+    Then the content of file "textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-8003
+  Scenario Outline: replace a file inside a folder with zero-byte file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "testFolder"
+    And user "Alice" has uploaded file with content "This is TUS upload" to "testFolder/textfile.txt"
+    When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "testFolder/textfile.txt" using the TUS protocol on the WebDAV API
+    Then the content of file "testFolder/textfile.txt" for user "Alice" should be ""
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
