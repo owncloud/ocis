@@ -299,6 +299,14 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 
 	metrics.UploadSessionsInitiated.Inc()
 
+	if uploadLength == 0 {
+		// Directly finish this upload
+		err = session.FinishUpload(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return map[string]string{
 		"simple": session.ID(),
 		"tus":    session.ID(),

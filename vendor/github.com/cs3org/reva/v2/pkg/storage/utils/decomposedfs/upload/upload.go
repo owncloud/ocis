@@ -177,7 +177,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 			err = errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
 		}
 		if err != nil {
-			session.store.Cleanup(ctx, session, true, false)
+			session.store.Cleanup(ctx, session, true, false, false)
 			return err
 		}
 	}
@@ -191,7 +191,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 
 	n, err := session.store.CreateNodeForUpload(session, attrs)
 	if err != nil {
-		session.store.Cleanup(ctx, session, true, false)
+		session.store.Cleanup(ctx, session, true, false, true)
 		return err
 	}
 
@@ -223,7 +223,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 	if !session.store.async {
 		// handle postprocessing synchronously
 		err = session.Finalize()
-		session.store.Cleanup(ctx, session, err != nil, false)
+		session.store.Cleanup(ctx, session, err != nil, false, err == nil)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to upload")
 			return err
@@ -312,10 +312,10 @@ func (session *OcisSession) removeNode(ctx context.Context) {
 }
 
 // cleanup cleans up after the upload is finished
-func (session *OcisSession) Cleanup(cleanNode, cleanBin, cleanInfo bool) {
+func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool) {
 	ctx := session.Context(context.Background())
 
-	if cleanNode {
+	if revertNodeMetadata {
 		if session.NodeExists() {
 			p := session.info.MetaData["versionsPath"]
 			n, err := session.Node(ctx)

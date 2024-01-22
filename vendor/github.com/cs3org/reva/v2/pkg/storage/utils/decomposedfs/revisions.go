@@ -263,10 +263,6 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	// copy blob metadata from restored revision to node
 	restoredRevisionPath := fs.lu.InternalPath(spaceID, revisionKey)
 	err = fs.lu.CopyMetadata(ctx, restoredRevisionPath, nodePath, func(attributeName string, value []byte) (newValue []byte, copy bool) {
-		if attributeName == prefixes.MTimeAttr {
-			// update mtime
-			return []byte(time.Now().UTC().Format(time.RFC3339Nano)), true
-		}
 		return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 			attributeName == prefixes.TypeAttr ||
 			attributeName == prefixes.BlobIDAttr ||
@@ -274,6 +270,15 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	}, false)
 	if err != nil {
 		return errtypes.InternalError("failed to copy blob xattrs to old revision to node: " + err.Error())
+	}
+	// always set the node mtime to the current time
+	err = fs.lu.MetadataBackend().SetMultiple(ctx, nodePath,
+		map[string][]byte{
+			prefixes.MTimeAttr: []byte(time.Now().UTC().Format(time.RFC3339Nano)),
+		},
+		false)
+	if err != nil {
+		return errtypes.InternalError("failed to set mtime attribute on node: " + err.Error())
 	}
 
 	revisionSize, err := fs.lu.MetadataBackend().GetInt64(ctx, restoredRevisionPath, prefixes.BlobsizeAttr)
