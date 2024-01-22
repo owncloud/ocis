@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
 * Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
@@ -146,6 +147,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8027
    https://github.com/owncloud/ocis/issues/8215
    https://github.com/owncloud/ocis/pull/8233
+
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+
+   Updating and Deleting the virtual drives for shares is currently not supported.
+   Instead of returning a generic 500 status we return a 405 response now.
+
+   https://github.com/owncloud/ocis/issues/7881
+   https://github.com/owncloud/ocis/pull/8235
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
