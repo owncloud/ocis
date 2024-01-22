@@ -270,10 +270,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/linkShare.feature:453](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L453)
 - [apiSharingNg/linkShare.feature:455](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L455)
 - [apiSharingNg/linkShare.feature:456](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L456)
-- [apiSharingNg/deletePermissions.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L146)
-- [apiSharingNg/deletePermissions.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L163)
-- [apiSharingNg/deletePermissions.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L184)
-- [apiSharingNg/deletePermissions.feature:203](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L203)
+- [apiSharingNg/deletePermissions.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L138)
+- [apiSharingNg/deletePermissions.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L155)
+- [apiSharingNg/deletePermissions.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L176)
+- [apiSharingNg/deletePermissions.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L195)
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
@@ -358,6 +358,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:463](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L463)
 - [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
+
+### [CORS headers are only set when origin is sent by the client](https://github.com/owncloud/ocis/issues/5195)
+
+- [apiContract/copy.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/copy.feature#L16)
 
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

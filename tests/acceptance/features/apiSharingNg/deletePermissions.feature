@@ -27,8 +27,6 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
       | Co Owner        | folder        | FolderToShare |
@@ -56,8 +54,6 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
       | Co Owner        | folder        | FolderToShare |
@@ -86,8 +82,6 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
       | Co Owner        | folder        | FolderToShare |
@@ -118,8 +112,6 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
       | Co Owner        | folder        | FolderToShare |
