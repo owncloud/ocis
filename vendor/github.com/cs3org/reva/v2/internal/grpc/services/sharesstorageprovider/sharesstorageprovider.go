@@ -859,6 +859,7 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 				OpaqueId:  share.Share.Id.OpaqueId,
 			}
 			info.Path = filepath.Base(share.MountPoint.Path)
+			info.Name = info.Path
 
 			infos = append(infos, info)
 		}

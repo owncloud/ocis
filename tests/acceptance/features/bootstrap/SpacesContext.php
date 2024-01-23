@@ -1807,12 +1807,14 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)"(?: with following headers) using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
 	 * @param string $fromSpaceName
 	 * @param string $fileDestination
 	 * @param string $toSpaceName
+	 * @param TableNode|null $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1822,10 +1824,22 @@ class SpacesContext implements Context {
 		string $fileSource,
 		string $fromSpaceName,
 		string $fileDestination,
-		string $toSpaceName
+		string $toSpaceName,
+		TableNode $table = null
 	):void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+
+		if ($table !== null) {
+			$this->featureContext->verifyTableNodeColumns(
+				$table,
+				['header', 'value']
+			);
+			foreach ($table as $row) {
+				$headers[$row['header']] = $this->featureContext->substituteInLineCodes($row['value']);
+			}
+		}
+
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}

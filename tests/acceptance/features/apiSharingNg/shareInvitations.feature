@@ -91,8 +91,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -187,8 +185,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -271,7 +267,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -281,11 +276,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
@@ -467,7 +460,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -477,11 +469,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
@@ -673,8 +663,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -773,8 +761,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -860,8 +846,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -923,8 +907,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -978,8 +960,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -1045,8 +1025,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -1110,8 +1088,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |

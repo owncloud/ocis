@@ -486,12 +486,16 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 	w.Header().Set(net.HeaderDav, "1, 3, extended-mkcol")
 	w.Header().Set(net.HeaderContentType, "application/xml; charset=utf-8")
 	if sendTusHeaders {
-		w.Header().Add(net.HeaderAccessControlExposeHeaders, strings.Join([]string{net.HeaderTusResumable, net.HeaderTusVersion, net.HeaderTusExtension}, ", "))
+		w.Header().Add(net.HeaderAccessControlExposeHeaders, net.HeaderTusResumable)
+		w.Header().Add(net.HeaderAccessControlExposeHeaders, net.HeaderTusVersion)
+		w.Header().Add(net.HeaderAccessControlExposeHeaders, net.HeaderTusExtension)
+		w.Header().Set(net.HeaderAccessControlExposeHeaders, strings.Join(w.Header().Values(net.HeaderAccessControlExposeHeaders), ", "))
 		w.Header().Set(net.HeaderTusResumable, "1.0.0")
 		w.Header().Set(net.HeaderTusVersion, "1.0.0")
-		w.Header().Set(net.HeaderTusExtension, "creation,creation-with-upload,checksum,expiration")
+		w.Header().Set(net.HeaderTusExtension, "creation, creation-with-upload, checksum, expiration")
 	}
-	w.Header().Set(net.HeaderVary, net.HeaderPrefer)
+	w.Header().Add(net.HeaderVary, net.HeaderPrefer)
+	w.Header().Set(net.HeaderVary, strings.Join(w.Header().Values(net.HeaderVary), ", "))
 	if returnMinimal {
 		w.Header().Set(net.HeaderPreferenceApplied, "return=minimal")
 	}

@@ -197,11 +197,6 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		}
 	}
 
-	// check lock
-	if err := grantNode.CheckLock(ctx); err != nil {
-		return err
-	}
-
 	if err := grantNode.DeleteGrant(ctx, g, false); err != nil {
 		return err
 	}
@@ -308,11 +303,6 @@ func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, 
 }
 
 func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provider.Grant) error {
-	// check lock
-	if err := n.CheckLock(ctx); err != nil {
-		return err
-	}
-
 	var spaceType string
 	spaceGrant := ctx.Value(utils.SpaceGrant)
 	// this is not a grant on a space root we are just adding a share

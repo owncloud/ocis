@@ -91,11 +91,7 @@ type AsyncPropagatorOptions struct {
 
 // EventOptions are the configurable options for events
 type EventOptions struct {
-	NatsAddress          string `mapstructure:"natsaddress"`
-	NatsClusterID        string `mapstructure:"natsclusterid"`
-	TLSInsecure          bool   `mapstructure:"tlsinsecure"`
-	TLSRootCACertificate string `mapstructure:"tlsrootcacertificate"`
-	NumConsumers         int    `mapstructure:"numconsumers"`
+	NumConsumers int `mapstructure:"numconsumers"`
 }
 
 // TokenOptions are the configurable option for tokens
