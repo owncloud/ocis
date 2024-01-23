@@ -378,6 +378,11 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		condition = unifiedrole.UnifiedRoleConditionOwner
+	}
+
 	permissionSet := *statResponse.GetInfo().GetPermissionSet()
 	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
 
@@ -386,7 +391,7 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
 			unifiedrole.GetApplicableRoleDefinitionsForActions(
 				allowedActions,
-				unifiedrole.UnifiedRoleConditionGrantee,
+				condition,
 				g.config.FilesSharing.EnableResharing,
 				false,
 			),
@@ -452,6 +457,18 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
+		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
+		errCode.Render(w, r)
+		return
+	}
+
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		condition = unifiedrole.UnifiedRoleConditionOwner
+	}
+
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: driveItemInvite.LibreGraphPermissionsActions}}
 	for _, roleID := range driveItemInvite.GetRoles() {
 		role, err := unifiedrole.NewUnifiedRoleFromID(roleID, g.config.FilesSharing.EnableResharing)
@@ -460,21 +477,14 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			return
 		}
-		// FIXME: When setting permissions on a space, we need to use UnifiedRoleConditionOwner here
-		allowedResourceActions := unifiedrole.GetAllowedResourceActions(role, unifiedrole.UnifiedRoleConditionGrantee)
+
+		allowedResourceActions := unifiedrole.GetAllowedResourceActions(role, condition)
 		if len(allowedResourceActions) == 0 {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "role not applicable to this resource")
 			return
 		}
 
 		unifiedRolePermissions = append(unifiedRolePermissions, conversions.ToPointerSlice(role.GetRolePermissions())...)
-	}
-
-	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
-		errCode.Render(w, r)
-		return
 	}
 
 	driveRecipient := driveItemInvite.GetRecipients()[0]
@@ -492,7 +502,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, unifiedrole.UnifiedRoleConditionGrantee, g.config.FilesSharing.EnableResharing); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition, g.config.FilesSharing.EnableResharing); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
