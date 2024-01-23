@@ -2884,6 +2884,14 @@ def k6LoadTests(ctx):
                     "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
                 ],
             },
+            {
+                "name": "open-grafana-dashboard",
+                "image": OC_CI_ALPINE,
+                "environment": {},
+                "commands": [
+                    "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works'",
+                ],
+            },
         ],
         "depends_on": [],
         "trigger": {
