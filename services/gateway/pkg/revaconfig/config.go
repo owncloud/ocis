@@ -61,17 +61,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					// cache and TTLs
-					"stat_cache_config": map[string]interface{}{
-						"cache_store":              cfg.Cache.StatCacheStore,
-						"cache_nodes":              cfg.Cache.StatCacheNodes,
-						"cache_database":           cfg.Cache.StatCacheDatabase,
-						"cache_table":              "stat",
-						"cache_ttl":                cfg.Cache.StatCacheTTL,
-						"cache_size":               cfg.Cache.StatCacheSize,
-						"cache_disable_persistenc": cfg.Cache.StatCacheDisablePersistence,
-						"cache_auth_username":      cfg.Cache.StatCacheAuthUsername,
-						"cache_auth_password":      cfg.Cache.StatCacheAuthPassword,
-					},
 					"provider_cache_config": map[string]interface{}{
 						"cache_store":         cfg.Cache.ProviderCacheStore,
 						"cache_nodes":         cfg.Cache.ProviderCacheNodes,
