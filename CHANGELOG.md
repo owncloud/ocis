@@ -55,9 +55,9 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+* Enhancement - Update reva to latest edge version: [#8264](https://github.com/owncloud/ocis/pull/8264)
 
 ## Details
 
@@ -176,12 +176,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/6764
    https://github.com/owncloud/ocis/pull/8062
 
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
-
-   We update reva to the latest edge version to get the latest fixes and features.
-
-   https://github.com/owncloud/ocis/pull/8100
-
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 
    We have removed all deprecated environment variables that have been marked for
@@ -198,6 +192,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7916
    https://github.com/owncloud/ocis/pull/8152
    https://github.com/cs3org/reva/pull/4453
+
+* Enhancement - Update reva to latest edge version: [#8264](https://github.com/owncloud/ocis/pull/8264)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   https://github.com/owncloud/ocis/pull/8264
+   https://github.com/owncloud/ocis/pull/8100
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
