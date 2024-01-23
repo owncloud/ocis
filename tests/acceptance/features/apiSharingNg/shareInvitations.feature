@@ -23,6 +23,8 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
     And the JSON data of the response should match
       """
       {
@@ -115,6 +117,10 @@ Feature: Send a sharing invitations
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
+    And for user "Carol" the space Shares should contain these entries:
+      | <path> |
     And the JSON data of the response should match
       """
       {
