@@ -1,8 +1,6 @@
 package revaconfig
 
 import (
-	"time"
-
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
 )
@@ -165,7 +163,7 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_store":               cfg.FileMetadataCache.Store,
 				"cache_nodes":               cfg.FileMetadataCache.Nodes,
 				"cache_database":            cfg.FileMetadataCache.Database,
-				"cache_ttl":                 cfg.FileMetadataCache.TTL / time.Second,
+				"cache_ttl":                 cfg.FileMetadataCache.TTL,
 				"cache_size":                cfg.FileMetadataCache.Size,
 				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
 				"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
