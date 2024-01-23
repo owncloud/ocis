@@ -39,11 +39,11 @@ Feature: Space management
           "enum": ["Project"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["project"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         }
       }
@@ -70,11 +70,11 @@ Feature: Space management
           "enum": ["Alice Hansen"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["personal"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         }
       }

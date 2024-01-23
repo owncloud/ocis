@@ -167,11 +167,11 @@ Feature: List and create spaces
           "enum": ["my project"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["project"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         }
       }
@@ -227,13 +227,17 @@ Feature: List and create spaces
             "user"
           ],
           "properties": {
-            "type": "object",
-            "required": [
-              "id"
-            ],
-            "properties": {
-              "type": "string",
-              "enum": ["%user_id%"]
+            "user": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": ["%user_id%"]
+                }
+              }
             }
           }
         },
@@ -343,6 +347,10 @@ Feature: List and create spaces
                 "enum": ["%base_url%/dav/spaces/%space_id%"]
               }
            }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
         }
       }
     }
@@ -454,28 +462,28 @@ Feature: List and create spaces
           "enum": ["Shares"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["virtual"]
         },
         "driveAlias": {
-           "type": "string",
+          "type": "string",
           "enum": ["virtual/shares"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         },
         "quota": {
-           "type": "object",
-           "required": [
+          "type": "object",
+          "required": [
             "state"
-           ],
-           "properties": {
-              "state": {
-                "type": "string",
-                "enum": ["normal"]
-              }
-           }
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["normal"]
+            }
+          }
         },
         "root": {
           "type": "object",
@@ -484,15 +492,15 @@ Feature: List and create spaces
             "webDavUrl"
           ],
           "properties": {
-              "eTag": {
-                "type": "string",
-                "enum": ["%space_etag%"]
-              },
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
+            "eTag": {
+              "type": "string",
+              "enum": ["%space_etag%"]
+            },
+            "webDavUrl": {
+              "type": "string",
+              "enum": ["%base_url%/dav/spaces/%space_id%"]
+            }
+          }
         },
         "webUrl": {
           "type": "string",
