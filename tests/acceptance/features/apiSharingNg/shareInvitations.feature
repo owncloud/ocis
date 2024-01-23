@@ -261,7 +261,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      # | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -271,11 +270,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      # | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      # | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
@@ -457,7 +454,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      # | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -467,11 +463,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      # | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      # | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
