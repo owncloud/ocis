@@ -1814,7 +1814,6 @@ class SpacesContext implements Context {
 	 * @param string $fromSpaceName
 	 * @param string $fileDestination
 	 * @param string $toSpaceName
-	 * @param string $toSpaceName
 	 * @param TableNode|null $table
 	 *
 	 * @return void
