@@ -359,9 +359,5 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
 
-### [CORS headers are only set when origin is sent by the client](https://github.com/owncloud/ocis/issues/5195)
-
-- [apiContract/copy.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/copy.feature#L16)
-
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
