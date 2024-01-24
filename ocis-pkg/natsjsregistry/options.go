@@ -10,7 +10,6 @@ import (
 
 type storeOptionsKey struct{}
 type expiryKey struct{}
-type authKey struct{}
 
 // StoreOptions sets the options for the underlying store
 func StoreOptions(opts []store.Option) registry.Option {
@@ -29,15 +28,5 @@ func ServiceExpiry(t time.Duration) registry.Option {
 			o.Context = context.Background()
 		}
 		o.Context = context.WithValue(o.Context, expiryKey{}, t)
-	}
-}
-
-// Authenticate sets the username/password for the nats connection
-func Authenticate(username, password string) registry.Option {
-	return func(o *registry.Options) {
-		if o.Context == nil {
-			o.Context = context.Background()
-		}
-		o.Context = context.WithValue(o.Context, authKey{}, []string{username, password})
 	}
 }
