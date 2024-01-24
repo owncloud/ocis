@@ -33,8 +33,8 @@ Feature: CORS headers
   Scenario Outline: CORS headers should not be returned when CORS domain does not match origin header
     Given using OCS API version "<ocs_api_version>"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "<endpoint>" with headers
-      | header | value               |
-      | Origin | https://mero.badal  |
+      | header | value              |
+      | Origin | https://mero.badal |
     Then the OCS status code should be "<ocs-code>"
     And the HTTP status code should be "<http-code>"
     And the following headers should not be set
@@ -70,3 +70,23 @@ Feature: CORS headers
       | 2               |  | /apps/files_sharing/api/v1/shares | PUT            |
       | 1               |  | /apps/files_sharing/api/v1/shares | DELETE         |
       | 2               |  | /apps/files_sharing/api/v1/shares | POST           |
+
+
+  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the Graph api
+    When user "Alice" lists all available spaces with headers using the Graph API
+      | header | value               |
+      | Origin | https://aphno.badal |
+    Then the HTTP status code should be "200"
+    And the following headers should be set
+      | header                      | value               |
+      | Access-Control-Allow-Origin | https://aphno.badal |
+
+  @issue-8231
+  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the Webdav api
+    When user "Alice" sends PROPFIND request to space "Alice Hansen" with headers using the WebDAV API
+      | header | value               |
+      | Origin | https://aphno.badal |
+    Then the HTTP status code should be "207"
+    And the following headers should be set
+      | header                      | value               |
+      | Access-Control-Allow-Origin | https://aphno.badal |
