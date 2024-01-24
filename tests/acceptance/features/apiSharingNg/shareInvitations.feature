@@ -1145,3 +1145,66 @@ Feature: Send a sharing invitations
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
+
+
+  Scenario Outline: send sharing invitation to already shared group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "nameAlreadyExists"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^error creating share: error: already exists:.*$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
