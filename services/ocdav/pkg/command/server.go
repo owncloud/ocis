@@ -30,7 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -86,7 +86,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.MetricsEnabled(true),
 					ocdav.MetricsNamespace("ocis"),
 					ocdav.Tracing("Adding these strings is a workaround for ->", "https://github.com/cs3org/reva/issues/4131"),
-					ocdav.WithTraceProvider(tracingProvider),
+					ocdav.WithTraceProvider(traceProvider),
 				}
 
 				s, err := ocdav.Service(opts...)
