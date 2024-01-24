@@ -72,13 +72,21 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
 		req.Body = fd
-	}
 
-	size, err := session.WriteChunk(ctx, 0, req.Body)
-	if err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
+		size, err := session.WriteChunk(ctx, 0, req.Body)
+		if err != nil {
+			return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
+		}
+		session.SetSize(size)
+	} else {
+		size, err := session.WriteChunk(ctx, 0, req.Body)
+		if err != nil {
+			return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
+		}
+		if size != req.Length {
+			return provider.ResourceInfo{}, errtypes.PartialContent("Decomposedfs: unexpected end of stream")
+		}
 	}
-	session.SetSize(size)
 
 	if err := session.FinishUpload(ctx); err != nil {
 		return provider.ResourceInfo{}, err

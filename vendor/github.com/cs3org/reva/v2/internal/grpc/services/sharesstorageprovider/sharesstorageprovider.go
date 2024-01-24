@@ -321,7 +321,7 @@ func (s *service) GetPath(ctx context.Context, req *provider.GetPathRequest) (*p
 
 	return &provider.GetPathResponse{
 		Status: status.NewOK(ctx),
-		Path:   receivedShare.MountPoint.Path,
+		Path:   filepath.Clean("/" + receivedShare.MountPoint.Path),
 	}, nil
 
 }
