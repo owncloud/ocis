@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -156,6 +157,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7881
    https://github.com/owncloud/ocis/pull/8235
+
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+
+   Fixes nats authentication for registry/events/stores
+
+   https://github.com/owncloud/ocis/pull/8236
 
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 
