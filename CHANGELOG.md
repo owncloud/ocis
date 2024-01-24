@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
@@ -155,6 +156,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7881
    https://github.com/owncloud/ocis/pull/8235
+
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+
+   We fixed the race condition that led to concurrent map access in a publicshare
+   manager.
+
+   https://github.com/owncloud/ocis/issues/8255
+   https://github.com/owncloud/ocis/pull/8269
+   https://github.com/cs3org/reva/pull/4472
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
