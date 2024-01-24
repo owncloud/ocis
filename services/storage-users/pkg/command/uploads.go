@@ -81,24 +81,24 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 		Usage: "Print a list of upload sessions",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "id",
-				Usage: "filter sessions by upload session id",
+				Name:        "id",
+				DefaultText: "unset",
+				Usage:       "filter sessions by upload session id",
 			},
 			&cli.BoolFlag{
-				Name:               "processing",
-				DisableDefaultText: true,
-				Usage:              "filter sessions by processing status",
+				Name:        "processing",
+				DefaultText: "unset",
+				Usage:       "filter sessions by processing status",
 			},
 			&cli.BoolFlag{
-				Name:               "expired",
-				DisableDefaultText: true,
-				Usage:              "filter sessions by expired status",
+				Name:        "expired",
+				DefaultText: "unset",
+				Usage:       "filter sessions by expired status",
 			},
 			&cli.StringFlag{
-				Name:        "output",
-				Usage:       "output format to use (can be 'plain' or 'json', experimental)",
-				Value:       "plain",
-				DefaultText: "plain",
+				Name:  "output",
+				Usage: "output format to use (can be 'plain' or 'json', experimental)",
+				Value: "plain",
 			},
 		},
 		Before: func(c *cli.Context) error {
