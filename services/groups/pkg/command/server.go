@@ -34,7 +34,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -63,7 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 				runtime.RunWithOptions(rCfg, pidFile,
 					runtime.WithLogger(&logger.Logger),
 					runtime.WithRegistry(reg),
-					runtime.WithTraceProvider(tracingProvider),
+					runtime.WithTraceProvider(traceProvider),
 				)
 
 				return nil

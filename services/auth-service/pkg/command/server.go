@@ -12,13 +12,13 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/auth-service/pkg/config"
 	"github.com/owncloud/ocis/v2/services/auth-service/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/auth-service/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/auth-service/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/auth-service/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/auth-service/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -33,7 +33,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg, logger)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -43,11 +43,16 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+			reg := registry.GetRegistry()
 
 			rcfg := revaconfig.AuthMachineConfigFromStruct(cfg)
 
 			gr.Add(func() error {
-				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
+				runtime.RunWithOptions(rcfg, pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+					runtime.WithTraceProvider(traceProvider),
+				)
 				return nil
 			}, func(err error) {
 				logger.Error().
