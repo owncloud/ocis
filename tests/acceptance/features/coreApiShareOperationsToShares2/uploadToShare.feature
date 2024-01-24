@@ -140,11 +140,11 @@ Feature: sharing
       | old              |
       | new              |
 
-  @smokeTest @skipOnGraph
+  @smokeTest
   Scenario Outline: check quota of owners parent directory of a shared file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And the quota of user "Brian" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "0"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
     And user "Alice" has shared file "myfile.txt" with user "Brian"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/myfile.txt" using the WebDAV API
@@ -162,17 +162,17 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and small skeleton files
+    And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |
       | shareType   | user   |
       | permissions | change |
       | shareWith   | Brian  |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -193,7 +193,7 @@ Feature: sharing
       | shareType   | group  |
       | permissions | change |
       | shareWith   | grp1   |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -202,7 +202,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -212,7 +212,7 @@ Feature: sharing
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
@@ -221,7 +221,7 @@ Feature: sharing
       | old              |
       | new              |
 
-  @skipOnGraph
+
   Scenario Outline: uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -233,7 +233,7 @@ Feature: sharing
       | shareType   | group  |
       | permissions | create |
       | shareWith   | grp1   |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/myfile.txt" should not exist
