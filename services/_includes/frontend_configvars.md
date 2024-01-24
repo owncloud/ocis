@@ -59,6 +59,8 @@
 | OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE | bool | false | Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.|
+| OCIS_CACHE_AUTH_USERNAME<br/>FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME | string |  | The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
+| OCIS_CACHE_AUTH_PASSWORD<br/>FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD | string |  | The password to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|
 | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|

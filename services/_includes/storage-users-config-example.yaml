@@ -93,14 +93,6 @@ events:
   num_consumers: 0
   username: ""
   password: ""
-stat_cache:
-  store: memory
-  nodes:
-  - 127.0.0.1:9233
-  database: ocis
-  ttl: 5m0s
-  size: 0
-  disable_persistence: false
 filemetadata_cache:
   store: memory
   nodes:
@@ -109,6 +101,8 @@ filemetadata_cache:
   ttl: 24m0s
   size: 0
   disable_persistence: false
+  username: ""
+  password: ""
 id_cache:
   store: memory
   nodes:
@@ -117,6 +111,8 @@ id_cache:
   ttl: 24m0s
   size: 0
   disable_persistence: false
+  username: ""
+  password: ""
 mount_id: ""
 expose_data_server: false
 readonly: false

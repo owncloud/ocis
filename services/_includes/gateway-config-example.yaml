@@ -34,13 +34,6 @@ disable_home_creation_on_login: true
 transfer_secret: ""
 transfer_expires: 86400
 cache:
-  statcachestore: noop
-  stat_cache_nodes:
-  - 127.0.0.1:9233
-  stat_cache_database: ocis
-  stat_cache_ttl: 5m0s
-  stat_cache_size: 0
-  stat_cache_disable_persistence: false
   provider_cache_store: noop
   provider_cache_nodes:
   - 127.0.0.1:9233
@@ -48,6 +41,8 @@ cache:
   provider_cache_ttl: 5m0s
   provider_cache_size: 0
   provider_cache_disable_persistence: false
+  provider_cache_auth_username: ""
+  provider_cache_auth_password: ""
   create_home_cache_store: memory
   create_home_cache_nodes:
   - 127.0.0.1:9233
@@ -55,6 +50,8 @@ cache:
   create_home_cache_ttl: 5m0s
   create_home_cache_size: 0
   create_home_cache_disable_persistence: false
+  create_home_cache_auth_username: ""
+  create_home_cache_auth_password: ""
 frontend_public_url: https://localhost:9200
 storage_registry:
   driver: spaces

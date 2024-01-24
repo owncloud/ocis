@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-24-10-02-23]
+[#deprecation-note-2024-01-24-10-19-13]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -300,6 +300,26 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_SYSTEM_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Username for the configured store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_SYSTEM_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Password for the configured store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`STORAGE_SYSTEM_DRIVER` +
 

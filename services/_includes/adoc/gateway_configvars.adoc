@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-24-10-02-23]
+[#deprecation-note-2024-01-24-10-19-13]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -252,55 +252,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Expiry for the gateway tokens.
 
-a|`OCIS_CACHE_STORE_NODES` +
-`GATEWAY_STAT_CACHE_STORE_NODES` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[127.0.0.1:9233] ++
-a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_DATABASE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ocis ++
-a| [subs=-attributes]
-The database name the configured store should use.
-
-a|`OCIS_CACHE_TTL` +
-`GATEWAY_STAT_CACHE_TTL` +
-
-a| [subs=-attributes]
-++Duration ++
-a| [subs=-attributes]
-++5m0s ++
-a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_SIZE` +
-`GATEWAY_STAT_CACHE_SIZE` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
-
-a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
-`GATEWAY_STAT_CACHE_DISABLE_PERSISTENCE` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Disables persistence of the stat cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
-
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_PROVIDER_CACHE_STORE` +
 
@@ -360,6 +311,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_PROVIDER_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_PROVIDER_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_CREATE_HOME_CACHE_STORE` +
 
@@ -418,6 +389,26 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables persistence of the create home cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
 
 a|`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL` +

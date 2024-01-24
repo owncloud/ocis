@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-24-10-02-23]
+[#deprecation-note-2024-01-24-10-19-13]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -564,6 +564,26 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 
 a|`FRONTEND_OCS_ENABLE_DENIALS` +
 

@@ -33,6 +33,8 @@ events:
   tls_insecure: false
   tls_root_ca_cert_path: ""
   enable_tls: false
+  auth_username: ""
+  auth_password: ""
 skip_user_groups_in_token: false
 user_sharing_driver: jsoncs3
 user_sharing_drivers:
