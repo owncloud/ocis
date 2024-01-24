@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
+	"strings"
 	"time"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
@@ -14,7 +16,12 @@ import (
 	"go-micro.dev/v4/util/cmd"
 )
 
-var _registryName = "nats-js-kv"
+var (
+	_registryName        = "nats-js-kv"
+	_registryAddressEnv  = "MICRO_REGISTRY_ADDRESS"
+	_registryUsernameEnv = "MICRO_REGISTRY_AUTH_USERNAME"
+	_registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
+)
 
 func init() {
 	cmd.DefaultRegistries[_registryName] = NewRegistry
@@ -127,18 +134,31 @@ func (n *storeregistry) String() string {
 
 func storeOptions(opts registry.Options) []store.Option {
 	storeoptions := []store.Option{
-		store.Nodes(opts.Addrs...),
 		store.Database("service-registry"),
 		store.Table("service-registry"),
+		natsjskv.DefaultMemory(),
 	}
+
+	addr := []string{"127.0.0.1:9233"}
+	if len(opts.Addrs) > 0 {
+		addr = opts.Addrs
+	} else if a := strings.Split(os.Getenv(_registryAddressEnv), ","); len(a) > 0 && a[0] != "" {
+		addr = a
+	}
+	storeoptions = append(storeoptions, store.Nodes(addr...))
+
+	natsOptions := nats.GetDefaultOptions()
+	natsOptions.Name = "nats-js-kv-registry"
+	natsOptions.User, natsOptions.Password = getAuth()
+	storeoptions = append(storeoptions, natsjskv.NatsOptions(natsOptions))
+
 	if so, ok := opts.Context.Value(storeOptionsKey{}).([]store.Option); ok {
 		storeoptions = append(storeoptions, so...)
 	}
-	natsOptions := nats.GetDefaultOptions()
-	natsOptions.Name = "nats-js-kv-registry"
-	if auth, ok := opts.Context.Value(authKey{}).([]string); ok {
-		natsOptions.User = auth[0]
-		natsOptions.Password = auth[1]
-	}
-	return append(storeoptions, natsjskv.NatsOptions(natsOptions))
+
+	return storeoptions
+}
+
+func getAuth() (string, string) {
+	return os.Getenv(_registryUsernameEnv), os.Getenv(_registryPasswordEnv)
 }

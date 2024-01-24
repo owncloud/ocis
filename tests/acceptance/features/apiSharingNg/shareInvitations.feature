@@ -23,6 +23,8 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
     And the JSON data of the response should match
       """
       {
@@ -89,13 +91,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation to group with different roles
@@ -115,6 +113,10 @@ Feature: Send a sharing invitations
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
+    And for user "Carol" the space Shares should contain these entries:
+      | <path> |
     And the JSON data of the response should match
       """
       {
@@ -181,13 +183,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation for a file to user with different permissions
@@ -265,7 +263,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -275,11 +272,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
@@ -461,7 +456,6 @@ Feature: Send a sharing invitations
     Examples:
       | permissionsAction  |
       | permissions/create |
-      | children/create    |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -471,11 +465,9 @@ Feature: Send a sharing invitations
       | versions/read      |
       | deleted/read       |
       | basic/read         |
-      | path/update        |
       | versions/update    |
       | deleted/update     |
       | permissions/update |
-      | standard/delete    |
       | permissions/delete |
       | deleted/delete     |
       | permissions/deny   |
@@ -667,13 +659,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation with expiration date to group with different roles
@@ -767,13 +755,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
   @issue-7962
   Scenario Outline: send share invitation to disabled user
@@ -854,13 +838,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to a deleted group with different roles
@@ -917,13 +897,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: send share invitation to deleted user
@@ -972,13 +948,9 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
 
 
   Scenario Outline: try to send sharing invitation to multiple groups
@@ -1039,8 +1011,6 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Co Owner         | folder        | FolderToShare  |
@@ -1104,10 +1074,121 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Viewer           | file          | /textfile1.txt |
       | File Editor      | file          | /textfile1.txt |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
+
+
+  Scenario Outline: send sharing invitation to non-existing group
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | nonExistentGroup   |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "generalException"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "itemNotFound: not found"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |
+
+
+  Scenario Outline: send sharing invitation to already shared group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "nameAlreadyExists"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^error creating share: error: already exists:.*$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Viewer           | file          | /textfile1.txt |
+      | File Editor      | file          | /textfile1.txt |
+      | Viewer           | folder        | FolderToShare  |
+      | Editor           | folder        | FolderToShare  |
+      | Uploader         | folder        | FolderToShare  |

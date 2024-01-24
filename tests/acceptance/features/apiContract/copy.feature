@@ -16,7 +16,9 @@ Feature: Copy test
   Scenario: check the COPY response headers
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
     And user "Alice" has created a folder "new" in space "new-space"
-    When user "Alice" copies file "testfile.txt" from space "new-space" to "/new/testfile.txt" inside space "new-space" using the WebDAV API
+    When user "Alice" copies file "testfile.txt" from space "new-space" to "/new/testfile.txt" inside space "new-space" with following headers using the WebDAV API
+      | header | value      |
+      | Origin | %base_url% |
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions
       | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/                       |

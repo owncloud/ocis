@@ -63,6 +63,8 @@ type Cache struct {
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h."`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured."`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false."`
+	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured."`
+	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured."`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether

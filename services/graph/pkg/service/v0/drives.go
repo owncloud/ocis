@@ -622,6 +622,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			logger.Debug().Interface("id", rid).Msg("could not update drive, invalid argument")
 			errorcode.NotAllowed.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
 			return
+		case cs3rpc.Code_CODE_UNIMPLEMENTED:
+			logger.Debug().Interface("id", rid).Msg("could not delete drive: delete not implemented for this type of drive")
+			errorcode.NotAllowed.Render(w, r, http.StatusMethodNotAllowed, "drive cannot be updated")
+			return
 		default:
 			logger.Debug().Interface("id", rid).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not update drive: grpc error")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "grpc error")
@@ -1192,6 +1196,10 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	case cs3rpc.Code_CODE_NOT_FOUND:
 		logger.Debug().Interface("id", rid).Msg("could not delete drive: drive not found")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+		return
+	case cs3rpc.Code_CODE_UNIMPLEMENTED:
+		logger.Debug().Interface("id", rid).Msg("could not delete drive: delete not implemented for this type of drive")
+		errorcode.NotAllowed.Render(w, r, http.StatusMethodNotAllowed, "drive cannot be deleted")
 		return
 	// don't expose internal error codes to the outside world
 	default:

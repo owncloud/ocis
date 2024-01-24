@@ -32,9 +32,9 @@ func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider
 	}
 
 	gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
-		ResourceId: ri.Id,
+		ResourceId: ri.GetId(),
 	})
-	if err != nil || gpRes.Status.Code != rpc.Code_CODE_OK {
+	if err != nil || gpRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return nil, err
 	}
 	return &provider.Reference{
@@ -43,7 +43,7 @@ func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider
 			SpaceId:   ref.GetResourceId().GetSpaceId(),
 			OpaqueId:  ref.GetResourceId().GetSpaceId(),
 		},
-		Path: utils.MakeRelativePath(gpRes.Path),
+		Path: utils.MakeRelativePath(gpRes.GetPath()),
 	}, nil
 }
 
@@ -56,7 +56,7 @@ func (ma matchArray) Swap(i, j int) {
 	ma[i], ma[j] = ma[j], ma[i]
 }
 func (ma matchArray) Less(i, j int) bool {
-	return ma[i].Score > ma[j].Score
+	return ma[i].GetScore() > ma[j].GetScore()
 }
 
 func logDocCount(engine engine.Engine, logger log.Logger) {
@@ -88,7 +88,7 @@ func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector 
 		logger.Error().Err(err).Msg("failed to stat the moved resource")
 		return nil, err
 	}
-	switch res.Status.Code {
+	switch res.GetStatus().GetCode() {
 	case rpc.Code_CODE_OK:
 		return res, nil
 	case rpc.Code_CODE_NOT_FOUND:
@@ -111,34 +111,34 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 	if isShared {
 		fmt.Fprintf(&b, "S")
 	}
-	if p.ListContainer &&
-		p.ListFileVersions &&
-		p.ListRecycle &&
-		p.Stat &&
-		p.GetPath &&
-		p.GetQuota &&
-		p.InitiateFileDownload {
+	if p.GetListContainer() &&
+		p.GetListFileVersions() &&
+		p.GetListRecycle() &&
+		p.GetStat() &&
+		p.GetGetPath() &&
+		p.GetGetQuota() &&
+		p.GetInitiateFileDownload() {
 		fmt.Fprintf(&b, "R")
 	}
 	if isMountpoint {
 		fmt.Fprintf(&b, "M")
 	}
-	if p.Delete {
+	if p.GetDelete() {
 		fmt.Fprintf(&b, "D")
 	}
-	if p.InitiateFileUpload &&
-		p.RestoreFileVersion &&
-		p.RestoreRecycleItem {
+	if p.GetInitiateFileUpload() &&
+		p.GetRestoreFileVersion() &&
+		p.GetRestoreRecycleItem() {
 		fmt.Fprintf(&b, "NV")
 		if !isDir {
 			fmt.Fprintf(&b, "W")
 		}
 	}
 	if isDir &&
-		p.ListContainer &&
-		p.Stat &&
-		p.CreateContainer &&
-		p.InitiateFileUpload {
+		p.GetListContainer() &&
+		p.GetStat() &&
+		p.GetCreateContainer() &&
+		p.GetInitiateFileUpload() {
 		fmt.Fprintf(&b, "CK")
 	}
 	return b.String()

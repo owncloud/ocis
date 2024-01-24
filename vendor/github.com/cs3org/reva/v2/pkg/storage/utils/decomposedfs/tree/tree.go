@@ -152,6 +152,11 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		if err := n.SetMtimeString(ctx, mtime); err != nil {
 			return errors.Wrap(err, "Decomposedfs: could not set mtime")
 		}
+	} else {
+		now := time.Now()
+		if err := n.SetMtime(ctx, &now); err != nil {
+			return errors.Wrap(err, "Decomposedfs: could not set mtime")
+		}
 	}
 	err = n.SetXattrsWithContext(ctx, attributes, true)
 	if err != nil {

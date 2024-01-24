@@ -702,10 +702,24 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}
 	}
 
-	md, err := s.storage.GetMD(ctx, req.Ref, []string{}, []string{"id"})
+	md, err := s.storage.GetMD(ctx, req.Ref, []string{}, []string{"id", "status"})
 	if err != nil {
 		return &provider.DeleteResponse{
 			Status: status.NewStatusFromErrType(ctx, "can't stat resource to delete", err),
+		}, nil
+	}
+
+	if utils.ReadPlainFromOpaque(md.GetOpaque(), "status") == "processing" {
+		return &provider.DeleteResponse{
+			Status: &rpc.Status{
+				Code:    rpc.Code_CODE_UNAVAILABLE,
+				Message: "file is processing",
+			},
+			Opaque: &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"status": {Decoder: "plain", Value: []byte("processing")},
+				},
+			},
 		}, nil
 	}
 

@@ -219,6 +219,9 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 
 // Load imports public shares and received shares from channels (e.g. during migration)
 func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPassword) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
@@ -414,6 +417,9 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 
 // GetPublicShare gets a public share either by ID or Token.
 func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.PublicShareReference, sign bool) (*link.PublicShare, error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	if ref.GetToken() != "" {
 		ps, pw, err := m.getByToken(ctx, ref.GetToken())
 		if err != nil {
@@ -427,9 +433,6 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 		}
 		return ps, nil
 	}
-
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
@@ -447,7 +450,7 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 
 		if ref.GetId().GetOpaqueId() == ps.Id.OpaqueId {
 			if publicshare.IsExpired(ps) {
-				if err := m.revokeExpiredPublicShare(ctx, &ps, u); err != nil {
+				if err := m.revokeExpiredPublicShare(ctx, &ps); err != nil {
 					return nil, err
 				}
 				return nil, errtypes.NotFound("no shares found by id:" + ref.GetId().String())
@@ -491,7 +494,7 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 		}
 
 		if publicshare.IsExpired(local.PublicShare) {
-			if err := m.revokeExpiredPublicShare(ctx, &local.PublicShare, u); err != nil {
+			if err := m.revokeExpiredPublicShare(ctx, &local.PublicShare); err != nil {
 				log.Error().Err(err).
 					Str("share_token", local.Token).
 					Msg("failed to revoke expired public share")
@@ -561,20 +564,18 @@ func (m *manager) cleanupExpiredShares() {
 		_ = utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps)
 
 		if publicshare.IsExpired(ps) {
-			_ = m.revokeExpiredPublicShare(context.Background(), &ps, nil)
+			_ = m.revokeExpiredPublicShare(context.Background(), &ps)
 		}
 	}
 }
 
-func (m *manager) revokeExpiredPublicShare(ctx context.Context, s *link.PublicShare, u *user.User) error {
+// revokeExpiredPublicShare doesn't have a lock inside, ensure a lock before call
+func (m *manager) revokeExpiredPublicShare(ctx context.Context, s *link.PublicShare) error {
 	if !m.enableExpiredSharesCleanup {
 		return nil
 	}
 
-	m.mutex.Unlock()
-	defer m.mutex.Lock()
-
-	err := m.RevokePublicShare(ctx, u, &link.PublicShareReference{
+	err := m.revokePublicShare(ctx, &link.PublicShareReference{
 		Spec: &link.PublicShareReference_Id{
 			Id: &link.PublicShareId{
 				OpaqueId: s.Id.OpaqueId,
@@ -590,13 +591,18 @@ func (m *manager) revokeExpiredPublicShare(ctx context.Context, s *link.PublicSh
 }
 
 // RevokePublicShare undocumented.
-func (m *manager) RevokePublicShare(ctx context.Context, u *user.User, ref *link.PublicShareReference) error {
+func (m *manager) RevokePublicShare(ctx context.Context, _ *user.User, ref *link.PublicShareReference) error {
 	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.revokePublicShare(ctx, ref)
+}
+
+// revokePublicShare doesn't have a lock inside, ensure a lock before call
+func (m *manager) revokePublicShare(ctx context.Context, ref *link.PublicShareReference) error {
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
 	}
-	m.mutex.Unlock()
 
 	switch {
 	case ref.GetId() != nil && ref.GetId().OpaqueId != "":
@@ -615,19 +621,15 @@ func (m *manager) RevokePublicShare(ctx context.Context, u *user.User, ref *link
 		return errors.New("reference does not exist")
 	}
 
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
 	return m.persistence.Write(ctx, db)
 }
 
+// getByToken doesn't have a lock inside, ensure a lock before call
 func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicShare, string, error) {
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return nil, "", err
 	}
-
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
 
 	for _, v := range db {
 		var local link.PublicShare
@@ -646,13 +648,13 @@ func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicSha
 
 // GetPublicShareByToken gets a public share by its opaque token.
 func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth *link.PublicShareAuthentication, sign bool) (*link.PublicShare, error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
 
 	for _, v := range db {
 		passDB := v.(map[string]interface{})["password"].(string)
@@ -663,8 +665,7 @@ func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 
 		if local.Token == token {
 			if publicshare.IsExpired(local) {
-				// TODO user is not needed at all in this API.
-				if err := m.revokeExpiredPublicShare(ctx, &local, nil); err != nil {
+				if err := m.revokeExpiredPublicShare(ctx, &local); err != nil {
 					return nil, err
 				}
 				break

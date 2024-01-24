@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -41,7 +42,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
-// From https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
 // CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
 // An upload session allows your app to upload ranges of the file in sequential API requests, which allows the
 // transfer to be resumed if a connection is dropped while the upload is in progress.
@@ -55,6 +55,7 @@ import (
 //	}
 //
 // ```
+// From https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
 func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling CreateUploadSession")
 
@@ -68,7 +69,7 @@ func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
 		errorcode.RenderError(w, r, err)
 		return
 	}
-	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+	if driveID.GetStorageId() != driveItemID.GetStorageId() || driveID.GetSpaceId() != driveItemID.GetSpaceId() {
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
 		return
 	}
@@ -101,27 +102,27 @@ func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_OK:
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_OK:
 		// ok
-	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
-		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
 	default:
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.GetStatus().GetMessage())
 		return
 	}
 	uploadSession := uploadSession{
-		CS3Protocols: res.Protocols,
+		CS3Protocols: res.GetProtocols(),
 	}
-	for _, p := range res.Protocols {
-		if p.Protocol == "simple" {
-			uploadSession.UploadUrl = p.UploadEndpoint + "/" + p.Token
+	for _, p := range res.GetProtocols() {
+		if p.GetProtocol() == "simple" {
+			uploadSession.UploadURL = p.GetUploadEndpoint() + "/" + p.GetToken()
 		}
 	}
 	render.Status(r, http.StatusOK)
@@ -129,18 +130,18 @@ func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
 }
 
 type createUploadSessionRequest struct {
-	DeferCommit bool
-	Item        driveItemUploadableProperties
+	DeferCommit bool                          `json:"deferCommit"`
+	Item        driveItemUploadableProperties `json:"item"`
 }
 type driveItemUploadableProperties struct {
 	// ConflictBehavior "@microsoft.graph.conflictBehavior"
 	//Description string
-	FileSize int64
+	FileSize int64 `json:"fileSize"`
 	// fileSystemInfo
-	Name string
+	Name string `json:"name"`
 }
 type uploadSession struct {
-	UploadUrl string
+	UploadURL string
 	//"expirationDateTime": "2015-01-29T09:21:55.523Z",
 	//"nextExpectedRanges": ["0-"]
 	CS3Protocols []*gateway.FileUploadProtocol
@@ -161,7 +162,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	currentUser := revactx.ContextMustGetUser(r.Context())
 	// do we need to list all or only the personal drive
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
-	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().OpaqueId))
+	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().GetOpaqueId()))
 	filters = append(filters, listStorageSpacesTypeFilter("personal"))
 
 	res, err := gatewayClient.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
@@ -172,47 +173,47 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		g.logger.Error().Err(err).Msg("error making ListStorageSpaces grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		if res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage())
 			return
 		}
 		g.logger.Error().Err(err).Msg("error sending ListStorageSpaces grpc request")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.GetStatus().GetMessage())
 		return
 	}
 
 	var space *storageprovider.StorageSpace
-	for _, s := range res.StorageSpaces {
+	for _, s := range res.GetStorageSpaces() {
 		if utils.UserIDEqual(currentUser.GetId(), s.GetOwner().GetId()) {
 			space = s
 		}
 	}
 
 	lRes, err := gatewayClient.ListContainer(ctx, &storageprovider.ListContainerRequest{
-		Ref: &storageprovider.Reference{ResourceId: space.Root},
+		Ref: &storageprovider.Reference{ResourceId: space.GetRoot()},
 	})
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error making ListContainer grpc call")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case lRes.Status.Code != cs3rpc.Code_CODE_OK:
-		if lRes.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, lRes.Status.Message)
+	case lRes.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		if lRes.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, lRes.GetStatus().GetMessage())
 			return
 		}
-		if lRes.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
+		if lRes.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED {
 			// TODO check if we should return 404 to not disclose existing items
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, lRes.Status.Message)
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, lRes.GetStatus().GetMessage())
 			return
 		}
 		g.logger.Error().Err(err).Msg("error sending list container grpc request")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.GetStatus().GetMessage())
 		return
 	}
 
-	files, err := formatDriveItems(g.logger, lRes.Infos)
+	files, err := formatDriveItems(g.logger, lRes.GetInfos())
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -238,7 +239,7 @@ func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
 		errorcode.RenderError(w, r, err)
 		return
 	}
-	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+	if driveID.GetStorageId() != driveItemID.GetStorageId() || driveID.GetSpaceId() != driveItemID.GetSpaceId() {
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
 		return
 	}
@@ -262,22 +263,22 @@ func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_OK:
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_OK:
 		// ok
-	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
-		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
 	default:
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.GetStatus().GetMessage())
 		return
 	}
-	driveItem, err := cs3ResourceToDriveItem(g.logger, res.Info)
+	driveItem, err := cs3ResourceToDriveItem(g.logger, res.GetInfo())
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
@@ -302,7 +303,7 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 		errorcode.RenderError(w, r, err)
 		return
 	}
-	if driveID.StorageId != driveItemID.StorageId || driveID.SpaceId != driveItemID.SpaceId {
+	if driveID.GetStorageId() != driveItemID.GetStorageId() || driveID.GetSpaceId() != driveItemID.GetSpaceId() {
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Item does not exist")
 		return
 	}
@@ -329,23 +330,23 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_OK:
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_OK:
 		// ok
-	case res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage())
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED:
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
-	case res.Status.Code == cs3rpc.Code_CODE_UNAUTHENTICATED:
-		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.Status.Message) // do not leak existence? check what graph does
+	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNAUTHENTICATED:
+		errorcode.Unauthenticated.Render(w, r, http.StatusUnauthorized, res.GetStatus().GetMessage()) // do not leak existence? check what graph does
 		return
 	default:
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.GetStatus().GetMessage())
 		return
 	}
 
-	files, err := formatDriveItems(g.logger, res.Infos)
+	files, err := formatDriveItems(g.logger, res.GetInfos())
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
@@ -372,9 +373,14 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
 	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse)
+		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
 		errCode.Render(w, r)
 		return
+	}
+
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		condition = unifiedrole.UnifiedRoleConditionOwner
 	}
 
 	permissionSet := *statResponse.GetInfo().GetPermissionSet()
@@ -385,7 +391,7 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
 			unifiedrole.GetApplicableRoleDefinitionsForActions(
 				allowedActions,
-				unifiedrole.UnifiedRoleConditionGrantee,
+				condition,
 				g.config.FilesSharing.EnableResharing,
 				false,
 			),
@@ -451,28 +457,39 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
+		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
+		errCode.Render(w, r)
+		return
+	}
+
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		condition = unifiedrole.UnifiedRoleConditionOwner
+	}
+
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: driveItemInvite.LibreGraphPermissionsActions}}
-	for _, roleId := range driveItemInvite.GetRoles() {
-		role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
+	for _, roleID := range driveItemInvite.GetRoles() {
+		role, err := unifiedrole.NewUnifiedRoleFromID(roleID, g.config.FilesSharing.EnableResharing)
 		if err != nil {
 			g.logger.Debug().Err(err).Interface("role", driveItemInvite.GetRoles()[0]).Msg("unable to convert requested role")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			return
 		}
 
-		unifiedRolePermissions = append(unifiedRolePermissions, conversions.ToPointerSlice(role.GetRolePermissions())...)
-	}
+		allowedResourceActions := unifiedrole.GetAllowedResourceActions(role, condition)
+		if len(allowedResourceActions) == 0 {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "role not applicable to this resource")
+			return
+		}
 
-	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse)
-		errCode.Render(w, r)
-		return
+		unifiedRolePermissions = append(unifiedRolePermissions, conversions.ToPointerSlice(role.GetRolePermissions())...)
 	}
 
 	driveRecipient := driveItemInvite.GetRecipients()[0]
 
-	objectId := driveRecipient.GetObjectId()
+	objectID := driveRecipient.GetObjectId()
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	createShareRequest := &collaboration.CreateShareRequest{
@@ -485,7 +502,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, unifiedrole.UnifiedRoleConditionGrantee, g.config.FilesSharing.EnableResharing); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition, g.config.FilesSharing.EnableResharing); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
@@ -495,9 +512,9 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 
 	switch driveRecipient.GetLibreGraphRecipientType() {
 	case "group":
-		group, err := g.identityCache.GetGroup(ctx, objectId)
+		group, err := g.identityCache.GetGroup(ctx, objectID)
 		if err != nil {
-			g.logger.Debug().Err(err).Interface("groupId", objectId).Msg("failed group lookup")
+			g.logger.Debug().Err(err).Interface("groupId", objectID).Msg("failed group lookup")
 			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -514,9 +531,9 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 	default:
-		user, err := g.identityCache.GetUser(ctx, objectId)
+		user, err := g.identityCache.GetUser(ctx, objectID)
 		if err != nil {
-			g.logger.Debug().Err(err).Interface("userId", objectId).Msg("failed user lookup")
+			g.logger.Debug().Err(err).Interface("userId", objectID).Msg("failed user lookup")
 			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -588,7 +605,7 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oldPermission, sharedResourceId, err := g.getPermissionByID(ctx, permissionID)
+	oldPermission, sharedResourceID, err := g.getPermissionByID(ctx, permissionID)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -596,7 +613,7 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(sharedResourceId, &itemID) {
+	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
 		g.logger.Debug().Msg("resourceID of shared does not match itemID")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
 		return
@@ -615,14 +632,13 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// This is a user share
-	updatedPermission, err := g.updateUserShare(ctx, permissionID, oldPermission, permission)
+	updatedPermission, err := g.updateUserShare(ctx, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &updatedPermission)
-	return
 }
 
 // DeletePermission removes a Permission from a Drive item
@@ -643,13 +659,13 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	isUserPermission := true
 
-	// Check if the id is refering to a User Share
-	sharedResourceId, err := g.getUserPermissionResourceID(ctx, permissionID)
+	// Check if the id is referring to a User Share
+	sharedResourceID, err := g.getUserPermissionResourceID(ctx, permissionID)
 	var errcode errorcode.Error
 	if err != nil && errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
 		// there is no user share with that ID, so lets check if it is referring to a public link
 		isUserPermission = false
-		sharedResourceId, err = g.getLinkPermissionResourceID(ctx, permissionID)
+		sharedResourceID, err = g.getLinkPermissionResourceID(ctx, permissionID)
 	}
 
 	if err != nil {
@@ -659,7 +675,7 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(sharedResourceId, &itemID) {
+	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
 		g.logger.Debug().Msg("resourceID of shared does not match itemID")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
 		return
@@ -679,7 +695,6 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 
-	return
 }
 
 func (g Graph) getPermissionByID(ctx context.Context, permissionID string) (*libregraph.Permission, *storageprovider.ResourceId, error) {
@@ -741,7 +756,7 @@ func (g Graph) getCS3UserShareByID(ctx context.Context, permissionID string) (*c
 	return getShareResp.GetShare(), nil
 }
 
-func (g Graph) updateUserShare(ctx context.Context, permissionID string, oldPermission, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
+func (g Graph) updateUserShare(ctx context.Context, permissionID string, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
@@ -765,8 +780,8 @@ func (g Graph) updateUserShare(ctx context.Context, permissionID string, oldPerm
 	var roles, allowedResourceActions []string
 	var permissionsUpdated, ok bool
 	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
-		for _, roleId := range roles {
-			role, err := unifiedrole.NewUnifiedRoleFromID(roleId, g.config.FilesSharing.EnableResharing)
+		for _, roleID := range roles {
+			role, err := unifiedrole.NewUnifiedRoleFromID(roleID, g.config.FilesSharing.EnableResharing)
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
 				return nil, err
@@ -906,11 +921,11 @@ func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) 
 	if err != nil {
 		return nil, err
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		refStr, _ := storagespace.FormatReference(&ref)
-		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.Status.Message)
+		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.GetStatus().GetMessage())
 	}
-	return cs3ResourceToDriveItem(g.logger, res.Info)
+	return cs3ResourceToDriveItem(g.logger, res.GetInfo())
 }
 
 func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
@@ -926,12 +941,12 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 	if err != nil {
 		return nil, err
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		// Only log this, there could be mountpoints which have no grant
-		g.logger.Debug().Msg(res.Status.Message)
+		g.logger.Debug().Msg(res.GetStatus().GetMessage())
 		return nil, errors.New("could not fetch grant resource for the mountpoint")
 	}
-	item, err := cs3ResourceToRemoteItem(res.Info)
+	item, err := cs3ResourceToRemoteItem(res.GetInfo())
 	if err != nil {
 		return nil, err
 	}
@@ -965,46 +980,46 @@ func formatDriveItems(logger *log.Logger, mds []*storageprovider.ResourceInfo) (
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
-	return time.Unix(int64(t.Seconds), int64(t.Nanos))
+	return time.Unix(int64(t.GetSeconds()), int64(t.GetNanos()))
 }
 
 func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 	size := new(int64)
-	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
+	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.Id)),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.GetId())),
 		Size: size,
 	}
 
-	if name := path.Base(res.Path); name != "" {
+	if name := path.Base(res.GetPath()); name != "" {
 		driveItem.Name = &name
 	}
-	if res.Etag != "" {
+	if res.GetEtag() != "" {
 		driveItem.ETag = &res.Etag
 	}
-	if res.Mtime != nil {
-		lastModified := cs3TimestampToTime(res.Mtime)
+	if res.GetMtime() != nil {
+		lastModified := cs3TimestampToTime(res.GetMtime())
 		driveItem.LastModifiedDateTime = &lastModified
 	}
-	if res.ParentId != nil {
+	if res.GetParentId() != nil {
 		parentRef := libregraph.NewItemReference()
-		parentRef.SetDriveType(res.Space.SpaceType)
-		parentRef.SetDriveId(storagespace.FormatStorageID(res.ParentId.StorageId, res.ParentId.SpaceId))
-		parentRef.SetId(storagespace.FormatResourceID(*res.ParentId))
+		parentRef.SetDriveType(res.GetSpace().GetSpaceType())
+		parentRef.SetDriveId(storagespace.FormatStorageID(res.GetParentId().GetStorageId(), res.GetParentId().GetSpaceId()))
+		parentRef.SetId(storagespace.FormatResourceID(*res.GetParentId()))
 		driveItem.ParentReference = parentRef
 	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
+	if res.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.GetMimeType() != "" {
 		// We cannot use a libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 		driveItem.File = &libregraph.OpenGraphFile{
 			MimeType: &res.MimeType,
 		}
 	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
+	if res.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		driveItem.Folder = &libregraph.Folder{}
 	}
 
-	if res.ArbitraryMetadata != nil {
+	if res.GetArbitraryMetadata() != nil {
 		driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
 		driveItem.Location = cs3ResourceToDriveItemLocationFacet(logger, res)
 	}
@@ -1013,11 +1028,11 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 }
 
 func cs3ResourceToDriveItemAudioFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.Audio {
-	if !strings.HasPrefix(res.MimeType, "audio/") {
+	if !strings.HasPrefix(res.GetMimeType(), "audio/") {
 		return nil
 	}
 
-	k := res.ArbitraryMetadata.Metadata
+	k := res.GetArbitraryMetadata().GetMetadata()
 	if k == nil {
 		return nil
 	}
@@ -1031,7 +1046,7 @@ func cs3ResourceToDriveItemAudioFacet(logger *log.Logger, res *storageprovider.R
 }
 
 func cs3ResourceToDriveItemLocationFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.GeoCoordinates {
-	k := res.ArbitraryMetadata.Metadata
+	k := res.GetArbitraryMetadata().GetMetadata()
 	if k == nil {
 		return nil
 	}
@@ -1099,30 +1114,30 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 
 func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.RemoteItem, error) {
 	size := new(int64)
-	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
+	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	remoteItem := &libregraph.RemoteItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.Id)),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.GetId())),
 		Size: size,
 	}
 
 	if res.GetPath() != "" {
 		remoteItem.Path = libregraph.PtrString(path.Clean(res.GetPath()))
 	}
-	if res.Etag != "" {
+	if res.GetEtag() != "" {
 		remoteItem.ETag = &res.Etag
 	}
-	if res.Mtime != nil {
-		lastModified := cs3TimestampToTime(res.Mtime)
+	if res.GetMtime() != nil {
+		lastModified := cs3TimestampToTime(res.GetMtime())
 		remoteItem.LastModifiedDateTime = &lastModified
 	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
+	if res.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.GetMimeType() != "" {
 		// We cannot use a libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 		remoteItem.File = &libregraph.OpenGraphFile{
 			MimeType: &res.MimeType,
 		}
 	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
+	if res.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		remoteItem.Folder = &libregraph.Folder{}
 	}
 	if res.GetSpace() != nil && res.GetSpace().GetRoot() != nil {
@@ -1145,10 +1160,10 @@ func (g Graph) getPathForResource(ctx context.Context, id storageprovider.Resour
 	if err != nil {
 		return "", err
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return "", fmt.Errorf("could not stat %v: %s", id, res.Status.Message)
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return "", fmt.Errorf("could not stat %v: %s", id, res.GetStatus().GetMessage())
 	}
-	return res.Path, err
+	return res.GetPath(), err
 }
 
 // getSpecialDriveItems reads properties from the opaque and transforms them into driveItems
@@ -1156,20 +1171,20 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	if space.GetRoot().GetStorageId() == utils.ShareStorageProviderID {
 		return nil // no point in stating the ShareStorageProvider
 	}
-	if space.Opaque == nil {
+	if space.GetOpaque() == nil {
 		return nil
 	}
 
-	imageNode := utils.ReadPlainFromOpaque(space.Opaque, SpaceImageSpecialFolderName)
-	readmeNode := utils.ReadPlainFromOpaque(space.Opaque, ReadmeSpecialFolderName)
+	imageNode := utils.ReadPlainFromOpaque(space.GetOpaque(), SpaceImageSpecialFolderName)
+	readmeNode := utils.ReadPlainFromOpaque(space.GetOpaque(), ReadmeSpecialFolderName)
 
-	cachekey := spaceRootStatKey(space.Root, imageNode, readmeNode)
+	cachekey := spaceRootStatKey(space.GetRoot(), imageNode, readmeNode)
 	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
 	if entry := g.specialDriveItemsCache.Get(cachekey); entry != nil {
 		if cached, ok := entry.Value().(specialDriveItemEntry); ok {
-			if cached.rootMtime != nil && space.Mtime != nil {
+			if cached.rootMtime != nil && space.GetMtime() != nil {
 				// beware, LaterTS does not handle equalness. it returns t1 if t1 > t2, else t2, so a >= check looks like this
-				if utils.LaterTS(space.Mtime, cached.rootMtime) == cached.rootMtime {
+				if utils.LaterTS(space.GetMtime(), cached.rootMtime) == cached.rootMtime {
 					return cached.specialDriveItems
 				}
 			}
@@ -1184,7 +1199,7 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	// cache properties
 	spacePropertiesEntry := specialDriveItemEntry{
 		specialDriveItems: spaceItems,
-		rootMtime:         space.Mtime,
+		rootMtime:         space.GetMtime(),
 	}
 	g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
 
@@ -1222,7 +1237,7 @@ func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode stri
 	_, _ = shakeHash.Write([]byte(readmeNode))
 	h := make([]byte, 64)
 	_, _ = shakeHash.Read(h)
-	return fmt.Sprintf("%x", h)
+	return hex.EncodeToString(h)
 }
 
 type specialDriveItemEntry struct {
@@ -1244,10 +1259,10 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Refe
 		g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
 		return nil
 	}
-	itemPath := ref.Path
+	itemPath := ref.GetPath()
 	if itemPath == "" {
 		// lookup by id
-		itemPath, err = g.getPathForResource(ctx, *ref.ResourceId)
+		itemPath, err = g.getPathForResource(ctx, *ref.GetResourceId())
 		if err != nil {
 			g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
 			return nil
@@ -1255,7 +1270,7 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Refe
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
 	webdavURL := *baseURL
-	webdavURL.Path = path.Join(webdavURL.Path, space.Id.OpaqueId, itemPath)
+	webdavURL.Path = path.Join(webdavURL.Path, space.GetId().GetOpaqueId(), itemPath)
 	spaceItem.WebDavUrl = libregraph.PtrString(webdavURL.String())
 
 	return spaceItem

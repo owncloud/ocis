@@ -232,7 +232,7 @@ type MatchValueData struct {
 }
 
 // CS3Share2ShareData converts a cs3api user share into shareData data model
-func CS3Share2ShareData(ctx context.Context, share *collaboration.Share) (*ShareData, error) {
+func CS3Share2ShareData(ctx context.Context, share *collaboration.Share) *ShareData {
 	sd := &ShareData{
 		// share.permissions are mapped below
 		// Displaynames are added later
@@ -269,7 +269,7 @@ func CS3Share2ShareData(ctx context.Context, share *collaboration.Share) (*Share
 		sd.Expiration = expiration.Format(_iso8601)
 	}
 
-	return sd, nil
+	return sd
 }
 
 // PublicShare2ShareData converts a cs3api public share into shareData data model

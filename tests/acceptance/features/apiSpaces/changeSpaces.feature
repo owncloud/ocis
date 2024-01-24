@@ -205,8 +205,10 @@ Feature: Change data of space
                     "mimeType"
                   ],
                   "properties": {
-                    "type": "string",
-                    "enum": ["text/markdown"]
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/markdown"]
+                    }
                   }
                 },
                 "id": {
@@ -298,8 +300,10 @@ Feature: Change data of space
                     "mimeType"
                   ],
                   "properties": {
-                    "type": "string",
-                    "enum": ["<mimeType>"]
+                   "mimeType": {
+                      "type": "string",
+                      "enum": ["<mimeType>"]
+                    }
                   }
                 },
                 "id": {
@@ -393,8 +397,10 @@ Feature: Change data of space
                     "mimeType"
                   ],
                   "properties": {
-                    "type": "string",
-                    "enum": ["text/markdown"]
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/markdown"]
+                    }
                   }
                 },
                 "id": {
@@ -479,8 +485,10 @@ Feature: Change data of space
                     "mimeType"
                   ],
                   "properties": {
-                    "type": "string",
-                    "enum": ["image/png"]
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["image/png"]
+                    }
                   }
                 },
                 "id": {

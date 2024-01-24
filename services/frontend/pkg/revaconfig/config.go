@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -25,14 +24,10 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 	webURL.Path = path.Join(webURL.Path, "external")
 	webOpenInAppURL := webURL.String()
 
-	var bannedPasswordsList map[string]struct{}
-	if cfg.PasswordPolicy.BannedPasswordsList != "" {
-		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
-		if err != nil {
-			err = fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
-			logger.Err(err).Send()
-			return nil, err
-		}
+	passwordPolicyCfg, err := passwordPolicyConfig(cfg)
+	if err != nil {
+		logger.Err(err).Send()
+		return nil, err
 	}
 
 	archivers := []map[string]interface{}{
@@ -164,9 +159,11 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						"cache_nodes":               cfg.OCS.StatCacheNodes,
 						"cache_database":            cfg.OCS.StatCacheDatabase,
 						"cache_table":               cfg.OCS.StatCacheTable,
-						"cache_ttl":                 cfg.OCS.StatCacheTTL / time.Second,
+						"cache_ttl":                 cfg.OCS.StatCacheTTL,
 						"cache_size":                cfg.OCS.StatCacheSize,
 						"cache_disable_persistence": cfg.OCS.StatCacheDisablePersistence,
+						"cache_auth_username":       cfg.OCS.StatCacheAuthUsername,
+						"cache_auth_password":       cfg.OCS.StatCacheAuthPassword,
 					},
 					"prefix":                    cfg.OCS.Prefix,
 					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
@@ -327,16 +324,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									},
 								},
 							},
-							"password_policy": map[string]interface{}{
-								"max_characters":           72,
-								"disabled":                 cfg.PasswordPolicy.Disabled,
-								"min_characters":           cfg.PasswordPolicy.MinCharacters,
-								"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
-								"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
-								"min_digits":               cfg.PasswordPolicy.MinDigits,
-								"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
-								"banned_passwords_list":    bannedPasswordsList,
-							},
+							"password_policy": passwordPolicyCfg,
 							"notifications": map[string]interface{}{
 								"endpoints": []string{"list", "get", "delete"},
 							},
@@ -384,4 +372,31 @@ func fileExists(path string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func passwordPolicyConfig(cfg *config.Config) (map[string]interface{}, error) {
+	_maxCharacters := 72
+	if cfg.PasswordPolicy.Disabled {
+		return map[string]interface{}{
+			"max_characters":        _maxCharacters,
+			"banned_passwords_list": nil,
+		}, nil
+	}
+	var bannedPasswordsList map[string]struct{}
+	var err error
+	if cfg.PasswordPolicy.BannedPasswordsList != "" {
+		bannedPasswordsList, err = readMultilineFile(cfg.PasswordPolicy.BannedPasswordsList)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load the banned passwords from a file %s: %w", cfg.PasswordPolicy.BannedPasswordsList, err)
+		}
+	}
+	return map[string]interface{}{
+		"max_characters":           _maxCharacters,
+		"min_digits":               cfg.PasswordPolicy.MinDigits,
+		"min_characters":           cfg.PasswordPolicy.MinCharacters,
+		"min_lowercase_characters": cfg.PasswordPolicy.MinLowerCaseCharacters,
+		"min_uppercase_characters": cfg.PasswordPolicy.MinUpperCaseCharacters,
+		"min_special_characters":   cfg.PasswordPolicy.MinSpecialCharacters,
+		"banned_passwords_list":    bannedPasswordsList,
+	}, nil
 }

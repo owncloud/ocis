@@ -418,3 +418,31 @@ Feature: dav-versions
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\Forbidden"
+
+  @issue-enterprise-6249
+  Scenario: upload empty content file and check versions after multiple restores
+    Given user "Alice" has uploaded file with content "" to "textfile.txt"
+    And user "Alice" has uploaded file with content "test content" to "textfile.txt"
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" element
+    When user "Alice" restores version index "1" of file "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "textfile.txt" for user "Alice" should be ""
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" elements
+    When user "Alice" restores version index "1" of file "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "textfile.txt" for user "Alice" should be "test content"
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" elements
+
+
+  Scenario: update with empty content and check versions after multiple restores
+    Given user "Alice" has uploaded file with content "test content" to "textfile.txt"
+    And user "Alice" has uploaded file with content "" to "textfile.txt"
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" element
+    When user "Alice" restores version index "1" of file "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "textfile.txt" for user "Alice" should be "test content"
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" elements
+    When user "Alice" restores version index "1" of file "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "textfile.txt" for user "Alice" should be ""
+    And the version folder of file "textfile.txt" for user "Alice" should contain "1" elements

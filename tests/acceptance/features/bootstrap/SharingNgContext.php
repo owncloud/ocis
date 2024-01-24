@@ -23,7 +23,9 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
+use TestHelpers\WebDavHelper;
 use Behat\Gherkin\Node\TableNode;
+use PHPUnit\Framework\Assert;
 
 require_once 'bootstrap.php';
 
@@ -139,9 +141,20 @@ class SharingNgContext implements Context {
 		$rows = $table->getRowsHash();
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
 
-		$itemId = ($rows['resourceType'] === 'folder')
-			? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
-			: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
+		// for resharing a resource, "item-id" in API endpoint takes shareMountId
+		if ($rows['space'] === 'Shares') {
+			$itemId = GraphHelper::getShareMountId(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$rows['resource']
+			);
+		} else {
+			$itemId = ($rows['resourceType'] === 'folder')
+				? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
+				: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
+		}
 
 		$sharees = array_map('trim', explode(',', $rows['sharee']));
 		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
@@ -149,9 +162,10 @@ class SharingNgContext implements Context {
 		$shareeIds = [];
 		foreach ($sharees as $index => $sharee) {
 			$shareType = $shareTypes[$index];
-			$shareeIds[] = ($shareType === 'user')
+			// for non-exiting group or user, generate random id
+			$shareeIds[] = (($shareType === 'user')
 				? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
-				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id')) ?: WebDavHelper::generateUUIDv4();
 		}
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
@@ -423,5 +437,35 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->removeSharePermission($sharer, 'link', $resourceType, $resource, $space)
 		);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the space Shares should (not|)\s?contain these (files|entries):$/
+	 *
+	 * @param string $user
+	 * @param string $shouldOrNot
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function forUserTheSpaceSharesShouldContainTheseEntries(string $user, string $shouldOrNot, TableNode $table): void {
+		$should = $shouldOrNot !== 'not';
+		$rows = $table->getRows();
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$contents = \json_decode($response->getBody()->getContents(), true);
+
+		$fileFound = empty(array_diff(array_map(fn ($row) => trim($row[0], '/'), $rows), array_column($contents['value'], 'name')));
+
+		$assertMessage = $should
+			? "Response does not contain the entry."
+			: "Response does contain the entry but should not.";
+
+		Assert::assertSame($should, $fileFound, $assertMessage);
 	}
 }

@@ -153,7 +153,7 @@ func NewCoownerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
+				Condition:              proto.String(UnifiedRoleConditionOwner),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -185,10 +185,6 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		Description: proto.String("Grants manager permissions on a resource. Semantically equivalent to co-owner"),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
-			},
 			{
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionOwner),
