@@ -59,7 +59,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
-* Enhancement - Update reva to latest edge version: [#8264](https://github.com/owncloud/ocis/pull/8264)
+* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
 
 ## Details
 
@@ -210,10 +210,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8152
    https://github.com/cs3org/reva/pull/4453
 
-* Enhancement - Update reva to latest edge version: [#8264](https://github.com/owncloud/ocis/pull/8264)
+* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
 
    We update reva to the latest edge version to get the latest fixes and features.
 
+   https://github.com/owncloud/ocis/pull/8278
    https://github.com/owncloud/ocis/pull/8264
    https://github.com/owncloud/ocis/pull/8100
 
