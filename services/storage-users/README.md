@@ -36,10 +36,13 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 Example cases for expired uploads
 
-*   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
+*   In the final step the upload blob is moved from the upload area to the final blobstore (e.g. S3). 
+
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
-There are two commands available to manage unfinished uploads
+The admin can restart the postprocessing for this with the postprocessing cli.
+
+The storage users service can only list and clean upload sessions:
 
 ```bash
 ocis storage-users uploads <command>
@@ -47,21 +50,23 @@ ocis storage-users uploads <command>
 
 ```plaintext
 COMMANDS:
-   list     Print a list of all incomplete uploads
-   clean    Clean up leftovers from expired uploads
+   sessions   Print a list of upload sessions
+   clean      Clean up leftovers from expired uploads
+   list       Print a list of all incomplete uploads (deprecated)
 ```
 
 #### Command Examples
 
-Command to identify incomplete uploads
+Command to list ongoing upload sessions
 
 ```bash
-ocis storage-users uploads list
+ocis storage-users sessions --expired=false
 ```
 
 ```plaintext
-Incomplete uploads:
- - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
+Expired sessions:
+ - b921cccc-bf52-478c-aba0-7d213c4cd3a0 (Space: 068ca28f-5c2c-42c3-87ff-f3e1e94dd429, Name: file.txt, Size: 2/3, Expires: 2024-01-23 14:07:05 +0100 CET, Processing: false)
+ - 4c510ada-c86b-4815-8820-42cdf82c3d51 (Space: 074f9e32-63f0-48e7-bef6-75a37096b2db, Name: logs_cs3org_reva_3695_14_6.log, Size: 275672/275672, Expires: 2023-12-19 11:43:16 +0100 CET, Processing: true)
 ```
 
 Command to clear expired uploads
@@ -72,6 +77,17 @@ ocis storage-users uploads clean
 ```plaintext
 Cleaned uploads:
 - 455bd640-cd08-46e8-a5a0-9304908bd40a (Filename: file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
+```
+
+Deprecated list command to identify unfinished uploads
+
+```bash
+ocis storage-users uploads list
+```
+
+```plaintext
+Incomplete uploads:
+ - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
 ```
 
 ### Purge Expired Space Trash-Bins Items

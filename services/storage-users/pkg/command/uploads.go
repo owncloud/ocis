@@ -210,7 +210,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 	}
 }
 
-// PurgeExpiredUploads is the entry point for the server command.
+// PurgeExpiredUploads is the entry point for the clean command
 func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "clean",
