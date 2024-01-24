@@ -137,6 +137,8 @@ type OCS struct {
 	StatCacheTTL                time.Duration `yaml:"stat_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_STAT_CACHE_TTL" desc:"Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
 	StatCacheSize               int           `yaml:"stat_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_STAT_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
 	StatCacheDisablePersistence bool          `yaml:"stat_cache_disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE" desc:"Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false."`
+	StatCacheAuthUsername       string        `yaml:"stat_cache_auth_username" env:"OCIS_CACHE_AUTH_USERNAME;FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when using the 'nats-js-kv' store type."`
+	StatCacheAuthPassword       string        `yaml:"stat_cache_auth_password" env:"OCIS_CACHE_AUTH_PASSWORD;FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when using the 'nats-js-kv' store type."`
 
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs

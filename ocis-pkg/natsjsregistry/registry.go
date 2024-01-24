@@ -31,7 +31,7 @@ func NewRegistry(opts ...registry.Option) registry.Registry {
 	exp, _ := options.Context.Value(expiryKey{}).(time.Duration)
 	return &storeregistry{
 		opts:   options,
-		store:  natsjskv.NewStore(storeOptions(options)...),
+		store:  natsjskv.NewStore(append(storeOptions(options), natsjskv.DefaultMemory())...),
 		typ:    _registryName,
 		expiry: exp,
 	}

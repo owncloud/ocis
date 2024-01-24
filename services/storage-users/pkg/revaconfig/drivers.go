@@ -132,14 +132,6 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
-		"statcache": map[string]interface{}{
-			"cache_store":               cfg.StatCache.Store,
-			"cache_nodes":               cfg.StatCache.Nodes,
-			"cache_database":            cfg.StatCache.Database,
-			"cache_ttl":                 cfg.StatCache.TTL,
-			"cache_size":                cfg.StatCache.Size,
-			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
-		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -147,6 +139,8 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -155,13 +149,11 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
-			"natsaddress":          cfg.Events.Addr,
-			"natsclusterid":        cfg.Events.ClusterID,
-			"tlsinsecure":          cfg.Events.TLSInsecure,
-			"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
-			"numconsumers":         cfg.Events.NumConsumers,
+			"numconsumers": cfg.Events.NumConsumers,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -193,14 +185,6 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
 		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
-		"statcache": map[string]interface{}{
-			"cache_store":               cfg.StatCache.Store,
-			"cache_nodes":               cfg.StatCache.Nodes,
-			"cache_database":            cfg.StatCache.Database,
-			"cache_ttl":                 cfg.StatCache.TTL,
-			"cache_size":                cfg.StatCache.Size,
-			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
-		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -208,6 +192,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -216,6 +202,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 	}
 }
@@ -259,14 +247,6 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
 		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
-		"statcache": map[string]interface{}{
-			"cache_store":               cfg.StatCache.Store,
-			"cache_nodes":               cfg.StatCache.Nodes,
-			"cache_database":            cfg.StatCache.Database,
-			"cache_ttl":                 cfg.StatCache.TTL,
-			"cache_size":                cfg.StatCache.Size,
-			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
-		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -274,6 +254,8 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -282,13 +264,11 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
-			"natsaddress":          cfg.Events.Addr,
-			"natsclusterid":        cfg.Events.ClusterID,
-			"tlsinsecure":          cfg.Events.TLSInsecure,
-			"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
-			"numconsumers":         cfg.Events.NumConsumers,
+			"numconsumers": cfg.Events.NumConsumers,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -324,14 +304,6 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
 		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
-		"statcache": map[string]interface{}{
-			"cache_store":               cfg.StatCache.Store,
-			"cache_nodes":               cfg.StatCache.Nodes,
-			"cache_database":            cfg.StatCache.Database,
-			"cache_ttl":                 cfg.StatCache.TTL,
-			"cache_size":                cfg.StatCache.Size,
-			"cache_disable_persistence": cfg.StatCache.DisablePersistence,
-		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -339,6 +311,8 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_size":                cfg.FilemetadataCache.Size,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -347,6 +321,8 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_size":                cfg.IDCache.Size,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 	}
 }
