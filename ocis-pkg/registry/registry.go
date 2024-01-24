@@ -20,10 +20,8 @@ import (
 )
 
 const (
-	registryEnv         = "MICRO_REGISTRY"
-	registryAddressEnv  = "MICRO_REGISTRY_ADDRESS"
-	registryUsernameEnv = "MICRO_REGISTRY_AUTH_USERNAME"
-	registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
+	_registryEnv        = "MICRO_REGISTRY"
+	_registryAddressEnv = "MICRO_REGISTRY_ADDRESS"
 )
 
 var (
@@ -64,7 +62,6 @@ func GetRegistry(opts ...Option) mRegistry.Registry {
 		case "natsjs", "nats-js", "nats-js-kv": // for backwards compatibility - we will stick with one of those
 			_reg = natsjsregistry.NewRegistry(
 				mRegistry.Addrs(cfg.Addresses...),
-				natsjsregistry.Authenticate(cfg.Username, cfg.Password),
 			)
 		case "memory":
 			_reg = memr.NewRegistry()
@@ -112,15 +109,13 @@ func getEnvs(opts ...Option) *Config {
 	cfg := &Config{
 		Type:      "nats-js-kv",
 		Addresses: []string{"127.0.0.1:9233"},
-		Username:  os.Getenv(registryUsernameEnv),
-		Password:  os.Getenv(registryPasswordEnv),
 	}
 
-	if s := os.Getenv(registryEnv); s != "" {
+	if s := os.Getenv(_registryEnv); s != "" {
 		cfg.Type = s
 	}
 
-	if s := strings.Split(os.Getenv(registryAddressEnv), ","); len(s) > 0 && s[0] != "" {
+	if s := strings.Split(os.Getenv(_registryAddressEnv), ","); len(s) > 0 && s[0] != "" {
 		cfg.Addresses = s
 	}
 
