@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
@@ -182,6 +183,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8255
    https://github.com/owncloud/ocis/pull/8269
    https://github.com/cs3org/reva/pull/4472
+
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+
+   The nats registry would behave badly when configuring `nats-js-kv` via envvar.
+   Reason is the way go-micro initializes. It took 5 developers to find the issue
+   and the fix so the details cannot be shared here. Just accept that it is working
+   now
+
+   https://github.com/owncloud/ocis/pull/8281
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
