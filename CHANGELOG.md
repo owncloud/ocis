@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
 * Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -163,6 +164,15 @@ The following sections list the changes for unreleased.
    Fixes nats authentication for registry/events/stores
 
    https://github.com/owncloud/ocis/pull/8236
+
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
+
+   We fixed a bug in the graph API for creating and updating shares so that
+   Spaceroot specific roles like 'Manager' and 'Co-owner' can no longer be assigned
+   for shares on files or directories.
+
+   https://github.com/owncloud/ocis/issues/8131
+   https://github.com/owncloud/ocis/pull/8247
 
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 
