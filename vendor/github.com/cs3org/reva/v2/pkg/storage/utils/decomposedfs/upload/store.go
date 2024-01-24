@@ -96,7 +96,8 @@ func (store OcisStore) List(ctx context.Context) ([]*OcisSession, error) {
 	}
 
 	for _, info := range infoFiles {
-		progress, err := store.Get(ctx, info)
+		id := strings.TrimSuffix(filepath.Base(info), filepath.Ext(info))
+		progress, err := store.Get(ctx, id)
 		if err != nil {
 			appctx.GetLogger(ctx).Error().Interface("path", info).Msg("Decomposedfs: could not getUploadSession")
 			continue

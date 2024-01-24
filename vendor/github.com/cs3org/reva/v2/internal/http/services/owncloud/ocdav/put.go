@@ -307,6 +307,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		}
 		Propagator.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 		httpReq.Header.Set(datagateway.TokenTransportHeader, token)
+		httpReq.ContentLength = length
 
 		httpRes, err := s.client.Do(httpReq)
 		if err != nil {
