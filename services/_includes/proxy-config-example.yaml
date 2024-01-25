@@ -19,8 +19,8 @@ debug:
 http:
   addr: 0.0.0.0:9200
   root: /
-  tls_cert: ~/.ocis/proxy/server.crt
-  tls_key: ~/.ocis/proxy/server.key
+  tls_cert: /var/lib/ocis/proxy/server.crt
+  tls_key: /var/lib/ocis/proxy/server.key
   tls: true
 reva:
   address: com.owncloud.api.gateway

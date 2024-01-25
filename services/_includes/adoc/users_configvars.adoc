@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-25-00-16-03]
+[#deprecation-note-2024-01-25-06-27-01]
 [caption=]
 .Deprecation notes for the users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -231,7 +231,7 @@ a|`OCIS_LDAP_CACERT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/idm/ldap.crt ++
+++/var/lib/ocis/idm/ldap.crt ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 

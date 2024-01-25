@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-25-00-16-03]
+[#deprecation-note-2024-01-25-06-27-01]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -247,6 +247,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`SHARING_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Username for the events broker.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`SHARING_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Password for the events broker.
+
 a|`SHARING_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
@@ -318,7 +338,7 @@ a|`SHARING_USER_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/shares.json ++
+++/var/lib/ocis/storage/shares.json ++
 a| [subs=-attributes]
 Path to the JSON file where shares will be persisted. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
@@ -429,7 +449,7 @@ a|`SHARING_PUBLIC_JSON_FILE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/publicshares.json ++
+++/var/lib/ocis/storage/publicshares.json ++
 a| [subs=-attributes]
 Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 

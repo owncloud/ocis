@@ -88,25 +88,25 @@ ocm_invite_manager:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocm/ocminvites.json
+      file: /var/lib/ocis/storage/ocm/ocminvites.json
   insecure: false
 ocm_provider_authorizer_driver: json
 ocm_provider_authorizer_drivers:
   json:
-    providers: ~/.ocis/storage/ocm/ocmproviders.json
+    providers: /var/lib/ocis/storage/ocm/ocmproviders.json
     verify_request_hostname: false
 ocm_share_provider:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocm/ocmshares.json
+      file: /var/lib/ocis/storage/ocm/ocmshares.json
   insecure: false
   webapp_template: ""
 ocm_core:
   driver: json
   drivers:
     json:
-      file: ~/.ocis/storage/ocm/ocmshares.json
+      file: /var/lib/ocis/storage/ocm/ocmshares.json
 ocm_storage_provider:
   insecure: false
-  storage_root: ~/.ocis/storage/ocm
+  storage_root: /var/lib/ocis/storage/ocm

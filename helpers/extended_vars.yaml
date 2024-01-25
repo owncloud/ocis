@@ -89,6 +89,30 @@ variables:
     for container images (inside the container) or '$HOME/.ocis/config' for binary
     releases.
   do_ignore: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:118
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/natsjsregistry/registry.go:145
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryEnv
+  path: ocis-pkg/registry/registry.go:114
+  foundincode: true
+  name: _registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true
@@ -97,35 +121,3 @@ variables:
   default_value: ""
   description: false positive - code that extract envvars for config structs
   do_ignore: true
-- rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:123
-  foundincode: true
-  name: registryAddressEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:119
-  foundincode: true
-  name: registryEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryPasswordEnv
-  path: ocis-pkg/registry/registry.go:116
-  foundincode: true
-  name: registryPasswordEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryUsernameEnv
-  path: ocis-pkg/registry/registry.go:115
-  foundincode: true
-  name: registryUsernameEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-25-00-16-03]
+[#deprecation-note-2024-01-25-06-27-01]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -301,6 +301,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_SYSTEM_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Username for the configured store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_SYSTEM_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Password for the configured store. Only applies when store type 'nats-js-kv' is configured.
+
 a|`STORAGE_SYSTEM_DRIVER` +
 
 a| [subs=-attributes]
@@ -325,7 +345,7 @@ a|`STORAGE_SYSTEM_OCIS_ROOT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/metadata ++
+++/var/lib/ocis/storage/metadata ++
 a| [subs=-attributes]
 Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 

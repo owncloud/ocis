@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-25-00-16-03]
+[#deprecation-note-2024-01-25-06-27-01]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -165,7 +165,7 @@ a|`PROXY_TRANSPORT_TLS_CERT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/proxy/server.crt ++
+++/var/lib/ocis/proxy/server.crt ++
 a| [subs=-attributes]
 Path/File name of the TLS server certificate (in PEM format) for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
 
@@ -174,7 +174,7 @@ a|`PROXY_TRANSPORT_TLS_KEY` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/proxy/server.key ++
+++/var/lib/ocis/proxy/server.key ++
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
 

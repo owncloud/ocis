@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-25-00-16-03]
+[#deprecation-note-2024-01-25-06-27-01]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -276,7 +276,7 @@ a|`STORAGE_USERS_OCIS_ROOT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/users ++
+++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
 The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
 
@@ -405,7 +405,7 @@ a|`STORAGE_USERS_S3NG_ROOT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/users ++
+++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
 The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
 
@@ -532,7 +532,7 @@ a|`STORAGE_USERS_OWNCLOUDSQL_DATADIR` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/owncloud ++
+++/var/lib/ocis/storage/owncloud ++
 a| [subs=-attributes]
 The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.
 
@@ -559,7 +559,7 @@ a|`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++~/.ocis/storage/uploadinfo ++
+++/var/lib/ocis/storage/uploadinfo ++
 a| [subs=-attributes]
 The directory where the filesystem will store uploads temporarily. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/uploadinfo.
 
@@ -724,65 +724,6 @@ a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
 a|`OCIS_CACHE_STORE` +
-`STORAGE_USERS_STAT_CACHE_STORE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++memory ++
-a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
-
-a|`OCIS_CACHE_STORE_NODES` +
-`STORAGE_USERS_STAT_CACHE_STORE_NODES` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[127.0.0.1:9233] ++
-a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_DATABASE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ocis ++
-a| [subs=-attributes]
-The database name the configured store should use.
-
-a|`OCIS_CACHE_TTL` +
-`STORAGE_USERS_STAT_CACHE_TTL` +
-
-a| [subs=-attributes]
-++Duration ++
-a| [subs=-attributes]
-++5m0s ++
-a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_SIZE` +
-`STORAGE_USERS_STAT_CACHE_SIZE` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
-
-a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
-`STORAGE_USERS_STAT_CACHE_DISABLE_PERSISTENCE` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
-
-a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_STORE` +
 
 a| [subs=-attributes]
@@ -840,6 +781,26 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_ID_CACHE_STORE` +
@@ -899,6 +860,26 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_ID_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_ID_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`STORAGE_USERS_MOUNT_ID` +
 

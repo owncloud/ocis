@@ -33,6 +33,8 @@ events:
   tls_insecure: false
   tls_root_ca_cert_path: ""
   enable_tls: false
+  auth_username: ""
+  auth_password: ""
 skip_user_groups_in_token: false
 user_sharing_driver: jsoncs3
 user_sharing_drivers:
@@ -43,7 +45,7 @@ user_sharing_drivers:
     system_user_api_key: ""
     cache_ttl: 0
   json:
-    file: ~/.ocis/storage/shares.json
+    file: /var/lib/ocis/storage/shares.json
   cs3:
     provider_addr: com.owncloud.api.storage-system
     system_user_id: ""
@@ -59,7 +61,7 @@ user_sharing_drivers:
 public_sharing_driver: jsoncs3
 public_sharing_drivers:
   json:
-    file: ~/.ocis/storage/publicshares.json
+    file: /var/lib/ocis/storage/publicshares.json
   jsoncs3:
     provider_addr: com.owncloud.api.storage-system
     system_user_id: ""

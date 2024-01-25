@@ -40,7 +40,7 @@ drivers:
     propagator: sync
     async_propagator_options:
       propagation_delay: 0s
-    root: ~/.ocis/storage/users
+    root: /var/lib/ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: com.owncloud.api.settings
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
@@ -56,7 +56,7 @@ drivers:
     propagator: sync
     async_propagator_options:
       propagation_delay: 0s
-    root: ~/.ocis/storage/users
+    root: /var/lib/ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: com.owncloud.api.settings
     region: default
@@ -71,10 +71,10 @@ drivers:
     lock_cycle_duration_factor: 30
     max_concurrency: 0
   owncloudsql:
-    root: ~/.ocis/storage/owncloud
+    root: /var/lib/ocis/storage/owncloud
     share_folder: /Shares
     user_layout: '{{.Username}}'
-    upload_info_dir: ~/.ocis/storage/uploadinfo
+    upload_info_dir: /var/lib/ocis/storage/uploadinfo
     db_username: owncloud
     db_password: owncloud
     db_host: ""
@@ -93,14 +93,6 @@ events:
   num_consumers: 0
   username: ""
   password: ""
-stat_cache:
-  store: memory
-  nodes:
-  - 127.0.0.1:9233
-  database: ocis
-  ttl: 5m0s
-  size: 0
-  disable_persistence: false
 filemetadata_cache:
   store: memory
   nodes:
@@ -109,6 +101,8 @@ filemetadata_cache:
   ttl: 24m0s
   size: 0
   disable_persistence: false
+  username: ""
+  password: ""
 id_cache:
   store: memory
   nodes:
@@ -117,6 +111,8 @@ id_cache:
   ttl: 24m0s
   size: 0
   disable_persistence: false
+  username: ""
+  password: ""
 mount_id: ""
 expose_data_server: false
 readonly: false

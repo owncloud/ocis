@@ -41,11 +41,13 @@ cache:
   ttl: 24m0s
   size: 0
   disable_persistence: false
+  auth_username: ""
+  auth_password: ""
 driver: ocis
 drivers:
   ocis:
     metadata_backend: messagepack
-    root: ~/.ocis/storage/metadata
+    root: /var/lib/ocis/storage/metadata
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
 data_server_url: http://localhost:9216/data

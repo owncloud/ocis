@@ -67,37 +67,29 @@ a| [subs=-attributes]
 ++'/etc/ocis' or '$HOME/.ocis/config' ++
 a| [subs=-attributes]
 ++The default directory location for config files. Predefined to '/etc/ocis' for container images (inside the container) or '$HOME/.ocis/config' for binary releases. ++
+
+a| `_registryAddressEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryAddressEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
-
-a| `registryAddressEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryPasswordEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `registryUsernameEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
 |===

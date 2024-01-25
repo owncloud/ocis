@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2024-01-25T00:16:04.156790101Z
+date: 2024-01-25T06:27:04.51521128Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -212,7 +212,7 @@ The following metrics are exposed by the proxy service:
 | `ocis_proxy_build_info{version}` | A metric with a constant `1` value labeled by version, exposing the version of the ocis proxy service.                                                                                                                        | `version`: Build version of the proxy |
 
 ### Prometheus Configuration
-The following is an example prometheus configuration for the single process mode. It assumes that the proxy service is configured to bind on all interfaces `PROXY_HTTP_ADDR=0.0.0.0:9205` and that the proxy is available via the `ocis` service name (typically in docker-compose). The prometheus service detects the `/metrics` endpoint automatically and scrapes it every 15 seconds.
+The following is an example prometheus configuration for the single process mode. It assumes that the proxy debug address is configured to bind on all interfaces `PROXY_DEBUG_ADDR=0.0.0.0:9205` and that the proxy is available via the `ocis` service name (typically in docker-compose). The prometheus service detects the `/metrics` endpoint automatically and scrapes it every 15 seconds.
 
 ```yaml
 global:
