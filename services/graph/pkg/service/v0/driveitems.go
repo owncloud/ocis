@@ -94,10 +94,13 @@ func (g Graph) CreateUploadSession(w http.ResponseWriter, r *http.Request) {
 	if cusr.Item.Name != "" {
 		ref.Path = utils.MakeRelativePath(cusr.Item.Name)
 	}
-	// TODO size?
+	req := &storageprovider.InitiateFileUploadRequest{
+		Ref:    ref,
+		Opaque: utils.AppendPlainToOpaque(nil, "Upload-Length", strconv.FormatUint(uint64(cusr.Item.FileSize), 10)),
+	}
 
 	ctx := r.Context()
-	res, err := gatewayClient.InitiateFileUpload(ctx, &storageprovider.InitiateFileUploadRequest{Ref: ref})
+	res, err := gatewayClient.InitiateFileUpload(ctx, req)
 	switch {
 	case err != nil:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
