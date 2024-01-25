@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-rc.2](#changelog-for-500-rc2-2024-01-17)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
@@ -30,6 +31,108 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.2...master
+
+## Summary
+
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
+* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+
+## Details
+
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
+
+   Removes jwt config of policies service
+
+   https://github.com/owncloud/ocis/pull/7893
+
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+
+   Main fix is using proto getters to avoid panics. But some other code
+   improvements were also done
+
+   https://github.com/owncloud/ocis/pull/8228
+
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
+
+   Now uses proto getters to avoid panics.
+
+   https://github.com/owncloud/ocis/pull/8230
+
+* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
+
+   We fixed a bug in the 'graph/v1beta1/me/drive/sharedWithMe' endpoint that caused
+   an error response when the user received shares from project spaces.
+   Additionally the endpoint now behaves more graceful in cases where the
+   displayname of the owner or creator of a share or shared resource couldn't be
+   resolved.
+
+   https://github.com/owncloud/ocis/issues/8027
+   https://github.com/owncloud/ocis/issues/8215
+   https://github.com/owncloud/ocis/pull/8233
+
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+
+   Updating and Deleting the virtual drives for shares is currently not supported.
+   Instead of returning a generic 500 status we return a 405 response now.
+
+   https://github.com/owncloud/ocis/issues/7881
+   https://github.com/owncloud/ocis/pull/8235
+
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+
+   Fixes nats authentication for registry/events/stores
+
+   https://github.com/owncloud/ocis/pull/8236
+
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
+
+   We fixed a bug in the graph API for creating and updating shares so that
+   Spaceroot specific roles like 'Manager' and 'Co-owner' can no longer be assigned
+   for shares on files or directories.
+
+   https://github.com/owncloud/ocis/issues/8131
+   https://github.com/owncloud/ocis/pull/8247
+
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+
+   We fixed the race condition that led to concurrent map access in a publicshare
+   manager.
+
+   https://github.com/owncloud/ocis/issues/8255
+   https://github.com/owncloud/ocis/pull/8269
+   https://github.com/cs3org/reva/pull/4472
+
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+
+   The nats registry would behave badly when configuring `nats-js-kv` via envvar.
+   Reason is the way go-micro initializes. It took 5 developers to find the issue
+   and the fix so the details cannot be shared here. Just accept that it is working
+   now
+
+   https://github.com/owncloud/ocis/pull/8281
+
+* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+
+   We reworked and moved disabling the password policy logic from the reva to the
+   ocis.
+
+   https://github.com/owncloud/ocis/issues/7916
+   https://github.com/owncloud/ocis/pull/8152
+   https://github.com/cs3org/reva/pull/4453
 
 # Changelog for [5.0.0-rc.2] (2024-01-17)
 
@@ -143,9 +246,9 @@ The following sections list the changes for 5.0.0-rc.2.
 * Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 * Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
+* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
 
 ## Details
 
@@ -1128,12 +1231,6 @@ The following sections list the changes for 5.0.0-rc.2.
 
    We update reva to the latest edge version to get the latest fixes and features.
 
-   https://github.com/owncloud/ocis/pull/8100
-
-* Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
-
-   We update reva to the latest edge version to get the latest fixes and features.
-
    ## Changelog for reva edge
 
   *   Bugfix [cs3org/reva#4434](https://github.com/cs3org/reva/pull/4434): Fix the upload postprocessing
@@ -1503,6 +1600,14 @@ The following sections list the changes for 5.0.0-rc.2.
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
+
+* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   https://github.com/owncloud/ocis/pull/8278
+   https://github.com/owncloud/ocis/pull/8264
+   https://github.com/owncloud/ocis/pull/8100
 
 # Changelog for [4.0.4] (2023-12-07)
 
