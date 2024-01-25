@@ -90,3 +90,11 @@ ocis storage-users uploads list
 ```bash
 ocis postprocessing restart -u <uploadID>
 ```
+
+Instead of starting one specific upload, a system admin can also restart all uploads that are currently in a specific step.
+Examples:
+```
+ocis postprocessing restart # Restarts all uploads where postprocessing is finished, but upload is not finished
+ocis postprocessing restart -s "finished" # Equivalent to the above
+ocis postprocessing restart -s "virusscan" # Restart all uploads currently in virusscan step
+```
