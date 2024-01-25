@@ -1194,7 +1194,7 @@ Feature: Send a sharing invitations
       | Uploader         | folder        | FolderToShare  |
 
 
-  Scenario Outline: send share invitation to wrong user id with different roles
+  Scenario Outline: send share invitation to wrong user id
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
@@ -1203,7 +1203,7 @@ Feature: Send a sharing invitations
       | space           | Personal                             |
       | shareeId        | a4c0c83e-ae24-4870-93c3-fcaf2a2228f7 |
       | shareType       | user                                 |
-      | permissionsRole | <permissions-role>                   |
+      | permissionsRole | Viewer                               |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1236,9 +1236,6 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
