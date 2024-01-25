@@ -1720,7 +1720,7 @@ trait WebDav {
 		string $entry = "file",
 		?string $path = null,
 		string $type = "files"
-	):ResponseInterface {
+	):void {
 		$user = $this->getActualUsername($user);
 		$path = $this->substituteInLineCodes($path);
 		$response = $this->listFolder(
@@ -1733,7 +1733,7 @@ trait WebDav {
 		$statusCode = $response->getStatusCode();
 		if ($statusCode < 401 || $statusCode > 404) {
 			try {
-				$responseXml = $this->featureContext->getResponseXml(
+				$responseXml = HttpRequestHelper::getResponseXml(
 					$response,
 					__METHOD__
 				);
@@ -1756,7 +1756,6 @@ trait WebDav {
 				"$entry '$path' should not exist. But it does exist and is a $actualResourceType"
 			);
 		}
-		return $response;
 	}
 
 	/**
