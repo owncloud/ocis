@@ -354,7 +354,7 @@ replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/pl
 
 replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 
-replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240105150744-9c2d8aff3ef2
+replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
