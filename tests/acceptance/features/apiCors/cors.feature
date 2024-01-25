@@ -7,7 +7,7 @@ Feature: CORS headers
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
+  And the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
 
   @issue-5195
   Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header
@@ -90,3 +90,14 @@ Feature: CORS headers
     And the following headers should be set
       | header                      | value               |
       | Access-Control-Allow-Origin | https://aphno.badal |
+
+
+  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the settings api
+    When user "Alice" lists values-list with headers using the Settings API
+      | header | value               |
+      | Origin | https://aphno.badal |
+    Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                      | value               |
+      | Access-Control-Allow-Origin | https://aphno.badal |
+      
