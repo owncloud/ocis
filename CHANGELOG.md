@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
 * Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
@@ -165,6 +166,15 @@ The following sections list the changes for unreleased.
    Fixes nats authentication for registry/events/stores
 
    https://github.com/owncloud/ocis/pull/8236
+
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
+
+   We fixed a problem where after renaming resource as sharer the receiver see a
+   new name.
+
+   https://github.com/owncloud/ocis/issues/8242
+   https://github.com/owncloud/ocis/pull/8246
+   https://github.com/cs3org/reva/pull/4463
 
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 
