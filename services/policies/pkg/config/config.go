@@ -34,11 +34,6 @@ type GRPC struct {
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 }
 
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;POLICIES_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
-}
-
 // Engine configures the policy engine.
 type Engine struct {
 	Timeout  time.Duration `yaml:"timeout" env:"POLICIES_ENGINE_TIMEOUT" desc:"Sets the timeout the rego expression evaluation can take. Rules default to deny if the timeout was reached. See the Environment Variable Types description for more details."`

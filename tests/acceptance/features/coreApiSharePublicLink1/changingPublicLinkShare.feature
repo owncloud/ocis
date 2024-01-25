@@ -1,4 +1,4 @@
-@issue-1276 @issue-1277 @issue-1269
+@issue-1276 @issue-1269
 
 Feature: changing a public link share
   As a user

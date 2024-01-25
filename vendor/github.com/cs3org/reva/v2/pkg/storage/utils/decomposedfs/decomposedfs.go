@@ -122,7 +122,7 @@ type SessionStore interface {
 	New(ctx context.Context) *upload.OcisSession
 	List(ctx context.Context) ([]*upload.OcisSession, error)
 	Get(ctx context.Context, id string) (*upload.OcisSession, error)
-	Cleanup(ctx context.Context, session upload.Session, failure bool, keepUpload bool)
+	Cleanup(ctx context.Context, session upload.Session, revertNodeMetadata, keepUpload, unmarkPostprocessing bool)
 }
 
 // Decomposedfs provides the base for decomposed filesystem implementations
@@ -281,7 +281,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			}
 			if !n.Exists {
 				log.Debug().Str("uploadID", ev.UploadID).Str("nodeID", session.NodeID()).Msg("node no longer exists")
-				fs.sessionStore.Cleanup(ctx, session, false, false)
+				fs.sessionStore.Cleanup(ctx, session, false, false, false)
 				continue
 			}
 
@@ -289,6 +289,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				failed     bool
 				keepUpload bool
 			)
+			unmarkPostprocessing := true
 
 			switch ev.Outcome {
 			default:
@@ -301,8 +302,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			case events.PPOutcomeContinue:
 				if err := session.Finalize(); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
-					keepUpload = true // should we keep the upload when assembling failed?
 					failed = true
+					keepUpload = true
+					// keep postprocessing status so the upload is not deleted during housekeeping
+					unmarkPostprocessing = false
 				} else {
 					metrics.UploadSessionsFinalized.Inc()
 				}
@@ -334,7 +337,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				}
 			}
 
-			fs.sessionStore.Cleanup(ctx, session, failed, keepUpload)
+			fs.sessionStore.Cleanup(ctx, session, failed, keepUpload, unmarkPostprocessing)
 
 			// remove cache entry in gateway
 			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})

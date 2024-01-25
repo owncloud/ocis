@@ -31,7 +31,6 @@ type Config struct {
 
 	TransferExpires   int64             `yaml:"transfer_expires" env:"STORAGE_USERS_TRANSFER_EXPIRES" desc:"the time after which the token for upload postprocessing expires"`
 	Events            Events            `yaml:"events"`
-	StatCache         StatCache         `yaml:"stat_cache"`
 	FilemetadataCache FilemetadataCache `yaml:"filemetadata_cache"`
 	IDCache           IDCache           `yaml:"id_cache"`
 	MountID           string            `yaml:"mount_id" env:"STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage."`
@@ -182,16 +181,6 @@ type Events struct {
 	AuthPassword      string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;STORAGE_USERS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
 }
 
-// StatCache holds cache config
-type StatCache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details."`
-	Nodes              []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_USERS_STAT_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details."`
-	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
-	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_STAT_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
-	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_USERS_STAT_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default."`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_STAT_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false."`
-}
-
 // FilemetadataCache holds cache config
 type FilemetadataCache struct {
 	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_FILEMETADATA_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details."`
@@ -200,6 +189,8 @@ type FilemetadataCache struct {
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_FILEMETADATA_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details."`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_USERS_FILEMETADATA_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default."`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false."`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured."`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured."`
 }
 
 // IDCache holds cache config
@@ -210,6 +201,8 @@ type IDCache struct {
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_ID_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens have no expiration. Defaults to 300s which is derived from the underlaying package though not explicitly set as default. See the Environment Variable Types description for more details."`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_USERS_ID_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default."`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false."`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_ID_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured."`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_ID_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured."`
 }
 
 // S3Driver is the storage driver configuration when using 's3' storage driver

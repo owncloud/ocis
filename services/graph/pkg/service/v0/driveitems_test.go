@@ -685,6 +685,25 @@ var _ = Describe("Driveitems", func() {
 			_, ok := res.GetRolesOk()
 			Expect(ok).To(BeTrue())
 		})
+		It("fails to update the share permissions for a file share when setting a space specific role", func() {
+			updateShareMock := gatewayClient.On("UpdateShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+			updateShareMock.Return(updateShareMockResponse, nil)
+
+			driveItemPermission.SetRoles([]string{unifiedrole.NewSpaceViewerUnifiedRole().GetId()})
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
 		It("updates the share permissions when changing the resource permission actions", func() {
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
@@ -1005,6 +1024,17 @@ var _ = Describe("Driveitems", func() {
 			Expect(jsonData.Get(`0.@libre\.graph\.permissions\.actions`).Exists()).To(BeFalse())
 			Expect(jsonData.Get("0.roles.#").Num).To(Equal(float64(1)))
 			Expect(jsonData.Get("0.roles.0").String()).To(Equal(unifiedrole.NewViewerUnifiedRole(true).GetId()))
+		})
+
+		It("fails with wrong role", func() {
+			driveItemInvite.Roles = []string{unifiedrole.NewCoownerUnifiedRole().GetId()}
+			svc.Invite(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).
+					WithContext(ctx),
+			)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
 		It("with actions (happy path)", func() {

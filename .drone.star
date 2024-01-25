@@ -16,7 +16,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.21"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.0"
+OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.1"
 OC_LITMUS = "owncloudci/litmus:latest"
 OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.8"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
@@ -941,7 +941,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                  [
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v10.2.2",
+                         "image": "cs3org/wopiserver:v10.3.0",
                          "detach": True,
                          "commands": [
                              "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
@@ -2874,6 +2874,13 @@ def k6LoadTests(ctx):
                     "curl -s -o run_k6_tests.sh %s" % script_link,
                     "apk add --no-cache openssh-client sshpass",
                     "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
+                ],
+            },
+            {
+                "name": "open-grafana-dashboard",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works/d/P4D1D31A5B69203FF'",
                 ],
             },
         ],

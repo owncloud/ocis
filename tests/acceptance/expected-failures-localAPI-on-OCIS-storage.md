@@ -45,18 +45,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraphUserGroup/deleteGroup.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteGroup.feature#L67)
 
-#### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
-
-- [apiCors/cors.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L28)
-- [apiCors/cors.feature:29](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L29)
-- [apiCors/cors.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L30)
-- [apiCors/cors.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L31)
-
-#### [Requests with invalid credentials do not return CORS headers](https://github.com/owncloud/ocis/issues/5194)
-
-- [apiCors/cors.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L70)
-- [apiCors/cors.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L71)
-
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
 - [apiGraphUserGroup/getUser.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L89)
@@ -270,10 +258,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/linkShare.feature:453](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L453)
 - [apiSharingNg/linkShare.feature:455](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L455)
 - [apiSharingNg/linkShare.feature:456](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L456)
-- [apiSharingNg/deletePermissions.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L146)
-- [apiSharingNg/deletePermissions.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L163)
-- [apiSharingNg/deletePermissions.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L184)
-- [apiSharingNg/deletePermissions.feature:203](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L203)
+- [apiSharingNg/deletePermissions.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L130)
+- [apiSharingNg/deletePermissions.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L147)
+- [apiSharingNg/deletePermissions.feature:168](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L168)
+- [apiSharingNg/deletePermissions.feature:187](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L187)
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 

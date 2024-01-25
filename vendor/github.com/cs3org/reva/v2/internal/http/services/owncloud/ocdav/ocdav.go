@@ -286,8 +286,6 @@ func (s *svc) ApplyLayout(ctx context.Context, ns string, useLoggedInUserNS bool
 
 func addAccessHeaders(w http.ResponseWriter, r *http.Request) {
 	headers := w.Header()
-	// the webdav api is accessible from anywhere
-	headers.Set("Access-Control-Allow-Origin", "*")
 	// all resources served via the DAV endpoint should have the strictest possible as default
 	headers.Set("Content-Security-Policy", "default-src 'none';")
 	// disable sniffing the content type for IE

@@ -198,7 +198,7 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to add grants on shared resource"),
 		}, err
 	}
-	// check if the requested share creation has sufficient permissions to do so.
+	// check if the share creator has sufficient permissions to do so.
 	if shareCreationAllowed := conversions.SufficientCS3Permissions(
 		sRes.GetInfo().GetPermissionSet(),
 		req.GetGrant().GetPermissions().GetPermissions(),
@@ -206,6 +206,14 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 		return &collaboration.CreateShareResponse{
 			Status: status.NewPermissionDenied(ctx, nil, "insufficient permissions to create that kind of share"),
 		}, nil
+	}
+	// check if the requested permission are plausible for the Resource
+	if sRes.GetInfo().GetType() == provider.ResourceType_RESOURCE_TYPE_FILE {
+		if newPermissions := req.GetGrant().GetPermissions().GetPermissions(); newPermissions.GetCreateContainer() || newPermissions.GetMove() || newPermissions.GetDelete() {
+			return &collaboration.CreateShareResponse{
+				Status: status.NewInvalid(ctx, "cannot set the requested permissions on that type of resource"),
+			}, nil
+		}
 	}
 
 	if !s.isPathAllowed(req.GetResourceInfo().GetPath()) {

@@ -27,13 +27,9 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
-      | Co Owner        | folder        | FolderToShare |
       | Uploader        | folder        | FolderToShare |
-      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to resource inside of a project space in the user share
@@ -56,13 +52,9 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
-      | Co Owner        | folder        | FolderToShare |
       | Uploader        | folder        | FolderToShare |
-      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource in a group share
@@ -86,13 +78,9 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
-      | Co Owner        | folder        | FolderToShare |
       | Uploader        | folder        | FolderToShare |
-      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource inside of a project space in group share
@@ -118,13 +106,9 @@ Feature: Remove access to a drive item
       | permissionsRole | resource-type | path          |
       | Viewer          | file          | textfile.txt  |
       | File Editor     | file          | textfile.txt  |
-      | Co Owner        | file          | textfile.txt  |
-      | Manager         | file          | textfile.txt  |
       | Viewer          | folder        | FolderToShare |
       | Editor          | folder        | FolderToShare |
-      | Co Owner        | folder        | FolderToShare |
       | Uploader        | folder        | FolderToShare |
-      | Manager         | folder        | FolderToShare |
 
 
   Scenario Outline: user removes access to a folder in link share

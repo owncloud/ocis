@@ -1443,3 +1443,171 @@ Feature: get users
       | user                  | errorToken       |
       | Alice-From-Wonderland | -From-Wonderland |
       | Alice@From@Wonderland | @From@Wonderland |
+
+  @issue-7990
+  Scenario: non-admin user searches other users by e-mail
+    When user "Brian" searches for user "%22alice@example.org%22" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "required": [
+            "displayName",
+            "id",
+            "mail",
+            "userType"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "enum": ["Alice Hansen"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            },
+            "mail": {
+              "type": "string",
+              "enum": ["alice@example.org"]
+            },
+            "userType": {
+              "type": "string",
+              "enum": ["Member"]
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: non-admin user searches for a disabled users
+    Given the user "Admin" has disabled user "Alice"
+    When user "Brian" searches for user "alice" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "required": [
+            "displayName",
+            "id",
+            "mail",
+            "userType"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "enum": ["Alice Hansen"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            },
+            "mail": {
+              "type": "string",
+              "enum": ["alice@example.org"]
+            },
+            "userType": {
+              "type": "string",
+              "enum": ["Member"]
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: non-admin user searches for multiple users having same displayname
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | another-alice                |
+      | displayName | Alice Hansen                 |
+      | email       | another-alice@example.org    |
+      | password    | containsCharacters(*:!;_+-&) |
+
+    When user "Brian" searches for user "alice" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+        "type": "array",
+         "items": [
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Alice Hansen"]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["alice@example.org"]
+                },
+                "userType": {
+                  "type": "string",
+                  "enum": ["Member"]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Alice Hansen"]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["another-alice@example.org"]
+                },
+                "userType": {
+                  "type": "string",
+                  "enum": ["Member"]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    """

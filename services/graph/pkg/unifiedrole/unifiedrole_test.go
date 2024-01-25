@@ -27,8 +27,7 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
 		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
 		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
-		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
-		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceViewer, rConversions.NewSpaceViewerRole(), unifiedrole.NewSpaceViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
@@ -208,6 +207,17 @@ var _ = Describe("unifiedroles", func() {
 					unifiedrole.NewViewerUnifiedRole(false),
 					unifiedrole.NewFileEditorUnifiedRole(false),
 					unifiedrole.NewEditorUnifiedRole(false),
+				},
+			),
+
+			Entry(
+				"GetBuiltinRoleDefinitionList",
+				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList(false)...),
+				unifiedrole.UnifiedRoleConditionOwner,
+				false,
+				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSpaceViewerUnifiedRole(),
+					unifiedrole.NewSpaceEditorUnifiedRole(),
 					unifiedrole.NewCoownerUnifiedRole(),
 					unifiedrole.NewManagerUnifiedRole(),
 				},
@@ -223,8 +233,6 @@ var _ = Describe("unifiedroles", func() {
 					unifiedrole.NewViewerUnifiedRole(true),
 					unifiedrole.NewFileEditorUnifiedRole(true),
 					unifiedrole.NewEditorUnifiedRole(true),
-					unifiedrole.NewCoownerUnifiedRole(),
-					unifiedrole.NewManagerUnifiedRole(),
 				},
 			),
 

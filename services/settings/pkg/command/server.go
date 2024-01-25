@@ -32,12 +32,12 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
 			cfg.GrpcClient, err = ogrpc.NewClient(
-				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracingProvider))...,
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
 			)
 			if err != nil {
 				return err
@@ -65,7 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Config(cfg),
 				http.Metrics(mtrcs),
 				http.ServiceHandler(handle),
-				http.TraceProvider(tracingProvider),
+				http.TraceProvider(traceProvider),
 			)
 			if err != nil {
 				logger.Error().
@@ -87,7 +87,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Config(cfg),
 				grpc.Metrics(mtrcs),
 				grpc.ServiceHandler(handle),
-				grpc.TraceProvider(tracingProvider),
+				grpc.TraceProvider(traceProvider),
 			)
 			servers.Add(grpcServer.Run, func(_ error) {
 				logger.Info().Str("server", "grpc").Msg("Shutting down server")

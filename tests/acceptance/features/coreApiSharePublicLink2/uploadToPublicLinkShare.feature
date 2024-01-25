@@ -1,4 +1,4 @@
-@issue-1276 @issue-1277
+@issue-1276
 
 Feature: upload to a public link share
   As a user
@@ -93,17 +93,17 @@ Feature: upload to a public link share
       | path        | FOLDER   |
       | permissions | change   |
       | password    | %public% |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
     Then the HTTP status code should be "507"
 
-  @issue-1290
+
   Scenario: uploading file to a public shared folder with upload-only permission when the sharer has insufficient quota does not work with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER   |
       | permissions | create   |
       | password    | %public% |
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
     Then the HTTP status code should be "507"
 

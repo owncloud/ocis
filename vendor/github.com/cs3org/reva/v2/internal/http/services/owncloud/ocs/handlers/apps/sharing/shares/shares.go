@@ -303,11 +303,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		s, err := conversions.CS3Share2ShareData(ctx, share)
-		if err != nil {
-			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
-			return
-		}
+		s := conversions.CS3Share2ShareData(ctx, share)
 
 		h.addFileInfo(ctx, s, statRes.Info)
 
@@ -402,12 +398,12 @@ func (h *Handler) updateExistingShareMountpoints(ctx context.Context, shareType 
 		}
 		granteeCtx = metadata.AppendToOutgoingContext(granteeCtx, ctxpkg.TokenHeader, authRes.Token)
 
-		lrs, ocsResponse := getSharesList(granteeCtx, client)
-		if ocsResponse != nil {
-			return ocsResponse.OCS.Meta.StatusCode, ocsResponse.OCS.Meta.Message, nil
+		receivedShares, err := listReceivedShares(granteeCtx, client)
+		if err != nil {
+			return response.MetaServerError.StatusCode, "could not list shares", nil
 		}
 
-		for _, s := range lrs.Shares {
+		for _, s := range receivedShares {
 			if s.GetShare().GetId() != share.Id && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED && utils.ResourceIDEqual(s.Share.ResourceId, info.GetId()) {
 				updateRequest := &collaboration.UpdateReceivedShareRequest{
 					Share: &collaboration.ReceivedShare{
@@ -595,12 +591,8 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 		})
 		if err == nil && uRes.GetShare() != nil {
 			resourceID = uRes.Share.Share.ResourceId
-			share, err = conversions.CS3Share2ShareData(ctx, uRes.Share.Share)
+			share = conversions.CS3Share2ShareData(ctx, uRes.Share.Share)
 			share.Hidden = uRes.Share.Hidden
-			if err != nil {
-				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
-				return
-			}
 		}
 	}
 
@@ -635,11 +627,7 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 
 		if err == nil && uRes.GetShare() != nil {
 			resourceID = uRes.Share.ResourceId
-			share, err = conversions.CS3Share2ShareData(ctx, uRes.Share)
-			if err != nil {
-				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
-				return
-			}
+			share = conversions.CS3Share2ShareData(ctx, uRes.Share)
 		}
 	}
 
@@ -874,11 +862,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 		h.statCache.RemoveStat(currentUser.Id, share.ResourceId)
 	}
 
-	resultshare, err := conversions.CS3Share2ShareData(ctx, uRes.Share)
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
-		return
-	}
+	resultshare := conversions.CS3Share2ShareData(ctx, uRes.Share)
 
 	statReq := provider.StatRequest{Ref: &provider.Reference{
 		ResourceId: uRes.Share.ResourceId,
@@ -1072,11 +1056,7 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		data, err := conversions.CS3Share2ShareData(r.Context(), rs.Share)
-		if err != nil {
-			sublog.Debug().Interface("share", rs.Share).Interface("shareData", data).Err(err).Msg("could not CS3Share2ShareData, skipping")
-			continue
-		}
+		data := conversions.CS3Share2ShareData(r.Context(), rs.Share)
 
 		data.State = mapState(rs.GetState())
 		data.Hidden = rs.Hidden

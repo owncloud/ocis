@@ -41,28 +41,28 @@ Feature: create space
           "enum": ["Project Mars"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["project"]
         },
         "driveAlias": {
-           "type": "string",
+          "type": "string",
           "enum": ["project/project-mars"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         },
         "quota": {
-           "type": "object",
-           "required": [
+          "type": "object",
+          "required": [
             "total"
-           ],
-           "properties": {
-              "state": {
-                "type": "number",
-                "enum": [1000000000]
-              }
-           }
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "enum": [1000000000]
+            }
+          }
         },
         "root": {
           "type": "object",
@@ -70,11 +70,11 @@ Feature: create space
             "webDavUrl"
           ],
           "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
+            "webDavUrl": {
+              "type": "string",
+              "enum": ["%base_url%/dav/spaces/%space_id%"]
+            }
+          }
         },
         "webUrl": {
           "type": "string",
@@ -111,24 +111,24 @@ Feature: create space
           "enum": ["Project Venus"]
         },
         "driveType": {
-           "type": "string",
+          "type": "string",
           "enum": ["project"]
         },
         "id": {
-           "type": "string",
+          "type": "string",
           "enum": ["%space_id%"]
         },
         "quota": {
-           "type": "object",
-           "required": [
+          "type": "object",
+          "required": [
             "total"
-           ],
-           "properties": {
-              "state": {
-                "type": "number",
-                "enum": [2000]
-              }
-           }
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "enum": [2000]
+            }
+          }
         },
         "root": {
           "type": "object",
@@ -136,11 +136,11 @@ Feature: create space
             "webDavUrl"
           ],
           "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
+            "webDavUrl": {
+              "type": "string",
+              "enum": ["%base_url%/dav/spaces/%space_id%"]
+            }
+          }
         },
         "webUrl": {
           "type": "string",

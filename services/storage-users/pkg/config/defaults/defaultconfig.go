@@ -94,12 +94,6 @@ func DefaultConfig() *config.Config {
 			ClusterID: "ocis-cluster",
 			EnableTLS: false,
 		},
-		StatCache: config.StatCache{
-			Store:    "memory",
-			Nodes:    []string{"127.0.0.1:9233"},
-			Database: "ocis",
-			TTL:      300 * time.Second,
-		},
 		FilemetadataCache: config.FilemetadataCache{
 			Store:    "memory",
 			Nodes:    []string{"127.0.0.1:9233"},
