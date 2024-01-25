@@ -30,3 +30,75 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+
+## Storage registry
+
+In order to add another storage provider the CS3 storage registry that is running as part of the CS3 gateway hes to be made aware of it. The easiest cleanest way to do it is to set `GATEWAY_STORAGE_REGISTRY_CONFIG_JSON=/path/to/storages.json` and list all storage providers like this:
+
+```json
+{
+  "com.owncloud.api.storage-users": {
+    "providerid": "{storage-users-mount-uuid}",
+    "spaces": {
+      "personal": {
+        "mount_point":   "/users",
+        "path_template": "/users/{{.Space.Owner.Id.OpaqueId}}"
+      },
+      "project": {
+        "mount_point":   "/projects",
+        "path_template": "/projects/{{.Space.Name}}"
+      }
+    }
+  },
+  "com.owncloud.api.storage-shares": {
+    "providerid": "a0ca6a90-a365-4782-871e-d44447bbc668",
+    "spaces": {
+      "virtual": {
+        "mount_point": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares"
+      },
+      "grant": {
+        "mount_point": "."
+      },
+      "mountpoint": {
+        "mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+        "path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}"
+      }
+    }
+  },
+  "com.owncloud.api.storage-publiclink": {
+    "providerid": "7993447f-687f-490d-875c-ac95e89a62a4",
+    "spaces": {
+      "grant": {
+        "mount_point": "."
+      },
+      "mountpoint": {
+        "mount_point":   "/public",
+        "path_template": "/public/{{.Space.Root.OpaqueId}}"
+      }
+    }
+  },
+  "com.owncloud.api.ocm": {
+    "providerid": "89f37a33-858b-45fa-8890-a1f2b27d90e1",
+    "spaces": {
+      "grant": {
+        "mount_point": "."
+      },
+      "mountpoint": {
+        "mount_point":   "/ocm",
+        "path_template": "/ocm/{{.Space.Root.OpaqueId}}"
+      }
+    }
+  },
+  "com.owncloud.api.storage-hello": {
+    "providerid": "hello-storage-id",
+    "spaces": {
+      "project": {
+        "mount_point":   "/hello",
+        "path_template": "/hello/{{.Space.Name}}"
+      }
+    }
+  }
+}
+```
+
+In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `com.owncloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.
