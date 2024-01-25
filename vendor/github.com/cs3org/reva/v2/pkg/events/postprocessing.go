@@ -42,6 +42,8 @@ var (
 	PPStepPolicies Postprocessingstep = "policies"
 	// PPStepDelay is the step that processing. Useful for testing or user annoyment
 	PPStepDelay Postprocessingstep = "delay"
+	// PPStepFinished is the step that signals that postprocessing is finished, but storage provider hasn't acknowledged it yet
+	PPStepFinished Postprocessingstep = "finished"
 
 	// PPOutcomeDelete means that the file and the upload should be deleted
 	PPOutcomeDelete PostprocessingOutcome = "delete"
@@ -193,6 +195,7 @@ func (UploadReady) Unmarshal(v []byte) (interface{}, error) {
 // ResumePostprocessing can be emitted to repair broken postprocessing
 type ResumePostprocessing struct {
 	UploadID  string
+	Step      Postprocessingstep
 	Timestamp *types.Timestamp
 }
 

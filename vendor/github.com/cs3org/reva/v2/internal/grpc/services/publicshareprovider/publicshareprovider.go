@@ -68,7 +68,6 @@ type config struct {
 }
 
 type passwordPolicy struct {
-	Disabled               bool                `mapstructure:"disabled"`
 	MinCharacters          int                 `mapstructure:"min_characters"`
 	MinLowerCaseCharacters int                 `mapstructure:"min_lowercase_characters"`
 	MinUpperCaseCharacters int                 `mapstructure:"min_uppercase_characters"`
@@ -174,10 +173,9 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 
 func newPasswordPolicy(c *passwordPolicy) password.Validator {
 	if c == nil {
-		return password.NewPasswordPolicy(true, 0, 0, 0, 0, 0, nil)
+		return password.NewPasswordPolicy(0, 0, 0, 0, 0, nil)
 	}
 	return password.NewPasswordPolicy(
-		c.Disabled,
 		c.MinCharacters,
 		c.MinLowerCaseCharacters,
 		c.MinUpperCaseCharacters,

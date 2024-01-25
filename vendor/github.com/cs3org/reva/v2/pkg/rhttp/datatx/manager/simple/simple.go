@@ -93,6 +93,13 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 			defer func() {
 				metrics.UploadsActive.Sub(1)
 			}()
+
+			if r.ContentLength == 0 {
+				sublog.Info().Msg("received invalid 0-byte PUT request")
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
 			fn := r.URL.Path
 			defer r.Body.Close()
 

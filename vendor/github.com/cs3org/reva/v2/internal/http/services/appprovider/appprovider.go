@@ -276,9 +276,8 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer httpRes.Body.Close()
-	if httpRes.StatusCode == http.StatusForbidden {
+	if httpRes.StatusCode == http.StatusBadRequest {
 		// the file upload was already finished since it is a zero byte file
-		// TODO: why do we get a 401 then!?
 	} else if httpRes.StatusCode != http.StatusOK {
 		writeError(w, r, appErrorServerError, "failed to create the file", nil)
 		return
