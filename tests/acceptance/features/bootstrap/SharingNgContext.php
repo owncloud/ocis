@@ -232,6 +232,26 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user updates the last share with the following using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userUpdatesTheLastShareWithFollowingUsingGraphApi($user, TableNode $table) {
+		$response = $this->featureContext->shareNgGetLastCreatedUserGroupShare();
+		$permissionID = json_decode($response->getBody()->getContents())->value[0]->id;
+		$this->featureContext->setResponse(
+			$this->updateShare(
+				$user,
+				$table,
+				$permissionID
+			)
+		);
+	}
+
+	/**
 	 * @When user :user sends the following share invitation with file-id :fileId using the Graph API:
 	 *
 	 * @param string $user
@@ -287,16 +307,28 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 */
 	public function userUpdatesLastPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
+		$this->featureContext->setResponse(
+			$this->updateShare(
+				$user,
+				$body,
+				$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $body
+	 * @param string $permissionID
+	 *
+	 * @return ResponseInterface
+	 */
+	public function updateShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		if (\array_key_exists('role', $bodyRows) && \array_key_exists('expirationDateTime', $bodyRows)) {
 			$body = [
@@ -319,7 +351,7 @@ class SharingNgContext implements Context {
 			throw new Error('Expiration date or role is missing to update for share link!');
 		}
 
-		$response = GraphHelper::updateLinkShare(
+		return GraphHelper::updateLinkShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -327,9 +359,8 @@ class SharingNgContext implements Context {
 			$spaceId,
 			$itemId,
 			\json_encode($body),
-			$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			$permissionID
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
