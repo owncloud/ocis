@@ -14,7 +14,7 @@ github.com/BurntSushi/toml/internal
 # github.com/CiscoM31/godata v1.0.9
 ## explicit; go 1.19
 github.com/CiscoM31/godata
-# github.com/KimMachineGun/automemlimit v0.4.0
+# github.com/KimMachineGun/automemlimit v0.5.0
 ## explicit; go 1.19
 github.com/KimMachineGun/automemlimit
 github.com/KimMachineGun/automemlimit/memlimit
@@ -1599,6 +1599,9 @@ github.com/oxtoacart/bpool
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
+# github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
+## explicit; go 1.16
+github.com/pbnjay/memory
 # github.com/pjbgf/sha1cd v0.3.0
 ## explicit; go 1.19
 github.com/pjbgf/sha1cd

@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/CiscoM31/godata v1.0.9
-	github.com/KimMachineGun/automemlimit v0.4.0
+	github.com/KimMachineGun/automemlimit v0.5.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
@@ -284,6 +284,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
