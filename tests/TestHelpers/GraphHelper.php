@@ -68,6 +68,27 @@ class GraphHelper {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getFileIdRegex(): string {
+		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!' . self::getUUIDv4Regex();
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getShareIdRegex(): string {
+		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getEtagRegex(): string {
+		return "^\\\"[a-f0-9:.]{1,32}\\\"$";
+	}
+
+	/**
 	 * Key name can consist of @@@
 	 * This function separate such key and return its actual value from actual drive response which can be used for assertion
 	 *
