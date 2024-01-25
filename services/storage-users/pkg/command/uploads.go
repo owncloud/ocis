@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	tw "github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -95,10 +97,9 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				DefaultText: "unset",
 				Usage:       "filter sessions by expired status",
 			},
-			&cli.StringFlag{
-				Name:  "output",
-				Usage: "output format to use (can be 'plain' or 'json', experimental)",
-				Value: "plain",
+			&cli.BoolFlag{
+				Name:  "json",
+				Usage: "output as json",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -122,6 +123,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				fmt.Fprintf(os.Stderr, "'%s' storage does not support listing upload sessions\n", cfg.Driver)
 				os.Exit(1)
 			}
+
 			var b strings.Builder
 			filter := storage.UploadSessionFilter{}
 			if c.IsSet("processing") {
@@ -168,13 +170,10 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			asJson := c.String("output") == "json"
-			if !asJson {
-				fmt.Println(b.String())
-			}
-			for _, u := range uploads {
-				ref := u.Reference()
-				if asJson {
+			var table *tw.Table
+			if c.Bool("json") {
+				for _, u := range uploads {
+					ref := u.Reference()
 					s := struct {
 						ID         string         `json:"id"`
 						Space      string         `json:"space"`
@@ -201,9 +200,31 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						fmt.Println(err)
 					}
 					fmt.Println(string(j))
-				} else {
-					fmt.Printf(" - %s (Space: %s, Name: %s, Size: %d/%d, Expires: %s, Processing: %t)\n", ref.GetResourceId().GetSpaceId(), u.ID(), u.Filename(), u.Offset(), u.Size(), u.Expires(), u.IsProcessing())
 				}
+			} else {
+
+				// Print what the user requested
+				fmt.Println(b.String())
+
+				// start a table
+				table = tw.NewWriter(os.Stdout)
+				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing"})
+				table.SetAutoFormatHeaders(false)
+
+				for _, u := range uploads {
+					table.Append([]string{
+						u.Reference().ResourceId.GetSpaceId(),
+						u.ID(),
+						u.Filename(),
+						strconv.FormatInt(u.Offset(), 10),
+						strconv.FormatInt(u.Size(), 10),
+						u.Executant().OpaqueId,
+						u.SpaceOwner().GetOpaqueId(),
+						u.Expires().Format(time.RFC3339),
+						strconv.FormatBool(u.IsProcessing()),
+					})
+				}
+				table.Render()
 			}
 			return nil
 		},
