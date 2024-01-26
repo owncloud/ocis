@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -20,10 +19,15 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 		Usage: "restart postprocessing for an uploadID",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "upload-id",
-				Aliases:  []string{"u"},
-				Required: true,
-				Usage:    "the uploadid to restart",
+				Name:    "upload-id",
+				Aliases: []string{"u"},
+				Usage:   "the uploadid to restart. Ignored if unset.",
+			},
+			&cli.StringFlag{
+				Name:    "step",
+				Aliases: []string{"s"},
+				Usage:   "restarts all uploads in the given postprocessing step. Ignored if upload-id is set.",
+				Value:   "finished", // Calling `ocis postprocessing restart` without any arguments will restart all uploads that are finished but failed to move the uploed from the upload area to the blobstore.
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -35,24 +39,18 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			uid, step := c.String("upload-id"), ""
+			if uid == "" {
+				step = c.String("step")
+			}
+
 			ev := events.ResumePostprocessing{
-				UploadID:  c.String("upload-id"),
+				UploadID:  uid,
+				Step:      events.Postprocessingstep(step),
 				Timestamp: utils.TSNow(),
 			}
 
-			if err := events.Publish(context.Background(), stream, ev); err != nil {
-				return err
-			}
-
-			// go-micro nats implementation uses async publishing,
-			// therefore we need to manually wait.
-			//
-			// FIXME: upstream pr
-			//
-			// https://github.com/go-micro/plugins/blob/3e77393890683be4bacfb613bc5751867d584692/v4/events/natsjs/nats.go#L115
-			time.Sleep(5 * time.Second)
-
-			return nil
+			return events.Publish(context.Background(), stream, ev)
 		},
 	}
 }

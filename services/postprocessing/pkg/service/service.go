@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/postprocessing"
@@ -142,29 +143,20 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 			return fmt.Errorf("%w: cannot get upload", errEvent)
 		}
-		next = pp.Delay(ev)
+		next = pp.Delay()
 	case events.UploadReady:
+		if ev.Failed {
+			// the upload failed - let's keep it around for a while
+			return nil
+		}
+
 		// the storage provider thinks the upload is done - so no need to keep it any more
 		if err := pps.store.Delete(ev.UploadID); err != nil {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot delete upload")
 			return fmt.Errorf("%w: cannot delete upload", errEvent)
 		}
 	case events.ResumePostprocessing:
-		pp, err = pps.getPP(pps.store, ev.UploadID)
-		if err != nil {
-			if err == store.ErrNotFound {
-				if err := events.Publish(ctx, pps.pub, events.RestartPostprocessing{
-					UploadID:  ev.UploadID,
-					Timestamp: ev.Timestamp,
-				}); err != nil {
-					pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot publish RestartPostprocessing event")
-				}
-				return fmt.Errorf("%w: cannot publish RestartPostprocessing event", errEvent)
-			}
-			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
-			return fmt.Errorf("%w: cannot get upload", errEvent)
-		}
-		next = pp.CurrentStep()
+		return pps.handleResumePPEvent(ctx, ev)
 	}
 
 	if pp != nil {
@@ -180,30 +172,6 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 		}
 	}
 	return nil
-}
-
-func getSteps(c config.Postprocessing) []events.Postprocessingstep {
-	// NOTE: improved version only allows configuring order of postprocessing steps
-	// But we aim for a system where postprocessing steps can be configured per space, ideally by the spaceadmin itself
-	// We need to iterate over configuring PP service when we see fit
-	var steps []events.Postprocessingstep
-	for _, s := range c.Steps {
-		steps = append(steps, events.Postprocessingstep(s))
-	}
-
-	return steps
-}
-
-func storePP(sto store.Store, pp *postprocessing.Postprocessing) error {
-	b, err := json.Marshal(pp)
-	if err != nil {
-		return err
-	}
-
-	return sto.Write(&store.Record{
-		Key:   pp.ID,
-		Value: b,
-	})
 }
 
 func (pps *PostprocessingService) getPP(sto store.Store, uploadID string) (*postprocessing.Postprocessing, error) {
@@ -223,4 +191,96 @@ func (pps *PostprocessingService) getPP(sto store.Store, uploadID string) (*post
 	}
 
 	return pp, nil
+}
+
+func getSteps(c config.Postprocessing) []events.Postprocessingstep {
+	// NOTE: improved version only allows configuring order of postprocessing steps
+	// But we aim for a system where postprocessing steps can be configured per space, ideally by the spaceadmin itself
+	// We need to iterate over configuring PP service when we see fit
+	steps := make([]events.Postprocessingstep, 0, len(c.Steps))
+	for _, s := range c.Steps {
+		steps = append(steps, events.Postprocessingstep(s))
+	}
+
+	return steps
+}
+
+func storePP(sto store.Store, pp *postprocessing.Postprocessing) error {
+	b, err := json.Marshal(pp)
+	if err != nil {
+		return err
+	}
+
+	return sto.Write(&store.Record{
+		Key:   pp.ID,
+		Value: b,
+	})
+}
+
+func (pps *PostprocessingService) handleResumePPEvent(ctx context.Context, ev events.ResumePostprocessing) error {
+	ids := []string{ev.UploadID}
+	if ev.Step != "" {
+		ids = pps.findUploadsByStep(ev.Step)
+	}
+
+	for _, id := range ids {
+		if err := pps.resumePP(ctx, id); err != nil {
+			pps.log.Error().Str("uploadID", id).Err(err).Msg("cannot resume upload")
+			return fmt.Errorf("%w: cannot resume upload", errEvent)
+		}
+	}
+	return nil
+}
+
+func (pps *PostprocessingService) resumePP(ctx context.Context, uploadID string) error {
+	pp, err := pps.getPP(pps.store, uploadID)
+	if err != nil {
+		if err == store.ErrNotFound {
+			if err := events.Publish(ctx, pps.pub, events.RestartPostprocessing{
+				UploadID:  uploadID,
+				Timestamp: utils.TSNow(),
+			}); err != nil {
+				return err
+			}
+			return nil
+		}
+		return fmt.Errorf("%w: cannot get upload", errEvent)
+	}
+
+	return events.Publish(ctx, pps.pub, pp.CurrentStep())
+}
+
+func (pps *PostprocessingService) findUploadsByStep(step events.Postprocessingstep) []string {
+	var ids []string
+
+	keys, err := pps.store.List()
+	if err != nil {
+		pps.log.Error().Err(err).Msg("cannot list uploads")
+	}
+
+	for _, k := range keys {
+		rec, err := pps.store.Read(k)
+		if err != nil {
+			pps.log.Error().Err(err).Msg("cannot read upload")
+			continue
+		}
+
+		if len(rec) != 1 {
+			pps.log.Error().Err(err).Msg("expected only one result")
+			continue
+		}
+
+		pp := &postprocessing.Postprocessing{}
+		err = json.Unmarshal(rec[0].Value, pp)
+		if err != nil {
+			pps.log.Error().Err(err).Msg("cannot unmarshal upload")
+			continue
+		}
+
+		if pp.Status.CurrentStep == step {
+			ids = append(ids, pp.ID)
+		}
+	}
+
+	return ids
 }

@@ -55,10 +55,9 @@ func NewRequest(ctx context.Context, method, urlStr string, httpReq *http.Reques
 
 // SetPreview sets the preview bytes in the icap header
 // todo: defer close error
-func (r *Request) SetPreview(maxBytes int) error {
+func (r *Request) SetPreview(maxBytes int) (err error) {
 	var bodyBytes []byte
 	var previewBytes int
-	var err error
 
 	// receiving the body bites to determine the preview bytes depending on the request ICAP method
 	if r.Method == MethodREQMOD {

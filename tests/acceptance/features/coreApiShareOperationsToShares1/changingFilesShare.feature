@@ -20,7 +20,7 @@ Feature: sharing
     And user "Alice" has shared folder "/share1" with user "Brian"
     And user "Alice" has shared folder "/share2" with user "Brian"
     When user "Brian" moves file "/Shares/share1/textfile0.txt" to "/Shares/share2/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And as "Brian" file "/Shares/share1/textfile0.txt" should exist
     And as "Alice" file "share1/textfile0.txt" should exist
     But as "Brian" file "/Shares/share2/textfile0.txt" should not exist

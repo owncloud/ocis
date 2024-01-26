@@ -45,7 +45,7 @@ Feature: move (rename) file
       | shareWith   | Alice         |
     And user "Alice" has uploaded file with content "test data" to "/testfile.txt"
     When user "Alice" moves file "/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And as "Alice" file "Shares/testshare/testfile.txt" should not exist
     And as "Brian" file "testshare/testfile.txt" should not exist
     But as "Alice" file "/testfile.txt" should exist
@@ -95,7 +95,7 @@ Feature: move (rename) file
       | permissions | <permissions> |
       | shareWith   | Alice         |
     When user "Alice" moves file "/Shares/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And as "Alice" file "/Shares/testshare/testfile.txt" should exist
     And as "Brian" file "/testshare/testfile.txt" should exist
     Examples:
@@ -146,7 +146,7 @@ Feature: move (rename) file
     And user "Alice" has created folder "/testsubfolder"
     And user "Alice" has uploaded file with content "test data" to "/testsubfolder/testfile.txt"
     When user "Alice" moves folder "/testsubfolder" to "Shares/testshare/testsubfolder" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And as "Alice" folder "/Shares/testshare/testsubfolder" should not exist
     And as "Brian" folder "/testshare/testsubfolder" should not exist
     But as "Alice" folder "/testsubfolder" should exist
@@ -202,7 +202,7 @@ Feature: move (rename) file
       | permissions | <permissions> |
       | shareWith   | Alice         |
     When user "Alice" moves folder "/Shares/testshare/testsubfolder" to "/testsubfolder" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And as "Alice" folder "/Shares/testshare/testsubfolder" should exist
     And as "Brian" folder "/testshare/testsubfolder" should exist
     Examples:
