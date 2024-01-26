@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2024-01-26T11:36:32.105780284Z
+date: 2024-01-26T16:15:42.767642886Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
@@ -119,6 +119,14 @@ ocis storage-users uploads list
 -   Then use the restart command to resume postprocessing of the ID selected.
 ```bash
 ocis postprocessing restart -u <uploadID>
+```
+
+Instead of starting one specific upload, a system admin can also restart all uploads that are currently in a specific step.
+Examples:
+```
+ocis postprocessing restart # Restarts all uploads where postprocessing is finished, but upload is not finished
+ocis postprocessing restart -s "finished" # Equivalent to the above
+ocis postprocessing restart -s "virusscan" # Restart all uploads currently in virusscan step
 ```
 ## Example Yaml Config
 {{< include file="services/_includes/postprocessing-config-example.yaml"  language="yaml" >}}
