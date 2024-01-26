@@ -1010,6 +1010,8 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		parentRef.SetDriveType(res.GetSpace().GetSpaceType())
 		parentRef.SetDriveId(storagespace.FormatStorageID(res.GetParentId().GetStorageId(), res.GetParentId().GetSpaceId()))
 		parentRef.SetId(storagespace.FormatResourceID(*res.GetParentId()))
+		parentRef.SetName(res.GetName())
+		parentRef.SetPath(res.GetPath())
 		driveItem.ParentReference = parentRef
 	}
 	if res.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.GetMimeType() != "" {
