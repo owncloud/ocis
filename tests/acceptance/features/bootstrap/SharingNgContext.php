@@ -156,16 +156,18 @@ class SharingNgContext implements Context {
 				: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
 		}
 
-		$sharees = array_map('trim', explode(',', $rows['sharee']));
-		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+		if (\array_key_exists('shareeId', $rows)) {
+			$shareeIds[] = $rows['shareeId'];
+			$shareTypes[] = $rows['shareType'];
+		} else {
+			$sharees = array_map('trim', explode(',', $rows['sharee']));
+			$shareTypes = array_map('trim', explode(',', $rows['shareType']));
 
-		$shareeIds = [];
-		foreach ($sharees as $index => $sharee) {
-			$shareType = $shareTypes[$index];
-			// for non-exiting group or user, generate random id
-			$shareeIds[] = (($shareType === 'user')
-				? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
-				: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id')) ?: WebDavHelper::generateUUIDv4();
+			foreach ($sharees as $sharee) {
+				// for non-exiting group or user, generate random id
+				$shareeIds[] = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
+					?: ($this->featureContext->getAttributeOfCreatedGroup($sharee, 'id') ?: WebDavHelper::generateUUIDv4());
+			}
 		}
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
@@ -208,6 +210,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
+	 * @When /^user "([^"]*)" tries to send the following share invitation using the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table

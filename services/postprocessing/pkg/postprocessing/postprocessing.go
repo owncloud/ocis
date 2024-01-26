@@ -65,14 +65,14 @@ func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interfa
 
 // CurrentStep returns the current postprocessing step
 func (pp *Postprocessing) CurrentStep() interface{} {
-	if pp.Status.Outcome != "" {
+	if pp.Status.CurrentStep == events.PPStepFinished {
 		return pp.finished(pp.Status.Outcome)
 	}
 	return pp.step(pp.Status.CurrentStep)
 }
 
 // Delay will sleep the configured time then continue
-func (pp *Postprocessing) Delay(ev events.StartPostprocessingStep) interface{} {
+func (pp *Postprocessing) Delay() interface{} {
 	time.Sleep(pp.config.Delayprocessing)
 	return pp.next(events.PPStepDelay)
 }
@@ -106,6 +106,7 @@ func (pp *Postprocessing) step(next events.Postprocessingstep) events.StartPostp
 }
 
 func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.PostprocessingFinished {
+	pp.Status.CurrentStep = events.PPStepFinished
 	pp.Status.Outcome = outcome
 	return events.PostprocessingFinished{
 		UploadID:      pp.ID,

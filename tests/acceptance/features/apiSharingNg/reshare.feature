@@ -123,3 +123,109 @@ Feature: Reshare a share invitation
       | Editor           | Viewer                   |
       | Editor           | Editor                   |
       | Editor           | Uploader                 |
+
+
+  Scenario: try to reshare a resource to higher roles
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | file          |
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Brian" sends the following share invitation using the Graph API:
+      | resourceType    | file          |
+      | resource        | textfile1.txt |
+      | space           | Shares        |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "accessDenied"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "insufficient permissions to create that kind of share"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    And for user "Carol" the space Shares should not contain these entries:
+      | textfile1.txt |
+
+
+  Scenario: user with role Uploader tries to reshare a folder
+    Given user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | folder        |
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Uploader      |
+    When user "Brian" sends the following share invitation using the Graph API:
+      | resourceType    | folder        |
+      | resource        | FolderToShare |
+      | space           | Shares        |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "accessDenied"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "no permission to add grants on shared resource"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    And for user "Carol" the space Shares should not contain these entries:
+      | textfile1.txt |

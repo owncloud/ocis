@@ -1192,3 +1192,297 @@ Feature: Send a sharing invitations
       | Viewer           | folder        | FolderToShare  |
       | Editor           | folder        | FolderToShare  |
       | Uploader         | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to wrong user id
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type>                      |
+      | resource        | <path>                               |
+      | space           | Personal                             |
+      | shareeId        | a4c0c83e-ae24-4870-93c3-fcaf2a2228f7 |
+      | shareType       | user                                 |
+      | permissionsRole | Viewer                               |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["generalException"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "itemNotFound: not found"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation with empty user id
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | shareeId        |                 |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["invalidRequest"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].ObjectId' Error:Field validation for 'ObjectId' failed on the 'ne' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to user with wrong recipient type
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | wrongShareType  |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["invalidRequest"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to group with wrong recipient type
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       | wrongShareType  |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["invalidRequest"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to user with empty recipient type
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       |                 |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["invalidRequest"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to group with empty recipient type
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       |                 |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["invalidRequest"]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |

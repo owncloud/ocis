@@ -125,7 +125,7 @@ Feature: move (rename) file
       | role      | <role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     When user "Alice" moves file "project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And for user "Alice" the space "Project" should contain these entries:
       | project.txt |
     But for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
@@ -168,7 +168,7 @@ Feature: move (rename) file
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has uploaded file with content "personal content" to "personal.txt"
     When user "Alice" moves file "personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And for user "Alice" the space "Personal" should contain these entries:
       | personal.txt |
     But for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
@@ -185,7 +185,7 @@ Feature: move (rename) file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     When user "Alice" moves file "/testshare/testshare.txt" from space "Shares" to "testshare.txt" inside space "Personal" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And for user "Alice" the space "Personal" should not contain these entries:
       | testshare.txt |
     And for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
@@ -207,7 +207,7 @@ Feature: move (rename) file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     When user "Alice" moves file "/testshare/testshare.txt" from space "Shares" to "testshare.txt" inside space "Project" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And for user "Alice" the space "Project" should not contain these entries:
       | /testshare.txt |
     And for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
@@ -232,7 +232,7 @@ Feature: move (rename) file
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<from_permissions>"
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "<to_permissions>"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And for user "Alice" folder "testshare1" of the space "Shares" should contain these entries:
       | testshare1.txt |
     But for user "Alice" folder "testshare2" of the space "Shares" should not contain these entries:

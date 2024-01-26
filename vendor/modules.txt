@@ -362,7 +362,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.18.1-0.20240124094635-6eec406c0be7
+# github.com/cs3org/reva/v2 v2.18.1-0.20240126141248-c9e4a3bcd0da
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -763,7 +763,7 @@ github.com/dutchcoders/go-clamd
 # github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc
 ## explicit
 github.com/egirna/icap
-# github.com/egirna/icap-client v0.1.1 => github.com/fschade/icap-client v0.0.0-20240105150744-9c2d8aff3ef2
+# github.com/egirna/icap-client v0.1.1 => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 ## explicit; go 1.21
 github.com/egirna/icap-client
 # github.com/emirpasic/gods v1.18.1
@@ -2320,4 +2320,4 @@ stash.kopano.io/kgol/oidc-go
 stash.kopano.io/kgol/rndm
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
 # github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
-# github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240105150744-9c2d8aff3ef2
+# github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf

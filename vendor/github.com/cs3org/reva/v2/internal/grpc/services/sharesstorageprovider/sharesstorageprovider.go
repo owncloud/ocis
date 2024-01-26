@@ -667,7 +667,7 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 
 	if dstReceivedShare.Share.Id.OpaqueId != srcReceivedShare.Share.Id.OpaqueId {
 		return &provider.MoveResponse{
-			Status: status.NewPermissionDenied(ctx, nil, "cross storage moves are not permitted, use copy and delete"),
+			Status: status.NewUnimplemented(ctx, nil, "cross storage moves are not supported, use copy and delete"),
 		}, nil
 	}
 

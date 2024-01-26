@@ -295,13 +295,9 @@ func (s *OcisSession) MTime() time.Time {
 	return t
 }
 
-// IsProcessing returns true if the node has entered postprocessing state
+// IsProcessing returns true if all bytes have been received. The session then has entered postprocessing state.
 func (s *OcisSession) IsProcessing() bool {
-	n, err := s.Node(context.Background())
-	if err != nil {
-		return false
-	}
-	return n.IsProcessing(context.Background())
+	return s.info.Size == s.info.Offset
 }
 
 // binPath returns the path to the file storing the binary data.

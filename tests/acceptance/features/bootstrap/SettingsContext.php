@@ -15,6 +15,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
+use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -339,13 +340,14 @@ class SettingsContext implements Context {
 
 	/**
 	 * @param string $user
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestGetSettingsValuesList(string $user): ResponseInterface {
+	public function sendRequestGetSettingsValuesList(string $user, array $headers = null): ResponseInterface {
 		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-list";
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
@@ -353,9 +355,31 @@ class SettingsContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
+			$headers,
 			$body
 		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists values-list with headers using the Settings API$/
+	 *
+	 * @param string $user
+	 * @param TableNode $headersTable
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserListsAllValuesListWithHeadersUsingSettingsApi(string $user, TableNode $headersTable): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$headersTable,
+			['header', 'value']
+		);
+		foreach ($headersTable as $row) {
+			$headers[$row['header']] = $row ['value'];
+		}
+		$this->featureContext->setResponse($this->sendRequestGetSettingsValuesList($user, $headers));
 	}
 
 	/**
