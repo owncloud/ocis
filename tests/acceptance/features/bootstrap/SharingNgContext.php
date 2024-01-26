@@ -163,12 +163,10 @@ class SharingNgContext implements Context {
 			$sharees = array_map('trim', explode(',', $rows['sharee']));
 			$shareTypes = array_map('trim', explode(',', $rows['shareType']));
 
-			foreach ($sharees as $index => $sharee) {
-				$shareType = $shareTypes[$index];
+			foreach ($sharees as $sharee) {
 				// for non-exiting group or user, generate random id
-				$shareeIds[] = (($shareType === 'user')
-					? $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
-					: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id')) ?: WebDavHelper::generateUUIDv4();
+				$shareeIds[] = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
+					?: ($this->featureContext->getAttributeOfCreatedGroup($sharee, 'id') ?: WebDavHelper::generateUUIDv4());
 			}
 		}
 
