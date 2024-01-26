@@ -822,7 +822,6 @@ def localApiTestPipeline(ctx):
 
 def localApiTests(suite, storage, extra_environment = {}):
     environment = {
-        "TEST_WITH_GRAPH_API": "true",
         "PATH_TO_OCIS": dirs["base"],
         "TEST_SERVER_URL": "https://ocis-server:9200",
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
@@ -1006,7 +1005,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
-                             "TEST_WITH_GRAPH_API": "true",
                              "PATH_TO_OCIS": "%s" % dirs["base"],
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
