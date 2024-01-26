@@ -1218,6 +1218,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
+		$url = $this->substituteInLineCodes($url, $user);
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null));
 	}
 
@@ -2879,6 +2880,14 @@ class FeatureContext extends BehatVariablesContext {
 				"function" =>
 				[$this, "getGroupIdByGroupName"],
 				"parameter" => [$group]
+				],
+				[
+					"code" => "%shares_drive_id%",
+					"function" => [
+						$this->spacesContext,
+						"getSpaceIdByName"
+					],
+					"parameter" => [$user, "Shares"]
 				]
 			);
 		}
