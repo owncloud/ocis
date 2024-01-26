@@ -41,15 +41,18 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
+* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
 * Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
 * Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
 * Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
 * Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
 * Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
 ## Details
 
@@ -58,6 +61,15 @@ The following sections list the changes for unreleased.
    Removes jwt config of policies service
 
    https://github.com/owncloud/ocis/pull/7893
+
+* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
+
+   We want to disallow deleting a file during the processing to prevent collecting
+   the orphan uploads.
+
+   https://github.com/owncloud/ocis/issues/8127
+   https://github.com/owncloud/ocis/pull/8132
+   https://github.com/cs3org/reva/pull/4446
 
 * Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
 
@@ -98,6 +110,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8236
 
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
+
+   We fixed a problem where after renaming resource as sharer the receiver see a
+   new name.
+
+   https://github.com/owncloud/ocis/issues/8242
+   https://github.com/owncloud/ocis/pull/8246
+   https://github.com/cs3org/reva/pull/4463
+
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 
    We fixed a bug in the graph API for creating and updating shares so that
@@ -133,6 +154,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7916
    https://github.com/owncloud/ocis/pull/8152
    https://github.com/cs3org/reva/pull/4453
+
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
+
+   Allows to restart all commands in a specific state.
+
+   https://github.com/owncloud/ocis/pull/8287
 
 # Changelog for [5.0.0-rc.2] (2024-01-17)
 
@@ -248,7 +275,7 @@ The following sections list the changes for 5.0.0-rc.2.
 * Enhancement - Update reva to latest edge version: [#8100](https://github.com/owncloud/ocis/pull/8100)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 * Enhancement - Update web to v8.0.0-rc.2: [#8154](https://github.com/owncloud/ocis/pull/8154)
-* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
 ## Details
 
@@ -1601,10 +1628,11 @@ The following sections list the changes for 5.0.0-rc.2.
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
 
-* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
    We update reva to the latest edge version to get the latest fixes and features.
 
+   https://github.com/owncloud/ocis/pull/8287
    https://github.com/owncloud/ocis/pull/8278
    https://github.com/owncloud/ocis/pull/8264
    https://github.com/owncloud/ocis/pull/8100
