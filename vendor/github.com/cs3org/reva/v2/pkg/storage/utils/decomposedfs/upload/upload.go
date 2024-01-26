@@ -191,7 +191,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 
 	n, err := session.store.CreateNodeForUpload(session, attrs)
 	if err != nil {
-		session.store.Cleanup(ctx, session, true, false, true)
+		session.store.Cleanup(ctx, session, true, false, false)
 		return err
 	}
 
