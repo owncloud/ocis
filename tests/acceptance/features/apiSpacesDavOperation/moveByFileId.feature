@@ -95,7 +95,7 @@ Feature: moving/renaming file using file id
     And we save it into "FILEID"
     When user "Brian" moves a file "test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
-    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "move:error: not supported: cannot move across spaces"
+    And the value of the item "/d:error/s:message" in the response about user "Brian" should be "cross storage moves are not supported, use copy and delete"
     And for user "Brian" folder "/" of the space "Personal" should contain these files:
       | test.txt |
     But for user "Alice" folder "folder" of the space "Personal" should not contain these files:
