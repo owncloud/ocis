@@ -1,4 +1,4 @@
-services/settings/ @kulmann @lookacat
+services/settings/ @kulmann
 services/web/ @kulmann
 .drone.star @wkloucek @micbar @phil-davis @individual-it
 assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf @micbar @dragotin @tbsbdr
