@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-01-26T00:53:23.284453632Z
+date: 2024-01-26T18:43:32.868926532Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -63,10 +63,13 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 Example cases for expired uploads
 
-*   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
+*   In the final step the upload blob is moved from the upload area to the final blobstore (e.g. S3). 
+
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
-There are two commands available to manage unfinished uploads
+The admin can restart the postprocessing for this with the postprocessing cli.
+
+The storage users service can only list and clean upload sessions:
 
 ```bash
 ocis storage-users uploads <command>
@@ -74,21 +77,38 @@ ocis storage-users uploads <command>
 
 ```plaintext
 COMMANDS:
-   list     Print a list of all incomplete uploads
-   clean    Clean up leftovers from expired uploads
+   sessions   Print a list of upload sessions
+   clean      Clean up leftovers from expired uploads
+   list       Print a list of all incomplete uploads (deprecated)
 ```
 
 #### Command Examples
 
-Command to identify incomplete uploads
+Command to list ongoing upload sessions
 
 ```bash
-ocis storage-users uploads list
+ocis storage-users sessions --expired=false
 ```
 
 ```plaintext
-Incomplete uploads:
- - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
+Not expired sessions:
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
+|                Space                 |              Upload Id               |  Name   | Offset | Size |              Executant               |                Owner                 |          Expires          | Processing |
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
+| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 5e387954-7313-4223-a904-bf996da6ec0b | foo.txt |      0 | 1234 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:04:31+01:00 | false      |
+| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f066244d-97b2-48e7-a30d-b40fcb60cec6 | bar.txt |      0 | 4321 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:18:47+01:00 | false      |
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
+```
+
+The sessions command can also output json
+
+```bash
+ocis storage-users sessions --expired=false --json
+```
+
+```json
+{"id":"5e387954-7313-4223-a904-bf996da6ec0b","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"foo.txt","offset":0,"size":1234,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:04:31+01:00","processing":false}
+{"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false}
 ```
 
 Command to clear expired uploads
@@ -99,6 +119,17 @@ ocis storage-users uploads clean
 ```plaintext
 Cleaned uploads:
 - 455bd640-cd08-46e8-a5a0-9304908bd40a (Filename: file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
+```
+
+Deprecated list command to identify unfinished uploads
+
+```bash
+ocis storage-users uploads list
+```
+
+```plaintext
+Incomplete uploads:
+ - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
 ```
 
 ### Purge Expired Space Trash-Bins Items
