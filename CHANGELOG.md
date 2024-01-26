@@ -63,7 +63,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
-* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
 ## Details
 
@@ -250,13 +251,20 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8152
    https://github.com/cs3org/reva/pull/4453
 
-* Enhancement - Update reva to latest edge version: [#8278](https://github.com/owncloud/ocis/pull/8278)
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
    We update reva to the latest edge version to get the latest fixes and features.
 
+   https://github.com/owncloud/ocis/pull/8287
    https://github.com/owncloud/ocis/pull/8278
    https://github.com/owncloud/ocis/pull/8264
    https://github.com/owncloud/ocis/pull/8100
+
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
+
+   Allows to restart all commands in a specific state.
+
+   https://github.com/owncloud/ocis/pull/8287
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
