@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 )
@@ -27,7 +28,7 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create link")
 
-	_, driveItemID, err := g.GetDriveAndItemIDParam(r)
+	_, driveItemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -60,7 +61,7 @@ func (g Graph) CreateLink(w http.ResponseWriter, r *http.Request) {
 // SetLinkPassword sets public link password on the cs3 api
 func (g Graph) SetLinkPassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

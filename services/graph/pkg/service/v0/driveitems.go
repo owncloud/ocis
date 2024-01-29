@@ -580,7 +580,7 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePermission updates a Permission of a Drive item
 func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
-	_, itemID, err := g.GetDriveAndItemIDParam(r)
+	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
