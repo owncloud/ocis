@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
 * Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 
 ## Details
 
@@ -265,6 +266,16 @@ The following sections list the changes for unreleased.
    Allows to restart all commands in a specific state.
 
    https://github.com/owncloud/ocis/pull/8287
+
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
+
+   We have changed the default MaxConcurrency value from 100 to 5 to prevent too
+   frequent gc runs on low memory systems. We have also bumped reva to pull in the
+   related changes from there.
+
+   https://github.com/owncloud/ocis/issues/8257
+   https://github.com/owncloud/ocis/pull/8309
+   https://github.com/cs3org/reva/pull/4485
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
