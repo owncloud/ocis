@@ -1486,3 +1486,54 @@ Feature: Send a sharing invitations
       | resource-type | path           |
       | file          | /textfile1.txt |
       | folder        | FolderToShare  |
+
+
+  Scenario Outline: try to share a resource with invalid roles
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalidRequest"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "role not applicable to this resource"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Co Owner         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
