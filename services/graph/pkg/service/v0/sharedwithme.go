@@ -136,7 +136,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 				driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
 					StorageId: utils.ShareStorageProviderID,
-					OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
+					OpaqueId:  storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId()),
 					SpaceId:   utils.ShareStorageSpaceID,
 				}))
 
