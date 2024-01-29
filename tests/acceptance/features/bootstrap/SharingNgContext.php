@@ -151,9 +151,8 @@ class SharingNgContext implements Context {
 				$rows['resource']
 			);
 		} else {
-			$itemId = ($rows['resourceType'] === 'folder')
-				? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
-				: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
+			$resource = $rows['resource'] ?? '';
+			$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
 		}
 
 		if (\array_key_exists('shareeId', $rows)) {
@@ -211,6 +210,7 @@ class SharingNgContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
 	 * @When /^user "([^"]*)" tries to send the following share invitation using the Graph API:$/
+	 * @When user :user sends the following share invitation for space using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
