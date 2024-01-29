@@ -2,12 +2,15 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -18,7 +21,7 @@ import (
 
 // DrivesDriveItemProvider is the interface that needs to be implemented by the individual space service
 type DrivesDriveItemProvider interface {
-	CreateChildren(ctx context.Context, driveId, itemId storageprovider.ResourceId, driveItem libregraph.DriveItem) (libregraph.DriveItem, error)
+	AcceptShare(ctx context.Context, driveId, itemId storageprovider.ResourceId, driveItem libregraph.DriveItem) (libregraph.DriveItem, error)
 }
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
@@ -35,10 +38,31 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
-// CreateChildren is currently only used for accepting pending//dangling shares.
+// AcceptShare is currently only used for accepting pending//dangling shares.
 // fixMe: currently the driveItem is not used, why is it needed?
-func (s DrivesDriveItemService) CreateChildren(ctx context.Context, driveId, itemId storageprovider.ResourceId, _ libregraph.DriveItem) (libregraph.DriveItem, error) {
+func (s DrivesDriveItemService) AcceptShare(ctx context.Context, driveId, itemId storageprovider.ResourceId, driveItem libregraph.DriveItem) (libregraph.DriveItem, error) {
+	remoteItem := driveItem.GetRemoteItem()
+	switch {
+	case driveId.GetStorageId() != utils.ShareStorageProviderID:
+		fallthrough
+	case driveId.GetSpaceId() != utils.ShareStorageSpaceID:
+		fallthrough
+	case itemId.GetStorageId() != utils.ShareStorageProviderID:
+		fallthrough
+	case itemId.GetSpaceId() != utils.ShareStorageSpaceID:
+		fallthrough
+	case itemId.GetOpaqueId() != utils.ShareStorageSpaceID:
+		return libregraph.DriveItem{}, errors.New("invalid item or drive id, ids do not match any known share jail")
+	case remoteItem.GetId() == "":
+		return libregraph.DriveItem{}, errors.New("empty remote item id")
+	}
+
 	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return libregraph.DriveItem{}, err
+	}
+
+	resourceId, err := storagespace.ParseID(remoteItem.GetId())
 	if err != nil {
 		return libregraph.DriveItem{}, err
 	}
@@ -60,35 +84,40 @@ func (s DrivesDriveItemService) CreateChildren(ctx context.Context, driveId, ite
 			{
 				Type: collaboration.Filter_TYPE_RESOURCE_ID,
 				Term: &collaboration.Filter_ResourceId{
-					ResourceId: &storageprovider.ResourceId{
-						StorageId: driveId.GetStorageId(),
-						SpaceId:   driveId.GetSpaceId(),
-						OpaqueId:  itemId.GetOpaqueId(),
-					},
+					ResourceId: &resourceId,
 				},
 			},
 		},
 	})
+	if err != nil {
+		return libregraph.DriveItem{}, err
+	}
 
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
-		mountPoint := receivedShare.GetMountPoint()
-		if mountPoint == nil {
-			// fixMe: should not happen, add exception handling
-			continue
-		}
-
+		updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state"}}
 		receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
-		receivedShare.MountPoint = &storageprovider.Reference{
-			// keep the original mount point path,
-			// custom path handling should come here later
-			Path: mountPoint.GetPath(),
+
+		// handle mount point related changes
+		{
+			mountPoint := receivedShare.GetMountPoint()
+			if mountPoint == nil {
+				mountPoint = &storageprovider.Reference{}
+			}
+
+			name := driveItem.GetName()
+			newPath := utils.MakeRelativePath(name)
+
+			// only update if mountPoint name is not empty and the path has changed
+			if name != "" && mountPoint.GetPath() != newPath {
+				mountPoint.Path = newPath
+				receivedShare.MountPoint = mountPoint
+				updateMask.Paths = append(updateMask.Paths, "mount_point")
+			}
 		}
 
 		updateReceivedShareRequest := &collaboration.UpdateReceivedShareRequest{
-			Share: receivedShare,
-			// mount_point currently contain no changes, this is for future use
-			// state changes from pending or rejected to accept
-			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}},
+			Share:      receivedShare,
+			UpdateMask: updateMask,
 		}
 
 		//fixMe:  should be processed in parallel
@@ -137,8 +166,14 @@ func (api DrivesDriveItemApi) CreateChildren(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	driveItem, err := api.drivesDriveItemService.
-		CreateChildren(ctx, driveID, itemID, libregraph.DriveItem{})
+	driveItem := libregraph.DriveItem{}
+	if err := StrictJSONUnmarshal(r.Body, &driveItem); err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	_, err = api.drivesDriveItemService.
+		AcceptShare(ctx, driveID, itemID, driveItem)
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, driveItem)
