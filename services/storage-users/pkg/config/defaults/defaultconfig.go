@@ -73,6 +73,7 @@ func DefaultConfig() *config.Config {
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "com.owncloud.api.settings",
 				MaxAcquireLockCycles:       20,
+				MaxConcurrency:             5,
 				LockCycleDurationFactor:    30,
 			},
 			OCIS: config.OCISDriver{
@@ -85,6 +86,7 @@ func DefaultConfig() *config.Config {
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "com.owncloud.api.settings",
 				MaxAcquireLockCycles:       20,
+				MaxConcurrency:             5,
 				LockCycleDurationFactor:    30,
 				AsyncUploads:               true,
 			},
