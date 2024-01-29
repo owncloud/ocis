@@ -81,8 +81,6 @@ func DefaultConfig() *config.Config {
 		Reva:                     shared.DefaultRevaConfig(),
 		PublicURL:                "https://localhost:9200",
 		EnableFavorites:          false,
-		EnableProjectSpaces:      true,
-		EnableShareJail:          true,
 		UploadMaxChunkSize:       1e+7,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
