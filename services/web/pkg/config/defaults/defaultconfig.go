@@ -118,7 +118,9 @@ func DefaultConfig() *config.Config {
 					Editor:                   &config.Editor{},
 					FeedbackLink:             &config.FeedbackLink{},
 					Embed:                    &config.Embed{},
-					ConcurrentRequests:       &config.ConcurrentRequests{},
+					ConcurrentRequests: &config.ConcurrentRequests{
+						Shares: &config.ConcurrentRequestsShares{},
+					},
 					Routing: config.Routing{
 						IDBased: true,
 					},
