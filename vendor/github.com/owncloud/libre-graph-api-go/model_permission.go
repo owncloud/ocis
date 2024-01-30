@@ -33,11 +33,8 @@ type Permission struct {
 	// Deprecated
 	GrantedToIdentities []IdentitySet `json:"grantedToIdentities,omitempty"`
 	// Use this to create a permission with custom actions.
-	LibreGraphPermissionsActions []string `json:"@libre.graph.permissions.actions,omitempty"`
-	// Indicates if the item is synchronized with the underlying storage provider. Read-only.
-	ClientSynchronize *bool `json:"@client.synchronize,omitempty"`
-	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
-	UiHidden *bool `json:"@ui.hidden,omitempty"`
+	LibreGraphPermissionsActions []string           `json:"@libre.graph.permissions.actions,omitempty"`
+	Invitation                   *SharingInvitation `json:"invitation,omitempty"`
 }
 
 // NewPermission instantiates a new Permission object
@@ -327,68 +324,36 @@ func (o *Permission) SetLibreGraphPermissionsActions(v []string) {
 	o.LibreGraphPermissionsActions = v
 }
 
-// GetClientSynchronize returns the ClientSynchronize field value if set, zero value otherwise.
-func (o *Permission) GetClientSynchronize() bool {
-	if o == nil || IsNil(o.ClientSynchronize) {
-		var ret bool
+// GetInvitation returns the Invitation field value if set, zero value otherwise.
+func (o *Permission) GetInvitation() SharingInvitation {
+	if o == nil || IsNil(o.Invitation) {
+		var ret SharingInvitation
 		return ret
 	}
-	return *o.ClientSynchronize
+	return *o.Invitation
 }
 
-// GetClientSynchronizeOk returns a tuple with the ClientSynchronize field value if set, nil otherwise
+// GetInvitationOk returns a tuple with the Invitation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Permission) GetClientSynchronizeOk() (*bool, bool) {
-	if o == nil || IsNil(o.ClientSynchronize) {
+func (o *Permission) GetInvitationOk() (*SharingInvitation, bool) {
+	if o == nil || IsNil(o.Invitation) {
 		return nil, false
 	}
-	return o.ClientSynchronize, true
+	return o.Invitation, true
 }
 
-// HasClientSynchronize returns a boolean if a field has been set.
-func (o *Permission) HasClientSynchronize() bool {
-	if o != nil && !IsNil(o.ClientSynchronize) {
+// HasInvitation returns a boolean if a field has been set.
+func (o *Permission) HasInvitation() bool {
+	if o != nil && !IsNil(o.Invitation) {
 		return true
 	}
 
 	return false
 }
 
-// SetClientSynchronize gets a reference to the given bool and assigns it to the ClientSynchronize field.
-func (o *Permission) SetClientSynchronize(v bool) {
-	o.ClientSynchronize = &v
-}
-
-// GetUiHidden returns the UiHidden field value if set, zero value otherwise.
-func (o *Permission) GetUiHidden() bool {
-	if o == nil || IsNil(o.UiHidden) {
-		var ret bool
-		return ret
-	}
-	return *o.UiHidden
-}
-
-// GetUiHiddenOk returns a tuple with the UiHidden field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Permission) GetUiHiddenOk() (*bool, bool) {
-	if o == nil || IsNil(o.UiHidden) {
-		return nil, false
-	}
-	return o.UiHidden, true
-}
-
-// HasUiHidden returns a boolean if a field has been set.
-func (o *Permission) HasUiHidden() bool {
-	if o != nil && !IsNil(o.UiHidden) {
-		return true
-	}
-
-	return false
-}
-
-// SetUiHidden gets a reference to the given bool and assigns it to the UiHidden field.
-func (o *Permission) SetUiHidden(v bool) {
-	o.UiHidden = &v
+// SetInvitation gets a reference to the given SharingInvitation and assigns it to the Invitation field.
+func (o *Permission) SetInvitation(v SharingInvitation) {
+	o.Invitation = &v
 }
 
 func (o Permission) MarshalJSON() ([]byte, error) {
@@ -425,11 +390,8 @@ func (o Permission) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.LibreGraphPermissionsActions) {
 		toSerialize["@libre.graph.permissions.actions"] = o.LibreGraphPermissionsActions
 	}
-	if !IsNil(o.ClientSynchronize) {
-		toSerialize["@client.synchronize"] = o.ClientSynchronize
-	}
-	if !IsNil(o.UiHidden) {
-		toSerialize["@ui.hidden"] = o.UiHidden
+	if !IsNil(o.Invitation) {
+		toSerialize["invitation"] = o.Invitation
 	}
 	return toSerialize, nil
 }
