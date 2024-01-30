@@ -223,7 +223,6 @@ ocis/bin/ocis server
 ```bash
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
-TEST_WITH_GRAPH_API=true \
 ```
 
 #### Run Tests Transferred From ownCloud Core (prefix `coreApi`)
@@ -231,7 +230,6 @@ TEST_WITH_GRAPH_API=true \
 ```bash
 make test-acceptance-from-core-api \
 TEST_SERVER_URL=https://localhost:9200 \
-TEST_WITH_GRAPH_API=true \
 ```
 
 Useful environment variables:
@@ -289,7 +287,6 @@ If you want to work on a specific issue
    ```bash
    make test-acceptance-from-core-api \
    TEST_SERVER_URL=https://localhost:9200 \
-   TEST_WITH_GRAPH_API=true \
    STORAGE_DRIVER=OCIS \
    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
    ```
@@ -326,7 +323,6 @@ PROXY_ENABLE_BASIC_AUTH=true \
 
 ```bash
 OCIS_WRAPPER_URL=http://localhost:5200 \
-TEST_WITH_GRAPH_API=true \
 TEST_SERVER_URL="https://localhost:9200" \
 BEHAT_FEATURE=tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature \
 make test-acceptance-api
@@ -374,7 +370,6 @@ ocis/bin/ocis server
 Run the acceptance test with the following command:
 
 ```bash
-TEST_WITH_GRAPH_API=true \
 TEST_SERVER_URL="https://localhost:9200" \
 EMAIL_HOST="localhost" \
 EMAIL_PORT=9000 \
@@ -417,7 +412,6 @@ ocis/bin/ocis server
 Run the acceptance test with the following command:
 
 ```bash
-TEST_WITH_GRAPH_API=true \
 TEST_SERVER_URL="https://localhost:9200" \
 BEHAT_FEATURE="tests/acceptance/features/apiSearch/contentSearch.feature" \
 make test-acceptance-api
@@ -539,7 +533,6 @@ For antivirus running with docker, use `ANTIVIRUS_CLAMAV_SOCKET= "tcp://host.doc
 Run the acceptance test with the following command:
 
 ```bash
-TEST_WITH_GRAPH_API=true \
 TEST_SERVER_URL="https://localhost:9200" \
 BEHAT_FEATURE="tests/acceptance/features/apiAntivirus/antivirus.feature" \
 make test-acceptance-api
