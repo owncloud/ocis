@@ -1811,7 +1811,7 @@ class GraphHelper {
 			$body
 		);
 	}
-	
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
