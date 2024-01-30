@@ -4,6 +4,8 @@ dir: "{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/ocis-pkg/oidc:
+    github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0:
         interfaces:
-            OIDCClient:
+            EventHistoryService:
+                config:
+                    dir: mocks

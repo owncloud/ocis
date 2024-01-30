@@ -25,7 +25,7 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
-	$(MOCKERY) --srcpkg github.com/go-ldap/ldap/v3 --case underscore --filename ldapclient.go --name Client
+	$(MOCKERY)
 
 
 .PHONY: ci-node-generate

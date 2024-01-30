@@ -29,7 +29,7 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
-	$(MOCKERY) --dir ../../protogen/gen/ocis/services/eventhistory/v0 --case underscore --name EventHistoryService
+	$(MOCKERY)
 
 .PHONY: ci-node-generate
 ci-node-generate:

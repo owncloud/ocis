@@ -4,6 +4,8 @@ dir: "{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/ocis-pkg/oidc:
+    github.com/owncloud/ocis/v2/ocis-pkg/keycloak:
         interfaces:
-            OIDCClient:
+            Client:
+                config:
+                    dir: pkg/mocks

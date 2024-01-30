@@ -4,6 +4,9 @@ dir: "{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/ocis-pkg/oidc:
+    github.com/go-ldap/ldap/v3:
         interfaces:
-            OIDCClient:
+            Client:
+                config:
+                    dir: mocks
+                    filename: ldapclient.go
