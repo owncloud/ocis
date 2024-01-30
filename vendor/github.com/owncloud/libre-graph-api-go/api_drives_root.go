@@ -42,7 +42,7 @@ func (r ApiCreateDriveItemRequest) Execute() (*DriveItem, *http.Response, error)
 /*
 CreateDriveItem Create a drive item
 
-You can use the root childrens endpoint to mount a remoteItem in the share jail. The `@client.synchronize` property of the `remoteItem` in the [sharedWithMe](#/me.drive/ListSharedWithMe) endpoint will change to true.
+You can use the root childrens endpoint to mount a remoteItem in the share jail. The `@client.synchronize` property of the `driveItem` in the [sharedWithMe](#/me.drive/ListSharedWithMe) endpoint will change to true.
 
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
