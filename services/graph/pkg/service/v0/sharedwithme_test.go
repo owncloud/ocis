@@ -2,11 +2,13 @@ package svc_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	groupv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -23,6 +25,7 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -130,11 +133,32 @@ var _ = Describe("SharedWithMe", func() {
 				Return(getUserResponseShareCreator, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponseDefault, nil)
 
+			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).
+				Return(
+					&groupv1beta1.GetGroupResponse{
+						Status: status.NewOK(ctx),
+						Group: &groupv1beta1.Group{
+							Id: &groupv1beta1.GroupId{
+								OpaqueId: "group-id",
+							},
+							DisplayName: "Group",
+						},
+					}, nil)
+
 			listReceivedSharesResponse = &collaborationv1beta1.ListReceivedSharesResponse{
 				Status: status.NewOK(ctx),
 				Shares: []*collaborationv1beta1.ReceivedShare{
 					{
-						Share: &collaborationv1beta1.Share{ResourceId: toResourceID("1$2!3")},
+						Share: &collaborationv1beta1.Share{
+							ResourceId: toResourceID("1$2!3"),
+							Id: &collaborationv1beta1.ShareId{
+								OpaqueId: "sh:are:id",
+							},
+							Permissions: &collaborationv1beta1.SharePermissions{
+								Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+							},
+							Creator: getUserResponseShareCreator.User.Id,
+						},
 						MountPoint: &providerv1beta1.Reference{
 							ResourceId: &providerv1beta1.ResourceId{
 								StorageId: utils.ShareStorageProviderID,
@@ -209,9 +233,6 @@ var _ = Describe("SharedWithMe", func() {
 			share.Id = &collaborationv1beta1.ShareId{OpaqueId: "1:2:3"}
 			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4001}
 			share.Mtime = &typesv1beta1.Timestamp{Seconds: 4002}
-			share.Creator = &userv1beta1.UserId{
-				OpaqueId: "share-creator-id",
-			}
 
 			resourceInfo := statResponse.Info
 			resourceInfo.Name = "some folder"
@@ -337,72 +358,24 @@ var _ = Describe("SharedWithMe", func() {
 				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
 			)
 
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.permissions.0")
+			driveitemJSON := gjson.Get(tape.Body.String(), "value.0")
+			Expect(driveitemJSON.Get("@UI\\.Hidden").Exists()).To(BeTrue())
+			Expect(driveitemJSON.Get("@UI\\.Hidden").Bool()).To(BeFalse())
+			Expect(driveitemJSON.Get("@client\\.synchronize").Exists()).To(BeTrue())
+			Expect(driveitemJSON.Get("@client\\.synchronize").Bool()).To(BeTrue())
 
-			Expect(jsonData.Get("roles.0").String()).To(Equal(unifiedrole.UnifiedRoleViewerID))
-			Expect(jsonData.Get("@ui\\.hidden").Exists()).To(BeTrue())
-			Expect(jsonData.Get("@ui\\.hidden").Bool()).To(BeFalse())
-			Expect(jsonData.Get("@client\\.synchronize").Exists()).To(BeTrue())
-			Expect(jsonData.Get("@client\\.synchronize").Bool()).To(BeTrue())
-		})
-
-		It("populates the driveItem.remoteItem.shared properties", func() {
-			share := listReceivedSharesResponse.Shares[0].Share
-			share.Ctime = &typesv1beta1.Timestamp{Seconds: 4000}
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.shared")
-
-			Expect(jsonData.Get("sharedDateTime").String()).To(Equal(utils.TSToTime(share.Ctime).Format(time.RFC3339Nano)))
-		})
-
-		It("populates the driveItem.remoteItem.shared.owner properties", func() {
-			shareOwner := getUserResponseDefault.User
-
-			share := listReceivedSharesResponse.Shares[0].Share
-			share.Owner = shareOwner.Id
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.shared.owner")
-
-			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareOwner.DisplayName))
-			Expect(jsonData.Get("user.id").String()).To(Equal(shareOwner.Id.OpaqueId))
-		})
-
-		It("populates the driveItem.remoteItem.shared.sharedBy properties", func() {
-			shareCreator := getUserResponseDefault.User
-
-			share := listReceivedSharesResponse.Shares[0].Share
-			share.Creator = shareCreator.Id
-
-			svc.ListSharedWithMe(
-				tape,
-				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-			)
-
-			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem.shared.sharedBy")
-
-			Expect(jsonData.Get("user.displayName").String()).To(Equal(shareCreator.DisplayName))
-			Expect(jsonData.Get("user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
+			permissionsJSON := driveitemJSON.Get("remoteItem.permissions.0")
+			Expect(permissionsJSON.Get("id").String()).To(Equal(listReceivedSharesResponse.Shares[0].Share.Id.OpaqueId))
+			Expect(permissionsJSON.Get("roles.0").String()).To(Equal(unifiedrole.UnifiedRoleViewerID))
+			Expect(permissionsJSON.Get("invitation.invitedBy.user.id").String()).To(Equal(getUserResponseShareCreator.User.Id.OpaqueId))
 		})
 
 		It("returns shares created on project space", func() {
-			shareCreator := getUserResponseDefault.User
-
 			ownerID := &userv1beta1.UserId{
 				OpaqueId: "project-space-id",
 				Type:     userv1beta1.UserType_USER_TYPE_SPACE_OWNER,
 			}
 			share := listReceivedSharesResponse.Shares[0].Share
-			share.Creator = shareCreator.Id
 			share.Owner = ownerID
 			resourceInfo := statResponse.Info
 			resourceInfo.Owner = ownerID
@@ -417,11 +390,43 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(jsonData.Get("user.displayName").String()).To(Equal(""))
 			Expect(jsonData.Get("user.id").String()).To(Equal(ownerID.OpaqueId))
 
-			jsonData = gjson.Get(tape.Body.String(), "value.0.remoteItem.shared")
-			Expect(jsonData.Get("sharedBy.user.displayName").String()).To(Equal(shareCreator.DisplayName))
-			Expect(jsonData.Get("sharedBy.user.id").String()).To(Equal(shareCreator.Id.OpaqueId))
-			Expect(jsonData.Get("owner.user.displayName").String()).To(Equal(""))
-			Expect(jsonData.Get("owner.user.id").String()).To(Equal(ownerID.OpaqueId))
+			jsonData = gjson.Get(tape.Body.String(), "value.0.remoteItem.permissions.0.invitation.invitedBy.user")
+			Expect(jsonData.Get("displayName").String()).To(Equal(getUserResponseShareCreator.User.DisplayName))
+			Expect(jsonData.Get("id").String()).To(Equal(getUserResponseShareCreator.User.Id.OpaqueId))
+		})
+
+		It("returns a single drive item when multiple shares exist for the same resource", func() {
+			anotherShare := &collaborationv1beta1.ReceivedShare{
+				Share: &collaborationv1beta1.Share{
+					ResourceId: toResourceID("1$2!3"),
+					Id: &collaborationv1beta1.ShareId{
+						OpaqueId: "sh:are:id2",
+					},
+					Permissions: &collaborationv1beta1.SharePermissions{
+						Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+					},
+					Creator: getUserResponseShareCreator.User.Id,
+					Grantee: &providerv1beta1.Grantee{
+						Type: providerv1beta1.GranteeType_GRANTEE_TYPE_GROUP,
+						Id: &providerv1beta1.Grantee_GroupId{
+							GroupId: &groupv1beta1.GroupId{
+								OpaqueId: "group-id",
+							},
+						},
+					},
+				},
+			}
+			listReceivedSharesResponse.Shares = append(listReceivedSharesResponse.Shares, anotherShare)
+			svc.ListSharedWithMe(
+				tape,
+				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
+			)
+			driveItems := libregraph.CollectionOfDriveItems{}
+			err := json.Unmarshal(tape.Body.Bytes(), &driveItems)
+			Expect(err).To(BeNil())
+			Expect(len(driveItems.Value)).To(Equal(1))
+			ri := driveItems.GetValue()[0].GetRemoteItem()
+			Expect(len(ri.GetPermissions())).To(Equal(2))
 		})
 	})
 })
