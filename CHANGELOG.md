@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
@@ -214,6 +215,13 @@ The following sections list the changes for unreleased.
    now
 
    https://github.com/owncloud/ocis/pull/8281
+
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+
+   We fixed setting the config for concurrent web requests, which did not work as
+   expected before.
+
+   https://github.com/owncloud/ocis/pull/8317
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
