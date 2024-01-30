@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-01-30-11-31-52]
+[#deprecation-note-2024-01-30-16-42-18]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -511,6 +511,24 @@ a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
 Defines the maximum number of concurrent requests in SSE event handlers. Defaults to 4.
+
+a|`WEB_OPTION_CONCURRENT_REQUESTS_SHARES_CREATE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Defines the maximum number of concurrent requests per sharing invite batch. Defaults to 4.
+
+a|`WEB_OPTION_CONCURRENT_REQUESTS_SHARES_LIST` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Defines the maximum number of concurrent requests when loading individual share information inside listings. Defaults to 2.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

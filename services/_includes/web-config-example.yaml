@@ -135,7 +135,9 @@ web:
       concurrentRequests:
         resourceBatchActions: 0
         sse: 0
-        shares: null
+        shares:
+          create: 0
+          list: 0
     styles: []
     scripts: []
     custom_translations: []
