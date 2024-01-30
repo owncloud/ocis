@@ -387,8 +387,7 @@ var _ = Describe("SharedWithMe", func() {
 
 			jsonData := gjson.Get(tape.Body.String(), "value.0.createdBy")
 
-			Expect(jsonData.Get("user.displayName").String()).To(Equal(""))
-			Expect(jsonData.Get("user.id").String()).To(Equal(ownerID.OpaqueId))
+			Expect(jsonData.String()).To(Equal(""))
 
 			jsonData = gjson.Get(tape.Body.String(), "value.0.remoteItem.permissions.0.invitation.invitedBy.user")
 			Expect(jsonData.Get("displayName").String()).To(Equal(getUserResponseShareCreator.User.DisplayName))

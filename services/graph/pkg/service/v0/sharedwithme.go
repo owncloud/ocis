@@ -226,7 +226,7 @@ func (g Graph) cs3ReceivedSharesToDriveItems(ctx context.Context, receivedShares
 					remoteItem.SetSize(s)
 				}
 
-				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
+				if userID := shareStat.GetInfo().GetOwner(); userID != nil && userID.Type != cs3User.UserType_USER_TYPE_SPACE_OWNER {
 					identity, err := g.cs3UserIdToIdentity(ctx, userID)
 					if err != nil {
 						// TODO: define a proper error behavior here. We don't
