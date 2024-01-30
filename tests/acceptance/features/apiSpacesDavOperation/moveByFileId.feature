@@ -127,11 +127,11 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     Examples:
       | role    | http-status-code | dav-path                          |
-      | manager | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager | 403              | /dav/spaces/<<FILEID>>            |
-      | editor  | 403              | /dav/spaces/<<FILEID>>            |
+      | manager | 502              | /dav/spaces/<<FILEID>>            |
+      | editor  | 502              | /dav/spaces/<<FILEID>>            |
       | viewer  | 403              | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
@@ -141,7 +141,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has uploaded a file inside space "Personal" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" renames a file "/textfile.txt" into "/renamed.txt" inside space "project-space" using file-id path "<dav-path>"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "Personal" should contain these files:
       | textfile.txt |
@@ -297,19 +297,19 @@ Feature: moving/renaming file using file id
       | file.txt |
     Examples:
       | from_role | to_role | http-status-code | dav-path                          |
-      | manager   | manager | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor    | manager | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager   | editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor    | editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager   | manager | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor    | manager | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager   | editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor    | editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
       | manager   | viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | editor    | viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer    | manager | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer    | editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer    | viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager   | manager | 403              | /dav/spaces/<<FILEID>>            |
-      | editor    | manager | 403              | /dav/spaces/<<FILEID>>            |
-      | manager   | editor  | 403              | /dav/spaces/<<FILEID>>            |
-      | editor    | editor  | 403              | /dav/spaces/<<FILEID>>            |
+      | manager   | manager | 502              | /dav/spaces/<<FILEID>>            |
+      | editor    | manager | 502              | /dav/spaces/<<FILEID>>            |
+      | manager   | editor  | 502              | /dav/spaces/<<FILEID>>            |
+      | editor    | editor  | 502              | /dav/spaces/<<FILEID>>            |
       | manager   | viewer  | 403              | /dav/spaces/<<FILEID>>            |
       | editor    | viewer  | 403              | /dav/spaces/<<FILEID>>            |
       | viewer    | manager | 403              | /dav/spaces/<<FILEID>>            |
@@ -325,7 +325,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
     And we save it into "FILEID"
     When user "Alice" renames a file "/secondProjectSpacetextfile.txt" into "/renamedSecondProjectSpacetextfile.txt" inside space "first-project-space" using file-id path "<dav-path>"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
       | firstProjectSpacetextfile.txt |
@@ -395,11 +395,11 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     Examples:
       | role    | http-status-code | dav-path                          |
-      | manager | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager | 403              | /dav/spaces/<<FILEID>>            |
-      | editor  | 403              | /dav/spaces/<<FILEID>>            |
+      | manager | 502              | /dav/spaces/<<FILEID>>            |
+      | editor  | 502              | /dav/spaces/<<FILEID>>            |
       | viewer  | 403              | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
@@ -409,7 +409,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" renames a file "/textfile.txt" into "/renamed.txt" inside space "Personal" using file-id path "<dav-path>"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "project-space" should contain these files:
       | textfile.txt |
@@ -540,10 +540,10 @@ Feature: moving/renaming file using file id
       | test.txt |
     Examples:
       | permissions | dav-path                          | http-status-code |
-      | all         | /remote.php/dav/spaces/<<FILEID>> | 403              |
-      | all         | /dav/spaces/<<FILEID>>            | 403              |
-      | change      | /remote.php/dav/spaces/<<FILEID>> | 403              |
-      | change      | /dav/spaces/<<FILEID>>            | 403              |
+      | all         | /remote.php/dav/spaces/<<FILEID>> | 502              |
+      | all         | /dav/spaces/<<FILEID>>            | 502              |
+      | change      | /remote.php/dav/spaces/<<FILEID>> | 502              |
+      | change      | /dav/spaces/<<FILEID>>            | 502              |
       | read        | /remote.php/dav/spaces/<<FILEID>> | 403              |
       | read        | /dav/spaces/<<FILEID>>            | 403              |
 
@@ -567,20 +567,20 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     Examples:
       | role    | permissions | http-status-code | dav-path                          |
-      | manager | all         | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor  | all         | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager | all         | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor  | all         | 502              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer  | all         | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager | change      | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor  | change      | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | manager | change      | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | editor  | change      | 502              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer  | change      | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | manager | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | editor  | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
       | viewer  | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager | all         | 403              | /dav/spaces/<<FILEID>>            |
-      | editor  | all         | 403              | /dav/spaces/<<FILEID>>            |
+      | manager | all         | 502              | /dav/spaces/<<FILEID>>            |
+      | editor  | all         | 502              | /dav/spaces/<<FILEID>>            |
       | viewer  | all         | 403              | /dav/spaces/<<FILEID>>            |
-      | manager | change      | 403              | /dav/spaces/<<FILEID>>            |
-      | editor  | change      | 403              | /dav/spaces/<<FILEID>>            |
+      | manager | change      | 502              | /dav/spaces/<<FILEID>>            |
+      | editor  | change      | 502              | /dav/spaces/<<FILEID>>            |
       | viewer  | change      | 403              | /dav/spaces/<<FILEID>>            |
       | manager | read        | 403              | /dav/spaces/<<FILEID>>            |
       | editor  | read        | 403              | /dav/spaces/<<FILEID>>            |
