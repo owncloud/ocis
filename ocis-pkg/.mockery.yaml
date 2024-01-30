@@ -1,0 +1,12 @@
+with-expecter: true
+filename: "{{.InterfaceName | lower }}.go"
+dir: "{{.PackageName}}/mocks"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+packages:
+    #github.com/owncloud/ocis/v2/ocis-pkg/middleware:
+    #    interfaces:
+    #        OIDCProvider:
+    github.com/owncloud/ocis/v2/ocis-pkg/oidc:
+        interfaces:
+            OIDCClient:
