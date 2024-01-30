@@ -11,8 +11,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
-//go:generate mockery --name=UserRoleAssigner
-
 // UserRoleAssigner allows providing different implementations for how users get their default roles
 // assigned by the proxy during authentication
 type UserRoleAssigner interface {
