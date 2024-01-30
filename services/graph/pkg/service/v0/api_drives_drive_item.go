@@ -21,7 +21,7 @@ import (
 
 // DrivesDriveItemProvider is the interface that needs to be implemented by the individual space service
 type DrivesDriveItemProvider interface {
-	AcceptShare(ctx context.Context, driveId, itemId storageprovider.ResourceId, driveItem libregraph.DriveItem) (libregraph.DriveItem, error)
+	MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) (libregraph.DriveItem, error)
 }
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
@@ -38,31 +38,9 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
-// AcceptShare is currently only used for accepting pending//dangling shares.
-// fixMe: currently the driveItem is not used, why is it needed?
-func (s DrivesDriveItemService) AcceptShare(ctx context.Context, driveId, itemId storageprovider.ResourceId, driveItem libregraph.DriveItem) (libregraph.DriveItem, error) {
-	remoteItem := driveItem.GetRemoteItem()
-	switch {
-	case driveId.GetStorageId() != utils.ShareStorageProviderID:
-		fallthrough
-	case driveId.GetSpaceId() != utils.ShareStorageSpaceID:
-		fallthrough
-	case itemId.GetStorageId() != utils.ShareStorageProviderID:
-		fallthrough
-	case itemId.GetSpaceId() != utils.ShareStorageSpaceID:
-		fallthrough
-	case itemId.GetOpaqueId() != utils.ShareStorageSpaceID:
-		return libregraph.DriveItem{}, errors.New("invalid item or drive id, ids do not match any known share jail")
-	case remoteItem.GetId() == "":
-		return libregraph.DriveItem{}, errors.New("empty remote item id")
-	}
-
+// MountShare mounts a share
+func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) (libregraph.DriveItem, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
-	if err != nil {
-		return libregraph.DriveItem{}, err
-	}
-
-	resourceId, err := storagespace.ParseID(remoteItem.GetId())
 	if err != nil {
 		return libregraph.DriveItem{}, err
 	}
@@ -84,7 +62,7 @@ func (s DrivesDriveItemService) AcceptShare(ctx context.Context, driveId, itemId
 			{
 				Type: collaboration.Filter_TYPE_RESOURCE_ID,
 				Term: &collaboration.Filter_ResourceId{
-					ResourceId: &resourceId,
+					ResourceId: &resourceID,
 				},
 			},
 		},
@@ -93,22 +71,21 @@ func (s DrivesDriveItemService) AcceptShare(ctx context.Context, driveId, itemId
 		return libregraph.DriveItem{}, err
 	}
 
+	var errs []error
+
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
 		updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state"}}
 		receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
 
-		// handle mount point related changes
-		{
+		// only update if mountPoint name is not empty and the path has changed
+		if name != "" {
 			mountPoint := receivedShare.GetMountPoint()
 			if mountPoint == nil {
 				mountPoint = &storageprovider.Reference{}
 			}
 
-			name := driveItem.GetName()
 			newPath := utils.MakeRelativePath(name)
-
-			// only update if mountPoint name is not empty and the path has changed
-			if name != "" && mountPoint.GetPath() != newPath {
+			if mountPoint.GetPath() != newPath {
 				mountPoint.Path = newPath
 				receivedShare.MountPoint = mountPoint
 				updateMask.Paths = append(updateMask.Paths, "mount_point")
@@ -120,19 +97,18 @@ func (s DrivesDriveItemService) AcceptShare(ctx context.Context, driveId, itemId
 			UpdateMask: updateMask,
 		}
 
-		//fixMe:  should be processed in parallel
 		updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
 		if err != nil {
-			// fixMe: should not happen, add exception handling
+			errs = append(errs, err)
 			continue
 		}
 
-		// fixMe: send to nirvana, add status handling
+		// fixMe: send to nirvana, wait for toDriverItem func
 		_ = updateReceivedShareResponse
 	}
 
 	// fixMe: return a concrete driveItem
-	return libregraph.DriveItem{}, nil
+	return libregraph.DriveItem{}, errors.Join(errs...)
 }
 
 // DrivesDriveItemApi is the api that registers the http endpoints which expose needed operation to the graph api.
@@ -162,19 +138,45 @@ func (api DrivesDriveItemApi) CreateChildren(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
-		errorcode.RenderError(w, r, err)
+		msg := "invalid driveID or itemID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
 		return
 	}
 
-	driveItem := libregraph.DriveItem{}
-	if err := StrictJSONUnmarshal(r.Body, &driveItem); err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+	if !IsShareJail(driveID) || !IsShareJail(itemID) {
+		msg := "invalid driveID or itemID, must be share jail"
+		api.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
 		return
 	}
 
-	_, err = api.drivesDriveItemService.
-		AcceptShare(ctx, driveID, itemID, driveItem)
+	requestDriveItem := libregraph.DriveItem{}
+	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
+		msg := "invalid request body"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	remoteItem := requestDriveItem.GetRemoteItem()
+	resourceId, err := storagespace.ParseID(remoteItem.GetId())
+	if err != nil {
+		msg := "invalid remote item id"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	responseDriveItem, err := api.drivesDriveItemService.
+		MountShare(ctx, resourceId, remoteItem.GetName())
+	if err != nil {
+		msg := "mounting share failed"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		return
+	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, driveItem)
+	render.JSON(w, r, responseDriveItem)
 }
