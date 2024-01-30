@@ -7,6 +7,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 
@@ -72,4 +73,9 @@ func (g Graph) GetGatewayClient(w http.ResponseWriter, r *http.Request) (gateway
 	}
 
 	return gatewayClient, true
+}
+
+// IsShareJail returns true if the resourceID is a share jail.
+func IsShareJail(id storageprovider.ResourceId) bool {
+	return id.GetStorageId() == utils.ShareStorageProviderID && id.GetSpaceId() == utils.ShareStorageSpaceID
 }
