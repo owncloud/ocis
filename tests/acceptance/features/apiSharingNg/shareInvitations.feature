@@ -1537,3 +1537,55 @@ Feature: Send a sharing invitations
       | Manager          | file          | /textfile1.txt |
       | Co Owner         | folder        | FolderToShare  |
       | Manager          | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation to already shared user
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["nameAlreadyExists"]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^error creating share: error: already exists:.*$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
