@@ -102,11 +102,6 @@ cannot share a folder with create permission
 - [coreApiShareOperationsToShares1/gettingShares.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L144)
 - [coreApiShareOperationsToShares1/gettingShares.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L145)
 
-#### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
-
-- [coreApiShareOperationsToShares1/gettingShares.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L179)
-- [coreApiShareOperationsToShares1/gettingShares.feature:178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L178)
-
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:288](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L288)
