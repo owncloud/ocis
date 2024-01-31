@@ -130,6 +130,7 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $user
 	 * @param TableNode $table
+	 * @param string|null $fileId
 	 *
 	 * @return ResponseInterface
 	 *
@@ -137,7 +138,7 @@ class SharingNgContext implements Context {
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 * @throws Exception
 	 */
-	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
+	public function sendShareInvitation(string $user, TableNode $table, string $fileId = null): ResponseInterface {
 		$rows = $table->getRowsHash();
 		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
 			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
@@ -146,8 +147,11 @@ class SharingNgContext implements Context {
 		}
 		$spaceId = $space['id'];
 
+		// $fileId is used for sharing deleted files
 		// for resharing a resource, "item-id" in API endpoint takes shareMountId
-		if ($rows['space'] === 'Shares') {
+		if ($fileId) {
+			$itemId = $fileId;
+		} elseif ($rows['space'] === 'Shares') {
 			$itemId = GraphHelper::getShareMountId(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
@@ -233,6 +237,23 @@ class SharingNgContext implements Context {
 	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $table)
+		);
+	}
+
+	/**
+	 * @When user :user sends the following share invitation with file-id :fileId using the Graph API:
+	 *
+	 * @param string $user
+	 * @param string $fileId
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationWithFileIdUsingTheGraphApi(string $user, string $fileId, TableNode $table): void {
+		$this->featureContext->setResponse(
+			$this->sendShareInvitation($user, $table, $fileId)
 		);
 	}
 
