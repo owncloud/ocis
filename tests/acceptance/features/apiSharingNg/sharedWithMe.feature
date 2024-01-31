@@ -14,7 +14,12 @@ Feature: an user gets the resources shared to them
 
   Scenario: user lists the file shared with them
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" lists the resources shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -252,7 +257,12 @@ Feature: an user gets the resources shared to them
 
   Scenario: user lists the folder shared with them
     Given user "Alice" has created folder "folder"
-    And user "Alice" has shared folder "folder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" lists the resources shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
