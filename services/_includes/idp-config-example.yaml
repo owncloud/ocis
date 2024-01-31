@@ -30,6 +30,7 @@ reva:
 machine_auth_api_key: ""
 asset:
   asset: ""
+  login-background-url: ""
 idp:
   iss: https://localhost:9200
   identity_manager: ldap

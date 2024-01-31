@@ -25,6 +25,7 @@
 | OCIS_GRPC_CLIENT_TLS_CACERT | string |  | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|
+| IDP_LOGIN_BACKGROUND_URL | string |  | Configure an alternative URL to the background image for the login page.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | The OIDC issuer URL to use.|
 | IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'.|
 | IDP_URI_BASE_PATH | string |  | IDP uri base path (defaults to '').|
