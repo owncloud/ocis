@@ -1,31 +1,18 @@
 with-expecter: true
 filename: "{{.InterfaceName | snakecase }}.go"
-dir: "{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/services/graph/pkg/service/v0:
-        config:
-            dir: mocks
-        interfaces:
-            HTTPClient:
-            Publisher:
-            Permissions:
-            RoleService:
     github.com/owncloud/ocis/v2/services/graph/pkg/identity:
         config:
-            dir: pkg/identity/mocks
+            dir: "pkg/identity/mocks"
         interfaces:
             Backend:
             EducationBackend:
     github.com/go-ldap/ldap/v3:
+        config:
+            dir: "pkg/identity/mocks"
         interfaces:
             Client:
                 config:
-                    dir: mocks
-                    filename: ldapclient.go
-    github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0:
-        interfaces:
-            ValueService:
-                config:
-                    dir: mocks
+                    filename: "ldapclient.go"

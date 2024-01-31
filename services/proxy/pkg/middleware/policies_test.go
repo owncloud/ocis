@@ -11,19 +11,17 @@ import (
 	"testing"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/gomega"
+	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
+	policiesPG "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
+	"github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0/mocks"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
-
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/v2/services/proxy/mocks"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
-
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
-	policiesPG "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
 )
 
 func TestPolicies_NoQuery_PassThrough(t *testing.T) {

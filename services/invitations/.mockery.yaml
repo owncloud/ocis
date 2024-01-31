@@ -1,11 +1,10 @@
 with-expecter: true
 filename: "{{.InterfaceName | snakecase }}.go"
-dir: "{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
     github.com/owncloud/ocis/v2/ocis-pkg/keycloak:
+        config:
+            dir: "pkg/backends/keycloak/mocks"
         interfaces:
             Client:
-                config:
-                    dir: pkg/mocks
