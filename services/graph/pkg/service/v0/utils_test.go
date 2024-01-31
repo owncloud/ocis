@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -72,6 +73,35 @@ var _ = Describe("Utils", func() {
 		Entry("spaceID and opaqueID unequal", &provider.ResourceId{
 			OpaqueId: "2",
 			SpaceId:  "3",
+		}, false),
+	)
+
+	DescribeTable("IsShareJail",
+		func(resourceID provider.ResourceId, isShareJail bool) {
+			Expect(service.IsShareJail(resourceID)).To(Equal(isShareJail))
+		},
+		Entry("valid: share jail", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   utils.ShareStorageSpaceID,
+		}, true),
+		Entry("invalid: empty storageId", provider.ResourceId{
+			SpaceId: utils.ShareStorageSpaceID,
+		}, false),
+		Entry("invalid: empty spaceId", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+		}, false),
+		Entry("invalid: empty storageId and spaceId", provider.ResourceId{}, false),
+		Entry("invalid: non share jail storageId", provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   utils.ShareStorageSpaceID,
+		}, false),
+		Entry("invalid: non share jail spaceId", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   "123",
+		}, false),
+		Entry("invalid: non share jail storageID and spaceId", provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   "123",
 		}, false),
 	)
 })
