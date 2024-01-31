@@ -5,22 +5,328 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
+	"google.golang.org/grpc"
 
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
+
+var _ = Describe("DrivesDriveItemService", func() {
+	var (
+		drivesDriveItemService svc.DrivesDriveItemService
+		gatewayClient          *cs3mocks.GatewayAPIClient
+		gatewaySelector        *mocks.Selectable[gateway.GatewayAPIClient]
+	)
+
+	BeforeEach(func() {
+		logger := log.NewLogger()
+		gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
+
+		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
+		gatewaySelector.On("Next").Return(gatewayClient, nil)
+
+		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector)
+		Expect(err).ToNot(HaveOccurred())
+		drivesDriveItemService = service
+	})
+
+	Describe("UnmountShare", func() {
+		It("handles gateway selector related errors", func() {
+			gatewaySelector.ExpectedCalls = nil
+
+			expectedError := errors.New("obtaining next gatewayClient failed")
+			gatewaySelector.On("Next").Return(gatewayClient, expectedError)
+
+			_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
+			Expect(err).To(MatchError(expectedError))
+		})
+
+		Describe("gateway client share listing", func() {
+			It("handles share listing errors", func() {
+				expectedError := errors.New("listing shares failed")
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(&collaborationv1beta1.ListReceivedSharesResponse{}, expectedError)
+
+				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
+				Expect(err).To(MatchError(expectedError))
+			})
+
+			It("uses the correct filters to get the shares", func() {
+				expectedResourceID := storageprovider.ResourceId{
+					StorageId: "1",
+					OpaqueId:  "2",
+					SpaceId:   "3",
+				}
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						Expect(in.Filters).To(HaveLen(3))
+
+						var shareStates []collaborationv1beta1.ShareState
+						var resourceIDs []*storageprovider.ResourceId
+
+						for _, filter := range in.Filters {
+							switch filter.Term.(type) {
+							case *collaborationv1beta1.Filter_State:
+								shareStates = append(shareStates, filter.GetState())
+							case *collaborationv1beta1.Filter_ResourceId:
+								resourceIDs = append(resourceIDs, filter.GetResourceId())
+							}
+						}
+
+						Expect(shareStates).To(HaveLen(2))
+						Expect(shareStates).To(ContainElements(
+							collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
+							collaborationv1beta1.ShareState_SHARE_STATE_REJECTED,
+						))
+
+						Expect(resourceIDs).To(HaveLen(1))
+						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
+
+						return nil, nil
+					})
+
+				_, err := drivesDriveItemService.MountShare(context.Background(), expectedResourceID, "")
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
+		Describe("gateway client share update", func() {
+			It("updates the share state to be accepted", func() {
+				expectedShareID := collaborationv1beta1.ShareId{
+					OpaqueId: "1$2!3",
+				}
+
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{
+									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
+									Share: &collaborationv1beta1.Share{
+										Id: &expectedShareID,
+									},
+								},
+							},
+						}, nil
+					})
+
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
+						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
+						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+					})
+
+				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("updates the mountPoint", func() {
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{},
+							},
+						}, nil
+					})
+
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						Expect(in.GetUpdateMask().GetPaths()).To(HaveLen(2))
+						Expect(in.GetUpdateMask().GetPaths()).To(ContainElements("mount_point"))
+						Expect(in.GetShare().GetMountPoint().GetPath()).To(Equal("./new name"))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+					})
+
+				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("bubbles errors and continues", func() {
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{},
+								{},
+								{},
+							},
+						}, nil
+					})
+
+				var calls int
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						calls++
+						Expect(calls).To(BeNumerically("<=", 3))
+
+						if calls <= 2 {
+							return nil, fmt.Errorf("error %d", calls)
+						}
+
+						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+					})
+
+				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
+				Expect(fmt.Sprint(err)).To(Equal("error 1\nerror 2"))
+			})
+		})
+	})
+
+	Describe("UnmountShare", func() {
+		It("handles gateway selector related errors", func() {
+			gatewaySelector.ExpectedCalls = nil
+
+			expectedError := errors.New("obtaining next gatewayClient failed")
+			gatewaySelector.On("Next").Return(gatewayClient, expectedError)
+
+			err := drivesDriveItemService.UnmountShare(context.Background(), storageprovider.ResourceId{})
+			Expect(err).To(MatchError(expectedError))
+		})
+
+		Describe("gateway client share listing", func() {
+			It("handles share listing errors", func() {
+				expectedError := errors.New("listing shares failed")
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(&collaborationv1beta1.ListReceivedSharesResponse{}, expectedError)
+
+				err := drivesDriveItemService.UnmountShare(context.Background(), storageprovider.ResourceId{})
+				Expect(err).To(MatchError(expectedError))
+			})
+
+			It("uses the correct filters to get the shares", func() {
+				expectedResourceID := storageprovider.ResourceId{
+					StorageId: "1",
+					OpaqueId:  "2",
+					SpaceId:   "3",
+				}
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						Expect(in.Filters).To(HaveLen(2))
+
+						var shareStates []collaborationv1beta1.ShareState
+						var resourceIDs []*storageprovider.ResourceId
+
+						for _, filter := range in.Filters {
+							switch filter.Term.(type) {
+							case *collaborationv1beta1.Filter_State:
+								shareStates = append(shareStates, filter.GetState())
+							case *collaborationv1beta1.Filter_ResourceId:
+								resourceIDs = append(resourceIDs, filter.GetResourceId())
+							}
+						}
+
+						Expect(shareStates).To(HaveLen(1))
+						Expect(shareStates).To(ContainElements(
+							collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+						))
+
+						Expect(resourceIDs).To(HaveLen(1))
+						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
+
+						return nil, nil
+					})
+
+				err := drivesDriveItemService.UnmountShare(context.Background(), expectedResourceID)
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
+		Describe("gateway client share update", func() {
+			It("updates the share state to be accepted", func() {
+				expectedShareID := collaborationv1beta1.ShareId{
+					OpaqueId: "1$2!3",
+				}
+
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{
+									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
+									Share: &collaborationv1beta1.Share{
+										Id: &expectedShareID,
+									},
+								},
+							},
+						}, nil
+					})
+
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
+						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
+						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+					})
+
+				err := drivesDriveItemService.UnmountShare(context.Background(), storageprovider.ResourceId{})
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("bubbles errors and continues", func() {
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{},
+								{},
+								{},
+							},
+						}, nil
+					})
+
+				var calls int
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						calls++
+						Expect(calls).To(BeNumerically("<=", 3))
+
+						if calls <= 2 {
+							return nil, fmt.Errorf("error %d", calls)
+						}
+
+						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+					})
+
+				err := drivesDriveItemService.UnmountShare(context.Background(), storageprovider.ResourceId{})
+				Expect(fmt.Sprint(err)).To(Equal("error 1\nerror 2"))
+			})
+		})
+	})
+})
 
 var _ = Describe("DrivesDriveItemApi", func() {
 	var (
