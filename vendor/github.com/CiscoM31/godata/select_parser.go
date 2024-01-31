@@ -11,11 +11,16 @@ type SelectItem struct {
 }
 
 func ParseSelectString(ctx context.Context, sel string) (*GoDataSelectQuery, error) {
+	return GlobalExpressionParser.ParseSelectString(ctx, sel)
+}
+
+func (p *ExpressionParser) ParseSelectString(ctx context.Context, sel string) (*GoDataSelectQuery, error) {
 	items := strings.Split(sel, ",")
 
 	result := []*SelectItem{}
 
 	for _, item := range items {
+		item = strings.TrimSpace(item)
 
 		cfg, hasComplianceConfig := ctx.Value(odataCompliance).(OdataComplianceConfig)
 		if !hasComplianceConfig {
@@ -27,11 +32,28 @@ func ParseSelectString(ctx context.Context, sel string) (*GoDataSelectQuery, err
 			return nil, BadRequestError("Extra comma in $select.")
 		}
 
-		segments := []*Token{}
-		for _, val := range strings.Split(item, "/") {
-			segments = append(segments, &Token{Value: val})
+		if _, err := p.tokenizer.Tokenize(ctx, item); err != nil {
+			switch e := err.(type) {
+			case *GoDataError:
+				return nil, &GoDataError{
+					ResponseCode: e.ResponseCode,
+					Message:      "Invalid $select value",
+					Cause:        e,
+				}
+			default:
+				return nil, &GoDataError{
+					ResponseCode: 500,
+					Message:      "Invalid $select value",
+					Cause:        e,
+				}
+			}
+		} else {
+			segments := []*Token{}
+			for _, val := range strings.Split(item, "/") {
+				segments = append(segments, &Token{Value: val})
+			}
+			result = append(result, &SelectItem{segments})
 		}
-		result = append(result, &SelectItem{segments})
 	}
 
 	return &GoDataSelectQuery{result, sel}, nil
