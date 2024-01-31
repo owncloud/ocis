@@ -1664,3 +1664,98 @@ Feature: Send a sharing invitations
       | Space Editor     |
       | Co Owner         |
       | Manager          |
+
+
+  Scenario Outline: send share invitation for disabled project space to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^stat: error: not found: %user_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for deleted project space to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    And user "Admin" has deleted a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |

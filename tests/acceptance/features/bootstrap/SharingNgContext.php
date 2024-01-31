@@ -139,7 +139,12 @@ class SharingNgContext implements Context {
 	 */
 	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
 		$rows = $table->getRowsHash();
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
+		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+		}
+		$spaceId = $space['id'];
 
 		// for resharing a resource, "item-id" in API endpoint takes shareMountId
 		if ($rows['space'] === 'Shares') {
@@ -152,7 +157,13 @@ class SharingNgContext implements Context {
 			);
 		} else {
 			$resource = $rows['resource'] ?? '';
-			$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
+
+			// for a disabled and deleted space, resource id is not accessible, so get resource id from the saved response
+			if ($resource === '' && $rows['space'] !== 'Personal') {
+				$itemId = $space['fileId'];
+			} else {
+				$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
+			}
 		}
 
 		if (\array_key_exists('shareeId', $rows)) {
