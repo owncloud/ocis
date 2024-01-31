@@ -119,7 +119,6 @@ Feature: an user gets the resources shared to them
                   "name",
                   "parentReference",
                   "permissions",
-                  "shared",
                   "size"
                 ],
                 "properties": {
@@ -176,82 +175,107 @@ Feature: an user gets the resources shared to them
                       "textfile0.txt"
                     ]
                   },
-                  "shared": {
-                    "type": "object",
-                    "required": [
-                      "sharedBy",
-                      "owner"
-                    ],
-                    "properties": {
-                      "owner": {
+                  "permissions": {
+                    "type": "array",
+                    "items": [
+                      {
                         "type": "object",
                         "required": [
-                          "user"
-                        ],
-                        "properties": {
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "displayName"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "pattern": "^%user_id_pattern%$"
-                              },
-                              "displayName": {
-                                "type": "string",
-                                "enum": [
-                                  "Alice Hansen"
-                                ]
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "sharedBy": {
-                        "type": "object",
-                        "required": [
-                          "user"
-                        ],
-                        "properties": {
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "displayName"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "pattern": "^%user_id_pattern%$"
-                              },
-                              "displayName": {
-                                "type": "string",
-                                "enum": [
-                                  "Alice Hansen"
-                                ]
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "size": {
-                    "type": "number",
-                    "enum": [
-                      11
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                           "grantedToV2",
+                           "id",
+                           "invitation"
+                         ],
+                         "properties": {
+                           "id": {
+                             "type": "string"
+                           },
+                           "grantedToV2": {
+                             "type": "object",
+                             "required": [
+                               "user"
+                             ],
+                             "properties": {
+                               "user": {
+                                 "type": "object",
+                                 "properties": {
+                                   "displayName": {
+                                     "type": "string"
+                                   },
+                                   "id": {
+                                     "type": "string"
+                                   }
+                                 },
+                                 "required": [
+                                   "displayName",
+                                   "id"
+                                 ]
+                               }
+                             }
+                           },
+                           "invitation": {
+                             "type": "object",
+                             "properties": {
+                               "invitedBy": {
+                                 "type": "object",
+                                 "properties": {
+                                   "user": {
+                                     "type": "object",
+                                     "properties": {
+                                       "displayName": {
+                                         "type": "string"
+                                       },
+                                       "id": {
+                                         "type": "string"
+                                       }
+                                     },
+                                     "required": [
+                                       "displayName",
+                                       "id"
+                                     ]
+                                   }
+                                 },
+                                 "required": [
+                                   "user"
+                                 ]
+                               }
+                             },
+                             "required": [
+                               "invitedBy"
+                             ]
+                           },
+                           "@libre.graph.permissions.actions": {
+                             "type": "array",
+                             "items": [
+                               {
+                                 "type": "string"
+                               }
+                             ]
+                           },
+                           "roles": {
+                             "type": "array",
+                             "items": [
+                               {
+                                 "type": "string"
+                               }
+                             ]
+                           }
+                         }
+                       }
+                     ]
+                   },
+                   "size": {
+                     "type": "number",
+                     "enum": [
+                       11
+                     ]
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
     """
 
 
@@ -356,8 +380,7 @@ Feature: an user gets the resources shared to them
                   "lastModifiedDateTime",
                   "name",
                   "parentReference",
-                  "permissions",
-                  "shared"
+                  "permissions"
                 ],
                 "properties": {
                   "createdBy": {
@@ -413,74 +436,99 @@ Feature: an user gets the resources shared to them
                       "folder"
                     ]
                   },
-                  "shared": {
-                    "type": "object",
-                    "required": [
-                      "sharedBy",
-                      "owner"
-                    ],
-                    "properties": {
-                      "owner": {
+                  "permissions": {
+                    "type": "array",
+                    "items": [
+                      {
                         "type": "object",
                         "required": [
-                          "user"
-                        ],
-                        "properties": {
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "displayName"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "pattern": "^%user_id_pattern%$"
-                              },
-                              "displayName": {
-                                "type": "string",
-                                "enum": [
-                                  "Alice Hansen"
-                                ]
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "sharedBy": {
-                        "type": "object",
-                        "required": [
-                          "user"
-                        ],
-                        "properties": {
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "displayName"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "pattern": "^%user_id_pattern%$"
-                              },
-                              "displayName": {
-                                "type": "string",
-                                "enum": [
-                                  "Alice Hansen"
-                                ]
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                           "grantedToV2",
+                           "id",
+                           "invitation"
+                         ],
+                         "properties": {
+                           "id": {
+                             "type": "string"
+                           },
+                           "grantedToV2": {
+                             "type": "object",
+                             "required": [
+                               "user"
+                             ],
+                             "properties": {
+                               "user": {
+                                 "type": "object",
+                                 "properties": {
+                                   "displayName": {
+                                     "type": "string"
+                                   },
+                                   "id": {
+                                     "type": "string"
+                                   }
+                                 },
+                                 "required": [
+                                   "displayName",
+                                   "id"
+                                 ]
+                               }
+                             }
+                           },
+                           "invitation": {
+                             "type": "object",
+                             "properties": {
+                               "invitedBy": {
+                                 "type": "object",
+                                 "properties": {
+                                   "user": {
+                                     "type": "object",
+                                     "properties": {
+                                       "displayName": {
+                                         "type": "string"
+                                       },
+                                       "id": {
+                                         "type": "string"
+                                       }
+                                     },
+                                     "required": [
+                                       "displayName",
+                                       "id"
+                                     ]
+                                   }
+                                 },
+                                 "required": [
+                                   "user"
+                                 ]
+                               }
+                             },
+                             "required": [
+                               "invitedBy"
+                             ]
+                           },
+                           "@libre.graph.permissions.actions": {
+                             "type": "array",
+                             "items": [
+                               {
+                                 "type": "string"
+                               }
+                             ]
+                           },
+                           "roles": {
+                             "type": "array",
+                             "items": [
+                               {
+                                 "type": "string"
+                               }
+                             ]
+                           }
+                         }
+                       }
+                     ]
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
     """
