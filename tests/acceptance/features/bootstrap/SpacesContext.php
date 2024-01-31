@@ -83,17 +83,31 @@ class SpacesContext implements Context {
 		if (!\array_key_exists($spaceName, $this->createdSpaces)) {
 			throw new Exception(__METHOD__ . " space '$spaceName' has not been created in this scenario");
 		}
-		return $this->createdSpaces[$spaceName];
+		return $this->createdSpaces[$spaceName]['spaceCreator'];
+	}
+
+	/**
+	 * @param string $spaceCreator
+	 * @param ResponseInterface $response
+	 *
+	 * @return void
+	 */
+	public function addCreatedSpace(string $spaceCreator, ResponseInterface $response): void {
+		$response = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$spaceName = $response->name;
+		$this->createdSpaces[$spaceName] = [];
+		$this->createdSpaces[$spaceName]['id'] = $response->id;
+		$this->createdSpaces[$spaceName]['spaceCreator'] = $spaceCreator;
+		$this->createdSpaces[$spaceName]['fileId'] = $response->id . '!' . $response->owner->user->id;
 	}
 
 	/**
 	 * @param string $spaceName
-	 * @param string $spaceCreator
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function setSpaceCreator(string $spaceName, string $spaceCreator): void {
-		$this->createdSpaces[$spaceName] = $spaceCreator;
+	public function getCreatedSpace(string $spaceName): array {
+		return $this->createdSpaces[$spaceName];
 	}
 
 	private array $availableSpaces = [];
@@ -695,16 +709,17 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
-		$this->featureContext->setResponse(
-			GraphHelper::createSpace(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$this->featureContext->getStepLineRef()
-			)
+		$response = GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$this->featureContext->getStepLineRef()
 		);
-		$this->setSpaceCreator($spaceName, $user);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() === '201') {
+			$this->addCreatedSpace($user, $response);
+		}
 	}
 
 	/**
@@ -1645,7 +1660,7 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$response = $this->createSpace($user, $space);
-		$this->setSpaceCreator($spaceName, $user);
+		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
@@ -1670,7 +1685,7 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName];
 		$response = $this->createSpace($user, $space);
-		$this->setSpaceCreator($spaceName, $user);
+		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
