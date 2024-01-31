@@ -75,7 +75,7 @@ func (g Graph) GetGatewayClient(w http.ResponseWriter, r *http.Request) (gateway
 	return gatewayClient, true
 }
 
-// IsShareJail returns true if the resourceID is a share jail.
+// IsShareJail returns true if given id is a share jail id.
 func IsShareJail(id storageprovider.ResourceId) bool {
 	return id.GetStorageId() == utils.ShareStorageProviderID && id.GetSpaceId() == utils.ShareStorageSpaceID
 }
