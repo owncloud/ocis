@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
 * Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
@@ -222,6 +223,14 @@ The following sections list the changes for unreleased.
    expected before.
 
    https://github.com/owncloud/ocis/pull/8317
+
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
+
+   Introduce a new environment variable `IDP_LOGIN_BACKGROUND_URL` that overrides
+   the default background image of the IDP login page when present.
+
+   https://github.com/owncloud/ocis/issues/7674
+   https://github.com/owncloud/ocis/pull/7900
 
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 
