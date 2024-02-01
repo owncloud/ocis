@@ -1,6 +1,21 @@
-Enhancement: Update web to v8.0.0-rc.1
+Enhancement: Update web to v8.0.0-rc.3
 
 Tags: web
+
+We updated ownCloud Web to v8.0.0-rc.3. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Bugfix [owncloud/web#10318](https://github.com/owncloud/web/pull/10318): Scrollable account page
+* Bugfix [owncloud/web#10321](https://github.com/owncloud/web/pull/10321): Private link error messages
+* Bugfix [owncloud/web#10347](https://github.com/owncloud/web/pull/10347): Readonly user attributes have no effect on group memberships
+* Bugfix [owncloud/web#10424](https://github.com/owncloud/web/pull/10424): Restore space
+* Enhancement [owncloud/web#10356](https://github.com/owncloud/web/pull/10356): Preview app add reset button for images
+
+We updated ownCloud Web to v8.0.0-rc.2. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Bugfix [owncloud/web#10176](https://github.com/owncloud/web/pull/10176): Turned off file extensions not always respected
+* Bugfix [owncloud/web#10232](https://github.com/owncloud/web/pull/10232): Skip searchbar preview fetch on reload
 
 We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked) for details on the web release.
 
@@ -121,6 +136,10 @@ We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog (linke
 * Enhancement [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support mandatory filter while listing users
 * Enhancement [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering quick actions as extension
 
+https://github.com/owncloud/ocis/pull/8342
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
+https://github.com/owncloud/ocis/pull/8154
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
 https://github.com/owncloud/ocis/pull/8055
 https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
 https://github.com/owncloud/ocis/pull/7930
