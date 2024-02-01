@@ -20,6 +20,7 @@ var (
 func BindSourcesToStructs(service string, dst interface{}) (*gofig.Config, error) {
 	cnf := gofig.NewWithOptions(service)
 	cnf.WithOptions(func(options *gofig.Options) {
+		options.ParseEnv = true
 		options.DecoderConfig.TagName = decoderConfigTagName
 	})
 	cnf.AddDriver(gooyaml.Driver)
