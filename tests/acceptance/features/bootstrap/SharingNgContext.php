@@ -148,17 +148,8 @@ class SharingNgContext implements Context {
 		$spaceId = $space['id'];
 
 		// $fileId is used for trying to share deleted files
-		// for resharing a resource, "item-id" in API endpoint takes shareMountId
 		if ($fileId) {
 			$itemId = $fileId;
-		} elseif ($rows['space'] === 'Shares') {
-			$itemId = GraphHelper::getShareMountId(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$rows['resource']
-			);
 		} else {
 			$resource = $rows['resource'] ?? '';
 
