@@ -2041,7 +2041,7 @@ Feature: Send a sharing invitations
       """
 
 
-  Scenario Outline: send share invitation for resource of project space to user with different roles
+  Scenario Outline: send share invitation for project space resource to user with different roles
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -2122,7 +2122,7 @@ Feature: Send a sharing invitations
       | Uploader         | FolderToShare |
 
 
-  Scenario Outline: send share invitation for resource of project space to group with different roles
+  Scenario Outline: send share invitation for project space resource to group with different roles
     Given using spaces DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
