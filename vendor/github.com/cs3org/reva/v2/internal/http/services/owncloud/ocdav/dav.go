@@ -44,8 +44,6 @@ const (
 	_trashbinPath = "trash-bin"
 )
 
-type tokenStatInfoKey struct{}
-
 // DavHandler routes to the different sub handlers
 type DavHandler struct {
 	AvatarsHandler      *AvatarsHandler
@@ -318,9 +316,9 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			}
 			log.Debug().Interface("statInfo", sRes.Info).Msg("Stat info from public link token path")
 
+			ctx := ContextWithTokenStatInfo(ctx, sRes.Info)
+			r = r.WithContext(ctx)
 			if sRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-				ctx := context.WithValue(ctx, tokenStatInfoKey{}, sRes.Info)
-				r = r.WithContext(ctx)
 				h.PublicFileHandler.Handler(s).ServeHTTP(w, r)
 			} else {
 				h.PublicFolderHandler.Handler(s).ServeHTTP(w, r)

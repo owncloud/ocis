@@ -361,3 +361,5 @@ replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-2
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
+replace github.com/cs3org/reva/v2 => github.com/dragonchaser/reva/v2 v2.4.1-0.20240201130351-4b087c2a6b7b

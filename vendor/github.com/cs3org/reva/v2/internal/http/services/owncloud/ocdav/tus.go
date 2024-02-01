@@ -24,6 +24,7 @@ import (
 	"io"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -115,6 +116,15 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusPreconditionFailed)
 		return
 	}
+
+	// Test if the target is a secret filedrop
+	var isSecretFileDrop bool
+	tokenStatInfo, ok := TokenStatInfoFromContext(ctx)
+	// We assume that when the uploader can create containers, but is not allowed to list them, it is a secret file drop
+	if ok && tokenStatInfo.GetPermissionSet().CreateContainer && !tokenStatInfo.GetPermissionSet().ListContainer {
+		isSecretFileDrop = true
+	}
+
 	// r.Header.Get(net.HeaderOCChecksum)
 	// TODO must be SHA1, ADLER32 or MD5 ... in capital letters????
 	// curl -X PUT https://demo.owncloud.com/remote.php/webdav/testcs.bin -u demo:demo -d '123' -v -H 'OC-Checksum: SHA1:40bd001563085fc35165329ea1ff5c5ecbdbbeef'
@@ -156,6 +166,43 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				log.Warn().Str("client-etag", clientETag).Str("server-etag", serverETag).Msg("etags mismatch")
 				w.WriteHeader(http.StatusPreconditionFailed)
 				return
+			}
+		}
+		if isSecretFileDrop {
+			lReq := &provider.ListContainerRequest{
+				Ref: &provider.Reference{
+					ResourceId: sRes.GetInfo().GetParentId(),
+				},
+			}
+			lRes, err := client.ListContainer(ctx, lReq)
+			if err != nil {
+				log.Error().Err(err).Msg("error sending grpc stat request")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if lRes.Status.Code != rpc.Code_CODE_OK {
+				log.Debug().Err(err).Msg("error listing container")
+				errors.HandleErrorStatus(&log, w, lRes.Status)
+				return
+			}
+			// iterate over the listing to determine next suffix
+			var itemMap = make(map[string]struct{})
+			for _, fi := range lRes.Infos {
+				itemMap[fi.GetName()] = struct{}{}
+			}
+			ext := filepath.Ext(sRes.GetInfo().GetName())
+			fileName := strings.TrimSuffix(sRes.GetInfo().GetName(), ext)
+			if strings.HasSuffix(fileName, ".tar") {
+				fileName = strings.TrimSuffix(fileName, ".tar")
+				ext = filepath.Ext(fileName) + "." + ext
+			}
+			// starts with two because "normal" humans begin counting with 1 and we say the existing file is the first one
+			for i := 2; i < len(itemMap)+3; i++ {
+				if _, ok := itemMap[fileName+" ("+strconv.Itoa(i)+")"+ext]; !ok {
+					sRes.GetInfo().Name = fileName + " (" + strconv.Itoa(i) + ")" + ext
+					ref.Path = filepath.Join(filepath.Dir(ref.GetPath()), sRes.GetInfo().GetName())
+					break
+				}
 			}
 		}
 	}
