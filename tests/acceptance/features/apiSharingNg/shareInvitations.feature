@@ -1947,3 +1947,95 @@ Feature: Send a sharing invitations
       | Space Editor     |
       | Co Owner         |
       | Manager          |
+
+
+  Scenario: send share invitation to user for deleted file
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "textfile1.txt"
+    When user "Alice" sends the following share invitation with file-id "<<FILEID>>" using the Graph API:
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    Then the HTTP status code should be "404"
+    And for user "Brian" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: send share invitation to group for deleted file
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "textfile1.txt"
+    When user "Alice" sends the following share invitation with file-id "<<FILEID>>" using the Graph API:
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    Then the HTTP status code should be "404"
+    And for user "Brian" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And for user "Carol" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
