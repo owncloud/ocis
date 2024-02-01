@@ -147,7 +147,7 @@ class SharingNgContext implements Context {
 		}
 		$spaceId = $space['id'];
 
-		// $fileId is used for sharing deleted files
+		// $fileId is used for trying to share deleted files
 		// for resharing a resource, "item-id" in API endpoint takes shareMountId
 		if ($fileId) {
 			$itemId = $fileId;
