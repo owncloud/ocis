@@ -21,9 +21,9 @@ Feature: resources shared by user
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -146,9 +146,9 @@ Feature: resources shared by user
       | sharee          | Brian                      |
       | shareType       | user                       |
       | permissionsRole | Viewer                     |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -270,9 +270,9 @@ Feature: resources shared by user
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "FolderToShare" with the following data:
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
     """
     {
       "type": "object",
@@ -395,9 +395,9 @@ Feature: resources shared by user
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -508,7 +508,7 @@ Feature: resources shared by user
       }
     }
     """
-    And the JSON data of the response should contain file name "FolderToShare" with the following data:
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
     """
     {
       "type": "object",
@@ -626,9 +626,9 @@ Feature: resources shared by user
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -754,9 +754,9 @@ Feature: resources shared by user
       | sharee          | Brian                      |
       | shareType       | user                       |
       | permissionsRole | Viewer                     |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -881,9 +881,9 @@ Feature: resources shared by user
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "FolderToShare" with the following data:
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
     """
     {
       "type": "object",
@@ -1009,9 +1009,9 @@ Feature: resources shared by user
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    When user "Alice" lists the resources shared by her using the Graph API
+    When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain file name "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
     """
     {
       "type": "object",
@@ -1122,7 +1122,7 @@ Feature: resources shared by user
       }
     }
     """
-    And the JSON data of the response should contain file name "FolderToShare" with the following data:
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
     """
     {
       "type": "object",
