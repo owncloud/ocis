@@ -28,6 +28,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	settingsmocks "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -48,7 +49,7 @@ var _ = Describe("Users", func() {
 		gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher   mocks.Publisher
 		roleService       *mocks.RoleService
-		valueService      *mocks.ValueService
+		valueService      *settingsmocks.ValueService
 		permissionService *mocks.Permissions
 		identityBackend   *identitymocks.Backend
 
@@ -76,7 +77,7 @@ var _ = Describe("Users", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
-		valueService = &mocks.ValueService{}
+		valueService = &settingsmocks.ValueService{}
 		permissionService = &mocks.Permissions{}
 
 		rr = httptest.NewRecorder()
