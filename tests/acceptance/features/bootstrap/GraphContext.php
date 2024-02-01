@@ -2507,7 +2507,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user lists the resources shared with him/her using the Graph API
+	 * @When user :user lists the shares shared with him/her using the Graph API
 	 *
 	 * @param string $user
 	 *
@@ -2527,7 +2527,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user lists the resources shared by him/her using the Graph API
+	 * @When user :user lists the shares shared by him/her using the Graph API
 	 *
 	 * @param string $user
 	 *
@@ -2547,7 +2547,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the JSON data of the response should (not )?contain file name "([^"]*)" with the following data:?$/
+	 * @Then /^the JSON data of the response should (not )?contain resource "([^"]*)" with the following data:?$/
 	 *
 	 * @param string $shouldOrNot (not| )
 	 * @param string $fileName
