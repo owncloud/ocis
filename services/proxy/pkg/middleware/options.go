@@ -39,7 +39,7 @@ type Options struct {
 	SettingsRoleService settingssvc.RoleService
 	// PoliciesProviderService for policy evaluation
 	PoliciesProviderService policiessvc.PoliciesProviderService
-	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
+	// OIDCClient to fetch user info and verify tokens, must be set for the oidc_auth middleware
 	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string

@@ -25,8 +25,6 @@ var (
 // RegisterFunc stores store constructors
 type RegisterFunc func(*config.Config) Manager
 
-//go:generate mockery --name=Manager
-
 // ServiceHandler combines handlers interfaces
 type ServiceHandler interface {
 	settingssvc.BundleServiceHandler

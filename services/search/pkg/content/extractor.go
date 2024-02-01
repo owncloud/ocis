@@ -9,8 +9,6 @@ import (
 )
 
 // Extractor is responsible to extract content and meta information from documents.
-//
-//go:generate mockery --name=Extractor
 type Extractor interface {
 	Extract(ctx context.Context, ri *provider.ResourceInfo) (Document, error)
 }
