@@ -1878,7 +1878,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getSharesSharedByAUser(
+	public static function getSharesSharedByMe(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,

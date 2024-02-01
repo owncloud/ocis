@@ -2537,7 +2537,7 @@ class GraphContext implements Context {
 	public function userListsTheResourcesSharedByAUserUsingGraphApi(string $user): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
-			GraphHelper::getSharesSharedByAUser(
+			GraphHelper::getSharesSharedByMe(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
@@ -2551,7 +2551,7 @@ class GraphContext implements Context {
 	 *
 	 * @param string $shouldOrNot (not| )
 	 * @param string $fileName
-	 * @param PyStringNode|null $schemaString
+	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
@@ -2559,7 +2559,7 @@ class GraphContext implements Context {
 	public function theJsonDataResponseShouldOrNotContainSharedByMeDetails(
 		string $shouldOrNot,
 		string $fileName,
-		?PyStringNode $schemaString = null
+		PyStringNode $schemaString
 	): void {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 		$fileOrFolderFound = false;
@@ -2576,7 +2576,7 @@ class GraphContext implements Context {
 		}
 		Assert::assertFalse(
 			!$shouldContain && $fileOrFolderFound,
-			'Response contains file "' . $fileName . '" but should not have.'
+			'Response contains file "' . $fileName . '" but should.'
 		);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
