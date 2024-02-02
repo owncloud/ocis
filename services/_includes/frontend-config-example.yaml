@@ -73,8 +73,6 @@ reva:
 machine_auth_api_key: ""
 skip_user_groups_in_token: false
 enable_favorites: false
-enable_project_spaces: true
-enable_share_jail: true
 max_quota: 0
 upload_max_chunk_size: 10000000
 upload_http_method_override: ""

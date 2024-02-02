@@ -29,8 +29,6 @@
 | OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | The machine auth API key used to validate internal requests necessary to access resources from other services.|
 | FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | FRONTEND_ENABLE_FAVORITES | bool | false | Enables the support for favorites in the clients.|
-| FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Changing this value is NOT supported. Indicates to clients that project spaces are supposed to be made available.|
-| FRONTEND_ENABLE_SHARE_JAIL | bool | true | Changing this value is NOT supported. Indicates to clients that the share jail is supposed to be used.|
 | OCIS_SPACES_MAX_QUOTA<br/>FRONTEND_MAX_QUOTA | uint64 | 0 | Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.|
 | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 10000000 | Sets the max chunk sizes in bytes for uploads via the clients.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
