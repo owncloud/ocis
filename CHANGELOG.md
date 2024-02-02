@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
@@ -216,6 +217,14 @@ The following sections list the changes for unreleased.
    now
 
    https://github.com/owncloud/ocis/pull/8281
+
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
+
+   We have removed two spaces related environment variables (whether project spaces
+   and the share jail are enabled) and hardcoded the only allowed options. Misusing
+   those variables would have resulted in invalid config.
+
+   https://github.com/owncloud/ocis/pull/8303
 
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
 
