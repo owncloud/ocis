@@ -1451,7 +1451,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString, ResponseInterface $response=null): void {
 		$responseBody = $this->getJsonDecodedResponseBodyContent($response);
-		print_r($schemaString);
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)
@@ -2748,30 +2747,6 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%group_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%space_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getSpaceIdRegex"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%user_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
-				],
-				"parameter" => []
-			],
-			[
 				"code" => "%user_id%",
 				"function" => [
 					$this, "getUserIdByUserName"
@@ -2784,6 +2759,22 @@ class FeatureContext extends BehatVariablesContext {
 					$this, "getGroupIdByGroupName"
 				],
 				"parameter" => [$group]
+			],
+			[
+				"code" => "%user_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%group_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
 			],
 			[
 				"code" => "%role_id_pattern%",
@@ -2806,6 +2797,14 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
 					"getFileIdRegex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%space_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getSpaceIdRegex"
 				],
 				"parameter" => []
 			],
