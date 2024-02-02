@@ -1162,11 +1162,11 @@ def e2eTests(ctx):
     test_suites = {
         "suite1": {
             "path": "tests/e2e/cucumber/features/*/*[!.oc10].feature",
-            "tikaNeeded": True,
+            "tikaNeeded": False,
         },
         "suite2": {
             "path": "tests/e2e/cucumber/features/smoke/*[!app-provider]/*[!.oc10].feature",
-            "tikaNeeded": False,
+            "tikaNeeded": True,
         },
     }
 
