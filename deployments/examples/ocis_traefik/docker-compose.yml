@@ -14,6 +14,12 @@ services:
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+      # Let’s Encrypt provides rate limits to ensure fair usage by as many people as possible. 
+      # If you’re actively developing or testing a Let’s Encrypt client, please utilize the staging environment instead of the production API.
+      # There are two steps to go: 
+      # 1. Enable the staging API below this comment. 
+      # 2. Install staging intermediate and root certificates from: https://letsencrypt.org/docs/staging-environment/ on your local machine.
+      # - "--certificatesresolvers.http.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       # enable dashboard
       - "--api.dashboard=true"
       # define entrypoints
