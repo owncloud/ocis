@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/cs3org/reva/v2/pkg/publicshare/manager/json/persistence"
 )
@@ -31,16 +32,28 @@ import (
 type file struct {
 	path        string
 	initialized bool
+	lock        *sync.RWMutex
 }
 
 // New returns a new Cache instance
 func New(path string) persistence.Persistence {
 	return &file{
 		path: path,
+		lock: &sync.RWMutex{},
 	}
 }
 
 func (p *file) Init(_ context.Context) error {
+	if p.isInitialized() {
+		return nil
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	if p.initialized {
+		return nil
+	}
+
 	// attempt to create the db file
 	var fi os.FileInfo
 	var err error
@@ -65,7 +78,7 @@ func (p *file) Init(_ context.Context) error {
 }
 
 func (p *file) Read(_ context.Context) (persistence.PublicShares, error) {
-	if !p.initialized {
+	if !p.isInitialized() {
 		return nil, fmt.Errorf("not initialized")
 	}
 	db := map[string]interface{}{}
@@ -80,7 +93,7 @@ func (p *file) Read(_ context.Context) (persistence.PublicShares, error) {
 }
 
 func (p *file) Write(_ context.Context, db persistence.PublicShares) error {
-	if !p.initialized {
+	if !p.isInitialized() {
 		return fmt.Errorf("not initialized")
 	}
 	dbAsJSON, err := json.Marshal(db)
@@ -89,4 +102,10 @@ func (p *file) Write(_ context.Context, db persistence.PublicShares) error {
 	}
 
 	return os.WriteFile(p.path, dbAsJSON, 0644)
+}
+
+func (p *file) isInitialized() bool {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
+	return p.initialized
 }

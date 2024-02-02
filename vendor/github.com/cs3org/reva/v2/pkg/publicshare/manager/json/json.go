@@ -72,10 +72,6 @@ func NewFile(c map[string]interface{}) (publicshare.Manager, error) {
 	}
 
 	p := file.New(conf.File)
-	if err := p.Init(context.Background()); err != nil {
-		return nil, err
-	}
-
 	return New(conf.GatewayAddr, conf.SharePasswordHashCost, conf.JanitorRunInterval, conf.EnableExpiredSharesCleanup, p)
 }
 
@@ -88,10 +84,6 @@ func NewMemory(c map[string]interface{}) (publicshare.Manager, error) {
 
 	conf.init()
 	p := memory.New()
-
-	if err := p.Init(context.Background()); err != nil {
-		return nil, err
-	}
 
 	return New(conf.GatewayAddr, conf.SharePasswordHashCost, conf.JanitorRunInterval, conf.EnableExpiredSharesCleanup, p)
 }
@@ -110,10 +102,6 @@ func NewCS3(c map[string]interface{}) (publicshare.Manager, error) {
 		return nil, err
 	}
 	p := cs3.New(s)
-
-	if err := p.Init(context.Background()); err != nil {
-		return nil, err
-	}
 
 	return New(conf.GatewayAddr, conf.SharePasswordHashCost, conf.JanitorRunInterval, conf.EnableExpiredSharesCleanup, p)
 }
@@ -174,6 +162,10 @@ type manager struct {
 	enableExpiredSharesCleanup bool
 }
 
+func (m *manager) init() error {
+	return m.persistence.Init(context.Background())
+}
+
 func (m *manager) startJanitorRun() {
 	if !m.enableExpiredSharesCleanup {
 		return
@@ -200,6 +192,10 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
+	if err := m.init(); err != nil {
+		return err
+	}
+
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
@@ -221,6 +217,10 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPassword) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return err
+	}
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
@@ -295,6 +295,10 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return nil, err
+	}
 
 	encShare, err := utils.MarshalProtoV1ToJSON(&ps.PublicShare)
 	if err != nil {
@@ -385,6 +389,10 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
+	if err := m.init(); err != nil {
+		return nil, err
+	}
+
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return nil, err
@@ -419,6 +427,10 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.PublicShareReference, sign bool) (*link.PublicShare, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return nil, err
+	}
 
 	if ref.GetToken() != "" {
 		ps, pw, err := m.getByToken(ctx, ref.GetToken())
@@ -472,6 +484,10 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []*link.ListPublicSharesRequest_Filter, sign bool) ([]*link.PublicShare, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return nil, err
+	}
 
 	log := appctx.GetLogger(ctx)
 
@@ -555,6 +571,10 @@ func (m *manager) cleanupExpiredShares() {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
+	if err := m.init(); err != nil {
+		return
+	}
+
 	db, _ := m.persistence.Read(context.Background())
 
 	for _, v := range db {
@@ -594,6 +614,11 @@ func (m *manager) revokeExpiredPublicShare(ctx context.Context, s *link.PublicSh
 func (m *manager) RevokePublicShare(ctx context.Context, _ *user.User, ref *link.PublicShareReference) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return err
+	}
+
 	return m.revokePublicShare(ctx, ref)
 }
 
@@ -650,6 +675,10 @@ func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicSha
 func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth *link.PublicShareAuthentication, sign bool) (*link.PublicShare, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+
+	if err := m.init(); err != nil {
+		return nil, err
+	}
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {

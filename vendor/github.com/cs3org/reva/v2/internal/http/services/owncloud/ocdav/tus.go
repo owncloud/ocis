@@ -169,41 +169,20 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			}
 		}
 		if isSecretFileDrop {
-			lReq := &provider.ListContainerRequest{
-				Ref: &provider.Reference{
-					ResourceId: sRes.GetInfo().GetParentId(),
-				},
-			}
-			lRes, err := client.ListContainer(ctx, lReq)
+			// find next filename
+			newName, status, err := FindName(ctx, client, filepath.Base(ref.Path), sRes.GetInfo().GetParentId())
 			if err != nil {
 				log.Error().Err(err).Msg("error sending grpc stat request")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if lRes.Status.Code != rpc.Code_CODE_OK {
-				log.Debug().Err(err).Msg("error listing container")
-				errors.HandleErrorStatus(&log, w, lRes.Status)
+			if status.GetCode() != rpc.Code_CODE_OK {
+				log.Error().Interface("status", status).Msg("error listing file")
+				errors.HandleErrorStatus(&log, w, status)
 				return
 			}
-			// iterate over the listing to determine next suffix
-			var itemMap = make(map[string]struct{})
-			for _, fi := range lRes.Infos {
-				itemMap[fi.GetName()] = struct{}{}
-			}
-			ext := filepath.Ext(sRes.GetInfo().GetName())
-			fileName := strings.TrimSuffix(sRes.GetInfo().GetName(), ext)
-			if strings.HasSuffix(fileName, ".tar") {
-				fileName = strings.TrimSuffix(fileName, ".tar")
-				ext = filepath.Ext(fileName) + "." + ext
-			}
-			// starts with two because "normal" humans begin counting with 1 and we say the existing file is the first one
-			for i := 2; i < len(itemMap)+3; i++ {
-				if _, ok := itemMap[fileName+" ("+strconv.Itoa(i)+")"+ext]; !ok {
-					sRes.GetInfo().Name = fileName + " (" + strconv.Itoa(i) + ")" + ext
-					ref.Path = filepath.Join(filepath.Dir(ref.GetPath()), sRes.GetInfo().GetName())
-					break
-				}
-			}
+			ref.Path = filepath.Join(filepath.Dir(ref.GetPath()), newName)
+			sRes.GetInfo().Name = newName
 		}
 	}
 

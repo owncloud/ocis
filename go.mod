@@ -12,7 +12,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.10
 	github.com/coreos/go-oidc/v3 v3.9.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
-	github.com/cs3org/reva/v2 v2.18.1-0.20240129131717-cff0a2eeb959
+	github.com/cs3org/reva/v2 v2.18.1-0.20240205065033-2c21ada2ae52
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -361,5 +361,3 @@ replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-2
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
-
-replace github.com/cs3org/reva/v2 => github.com/dragonchaser/reva/v2 v2.4.1-0.20240201130351-4b087c2a6b7b
