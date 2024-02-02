@@ -69,7 +69,7 @@ Feature: an user gets the resources shared to them
               },
               "eTag": {
                 "type": "string",
-                "pattern": "%eTag%"
+                "pattern": "%etag_pattern%"
               },
               "file": {
                 "type": "object",
@@ -151,7 +151,7 @@ Feature: an user gets the resources shared to them
                   },
                   "eTag": {
                     "type": "string",
-                    "pattern": "%eTag%"
+                    "pattern": "%etag_pattern%"
                   },
                   "file": {
                     "type": "object",
@@ -336,7 +336,7 @@ Feature: an user gets the resources shared to them
               },
               "eTag": {
                 "type": "string",
-                "pattern": "%eTag%"
+                "pattern": "%etag_pattern%"
               },
               "folder": {
                 "type": "object",
@@ -412,7 +412,7 @@ Feature: an user gets the resources shared to them
                   },
                   "eTag": {
                     "type": "string",
-                    "pattern": "%eTag%"
+                    "pattern": "%etag_pattern%"
                   },
                   "file": {
                     "type": "object",

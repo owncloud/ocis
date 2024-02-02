@@ -1451,6 +1451,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString, ResponseInterface $response=null): void {
 		$responseBody = $this->getJsonDecodedResponseBodyContent($response);
+		print_r($schemaString);
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)
@@ -2817,7 +2818,7 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%eTag%",
+				"code" => "%etag_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
 					"getEtagRegex"
