@@ -276,7 +276,7 @@ func (idp IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
-// Index renders the static html with the
+// Index renders the static html with templated variables.
 func (idp IDP) Index() http.HandlerFunc {
 	f, err := idp.assets.Open("/identifier/index.html")
 	if err != nil {
@@ -294,6 +294,9 @@ func (idp IDP) Index() http.HandlerFunc {
 	// TODO add environment variable to make the path prefix configurable
 	pp := "/signin/v1"
 	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
+
+	background := idp.config.Asset.LoginBackgroundUrl
+	indexHTML = bytes.Replace(template, []byte("__BG_IMG_URL__"), []byte(background), 1)
 
 	nonce := rndm.GenerateRandomString(32)
 	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)

@@ -25,7 +25,7 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
-	$(MOCKERY) --dir ../../protogen/gen/ocis/services/policies/v0 --case underscore --name PoliciesProviderService
+	$(MOCKERY)
 
 .PHONY: ci-node-generate
 ci-node-generate:

@@ -31,6 +31,12 @@ dev-docker:
 	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
 	docker build -f docker/Dockerfile.linux.$(GOARCH) -t owncloud/ocis:dev .
 
+############ debug-docker ############
+.PHONY: debug-docker
+debug-docker:
+	$(MAKE) --no-print-directory debug-linux-docker-$(GOARCH)
+	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t owncloud/ocis:debug .
+
 ############ generate ############
 include ../.make/generate.mk
 

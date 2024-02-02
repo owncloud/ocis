@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
@@ -34,7 +35,7 @@ var _ = Describe("Users changing their own password", func() {
 		svc             service.Service
 		gatewayClient   *cs3mocks.GatewayAPIClient
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		ldapClient      *mocks.Client
+		ldapClient      *identitymocks.Client
 		ldapConfig      config.LDAP
 		identityBackend identity.Backend
 		eventsPublisher mocks.Publisher
@@ -135,8 +136,8 @@ var _ = Describe("Users changing their own password", func() {
 	)
 })
 
-func mockedLDAPClient() *mocks.Client {
-	lm := &mocks.Client{}
+func mockedLDAPClient() *identitymocks.Client {
+	lm := &identitymocks.Client{}
 
 	userEntry := ldap.NewEntry("uid=test", map[string][]string{
 		"uid":         {"test"},

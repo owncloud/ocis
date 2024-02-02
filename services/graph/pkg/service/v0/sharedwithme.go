@@ -4,17 +4,16 @@ import (
 	"context"
 	"net/http"
 	"reflect"
-	"slices"
 
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -48,6 +47,16 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		return nil, *errCode
 	}
 
+	return g.cs3ReceivedSharesToDriveItems(ctx, listReceivedSharesResponse.GetShares())
+}
+
+func (g Graph) cs3ReceivedSharesToDriveItems(ctx context.Context, receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return nil, err
+	}
+
 	// doStat is a helper function that stat a resource.
 	doStat := func(resourceId *storageprovider.ResourceId) (*storageprovider.StatResponse, error) {
 		shareStat, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
@@ -67,28 +76,87 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		return shareStat, nil
 	}
 
+	ch := make(chan libregraph.DriveItem)
 	group := new(errgroup.Group)
-	receivedShares := listReceivedSharesResponse.GetShares()
-	driveItems := make([]libregraph.DriveItem, len(receivedShares))
+	// Set max concurrency
+	group.SetLimit(10)
 
-	for i, receivedShare := range receivedShares {
-		i, receivedShare := i, receivedShare
+	receivedSharesByResourceID := make(map[string][]*collaboration.ReceivedShare, len(receivedShares))
+	for _, receivedShare := range receivedShares {
+		rIDStr := storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId())
+		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
+	}
+
+	for _, receivedSharesForResource := range receivedSharesByResourceID {
+		receivedShares := receivedSharesForResource
 
 		group.Go(func() error {
-			shareStat, err := doStat(receivedShare.GetShare().GetResourceId())
+			var err error // redeclare
+			resourceID := receivedShares[0].GetShare().GetResourceId()
+			shareStat, err := doStat(receivedShares[0].GetShare().GetResourceId())
 			if shareStat == nil || err != nil {
 				return err
 			}
 
-			permission, err := g.cs3ReceivedShareToLibreGraphPermissions(ctx, receivedShare, shareStat.GetInfo())
-			if err != nil {
-				return err
+			driveItem := libregraph.NewDriveItem()
+
+			// The id of the driveItem will be the composed of the StorageID and the SpaceID of the sharestorage
+			// appended with the ResourceID of the shared resource
+			// '<sharestorageid>$<sharespaceid>!<resource's storageid>:<resource's spaceid>:<resource's opaque id>'
+			driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+				StorageId: utils.ShareStorageProviderID,
+				OpaqueId:  resourceID.GetStorageId() + ":" + resourceID.GetSpaceId() + ":" + resourceID.GetOpaqueId(),
+				SpaceId:   utils.ShareStorageSpaceID,
+			}))
+			permissions := make([]libregraph.Permission, 0, len(receivedShares))
+
+			for _, receivedShare := range receivedShares {
+				permission, err := g.cs3ReceivedShareToLibreGraphPermissions(ctx, receivedShare)
+				if err != nil {
+					return err
+				}
+
+				// If at least one of the shares was accepted, we consider the driveItem's synchronized
+				// flag enabled.
+				// Also we use the Mountpoint name of the first accepted mountpoint as the name of
+				// of the driveItem
+				if receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+					driveItem.SetClientSynchronize(true)
+					if name := receivedShare.GetMountPoint().GetPath(); name != "" && driveItem.GetName() == "" {
+						driveItem.SetName(receivedShare.GetMountPoint().GetPath())
+					}
+				}
+
+				// if at least one share is marked as hidden, consider the whole driveItem to be hidden
+				if receivedShare.GetHidden() {
+					driveItem.SetUIHidden(true)
+				}
+
+				if userID := receivedShare.GetShare().GetCreator(); userID != nil {
+					identity, err := g.cs3UserIdToIdentity(ctx, userID)
+					if err != nil {
+						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get creator of the share")
+					}
+
+					permission.SetInvitation(
+						libregraph.SharingInvitation{
+							InvitedBy: &libregraph.IdentitySet{
+								User: &identity,
+							},
+						},
+					)
+				}
+				permissions = append(permissions, *permission)
+
 			}
 
-			shared := libregraph.NewShared()
-			{
-				if cTime := receivedShare.GetShare().GetCtime(); cTime != nil {
-					shared.SetSharedDateTime(cs3TimestampToTime(cTime))
+			if !driveItem.HasUIHidden() {
+				driveItem.SetUIHidden(false)
+			}
+			if !driveItem.HasClientSynchronize() {
+				driveItem.SetClientSynchronize(false)
+				if name := shareStat.GetInfo().GetName(); name != "" {
+					driveItem.SetName(name)
 				}
 			}
 
@@ -128,43 +196,18 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 
 			}
 
-			driveItem := libregraph.NewDriveItem()
-
-			// handle share state related stuff
-			switch receivedShare.GetState() {
-			case collaboration.ShareState_SHARE_STATE_ACCEPTED:
-
-				driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
-					StorageId: utils.ShareStorageProviderID,
-					OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
-					SpaceId:   utils.ShareStorageSpaceID,
-				}))
-
-				if name := receivedShare.GetMountPoint().GetPath(); name != "" {
-					driveItem.SetName(receivedShare.GetMountPoint().GetPath())
-				}
-
-				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
-					driveItem.SetETag(etag)
-				}
-
-				// parentReference of the out driveItem should be the drive containing the mountpoint
-				// i.e. the share jail
-				driveItem.ParentReference = libregraph.NewItemReference()
-				driveItem.ParentReference.SetDriveType("virtual")
-				driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
-				driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
-					StorageId: utils.ShareStorageProviderID,
-					OpaqueId:  utils.ShareStorageSpaceID,
-					SpaceId:   utils.ShareStorageSpaceID,
-				}))
-
-			case collaboration.ShareState_SHARE_STATE_PENDING:
-				fallthrough
-			case collaboration.ShareState_SHARE_STATE_REJECTED:
-				if name := shareStat.GetInfo().GetName(); name != "" {
-					driveItem.SetName(name)
-				}
+			// the parentReference of the outer driveItem should be the drive
+			// containing the mountpoint i.e. the share jail
+			driveItem.ParentReference = libregraph.NewItemReference()
+			driveItem.ParentReference.SetDriveType("virtual")
+			driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
+			driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+				StorageId: utils.ShareStorageProviderID,
+				OpaqueId:  utils.ShareStorageSpaceID,
+				SpaceId:   utils.ShareStorageSpaceID,
+			}))
+			if etag := shareStat.GetInfo().GetEtag(); etag != "" {
+				driveItem.SetETag(etag)
 			}
 
 			// connect the dots
@@ -183,7 +226,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					remoteItem.SetSize(s)
 				}
 
-				if userID := shareStat.GetInfo().GetOwner(); userID != nil {
+				if userID := shareStat.GetInfo().GetOwner(); userID != nil && userID.Type != cs3User.UserType_USER_TYPE_SPACE_OWNER {
 					identity, err := g.cs3UserIdToIdentity(ctx, userID)
 					if err != nil {
 						// TODO: define a proper error behavior here. We don't
@@ -198,25 +241,6 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					remoteItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
 					driveItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
 				}
-
-				if userID := receivedShare.GetShare().GetOwner(); userID != nil {
-					identity, err := g.cs3UserIdToIdentity(ctx, userID)
-					if err != nil {
-						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get owner of the share")
-					}
-					shared.SetOwner(libregraph.IdentitySet{User: &identity})
-				}
-
-				if userID := receivedShare.GetShare().GetCreator(); userID != nil {
-					identity, err := g.cs3UserIdToIdentity(ctx, userID)
-					if err != nil {
-						g.logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get creator of the share")
-					}
-
-					shared.SetSharedBy(libregraph.IdentitySet{User: &identity})
-
-				}
-
 				switch info := shareStat.GetInfo(); {
 				case info.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
 					folder := libregraph.NewFolder()
@@ -234,13 +258,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 					driveItem.File = file
 				}
 
-				if !reflect.ValueOf(*shared).IsZero() {
-					remoteItem.Shared = shared
-				}
-
-				if !reflect.ValueOf(*permission).IsZero() {
-					permissions := []libregraph.Permission{*permission}
-
+				if len(permissions) > 0 {
 					remoteItem.Permissions = permissions
 				}
 
@@ -249,22 +267,27 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 				}
 			}
 
-			driveItems[i] = *driveItem
+			ch <- *driveItem
 
 			return nil
 		})
 	}
 
 	// wait for concurrent requests to finish
-	err = group.Wait()
+	go func() {
+		err = group.Wait()
+		close(ch)
+	}()
 
-	// filter out empty drive items
-	return slices.Clip(slices.DeleteFunc(driveItems, func(item libregraph.DriveItem) bool {
-		return reflect.ValueOf(item).IsZero()
-	})), err
+	driveItems := make([]libregraph.DriveItem, 0, len(receivedSharesByResourceID))
+	for di := range ch {
+		driveItems = append(driveItems, di)
+	}
+
+	return driveItems, err
 }
 
-func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, receivedShare *collaboration.ReceivedShare, shareStatInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, receivedShare *collaboration.ReceivedShare) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
@@ -274,7 +297,7 @@ func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, rece
 		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
 	}
 
-	if permissionSet := shareStatInfo.GetPermissionSet(); permissionSet != nil {
+	if permissionSet := receivedShare.GetShare().GetPermissions().GetPermissions(); permissionSet != nil {
 		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 			*permissionSet,
 			unifiedrole.UnifiedRoleConditionGrantee,
@@ -321,8 +344,6 @@ func (g Graph) cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, rece
 			},
 		})
 	}
-	permission.SetUiHidden(receivedShare.GetHidden())
-	permission.SetClientSynchronize(receivedShare.GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED)
 
 	return permission, nil
 }

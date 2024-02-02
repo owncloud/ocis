@@ -31,8 +31,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 )
 
-//go:generate make -C ../../.. generate
-
 // Publisher is the interface for events publisher
 type Publisher interface {
 	Publish(string, interface{}, ...mevents.PublishOption) error

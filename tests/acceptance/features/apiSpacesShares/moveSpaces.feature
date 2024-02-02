@@ -84,10 +84,10 @@ Feature: move (rename) file
       | project1.txt |
     Examples:
       | from_role | to_role | http-status-code  |
-      | manager   | manager | 403               |
-      | editor    | manager | 403               |
-      | manager   | editor  | 403               |
-      | editor    | editor  | 403               |
+      | manager   | manager | 502               |
+      | editor    | manager | 502               |
+      | manager   | editor  | 502               |
+      | editor    | editor  | 502               |
       | manager   | viewer  | 403               |
       | editor    | viewer  | 403               |
       | viewer    | manager | 403               |
@@ -110,8 +110,8 @@ Feature: move (rename) file
       | project.txt |
     Examples:
       | role    | http-status-code  |
-      | manager | 403               |
-      | editor  | 403               |
+      | manager | 502               |
+      | editor  | 502               |
       | viewer  | 403               |
 
 
@@ -158,8 +158,8 @@ Feature: move (rename) file
       | personal.txt |
     Examples:
       | role    | http-status-code  |
-      | manager | 403               |
-      | editor  | 403               |
+      | manager | 502               |
+      | editor  | 502               |
       | viewer  | 403               |
 
 

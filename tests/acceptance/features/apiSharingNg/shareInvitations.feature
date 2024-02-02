@@ -1486,3 +1486,782 @@ Feature: Send a sharing invitations
       | resource-type | path           |
       | file          | /textfile1.txt |
       | folder        | FolderToShare  |
+
+
+  Scenario Outline: try to share a resource with invalid roles
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resourceType    | <resource-type>    |
+      | resource        | <path>             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalidRequest"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "role not applicable to this resource"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | resource-type | path           |
+      | Co Owner         | file          | /textfile1.txt |
+      | Manager          | file          | /textfile1.txt |
+      | Space Viewer     | file          | /textfile1.txt |
+      | Space Editor     | file          | /textfile1.txt |
+      | Co Owner         | folder        | FolderToShare  |
+      | Manager          | folder        | FolderToShare  |
+      | Space Viewer     | folder        | FolderToShare  |
+      | Space Editor     | folder        | FolderToShare  |
+
+
+  Scenario Outline: try to share a file with invalid roles
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalidRequest"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "cannot set the requested permissions on that type of resource"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: send share invitation to already shared user
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    When user "Alice" tries to send the following share invitation using the Graph API:
+      | resourceType    | <resource-type> |
+      | resource        | <path>          |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["nameAlreadyExists"]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^error creating share: error: already exists:.*$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource-type | path           |
+      | file          | /textfile1.txt |
+      | folder        | FolderToShare  |
+
+
+  Scenario Outline: send share invitation for project space to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for disabled project space to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^stat: error: not found: %user_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for deleted project space to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    And user "Admin" has deleted a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for project space to group with different roles
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "grp1"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for disabled project space to group with different roles
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^stat: error: not found: %user_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for deleted project space to group with different roles
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Admin" has disabled a space "NewSpace"
+    And user "Admin" has deleted a space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Co Owner         |
+      | Manager          |
+
+
+  Scenario: send share invitation to user for deleted file
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "textfile1.txt"
+    When user "Alice" sends the following share invitation with file-id "<<FILEID>>" using the Graph API:
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    Then the HTTP status code should be "404"
+    And for user "Brian" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: send share invitation to group for deleted file
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "textfile1.txt"
+    When user "Alice" sends the following share invitation with file-id "<<FILEID>>" using the Graph API:
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    Then the HTTP status code should be "404"
+    And for user "Brian" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And for user "Carol" the space Shares should not contain these entries:
+      | textfile1.txt |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["itemNotFound"]
+              },
+              "message": {
+                "type": "string",
+                "enum": ["stat: error: not found: "]
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: send share invitation for project space resource to user with different roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | resource        | <path>             |
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | path          |
+      | Viewer           | textfile1.txt |
+      | File Editor      | textfile1.txt |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |
+
+
+  Scenario Outline: send share invitation for project space resource to group with different roles
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | resource        | <path>             |
+      | space           | NewSpace           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | <path> |
+    And for user "Carol" the space Shares should contain these entries:
+      | <path> |
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "roles",
+                "grantedToV2"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                },
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "displayName"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "grp1"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | path          |
+      | Viewer           | textfile1.txt |
+      | File Editor      | textfile1.txt |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |

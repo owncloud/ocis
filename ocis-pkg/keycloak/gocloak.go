@@ -7,8 +7,6 @@ import (
 )
 
 // GoCloak represents the parts of gocloak.GoCloak that we use, mainly here for mockery.
-//
-//go:generate mockery --name=GoCloak
 type GoCloak interface {
 	CreateUser(ctx context.Context, token, realm string, user gocloak.User) (string, error)
 	GetUsers(ctx context.Context, token, realm string, params gocloak.GetUsersParams) ([]*gocloak.User, error)
