@@ -1226,3 +1226,240 @@ Feature: resources shared by user
       }
     }
     """
+
+
+  Scenario: user lists shared resources to a group
+    Given group "grp1" has been created
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | file         |
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following share invitation:
+      | resourceType    | folder        |
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+    """
+    {
+      "type": "object",
+      "required": [
+        "parentReference",
+        "permissions",
+        "name",
+        "size"
+      ],
+      "properties": {
+        "parentReference": {
+          "type": "object",
+          "required": [
+            "driveId",
+            "driveType",
+            "path",
+            "name",
+            "id"
+          ],
+          "properties": {
+            "driveId": {
+              "type": "string",
+              "pattern": "^%space_id_pattern%$"
+            },
+            "driveType": {
+              "type": "string",
+              "enum": ["personal"]
+            },
+            "path": {
+              "type": "string",
+              "enum": ["/"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["/"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%file_id_pattern%$"
+            }
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "grp1"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string",
+                      "pattern": "^%role_id_pattern%$"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": ["textfile.txt"]
+        },
+        "size": {
+          "type": "number",
+          "enum": [
+            11
+          ]
+        }
+      }
+    }
+    """
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
+    """
+    {
+      "type": "object",
+      "required": [
+        "parentReference",
+        "permissions",
+        "name"
+      ],
+      "properties": {
+        "parentReference": {
+          "type": "object",
+          "required": [
+            "driveId",
+            "driveType",
+            "path",
+            "name",
+            "id"
+          ],
+          "properties": {
+            "driveId": {
+              "type": "string",
+              "pattern": "^%space_id_pattern%$"
+            },
+            "driveType": {
+              "type": "string",
+              "enum": ["personal"]
+            },
+            "path": {
+              "type": "string",
+              "enum": ["/"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["/"]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^%file_id_pattern%$"
+            }
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "grp1"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string",
+                      "pattern": "^%role_id_pattern%$"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": ["FolderToShare"]
+        }
+      }
+    }
+    """
