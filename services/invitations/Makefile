@@ -25,8 +25,7 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
-	$(MOCKERY) --output pkg/mocks --case underscore --name Client  --srcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
-
+	$(MOCKERY)
 
 .PHONY: ci-node-generate
 ci-node-generate:

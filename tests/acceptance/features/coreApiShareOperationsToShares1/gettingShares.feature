@@ -163,16 +163,32 @@ Feature: sharing
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
 
-  @issue-1231
-  Scenario Outline: getting all the shares inside the folder
+  @smokeTest @issue-1226 @issue-1270 @issue-1271 @issue-1231
+  Scenario Outline: getting share info of a share shared from inside folder
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
-    And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
-    When user "Alice" gets all the shares inside the folder "PARENT" using the sharing API
+    And user "Alice" has uploaded file with content "some data" to "/PARENT/file_to_share.txt"
+    And user "Alice" has shared file "/PARENT/file_to_share.txt" with user "Brian"
+    When user "Alice" gets all shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
-    And file "/Shares/parent.txt" should be included in the response
+    And the fields of the last response to user "Alice" sharing with user "Brian" should include
+      | id                     | A_STRING                  |
+      | item_type              | file                      |
+      | item_source            | A_STRING                  |
+      | share_type             | user                      |
+      | share_with             | %username%                |
+      | file_source            | A_STRING                  |
+      | file_target            | /Shares/file_to_share.txt |
+      | path                   | /PARENT/file_to_share.txt |
+      | permissions            | share,read,update         |
+      | stime                  | A_NUMBER                  |
+      | storage                | A_STRING                  |
+      | mail_send              | 0                         |
+      | uid_owner              | %username%                |
+      | share_with_displayname | %displayname%             |
+      | displayname_owner      | %displayname%             |
+      | mimetype               | text/plain                |
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |

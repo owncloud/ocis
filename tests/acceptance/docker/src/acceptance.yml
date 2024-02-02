@@ -6,7 +6,6 @@ services:
     environment:
       OCIS_ROOT: /drone/src
       TEST_SERVER_URL: https://ocis-server:9200
-      TEST_WITH_GRAPH_API: "true"
       OCIS_WRAPPER_URL: http://ocis-server:5200
       STORAGE_DRIVER: $STORAGE_DRIVER
       TEST_SOURCE: $TEST_SOURCE

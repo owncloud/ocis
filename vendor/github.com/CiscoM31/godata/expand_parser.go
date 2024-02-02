@@ -139,6 +139,14 @@ func ParseExpandItem(ctx context.Context, input tokenQueue) (*ExpandItem, error)
 				queue = &tokenQueue{}
 			}
 		} else if token.Value == "/" && stack.Empty() {
+			if queue.Empty() {
+				// Disallow extra leading and intermediate slash, like /Product and Product//Info
+				return nil, BadRequestError("Empty path segment in expand clause.")
+			}
+			if input.Empty() {
+				// Disallow extra trailing slash, like Product/
+				return nil, BadRequestError("Empty path segment in expand clause.")
+			}
 			// at root level, slashes separate path segments
 			item.Path = append(item.Path, queue.Dequeue())
 		} else if token.Value == ";" && stack.Size == 1 {

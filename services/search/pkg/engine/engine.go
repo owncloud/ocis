@@ -14,8 +14,6 @@ import (
 
 var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
 
-//go:generate mockery --name=Engine
-
 // Engine is the interface to the search engine
 type Engine interface {
 	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)

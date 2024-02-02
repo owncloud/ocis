@@ -130,6 +130,7 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $user
 	 * @param TableNode $table
+	 * @param string|null $fileId
 	 *
 	 * @return ResponseInterface
 	 *
@@ -137,23 +138,27 @@ class SharingNgContext implements Context {
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 * @throws Exception
 	 */
-	public function sendShareInvitation(string $user, TableNode $table): ResponseInterface {
+	public function sendShareInvitation(string $user, TableNode $table, string $fileId = null): ResponseInterface {
 		$rows = $table->getRowsHash();
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $rows['space']))["id"];
-
-		// for resharing a resource, "item-id" in API endpoint takes shareMountId
-		if ($rows['space'] === 'Shares') {
-			$itemId = GraphHelper::getShareMountId(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$rows['resource']
-			);
+		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
 		} else {
-			$itemId = ($rows['resourceType'] === 'folder')
-				? $this->spacesContext->getResourceId($user, $rows['space'], $rows['resource'])
-				: $this->spacesContext->getFileId($user, $rows['space'], $rows['resource']);
+			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+		}
+		$spaceId = $space['id'];
+
+		// $fileId is used for trying to share deleted files
+		if ($fileId) {
+			$itemId = $fileId;
+		} else {
+			$resource = $rows['resource'] ?? '';
+
+			// for a disabled and deleted space, resource id is not accessible, so get resource id from the saved response
+			if ($resource === '' && $rows['space'] !== 'Personal') {
+				$itemId = $space['fileId'];
+			} else {
+				$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
+			}
 		}
 
 		if (\array_key_exists('shareeId', $rows)) {
@@ -211,6 +216,7 @@ class SharingNgContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
 	 * @When /^user "([^"]*)" tries to send the following share invitation using the Graph API:$/
+	 * @When user :user sends the following share invitation for space using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -222,6 +228,23 @@ class SharingNgContext implements Context {
 	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $table)
+		);
+	}
+
+	/**
+	 * @When user :user sends the following share invitation with file-id :fileId using the Graph API:
+	 *
+	 * @param string $user
+	 * @param string $fileId
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationWithFileIdUsingTheGraphApi(string $user, string $fileId, TableNode $table): void {
+		$this->featureContext->setResponse(
+			$this->sendShareInvitation($user, $table, $fileId)
 		);
 	}
 

@@ -10,8 +10,8 @@ import (
 	kcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
+	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak/mocks"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

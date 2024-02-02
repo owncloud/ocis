@@ -134,6 +134,52 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 
 4. Start the service you are interested in debug mode. When using make to build the binary there is already a `bin/ocis-debug` binary for you. When running an IDE tell it which service to start by providing the corresponding sub command, e.g. `bin\ocis-debug reva-frontend`.
 
+### Debugging the ocis in a docker container
+
+Remote debugging is the debug mode commonly used to work with a debugger and target running on a remote machine or a container for example a wopi stack `deployments/examples/ocis_wopi/docker-compose.yml`.
+Below we describe the steps how to build the image, run the docker-compose and connect via remote debugger.
+1. Build the image:
+```bash
+cd github.com/owncloud/ocis/ocis
+make debug-docker
+```
+2. Change the tag label:
+```bash
+export OCIS_DOCKER_TAG=debug
+```
+3. Change the docker-compose `ocis` or `ocis-appprovider-collabora` or `ocis-appprovider-onlyoffice` depends on what do you want to debug:
+For example `deployments/examples/ocis_wopi/docker-compose.yml`
+```yaml
+  ocis:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    entrypoint:
+      - /bin/sh
+# Comment out command
+#    command: ["-c", "ocis init || true; ocis server"]
+# Replace the command and expose the port
+    command: [ "-c", "ocis init || true; dlv --listen=:40000 --headless=true --api-version=2 --accept-multiclient exec /usr/bin/ocis server" ]
+    ports:
+      - 40000:40000
+```
+4. Run the docker-compose
+5. Connect to remote `delve`
+* For the VS Code add the configuration to the `.vscode/launch.json` [https://github.com/golang/vscode-go/wiki/debugging#remote-debugging](https://github.com/golang/vscode-go/wiki/debugging#remote-debugging)
+```json
+ {
+  "name": "Debug remote :40000",
+  "type": "go",
+  "request": "attach",
+  "mode": "remote",
+  "port": 40000,
+  "host": "localhost", // optional
+  "trace": "verbose",  // optional
+  "showLog": true      // optional
+},
+```
+
+
 ### Gather error messages
 
 We recommend you collect all related information in a single file or in a GitHub issue. Let us start with an error that pops up in the Web UI:

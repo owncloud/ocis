@@ -1,6 +1,6 @@
 package jwx
 
-import jwt "github.com/golang-jwt/jwt/v4"
+import jwt "github.com/golang-jwt/jwt/v5"
 
 // DecodedAccessTokenHeader is the decoded header from the access token
 type DecodedAccessTokenHeader struct {
@@ -11,7 +11,7 @@ type DecodedAccessTokenHeader struct {
 
 // Claims served by keycloak inside the accessToken
 type Claims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	Typ               string         `json:"typ,omitempty"`
 	Azp               string         `json:"azp,omitempty"`
 	AuthTime          int            `json:"auth_time,omitempty"`

@@ -63,6 +63,10 @@ type DriveItem struct {
 	Permissions []Permission `json:"permissions,omitempty"`
 	Audio       *Audio       `json:"audio,omitempty"`
 	Video       *Video       `json:"video,omitempty"`
+	// Indicates if the item is synchronized with the underlying storage provider. Read-only.
+	ClientSynchronize *bool `json:"@client.synchronize,omitempty"`
+	// Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissons.
+	UIHidden *bool `json:"@UI.Hidden,omitempty"`
 }
 
 // NewDriveItem instantiates a new DriveItem object
@@ -1010,6 +1014,70 @@ func (o *DriveItem) SetVideo(v Video) {
 	o.Video = &v
 }
 
+// GetClientSynchronize returns the ClientSynchronize field value if set, zero value otherwise.
+func (o *DriveItem) GetClientSynchronize() bool {
+	if o == nil || IsNil(o.ClientSynchronize) {
+		var ret bool
+		return ret
+	}
+	return *o.ClientSynchronize
+}
+
+// GetClientSynchronizeOk returns a tuple with the ClientSynchronize field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DriveItem) GetClientSynchronizeOk() (*bool, bool) {
+	if o == nil || IsNil(o.ClientSynchronize) {
+		return nil, false
+	}
+	return o.ClientSynchronize, true
+}
+
+// HasClientSynchronize returns a boolean if a field has been set.
+func (o *DriveItem) HasClientSynchronize() bool {
+	if o != nil && !IsNil(o.ClientSynchronize) {
+		return true
+	}
+
+	return false
+}
+
+// SetClientSynchronize gets a reference to the given bool and assigns it to the ClientSynchronize field.
+func (o *DriveItem) SetClientSynchronize(v bool) {
+	o.ClientSynchronize = &v
+}
+
+// GetUIHidden returns the UIHidden field value if set, zero value otherwise.
+func (o *DriveItem) GetUIHidden() bool {
+	if o == nil || IsNil(o.UIHidden) {
+		var ret bool
+		return ret
+	}
+	return *o.UIHidden
+}
+
+// GetUIHiddenOk returns a tuple with the UIHidden field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DriveItem) GetUIHiddenOk() (*bool, bool) {
+	if o == nil || IsNil(o.UIHidden) {
+		return nil, false
+	}
+	return o.UIHidden, true
+}
+
+// HasUIHidden returns a boolean if a field has been set.
+func (o *DriveItem) HasUIHidden() bool {
+	if o != nil && !IsNil(o.UIHidden) {
+		return true
+	}
+
+	return false
+}
+
+// SetUIHidden gets a reference to the given bool and assigns it to the UIHidden field.
+func (o *DriveItem) SetUIHidden(v bool) {
+	o.UIHidden = &v
+}
+
 func (o DriveItem) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -1106,6 +1174,12 @@ func (o DriveItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Video) {
 		toSerialize["video"] = o.Video
+	}
+	if !IsNil(o.ClientSynchronize) {
+		toSerialize["@client.synchronize"] = o.ClientSynchronize
+	}
+	if !IsNil(o.UIHidden) {
+		toSerialize["@UI.Hidden"] = o.UIHidden
 	}
 	return toSerialize, nil
 }

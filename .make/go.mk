@@ -107,3 +107,15 @@ $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 .PHONY: watch
 watch: $(REFLEX)
 	$(REFLEX) -c reflex.conf
+
+debug-linux-docker-amd64: release-dirs
+	GOOS=linux \
+	GOARCH=amd64 \
+	go build \
+        -gcflags="all=-N -l" \
+		-tags 'netgo $(TAGS)' \
+		-buildmode=exe \
+		-trimpath \
+		-ldflags '-extldflags "-static" $(DEBUG_LDFLAGS) $(DOCKER_LDFLAGS)' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-amd64' \
+		./cmd/$(NAME)

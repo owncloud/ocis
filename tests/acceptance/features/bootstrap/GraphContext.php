@@ -2507,7 +2507,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user lists the resources shared with him/her using the Graph API
+	 * @When user :user lists the shares shared with him/her using the Graph API
 	 *
 	 * @param string $user
 	 *
@@ -2523,6 +2523,64 @@ class GraphContext implements Context {
 				$credentials['username'],
 				$credentials['password']
 			)
+		);
+	}
+
+	/**
+	 * @When user :user lists the shares shared by him/her using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsTheResourcesSharedByAUserUsingGraphApi(string $user): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::getSharesSharedByMe(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password']
+			)
+		);
+	}
+
+	/**
+	 * @Then /^the JSON data of the response should (not )?contain resource "([^"]*)" with the following data:?$/
+	 *
+	 * @param string $shouldOrNot (not| )
+	 * @param string $fileName
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataResponseShouldOrNotContainSharedByMeDetails(
+		string $shouldOrNot,
+		string $fileName,
+		PyStringNode $schemaString
+	): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+		$fileOrFolderFound = false;
+		foreach ($responseBody as $value) {
+			if (isset($value->name) && $value->name === $fileName) {
+				$responseBody = $value;
+				$fileOrFolderFound = true;
+				break;
+			}
+		}
+		$shouldContain = \trim($shouldOrNot) !== 'not';
+		if (!$shouldContain && !$fileOrFolderFound) {
+			return;
+		}
+		Assert::assertFalse(
+			!$shouldContain && $fileOrFolderFound,
+			'Response contains file "' . $fileName . '" but should.'
+		);
+		$this->featureContext->assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
 }

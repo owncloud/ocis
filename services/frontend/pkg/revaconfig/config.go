@@ -286,9 +286,9 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"spaces": map[string]interface{}{
 								"version":    "1.0.0",
-								"enabled":    cfg.EnableProjectSpaces || cfg.EnableShareJail,
-								"projects":   cfg.EnableProjectSpaces,
-								"share_jail": cfg.EnableShareJail,
+								"enabled":    true,
+								"projects":   true,
+								"share_jail": true,
 								"max_quota":  cfg.MaxQuota,
 							},
 							"search": map[string]interface{}{

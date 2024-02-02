@@ -87,7 +87,7 @@ Feature: upload to a public link share
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
-
+  @skipOnReva
   Scenario: uploading file to a public shared folder with read/write permission when the sharer has insufficient quota does not work with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER   |
@@ -97,7 +97,7 @@ Feature: upload to a public link share
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
     Then the HTTP status code should be "507"
 
-
+  @skipOnReva
   Scenario: uploading file to a public shared folder with upload-only permission when the sharer has insufficient quota does not work with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER   |

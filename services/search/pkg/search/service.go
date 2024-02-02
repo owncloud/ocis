@@ -33,8 +33,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 )
 
-//go:generate mockery --name=Searcher
-
 const (
 	_spaceStateTrashed   = "trashed"
 	_spaceTypeMountpoint = "mountpoint"

@@ -16,8 +16,6 @@ var (
 	ErrNotSupported = errors.New("operation not supported")
 )
 
-//go:generate mockery --name=UserBackend
-
 // UserBackend allows the proxy to retrieve users from different user-backends (accounts-service, CS3)
 type UserBackend interface {
 	GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error)

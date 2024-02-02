@@ -10,8 +10,6 @@ import (
 
 // Retriever is the interface that wraps the basic Retrieve method. 🐕
 // It requests and then returns a resource from the underlying storage.
-//
-//go:generate mockery --name=Retriever
 type Retriever interface {
 	Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadCloser, error)
 }

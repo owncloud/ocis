@@ -7,6 +7,13 @@
             "request": "launch"
         },
         {
+            "name": "Debug remote :40000",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 40000
+        },
+        {
             "name": "oCIS server",
             "type": "go",
             "request": "launch",

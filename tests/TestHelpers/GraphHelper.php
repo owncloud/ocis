@@ -1811,7 +1811,7 @@ class GraphHelper {
 			$body
 		);
 	}
-	
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
@@ -1860,6 +1860,31 @@ class GraphHelper {
 		string $password
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getSharesSharedByMe(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedByMe");
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,

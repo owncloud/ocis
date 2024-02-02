@@ -45,7 +45,6 @@ type RemoteItem struct {
 	// An eTag for the content of the item. This eTag is not changed if only the metadata is changed. Note This property is not returned if the item is a folder. Read-only.
 	CTag            *string        `json:"cTag,omitempty"`
 	ParentReference *ItemReference `json:"parentReference,omitempty"`
-	Shared          *Shared        `json:"shared,omitempty"`
 	// The set of permissions for the item. Read-only. Nullable.
 	Permissions []Permission `json:"permissions,omitempty"`
 	// Size of the remote item. Read-only.
@@ -586,38 +585,6 @@ func (o *RemoteItem) SetParentReference(v ItemReference) {
 	o.ParentReference = &v
 }
 
-// GetShared returns the Shared field value if set, zero value otherwise.
-func (o *RemoteItem) GetShared() Shared {
-	if o == nil || IsNil(o.Shared) {
-		var ret Shared
-		return ret
-	}
-	return *o.Shared
-}
-
-// GetSharedOk returns a tuple with the Shared field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *RemoteItem) GetSharedOk() (*Shared, bool) {
-	if o == nil || IsNil(o.Shared) {
-		return nil, false
-	}
-	return o.Shared, true
-}
-
-// HasShared returns a boolean if a field has been set.
-func (o *RemoteItem) HasShared() bool {
-	if o != nil && !IsNil(o.Shared) {
-		return true
-	}
-
-	return false
-}
-
-// SetShared gets a reference to the given Shared and assigns it to the Shared field.
-func (o *RemoteItem) SetShared(v Shared) {
-	o.Shared = &v
-}
-
 // GetPermissions returns the Permissions field value if set, zero value otherwise.
 func (o *RemoteItem) GetPermissions() []Permission {
 	if o == nil || IsNil(o.Permissions) {
@@ -835,9 +802,6 @@ func (o RemoteItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ParentReference) {
 		toSerialize["parentReference"] = o.ParentReference
-	}
-	if !IsNil(o.Shared) {
-		toSerialize["shared"] = o.Shared
 	}
 	if !IsNil(o.Permissions) {
 		toSerialize["permissions"] = o.Permissions
