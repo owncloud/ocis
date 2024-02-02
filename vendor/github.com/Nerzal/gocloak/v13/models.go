@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // GetQueryParams converts the struct to map[string]string
@@ -441,6 +441,7 @@ type ProtocolMappersConfig struct {
 	ClaimValue                         *string `json:"claim.value,omitempty"`
 	JSONTypeLabel                      *string `json:"jsonType.label,omitempty"`
 	Multivalued                        *string `json:"multivalued,omitempty"`
+	AggregateAttrs                     *string `json:"aggregate.attrs,omitempty"`
 	UsermodelClientRoleMappingClientID *string `json:"usermodel.clientRoleMapping.clientId,omitempty"`
 	IncludedClientAudience             *string `json:"included.client.audience,omitempty"`
 	FullPath                           *string `json:"full.path,omitempty"`
@@ -964,18 +965,20 @@ func (t *TokenOptions) FormData() map[string]string {
 
 // RequestingPartyTokenOptions represents the options to obtain a requesting party token
 type RequestingPartyTokenOptions struct {
-	GrantType                   *string   `json:"grant_type,omitempty"`
-	Ticket                      *string   `json:"ticket,omitempty"`
-	ClaimToken                  *string   `json:"claim_token,omitempty"`
-	ClaimTokenFormat            *string   `json:"claim_token_format,omitempty"`
-	RPT                         *string   `json:"rpt,omitempty"`
-	Permissions                 *[]string `json:"-"`
-	Audience                    *string   `json:"audience,omitempty"`
-	ResponseIncludeResourceName *bool     `json:"response_include_resource_name,string,omitempty"`
-	ResponsePermissionsLimit    *uint32   `json:"response_permissions_limit,omitempty"`
-	SubmitRequest               *bool     `json:"submit_request,string,omitempty"`
-	ResponseMode                *string   `json:"response_mode,omitempty"`
-	SubjectToken                *string   `json:"subject_token,omitempty"`
+	GrantType                     *string   `json:"grant_type,omitempty"`
+	Ticket                        *string   `json:"ticket,omitempty"`
+	ClaimToken                    *string   `json:"claim_token,omitempty"`
+	ClaimTokenFormat              *string   `json:"claim_token_format,omitempty"`
+	RPT                           *string   `json:"rpt,omitempty"`
+	Permissions                   *[]string `json:"-"`
+	PermissionResourceFormat      *string   `json:"permission_resource_format,omitempty"`
+	PermissionResourceMatchingURI *bool     `json:"permission_resource_matching_uri,string,omitempty"`
+	Audience                      *string   `json:"audience,omitempty"`
+	ResponseIncludeResourceName   *bool     `json:"response_include_resource_name,string,omitempty"`
+	ResponsePermissionsLimit      *uint32   `json:"response_permissions_limit,omitempty"`
+	SubmitRequest                 *bool     `json:"submit_request,string,omitempty"`
+	ResponseMode                  *string   `json:"response_mode,omitempty"`
+	SubjectToken                  *string   `json:"subject_token,omitempty"`
 }
 
 // FormData returns a map of options to be used in SetFormData function
@@ -1258,7 +1261,7 @@ type PermissionTicketRepresentation struct {
 	AZP         *string                                     `json:"azp,omitempty"`
 	Claims      *map[string][]string                        `json:"claims,omitempty"`
 	Permissions *[]PermissionTicketPermissionRepresentation `json:"permissions,omitempty"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // PermissionTicketPermissionRepresentation represents the individual permissions in a permission ticket
