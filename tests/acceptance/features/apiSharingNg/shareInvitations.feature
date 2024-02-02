@@ -1535,8 +1535,59 @@ Feature: Send a sharing invitations
       | permissions-role | resource-type | path           |
       | Co Owner         | file          | /textfile1.txt |
       | Manager          | file          | /textfile1.txt |
+      | Space Viewer     | file          | /textfile1.txt |
+      | Space Editor     | file          | /textfile1.txt |
       | Co Owner         | folder        | FolderToShare  |
       | Manager          | folder        | FolderToShare  |
+      | Space Viewer     | folder        | FolderToShare  |
+      | Space Editor     | folder        | FolderToShare  |
+
+
+  Scenario Outline: try to share a file with invalid roles
+    Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalidRequest"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "enum": [
+                  "cannot set the requested permissions on that type of resource"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Uploader         |
 
 
   Scenario Outline: send share invitation to already shared user
