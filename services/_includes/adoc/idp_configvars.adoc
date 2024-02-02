@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-02-01-12-04]
+[#deprecation-note-2024-02-02-12-25-59]
 [caption=]
 .Deprecation notes for the idp service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -241,6 +241,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Serve IDP assets from a path on the filesystem instead of the builtin assets.
+
+a|`IDP_LOGIN_BACKGROUND_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Configure an alternative URL to the background image for the login page.
 
 a|`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +

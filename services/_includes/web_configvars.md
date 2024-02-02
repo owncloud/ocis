@@ -54,5 +54,7 @@
 | WEB_OPTION_USER_LIST_REQUIRES_FILTER | bool | false | Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.|
 | WEB_OPTION_CONCURRENT_REQUESTS_RESOURCE_BATCH_ACTIONS | int | 0 | Defines the maximum number of concurrent requests per file/folder/space batch action. Defaults to 4.|
 | WEB_OPTION_CONCURRENT_REQUESTS_SSE | int | 0 | Defines the maximum number of concurrent requests in SSE event handlers. Defaults to 4.|
+| WEB_OPTION_CONCURRENT_REQUESTS_SHARES_CREATE | int | 0 | Defines the maximum number of concurrent requests per sharing invite batch. Defaults to 4.|
+| WEB_OPTION_CONCURRENT_REQUESTS_SHARES_LIST | int | 0 | Defines the maximum number of concurrent requests when loading individual share information inside listings. Defaults to 2.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | WEB_GATEWAY_GRPC_ADDR | string | com.owncloud.api.gateway | The bind address of the GRPC service.|

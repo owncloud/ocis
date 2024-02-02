@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-02-01-12-04]
+[#deprecation-note-2024-02-02-12-25-59]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -282,24 +282,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables the support for favorites in the clients.
-
-a|`FRONTEND_ENABLE_PROJECT_SPACES` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++true ++
-a| [subs=-attributes]
-Changing this value is NOT supported. Indicates to clients that project spaces are supposed to be made available.
-
-a|`FRONTEND_ENABLE_SHARE_JAIL` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++true ++
-a| [subs=-attributes]
-Changing this value is NOT supported. Indicates to clients that the share jail is supposed to be used.
 
 a|`OCIS_SPACES_MAX_QUOTA` +
 `FRONTEND_MAX_QUOTA` +

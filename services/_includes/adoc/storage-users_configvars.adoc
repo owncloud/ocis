@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-02-01-12-04]
+[#deprecation-note-2024-02-02-12-25-59]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -349,7 +349,7 @@ a|`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++5 ++
 a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
@@ -523,7 +523,7 @@ a|`STORAGE_USERS_S3NG_MAX_CONCURRENCY` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++0 ++
+++5 ++
 a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
