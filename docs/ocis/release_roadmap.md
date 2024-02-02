@@ -7,22 +7,23 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_roadmap.md
 ---
 
-You may have asked yourself why there are major version 1 tags in our GitHub repository but the Readme still states `ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.`. How can that be if it's a major version 1?
+## Semantic Versioning
+Since oCIS 2.0.0 release we will strictly stick to SemVer, just as we do right now for ownCloud Server. The general availability release will also mean that we can recommend oCIS warmly to everyone. Use it to store your precious family pictures or you confidential company data!
 
-Our initial and also our current plan is to stick to SemVer as versioning scheme. But sometimes there are other factors which cross your plans. Therefore we started releasing oCIS with version `1.0.0 Tech Preview`.
+## Community Release
+Releases of the type "Community" contain the latest greatest features, but are not as stable as an Enterprise release. Community Releases are characterized as followed:
+- Cycle: After each sprint (usually every 3 weeks).
+- No known blockers. Data loss is not expected and is a bug.
+- Can be used in production for specific purposes approved by ownCloud.
+- Issues are fixed based on "best effort".
+- Supported by community (no support by ownCloud).
 
-## ownCloud Infinite Scale 1.x technology preview releases
+## Enterprise Releases
+Releases of the type "Enterprise" are Releases that received our full quality assurance cycle but are released less often compared to Community Releases. Enterprise Releases are characterized as followed:
+- Cycle: About 2 times per year
+- The release is available for all customers to use under all documented circumstances.
+- Issues will be fixed according to our SLAs.
+- Full QA cycle incl. all clients
 
-All oCIS releases within major version 1 will be handled as technology previews. There will be no supported releases in terms of us guaranteeing production readiness. We will do releases every 3 weeks, and they will sometimes only include bugfixes, but also introduce new features or optimizations.
-
-We will be fixing bugs if you report them and truly appreciate every report and contribution. Depending on the individual case, we will publish bugfix releases or add the fix to the next minor release.
-
-We are going to stick to major version 1 until we feel confident about running oCIS in production environments. As a consequence of this we cannot raise the major version, like SemVer requires it, even if we need to introduce breaking changes. We will do our best to avoid breaking changes. If there is no way to circumvent this, we will add an automatic migration or at least point out manual migration steps, since we as oCIS developers are already using oCIS on a personal basis. The best place to see if a breaking change happens is our changelog which is available for every release. If things are not working out for you please contact us immediately. We want to know about this and solve it for you.
-
-It isn't our intention to scare you with our addendum "Tech Preview". We want you to have a clear picture of what you can expect from oCIS. You could take it as a disclaimer or even compare it to running a Linux kernel in alpha stage. It can be very pleasing to be on the latest codebase but you could also find yourself with a lot of problems arising because of that.
-
-You clearly can expect a totally new experience of file-sync and share with oCIS and we want you to use it now - but with understanding and caution.
-
-## ownCloud Infinite Scale 2.x general availability releases
-
-Starting with oCIS 2.0.0 release we will strictly stick to SemVer, just as we do right now for ownCloud Server. The general availability release will also mean that we can recommend oCIS warmly to everyone. Use it to store your precious family pictures or you confidential company data!
+## General Note
+The release types "Enterprise" and "Community" are not dependent to the major number of the release version. This means if the major version number is counted up (2.x.x -> 3.0.0) this does not necessarily imply an Enterprise Release. Sticking to the rules of Semantic Versioning, the increment of the major number means that there are incompatibe API changes, but is says nothing about the release type "Enterprise" or "Community".
