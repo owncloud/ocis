@@ -39,6 +39,6 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] If new envvars are introduced which serve the same purpose but in multiple services, an additional envvar must be added at the beginning of the list starting with `OCIS_` (global envvar).
 - [ ] Ensure that a service has a debug port
 - [ ] If the new service introduces a new port:
-  - the port must be added to [port-ranges.md](https://github.com/owncloud/ocis/blob/master/docs/services/port-ranges.md) and to the readme.md file.
+  - the port must be added to [port-ranges.md](https://github.com/owncloud/ocis/blob/master/docs/services/general-info/port-ranges.md) and to the readme.md file.
 - [ ] Make sure to have a function `FullDefaultConfig()` in `pkg/config/defaults/defaultconfig.go` of your service. It is needed to create the documentation.
 ```
