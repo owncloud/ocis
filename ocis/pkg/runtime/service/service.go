@@ -32,6 +32,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/command"
+	caldav "github.com/owncloud/ocis/v2/services/caldav/pkg/command"
 	clientlog "github.com/owncloud/ocis/v2/services/clientlog/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
@@ -168,6 +169,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.AuthService.Context = ctx
 		cfg.AuthService.Commons = cfg.Commons
 		return authservice.Execute(cfg.AuthService)
+	})
+	reg(3, opts.Config.CalDAV.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.CalDAV.Context = ctx
+		cfg.CalDAV.Commons = cfg.Commons
+		return caldav.Execute(cfg.CalDAV)
 	})
 	reg(3, opts.Config.Clientlog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Clientlog.Context = ctx

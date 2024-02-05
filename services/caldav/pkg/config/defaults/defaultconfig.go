@@ -16,7 +16,7 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9163",
+			Addr:   "127.0.0.1:9300",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
@@ -101,6 +101,9 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+	if cfg.JWTSecret == "" && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.JWTSecret = cfg.Commons.TokenManager.JWTSecret
 	}
 }
 
