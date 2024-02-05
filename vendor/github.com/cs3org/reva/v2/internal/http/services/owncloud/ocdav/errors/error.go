@@ -159,6 +159,8 @@ var (
 	ErrNoSuchLock = errors.New("webdav: no such lock")
 	// ErrNotImplemented is returned when hitting not implemented code paths
 	ErrNotImplemented = errors.New("webdav: not implemented")
+	// ErrTokenNotFound is returned when a token is not found
+	ErrTokenStatInfoMissing = errors.New("webdav: token stat info missing")
 )
 
 // HandleErrorStatus checks the status code, logs a Debug or Error level message

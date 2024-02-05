@@ -53,7 +53,7 @@ type PermissionsChecker interface {
 
 // OcisStore manages upload sessions
 type OcisStore struct {
-	lu      *lookup.Lookup
+	lu      node.PathLookup
 	tp      Tree
 	root    string
 	pub     events.Publisher
@@ -62,7 +62,7 @@ type OcisStore struct {
 }
 
 // NewSessionStore returns a new OcisStore
-func NewSessionStore(lu *lookup.Lookup, tp Tree, root string, pub events.Publisher, async bool, tknopts options.TokenOptions) *OcisStore {
+func NewSessionStore(lu node.PathLookup, tp Tree, root string, pub events.Publisher, async bool, tknopts options.TokenOptions) *OcisStore {
 	return &OcisStore{
 		lu:      lu,
 		tp:      tp,

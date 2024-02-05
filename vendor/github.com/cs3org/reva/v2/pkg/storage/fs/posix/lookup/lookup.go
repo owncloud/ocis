@@ -33,7 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
-	"github.com/google/uuid"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"go.opentelemetry.io/otel"
@@ -42,9 +42,7 @@ import (
 
 var tracer trace.Tracer
 
-const (
-	_spaceTypePersonal = "personal"
-)
+var _spaceTypePersonal = "personal"
 
 func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
@@ -192,16 +190,6 @@ func (lu *Lookup) NodeFromSpaceID(ctx context.Context, spaceID string) (n *node.
 	return node, nil
 }
 
-// GenerateSpaceID generates a new space id and alias
-func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, error) {
-	switch spaceType {
-	case _spaceTypePersonal:
-		return owner.Id.OpaqueId, nil
-	default:
-		return uuid.New().String(), nil
-	}
-}
-
 // Path returns the path for node
 func (lu *Lookup) Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (p string, err error) {
 	root := n.SpaceRoot
@@ -273,6 +261,10 @@ func (lu *Lookup) InternalRoot() string {
 // InternalPath returns the internal path for a given ID
 func (lu *Lookup) InternalPath(spaceID, nodeID string) string {
 	return filepath.Join(lu.Options.Root, "spaces", Pathify(spaceID, 1, 2), "nodes", Pathify(nodeID, 4, 2))
+}
+
+func (lu *Lookup) SpacePath(spaceID string) string {
+	return filepath.Join(lu.Options.Root, spaceID)
 }
 
 // // ReferenceFromAttr returns a CS3 reference from xattr of a node.
@@ -349,6 +341,16 @@ func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, ta
 	}
 
 	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, acquireTargetLock)
+}
+
+// GenerateSpaceID generates a space id for the given space type and owner
+func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, error) {
+	switch spaceType {
+	case _spaceTypePersonal:
+		return templates.WithUser(owner, lu.Options.UserLayout), nil
+	default:
+		return "", fmt.Errorf("unsupported space type: %s", spaceType)
+	}
 }
 
 // DetectBackendOnDisk returns the name of the metadata backend being used on disk

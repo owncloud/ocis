@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -91,20 +90,7 @@ func New(lu node.PathLookup, bs Blobstore, o *options.Options, cache store.Store
 
 // Setup prepares the tree structure
 func (t *Tree) Setup() error {
-	// create data paths for internal layout
-	dataPaths := []string{
-		filepath.Join(t.options.Root, "spaces"),
-		// notes contain symlinks from nodes/<u-u-i-d>/uploads/<uploadid> to ../../uploads/<uploadid>
-		// better to keep uploads on a fast / volatile storage before a workflow finally moves them to the nodes dir
-		filepath.Join(t.options.Root, "uploads"),
-	}
-	for _, v := range dataPaths {
-		err := os.MkdirAll(v, 0700)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return os.MkdirAll(t.options.Root, 0700)
 }
 
 // GetMD returns the metadata of a node in the tree
@@ -163,22 +149,6 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		return err
 	}
 
-	// link child name to parent if it is new
-	childNameLink := filepath.Join(n.ParentPath(), n.Name)
-	var link string
-	link, err = os.Readlink(childNameLink)
-	if err == nil && link != "../"+n.ID {
-		if err = os.Remove(childNameLink); err != nil {
-			return errors.Wrap(err, "Decomposedfs: could not remove symlink child entry")
-		}
-	}
-	if errors.Is(err, iofs.ErrNotExist) || link != "../"+n.ID {
-		relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
-		if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
-			return errors.Wrap(err, "Decomposedfs: could not symlink child entry")
-		}
-	}
-
 	return t.Propagate(ctx, n, 0)
 }
 
@@ -201,26 +171,6 @@ func (t *Tree) CreateDir(ctx context.Context, n *node.Node) (err error) {
 		return
 	}
 
-	// make child appear in listings
-	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
-	ctx, subspan := tracer.Start(ctx, "os.Symlink")
-	err = os.Symlink(relativeNodePath, filepath.Join(n.ParentPath(), n.Name))
-	subspan.End()
-	if err != nil {
-		// no better way to check unfortunately
-		if !strings.Contains(err.Error(), "file exists") {
-			return
-		}
-
-		// try to remove the node
-		ctx, subspan = tracer.Start(ctx, "os.RemoveAll")
-		e := os.RemoveAll(n.InternalPath())
-		subspan.End()
-		if e != nil {
-			appctx.GetLogger(ctx).Debug().Err(e).Msg("cannot delete node")
-		}
-		return errtypes.AlreadyExists(err.Error())
-	}
 	return t.Propagate(ctx, n, 0)
 }
 

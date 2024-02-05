@@ -1,4 +1,4 @@
-package decomposedfs
+package permissions
 
 import (
 	"context"
@@ -11,7 +11,25 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+)
+
+//go:generate make --no-print-directory -C ../../../../.. mockery NAME=PermissionsChecker
+//go:generate make --no-print-directory -C ../../../../.. mockery NAME=CS3PermissionsClient
+
+var (
+	tracer trace.Tracer
+)
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/permissions")
+}
+
+const (
+	_spaceTypePersonal = "personal"
+	_spaceTypeProject  = "project"
 )
 
 // PermissionsChecker defines an interface for checking permissions on a Node

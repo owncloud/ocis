@@ -155,6 +155,47 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	// Test if the target is a secret filedrop
+	tokenStatInfo, ok := TokenStatInfoFromContext(ctx)
+	// We assume that when the uploader can create containers, but is not allowed to list them, it is a secret file drop
+	if ok && tokenStatInfo.GetPermissionSet().CreateContainer && !tokenStatInfo.GetPermissionSet().ListContainer {
+		// TODO we can skip this stat if the tokenStatInfo is the direct parent
+		sReq := &provider.StatRequest{
+			Ref: ref,
+		}
+		sRes, err := client.Stat(ctx, sReq)
+		if err != nil {
+			log.Error().Err(err).Msg("error sending grpc stat request")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// We also need to continue if we are not allowed to stat a resource. We may not have stat permission. That still means it exists and we need to find a new filename.
+		switch sRes.Status.Code {
+		case rpc.Code_CODE_OK, rpc.Code_CODE_PERMISSION_DENIED:
+			// find next filename
+			newName, status, err := FindName(ctx, client, filepath.Base(ref.Path), sRes.GetInfo().GetParentId())
+			if err != nil {
+				log.Error().Err(err).Msg("error sending grpc stat request")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if status.Code != rpc.Code_CODE_OK {
+				log.Error().Interface("status", status).Msg("error listing file")
+				errors.HandleErrorStatus(&log, w, status)
+				return
+			}
+			ref.Path = utils.MakeRelativePath(filepath.Join(filepath.Dir(ref.GetPath()), newName))
+		case rpc.Code_CODE_NOT_FOUND:
+			// just continue with normal upload
+		default:
+			log.Error().Interface("status", sRes.Status).Msg("error stating file")
+			errors.HandleErrorStatus(&log, w, sRes.Status)
+			return
+		}
+	}
+
 	opaque := &typespb.Opaque{}
 	if mtime := r.Header.Get(net.HeaderOCMtime); mtime != "" {
 		utils.AppendPlainToOpaque(opaque, net.HeaderOCMtime, mtime)

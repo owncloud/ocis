@@ -18,16 +18,11 @@
 
 package decomposedfs
 
-//go:generate make --no-print-directory -C ../../../.. mockery NAME=PermissionsChecker
-//go:generate make --no-print-directory -C ../../../.. mockery NAME=CS3PermissionsClient
-//go:generate make --no-print-directory -C ../../../.. mockery NAME=Tree
-
 import (
 	"context"
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -47,11 +42,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/aspects"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
@@ -83,28 +80,6 @@ func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs")
 }
 
-// Tree is used to manage a tree hierarchy
-type Tree interface {
-	Setup() error
-
-	GetMD(ctx context.Context, node *node.Node) (os.FileInfo, error)
-	ListFolder(ctx context.Context, node *node.Node) ([]*node.Node, error)
-	// CreateHome(owner *userpb.UserId) (n *node.Node, err error)
-	CreateDir(ctx context.Context, node *node.Node) (err error)
-	TouchFile(ctx context.Context, node *node.Node, markprocessing bool, mtime string) error
-	// CreateReference(ctx context.Context, node *node.Node, targetURI *url.URL) error
-	Move(ctx context.Context, oldNode *node.Node, newNode *node.Node) (err error)
-	Delete(ctx context.Context, node *node.Node) (err error)
-	RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, target *node.Node) (*node.Node, *node.Node, func() error, error)
-	PurgeRecycleItemFunc(ctx context.Context, spaceid, key, purgePath string) (*node.Node, func() error, error)
-
-	WriteBlob(node *node.Node, source string) error
-	ReadBlob(node *node.Node) (io.ReadCloser, error)
-	DeleteBlob(node *node.Node) error
-
-	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
-}
-
 // Session is the interface that OcisSession implements. By combining tus.Upload,
 // storage.UploadSession and custom functions we can reuse the same struct throughout
 // the whole upload lifecycle.
@@ -127,10 +102,10 @@ type SessionStore interface {
 
 // Decomposedfs provides the base for decomposed filesystem implementations
 type Decomposedfs struct {
-	lu           *lookup.Lookup
-	tp           Tree
+	lu           node.PathLookup
+	tp           node.Tree
 	o            *options.Options
-	p            Permissions
+	p            permissions.Permissions
 	chunkHandler *chunking.ChunkHandler
 	stream       events.Stream
 	cache        cache.StatCache
@@ -175,23 +150,29 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		return nil, err
 	}
 
-	permissions := NewPermissions(node.NewPermissions(lu), permissionsSelector)
+	aspects := aspects.Aspects{
+		Lookup:      lu,
+		Tree:        tp,
+		Permissions: permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
+		EventStream: es,
+	}
 
-	return New(o, lu, permissions, tp, es)
+	return New(o, aspects)
 }
 
 // New returns an implementation of the storage.FS interface that talks to
 // a local filesystem.
-func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es events.Stream) (storage.FS, error) {
+func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 	log := logger.New()
-	err := tp.Setup()
+
+	err := aspects.Tree.Setup()
 	if err != nil {
 		log.Error().Err(err).Msg("could not setup tree")
 		return nil, errors.Wrap(err, "could not setup tree")
 	}
 
 	// Run migrations & return
-	m := migrator.New(lu, log)
+	m := migrator.New(aspects.Lookup, log)
 	err = m.RunMigrations()
 	if err != nil {
 		log.Error().Err(err).Msg("could not migrate tree")
@@ -222,18 +203,18 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 	}
 
 	fs := &Decomposedfs{
-		tp:              tp,
-		lu:              lu,
+		tp:              aspects.Tree,
+		lu:              aspects.Lookup,
 		o:               o,
-		p:               p,
+		p:               aspects.Permissions,
 		chunkHandler:    chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
-		stream:          es,
+		stream:          aspects.EventStream,
 		cache:           cache.GetStatCache(o.StatCache),
 		UserCache:       ttlcache.NewCache(),
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
 		spaceTypeIndex:  spaceTypeIndex,
-		sessionStore:    upload.NewSessionStore(lu, tp, o.Root, es, o.AsyncFileUploads, o.Tokens),
+		sessionStore:    upload.NewSessionStore(aspects.Lookup, aspects.Tree, o.Root, aspects.EventStream, o.AsyncFileUploads, o.Tokens),
 	}
 
 	if o.AsyncFileUploads {

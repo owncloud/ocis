@@ -362,7 +362,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.18.1-0.20240129131717-cff0a2eeb959
+# github.com/cs3org/reva/v2 v2.18.1-0.20240205065033-2c21ada2ae52
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -658,6 +658,10 @@ github.com/cs3org/reva/v2/pkg/storage/fs/ocis
 github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore
 github.com/cs3org/reva/v2/pkg/storage/fs/owncloudsql
 github.com/cs3org/reva/v2/pkg/storage/fs/owncloudsql/filecache
+github.com/cs3org/reva/v2/pkg/storage/fs/posix
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/blobstore
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/tree
 github.com/cs3org/reva/v2/pkg/storage/fs/registry
 github.com/cs3org/reva/v2/pkg/storage/fs/s3
 github.com/cs3org/reva/v2/pkg/storage/fs/s3ng
@@ -670,6 +674,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/ace
 github.com/cs3org/reva/v2/pkg/storage/utils/acl
 github.com/cs3org/reva/v2/pkg/storage/utils/chunking
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/aspects
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes
@@ -677,6 +682,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree/propagator
