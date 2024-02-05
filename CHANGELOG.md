@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
+* Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 
 ## Details
 
@@ -302,6 +303,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8257
    https://github.com/owncloud/ocis/pull/8309
    https://github.com/cs3org/reva/pull/4485
+
+* Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
+
+   We have bumped reve to pull in the changes needed for automatically increment
+   filenames on upload collisions in secret filedrops.
+
+   https://github.com/owncloud/ocis/issues/8291
+   https://github.com/owncloud/ocis/pull/8340
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
