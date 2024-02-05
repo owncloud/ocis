@@ -2,6 +2,7 @@ package caldav
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"mime"
 	"net/http"
@@ -14,6 +15,12 @@ import (
 	"github.com/emersion/go-webdav"
 	"github.com/emersion/go-webdav/internal"
 )
+
+// DiscoverContextURL performs a DNS-based CardDAV service discovery as
+// described in RFC 6352 section 11. It returns the URL to the CardDAV server.
+func DiscoverContextURL(ctx context.Context, domain string) (string, error) {
+	return internal.DiscoverContextURL(ctx, "caldavs", domain)
+}
 
 // Client provides access to a remote CardDAV server.
 type Client struct {
@@ -34,9 +41,9 @@ func NewClient(c webdav.HTTPClient, endpoint string) (*Client, error) {
 	return &Client{wc, ic}, nil
 }
 
-func (c *Client) FindCalendarHomeSet(principal string) (string, error) {
+func (c *Client) FindCalendarHomeSet(ctx context.Context, principal string) (string, error) {
 	propfind := internal.NewPropNamePropFind(calendarHomeSetName)
-	resp, err := c.ic.PropFindFlat(principal, propfind)
+	resp, err := c.ic.PropFindFlat(ctx, principal, propfind)
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +56,7 @@ func (c *Client) FindCalendarHomeSet(principal string) (string, error) {
 	return prop.Href.Path, nil
 }
 
-func (c *Client) FindCalendars(calendarHomeSet string) ([]Calendar, error) {
+func (c *Client) FindCalendars(ctx context.Context, calendarHomeSet string) ([]Calendar, error) {
 	propfind := internal.NewPropNamePropFind(
 		internal.ResourceTypeName,
 		internal.DisplayNameName,
@@ -57,7 +64,7 @@ func (c *Client) FindCalendars(calendarHomeSet string) ([]Calendar, error) {
 		maxResourceSizeName,
 		supportedCalendarComponentSetName,
 	)
-	ms, err := c.ic.PropFind(calendarHomeSet, internal.DepthOne, propfind)
+	ms, err := c.ic.PropFind(ctx, calendarHomeSet, internal.DepthOne, propfind)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +221,7 @@ func decodeCalendarObjectList(ms *internal.MultiStatus) ([]CalendarObject, error
 	return addrs, nil
 }
 
-func (c *Client) QueryCalendar(calendar string, query *CalendarQuery) ([]CalendarObject, error) {
+func (c *Client) QueryCalendar(ctx context.Context, calendar string, query *CalendarQuery) ([]CalendarObject, error) {
 	propReq, err := encodeCalendarReq(&query.CompRequest)
 	if err != nil {
 		return nil, err
@@ -228,7 +235,7 @@ func (c *Client) QueryCalendar(calendar string, query *CalendarQuery) ([]Calenda
 	}
 	req.Header.Add("Depth", "1")
 
-	ms, err := c.ic.DoMultiStatus(req)
+	ms, err := c.ic.DoMultiStatus(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +243,7 @@ func (c *Client) QueryCalendar(calendar string, query *CalendarQuery) ([]Calenda
 	return decodeCalendarObjectList(ms)
 }
 
-func (c *Client) MultiGetCalendar(path string, multiGet *CalendarMultiGet) ([]CalendarObject, error) {
+func (c *Client) MultiGetCalendar(ctx context.Context, path string, multiGet *CalendarMultiGet) ([]CalendarObject, error) {
 	propReq, err := encodeCalendarReq(&multiGet.CompRequest)
 	if err != nil {
 		return nil, err
@@ -244,7 +251,7 @@ func (c *Client) MultiGetCalendar(path string, multiGet *CalendarMultiGet) ([]Ca
 
 	calendarMultiget := calendarMultiget{Prop: propReq}
 
-	if multiGet == nil || len(multiGet.Paths) == 0 {
+	if len(multiGet.Paths) == 0 {
 		href := internal.Href{Path: path}
 		calendarMultiget.Hrefs = []internal.Href{href}
 	} else {
@@ -260,7 +267,7 @@ func (c *Client) MultiGetCalendar(path string, multiGet *CalendarMultiGet) ([]Ca
 	}
 	req.Header.Add("Depth", "1")
 
-	ms, err := c.ic.DoMultiStatus(req)
+	ms, err := c.ic.DoMultiStatus(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -268,29 +275,29 @@ func (c *Client) MultiGetCalendar(path string, multiGet *CalendarMultiGet) ([]Ca
 	return decodeCalendarObjectList(ms)
 }
 
-func populateCalendarObject(co *CalendarObject, resp *http.Response) error {
-	if loc := resp.Header.Get("Location"); loc != "" {
+func populateCalendarObject(co *CalendarObject, h http.Header) error {
+	if loc := h.Get("Location"); loc != "" {
 		u, err := url.Parse(loc)
 		if err != nil {
 			return err
 		}
 		co.Path = u.Path
 	}
-	if etag := resp.Header.Get("ETag"); etag != "" {
+	if etag := h.Get("ETag"); etag != "" {
 		etag, err := strconv.Unquote(etag)
 		if err != nil {
 			return err
 		}
 		co.ETag = etag
 	}
-	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
+	if contentLength := h.Get("Content-Length"); contentLength != "" {
 		n, err := strconv.ParseInt(contentLength, 10, 64)
 		if err != nil {
 			return err
 		}
 		co.ContentLength = n
 	}
-	if lastModified := resp.Header.Get("Last-Modified"); lastModified != "" {
+	if lastModified := h.Get("Last-Modified"); lastModified != "" {
 		t, err := http.ParseTime(lastModified)
 		if err != nil {
 			return err
@@ -301,14 +308,14 @@ func populateCalendarObject(co *CalendarObject, resp *http.Response) error {
 	return nil
 }
 
-func (c *Client) GetCalendarObject(path string) (*CalendarObject, error) {
+func (c *Client) GetCalendarObject(ctx context.Context, path string) (*CalendarObject, error) {
 	req, err := c.ic.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Accept", ical.MIMEType)
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -331,13 +338,13 @@ func (c *Client) GetCalendarObject(path string) (*CalendarObject, error) {
 		Path: resp.Request.URL.Path,
 		Data: cal,
 	}
-	if err := populateCalendarObject(co, resp); err != nil {
+	if err := populateCalendarObject(co, resp.Header); err != nil {
 		return nil, err
 	}
 	return co, nil
 }
 
-func (c *Client) PutCalendarObject(path string, cal *ical.Calendar) (*CalendarObject, error) {
+func (c *Client) PutCalendarObject(ctx context.Context, path string, cal *ical.Calendar) (*CalendarObject, error) {
 	// TODO: add support for If-None-Match and If-Match
 
 	// TODO: some servers want a Content-Length header, so we can't stream the
@@ -355,14 +362,14 @@ func (c *Client) PutCalendarObject(path string, cal *ical.Calendar) (*CalendarOb
 	}
 	req.Header.Set("Content-Type", ical.MIMEType)
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
 
 	co := &CalendarObject{Path: path}
-	if err := populateCalendarObject(co, resp); err != nil {
+	if err := populateCalendarObject(co, resp.Header); err != nil {
 		return nil, err
 	}
 	return co, nil

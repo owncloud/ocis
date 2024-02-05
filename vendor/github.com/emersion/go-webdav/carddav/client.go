@@ -2,9 +2,9 @@ package carddav
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"mime"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,38 +16,10 @@ import (
 	"github.com/emersion/go-webdav/internal"
 )
 
-// Discover performs a DNS-based CardDAV service discovery as described in
-// RFC 6352 section 11. It returns the URL to the CardDAV server.
-func Discover(domain string) (string, error) {
-	// Only lookup carddavs (not carddav), plaintext connections are insecure
-	_, addrs, err := net.LookupSRV("carddavs", "tcp", domain)
-	if dnsErr, ok := err.(*net.DNSError); ok {
-		if dnsErr.IsTemporary {
-			return "", err
-		}
-	} else if err != nil {
-		return "", err
-	}
-
-	if len(addrs) == 0 {
-		return "", fmt.Errorf("carddav: domain doesn't have an SRV record")
-	}
-	addr := addrs[0]
-
-	target := strings.TrimSuffix(addr.Target, ".")
-	if target == "" {
-		return "", fmt.Errorf("carddav: empty target in SRV record")
-	}
-
-	// TODO: perform a TXT lookup, check for a "path" key in the response
-	u := url.URL{Scheme: "https"}
-	if addr.Port == 443 {
-		u.Host = target
-	} else {
-		u.Host = fmt.Sprintf("%v:%v", target, addr.Port)
-	}
-	u.Path = "/.well-known/carddav"
-	return u.String(), nil
+// DiscoverContextURL performs a DNS-based CardDAV service discovery as
+// described in RFC 6352 section 11. It returns the URL to the CardDAV server.
+func DiscoverContextURL(ctx context.Context, domain string) (string, error) {
+	return internal.DiscoverContextURL(ctx, "carddavs", domain)
 }
 
 // Client provides access to a remote CardDAV server.
@@ -69,8 +41,8 @@ func NewClient(c webdav.HTTPClient, endpoint string) (*Client, error) {
 	return &Client{wc, ic}, nil
 }
 
-func (c *Client) HasSupport() error {
-	classes, _, err := c.ic.Options("")
+func (c *Client) HasSupport(ctx context.Context) error {
+	classes, _, err := c.ic.Options(ctx, "")
 	if err != nil {
 		return err
 	}
@@ -81,9 +53,9 @@ func (c *Client) HasSupport() error {
 	return nil
 }
 
-func (c *Client) FindAddressBookHomeSet(principal string) (string, error) {
+func (c *Client) FindAddressBookHomeSet(ctx context.Context, principal string) (string, error) {
 	propfind := internal.NewPropNamePropFind(addressBookHomeSetName)
-	resp, err := c.ic.PropFindFlat(principal, propfind)
+	resp, err := c.ic.PropFindFlat(ctx, principal, propfind)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +76,7 @@ func decodeSupportedAddressData(supported *supportedAddressData) []AddressDataTy
 	return l
 }
 
-func (c *Client) FindAddressBooks(addressBookHomeSet string) ([]AddressBook, error) {
+func (c *Client) FindAddressBooks(ctx context.Context, addressBookHomeSet string) ([]AddressBook, error) {
 	propfind := internal.NewPropNamePropFind(
 		internal.ResourceTypeName,
 		internal.DisplayNameName,
@@ -112,7 +84,7 @@ func (c *Client) FindAddressBooks(addressBookHomeSet string) ([]AddressBook, err
 		maxResourceSizeName,
 		supportedAddressDataName,
 	)
-	ms, err := c.ic.PropFind(addressBookHomeSet, internal.DepthOne, propfind)
+	ms, err := c.ic.PropFind(ctx, addressBookHomeSet, internal.DepthOne, propfind)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +243,7 @@ func decodeAddressList(ms *internal.MultiStatus) ([]AddressObject, error) {
 	return addrs, nil
 }
 
-func (c *Client) QueryAddressBook(addressBook string, query *AddressBookQuery) ([]AddressObject, error) {
+func (c *Client) QueryAddressBook(ctx context.Context, addressBook string, query *AddressBookQuery) ([]AddressObject, error) {
 	propReq, err := encodeAddressPropReq(&query.DataRequest)
 	if err != nil {
 		return nil, err
@@ -297,7 +269,7 @@ func (c *Client) QueryAddressBook(addressBook string, query *AddressBookQuery) (
 
 	req.Header.Add("Depth", "1")
 
-	ms, err := c.ic.DoMultiStatus(req)
+	ms, err := c.ic.DoMultiStatus(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +277,7 @@ func (c *Client) QueryAddressBook(addressBook string, query *AddressBookQuery) (
 	return decodeAddressList(ms)
 }
 
-func (c *Client) MultiGetAddressBook(path string, multiGet *AddressBookMultiGet) ([]AddressObject, error) {
+func (c *Client) MultiGetAddressBook(ctx context.Context, path string, multiGet *AddressBookMultiGet) ([]AddressObject, error) {
 	propReq, err := encodeAddressPropReq(&multiGet.DataRequest)
 	if err != nil {
 		return nil, err
@@ -313,7 +285,7 @@ func (c *Client) MultiGetAddressBook(path string, multiGet *AddressBookMultiGet)
 
 	addressbookMultiget := addressbookMultiget{Prop: propReq}
 
-	if multiGet == nil || len(multiGet.Paths) == 0 {
+	if len(multiGet.Paths) == 0 {
 		href := internal.Href{Path: path}
 		addressbookMultiget.Hrefs = []internal.Href{href}
 	} else {
@@ -330,7 +302,7 @@ func (c *Client) MultiGetAddressBook(path string, multiGet *AddressBookMultiGet)
 
 	req.Header.Add("Depth", "1")
 
-	ms, err := c.ic.DoMultiStatus(req)
+	ms, err := c.ic.DoMultiStatus(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -338,29 +310,29 @@ func (c *Client) MultiGetAddressBook(path string, multiGet *AddressBookMultiGet)
 	return decodeAddressList(ms)
 }
 
-func populateAddressObject(ao *AddressObject, resp *http.Response) error {
-	if loc := resp.Header.Get("Location"); loc != "" {
+func populateAddressObject(ao *AddressObject, h http.Header) error {
+	if loc := h.Get("Location"); loc != "" {
 		u, err := url.Parse(loc)
 		if err != nil {
 			return err
 		}
 		ao.Path = u.Path
 	}
-	if etag := resp.Header.Get("ETag"); etag != "" {
+	if etag := h.Get("ETag"); etag != "" {
 		etag, err := strconv.Unquote(etag)
 		if err != nil {
 			return err
 		}
 		ao.ETag = etag
 	}
-	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
+	if contentLength := h.Get("Content-Length"); contentLength != "" {
 		n, err := strconv.ParseInt(contentLength, 10, 64)
 		if err != nil {
 			return err
 		}
 		ao.ContentLength = n
 	}
-	if lastModified := resp.Header.Get("Last-Modified"); lastModified != "" {
+	if lastModified := h.Get("Last-Modified"); lastModified != "" {
 		t, err := http.ParseTime(lastModified)
 		if err != nil {
 			return err
@@ -371,14 +343,14 @@ func populateAddressObject(ao *AddressObject, resp *http.Response) error {
 	return nil
 }
 
-func (c *Client) GetAddressObject(path string) (*AddressObject, error) {
+func (c *Client) GetAddressObject(ctx context.Context, path string) (*AddressObject, error) {
 	req, err := c.ic.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Accept", vcard.MIMEType)
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -401,13 +373,13 @@ func (c *Client) GetAddressObject(path string) (*AddressObject, error) {
 		Path: resp.Request.URL.Path,
 		Card: card,
 	}
-	if err := populateAddressObject(ao, resp); err != nil {
+	if err := populateAddressObject(ao, resp.Header); err != nil {
 		return nil, err
 	}
 	return ao, nil
 }
 
-func (c *Client) PutAddressObject(path string, card vcard.Card) (*AddressObject, error) {
+func (c *Client) PutAddressObject(ctx context.Context, path string, card vcard.Card) (*AddressObject, error) {
 	// TODO: add support for If-None-Match and If-Match
 
 	// TODO: some servers want a Content-Length header, so we can't stream the
@@ -432,14 +404,14 @@ func (c *Client) PutAddressObject(path string, card vcard.Card) (*AddressObject,
 	}
 	req.Header.Set("Content-Type", vcard.MIMEType)
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
 
 	ao := &AddressObject{Path: path}
-	if err := populateAddressObject(ao, resp); err != nil {
+	if err := populateAddressObject(ao, resp.Header); err != nil {
 		return nil, err
 	}
 	return ao, nil
@@ -447,7 +419,7 @@ func (c *Client) PutAddressObject(path string, card vcard.Card) (*AddressObject,
 
 // SyncCollection performs a collection synchronization operation on the
 // specified resource, as defined in RFC 6578.
-func (c *Client) SyncCollection(path string, query *SyncQuery) (*SyncResponse, error) {
+func (c *Client) SyncCollection(ctx context.Context, path string, query *SyncQuery) (*SyncResponse, error) {
 	var limit *internal.Limit
 	if query.Limit > 0 {
 		limit = &internal.Limit{NResults: uint(query.Limit)}
@@ -458,7 +430,7 @@ func (c *Client) SyncCollection(path string, query *SyncQuery) (*SyncResponse, e
 		return nil, err
 	}
 
-	ms, err := c.ic.SyncCollection(path, query.SyncToken, internal.DepthOne, limit, propReq)
+	ms, err := c.ic.SyncCollection(ctx, path, query.SyncToken, internal.DepthOne, limit, propReq)
 	if err != nil {
 		return nil, err
 	}

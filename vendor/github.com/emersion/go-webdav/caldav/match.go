@@ -138,7 +138,6 @@ func matchCompTimeRange(start, end time.Time, comp *ical.Component) (bool, error
 		return len(rset.Between(start, end, true)) > 0, nil
 	}
 
-	// TODO handle "infinity" values in query
 	// TODO handle more than just events
 	if comp.Name != ical.CompEvent {
 		return false, nil
@@ -155,15 +154,15 @@ func matchCompTimeRange(start, end time.Time, comp *ical.Component) (bool, error
 	}
 
 	// Event starts in time range
-	if eventStart.After(start) && eventStart.Before(end) {
+	if eventStart.After(start) && (end.IsZero() || eventStart.Before(end)) {
 		return true, nil
 	}
 	// Event ends in time range
-	if eventEnd.After(start) && eventEnd.Before(end) {
+	if eventEnd.After(start) && (end.IsZero() || eventEnd.Before(end)) {
 		return true, nil
 	}
 	// Event covers entire time range plus some
-	if eventStart.Before(start) && eventEnd.After(end) {
+	if eventStart.Before(start) && (!end.IsZero() && eventEnd.After(end)) {
 		return true, nil
 	}
 	return false, nil
@@ -172,13 +171,11 @@ func matchCompTimeRange(start, end time.Time, comp *ical.Component) (bool, error
 func matchPropTimeRange(start, end time.Time, field *ical.Prop) (bool, error) {
 	// See https://datatracker.ietf.org/doc/html/rfc4791#section-9.9
 
-	// TODO handle "infinity" values in query
-
 	ptime, err := field.DateTime(start.Location())
 	if err != nil {
 		return false, err
 	}
-	if ptime.After(start) && ptime.Before(end) {
+	if ptime.After(start) && (end.IsZero() || ptime.Before(end)) {
 		return true, nil
 	}
 	return false, nil

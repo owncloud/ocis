@@ -126,9 +126,9 @@ func (c Card) Preferred(k string) *Field {
 	}
 
 	field := fields[0]
-	max := 0
+	min := 100
 	for _, f := range fields {
-		n := 0
+		n := 100
 		if pref := f.Params.Get(ParamPreferred); pref != "" {
 			n, _ = strconv.Atoi(pref)
 		} else if f.Params.HasType("pref") {
@@ -136,8 +136,8 @@ func (c Card) Preferred(k string) *Field {
 			n = 1
 		}
 
-		if n > max {
-			max = n
+		if n < min {
+			min = n
 			field = f
 		}
 	}
@@ -243,6 +243,11 @@ func (c Card) AddName(name *Name) {
 	c.Add(FieldName, name.field())
 }
 
+// SetName replaces the list of names with the single specified name.
+func (c Card) SetName(name *Name) {
+	c.Set(FieldName, name.field())
+}
+
 // Gender returns this card's gender.
 func (c Card) Gender() (sex Sex, identity string) {
 	v := c.Value(FieldGender)
@@ -286,6 +291,11 @@ func (c Card) Address() *Address {
 // AddAddress adds an address to the list of addresses.
 func (c Card) AddAddress(address *Address) {
 	c.Add(FieldAddress, address.field())
+}
+
+// SetAddress replaces the list of addresses with the single specified address.
+func (c Card) SetAddress(address *Address) {
+	c.Set(FieldAddress, address.field())
 }
 
 // Categories returns category information about the card, also known as "tags".

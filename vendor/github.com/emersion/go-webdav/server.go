@@ -14,14 +14,14 @@ import (
 
 // FileSystem is a WebDAV server backend.
 type FileSystem interface {
-	Open(name string) (io.ReadCloser, error)
-	Stat(name string) (*FileInfo, error)
-	Readdir(name string, recursive bool) ([]FileInfo, error)
-	Create(name string) (io.WriteCloser, error)
-	RemoveAll(name string) error
-	Mkdir(name string) error
-	Copy(name, dest string, recursive, overwrite bool) (created bool, err error)
-	MoveAll(name, dest string, overwrite bool) (created bool, err error)
+	Open(ctx context.Context, name string) (io.ReadCloser, error)
+	Stat(ctx context.Context, name string) (*FileInfo, error)
+	ReadDir(ctx context.Context, name string, recursive bool) ([]FileInfo, error)
+	Create(ctx context.Context, name string) (io.WriteCloser, error)
+	RemoveAll(ctx context.Context, name string) error
+	Mkdir(ctx context.Context, name string) error
+	Copy(ctx context.Context, name, dest string, options *CopyOptions) (created bool, err error)
+	Move(ctx context.Context, name, dest string, options *MoveOptions) (created bool, err error)
 }
 
 // Handler handles WebDAV HTTP requests. It can be used to create a WebDAV
@@ -56,8 +56,8 @@ type backend struct {
 }
 
 func (b *backend) Options(r *http.Request) (caps []string, allow []string, err error) {
-	fi, err := b.FileSystem.Stat(r.URL.Path)
-	if os.IsNotExist(err) {
+	fi, err := b.FileSystem.Stat(r.Context(), r.URL.Path)
+	if internal.IsNotFound(err) {
 		return nil, []string{http.MethodOptions, http.MethodPut, "MKCOL"}, nil
 	} else if err != nil {
 		return nil, nil, err
@@ -79,17 +79,15 @@ func (b *backend) Options(r *http.Request) (caps []string, allow []string, err e
 }
 
 func (b *backend) HeadGet(w http.ResponseWriter, r *http.Request) error {
-	fi, err := b.FileSystem.Stat(r.URL.Path)
-	if os.IsNotExist(err) {
-		return &internal.HTTPError{Code: http.StatusNotFound, Err: err}
-	} else if err != nil {
+	fi, err := b.FileSystem.Stat(r.Context(), r.URL.Path)
+	if err != nil {
 		return err
 	}
 	if fi.IsDir {
 		return &internal.HTTPError{Code: http.StatusMethodNotAllowed}
 	}
 
-	f, err := b.FileSystem.Open(r.URL.Path)
+	f, err := b.FileSystem.Open(r.Context(), r.URL.Path)
 	if err != nil {
 		return err
 	}
@@ -120,16 +118,14 @@ func (b *backend) HeadGet(w http.ResponseWriter, r *http.Request) error {
 func (b *backend) PropFind(r *http.Request, propfind *internal.PropFind, depth internal.Depth) (*internal.MultiStatus, error) {
 	// TODO: use partial error Response on error
 
-	fi, err := b.FileSystem.Stat(r.URL.Path)
-	if os.IsNotExist(err) {
-		return nil, &internal.HTTPError{Code: http.StatusNotFound, Err: err}
-	} else if err != nil {
+	fi, err := b.FileSystem.Stat(r.Context(), r.URL.Path)
+	if err != nil {
 		return nil, err
 	}
 
 	var resps []internal.Response
 	if depth != internal.DepthZero && fi.IsDir {
-		children, err := b.FileSystem.Readdir(r.URL.Path, depth == internal.DepthInfinity)
+		children, err := b.FileSystem.ReadDir(r.Context(), r.URL.Path, depth == internal.DepthInfinity)
 		if err != nil {
 			return nil, err
 		}
@@ -198,7 +194,7 @@ func (b *backend) PropPatch(r *http.Request, update *internal.PropertyUpdate) (*
 }
 
 func (b *backend) Put(r *http.Request) (*internal.Href, error) {
-	wc, err := b.FileSystem.Create(r.URL.Path)
+	wc, err := b.FileSystem.Create(r.Context(), r.URL.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -212,26 +208,26 @@ func (b *backend) Put(r *http.Request) (*internal.Href, error) {
 }
 
 func (b *backend) Delete(r *http.Request) error {
-	err := b.FileSystem.RemoveAll(r.URL.Path)
-	if os.IsNotExist(err) {
-		return &internal.HTTPError{Code: http.StatusNotFound, Err: err}
-	}
-	return err
+	return b.FileSystem.RemoveAll(r.Context(), r.URL.Path)
 }
 
 func (b *backend) Mkcol(r *http.Request) error {
 	if r.Header.Get("Content-Type") != "" {
 		return internal.HTTPErrorf(http.StatusUnsupportedMediaType, "webdav: request body not supported in MKCOL request")
 	}
-	err := b.FileSystem.Mkdir(r.URL.Path)
-	if os.IsNotExist(err) {
+	err := b.FileSystem.Mkdir(r.Context(), r.URL.Path)
+	if internal.IsNotFound(err) {
 		return &internal.HTTPError{Code: http.StatusConflict, Err: err}
 	}
 	return err
 }
 
 func (b *backend) Copy(r *http.Request, dest *internal.Href, recursive, overwrite bool) (created bool, err error) {
-	created, err = b.FileSystem.Copy(r.URL.Path, dest.Path, recursive, overwrite)
+	options := CopyOptions{
+		NoRecursive: !recursive,
+		NoOverwrite: !overwrite,
+	}
+	created, err = b.FileSystem.Copy(r.Context(), r.URL.Path, dest.Path, &options)
 	if os.IsExist(err) {
 		return false, &internal.HTTPError{http.StatusPreconditionFailed, err}
 	}
@@ -239,7 +235,10 @@ func (b *backend) Copy(r *http.Request, dest *internal.Href, recursive, overwrit
 }
 
 func (b *backend) Move(r *http.Request, dest *internal.Href, overwrite bool) (created bool, err error) {
-	created, err = b.FileSystem.MoveAll(r.URL.Path, dest.Path, overwrite)
+	options := MoveOptions{
+		NoOverwrite: !overwrite,
+	}
+	created, err = b.FileSystem.Move(r.Context(), r.URL.Path, dest.Path, &options)
 	if os.IsExist(err) {
 		return false, &internal.HTTPError{http.StatusPreconditionFailed, err}
 	}
@@ -248,7 +247,7 @@ func (b *backend) Move(r *http.Request, dest *internal.Href, overwrite bool) (cr
 
 // BackendSuppliedHomeSet represents either a CalDAV calendar-home-set or a
 // CardDAV addressbook-home-set. It should only be created via
-// `caldav.NewCalendarHomeSet()` or `carddav.NewAddressbookHomeSet()`. Only to
+// caldav.NewCalendarHomeSet or carddav.NewAddressBookHomeSet. Only to
 // be used server-side, for listing a user's home sets as determined by the
 // (external) backend.
 type BackendSuppliedHomeSet interface {
@@ -261,8 +260,10 @@ type UserPrincipalBackend interface {
 	CurrentUserPrincipal(ctx context.Context) (string, error)
 }
 
+// Capability indicates the features that a server supports.
 type Capability string
 
+// ServePrincipalOptions holds options for ServePrincipal.
 type ServePrincipalOptions struct {
 	CurrentUserPrincipalPath string
 	HomeSets                 []BackendSuppliedHomeSet

@@ -143,7 +143,10 @@ func (resp *Response) Err() error {
 		return nil
 	}
 
-	var err error = resp.Error
+	var err error
+	if resp.Error != nil {
+		err = resp.Error
+	}
 	if resp.ResponseDescription != "" {
 		if err != nil {
 			err = fmt.Errorf("%v (%w)", resp.ResponseDescription, err)

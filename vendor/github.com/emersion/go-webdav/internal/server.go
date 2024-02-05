@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io"
 	"mime"
 	"net/http"
 	"net/url"
@@ -27,9 +28,13 @@ func ServeError(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), code)
 }
 
+func isContentXML(h http.Header) bool {
+	t, _, _ := mime.ParseMediaType(h.Get("Content-Type"))
+	return t == "application/xml" || t == "text/xml"
+}
+
 func DecodeXMLRequest(r *http.Request, v interface{}) error {
-	t, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if t != "application/xml" && t != "text/xml" {
+	if !isContentXML(r.Header) {
 		return HTTPErrorf(http.StatusBadRequest, "webdav: expected application/xml request")
 	}
 
@@ -37,6 +42,11 @@ func DecodeXMLRequest(r *http.Request, v interface{}) error {
 		return &HTTPError{http.StatusBadRequest, err}
 	}
 	return nil
+}
+
+func IsRequestBodyEmpty(r *http.Request) bool {
+	_, err := r.Body.Read(nil)
+	return err == io.EOF
 }
 
 func ServeXML(w http.ResponseWriter) *xml.Encoder {
@@ -131,8 +141,16 @@ func (h *Handler) handleOptions(w http.ResponseWriter, r *http.Request) error {
 
 func (h *Handler) handlePropfind(w http.ResponseWriter, r *http.Request) error {
 	var propfind PropFind
-	if err := DecodeXMLRequest(r, &propfind); err != nil {
-		return err
+	if isContentXML(r.Header) {
+		if err := DecodeXMLRequest(r, &propfind); err != nil {
+			return err
+		}
+	} else {
+		var b [1]byte
+		if _, err := r.Body.Read(b[:]); err != io.EOF {
+			return HTTPErrorf(http.StatusBadRequest, "webdav: unsupported request body")
+		}
+		propfind.AllProp = &struct{}{}
 	}
 
 	depth := DepthInfinity

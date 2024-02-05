@@ -1,3 +1,5 @@
+// 2017-2022, Teambition. All rights reserved.
+
 package rrule
 
 import (
@@ -28,16 +30,17 @@ func (set *Set) Recurrence() []string {
 	}
 
 	for _, item := range set.rdate {
-		res = append(res, fmt.Sprintf("RDATE:%s", timeToStr(item)))
+		res = append(res, fmt.Sprintf("RDATE%s", timeToRFCDatetimeStr(item)))
 	}
 
 	for _, item := range set.exdate {
-		res = append(res, fmt.Sprintf("EXDATE:%s", timeToStr(item)))
+		res = append(res, fmt.Sprintf("EXDATE%s", timeToRFCDatetimeStr(item)))
 	}
 	return res
 }
 
-// DTStart sets dtstart property for set
+// DTStart sets dtstart property for set.
+// It will be truncated to second precision.
 func (set *Set) DTStart(dtstart time.Time) {
 	set.dtstart = dtstart.Truncate(time.Second)
 
@@ -68,11 +71,13 @@ func (set *Set) GetRRule() *RRule {
 }
 
 // RDate include the given datetime instance in the recurrence set generation.
+// It will be truncated to second precision.
 func (set *Set) RDate(rdate time.Time) {
 	set.rdate = append(set.rdate, rdate.Truncate(time.Second))
 }
 
-// SetRDates sets explicitly added dates (rdates) in the set
+// SetRDates sets explicitly added dates (rdates) in the set.
+// It will be truncated to second precision.
 func (set *Set) SetRDates(rdates []time.Time) {
 	set.rdate = make([]time.Time, 0, len(rdates))
 	for _, rdate := range rdates {
@@ -88,11 +93,13 @@ func (set *Set) GetRDate() []time.Time {
 // ExDate include the given datetime instance in the recurrence set exclusion list.
 // Dates included that way will not be generated,
 // even if some inclusive rrule or rdate matches them.
+// It will be truncated to second precision.
 func (set *Set) ExDate(exdate time.Time) {
 	set.exdate = append(set.exdate, exdate.Truncate(time.Second))
 }
 
-// SetExDates sets explicitly excluded dates (exdates) in the set
+// SetExDates sets explicitly excluded dates (exdates) in the set.
+// It will be truncated to second precision.
 func (set *Set) SetExDates(exdates []time.Time) {
 	set.exdate = make([]time.Time, 0, len(exdates))
 	for _, exdate := range exdates {
@@ -168,6 +175,7 @@ func (set *Set) Iterator() (next func() (time.Time, bool)) {
 }
 
 // All returns all occurrences of the rrule.Set.
+// It is only supported second precision.
 func (set *Set) All() []time.Time {
 	return all(set.Iterator())
 }
@@ -175,6 +183,7 @@ func (set *Set) All() []time.Time {
 // Between returns all the occurrences of the rrule between after and before.
 // The inc keyword defines what happens if after and/or before are themselves occurrences.
 // With inc == True, they will be included in the list, if they are found in the recurrence set.
+// It is only supported second precision.
 func (set *Set) Between(after, before time.Time, inc bool) []time.Time {
 	return between(set.Iterator(), after, before, inc)
 }
@@ -183,6 +192,7 @@ func (set *Set) Between(after, before time.Time, inc bool) []time.Time {
 // or time.Time's zero value if no recurrence match.
 // The inc keyword defines what happens if dt is an occurrence.
 // With inc == True, if dt itself is an occurrence, it will be returned.
+// It is only supported second precision.
 func (set *Set) Before(dt time.Time, inc bool) time.Time {
 	return before(set.Iterator(), dt, inc)
 }
@@ -191,6 +201,7 @@ func (set *Set) Before(dt time.Time, inc bool) time.Time {
 // or time.Time's zero value if no recurrence match.
 // The inc keyword defines what happens if dt is an occurrence.
 // With inc == True, if dt itself is an occurrence, it will be returned.
+// It is only supported second precision.
 func (set *Set) After(dt time.Time, inc bool) time.Time {
 	return after(set.Iterator(), dt, inc)
 }

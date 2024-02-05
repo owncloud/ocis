@@ -15,7 +15,8 @@ type Config struct {
 
 	HTTP HTTPConfig `yaml:"http"`
 
-	Context context.Context `yaml:"-"`
+	Context   context.Context `yaml:"-"`
+	JWTSecret string          `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;CALDAV_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
 }
 
 type Log struct {

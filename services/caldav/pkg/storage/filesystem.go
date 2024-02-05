@@ -57,9 +57,20 @@ func ensureLocalDir(path string) error {
 	return nil
 }
 
+func (b *filesystemBackend) localDir(homeSetPath string, components ...string) (string, error) {
+	c := append([]string{b.path}, homeSetPath)
+	c = append(c, components...)
+	localPath := filepath.Join(c...)
+	if err := ensureLocalDir(localPath); err != nil {
+		return "", err
+	}
+	return localPath, nil
+}
+
 // don't use this directly, use localCalDAVPath or localCardDAVPath instead.
+// note that homesetpath is expected to end in /
 func (b *filesystemBackend) safeLocalPath(homeSetPath string, urlPath string) (string, error) {
-	localPath := filepath.Join(b.path, homeSetPath, defaultResourceName)
+	localPath := filepath.Join(b.path, homeSetPath)
 	if err := ensureLocalDir(localPath); err != nil {
 		return "", err
 	}
@@ -69,27 +80,26 @@ func (b *filesystemBackend) safeLocalPath(homeSetPath string, urlPath string) (s
 	}
 
 	// We are mapping to local filesystem path, so be conservative about what to accept
-	// TODO this changes once multiple addess books are supported
-	dir, file := path.Split(urlPath)
-	// only accept resources in default calendar/adress book for now
-	if path.Clean(dir) != path.Join(homeSetPath, defaultResourceName) {
-		if strings.HasPrefix(dir, homeSetPath) {
-			err := fmt.Errorf("invalid request path: %s (%s is not %s)", urlPath, dir, path.Join(homeSetPath, defaultResourceName))
-			return "", webdav.NewHTTPError(400, err)
-		} else {
-			err := fmt.Errorf("access to resource outside of home set: %s", urlPath)
-			return "", webdav.NewHTTPError(403, err)
-		}
+	if strings.HasSuffix(urlPath, "/") {
+		urlPath = path.Clean(urlPath) + "/"
+	} else {
+		urlPath = path.Clean(urlPath)
 	}
+	if !strings.HasPrefix(urlPath, homeSetPath) {
+		err := fmt.Errorf("access to resource outside of home set: %s", urlPath)
+		return "", webdav.NewHTTPError(403, err)
+	}
+	urlPath = strings.TrimPrefix(urlPath, homeSetPath)
+
 	// only accept simple file names for now
-	if !validFilenameRegex.MatchString(file) {
+	dir, file := path.Split(urlPath)
+	if file != "" && !validFilenameRegex.MatchString(file) {
 		log.Debug().Str("file", file).Msg("file name does not match regex")
 		err := fmt.Errorf("invalid file name: %s", file)
 		return "", webdav.NewHTTPError(400, err)
 	}
 
-	// dir (= homeSetPath) is already included in path, so only file here
-	return filepath.Join(localPath, file), nil
+	return filepath.Join(localPath, dir, file), nil
 }
 
 func etagForFile(path string) (string, error) {

@@ -1,6 +1,7 @@
 package webdav
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,6 +40,11 @@ type Client struct {
 	ic *internal.Client
 }
 
+// NewClient creates a new WebDAV client.
+//
+// If the HTTPClient is nil, http.DefaultClient is used.
+//
+// To use HTTP basic authentication, HTTPClientWithBasicAuth can be used.
 func NewClient(c HTTPClient, endpoint string) (*Client, error) {
 	ic, err := internal.NewClient(c, endpoint)
 	if err != nil {
@@ -47,12 +53,13 @@ func NewClient(c HTTPClient, endpoint string) (*Client, error) {
 	return &Client{ic}, nil
 }
 
-func (c *Client) FindCurrentUserPrincipal() (string, error) {
+// FindCurrentUserPrincipal finds the current user's principal path.
+func (c *Client) FindCurrentUserPrincipal(ctx context.Context) (string, error) {
 	propfind := internal.NewPropNamePropFind(internal.CurrentUserPrincipalName)
 
 	// TODO: consider retrying on the root URI "/" if this fails, as suggested
 	// by the RFC?
-	resp, err := c.ic.PropFindFlat("", propfind)
+	resp, err := c.ic.PropFindFlat(ctx, "", propfind)
 	if err != nil {
 		return "", err
 	}
@@ -121,21 +128,23 @@ func fileInfoFromResponse(resp *internal.Response) (*FileInfo, error) {
 	return fi, nil
 }
 
-func (c *Client) Stat(name string) (*FileInfo, error) {
-	resp, err := c.ic.PropFindFlat(name, fileInfoPropFind)
+// Stat fetches a FileInfo for a single file.
+func (c *Client) Stat(ctx context.Context, name string) (*FileInfo, error) {
+	resp, err := c.ic.PropFindFlat(ctx, name, fileInfoPropFind)
 	if err != nil {
 		return nil, err
 	}
 	return fileInfoFromResponse(resp)
 }
 
-func (c *Client) Open(name string) (io.ReadCloser, error) {
+// Open fetches a file's contents.
+func (c *Client) Open(ctx context.Context, name string) (io.ReadCloser, error) {
 	req, err := c.ic.NewRequest(http.MethodGet, name, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -143,13 +152,14 @@ func (c *Client) Open(name string) (io.ReadCloser, error) {
 	return resp.Body, nil
 }
 
-func (c *Client) Readdir(name string, recursive bool) ([]FileInfo, error) {
+// ReadDir lists files in a directory.
+func (c *Client) ReadDir(ctx context.Context, name string, recursive bool) ([]FileInfo, error) {
 	depth := internal.DepthOne
 	if recursive {
 		depth = internal.DepthInfinity
 	}
 
-	ms, err := c.ic.PropFind(name, depth, fileInfoPropFind)
+	ms, err := c.ic.PropFind(ctx, name, depth, fileInfoPropFind)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +192,8 @@ func (fw *fileWriter) Close() error {
 	return <-fw.done
 }
 
-func (c *Client) Create(name string) (io.WriteCloser, error) {
+// Create writes a file's contents.
+func (c *Client) Create(ctx context.Context, name string) (io.WriteCloser, error) {
 	pr, pw := io.Pipe()
 
 	req, err := c.ic.NewRequest(http.MethodPut, name, pr)
@@ -193,7 +204,7 @@ func (c *Client) Create(name string) (io.WriteCloser, error) {
 
 	done := make(chan error, 1)
 	go func() {
-		resp, err := c.ic.Do(req)
+		resp, err := c.ic.Do(req.WithContext(ctx))
 		if err != nil {
 			done <- err
 			return
@@ -205,13 +216,15 @@ func (c *Client) Create(name string) (io.WriteCloser, error) {
 	return &fileWriter{pw, done}, nil
 }
 
-func (c *Client) RemoveAll(name string) error {
+// RemoveAll deletes a file. If the file is a directory, all of its descendants
+// are recursively deleted as well.
+func (c *Client) RemoveAll(ctx context.Context, name string) error {
 	req, err := c.ic.NewRequest(http.MethodDelete, name, nil)
 	if err != nil {
 		return err
 	}
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -219,13 +232,14 @@ func (c *Client) RemoveAll(name string) error {
 	return nil
 }
 
-func (c *Client) Mkdir(name string) error {
+// Mkdir creates a new directory.
+func (c *Client) Mkdir(ctx context.Context, name string) error {
 	req, err := c.ic.NewRequest("MKCOL", name, nil)
 	if err != nil {
 		return err
 	}
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -233,16 +247,30 @@ func (c *Client) Mkdir(name string) error {
 	return nil
 }
 
-func (c *Client) CopyAll(name, dest string, overwrite bool) error {
+// Copy copies a file.
+//
+// By default, if the file is a directory, all descendants are recursively
+// copied as well.
+func (c *Client) Copy(ctx context.Context, name, dest string, options *CopyOptions) error {
+	if options == nil {
+		options = new(CopyOptions)
+	}
+
 	req, err := c.ic.NewRequest("COPY", name, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Destination", c.ic.ResolveHref(dest).String())
-	req.Header.Set("Overwrite", internal.FormatOverwrite(overwrite))
+	depth := internal.DepthInfinity
+	if options.NoRecursive {
+		depth = internal.DepthZero
+	}
 
-	resp, err := c.ic.Do(req)
+	req.Header.Set("Destination", c.ic.ResolveHref(dest).String())
+	req.Header.Set("Overwrite", internal.FormatOverwrite(!options.NoOverwrite))
+	req.Header.Set("Depth", depth.String())
+
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -250,16 +278,21 @@ func (c *Client) CopyAll(name, dest string, overwrite bool) error {
 	return nil
 }
 
-func (c *Client) MoveAll(name, dest string, overwrite bool) error {
+// Move moves a file.
+func (c *Client) Move(ctx context.Context, name, dest string, options *MoveOptions) error {
+	if options == nil {
+		options = new(MoveOptions)
+	}
+
 	req, err := c.ic.NewRequest("MOVE", name, nil)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Destination", c.ic.ResolveHref(dest).String())
-	req.Header.Set("Overwrite", internal.FormatOverwrite(overwrite))
+	req.Header.Set("Overwrite", internal.FormatOverwrite(!options.NoOverwrite))
 
-	resp, err := c.ic.Do(req)
+	resp, err := c.ic.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}

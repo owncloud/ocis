@@ -1,3 +1,5 @@
+// 2017-2022, Teambition. All rights reserved.
+
 package rrule
 
 import (
@@ -117,15 +119,16 @@ func strToInts(value string) ([]int, error) {
 }
 
 // String returns RRULE string with DTSTART if exists. e.g.
-//   DTSTART;TZID=America/New_York:19970105T083000
-//   RRULE:FREQ=YEARLY;INTERVAL=2;BYMONTH=1;BYDAY=SU;BYHOUR=8,9;BYMINUTE=30
+//
+//	DTSTART;TZID=America/New_York:19970105T083000
+//	RRULE:FREQ=YEARLY;INTERVAL=2;BYMONTH=1;BYDAY=SU;BYHOUR=8,9;BYMINUTE=30
 func (option *ROption) String() string {
 	str := option.RRuleString()
 	if option.Dtstart.IsZero() {
 		return str
 	}
 
-	return fmt.Sprintf("DTSTART%s\n%s", timeToRFCDatetimeStr(option.Dtstart), str)
+	return fmt.Sprintf("DTSTART%s\nRRULE:%s", timeToRFCDatetimeStr(option.Dtstart), str)
 }
 
 // RRuleString returns RRULE string exclude DTSTART
@@ -202,6 +205,7 @@ func StrToROptionInLocation(rfcString string, loc *time.Location) (*ROption, err
 		}
 	}
 
+	rruleStr = strings.TrimPrefix(rruleStr, "RRULE:")
 	for _, attr := range strings.Split(rruleStr, ";") {
 		keyValue := strings.Split(attr, "=")
 		if len(keyValue) != 2 {

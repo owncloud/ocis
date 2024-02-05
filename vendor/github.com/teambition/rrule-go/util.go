@@ -1,3 +1,5 @@
+// 2017-2022, Teambition. All rights reserved.
+
 package rrule
 
 import (
@@ -66,7 +68,7 @@ func contains(list []int, elem int) bool {
 
 func timeContains(list []time.Time, elem time.Time) bool {
 	for _, t := range list {
-		if t == elem {
+		if t.Equal(elem) {
 			return true
 		}
 	}
@@ -176,4 +178,9 @@ func after(next Next, dt time.Time, inc bool) time.Time {
 			return v
 		}
 	}
+}
+
+type optInt struct {
+	Int     int
+	Defined bool
 }

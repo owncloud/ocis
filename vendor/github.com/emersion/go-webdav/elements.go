@@ -30,24 +30,3 @@ type groupMembership struct {
 	XMLName xml.Name        `xml:"DAV: group-membership"`
 	Hrefs   []internal.Href `xml:"href"`
 }
-
-// ConditionalMatch represents the value of a conditional header
-// according to RFC 2068 section 14.25 and RFC 2068 section 14.26
-// The (optional) value can either be a wildcard or an ETag.
-type ConditionalMatch string
-
-func (val ConditionalMatch) IsSet() bool {
-	return val != ""
-}
-
-func (val ConditionalMatch) IsWildcard() bool {
-	return val == "*"
-}
-
-func (val ConditionalMatch) ETag() (string, error) {
-	var e internal.ETag
-	if err := e.UnmarshalText([]byte(val)); err != nil {
-		return "", err
-	}
-	return string(e), nil
-}

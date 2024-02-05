@@ -2,16 +2,54 @@ package internal
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"mime"
+	"net"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
 	"unicode"
 )
+
+// DiscoverContextURL performs a DNS-based CardDAV/CalDAV service discovery as
+// described in RFC 6352 section 11. It returns the URL to the CardDAV server.
+func DiscoverContextURL(ctx context.Context, service, domain string) (string, error) {
+	var resolver net.Resolver
+
+	// Only lookup TLS records, plaintext connections are insecure
+	_, addrs, err := resolver.LookupSRV(ctx, service+"s", "tcp", domain)
+	if dnsErr, ok := err.(*net.DNSError); ok {
+		if dnsErr.IsTemporary {
+			return "", err
+		}
+	} else if err != nil {
+		return "", err
+	}
+
+	if len(addrs) == 0 {
+		return "", fmt.Errorf("webdav: domain doesn't have an SRV record")
+	}
+	addr := addrs[0]
+
+	target := strings.TrimSuffix(addr.Target, ".")
+	if target == "" {
+		return "", fmt.Errorf("webdav: empty target in SRV record")
+	}
+
+	// TODO: perform a TXT lookup, check for a "path" key in the response
+	u := url.URL{Scheme: "https"}
+	if addr.Port == 443 {
+		u.Host = target
+	} else {
+		u.Host = fmt.Sprintf("%v:%v", target, addr.Port)
+	}
+	u.Path = "/.well-known/" + service
+	return u.String(), nil
+}
 
 // HTTPClient performs HTTP requests. It's implemented by *http.Client.
 type HTTPClient interface {
@@ -131,7 +169,7 @@ func (c *Client) DoMultiStatus(req *http.Request) (*MultiStatus, error) {
 	return &ms, nil
 }
 
-func (c *Client) PropFind(path string, depth Depth, propfind *PropFind) (*MultiStatus, error) {
+func (c *Client) PropFind(ctx context.Context, path string, depth Depth, propfind *PropFind) (*MultiStatus, error) {
 	req, err := c.NewXMLRequest("PROPFIND", path, propfind)
 	if err != nil {
 		return nil, err
@@ -139,12 +177,12 @@ func (c *Client) PropFind(path string, depth Depth, propfind *PropFind) (*MultiS
 
 	req.Header.Add("Depth", depth.String())
 
-	return c.DoMultiStatus(req)
+	return c.DoMultiStatus(req.WithContext(ctx))
 }
 
 // PropfindFlat performs a PROPFIND request with a zero depth.
-func (c *Client) PropFindFlat(path string, propfind *PropFind) (*Response, error) {
-	ms, err := c.PropFind(path, DepthZero, propfind)
+func (c *Client) PropFindFlat(ctx context.Context, path string, propfind *PropFind) (*Response, error) {
+	ms, err := c.PropFind(ctx, path, DepthZero, propfind)
 	if err != nil {
 		return nil, err
 	}
@@ -174,13 +212,13 @@ func parseCommaSeparatedSet(values []string, upper bool) map[string]bool {
 	return m
 }
 
-func (c *Client) Options(path string) (classes map[string]bool, methods map[string]bool, err error) {
+func (c *Client) Options(ctx context.Context, path string) (classes map[string]bool, methods map[string]bool, err error) {
 	req, err := c.NewRequest(http.MethodOptions, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Do(req)
+	resp, err := c.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -196,7 +234,7 @@ func (c *Client) Options(path string) (classes map[string]bool, methods map[stri
 }
 
 // SyncCollection perform a `sync-collection` REPORT operation on a resource
-func (c *Client) SyncCollection(path, syncToken string, level Depth, limit *Limit, prop *Prop) (*MultiStatus, error) {
+func (c *Client) SyncCollection(ctx context.Context, path, syncToken string, level Depth, limit *Limit, prop *Prop) (*MultiStatus, error) {
 	q := SyncCollectionQuery{
 		SyncToken: syncToken,
 		SyncLevel: level.String(),
@@ -209,7 +247,7 @@ func (c *Client) SyncCollection(path, syncToken string, level Depth, limit *Limi
 		return nil, err
 	}
 
-	ms, err := c.DoMultiStatus(req)
+	ms, err := c.DoMultiStatus(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
