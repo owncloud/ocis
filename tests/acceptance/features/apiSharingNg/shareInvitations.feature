@@ -16,7 +16,6 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -88,12 +87,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send share invitation to group with different roles
@@ -106,7 +105,6 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -180,18 +178,17 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send share invitation for a file to user with different permissions
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType      | file                |
       | resource          | textfile1.txt       |
       | space             | Personal            |
       | sharee            | Brian               |
@@ -283,7 +280,6 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation for a folder to user with different permissions
     Given user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType      | folder              |
       | resource          | FolderToShare       |
       | space             | Personal            |
       | sharee            | Brian               |
@@ -384,7 +380,6 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType      | file                |
       | resource          | textfile1.txt       |
       | space             | Personal            |
       | sharee            | grp1                |
@@ -482,7 +477,6 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType      | folder              |
       | resource          | FolderToShare       |
       | space             | Personal            |
       | sharee            | grp1                |
@@ -578,7 +572,6 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>          |
       | resource        | <path>                   |
       | space           | Personal                 |
       | sharee          | Brian                    |
@@ -656,12 +649,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send share invitation with expiration date to group with different roles
@@ -674,7 +667,6 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>          |
       | resource        | <path>                   |
       | space           | Personal                 |
       | sharee          | grp1                     |
@@ -752,12 +744,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
   @issue-7962
   Scenario Outline: send share invitation to disabled user
@@ -765,7 +757,6 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has disabled user "Brian"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -835,12 +826,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to a deleted group with different roles
@@ -854,7 +845,6 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the administrator has deleted group "grp1"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -894,12 +884,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send share invitation to deleted user
@@ -907,7 +897,6 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has deleted a user "Brian"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -945,12 +934,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: try to send sharing invitation to multiple groups
@@ -968,7 +957,6 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1, grp2         |
@@ -1008,14 +996,14 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Co Owner         | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Co Owner         | FolderToShare  |
+      | Uploader         | FolderToShare  |
+      | Manager          | FolderToShare  |
 
 
   Scenario Outline: try to send sharing invitation to user and group at once
@@ -1031,7 +1019,6 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1, Bob          |
@@ -1071,19 +1058,18 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to non-existing group
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | nonExistentGroup   |
@@ -1123,12 +1109,12 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send sharing invitation to already shared group
@@ -1141,14 +1127,12 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -1186,19 +1170,18 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Viewer           | file          | /textfile1.txt |
-      | File Editor      | file          | /textfile1.txt |
-      | Viewer           | folder        | FolderToShare  |
-      | Editor           | folder        | FolderToShare  |
-      | Uploader         | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Viewer           | /textfile1.txt |
+      | File Editor      | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+      | Editor           | FolderToShare  |
+      | Uploader         | FolderToShare  |
 
 
   Scenario Outline: send share invitation to wrong user id
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type>                      |
       | resource        | <path>                               |
       | space           | Personal                             |
       | shareeId        | a4c0c83e-ae24-4870-93c3-fcaf2a2228f7 |
@@ -1236,21 +1219,20 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation with empty user id
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | shareeId        |                 |
-      | shareType       | user            |
-      | permissionsRole | Viewer          |
+      | resource        | <path>   |
+      | space           | Personal |
+      | shareeId        |          |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1283,21 +1265,20 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation to user with wrong recipient type
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | Brian           |
-      | shareType       | wrongShareType  |
-      | permissionsRole | Viewer          |
+      | resource        | <path>         |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | wrongShareType |
+      | permissionsRole | Viewer         |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1330,9 +1311,9 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation to group with wrong recipient type
@@ -1345,12 +1326,11 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | grp1            |
-      | shareType       | wrongShareType  |
-      | permissionsRole | Viewer          |
+      | resource        | <path>         |
+      | space           | Personal       |
+      | sharee          | grp1           |
+      | shareType       | wrongShareType |
+      | permissionsRole | Viewer         |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1383,21 +1363,20 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation to user with empty recipient type
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | Brian           |
-      | shareType       |                 |
-      | permissionsRole | Viewer          |
+      | resource        | <path>   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       |          |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1430,9 +1409,9 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation to group with empty recipient type
@@ -1445,12 +1424,11 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | grp1            |
-      | shareType       |                 |
-      | permissionsRole | Viewer          |
+      | resource        | <path>   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       |          |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1483,16 +1461,15 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: try to share a resource with invalid roles
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resourceType    | <resource-type>    |
       | resource        | <path>             |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -1532,15 +1509,15 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | resource-type | path           |
-      | Co Owner         | file          | /textfile1.txt |
-      | Manager          | file          | /textfile1.txt |
-      | Space Viewer     | file          | /textfile1.txt |
-      | Space Editor     | file          | /textfile1.txt |
-      | Co Owner         | folder        | FolderToShare  |
-      | Manager          | folder        | FolderToShare  |
-      | Space Viewer     | folder        | FolderToShare  |
-      | Space Editor     | folder        | FolderToShare  |
+      | permissions-role | path           |
+      | Co Owner         | /textfile1.txt |
+      | Manager          | /textfile1.txt |
+      | Space Viewer     | /textfile1.txt |
+      | Space Editor     | /textfile1.txt |
+      | Co Owner         | FolderToShare  |
+      | Manager          | FolderToShare  |
+      | Space Viewer     | FolderToShare  |
+      | Space Editor     | FolderToShare  |
 
 
   Scenario Outline: try to share a file with invalid roles
@@ -1594,19 +1571,17 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | Brian           |
-      | shareType       | user            |
-      | permissionsRole | Viewer          |
+      | resource        | <path>   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resourceType    | <resource-type> |
-      | resource        | <path>          |
-      | space           | Personal        |
-      | sharee          | Brian           |
-      | shareType       | user            |
-      | permissionsRole | Viewer          |
+      | resource        | <path>   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "409"
     And the JSON data of the response should match
       """
@@ -1637,9 +1612,9 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | resource-type | path           |
-      | file          | /textfile1.txt |
-      | folder        | FolderToShare  |
+      | path           |
+      | /textfile1.txt |
+      | FolderToShare  |
 
 
   Scenario Outline: send share invitation for project space to user with different roles

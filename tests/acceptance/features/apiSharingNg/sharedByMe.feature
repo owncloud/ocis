@@ -15,7 +15,6 @@ Feature: resources shared by user
   Scenario: user lists the shared file from personal space
     Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file         |
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -140,7 +139,6 @@ Feature: resources shared by user
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file                       |
       | resource        | FolderToShare/textfile.txt |
       | space           | Personal                   |
       | sharee          | Brian                      |
@@ -264,7 +262,6 @@ Feature: resources shared by user
   Scenario: user lists the shared folder from personal space
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | folder        |
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -382,14 +379,12 @@ Feature: resources shared by user
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file         |
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
     And user "Alice" has sent the following share invitation:
-      | resourceType    | folder        |
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -620,7 +615,6 @@ Feature: resources shared by user
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file         |
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
@@ -748,7 +742,6 @@ Feature: resources shared by user
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "FolderToShare/textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file                       |
       | resource        | FolderToShare/textfile.txt |
       | space           | NewSpace                   |
       | sharee          | Brian                      |
@@ -875,7 +868,6 @@ Feature: resources shared by user
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | folder        |
       | resource        | FolderToShare |
       | space           | NewSpace      |
       | sharee          | Brian         |
@@ -996,14 +988,12 @@ Feature: resources shared by user
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file         |
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
     And user "Alice" has sent the following share invitation:
-      | resourceType    | folder        |
       | resource        | FolderToShare |
       | space           | NewSpace      |
       | sharee          | Brian         |
@@ -1233,14 +1223,12 @@ Feature: resources shared by user
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resourceType    | file         |
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Viewer       |
     And user "Alice" has sent the following share invitation:
-      | resourceType    | folder        |
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | grp1          |
