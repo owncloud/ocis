@@ -65,15 +65,10 @@ class SharingNgContext implements Context {
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
 		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
@@ -432,7 +427,6 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $sharer
 	 * @param string $shareType (user|group)
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 * @param string|null $sharee can be both user or group
@@ -444,15 +438,12 @@ class SharingNgContext implements Context {
 	public function removeSharePermission(
 		string $sharer,
 		string $shareType,
-		string $resourceType,
 		string $resource,
 		string $space,
 		?string $sharee = null
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
-		$itemId = ($resourceType === 'folder')
-			? $this->spacesContext->getResourceId($sharer, $space, $resource)
-			: $this->spacesContext->getFileId($sharer, $space, $resource);
+		$itemId = $this->spacesContext->getResourceId($sharer, $space, $resource);
 
 		$permId = ($shareType === 'link')
 			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
@@ -470,12 +461,11 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $shareType (user|group)
 	 * @param string $sharee can be both user or group
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 *
@@ -487,20 +477,18 @@ class SharingNgContext implements Context {
 		string $sharer,
 		string $shareType,
 		string $sharee,
-		string $resourceType,
 		string $resource,
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, $shareType, $resourceType, $resource, $space)
+			$this->removeSharePermission($sharer, $shareType, $resource, $space)
 		);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of link from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of link from "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 *
@@ -510,12 +498,11 @@ class SharingNgContext implements Context {
 	 */
 	public function userRemovesSharePermissionOfAResourceInLinkShareUsingGraphAPI(
 		string $sharer,
-		string $resourceType,
 		string $resource,
 		string $space
 	):void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'link', $resourceType, $resource, $space)
+			$this->removeSharePermission($sharer, 'link', '', $resource, $space)
 		);
 	}
 
