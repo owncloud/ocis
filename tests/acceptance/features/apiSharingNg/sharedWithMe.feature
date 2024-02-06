@@ -595,9 +595,9 @@ Feature: an user gets the resources shared to them
     """
 
 
-  Scenario: user lists the file shared with them when sync is disabled
+  Scenario: user lists the file shared with them when auto-sync is disabled
     Given user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Brian" has disabled sync
+    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
@@ -863,9 +863,9 @@ Feature: an user gets the resources shared to them
       """
 
 
-  Scenario: user lists the folder shared with them when sync is disabled
+  Scenario: user lists the folder shared with them when auto-sync is disabled
     Given user "Alice" has created folder "folderToShare"
-    And user "Brian" has disabled sync
+    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
