@@ -84,6 +84,16 @@ func Local(cfg *config.Config) map[string]interface{} {
 	}
 }
 
+// Posix is the config mapping for the Posix storage driver
+func Posix(cfg *config.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"root":                    cfg.Drivers.Posix.Root,
+		"user_layout":             cfg.Drivers.Posix.UserLayout,
+		"permissionssvc":          cfg.Drivers.Posix.PermissionsEndpoint,
+		"permissionssvc_tls_mode": cfg.Commons.GRPCClientTLS.Mode,
+	}
+}
+
 // LocalHome is the config mapping for the LocalHome storage driver
 func LocalHome(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
