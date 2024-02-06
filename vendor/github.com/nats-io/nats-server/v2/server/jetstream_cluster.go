@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The NATS Authors
+// Copyright 2020-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -432,10 +432,10 @@ func (cc *jetStreamCluster) isStreamCurrent(account, stream string) bool {
 }
 
 // Restart the stream in question.
-// Should only be called when the stream is know in a bad state.
+// Should only be called when the stream is known to be in a bad state.
 func (js *jetStream) restartStream(acc *Account, csa *streamAssignment) {
 	js.mu.Lock()
-	cc := js.cluster
+	s, cc := js.srv, js.cluster
 	if cc == nil {
 		js.mu.Unlock()
 		return
@@ -458,9 +458,18 @@ func (js *jetStream) restartStream(acc *Account, csa *streamAssignment) {
 		}
 		rg.node = nil
 	}
+	sinceCreation := time.Since(sa.Created)
 	js.mu.Unlock()
 
 	// Process stream assignment to recreate.
+	// Check that we have given system enough time to start us up.
+	// This will be longer than obvious, and matches consumer logic in case system very busy.
+	if sinceCreation < 10*time.Second {
+		s.Debugf("Not restarting missing stream '%s > %s', too soon since creation %v",
+			acc, csa.Config.Name, sinceCreation)
+		return
+	}
+
 	js.processStreamAssignment(sa)
 
 	// If we had consumers assigned to this server they will be present in the copy, csa.
@@ -569,13 +578,24 @@ func (js *jetStream) isConsumerHealthy(mset *stream, consumer string, ca *consum
 	// When we try to restart we nil out the node if applicable
 	// and reprocess the consumer assignment.
 	restartConsumer := func() {
+		mset.mu.RLock()
+		accName, streamName := mset.acc.GetName(), mset.cfg.Name
+		mset.mu.RUnlock()
+
 		js.mu.Lock()
+		deleted := ca.deleted
+		// Check that we have not just been created.
+		if !deleted && time.Since(ca.Created) < 10*time.Second {
+			s.Debugf("Not restarting missing consumer '%s > %s > %s', too soon since creation %v",
+				accName, streamName, consumer, time.Since(ca.Created))
+			js.mu.Unlock()
+			return
+		}
 		// Make sure the node is stopped if still running.
 		if node != nil && node.State() != Closed {
 			node.Stop()
 		}
 		ca.Group.node = nil
-		deleted := ca.deleted
 		js.mu.Unlock()
 		if !deleted {
 			js.processConsumerAssignment(ca)
@@ -597,7 +617,7 @@ func (js *jetStream) isConsumerHealthy(mset *stream, consumer string, ca *consum
 			mset.mu.RLock()
 			accName, streamName := mset.acc.GetName(), mset.cfg.Name
 			mset.mu.RUnlock()
-			s.Warnf("Detected consumer cluster node skew '%s > %s'", accName, streamName, consumer)
+			s.Warnf("Detected consumer cluster node skew '%s > %s > %s'", accName, streamName, consumer)
 			node.Delete()
 			o.deleteWithoutAdvisory()
 			restartConsumer()
@@ -1123,6 +1143,7 @@ func (js *jetStream) checkForOrphans() {
 
 	for accName, jsa := range js.accounts {
 		asa := cc.streams[accName]
+		jsa.mu.RLock()
 		for stream, mset := range jsa.streams {
 			if sa := asa[stream]; sa == nil {
 				streams = append(streams, mset)
@@ -1136,6 +1157,7 @@ func (js *jetStream) checkForOrphans() {
 				}
 			}
 		}
+		jsa.mu.RUnlock()
 	}
 	js.mu.Unlock()
 
@@ -1356,7 +1378,7 @@ func (js *jetStream) monitorCluster() {
 
 		case isLeader = <-lch:
 			// For meta layer synchronize everyone to our state on becoming leader.
-			if isLeader {
+			if isLeader && n.ApplyQ().len() == 0 {
 				n.SendSnapshot(js.metaSnapshot())
 			}
 			// Process the change.
@@ -2233,7 +2255,7 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 
 		if err := n.InstallSnapshot(mset.stateSnapshot()); err == nil {
 			lastState, lastSnapTime = curState, time.Now()
-		} else if err != errNoSnapAvailable && err != errNodeClosed {
+		} else if err != errNoSnapAvailable && err != errNodeClosed && err != errCatchupsRunning {
 			s.RateLimitWarnf("Failed to install snapshot for '%s > %s' [%s]: %v", mset.acc.Name, mset.name(), n.Group(), err)
 		}
 	}
@@ -2298,7 +2320,11 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 				if mset.numConsumers() >= numExpectedConsumers {
 					break
 				}
-				time.Sleep(sleepTime)
+				select {
+				case <-s.quitCh:
+					return
+				case <-time.After(sleepTime):
+				}
 			}
 			if actual := mset.numConsumers(); actual < numExpectedConsumers {
 				s.Warnf("All consumers not online for '%s > %s': expected %d but only have %d", accName, mset.name(), numExpectedConsumers, actual)
@@ -2311,7 +2337,7 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 	// We can arrive here NOT being the leader, so we send the snapshot only if we are, and in this case
 	// reset the notion that we need to send the snapshot. If we are not, then the first time the server
 	// will switch to leader (in the loop below), we will send the snapshot.
-	if sendSnapshot && isLeader && mset != nil && n != nil {
+	if sendSnapshot && isLeader && mset != nil && n != nil && !isRecovering {
 		n.SendSnapshot(mset.stateSnapshot())
 		sendSnapshot = false
 	}
@@ -2331,9 +2357,14 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 				// No special processing needed for when we are caught up on restart.
 				if ce == nil {
 					isRecovering = false
-					// Check on startup if we should snapshot/compact.
-					if _, b := n.Size(); b > compactSizeMin || n.NeedSnapshot() {
-						doSnapshot()
+					// Make sure we create a new snapshot in case things have changed such that any existing
+					// snapshot may no longer be valid.
+					doSnapshot()
+					// If we became leader during this time and we need to send a snapshot to our
+					// followers, i.e. as a result of a scale-up from R1, do it now.
+					if sendSnapshot && isLeader && mset != nil && n != nil {
+						n.SendSnapshot(mset.stateSnapshot())
+						sendSnapshot = false
 					}
 					continue
 				}
@@ -2374,7 +2405,9 @@ func (js *jetStream) monitorStream(mset *stream, sa *streamAssignment, sendSnaps
 
 		case isLeader = <-lch:
 			if isLeader {
-				if mset != nil && n != nil && sendSnapshot {
+				if mset != nil && n != nil && sendSnapshot && !isRecovering {
+					// If we *are* recovering at the time then this will get done when the apply queue
+					// handles the nil guard to show the catchup ended.
 					n.SendSnapshot(mset.stateSnapshot())
 					sendSnapshot = false
 				}
@@ -2841,6 +2874,19 @@ func (js *jetStream) applyStreamEntries(mset *stream, ce *CommittedEntry, isReco
 
 				// Process the actual message here.
 				if err := mset.processJetStreamMsg(subject, reply, hdr, msg, lseq, ts); err != nil {
+					if err == errLastSeqMismatch {
+						var state StreamState
+						mset.store.FastState(&state)
+						// If we have no msgs and the other side is delivering us a sequence past where we
+						// should be reset. This is possible if the other side has a stale snapshot and no longer
+						// has those messages. So compact and retry to reset.
+						if state.Msgs == 0 {
+							mset.store.Compact(lseq + 1)
+							// Retry
+							err = mset.processJetStreamMsg(subject, reply, hdr, msg, lseq, ts)
+						}
+					}
+
 					// Only return in place if we are going to reset our stream or we are out of space, or we are closed.
 					if isClusterResetErr(err) || isOutOfSpaceErr(err) || err == errStreamClosed {
 						return err
@@ -4086,6 +4132,7 @@ func (js *jetStream) processConsumerRemoval(ca *consumerAssignment) {
 			// Make sure this removal is for what we have, otherwise ignore.
 			if ca.Group != nil && oca.Group != nil && ca.Group.Name == oca.Group.Name {
 				needDelete = true
+				oca.deleted = true
 				delete(sa.consumers, ca.Name)
 			}
 		}
@@ -4366,7 +4413,6 @@ func (js *jetStream) processClusterDeleteConsumer(ca *consumerAssignment, isMemb
 	recovering := ca.recovering
 	js.mu.RUnlock()
 
-	stopped := false
 	var resp = JSApiConsumerDeleteResponse{ApiResponse: ApiResponse{Type: JSApiConsumerDeleteResponseType}}
 	var err error
 	var acc *Account
@@ -4376,23 +4422,18 @@ func (js *jetStream) processClusterDeleteConsumer(ca *consumerAssignment, isMemb
 		if mset, _ := acc.lookupStream(ca.Stream); mset != nil {
 			if o := mset.lookupConsumer(ca.Name); o != nil {
 				err = o.stopWithFlags(true, false, true, wasLeader)
-				stopped = true
 			}
+		}
+	} else if ca.Group != nil {
+		// We have a missing account, see if we can cleanup.
+		if sacc := s.SystemAccount(); sacc != nil {
+			os.RemoveAll(filepath.Join(js.config.StoreDir, sacc.GetName(), defaultStoreDirName, ca.Group.Name))
 		}
 	}
 
 	// Always delete the node if present.
 	if node != nil {
 		node.Delete()
-	}
-
-	// This is a stop gap cleanup in case
-	// 1) the account does not exist (and mset consumer couldn't be stopped) and/or
-	// 2) node was nil (and couldn't be deleted)
-	if !stopped || node == nil {
-		if sacc := s.SystemAccount(); sacc != nil {
-			os.RemoveAll(filepath.Join(js.config.StoreDir, sacc.GetName(), defaultStoreDirName, ca.Group.Name))
-		}
 	}
 
 	if !wasLeader || ca.Reply == _EMPTY_ {
@@ -4595,8 +4636,8 @@ func (js *jetStream) monitorConsumer(o *consumer, ca *consumerAssignment) {
 			if !bytes.Equal(hash[:], lastSnap) || ne >= compactNumMin || nb >= compactSizeMin {
 				if err := n.InstallSnapshot(snap); err == nil {
 					lastSnap, lastSnapTime = hash[:], time.Now()
-				} else if err != errNoSnapAvailable && err != errNodeClosed {
-					s.Warnf("Failed to install snapshot for '%s > %s > %s' [%s]: %v", o.acc.Name, ca.Stream, ca.Name, n.Group(), err)
+				} else if err != errNoSnapAvailable && err != errNodeClosed && err != errCatchupsRunning {
+					s.RateLimitWarnf("Failed to install snapshot for '%s > %s > %s' [%s]: %v", o.acc.Name, ca.Stream, ca.Name, n.Group(), err)
 				}
 			}
 		}
@@ -4656,16 +4697,6 @@ func (js *jetStream) monitorConsumer(o *consumer, ca *consumerAssignment) {
 		case isLeader = <-lch:
 			if recovering && !isLeader {
 				js.setConsumerAssignmentRecovering(ca)
-			}
-
-			// Synchronize everyone to our state.
-			if isLeader && n != nil {
-				// Only send out if we have state.
-				if _, _, applied := n.Progress(); applied > 0 {
-					if snap, err := o.store.EncodedState(); err == nil {
-						n.SendSnapshot(snap)
-					}
-				}
 			}
 
 			// Process the change.
@@ -7789,6 +7820,7 @@ func (mset *stream) processSnapshot(snap *StreamReplicatedState) (e error) {
 	mset.store.FastState(&state)
 	mset.setCLFS(snap.Failed)
 	sreq := mset.calculateSyncRequest(&state, snap)
+
 	s, js, subject, n := mset.srv, mset.js, mset.sa.Sync, mset.node
 	qname := fmt.Sprintf("[ACC:%s] stream '%s' snapshot", mset.acc.Name, mset.cfg.Name)
 	mset.mu.Unlock()
