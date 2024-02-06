@@ -182,14 +182,6 @@ func NewDrivesDriveItemApi(drivesDriveItemService DrivesDriveItemProvider, logge
 	}, nil
 }
 
-// Routes returns the routes that should be registered for this api
-func (api DrivesDriveItemApi) Routes() []Route {
-	return []Route{
-		{http.MethodPost, "/v1beta1/drives/{driveID}/items/{itemID}/children", api.CreateDriveItem},
-		{http.MethodDelete, "/v1beta1/drives/{driveID}/items/{itemID}", api.DeleteDriveItem},
-	}
-}
-
 func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)

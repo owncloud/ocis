@@ -217,14 +217,6 @@ func NewService(opts ...Option) (Graph, error) {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 
-		for _, router := range []Router{
-			drivesDriveItemApi,
-		} {
-			for _, route := range router.Routes() {
-				r.Method(route.Method, route.Pattern, route.HandlerFunc)
-			}
-		}
-
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
@@ -236,6 +228,8 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/drives", func(r chi.Router) {
 				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Route("/{driveID}/items/{itemID}", func(r chi.Router) {
+					r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
+					r.Post("/children", drivesDriveItemApi.CreateDriveItem)
 					r.Post("/invite", svc.Invite)
 					r.Route("/permissions", func(r chi.Router) {
 						r.Get("/", svc.ListPermissions)
