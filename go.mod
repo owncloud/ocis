@@ -10,11 +10,13 @@ require (
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/bbalet/stopwords v1.0.0
+	github.com/beevik/etree v1.3.0
 	github.com/blevesearch/bleve/v2 v2.3.10
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
 	github.com/cs3org/reva/v2 v2.19.2-0.20240322140620-cbb501a7ae3a
+	github.com/dchest/uniuri v1.2.0
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -133,7 +135,6 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go v1.45.1 // indirect
-	github.com/beevik/etree v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
