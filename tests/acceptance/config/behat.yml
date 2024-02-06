@@ -316,6 +316,7 @@ default:
         - SharingNgContext:
         - PublicWebDavContext:
         - OcisConfigContext:
+        - SettingsContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
