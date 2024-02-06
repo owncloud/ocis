@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-06-11-12-20]
+[#deprecation-note-2024-02-06-11-34-56]
 [caption=]
 .Deprecation notes for the audit service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -190,7 +190,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `AUDIT_EVENTS_AUTH_USERNAME` +
@@ -200,7 +200,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `AUDIT_EVENTS_AUTH_PASSWORD` +
@@ -210,7 +210,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`AUDIT_LOG_TO_CONSOLE` +
 

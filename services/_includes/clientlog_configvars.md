@@ -20,8 +20,8 @@
 | OCIS_EVENTS_CLUSTER<br/>CLIENTLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>CLIENTLOG_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>CLIENTLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
-| OCIS_EVENTS_ENABLE_TLS<br/>CLIENTLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| OCIS_EVENTS_AUTH_USERNAME<br/>CLIENTLOG_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| OCIS_EVENTS_AUTH_PASSWORD<br/>CLIENTLOG_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| OCIS_EVENTS_ENABLE_TLS<br/>CLIENTLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>CLIENTLOG_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>CLIENTLOG_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>CLIENTLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>CLIENTLOG_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
