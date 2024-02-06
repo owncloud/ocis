@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 )
 
-// SendSEE instructs the sse service to send a notification to a user
+// SendSSE instructs the sse service to send one or multiple notifications
 type SendSSE struct {
-	UserID  string
+	UserIDs []string
 	Type    string
 	Message []byte
 }
