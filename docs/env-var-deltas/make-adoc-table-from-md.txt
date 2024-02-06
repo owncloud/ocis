@@ -18,7 +18,7 @@ check WEB_OPTION_LOGIN_URL, there is one | missing
 check WEB_OPTION_DISABLED_EXTENSIONS, in the linen before, there is one | too much 
 
 
-sed -i "s/\;/\` \+\n\`/g" 4.0.5-5.0.0.adoc		make each envvar a single line for ease of readbility
+sed -i "s/\;/\` \+\n\`/g" 4.0.5-5.0.0.adoc		make each envvar a single line for ease of readability
 sed -i "s/\`|/\`\n|/g" 4.0.5-5.0.0.adoc			put the next | after the last envvar in a line into a new line
 sed -i "s/|| \`/|\n|\`/g" 4.0.5-5.0.0.adoc		split the || before an envvar into two lines 
 sed -i "s/services\/(.*)\//xref\:\{s-path\}\/\1\.adoc/g" 4.0.5-5.0.0.adoc		make "service" a xref
