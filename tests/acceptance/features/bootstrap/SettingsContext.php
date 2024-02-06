@@ -523,6 +523,7 @@ class SettingsContext implements Context {
 
 	/**
 	 * @Given user :user has disabled auto-accepting
+	 * @Given user :user has disabled sync
 	 *
 	 * @param string $user
 	 *
