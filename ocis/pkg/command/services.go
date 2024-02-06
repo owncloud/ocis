@@ -17,6 +17,7 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/command"
 	clientlog "github.com/owncloud/ocis/v2/services/clientlog/pkg/command"
+	collaboration "github.com/owncloud/ocis/v2/services/collaboration/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
@@ -94,6 +95,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.Clientlog.Service.Name, clientlog.GetCommands(cfg.Clientlog), func(c *config.Config) {
 			cfg.Clientlog.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.Collaboration.Service.Name, collaboration.GetCommands(cfg.Collaboration), func(c *config.Config) {
+			cfg.Collaboration.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {
