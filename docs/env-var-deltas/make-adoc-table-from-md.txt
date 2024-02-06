@@ -15,7 +15,7 @@ and at the bottom
 
 check SSE_HTTP_ADDR and SSE_HTTP_ROOT, there is one | too much
 check WEB_OPTION_LOGIN_URL, there is one | missing
-check WEB_OPTION_DISABLED_EXTENSIONS, in the linen before, there is one | too much 
+check WEB_OPTION_DISABLED_EXTENSIONS, in the line before, there is one | too much 
 
 
 sed -i "s/\;/\` \+\n\`/g" 4.0.5-5.0.0.adoc		make each envvar a single line for ease of readability
