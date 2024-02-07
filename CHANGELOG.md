@@ -46,7 +46,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
 * Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
 * Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
-* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
 * Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
 * Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
 * Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
@@ -116,10 +116,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8140
 
-* Bugfix - IDP CS3 backend sessions now survire restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
 
-   We now correctly reinitialize the CS3 backend session after the IDP has been
-   restarted.
+   We now correctly reinitialize the CS3 backend session after the IDP service has
+   been restarted.
 
    https://github.com/owncloud/ocis/pull/8142
 
