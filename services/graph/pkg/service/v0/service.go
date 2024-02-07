@@ -204,7 +204,7 @@ func NewService(opts ...Option) (Graph, error) {
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
-	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector)
+	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector, identityCache, options.Config.FilesSharing.EnableResharing)
 	if err != nil {
 		return svc, err
 	}
