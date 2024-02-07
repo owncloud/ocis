@@ -1,4 +1,4 @@
-Bugfix: Fix Content-Deposition header for downloads
+Bugfix: Fix Content-Disposition header for downloads
 
 We have fixed a bug that caused downloads to fail on Chromebased browsers when the filename contained special characters.
 
