@@ -9,30 +9,131 @@ Feature: sharing
       | Brian    |
       | Carol    |
 
+  @issue-8242
+  Scenario Outline: sharer renames the shared item (old/new webdav)
+    Given user "Alice" has uploaded file with content "foo" to "sharefile.txt"
+    And using <dav-path-version> DAV path
+    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file "renamedsharefile.txt" should exist
+    And as "Brian" file "Shares/sharefile.txt" should exist
+    And as "Carol" file "Shares/sharefile.txt" should exist
+    When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Alice" the value of the item "//oc:name" of path "<dav-path>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    And as user "Alice" the value of the item "//d:displayname" of path "<dav-path>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>/Shares"
+    Then the HTTP status code should be "207"
+    And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    When user "Carol" sends HTTP method "PROPFIND" to URL "<dav-path>/Shares"
+    Then the HTTP status code should be "207"
+    And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    Examples:
+      | dav-path-version | dav-path                         |
+      | old              | /remote.php/webdav               |
+      | new              | /remote.php/dav/files/%username% |
+      | new              | /dav/files/%username%            |
 
-  Scenario: keep user/group shares when the user renames the share within the Shares folder
+  @issue-8242
+  Scenario Outline: sharer renames the shared item (spaces webdav)
+    Given user "Alice" has uploaded file with content "foo" to "sharefile.txt"
+    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file "renamedsharefile.txt" should exist
+    And as "Brian" file "Shares/sharefile.txt" should exist
+    And as "Carol" file "Shares/sharefile.txt" should exist
+    And using spaces DAV path
+    When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path-personal>"
+    Then the HTTP status code should be "207"
+    And as user "Alice" the value of the item "//oc:name" of path "<dav-path-personal>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    And as user "Alice" the value of the item "//d:displayname" of path "<dav-path-personal>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    When user "Carol" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    Examples:
+      | dav-path                                 |  dav-path-personal               |
+      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
+      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
+
+  @issue-8242
+  Scenario Outline: share receiver renames the shared item (old/new webdav)
+    Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    And using <dav-path-version> DAV path
+    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Carol" file "Shares/renamedsharefile.txt" should exist
+    And as "Brian" file "Shares/sharefile.txt" should exist
+    And as "Alice" file "sharefile.txt" should exist
+    When user "Carol" sends HTTP method "PROPFIND" to URL "<dav-path>/Shares"
+    Then the HTTP status code should be "207"
+    And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/Shares/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/Shares/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Alice" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Alice" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>/Shares"
+    Then the HTTP status code should be "207"
+    And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
+    Examples:
+      | dav-path-version | dav-path                         |
+      | old              | /remote.php/webdav               |
+      | new              | /remote.php/dav/files/%username% |
+      | new              | /dav/files/%username%            |
+
+  @issue-8242
+  Scenario Outline: share receiver renames the shared item (spaces webdav)
+    Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Carol" file "Shares/renamedsharefile.txt" should exist
+    And as "Brian" file "Shares/sharefile.txt" should exist
+    And as "Alice" file "sharefile.txt" should exist
+    And using spaces DAV path
+    When user "Carol" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
+    When user "Alice" sends HTTP method "PROPFIND" to URL "<dav-path-personal>"
+    Then the HTTP status code should be "207"
+    And as user "Alice" the value of the item "//oc:name" of path "<dav-path-personal>/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Alice" the value of the item "//d:displayname" of path "<dav-path-personal>/sharefile.txt" in the response should be "sharefile.txt"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"
+    Then the HTTP status code should be "207"
+    And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
+    Examples:
+      | dav-path                                 |  dav-path-personal               |
+      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
+      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
+
+
+  Scenario: keep group share when the one user renames the share and the user is deleted
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/TMP"
-    When user "Alice" shares folder "TMP" with group "grp1" using the sharing API
-    And user "Brian" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
+    And user "Alice" has shared folder "TMP" with group "grp1"
+    When user "Carol" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
     And the administrator deletes user "Carol" using the provisioning API
-    Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on each endpoint should be "200, 201, 204" respectively
-    And user "Brian" should see the following elements
-      | /Shares/new/|
-
-
-  Scenario: keep user shared file name same after one of recipient has renamed the file inside the Shares folder
-    Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
-    And user "Alice" has shared file "/sharefile.txt" with user "Brian"
-    And user "Alice" has shared file "/sharefile.txt" with user "Carol"
-    When user "Carol" moves file "/Shares/sharefile.txt" to "/Shares/renamedsharefile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And as "Carol" file "/Shares/renamedsharefile.txt" should exist
-    And as "Alice" file "/sharefile.txt" should exist
-    And as "Brian" file "/Shares/sharefile.txt" should exist
+    Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
+    And as "Alice" file "Shares/TMP" should not exist
 
 
   Scenario: receiver renames a received share with share, read, change permissions inside the Shares folder
