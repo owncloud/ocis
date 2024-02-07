@@ -1,4 +1,4 @@
-// # Added Variables between oCIS 4.0.5 and oCIS 5.0.0-rc
+// # Added Variables between oCIS 4.0.0 and oCIS 5.0.0
 // commenting the headline to make it better includable
 
 // table created based on the .md file per 2024.02.06
