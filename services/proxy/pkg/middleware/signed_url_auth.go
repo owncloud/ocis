@@ -27,6 +27,7 @@ const (
 	_paramOCDate       = "OC-Date"
 	_paramOCExpires    = "OC-Expires"
 	_paramOCVerb       = "OC-Verb"
+	_paramOCAlgo       = "OC-Algo"
 )
 
 var (
@@ -46,6 +47,7 @@ type SignedURLAuthenticator struct {
 	UserProvider       backend.UserBackend
 	UserRoleAssigner   userroles.UserRoleAssigner
 	Store              storesvc.StoreService
+	Now                func() time.Time
 }
 
 func (m SignedURLAuthenticator) shouldServe(req *http.Request) bool {
@@ -58,30 +60,30 @@ func (m SignedURLAuthenticator) shouldServe(req *http.Request) bool {
 func (m SignedURLAuthenticator) validate(req *http.Request) (err error) {
 	query := req.URL.Query()
 
-	if ok, err := m.allRequiredParametersArePresent(query); !ok {
+	if err := m.allRequiredParametersArePresent(query); err != nil {
 		return err
 	}
 
-	if ok, err := m.requestMethodMatches(req.Method, query); !ok {
+	if err := m.requestMethodMatches(req.Method, query); err != nil {
 		return err
 	}
 
-	if ok, err := m.requestMethodIsAllowed(req.Method); !ok {
+	if err := m.requestMethodIsAllowed(req.Method); err != nil {
 		return err
 	}
 
-	if expired, err := m.urlIsExpired(query, time.Now); expired {
+	if err = m.urlIsExpired(query); err != nil {
 		return err
 	}
 
-	if ok, err := m.signatureIsValid(req); !ok {
+	if err := m.signatureIsValid(req); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m SignedURLAuthenticator) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) allRequiredParametersArePresent(query url.Values) (err error) {
 	// check if required query parameters exist in given request query parameters
 	// OC-Signature - the computed signature - server will verify the request upon this REQUIRED
 	// OC-Credential - defines the user scope (shall we use the owncloud user id here - this might leak internal data ....) REQUIRED
@@ -90,23 +92,23 @@ func (m SignedURLAuthenticator) allRequiredParametersArePresent(query url.Values
 	// TODO OC-Verb - defines for which http verb the request is valid - defaults to GET OPTIONAL
 	for _, p := range _requiredParams {
 		if query.Get(p) == "" {
-			return false, fmt.Errorf("required %s parameter not found", p)
+			return fmt.Errorf("required %s parameter not found", p)
 		}
 	}
 
-	return true, nil
+	return nil
 }
 
-func (m SignedURLAuthenticator) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodMatches(meth string, query url.Values) (err error) {
 	// check if given url query parameter OC-Verb matches given request method
 	if !strings.EqualFold(meth, query.Get(_paramOCVerb)) {
-		return false, errors.New("required OC-Verb parameter did not match request method")
+		return errors.New("required OC-Verb parameter did not match request method")
 	}
 
-	return true, nil
+	return nil
 }
 
-func (m SignedURLAuthenticator) requestMethodIsAllowed(meth string) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodIsAllowed(meth string) (err error) {
 	//  check if given request method is allowed
 	methodIsAllowed := false
 	for _, am := range m.PreSignedURLConfig.AllowedHTTPMethods {
@@ -117,50 +119,81 @@ func (m SignedURLAuthenticator) requestMethodIsAllowed(meth string) (ok bool, er
 	}
 
 	if !methodIsAllowed {
-		return false, errors.New("request method is not listed in PreSignedURLConfig AllowedHTTPMethods")
+		return errors.New("request method is not listed in PreSignedURLConfig AllowedHTTPMethods")
 	}
 
-	return true, nil
+	return nil
 }
 
-func (m SignedURLAuthenticator) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
+func (m SignedURLAuthenticator) urlIsExpired(query url.Values) (err error) {
 	// check if url is expired by checking if given date (OC-Date) + expires in seconds (OC-Expires) is after now
 	validFrom, err := time.Parse(time.RFC3339, query.Get(_paramOCDate))
 	if err != nil {
-		return true, err
+		return err
 	}
 
 	requestExpiry, err := time.ParseDuration(query.Get(_paramOCExpires) + "s")
 	if err != nil {
-		return true, err
+		return err
 	}
 
 	validTo := validFrom.Add(requestExpiry)
+	if !(m.Now().Before(validTo)) {
+		return errors.New("URL is expired")
+	}
 
-	return !(now().After(validFrom) && now().Before(validTo)), nil
+	return nil
 }
 
-func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (ok bool, err error) {
-	u := revactx.ContextMustGetUser(req.Context())
-	signingKey, err := m.getSigningKey(req.Context(), u.Id.OpaqueId)
+func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) {
+	c := revactx.ContextMustGetUser(req.Context())
+	signingKey, err := m.getSigningKey(req.Context(), c.Id.OpaqueId)
 	if err != nil {
 		m.Logger.Error().Err(err).Msg("could not retrieve signing key")
-		return false, err
+		return err
 	}
 	if len(signingKey) == 0 {
 		m.Logger.Error().Err(err).Msg("signing key empty")
-		return false, err
+		return err
 	}
-	q := req.URL.Query()
-	signature := q.Get(_paramOCSignature)
-	q.Del(_paramOCSignature)
-	req.URL.RawQuery = q.Encode()
-	url := req.URL.String()
-	if !req.URL.IsAbs() {
-		url = "https://" + req.Host + url // TODO where do we get the scheme from
+	u := m.buildUrlToSign(req)
+	computedSignature := m.createSignature(u, signingKey)
+	signatureInURL := req.URL.Query().Get(_paramOCSignature)
+	if computedSignature == signatureInURL {
+		return nil
 	}
+	return fmt.Errorf("signature mismatch: expected %s != actual %s", computedSignature, signatureInURL)
+}
 
-	return m.createSignature(url, signingKey) == signature, nil
+func (m SignedURLAuthenticator) buildUrlToSign(req *http.Request) string {
+	q := req.URL.Query()
+
+	// only params required for signing
+	signParameters := make(url.Values)
+	signParameters.Add(_paramOCCredential, q.Get(_paramOCCredential))
+	signParameters.Add(_paramOCDate, q.Get(_paramOCDate))
+	signParameters.Add(_paramOCExpires, q.Get(_paramOCExpires))
+	signParameters.Add(_paramOCVerb, q.Get(_paramOCVerb))
+
+	// remaining query params
+	q.Del(_paramOCAlgo)
+	q.Del(_paramOCCredential)
+	q.Del(_paramOCDate)
+	q.Del(_paramOCExpires)
+	q.Del(_paramOCSignature)
+	q.Del(_paramOCVerb)
+
+	url := *req.URL
+	if len(q) == 0 {
+		url.RawQuery = signParameters.Encode()
+	} else {
+		url.RawQuery = strings.Join([]string{q.Encode(), signParameters.Encode()}, "&")
+	}
+	u := url.String()
+	if !url.IsAbs() {
+		u = "https://" + req.Host + u // TODO where do we get the scheme
+	}
+	return u
 }
 
 func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) string {
@@ -223,10 +256,12 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 			Err(err).
 			Str("authenticator", "signed_url").
 			Str("path", r.URL.Path).
+			Str("url", r.URL.String()).
 			Msg("Could not get user by claim")
 		return nil, false
 	}
 
+	// TODO: set user in context
 	m.Logger.Debug().
 		Str("authenticator", "signed_url").
 		Str("path", r.URL.Path).
