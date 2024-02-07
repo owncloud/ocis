@@ -374,6 +374,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		UserProvider:       userProvider,
 		UserRoleAssigner:   roleAssigner,
 		Store:              storeClient,
+		Now:                time.Now,
 	})
 
 	return alice.New(
