@@ -269,7 +269,7 @@ Feature: download file
     Then the HTTP status code should be "200"
     And the following headers should be set
       | header                            | value                                                            |
-      | Content-Disposition               | attachment; filename*=UTF-8''welcome.txt; filename="welcome.txt" |
+      | Content-Disposition               | attachment; filename*=UTF-8''"welcome.txt"; filename="welcome.txt" |
       | Content-Security-Policy           | default-src 'none';                                              |
       | X-Content-Type-Options            | nosniff                                                          |
       | X-Download-Options                | noopen                                                           |
