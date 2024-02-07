@@ -280,17 +280,23 @@ Feature: download file
       | X-XSS-Protection                  | 1; mode=block                                            |
     And the downloaded content should be "test file"
     Examples:
-      | dav-path-version | file         |
-      | old              | textfile.txt |
-      | old              | comma,.txt   |
-      | new              | textfile.txt |
-      | new              | comma,.txt   |
+      | dav-path-version | file               |
+      | old              | textfile.txt       |
+      | old              | comma,.txt         |
+      | old              | 'quote'single'.txt |
+      | old              | "quote"double".txt |
+      | new              | textfile.txt       |
+      | new              | comma,.txt         |
+      | new              | 'quote'single'.txt |
+      | new              | "quote"double".txt |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file         |
-      | spaces           | textfile.txt |
-      | spaces           | comma,.txt   |
+      | dav-path-version | file               |
+      | spaces           | textfile.txt       |
+      | spaces           | comma,.txt         |
+      | spaces           | 'quote'single'.txt |
+      | spaces           | "quote"double".txt |
 
 
   Scenario: download a zero byte size file
