@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 
@@ -61,6 +62,12 @@ The following sections list the changes for unreleased.
    expected before.
 
    https://github.com/owncloud/ocis/pull/8317
+
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+   Signed urls now expire properly
+
+   https://github.com/owncloud/ocis/pull/8385
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
