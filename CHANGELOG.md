@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
+* Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 
 ## Details
 
@@ -321,6 +322,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8291
    https://github.com/owncloud/ocis/pull/8340
+
+* Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
+
+   Sending multiple user ids in one sse event is now possible which reduces the
+   number of sent events.
+
+   https://github.com/owncloud/ocis/pull/8379
+   https://github.com/cs3org/reva/pull/4501
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
