@@ -61,6 +61,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
 * Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+* Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -233,6 +234,15 @@ The following sections list the changes for unreleased.
    expected before.
 
    https://github.com/owncloud/ocis/pull/8317
+
+* Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
+
+   We have fixed a bug that caused downloads to fail on Chromebased browsers when
+   the filename contained special characters.
+
+   https://github.com/owncloud/ocis/issues/8361
+   https://github.com/owncloud/ocis/pull/8381
+   https://github.com/cs3org/reva/pull/4498
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
