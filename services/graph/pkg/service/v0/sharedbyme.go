@@ -145,10 +145,9 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 	perm.SetRoles([]string{})
 	perm.SetId(share.Id.OpaqueId)
 	grantedTo := libregraph.SharePointIdentitySet{}
-	var li libregraph.Identity
 	switch share.GetGrantee().GetType() {
 	case storageprovider.GranteeType_GRANTEE_TYPE_USER:
-		user, err := g.identityCache.GetUser(ctx, share.Grantee.GetUserId().GetOpaqueId())
+		user, err := cs3UserIdToIdentity(ctx, g.identityCache, share.Grantee.GetUserId())
 		switch {
 		case errors.Is(err, identity.ErrNotFound):
 			g.logger.Warn().Str("userid", share.Grantee.GetUserId().GetOpaqueId()).Msg("User not found by id")
@@ -157,12 +156,10 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 		case err != nil:
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
-			li.SetDisplayName(user.GetDisplayName())
-			li.SetId(user.GetId())
-			grantedTo.SetUser(li)
+			grantedTo.SetUser(user)
 		}
 	case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
-		group, err := g.identityCache.GetGroup(ctx, share.Grantee.GetGroupId().GetOpaqueId())
+		group, err := groupIdToIdentity(ctx, g.identityCache, share.Grantee.GetGroupId().GetOpaqueId())
 		switch {
 		case errors.Is(err, identity.ErrNotFound):
 			g.logger.Warn().Str("groupid", share.Grantee.GetGroupId().GetOpaqueId()).Msg("Group not found by id")
@@ -171,9 +168,7 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 		case err != nil:
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
-			li.SetDisplayName(group.GetDisplayName())
-			li.SetId(group.GetId())
-			grantedTo.SetGroup(li)
+			grantedTo.SetGroup(group)
 		}
 	}
 
