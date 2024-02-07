@@ -1,7 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-rc.3](#changelog-for-500-rc3-2024-01-26)
+* [Changelog for 5.0.0-rc.4](#changelog-for-500-rc4-2024-02-07)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
 * [Changelog for 4.0.2](#changelog-for-402-2023-09-28)
@@ -10,8 +9,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -32,66 +31,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [5.0.0-rc.4] (2024-02-07)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 5.0.0-rc.4.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.3...master
-
-## Summary
-
-* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
-* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
-* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
-* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
-* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
-
-## Details
-
-* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
-
-   We have removed two spaces related environment variables (whether project spaces
-   and the share jail are enabled) and hardcoded the only allowed options. Misusing
-   those variables would have resulted in invalid config.
-
-   https://github.com/owncloud/ocis/pull/8303
-
-* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
-
-   We fixed setting the config for concurrent web requests, which did not work as
-   expected before.
-
-   https://github.com/owncloud/ocis/pull/8317
-
-* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
-
-   Signed urls now expire properly
-
-   https://github.com/owncloud/ocis/pull/8385
-
-* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
-
-   Introduce a new environment variable `IDP_LOGIN_BACKGROUND_URL` that overrides
-   the default background image of the IDP login page when present.
-
-   https://github.com/owncloud/ocis/issues/7674
-   https://github.com/owncloud/ocis/pull/7900
-
-* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
-
-   We have changed the default MaxConcurrency value from 100 to 5 to prevent too
-   frequent gc runs on low memory systems. We have also bumped reva to pull in the
-   related changes from there.
-
-   https://github.com/owncloud/ocis/issues/8257
-   https://github.com/owncloud/ocis/pull/8309
-   https://github.com/cs3org/reva/pull/4485
-
-# Changelog for [5.0.0-rc.3] (2024-01-26)
-
-The following sections list the changes for 5.0.0-rc.3.
-
-[5.0.0-rc.3]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.3
+[5.0.0-rc.4]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.4
 
 ## Summary
 
@@ -148,6 +92,9 @@ The following sections list the changes for 5.0.0-rc.3.
 * Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
 * Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
 * Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
@@ -184,6 +131,7 @@ The following sections list the changes for 5.0.0-rc.3.
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 * Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
@@ -213,6 +161,7 @@ The following sections list the changes for 5.0.0-rc.3.
 * Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
 * Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Update web to v8.0.0-rc.3: [#8342](https://github.com/owncloud/ocis/pull/8342)
 
 ## Details
@@ -626,6 +575,27 @@ The following sections list the changes for 5.0.0-rc.3.
    now
 
    https://github.com/owncloud/ocis/pull/8281
+
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
+
+   We have removed two spaces related environment variables (whether project spaces
+   and the share jail are enabled) and hardcoded the only allowed options. Misusing
+   those variables would have resulted in invalid config.
+
+   https://github.com/owncloud/ocis/pull/8303
+
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+
+   We fixed setting the config for concurrent web requests, which did not work as
+   expected before.
+
+   https://github.com/owncloud/ocis/pull/8317
+
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+   Signed urls now expire properly
+
+   https://github.com/owncloud/ocis/pull/8385
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -1070,6 +1040,14 @@ The following sections list the changes for 5.0.0-rc.3.
    https://github.com/owncloud/web/issues/9768
    https://github.com/owncloud/ocis/pull/7670
 
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
+
+   Introduce a new environment variable `IDP_LOGIN_BACKGROUND_URL` that overrides
+   the default background image of the IDP login page when present.
+
+   https://github.com/owncloud/ocis/issues/7674
+   https://github.com/owncloud/ocis/pull/7900
+
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 
    Adds new permissions to admin/spaceadmin/user roles - Favorites.List allows /
@@ -1444,6 +1422,16 @@ The following sections list the changes for 5.0.0-rc.3.
    Allows to restart all commands in a specific state.
 
    https://github.com/owncloud/ocis/pull/8287
+
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
+
+   We have changed the default MaxConcurrency value from 100 to 5 to prevent too
+   frequent gc runs on low memory systems. We have also bumped reva to pull in the
+   related changes from there.
+
+   https://github.com/owncloud/ocis/issues/8257
+   https://github.com/owncloud/ocis/pull/8309
+   https://github.com/cs3org/reva/pull/4485
 
 * Enhancement - Update web to v8.0.0-rc.3: [#8342](https://github.com/owncloud/ocis/pull/8342)
 
@@ -7023,7 +7011,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -7197,29 +7185,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -7392,6 +7362,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
