@@ -1824,6 +1824,7 @@ def docs():
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
+                    "apk update && apk add asciidoctor"
                     "make -C docs test",
                 ],
             },
