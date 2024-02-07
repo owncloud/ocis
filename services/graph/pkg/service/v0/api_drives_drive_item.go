@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"path/filepath"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -14,10 +15,10 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 )
 
 const (
@@ -33,15 +34,19 @@ type DrivesDriveItemProvider interface {
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
 type DrivesDriveItemService struct {
-	logger          log.Logger
-	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	logger           log.Logger
+	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	identityCache    identity.IdentityCache
+	resharingEnabled bool
 }
 
 // NewDrivesDriveItemService creates a new DrivesDriveItemService
-func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (DrivesDriveItemService, error) {
+func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, resharing bool) (DrivesDriveItemService, error) {
 	return DrivesDriveItemService{
-		logger:          log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
-		gatewaySelector: gatewaySelector,
+		logger:           log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
+		gatewaySelector:  gatewaySelector,
+		identityCache:    identityCache,
+		resharingEnabled: resharing,
 	}, nil
 }
 
@@ -96,11 +101,17 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 
 // MountShare mounts a share
 func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) (libregraph.DriveItem, error) {
+	if filepath.IsAbs(name) {
+		return libregraph.DriveItem{}, errorcode.New(errorcode.InvalidRequest, "name cannot be an absolute path")
+	}
+	name = filepath.Clean(name)
+
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.DriveItem{}, err
 	}
 
+	// Get all shares that the user has received for this resource. There might be multiple
 	receivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 		Filters: []*collaboration.Filter{
 			{
@@ -129,6 +140,10 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 
 	var errs []error
 
+	var acceptedShares []*collaboration.ReceivedShare
+
+	// try to accept all of the received shares for this resource. So that the stat is in sync across all
+	// shares
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
 		updateMask := &fieldmaskpb.FieldMask{Paths: []string{_fieldMaskPathState}}
 		receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
@@ -140,9 +155,8 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 				mountPoint = &storageprovider.Reference{}
 			}
 
-			newPath := utils.MakeRelativePath(name)
-			if mountPoint.GetPath() != newPath {
-				mountPoint.Path = newPath
+			if filepath.Clean(mountPoint.GetPath()) != name {
+				mountPoint.Path = name
 				receivedShare.MountPoint = mountPoint
 				updateMask.Paths = append(updateMask.Paths, _fieldMaskPathMountPoint)
 			}
@@ -154,17 +168,35 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 		}
 
 		updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
-		if err != nil {
-			errs = append(errs, err)
-			continue
+		switch errCode := errorcode.FromCS3Status(updateReceivedShareResponse.GetStatus(), err); {
+		case errCode == nil:
+			acceptedShares = append(acceptedShares, updateReceivedShareResponse.GetShare())
+		default:
+			// Just log at debug level here. If a single accept for any of the received shares failed this
+			// is not a critical problem. We mainly need to handle the case where all accepts fail. (Outside
+			// the loop)
+			s.logger.Debug().Err(errCode).
+				Str("shareid", receivedShare.GetShare().GetId().String()).
+				Str("resourceid", receivedShare.GetShare().GetResourceId().String()).
+				Msg("failed to accept share")
+			errs = append(errs, errCode)
 		}
-
-		// fixMe: send to nirvana, wait for toDriverItem func
-		_ = updateReceivedShareResponse
 	}
 
-	// fixMe: return a concrete driveItem
-	return libregraph.DriveItem{}, errors.Join(errs...)
+	if len(receivedSharesResponse.GetShares()) == len(errs) {
+		// none of the received shares could be accepted. This is an error. Return it.
+		return libregraph.DriveItem{}, errors.Join(errs...)
+	}
+
+	// As the accepted shares are all for the same resource they should collapse to a single driveitem
+	items, err := cs3ReceivedSharesToDriveItems(ctx, &s.logger, gatewayClient, s.identityCache, s.resharingEnabled, acceptedShares)
+	switch {
+	case err != nil:
+		return libregraph.DriveItem{}, nil
+	case len(items) != 1:
+		return libregraph.DriveItem{}, errorcode.New(errorcode.GeneralException, "failed to convert accepted shares into driveitem")
+	}
+	return items[0], nil
 }
 
 // DrivesDriveItemApi is the api that registers the http endpoints which expose needed operation to the graph api.

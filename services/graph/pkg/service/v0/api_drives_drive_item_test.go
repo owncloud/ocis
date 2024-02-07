@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -20,10 +21,12 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
@@ -41,7 +44,9 @@ var _ = Describe("DrivesDriveItemService", func() {
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 
-		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector)
+		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
+
+		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector, cache, false)
 		Expect(err).ToNot(HaveOccurred())
 		drivesDriveItemService = service
 	})
@@ -111,7 +116,12 @@ var _ = Describe("DrivesDriveItemService", func() {
 		Describe("gateway client share update", func() {
 			It("updates the share state to be accepted", func() {
 				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "1$2!3",
+					OpaqueId: "1:2:3",
+				}
+				expectedResourceID := storageprovider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
 				}
 
 				gatewayClient.
@@ -135,14 +145,42 @@ var _ = Describe("DrivesDriveItemService", func() {
 						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
 						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
 						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+							Share: &collaborationv1beta1.ReceivedShare{
+								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+								Share: &collaborationv1beta1.Share{
+									Id:         &expectedShareID,
+									ResourceId: &expectedResourceID,
+								},
+							},
+						}, nil
 					})
-
+				gatewayClient.
+					On("Stat", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *storageprovider.StatRequest, opts ...grpc.CallOption) (*storageprovider.StatResponse, error) {
+						return &storageprovider.StatResponse{
+							Status: status.NewOK(ctx),
+							Info: &storageprovider.ResourceInfo{
+								Id:   &expectedResourceID,
+								Name: "name",
+							},
+						}, nil
+					})
 				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("updates the mountPoint", func() {
+				expectedShareID := collaborationv1beta1.ShareId{
+					OpaqueId: "1:2:3",
+				}
+				expectedResourceID := storageprovider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				}
+
 				gatewayClient.
 					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
 					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
@@ -158,15 +196,45 @@ var _ = Describe("DrivesDriveItemService", func() {
 					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
 						Expect(in.GetUpdateMask().GetPaths()).To(HaveLen(2))
 						Expect(in.GetUpdateMask().GetPaths()).To(ContainElements("mount_point"))
-						Expect(in.GetShare().GetMountPoint().GetPath()).To(Equal("./new name"))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+						Expect(in.GetShare().GetMountPoint().GetPath()).To(Equal("new name"))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+							Share: &collaborationv1beta1.ReceivedShare{
+								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+								Share: &collaborationv1beta1.Share{
+									Id:         &expectedShareID,
+									ResourceId: &expectedResourceID,
+								},
+								MountPoint: &storageprovider.Reference{
+									Path: "new name",
+								},
+							},
+						}, nil
+					})
+				gatewayClient.
+					On("Stat", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *storageprovider.StatRequest, opts ...grpc.CallOption) (*storageprovider.StatResponse, error) {
+						return &storageprovider.StatResponse{
+							Status: status.NewOK(ctx),
+							Info: &storageprovider.ResourceInfo{
+								Id:   &expectedResourceID,
+								Name: "name",
+							},
+						}, nil
 					})
 
-				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
+				di, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(di.GetName()).To(Equal("new name"))
 			})
 
-			It("bubbles errors and continues", func() {
+			It("succeeds when any of the shares was accepted", func() {
+				expectedResourceID := storageprovider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				}
+
 				gatewayClient.
 					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
 					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
@@ -190,11 +258,61 @@ var _ = Describe("DrivesDriveItemService", func() {
 							return nil, fmt.Errorf("error %d", calls)
 						}
 
-						return &collaborationv1beta1.UpdateReceivedShareResponse{}, nil
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+							Share: &collaborationv1beta1.ReceivedShare{
+								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+								Share: &collaborationv1beta1.Share{
+									Id: &collaborationv1beta1.ShareId{
+										OpaqueId: strconv.Itoa(calls),
+									},
+									ResourceId: &expectedResourceID,
+								},
+							},
+						}, nil
+					})
+				gatewayClient.
+					On("Stat", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *storageprovider.StatRequest, opts ...grpc.CallOption) (*storageprovider.StatResponse, error) {
+						return &storageprovider.StatResponse{
+							Status: status.NewOK(ctx),
+							Info: &storageprovider.ResourceInfo{
+								Id:   &expectedResourceID,
+								Name: "name",
+							},
+						}, nil
+					})
+
+				di, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
+				Expect(err).To(BeNil())
+				Expect(di.GetId()).ToNot(BeEmpty())
+			})
+			It("errors when none of the shares can be accepted", func() {
+				gatewayClient.
+					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{},
+								{},
+								{},
+							},
+						}, nil
+					})
+
+				var calls int
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						calls++
+						Expect(calls).To(BeNumerically("<=", 3))
+						return nil, fmt.Errorf("error %d", calls)
 					})
 
 				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
-				Expect(fmt.Sprint(err)).To(Equal("error 1\nerror 2"))
+				Expect(fmt.Sprint(err)).To(ContainSubstring("error 1"))
+				Expect(fmt.Sprint(err)).To(ContainSubstring("error 2"))
+				Expect(fmt.Sprint(err)).To(ContainSubstring("error 3"))
 			})
 		})
 	})
