@@ -394,14 +394,9 @@ class SharingNgContext implements Context {
 	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		if (\array_key_exists('password', $bodyRows)) {
 			$body = [
@@ -502,7 +497,7 @@ class SharingNgContext implements Context {
 		string $space
 	):void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'link', '', $resource, $space)
+			$this->removeSharePermission($sharer, 'link', $resource, $space)
 		);
 	}
 
