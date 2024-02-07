@@ -8,13 +8,15 @@ import (
 	"reflect"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // ClientlogService is the service responsible for user activities
@@ -116,22 +118,20 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 
 	// II) instruct sse service to send the information
-	for _, id := range users {
-		if err := cl.sendSSE(id, evType, data); err != nil {
-			cl.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
-			return
-		}
+	if err := cl.sendSSE(users, evType, data); err != nil {
+		cl.log.Error().Err(err).Interface("userIDs", users).Str("eventid", event.ID).Msg("failed to store event for user")
+		return
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userid string, evType string, data interface{}) error {
+func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
 	return events.Publish(context.Background(), cl.publisher, events.SendSSE{
-		UserID:  userid,
+		UserIDs: userIDs,
 		Type:    evType,
 		Message: b,
 	})
