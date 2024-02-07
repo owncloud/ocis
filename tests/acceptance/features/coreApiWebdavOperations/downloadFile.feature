@@ -284,11 +284,9 @@ Feature: download file
       | old              | textfile.txt       |
       | old              | comma,.txt         |
       | old              | 'quote'single'.txt |
-      | old              | "quote"double".txt |
       | new              | textfile.txt       |
       | new              | comma,.txt         |
       | new              | 'quote'single'.txt |
-      | new              | "quote"double".txt |
 
     @skipOnRevaMaster
     Examples:
@@ -296,7 +294,33 @@ Feature: download file
       | spaces           | textfile.txt       |
       | spaces           | comma,.txt         |
       | spaces           | 'quote'single'.txt |
-      | spaces           | "quote"double".txt |
+
+  @smokeTest @issue-8361
+  Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to '/"quote"double".txt'
+    When user "Alice" downloads file '/"quote"double".txt' using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the following headers should be set
+      | header                            | value                                                                            |
+      | Content-Disposition               | attachment; filename*=UTF-8''""quote"double".txt"; filename=""quote"double".txt" |
+      | Content-Security-Policy           | default-src 'none';                                                              |
+      | X-Content-Type-Options            | nosniff                                                                          |
+      | X-Download-Options                | noopen                                                                           |
+      | X-Frame-Options                   | SAMEORIGIN                                                                       |
+      | X-Permitted-Cross-Domain-Policies | none                                                                             |
+      | X-Robots-Tag                      | none                                                                             |
+      | X-XSS-Protection                  | 1; mode=block                                                                    |
+    And the downloaded content should be "test file"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version |
+      | spaces           |
 
 
   Scenario: download a zero byte size file
