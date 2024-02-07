@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix RED metrics on the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 
 ## Details
 
@@ -26,6 +27,12 @@ The following sections list the changes for unreleased.
    prometheus compatible format and maybe secured by `PROXY_DEBUG_TOKEN`.
 
    https://github.com/owncloud/ocis/pull/7994
+
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+   Signed urls now expire properly
+
+   https://github.com/owncloud/ocis/pull/8385
 # Changelog for [4.0.5] (2023-12-21)
 
 The following sections list the changes for 4.0.5.
