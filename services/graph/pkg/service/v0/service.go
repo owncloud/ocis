@@ -227,19 +227,21 @@ func NewService(opts ...Option) (Graph, error) {
 			})
 			r.Route("/drives", func(r chi.Router) {
 				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
-				r.Route("/{driveID}/items/{itemID}", func(r chi.Router) {
-					r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
-					r.Post("/children", drivesDriveItemApi.CreateDriveItem)
-					r.Post("/invite", svc.Invite)
-					r.Route("/permissions", func(r chi.Router) {
-						r.Get("/", svc.ListPermissions)
-						r.Route("/{permissionID}", func(r chi.Router) {
-							r.Delete("/", svc.DeletePermission)
-							r.Patch("/", svc.UpdatePermission)
-							r.Post("/setPassword", svc.SetLinkPassword)
+				r.Route("/{driveID}", func(r chi.Router) {
+					r.Post("/root/children", drivesDriveItemApi.CreateDriveItem)
+					r.Route("/items/{itemID}", func(r chi.Router) {
+						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
+						r.Post("/invite", svc.Invite)
+						r.Route("/permissions", func(r chi.Router) {
+							r.Get("/", svc.ListPermissions)
+							r.Route("/{permissionID}", func(r chi.Router) {
+								r.Delete("/", svc.DeletePermission)
+								r.Patch("/", svc.UpdatePermission)
+								r.Post("/setPassword", svc.SetLinkPassword)
+							})
 						})
+						r.Post("/createLink", svc.CreateLink)
 					})
-					r.Post("/createLink", svc.CreateLink)
 				})
 			})
 			r.Route("/roleManagement/permissions/roleDefinitions", func(r chi.Router) {
