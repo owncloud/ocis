@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
+* Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
 
 ## Details
 
@@ -346,6 +347,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8379
    https://github.com/cs3org/reva/pull/4501
+
+* Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
+
+   The ocis version cmd listed all services by default. This is not always
+   intended, so we allow to skip the listing of the services by using the
+   --skip-services flag.
+
+   https://github.com/owncloud/ocis/issues/8070
+   https://github.com/owncloud/ocis/pull/8408
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
