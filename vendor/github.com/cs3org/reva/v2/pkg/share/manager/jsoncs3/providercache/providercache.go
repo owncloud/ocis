@@ -202,6 +202,11 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 			log.Debug().Msg("precondition failed when persisting added provider share: etag changed. retrying...")
 			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
 			// continue with sync below
+		case errtypes.AlreadyExists:
+			log.Debug().Msg("already exists when persisting added provider share. retrying...")
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added provider share failed")
@@ -393,10 +398,8 @@ func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 	// > If the field value is "*", the condition is false if the origin server has a current representation for the target resource.
 	if space.Etag == "" {
 		ur.IfNoneMatch = []string{"*"}
-		log.Debug().Msg("setting IfNoneMatch to *")
-	} else {
-		log.Debug().Msg("setting IfMatchEtag")
 	}
+
 	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
@@ -405,6 +408,7 @@ func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 		return err
 	}
 	space.Etag = res.Etag
+
 	span.SetStatus(codes.Ok, "")
 	shares := []string{}
 	for _, s := range space.Shares {

@@ -693,7 +693,7 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 
 	if share == nil {
 		sublog.Debug().Msg("no share found with this id")
-		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "share not found", nil)
+		response.WriteOCSError(w, r, response.MetaPathNotFound.StatusCode, "share not found", nil) // MetaNotFount with code 998 would be cleaner, but this is a legacy api
 		return
 	}
 

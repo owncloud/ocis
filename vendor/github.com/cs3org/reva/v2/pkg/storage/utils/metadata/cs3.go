@@ -165,7 +165,9 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	}
 	if len(req.IfNoneMatch) > 0 {
 		if req.IfNoneMatch[0] == "*" {
-			ifuReq.Options = &provider.InitiateFileUploadRequest_IfNotExist{}
+			ifuReq.Options = &provider.InitiateFileUploadRequest_IfNotExist{
+				IfNotExist: true,
+			}
 		}
 		// else {
 		//   the http upload will carry all if-not-match etags

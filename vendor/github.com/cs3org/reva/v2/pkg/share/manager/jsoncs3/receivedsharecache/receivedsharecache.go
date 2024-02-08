@@ -146,6 +146,11 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 			log.Debug().Msg("precondition failed when persisting added received share: etag changed. retrying...")
 			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
 			// continue with sync below
+		case errtypes.AlreadyExists:
+			log.Debug().Msg("already exists when persisting added received share. retrying...")
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added received share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added received share failed")
@@ -294,12 +299,14 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		ur.IfNoneMatch = []string{"*"}
 	}
 
-	_, err = c.storage.Upload(ctx, ur)
+	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	rss.etag = res.Etag
+
 	span.SetStatus(codes.Ok, "")
 	return nil
 }

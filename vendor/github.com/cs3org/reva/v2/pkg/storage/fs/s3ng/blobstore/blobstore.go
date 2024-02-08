@@ -37,11 +37,22 @@ import (
 type Blobstore struct {
 	client *minio.Client
 
+	defaultPutOptions Options
+
 	bucket string
 }
 
+type Options struct {
+	DisableContentSha256  bool
+	DisableMultipart      bool
+	SendContentMd5        bool
+	ConcurrentStreamParts bool
+	NumThreads            uint
+	PartSize              uint64
+}
+
 // New returns a new Blobstore
-func New(endpoint, region, bucket, accessKey, secretKey string) (*Blobstore, error) {
+func New(endpoint, region, bucket, accessKey, secretKey string, defaultPutOptions Options) (*Blobstore, error) {
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse s3 endpoint")
@@ -58,8 +69,9 @@ func New(endpoint, region, bucket, accessKey, secretKey string) (*Blobstore, err
 	}
 
 	return &Blobstore{
-		client: client,
-		bucket: bucket,
+		client:            client,
+		bucket:            bucket,
+		defaultPutOptions: defaultPutOptions,
 	}, nil
 }
 
@@ -71,7 +83,15 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	}
 	defer reader.Close()
 
-	_, err = bs.client.PutObject(context.Background(), bs.bucket, bs.path(node), reader, node.Blobsize, minio.PutObjectOptions{ContentType: "application/octet-stream", SendContentMd5: true})
+	_, err = bs.client.PutObject(context.Background(), bs.bucket, bs.path(node), reader, node.Blobsize, minio.PutObjectOptions{
+		ContentType:           "application/octet-stream",
+		SendContentMd5:        bs.defaultPutOptions.SendContentMd5,
+		ConcurrentStreamParts: bs.defaultPutOptions.ConcurrentStreamParts,
+		NumThreads:            bs.defaultPutOptions.NumThreads,
+		PartSize:              bs.defaultPutOptions.PartSize,
+		DisableMultipart:      bs.defaultPutOptions.DisableMultipart,
+		DisableContentSha256:  bs.defaultPutOptions.DisableContentSha256,
+	})
 
 	if err != nil {
 		return errors.Wrapf(err, "could not store object '%s' into bucket '%s'", bs.path(node), bs.bucket)
