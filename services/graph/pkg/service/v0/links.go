@@ -202,7 +202,7 @@ func (g Graph) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicSh
 }
 
 func parseAndFillUpTime(t *time.Time) *types.Timestamp {
-	if t == nil {
+	if t == nil || t.IsZero() {
 		return nil
 	}
 
