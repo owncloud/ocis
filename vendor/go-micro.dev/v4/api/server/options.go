@@ -4,26 +4,25 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"go-micro.dev/v4/api/server/cors"
-	"go-micro.dev/v4/logger"
-
 	"go-micro.dev/v4/api/resolver"
 	"go-micro.dev/v4/api/server/acme"
+	"go-micro.dev/v4/api/server/cors"
+	"go-micro.dev/v4/logger"
 )
 
 type Option func(o *Options)
 
 type Options struct {
+	ACMEProvider acme.Provider
+	Resolver     resolver.Resolver
+	Logger       logger.Logger
+	CORSConfig   *cors.Config
+	TLSConfig    *tls.Config
+	ACMEHosts    []string
+	Wrappers     []Wrapper
 	EnableACME   bool
 	EnableCORS   bool
-	CORSConfig   *cors.Config
-	ACMEProvider acme.Provider
 	EnableTLS    bool
-	ACMEHosts    []string
-	TLSConfig    *tls.Config
-	Resolver     resolver.Resolver
-	Wrappers     []Wrapper
-	Logger       logger.Logger
 }
 
 type Wrapper func(h http.Handler) http.Handler
@@ -94,7 +93,7 @@ func Resolver(r resolver.Resolver) Option {
 	}
 }
 
-// Logger sets the underline logging framework
+// Logger sets the underline logging framework.
 func Logger(l logger.Logger) Option {
 	return func(o *Options) {
 		o.Logger = l

@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"regexp"
 
 	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/pkg/handler"
@@ -45,14 +46,25 @@ func init() {
 	registry.Register("tus", New)
 }
 
+type TusConfig struct {
+	cache.Config
+	CorsEnabled          bool   `mapstructure:"cors_enabled"`
+	CorsAllowOrigin      string `mapstructure:"cors_allow_origin"`
+	CorsAllowCredentials bool   `mapstructure:"cors_allow_credentials"`
+	CorsAllowMethods     string `mapstructure:"cors_allow_methods"`
+	CorsAllowHeaders     string `mapstructure:"cors_allow_headers"`
+	CorsMaxAge           string `mapstructure:"cors_max_age"`
+	CorsExposeHeaders    string `mapstructure:"cors_expose_headers"`
+}
+
 type manager struct {
-	conf      *cache.Config
+	conf      *TusConfig
 	publisher events.Publisher
 	statCache cache.StatCache
 }
 
-func parseConfig(m map[string]interface{}) (*cache.Config, error) {
-	c := &cache.Config{}
+func parseConfig(m map[string]interface{}) (*TusConfig, error) {
+	c := &TusConfig{}
 	if err := mapstructure.Decode(m, c); err != nil {
 		err = errors.Wrap(err, "error decoding conf")
 		return nil, err
@@ -69,7 +81,7 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 	return &manager{
 		conf:      c,
 		publisher: publisher,
-		statCache: cache.GetStatCache(*c),
+		statCache: cache.GetStatCache(c.Config),
 	}, nil
 }
 
@@ -92,6 +104,23 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		StoreComposer:         composer,
 		NotifyCompleteUploads: true,
 		Logger:                log.New(appctx.GetLogger(context.Background()), "", 0),
+	}
+
+	if m.conf.CorsEnabled {
+		allowOrigin, err := regexp.Compile(m.conf.CorsAllowOrigin)
+		if m.conf.CorsAllowOrigin != "" && err != nil {
+			return nil, err
+		}
+
+		config.Cors = &tusd.CorsConfig{
+			Disable:          false,
+			AllowOrigin:      allowOrigin,
+			AllowCredentials: m.conf.CorsAllowCredentials,
+			AllowMethods:     m.conf.CorsAllowMethods,
+			AllowHeaders:     m.conf.CorsAllowHeaders,
+			MaxAge:           m.conf.CorsMaxAge,
+			ExposeHeaders:    m.conf.CorsExposeHeaders,
+		}
 	}
 
 	handler, err := tusd.NewUnroutedHandler(config)

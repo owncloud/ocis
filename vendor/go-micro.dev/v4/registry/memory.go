@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
 	log "go-micro.dev/v4/logger"
 )
 
@@ -15,9 +14,9 @@ var (
 )
 
 type node struct {
-	*Node
-	TTL      time.Duration
 	LastSeen time.Time
+	*Node
+	TTL time.Duration
 }
 
 type record struct {
@@ -31,9 +30,10 @@ type record struct {
 type memRegistry struct {
 	options *Options
 
-	sync.RWMutex
 	records  map[string]map[string]*record
 	watchers map[string]*memWatcher
+
+	sync.RWMutex
 }
 
 func NewMemoryRegistry(opts ...Option) Registry {

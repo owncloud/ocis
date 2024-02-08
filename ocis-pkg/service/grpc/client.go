@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 // ClientOptions represent options (e.g. tls settings) for the grpc clients
@@ -45,7 +46,7 @@ func WithTraceProvider(tp trace.TracerProvider) ClientOption {
 		if tp != nil {
 			o.tp = tp
 		} else {
-			o.tp = trace.NewNoopTracerProvider()
+			o.tp = noop.NewTracerProvider()
 		}
 	}
 }

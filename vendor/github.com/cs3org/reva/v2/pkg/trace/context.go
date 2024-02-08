@@ -22,6 +22,7 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 type ctxKey struct{}
@@ -43,5 +44,5 @@ func ContextGetTracerProvider(ctx context.Context) trace.TracerProvider {
 	if p, ok := ctx.Value(ctxKey{}).(trace.TracerProvider); ok {
 		return p
 	}
-	return trace.NewNoopTracerProvider()
+	return noop.NewTracerProvider()
 }

@@ -1,4 +1,4 @@
-// Package http provides a http based message broker
+// Package broker provides a http based message broker
 package broker
 
 import (
@@ -16,51 +16,53 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"golang.org/x/net/http2"
-
 	"go-micro.dev/v4/codec/json"
 	merr "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/registry/cache"
+	"go-micro.dev/v4/transport/headers"
 	maddr "go-micro.dev/v4/util/addr"
 	mnet "go-micro.dev/v4/util/net"
 	mls "go-micro.dev/v4/util/tls"
+	"golang.org/x/net/http2"
 )
 
-// HTTP Broker is a point to point async broker
+// HTTP Broker is a point to point async broker.
 type httpBroker struct {
-	id      string
-	address string
-	opts    Options
+	opts Options
+
+	r registry.Registry
 
 	mux *http.ServeMux
 
-	c *http.Client
-	r registry.Registry
-
-	sync.RWMutex
+	c           *http.Client
 	subscribers map[string][]*httpSubscriber
-	running     bool
 	exit        chan chan error
 
+	inbox   map[string][][]byte
+	id      string
+	address string
+
+	sync.RWMutex
+
 	// offline message inbox
-	mtx   sync.RWMutex
-	inbox map[string][][]byte
+	mtx     sync.RWMutex
+	running bool
 }
 
 type httpSubscriber struct {
 	opts  SubscribeOptions
-	id    string
-	topic string
 	fn    Handler
 	svc   *registry.Service
 	hb    *httpBroker
+	id    string
+	topic string
 }
 
 type httpEvent struct {
+	err error
 	m   *Message
 	t   string
-	err error
 }
 
 var (
@@ -314,8 +316,8 @@ func (h *httpBroker) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	topic := m.Header["Micro-Topic"]
-	//delete(m.Header, ":topic")
+	topic := m.Header[headers.Message]
+	// delete(m.Header, ":topic")
 
 	if len(topic) == 0 {
 		errr := merr.InternalServerError("go.micro.broker", "Topic not found")
@@ -518,7 +520,7 @@ func (h *httpBroker) Publish(topic string, msg *Message, opts ...PublishOption) 
 		m.Header[k] = v
 	}
 
-	m.Header["Micro-Topic"] = topic
+	m.Header[headers.Message] = topic
 
 	// encode the message
 	b, err := h.opts.Codec.Marshal(m)
@@ -703,7 +705,7 @@ func (h *httpBroker) String() string {
 	return "http"
 }
 
-// NewBroker returns a new http broker
+// NewBroker returns a new http broker.
 func NewBroker(opts ...Option) Broker {
 	return newHttpBroker(opts...)
 }
