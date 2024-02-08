@@ -243,11 +243,46 @@ class SharingNgContext implements Context {
 		$response = $this->featureContext->shareNgGetLastCreatedUserGroupShare();
 		$permissionID = json_decode($response->getBody()->getContents())->value[0]->id;
 		$this->featureContext->setResponse(
-			$this->updateShare(
+			$this->updateResourceShare(
 				$user,
 				$table,
 				$permissionID
 			)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $body
+	 * @param string $permissionID
+	 *
+	 * @return ResponseInterface
+	 */
+	public function updateResourceShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resource = $bodyRows['resource'];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		$body = [];
+
+		if (\array_key_exists('permissionsRole', $bodyRows)) {
+			$body["roles"] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
+		}
+
+		if (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body["expirationDateTime"] = $bodyRows['expirationDateTime'];
+		}
+
+		return GraphHelper::updateShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body),
+			$permissionID
 		);
 	}
 
@@ -308,7 +343,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userUpdatesLastPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
 		$this->featureContext->setResponse(
-			$this->updateShare(
+			$this->updateLinkShare(
 				$user,
 				$body,
 				$this->featureContext->shareNgGetLastCreatedLinkShareID()
@@ -323,35 +358,23 @@ class SharingNgContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function updateShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+	public function updateLinkShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resource = $bodyRows['resource'];
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		$body = [];
 
-		if (\array_key_exists('role', $bodyRows) && \array_key_exists('expirationDateTime', $bodyRows)) {
-			$body = [
-				"expirationDateTime" => $bodyRows['expirationDateTime'],
-				"link" => [
-					"type" => $bodyRows['permissionsRole']
-				]
-			];
-		} elseif (\array_key_exists('permissionsRole', $bodyRows)) {
-			$body = [
-				"link" => [
-					"type" => $bodyRows['permissionsRole']
-				]
-			];
-		} elseif (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body = [
-				"expirationDateTime" => $bodyRows['expirationDateTime']
-			];
-		} else {
-			throw new Error('Expiration date or role is missing to update for share link!');
+		if (\array_key_exists('permissionsRole', $bodyRows)) {
+			$body["link"]["type"] = $bodyRows['permissionsRole'];
 		}
 
-		return GraphHelper::updateLinkShare(
+		if (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body["expirationDateTime"] =  $bodyRows['expirationDateTime'];
+		}
+
+		return GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
