@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
 * Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
+* Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -261,6 +262,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/6739
    https://github.com/owncloud/ocis/pull/8396
    https://github.com/cs3org/reva/pull/4503
+
+* Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
+
+   The extended envvar parser would be angry if there are two `os.Getenv` in the
+   same line. We fixed this.
+
+   https://github.com/owncloud/ocis/pull/8409
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
