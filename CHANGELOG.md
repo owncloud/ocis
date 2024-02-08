@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
 * Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
 * Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+* Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -251,6 +252,14 @@ The following sections list the changes for unreleased.
    Signed urls now expire properly
 
    https://github.com/owncloud/ocis/pull/8385
+
+* Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
+
+   We fixed a bug that caused Internal Server Error when move using destination id
+
+   https://github.com/owncloud/ocis/issues/6739
+   https://github.com/owncloud/ocis/pull/8396
+   https://github.com/cs3org/reva/pull/4503
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
