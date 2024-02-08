@@ -400,7 +400,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
 
 a| `OCIS_EDITION`
 
@@ -430,7 +430,7 @@ a| [subs=-attributes]
 ++true ++
 
 a| [subs=-attributes]
-Changing this value is NOT supported. Enables the support for resharing.
+Changing this value is NOT supported. Enables the support for resharing in the clients.
 
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
@@ -592,7 +592,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
 
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
@@ -783,7 +783,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the WEBFINGER service.
 
 a| `OCIS_JWT_SECRET`
 
@@ -851,7 +851,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
@@ -1638,7 +1638,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1857,10 +1857,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 
 a| `OCIS_REVA_GATEWAY`
 
@@ -1899,7 +1899,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `OCIS_SERVICE_ACCOUNT_ID`
 
@@ -1976,7 +1976,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -2274,7 +2274,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `OCIS_TRANSLATION_PATH`
 
