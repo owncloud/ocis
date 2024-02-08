@@ -85,18 +85,20 @@ func GetRogueEnvs() {
 		}
 
 		res := re.FindAllSubmatch([]byte(r[1]), -1)
-		if len(res) != 1 || len(res[0]) < 2 {
+		if len(res) < 1 {
 			fmt.Printf("Error envvar not matching pattern: %s", r[1])
 			continue
 		}
 
-		path := r[0]
-		name := strings.Trim(string(res[0][1]), "\"")
-		currentVars[path+name] = Variable{
-			RawName:     name,
-			Path:        path,
-			FoundInCode: true,
-			Name:        name,
+		for _, m := range res {
+			path := r[0]
+			name := strings.Trim(string(m[1]), "\"")
+			currentVars[path+name] = Variable{
+				RawName:     name,
+				Path:        path,
+				FoundInCode: true,
+				Name:        name,
+			}
 		}
 	}
 

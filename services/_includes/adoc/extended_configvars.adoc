@@ -91,5 +91,21 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
+
+a| `_registryPasswordEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryUsernameEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
 |===
