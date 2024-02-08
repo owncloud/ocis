@@ -6,7 +6,7 @@
 
 [width="100%",cols="~,~,~,~",options="header"]
 |===
-| File| Variable| Replacement| Description
+| Service| Variable| Replacement| Description
 
 | xref:{s-path}/auth-basic.adoc[auth-basic]
 | `LDAP_BIND_PASSWORD`
