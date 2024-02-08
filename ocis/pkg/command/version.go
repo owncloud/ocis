@@ -5,29 +5,45 @@ import (
 	"os"
 
 	tw "github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli/v2"
+	mreg "go-micro.dev/v4/registry"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
-	"github.com/urfave/cli/v2"
-	mreg "go-micro.dev/v4/registry"
+)
+
+const (
+	_skipServiceListingFlagName = "skip-services"
 )
 
 // VersionCommand is the entrypoint for the version command.
 func VersionCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "version",
-		Usage:    "print the version of this binary and all running service instances",
+		Name:  "version",
+		Usage: "print the version of this binary and all running service instances",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  _skipServiceListingFlagName,
+				Usage: "skip service listing",
+			},
+		},
 		Category: "info",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Compiled: %s\n", version.Compiled())
-			fmt.Println("")
+
+			if c.Bool(_skipServiceListingFlagName) {
+				return nil
+			}
+
+			fmt.Print("\n")
 
 			reg := registry.GetRegistry()
 			serviceList, err := reg.ListServices()
 			if err != nil {
-				fmt.Println(fmt.Errorf("could not list services: %v", err))
+				fmt.Printf("could not list services: %v\n", err)
 				return err
 			}
 
@@ -35,7 +51,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 			for _, s := range serviceList {
 				s, err := reg.GetService(s.Name)
 				if err != nil {
-					fmt.Println(fmt.Errorf("could not get service: %v", err))
+					fmt.Printf("could not get service: %v\n", err)
 					return err
 				}
 				services = append(services, s...)
