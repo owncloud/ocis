@@ -346,7 +346,6 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 		rCTX = chi.NewRouteContext()
 		rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
-		rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!a0ca6a90-a365-4782-871e-d44447bbc668")
 	})
 
 	checkDriveIDAndItemIDValidation := func(handler http.HandlerFunc) {
@@ -367,12 +366,13 @@ var _ = Describe("DrivesDriveItemApi", func() {
 		Expect(jsonData.Get("message").String()).To(Equal("invalid driveID or itemID"))
 	}
 
-	Describe("CreateDriveItem", func() {
+	Describe("DeleteDriveItem", func() {
 		It("validates the driveID and itemID url param", func() {
 			checkDriveIDAndItemIDValidation(httpAPI.DeleteDriveItem)
 		})
 
 		It("uses the UnmountShare provider implementation", func() {
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!a0ca6a90-a365-4782-871e-d44447bbc668")
 			responseRecorder := httptest.NewRecorder()
 
 			request := httptest.NewRequest(http.MethodDelete, "/", nil).
@@ -409,13 +409,8 @@ var _ = Describe("DrivesDriveItemApi", func() {
 	})
 
 	Describe("CreateDriveItem", func() {
-		It("validates the driveID and itemID url param", func() {
-			checkDriveIDAndItemIDValidation(httpAPI.CreateDriveItem)
-		})
-
 		It("checks if the idemID and driveID is in share jail", func() {
 			rCTX.URLParams.Add("driveID", "1$2")
-			rCTX.URLParams.Add("itemID", "1$2!3")
 
 			responseRecorder := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodPost, "/", nil).

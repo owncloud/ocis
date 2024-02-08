@@ -207,17 +207,16 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 // CreateDriveItem creates a drive item
 func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		msg := "invalid driveID or itemID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg("invlid driveID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, "invalid driveID")
 		return
 	}
 
-	if !IsShareJail(driveID) || !IsShareJail(itemID) {
-		msg := "invalid driveID or itemID, must be share jail"
-		api.logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg(msg)
+	if !IsShareJail(driveID) {
+		msg := "invalid driveID, must be share jail"
+		api.logger.Debug().Interface("driveID", driveID).Msg(msg)
 		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
 		return
 	}
