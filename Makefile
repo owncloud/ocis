@@ -172,8 +172,9 @@ docs-generate:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
+
 	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
-	cp docs/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
+	cp docs/services/general-info/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
 
 .PHONY: ci-go-generate
 ci-go-generate:
