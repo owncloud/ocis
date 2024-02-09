@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0019-file-search-index.md
 ---
 
-* Status: proposed
+* Status: superseded by [ADR-0025]({{< ref "0025-distributed-search-index.md" >}})
 * Deciders: @butonic, @micbar, @dragotin, @C0rby
 * Date: 2022-03-18
 
