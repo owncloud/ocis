@@ -32,39 +32,47 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
-- rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:118
-  foundincode: false
+- rawname: _registryEnv
+  path: ocis-pkg/registry/registry.go:114
+  foundincode: true
   name: MICRO_REGISTRY
   type: string
-  default_value: ""
+  default_value: nats-js-kv
   description: 'The Go micro registry type to use. Supported types are: ''memory'',
     ''nats-js-kv'' (default) and ''kubernetes''. Note that ''nats'', ''etcd'', ''consul''
     and ''mdns'' are deprecated and will be removed in a later version. Only change
     on supervision of ownCloud Support.'
   do_ignore: false
-- rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:122
-  foundincode: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/natsjsregistry/registry.go:145
+  foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: 127.0.0.1:9233
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
   do_ignore: false
-- rawname: registryPasswordEnv
-  path: ocis-pkg/registry/registry.go:115
-  foundincode: false
-  name: MICRO_REGISTRY_AUTH_PASSWORD
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:118
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
   type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryPasswordEnv
+  path: ocis-pkg/natsjsregistry/registry.go:163
+  foundincode: true
+  name: MICRO_REGISTRY_AUTH_PASSWORD
+  type: string
   default_value: ""
   description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
-- rawname: registryUsernameEnv
-  path: ocis-pkg/registry/registry.go:114
-  foundincode: false
+- rawname: _registryUsernameEnv
+  path: ocis-pkg/natsjsregistry/registry.go:163
+  foundincode: true
   name: MICRO_REGISTRY_AUTH_USERNAME
-  type: ""
+  type: string
   default_value: ""
   description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
@@ -73,61 +81,20 @@ variables:
   foundincode: true
   name: OCIS_BASE_DATA_PATH
   type: string
-  default_value: '''/var/lib/ocis'' or ''$HOME/.ocis/'''
+  default_value: ""
   description: The base directory location used by several services and for user data.
-    Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/'
-    for binary releases. Services can have, if available, an individual setting with
-    an own environment variable.
+    See the General Info section in the documentation for more details on defaults.
+    Services can have, if available, an individual setting with an own environment
+    variable.
   do_ignore: false
 - rawname: OCIS_CONFIG_DIR
   path: ocis-pkg/config/defaults/paths.go:56
   foundincode: true
   name: OCIS_CONFIG_DIR
   type: string
-  default_value: '''/etc/ocis'' or ''$HOME/.ocis/config'''
-  description: The default directory location for config files. Predefined to '/etc/ocis'
-    for container images (inside the container) or '$HOME/.ocis/config' for binary
-    releases.
-  do_ignore: false
-- rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:145
-  foundincode: true
-  name: _registryAddressEnv
-  type: ""
   default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:118
-  foundincode: true
-  name: _registryAddressEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryEnv
-  path: ocis-pkg/registry/registry.go:114
-  foundincode: true
-  name: _registryEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryPasswordEnv
-  path: ocis-pkg/natsjsregistry/registry.go:163
-  foundincode: true
-  name: _registryPasswordEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryUsernameEnv
-  path: ocis-pkg/natsjsregistry/registry.go:163
-  foundincode: true
-  name: _registryUsernameEnv
-  type: ""
-  default_value: ""
-  description: ""
+  description: The default directory location for config files. See the General Info
+    section in the documentation for more details on defaults.
   do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
