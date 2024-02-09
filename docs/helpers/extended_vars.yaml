@@ -81,21 +81,20 @@ variables:
   foundincode: true
   name: OCIS_BASE_DATA_PATH
   type: string
-  default_value: '''/var/lib/ocis'' or ''$HOME/.ocis/'''
+  default_value: ""
   description: The base directory location used by several services and for user data.
-    Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/'
-    for binary releases. Services can have, if available, an individual setting with
-    an own environment variable.
+    See the General Info section in the documentation for more details on defaults.
+    Services can have, if available, an individual setting with an own environment
+    variable.
   do_ignore: false
 - rawname: OCIS_CONFIG_DIR
   path: ocis-pkg/config/defaults/paths.go:56
   foundincode: true
   name: OCIS_CONFIG_DIR
   type: string
-  default_value: '''/etc/ocis'' or ''$HOME/.ocis/config'''
-  description: The default directory location for config files. Predefined to '/etc/ocis'
-    for container images (inside the container) or '$HOME/.ocis/config' for binary
-    releases.
+  default_value: ""
+  description: The default directory location for config files. See the General Info
+    section in the documentation for more details on defaults.
   do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
