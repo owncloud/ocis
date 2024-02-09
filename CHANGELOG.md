@@ -40,6 +40,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix search response: [#7815](https://github.com/owncloud/ocis/pull/7815)
 * Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
 * Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
@@ -78,6 +79,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
 
 ## Details
+
+* Bugfix - Fix search response: [#7815](https://github.com/owncloud/ocis/pull/7815)
+
+   We fixed the search response code from 500 to 400 when the request is invalid
+
+   https://github.com/owncloud/ocis/issues/7812
+   https://github.com/owncloud/ocis/pull/7815
 
 * Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 
