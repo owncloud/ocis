@@ -456,7 +456,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $shareType (user|group)
@@ -481,7 +481,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of link from "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of link from (?:file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $resource
