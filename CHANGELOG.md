@@ -75,6 +75,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
+* Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
@@ -356,6 +357,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8257
    https://github.com/owncloud/ocis/pull/8309
    https://github.com/cs3org/reva/pull/4485
+
+* Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
+
+   Removes waiting times when starting the single binary. Improves ocis single
+   binary boot time from 8s to 2.5s
+
+   https://github.com/owncloud/ocis/pull/8320
 
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 
