@@ -2880,16 +2880,22 @@ class FeatureContext extends BehatVariablesContext {
 				"function" =>
 				[$this, "getGroupIdByGroupName"],
 				"parameter" => [$group]
-				],
-				[
-					"code" => "%shares_drive_id%",
-					"function" => [
-						$this->spacesContext,
-						"getSpaceIdByName"
-					],
-					"parameter" => [$user, "Shares"]
 				]
 			);
+
+			if (!OcisHelper::isTestingOnReva()) {
+				array_push(
+					$substitutions,
+					[
+						"code" => "%shares_drive_id%",
+						"function" => [
+							$this->spacesContext,
+							"getSpaceIdByName"
+						],
+						"parameter" => [$user, "Shares"]
+					]
+				);
+			}
 		}
 
 		if (!empty($additionalSubstitutions)) {
