@@ -9,7 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	svc "github.com/owncloud/ocis/v2/services/caldav/pkg/service/v0"
+	svc "github.com/owncloud/ocis/v2/services/ccs/pkg/service/v0"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 )
@@ -22,7 +22,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("caldav"),
+		http.Name("ccs"),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
@@ -40,7 +40,7 @@ func Server(opts ...Option) (http.Service, error) {
 		middleware.TraceContext,
 		chimiddleware.RequestID,
 		middleware.Version(
-			"caldav",
+			"ccs",
 			version.GetString(),
 		),
 		middleware.Logger(
@@ -67,7 +67,7 @@ func Server(opts ...Option) (http.Service, error) {
 		options.Logger.Error().
 			Err(err).
 			Msg("Error initializing ccs service")
-		return http.Service{}, errors.New("could not initialize caldav service")
+		return http.Service{}, errors.New("could not initialize CCS service")
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {

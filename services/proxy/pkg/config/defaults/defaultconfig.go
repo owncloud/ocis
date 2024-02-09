@@ -112,7 +112,7 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint:    "/.well-known/caldav",
-					Service:     "com.owncloud.web.caldav",
+					Service:     "com.owncloud.web.ccs",
 					Unprotected: true,
 				},
 				{
@@ -173,18 +173,18 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/dav/principals/",
-					Service:  "com.owncloud.web.caldav",
+					Service:  "com.owncloud.web.ccs",
 				},
 				{
 					Endpoint: "/dav/calendars/",
-					Service:  "com.owncloud.web.caldav",
+					Service:  "com.owncloud.web.ccs",
 				},
 				{
 					// RegexRoute will be evaluated before PrefixRoute and QueryRoute
 					Type:     config.RegexRoute,
 					Method:   "REPORT",
 					Endpoint: "/dav/calendars/",
-					Service:  "com.owncloud.web.caldav",
+					Service:  "com.owncloud.web.ccs",
 				},
 				{
 					Type:     config.QueryRoute,

@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := caldav
+NAME := ccs
 
 include ../../.make/recursion.mk
 

@@ -92,7 +92,7 @@ var svccmds = []register.Command{
 		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		return ServiceCommand(cfg, cfg.CalDAV.Service.Name, clientlog.GetCommands(cfg.Clientlog), func(c *config.Config) {
+		return ServiceCommand(cfg, cfg.CCS.Service.Name, clientlog.GetCommands(cfg.Clientlog), func(c *config.Config) {
 			cfg.Clientlog.Commons = cfg.Commons
 		})
 	},

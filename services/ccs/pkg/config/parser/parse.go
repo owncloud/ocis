@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config/defaults"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )

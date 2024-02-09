@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/command"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/command"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config/defaults"
 )
 
 func main() {

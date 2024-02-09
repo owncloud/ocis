@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 
