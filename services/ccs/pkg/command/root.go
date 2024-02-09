@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,8 +25,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-caldav command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "caldav",
-		Usage:    "Provide CalDAV for oCIS",
+		Name:     "ccs",
+		Usage:    "Provide Calendars and Constacts for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

@@ -12,8 +12,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	ocismiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/storage"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/storage"
 	"net/http"
+	"os"
 )
 
 type userPrincipalBackend struct{}
@@ -98,6 +99,7 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 	)
 	// just some fake location for now
 	storageURL := "/tmp/caldav/"
+	os.Mkdir(storageURL, 0700)
 	upBackend := &userPrincipalBackend{}
 
 	caldavBackend, _, err := storage.NewFilesystem(storageURL, "/calendar/", "/contacts/", upBackend)

@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/services/caldav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration
@@ -73,7 +73,7 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		Service: config.Service{
-			Name: "caldav",
+			Name: "ccs",
 		},
 	}
 }
