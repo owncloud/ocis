@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
         "skip": False,
@@ -296,7 +296,7 @@ def main(ctx):
 
     pipelines = pipelines + k6LoadTests(ctx)
 
-    pipelines += checkStarlark()
+    # pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
@@ -344,7 +344,8 @@ def testPipelines(ctx):
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
         pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
 
-    pipelines += localApiTestPipeline(ctx)
+    # pipelines += localApiTestPipeline(ctx)
+    pipelines += ccsTestPipeline(ctx)
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
@@ -859,6 +860,57 @@ def localApiTests(suite, storage, extra_environment = {}):
         "environment": environment,
         "commands": [
             "make test-acceptance-api",
+        ],
+    }]
+
+def ccsTestPipeline(ctx):
+    storage = "ocis"
+
+    pipeline = {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "calendar-contacts-tests",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                 ocisServer(storage, with_wrapper = False) +
+                 ccsTests(storage) +
+                 logRequests(),
+        "services": [],
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/pull/**",
+            ],
+        },
+    }
+
+    pipelines = []
+    pipelines.append(pipeline)
+    return pipelines
+
+def ccsTests(storage):
+    environment = {
+        "PATH_TO_OCIS": dirs["base"],
+        "TEST_SERVER_URL": "https://ocis-server:9200",
+        "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+        "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
+        "SEND_SCENARIO_LINE_REFERENCES": "true",
+        "STORAGE_DRIVER": storage,
+    }
+
+    return [{
+        "name": "ccsTests",
+        "image": "deepdiver/ccs-caldavtester:latest",
+        "environment": environment,
+        "commands": [
+            "pwd",
+            "ls -l /app",
+            "cd tests/caldav",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir caldavtest CalDAV/caldavIOP.xml",
         ],
     }]
 

@@ -64,6 +64,9 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	if err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error initializing ccs service")
 		return http.Service{}, errors.New("could not initialize caldav service")
 	}
 
