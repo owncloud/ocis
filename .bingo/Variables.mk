@@ -65,11 +65,11 @@ $(HUGO): $(BINGO_DIR)/hugo.mod
 	@echo "(re)installing $(GOBIN)/hugo-v0.115.2"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.115.2 "github.com/gohugoio/hugo"
 
-MOCKERY := $(GOBIN)/mockery-v2.40.1
+MOCKERY := $(GOBIN)/mockery-v2.40.2
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v2.40.1"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.40.1 "github.com/vektra/mockery/v2"
+	@echo "(re)installing $(GOBIN)/mockery-v2.40.2"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.40.2 "github.com/vektra/mockery/v2"
 
 MUTAGEN := $(GOBIN)/mutagen-v0.13.1
 $(MUTAGEN): $(BINGO_DIR)/mutagen.mod
