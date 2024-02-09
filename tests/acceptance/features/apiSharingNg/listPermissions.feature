@@ -48,6 +48,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
             "items": [
               {
                 "type": "object",
@@ -185,76 +187,6 @@ Feature: List a sharing permissions
                     "type": "string",
                     "enum": [
                       "fb6c3e19-e378-47e5-b277-9732f9de6e21"
-                    ]
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      5
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Grants co-owner permissions on a resource"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Co Owner"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "3a4ba8e9-6a0d-4235-9140-0e7a34007abe"
-                    ]
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      6
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Grants manager permissions on a resource. Semantically equivalent to co-owner"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Manager"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "312c0871-5ef7-4b3a-85b6-0e4074c64049"
                     ]
                   }
                 }
