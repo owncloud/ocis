@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
@@ -34,13 +35,13 @@ func TestParse_Spec(t *testing.T) {
 		},
 		{
 			name: `AND`,
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
 		{
 			name: `AND cat AND dog`,
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
@@ -80,13 +81,13 @@ func TestParse_Spec(t *testing.T) {
 		},
 		{
 			name: `OR`,
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},
 		{
 			name: `OR cat AND dog`,
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},
@@ -862,37 +863,37 @@ func TestParse_Errors(t *testing.T) {
 	tests := []testCase{
 		{
 			query: "animal:(mammal:cat mammal:dog reptile:turtle)",
-			error: kql.NamedGroupInvalidNodesError{
+			error: query.NamedGroupInvalidNodesError{
 				Node: &ast.StringNode{Key: "mammal", Value: "cat"},
 			},
 		},
 		{
 			query: "animal:(cat mammal:dog turtle)",
-			error: kql.NamedGroupInvalidNodesError{
+			error: query.NamedGroupInvalidNodesError{
 				Node: &ast.StringNode{Key: "mammal", Value: "dog"},
 			},
 		},
 		{
 			query: "animal:(AND cat)",
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
 		{
 			query: "animal:(OR cat)",
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},
 		{
 			query: "(AND cat)",
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolAND},
 			},
 		},
 		{
 			query: "(OR cat)",
-			error: kql.StartsWithBinaryOperatorError{
+			error: query.StartsWithBinaryOperatorError{
 				Node: &ast.OperatorNode{Value: kql.BoolOR},
 			},
 		},

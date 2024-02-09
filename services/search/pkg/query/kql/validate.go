@@ -1,6 +1,7 @@
 package kql
 
 import (
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
@@ -9,10 +10,9 @@ func validateAst(a *ast.Ast) error {
 	case *ast.OperatorNode:
 		switch node.Value {
 		case BoolAND, BoolOR:
-			return StartsWithBinaryOperatorError{Node: node}
+			return &query.StartsWithBinaryOperatorError{Node: node}
 		}
 	}
-
 	return nil
 }
 
@@ -21,14 +21,14 @@ func validateGroupNode(n *ast.GroupNode) error {
 	case *ast.OperatorNode:
 		switch node.Value {
 		case BoolAND, BoolOR:
-			return StartsWithBinaryOperatorError{Node: node}
+			return &query.StartsWithBinaryOperatorError{Node: node}
 		}
 	}
 
 	if n.Key != "" {
 		for _, node := range n.Nodes {
 			if ast.NodeKey(node) != "" {
-				return NamedGroupInvalidNodesError{Node: node}
+				return &query.NamedGroupInvalidNodesError{Node: node}
 			}
 		}
 	}
