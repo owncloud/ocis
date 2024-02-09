@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
 * Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
+* Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -277,6 +278,14 @@ The following sections list the changes for unreleased.
    same line. We fixed this.
 
    https://github.com/owncloud/ocis/pull/8409
+
+* Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
+
+   We fixed a bug in the Update sharing permission the expiration dates can't be
+   removed from link permissions.
+
+   https://github.com/owncloud/ocis/issues/8405
+   https://github.com/owncloud/ocis/pull/8413
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
