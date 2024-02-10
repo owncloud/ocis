@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 * Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
+* Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
@@ -364,6 +365,30 @@ The following sections list the changes for unreleased.
    binary boot time from 8s to 2.5s
 
    https://github.com/owncloud/ocis/pull/8320
+
+* Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
+
+   We added the ability to use environment variables in yaml config files. This
+   allows to use environment variables in the config files of the ocis services
+   which will be replaced by the actual value of the environment variable at
+   runtime.
+
+   Example:
+
+   ```
+   web:
+     http:
+       addr: ${SOME_HTTP_ADDR}
+   ```
+
+   This makes it possible to use the same config file for different environments
+   without the need to change the config file itself. This is especially useful
+   when using docker-compose to run the ocis services. It is a common pattern to
+   create an .env file which contains the environment variables for the
+   docker-compose file. Now you can use the same .env file to configure the ocis
+   services.
+
+   https://github.com/owncloud/ocis/pull/8339
 
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 
