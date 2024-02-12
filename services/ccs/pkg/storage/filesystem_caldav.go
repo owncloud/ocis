@@ -30,7 +30,6 @@ func (b *filesystemBackend) CalendarHomeSetPath(ctx context.Context) (string, er
 }
 
 func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav.Calendar) error {
-	// TODO what should the default calendar look like?
 	resourceName := path.Base(calendar.Path)
 	localPath, err_ := b.localCalDAVDir(ctx, resourceName)
 	if err_ != nil {

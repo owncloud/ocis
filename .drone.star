@@ -908,8 +908,9 @@ def ccsTests(storage):
         "environment": environment,
         "commands": [
             "pwd",
-            "ls -l /app",
             "cd tests/caldav",
+            "ping ocis-server -c1",
+            "curl https://ocis-server:9200/dav/ -kv -ueinstein:relativity",
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir caldavtest CalDAV/caldavIOP.xml",
         ],
     }]

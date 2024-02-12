@@ -41,7 +41,7 @@ func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
 
-	var homeSets []webdav.BackendSuppliedHomeSet //nolint:typecheck
+	var homeSets []webdav.BackendSuppliedHomeSet
 	if u.caldavBackend != nil {
 		path, err := u.caldavBackend.CalendarHomeSetPath(r.Context())
 		if err != nil {
