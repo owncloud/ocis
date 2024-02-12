@@ -17,13 +17,14 @@ Feature: upload to a public link share
       | permissions | create   |
       | password    | %public% |
     When the public uploads file "test.txt" with password "%public%" and content "test" using the new public WebDAV API
+    Then the HTTP status code should be "201"
+    And the content of file "/FOLDER/test.txt" for user "Alice" should be "test"
     When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
-    Then the HTTP status code of responses on all endpoints should be "201"
+    Then the HTTP status code should be "201"
+    And the content of file "/FOLDER/test (2).txt" for user "Alice" should be "test2"
     And the following headers should match these regular expressions
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/FOLDER/test.txt" for user "Alice" should be "test"
-    And the content of file "/FOLDER/test (2).txt" for user "Alice" should be "test2"
-
+             
 
   Scenario Outline: uploading file to a public upload-only share using public API that was deleted does not work
     Given using <dav-path-version> DAV path
