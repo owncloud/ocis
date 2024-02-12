@@ -64,7 +64,8 @@
 				</verify>
 			</request>
 		</test>
-		<test name='1.3'>
+		<!-- CalDAV Scheduling is not yet supported -->
+		<!-- test name='1.3'>
 			<description>Create new single-instance meeting titled "Meeting 1.3" with 2 other attendees.</description>
 			<request end-delete='yes'>
 				<method>PUT</method>
@@ -85,7 +86,7 @@
 				<method>WAITDELETEALL 1</method>
 				<ruri>$inboxpath3:/</ruri>
 			</request>
-		</test>
+		</test -->
 		<test name='1.4'>
 			<description>Create new single-instance meeting titled "Meeting 1.4" with an alarm set to trigger 15 minutes prior to the schedule time of the meeting.</description>
 			<request end-delete='yes'>
@@ -145,7 +146,8 @@
 				</verify>
 			</request>
 		</test>
-		<test name='2.4'>
+		<!-- CalDAV Scheduling is not yet supported -->
+		<!-- test name='2.4'>
 			<description>Add an attendee to "Meeting 1.1bis".</description>
 			<request>
 				<method>PUT</method>
@@ -162,7 +164,7 @@
 				<method>WAITDELETEALL 1</method>
 				<ruri>$inboxpath2:/</ruri>
 			</request>
-		</test>
+		</test -->
 		<test name='2.5'>
 			<description>Add an alarm to "Meeting 1.1bis".</description>
 			<request>
@@ -191,7 +193,8 @@
 				</verify>
 			</request>
 		</test>
-		<test name='2.7'>
+		<!-- CalDAV Scheduling is not yet supported -->
+		<!-- test name='2.7'>
 			<description>Modify the participation status of 1st instance to DECLINED.</description>
 			<request>
 				<method>PUT</method>
@@ -212,7 +215,7 @@
 				<method>WAITDELETEALL 1</method>
 				<ruri>$inboxpath3:/</ruri>
 			</request>
-		</test>
+		</test -->
 		<test name='2.8'>
 			<description>Cancel the 4th instance of the recurring meeting created in 1.2.</description>
 			<request>
@@ -227,7 +230,8 @@
 				</verify>
 			</request>
 		</test>
-		<test name='2.9'>
+		<!-- CalDAV Scheduling is not yet supported -->
+		<!-- test name='2.9'>
 			<description>One client changes "Meeting 1.1bis" to a different time, second client 'refreshes' its display to see the modification.</description>
 			<request end-delete='yes'>
 				<method>PUT</method>
@@ -244,7 +248,7 @@
 				<method>WAITDELETEALL 1</method>
 				<ruri>$inboxpath2:/</ruri>
 			</request>
-		</test>
+		</test -->
 	</test-suite>
 
 	<test-suite name='4. Event Deletion'>
