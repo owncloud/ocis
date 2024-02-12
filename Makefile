@@ -176,6 +176,10 @@ docs-generate:
 	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
 	cp docs/services/general-info/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
 
+.PHONY: check-env-var-annotations
+check-env-var-annotations:
+	.make/check-env-var-annotations.sh
+
 .PHONY: ci-go-generate
 ci-go-generate:
 	@for mod in $(OCIS_MODULES); do \
