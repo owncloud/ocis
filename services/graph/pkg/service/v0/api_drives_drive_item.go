@@ -56,6 +56,30 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 		return err
 	}
 
+	// This is a a bit of a hack. We should not rely on a specific format of the item id.
+	// (But currently the ShareID is
+	shareId := resourceID.GetOpaqueId()
+
+	// Now, find out the resourceID of the shared resource
+	getReceivedShareResponse, err := gatewayClient.GetReceivedShare(ctx,
+		&collaboration.GetReceivedShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Id{
+					Id: &collaboration.ShareId{
+						OpaqueId: shareId,
+					},
+				},
+			},
+		},
+	)
+	if errCode := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); errCode != nil {
+		s.logger.Debug().Err(errCode).
+			Str("shareid", shareId).
+			Msg("failed to read share")
+		return errCode
+	}
+
+	// Find all accepted shares for this resource
 	receivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 		Filters: []*collaboration.Filter{
 			{
@@ -67,7 +91,7 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 			{
 				Type: collaboration.Filter_TYPE_RESOURCE_ID,
 				Term: &collaboration.Filter_ResourceId{
-					ResourceId: &resourceID,
+					ResourceId: getReceivedShareResponse.GetShare().GetShare().GetResourceId(),
 				},
 			},
 		},
@@ -78,6 +102,7 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 
 	var errs []error
 
+	// Reject all the shares for this resource
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
 		receivedShare.State = collaboration.ShareState_SHARE_STATE_REJECTED
 
@@ -86,17 +111,20 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{_fieldMaskPathState}},
 		}
 
-		updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
+		_, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
-
-		// fixMe: send to nirvana, wait for toDriverItem func
-		_ = updateReceivedShareResponse
 	}
 
-	return errors.Join(errs...)
+	// We call it a success if all shares could successfully be rejected, otherwise
+	// we return an error
+	if len(errs) != 0 {
+		return errors.Join(errs...)
+	}
+
+	return nil
 }
 
 // MountShare mounts a share
