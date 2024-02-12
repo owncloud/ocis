@@ -466,12 +466,12 @@ The following sections list the changes for 5.0.0-rc.1.
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
 * Enhancement - SSE for messaging: [#6992](https://github.com/owncloud/ocis/pull/6992)
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 * Enhancement - Keyword Query Language (KQL) search syntax: [#7212](https://github.com/owncloud/ocis/pull/7212)
 * Enhancement - Introduce clientlog service: [#7217](https://github.com/owncloud/ocis/pull/7217)
 * Enhancement - Proxy uses service accounts for provisioning: [#7240](https://github.com/owncloud/ocis/pull/7240)
-* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
+* Enhancement - The password policies change request: [#7264](https://github.com/owncloud/ocis/pull/7264)
 * Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
 * Enhancement - Add the password policies: [#7285](https://github.com/owncloud/ocis/pull/7285)
 * Enhancement - Add login URL config: [#7317](https://github.com/owncloud/ocis/pull/7317)
@@ -497,7 +497,7 @@ The following sections list the changes for 5.0.0-rc.1.
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 * Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
-* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+* Enhancement - Allow configuring additional routes: [#7741](https://github.com/owncloud/ocis/pull/7741)
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 * Enhancement - Add banned password list to the default deployments: [#7784](https://github.com/owncloud/ocis/pull/7784)
 * Enhancement - Update to go 1.21: [#7794](https://github.com/owncloud/ocis/pull/7794)
@@ -867,13 +867,13 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/6992
 
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
 
    AD FS `/adfs/.well-known/openid-configuration` has an optional
    `access_token_issuer` which, in violation of the OpenID Connect spec, takes
    precedence over `issuer`.
 
-   https://github.com/owncloud/ocis/pull/7138
+   https://github.com/owncloud/ocis/pull/7140
 
 * Enhancement - Add OCIS_LDAP_BIND_PASSWORD as replacement for LDAP_BIND_PASSWORD: [#7176](https://github.com/owncloud/ocis/issues/7176)
 
@@ -954,11 +954,11 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/5550
    https://github.com/owncloud/ocis/pull/7240
 
-* Enhancement - The password policies change request: [#7264](https://github.com/cs3org/reva/pull/7264)
+* Enhancement - The password policies change request: [#7264](https://github.com/owncloud/ocis/pull/7264)
 
    The variables renaming OCIS-3767
 
-   https://github.com/cs3org/reva/pull/7264
+   https://github.com/owncloud/ocis/pull/7264
 
 * Enhancement - Introduce natsjs registry: [#7272](https://github.com/owncloud/ocis/issues/7272)
 
@@ -1262,12 +1262,12 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/5486
    https://github.com/owncloud/ocis/pull/7739
 
-* Enhancement - Allow configuring additional routes: [#7740](https://github.com/owncloud/ocis/pull/7740)
+* Enhancement - Allow configuring additional routes: [#7741](https://github.com/owncloud/ocis/pull/7741)
 
    Allows adding custom routes to the ocis proxy. This enables customs ocis
    extensions
 
-   https://github.com/owncloud/ocis/pull/7740
+   https://github.com/owncloud/ocis/pull/7741
 
 * Enhancement - Default link permission config: [#7783](https://github.com/owncloud/ocis/pull/7783)
 
@@ -1823,7 +1823,7 @@ The following sections list the changes for 4.0.3.
 
 * Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
 * Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
 * Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
 ## Details
@@ -1843,13 +1843,13 @@ The following sections list the changes for 4.0.3.
    https://github.com/owncloud/ocis/issues/7462
    https://github.com/owncloud/ocis/pull/7546
 
-* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
+* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
 
    AD FS `/adfs/.well-known/openid-configuration` has an optional
    `access_token_issuer` which, in violation of the OpenID Connect spec, takes
    precedence over `issuer`.
 
-   https://github.com/owncloud/ocis/pull/7138
+   https://github.com/owncloud/ocis/pull/7140
 
 * Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
