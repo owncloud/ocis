@@ -864,7 +864,6 @@ The following sections list the changes for 5.0.0-rc.1.
 
   * notify postprocessing state changes.
   * notify file locking and unlocking.
-  * ... @toDo
 
    https://github.com/owncloud/ocis/pull/6992
 
