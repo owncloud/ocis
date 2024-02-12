@@ -1264,8 +1264,8 @@ The following sections list the changes for 5.0.0-rc.1.
 
 * Enhancement - Allow configuring additional routes: [#7741](https://github.com/owncloud/ocis/pull/7741)
 
-   Allows adding custom routes to the ocis proxy. This enables customs ocis
-   extensions
+   Allows adding custom routes to the ocis proxy. This enables custom ocis
+   extensions.
 
    https://github.com/owncloud/ocis/pull/7741
 
@@ -1823,7 +1823,7 @@ The following sections list the changes for 4.0.3.
 
 * Bugfix - Bump reva to 2.16.2: [#7512](https://github.com/owncloud/ocis/pull/7512)
 * Bugfix - Token storage config fixed: [#7546](https://github.com/owncloud/ocis/pull/7546)
-* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 * Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
 ## Details
@@ -1843,13 +1843,13 @@ The following sections list the changes for 4.0.3.
    https://github.com/owncloud/ocis/issues/7462
    https://github.com/owncloud/ocis/pull/7546
 
-* Enhancement - Support spec violating AD FS access token issuer: [#7140](https://github.com/owncloud/ocis/pull/7140)
+* Enhancement - Support spec violating AD FS access token issuer: [#7138](https://github.com/owncloud/ocis/pull/7138)
 
    AD FS `/adfs/.well-known/openid-configuration` has an optional
    `access_token_issuer` which, in violation of the OpenID Connect spec, takes
    precedence over `issuer`.
 
-   https://github.com/owncloud/ocis/pull/7140
+   https://github.com/owncloud/ocis/pull/7138
 
 * Enhancement - Update web to v7.1.2: [#7798](https://github.com/owncloud/ocis/pull/7798)
 
