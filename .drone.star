@@ -54,10 +54,10 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
         "skip": False,
@@ -296,7 +296,7 @@ def main(ctx):
 
     pipelines = pipelines + k6LoadTests(ctx)
 
-    # pipelines += checkStarlark()
+    pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
@@ -344,7 +344,7 @@ def testPipelines(ctx):
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
         pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
 
-    # pipelines += localApiTestPipeline(ctx)
+    pipelines += localApiTestPipeline(ctx)
     pipelines += ccsTestPipeline(ctx)
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
@@ -876,8 +876,7 @@ def ccsTestPipeline(ctx):
         },
         "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, with_wrapper = False) +
-                 ccsTests(storage) +
-                 logRequests(),
+                 ccsTests(storage),
         "services": [],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -908,10 +907,9 @@ def ccsTests(storage):
         "environment": environment,
         "commands": [
             "pwd",
-            "cd tests/caldav",
             "ping ocis-server -c1",
             "curl https://ocis-server:9200/dav/ -kv -ueinstein:relativity",
-            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir caldavtest CalDAV/caldavIOP.xml",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/caldavIOP.xml",
         ],
     }]
 
