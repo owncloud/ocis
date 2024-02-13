@@ -18,7 +18,7 @@ File metadata management is an important aspect for oCIS as a data platform. Whi
 
 ## Decision Drivers <!-- optional -->
 
-Performance of reading extendet attributes suffers from the syscall overhead when listing and reading all attribudes.
+Performance of reading extended attributes suffers from the syscall overhead when listing and reading all attributes.
 
 ## Considered Options
 
@@ -31,7 +31,7 @@ Going back to the original [ADR-0016 Storage for Files Metadata]({{< ref "0016-f
 
 ## Decision Outcome
 
-Chosen option: "[msgpack files](#msgpack-files)", because we want to stay with a self describing binary format. This is a performance tradeoff that is faster and more efficient than text based formats and more flexible but less efficient then protobuf.
+Chosen option: "[msgpack files](#msgpack-files)", because we want to stay with a self describing binary format. This is a performance tradeoff that is faster and more efficient than text based formats and more flexible but less efficient than protobuf.
 
 Note: directory listings are still read from the storage and remain uncached.
 
