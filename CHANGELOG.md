@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
 * Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
 * Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
+* Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
@@ -289,6 +290,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8405
    https://github.com/owncloud/ocis/pull/8413
+
+* Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
+
+   We fixed an error message returned when the search request is invalid
+
+   https://github.com/owncloud/ocis/issues/8442
+   https://github.com/owncloud/ocis/pull/8444
 
 * Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 
