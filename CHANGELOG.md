@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
+* Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
 
 ## Details
 
@@ -414,6 +415,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8070
    https://github.com/owncloud/ocis/pull/8408
+
+* Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
+
+   We have added a make step `make validate-env-var-annotations` to validate the
+   env var annotations in to the environment variables.
+
+   https://github.com/owncloud/ocis/issues/8258
+   https://github.com/owncloud/ocis/pull/8436
 
 # Changelog for [5.0.0-rc.1] (2023-12-27)
 
