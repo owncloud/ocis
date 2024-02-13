@@ -347,7 +347,7 @@ class SpacesContext implements Context {
 		if ($folderName === $space["name"]) {
 			$folderName = '';
 		}
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $folderName;
+		$fullUrl = $space["root"]["webDavUrl"] . "/" . $folderName;
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
