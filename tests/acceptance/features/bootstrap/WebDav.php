@@ -5773,7 +5773,7 @@ trait WebDav {
 			$resourcePath = $href;
 			// do not try to parse the resouce path
 			// if the item to search space itself
-			if (!GraphHelper::isSpaceId($entryNameToSearch)){
+			if (!GraphHelper::isSpaceId($entryNameToSearch)) {
 				$resourcePath = \substr($href, \strpos($href, '/') + 1);
 			}
 			if (\count($shareRootXml)) {
