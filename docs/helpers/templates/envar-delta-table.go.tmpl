@@ -1,0 +1,120 @@
+package main
+
+import (
+	"fmt"
+	"gopkg.in/yaml.v2"
+	"html"
+	"reflect"
+	"strings"
+	"log"
+	"os"
+	"path/filepath"
+
+	{{- range $key, $value :=.}}
+	pkg{{$key}} "{{$value}}"
+	{{- end}}
+)
+
+const yamlSource = "env_vars.yaml"
+
+type ConfigField struct {
+	Name                string `yaml:"name"`
+	DefaultValue        string `yaml:"defaultValue"`
+	Type                string `yaml:"type"`
+	Description         string `yaml:"description"`
+	IntroductionVersion string `yaml:"introductionVersion"`
+	DeprecationVersion  string `yaml:"deprecationVersion"`
+	RemovalVersion      string `yaml:"removalVersion"`
+	DeprecationInfo     string `yaml:"deprecationInfo"`
+}
+
+func main() {
+	fmt.Println("Generating tables for env-var deltas")
+	var fields []ConfigField
+	configFields := make(map[string]ConfigField)
+	m := map[string]interface{}{
+		{{- range $key, $value := .}}
+			"{{$value}}": *pkg{{$key}}.FullDefaultConfig(),
+		{{- end }}
+	}
+	for _, conf := range m {
+		fields = GetAnnotatedVariables(conf)
+		for _, field := range fields {
+			variants := strings.Split(field.Name, ";")
+			for _, variant := range variants {
+				if configFields[variant].Name == "" {
+					configFields[variant] = field
+				} else {
+					fmt.Println("Duplicate key: ", variant)
+				}
+			}
+		}
+	}
+	curdir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fullYamlPath := filepath.Join(curdir, yamlSource)
+	output, err := yaml.Marshal(configFields)
+	if err != nil {
+		log.Fatalf("Could not marshall variables: %v", err)
+	}
+	err = os.WriteFile(fullYamlPath, output, 0666)
+	if err != nil {
+		log.Fatalf("could not write %s", fullYamlPath)
+	}
+	if err := os.Chdir(curdir); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GetAnnotatedVariables(s interface{}) []ConfigField {
+	t := reflect.TypeOf(s)
+	v := reflect.ValueOf(s)
+
+	var fields []ConfigField
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		switch value.Kind() {
+		default:
+			desc := field.Tag.Get("desc")
+			env, ok := field.Tag.Lookup("env")
+			if !ok {
+				continue
+			}
+			introductionVersion := field.Tag.Get("introductionVersion")
+			deprecationVersion := field.Tag.Get("deprecationVersion")
+			removalVersion := field.Tag.Get("removalVersion")
+			deprecationInfo := field.Tag.Get("deprecationInfo")
+			v := fmt.Sprintf("%v", value.Interface())
+			typeName := value.Type().Name()
+			if typeName == "" {
+				typeName = value.Type().String()
+			}
+			//fields = append(fields, ConfigField{Name: strings.ReplaceAll(env, ";", "<br/>"), DefaultValue: html.EscapeString(strings.Replace(v, "|", "\\|", -1)), Description: desc, Type: typeName})
+			fields = append(fields, ConfigField{
+				Name: env,
+				DefaultValue: html.EscapeString(strings.Replace(v, "|", "\\|", -1)),
+				Description: desc,
+				Type: typeName,
+				IntroductionVersion: introductionVersion,
+				DeprecationVersion: deprecationVersion,
+				RemovalVersion: removalVersion,
+				DeprecationInfo: deprecationInfo,
+			})
+		case reflect.Ptr:
+			// PolicySelectors in the Proxy are being skipped atm
+			// they are not configurable via env vars, if that changes
+			// they are probably added to the Sanitize() function
+			// and this should not be an issue then
+			if !value.IsZero() && value.Elem().CanInterface() {
+				fields = append(fields, GetAnnotatedVariables(value.Elem().Interface())...)
+			}
+		case reflect.Struct:
+			fields = append(fields, GetAnnotatedVariables(value.Interface())...)
+		}
+	}
+	return fields
+}

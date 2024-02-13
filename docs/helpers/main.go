@@ -16,18 +16,15 @@ func main() {
 			RenderGlobalVarsTemplate()
 		case "service-index":
 			GenerateServiceIndexMarkdowns()
-		case "envvar-deltas":
-			RenderEnvVarDeltas()
 		case "all":
 			RenderTemplates()
 			GetRogueEnvs()
 			RenderGlobalVarsTemplate()
 			GenerateServiceIndexMarkdowns()
-			RenderEnvVarDeltas()
 		case "help":
 			fallthrough
 		default:
-			fmt.Println("Usage: [templates|rogue|globals|service-index|envvar-deltas|all]")
+			fmt.Println("Usage: [templates|rogue|globals|service-index|all]")
 		}
 	} else {
 		// Left here, even though present in the switch case, for backwards compatibility
@@ -35,6 +32,5 @@ func main() {
 		GetRogueEnvs()
 		RenderGlobalVarsTemplate()
 		GenerateServiceIndexMarkdowns()
-		RenderEnvVarDeltas()
 	}
 }
