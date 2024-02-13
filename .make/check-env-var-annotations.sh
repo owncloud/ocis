@@ -22,7 +22,9 @@
 
 ERROR=0
 
-QUERY_INTRO=$(git grep "env:" -- '*.go' |grep -v -P "introductionVersion:\"([0-9.]{3,}([-].*)?|(pre5\.0))\""|grep -v "_test.go"|grep -v "vendor/")
+SEMVER_REGEX="([0-9]|[1-9][0-9]*)(\.([0-9]|[1-9][0-9]*)){1,2}(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"
+
+QUERY_INTRO=$(git grep "env:" -- '*.go' |grep -v -P "introductionVersion:\"($SEMVER_REGEX|(pre5\.0))\""|grep -v "_test.go"|grep -v "vendor/")
 
 RESULTS_INTRO=$(echo "${QUERY_INTRO}"|wc -l)
 if [ "${RESULTS_INTRO}" -gt 0 ]; then
