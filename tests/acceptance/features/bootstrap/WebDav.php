@@ -5280,6 +5280,7 @@ trait WebDav {
 		$should = ($shouldOrNot !== "not");
 		foreach ($elementRows as $expectedFile) {
 			$resource = $expectedFile[0];
+			$resource = $this->substituteInLineCodes($resource, $user);
 			if ($resource === '') {
 				continue;
 			}
@@ -5769,7 +5770,12 @@ trait WebDav {
 			$href = (string)$item->xpath("d:href")[0];
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
 			$href = \str_replace($spacesBaseUrl, "", $href);
-			$resourcePath = \substr($href, \strpos($href, '/') + 1);
+			$resourcePath = $href;
+			// do not try to parse the resouce path
+			// if the item to search space itself
+			if (!GraphHelper::isSpaceId($entryNameToSearch)){
+				$resourcePath = \substr($href, \strpos($href, '/') + 1);
+			}
 			if (\count($shareRootXml)) {
 				$shareroot = \trim((string)$shareRootXml[0], "/");
 				$resourcePath = $shareroot . "/" . $resourcePath;
