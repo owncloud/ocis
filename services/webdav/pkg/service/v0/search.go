@@ -78,7 +78,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		e := merrors.Parse(err.Error())
 		switch e.Code {
 		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(err.Error()))
+			renderError(w, r, errBadRequest(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
