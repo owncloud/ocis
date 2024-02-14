@@ -1,12 +1,5 @@
 // collected through docs/helpers/adoc-generator.go.tmpl
 
-Note that some global environment variables have been deprecated and replaced by a new one starting with `OCIS_` for naming consistency:
-
-* All envvars starting with `LDAP_`
-* All envvars starting with `IDM_` except `IDM_CREATE_DEMO_USERS`
-* The following envvars: `OCIS_REVA_GATEWAY`, `STORAGE_TRANSFER_SECRET`, `OCIS_ASYNC_UPLOADS`, `USERLOG_MACHINE_AUTH_API_KEY`.
-* Note that `WEB_UI_CONFIG_FILE` is not a global envar and will dropped from the list in a later release.
-
 [.landscape]
 [caption=]
 .Environment variables with global scope available in multiple services
@@ -17,9 +10,7 @@ Note that some global environment variables have been deprecated and replaced by
 | Type
 | Default Value
 | Description
-
 {{ range . }}
-
 a| `{{ .Name }}`
 
 a| [subs=attributes+]
