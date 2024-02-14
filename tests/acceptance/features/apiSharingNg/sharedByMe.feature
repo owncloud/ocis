@@ -1451,3 +1451,34 @@ Feature: resources shared by user
       }
     }
     """
+
+  @env-config
+  Scenario: user lists shared resources for deleted sharee
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And the administrator has deleted user "Brian" using the provisioning API
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "minItems":0,
+          "maxItems":0
+        }
+      }
+    }
+    """
