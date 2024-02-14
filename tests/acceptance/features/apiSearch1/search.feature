@@ -69,7 +69,7 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user cannot finsearch pending share
+  Scenario Outline: user cannot search pending share
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
     And user "Alice" has created a share inside of space "project101" with settings:
