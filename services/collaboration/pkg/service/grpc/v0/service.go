@@ -148,7 +148,7 @@ func (s *Service) OpenInApp(
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := app.EncryptAES([]byte(s.config.Secret), req.AccessToken)
+	cryptedReqAccessToken, err := app.EncryptAES([]byte(s.config.JWTSecret), req.AccessToken)
 	if err != nil {
 		s.logger.Error().
 			Err(err).
@@ -191,7 +191,7 @@ func (s *Service) OpenInApp(
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(s.config.Secret))
+	accessToken, err := token.SignedString([]byte(s.config.JWTSecret))
 
 	if err != nil {
 		s.logger.Error().

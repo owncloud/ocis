@@ -25,26 +25,27 @@ func DefaultConfig() *config.Config {
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",
 		},
-		Secret: uniuri.NewLen(32),
+		JWTSecret: uniuri.NewLen(32),
 		GRPC: config.GRPC{
-			Addr:      "127.0.0.1:56778",
+			Addr:      "0.0.0.0:9301",
 			Namespace: "com.owncloud.collaboration",
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:6789",
+			Addr:      "127.0.0.1:9300",
+			BindAddr:  "0.0.0.0:9300",
 			Namespace: "com.owncloud.collaboration",
-			//Scheme: "http",
+			Scheme:    "https",
 		},
 		WopiApp: config.WopiApp{
 			Addr:     "https://127.0.0.1:8080",
-			Insecure: true, // TODO: this should have a secure default
+			Insecure: false,
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{
 				Name: "com.owncloud.api.gateway",
 			},
 			DataGateway: config.DataGateway{
-				Insecure: true, // TODO: this should have a secure default
+				Insecure: false,
 			},
 		},
 	}
