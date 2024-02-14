@@ -89,6 +89,7 @@ func Posix(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"root":                    cfg.Drivers.Posix.Root,
 		"user_layout":             cfg.Drivers.Posix.UserLayout,
+		"project_layout":          cfg.Drivers.Posix.ProjectLayout,
 		"permissionssvc":          cfg.Drivers.Posix.PermissionsEndpoint,
 		"permissionssvc_tls_mode": cfg.Commons.GRPCClientTLS.Mode,
 		"treetime_accounting":     true,

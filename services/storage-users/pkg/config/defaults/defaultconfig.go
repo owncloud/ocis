@@ -138,6 +138,7 @@ func DefaultConfig() *config.Config {
 			},
 			Posix: config.PosixDriver{
 				UserLayout:          "users/{{.User.Username}}",
+				ProjectLayout:       "projects/{{.SpaceId}}",
 				PermissionsEndpoint: "com.owncloud.api.settings",
 			},
 		},
