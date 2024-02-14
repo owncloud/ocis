@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-13-03-46-25]
+[#deprecation-note-2024-02-14-00-42-19]
 [caption=]
 .Deprecation notes for the auth-machine service
 [width="100%",cols="~,~,~,~",options="header"]
