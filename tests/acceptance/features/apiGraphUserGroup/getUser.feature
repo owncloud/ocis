@@ -1450,7 +1450,7 @@ Feature: get users
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
-    { 
+    {
       "type": "object",
       "required": [
         "value"
@@ -1487,14 +1487,14 @@ Feature: get users
     }
     """
 
-  
+
   Scenario: non-admin user searches for a disabled users
     Given the user "Admin" has disabled user "Alice"
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
-    { 
+    {
       "type": "object",
       "required": [
         "value"
@@ -1531,7 +1531,7 @@ Feature: get users
     }
     """
 
-  
+
   Scenario: non-admin user searches for multiple users having same displayname
     Given the user "Admin" has created a new user with the following attributes:
       | userName    | another-alice                |
@@ -1543,7 +1543,7 @@ Feature: get users
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
-    { 
+    {
       "type": "object",
       "required": [
         "value"

@@ -140,6 +140,8 @@ https://github.com/owncloud/ocis/pull/8342
 https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
 https://github.com/owncloud/ocis/pull/8154
 https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
+https://github.com/owncloud/ocis/pull/8154
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
 https://github.com/owncloud/ocis/pull/8055
 https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
 https://github.com/owncloud/ocis/pull/7930
