@@ -3,9 +3,6 @@ Feature: Search
   I want to search for resources in the space
   So that I can get them quickly
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes and without skeleton files:
       | username |
@@ -13,29 +10,12 @@ Feature: Search
       | Brian    |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "find data" with the default quota using the Graph API
-    And user "Alice" has created a folder "folderMain/SubFolder1/subFOLDER2" in space "find data"
-    And user "Alice" has uploaded a file inside space "find data" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
+    And user "Alice" has created a space "project101" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderMain/SubFolder1/subFOLDER2" in space "project101"
+    And user "Alice" has uploaded a file inside space "project101" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
 
 
-  Scenario Outline: user can find data from the project space
-    Given using <dav-path-version> DAV path
-    When user "Alice" searches for "*fol*" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the search result should contain "4" entries
-    And the search result of user "Alice" should contain these entries:
-      | /folderMain                                           |
-      | /folderMain/SubFolder1                                |
-      | /folderMain/SubFolder1/subFOLDER2                     |
-      | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
-
-
-  Scenario Outline: user can only find data that they searched for from the project space
+  Scenario Outline: user can search items from the project space
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*SUB*" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -53,9 +33,9 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user can find data from the shares
+  Scenario Outline: user can search items from the shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "find data" with settings:
+    And user "Alice" has created a share inside of space "project101" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
@@ -74,9 +54,9 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user can find hidden file
+  Scenario Outline: user can search hidden files
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a folder ".space" in space "find data"
+    And user "Alice" has created a folder ".space" in space "project101"
     When user "Alice" searches for "*.sp*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -89,10 +69,10 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user cannot find pending share
+  Scenario Outline: user cannot search pending share
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "find data" with settings:
+    And user "Alice" has created a share inside of space "project101" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
@@ -110,9 +90,9 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user cannot find declined share
+  Scenario Outline: user cannot search declined share
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "find data" with settings:
+    And user "Alice" has created a share inside of space "project101" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
@@ -131,9 +111,9 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user cannot find deleted folder
+  Scenario Outline: user cannot search deleted items
     Given using <dav-path-version> DAV path
-    And user "Alice" has removed the folder "folderMain" from space "find data"
+    And user "Alice" has removed the folder "folderMain" from space "project101"
     When user "Alice" searches for "*folderMain*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
@@ -144,12 +124,12 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user can find project space by name
+  Scenario Outline: user can search project space by name
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for '"*find data*"' using the WebDAV API
+    When user "Alice" searches for '*project101*' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
-    And for user "Alice" the search result should contain space "find data"
+    And for user "Alice" the search result should contain space "project101"
     Examples:
       | dav-path-version |
       | old              |
@@ -159,7 +139,7 @@ Feature: Search
 
   Scenario Outline: user can search inside folder in space
     Given using <dav-path-version> DAV path
-    When user "Alice" searches for "*folder*" inside folder "/folderMain" in space "find data" using the WebDAV API
+    When user "Alice" searches for "*folder*" inside folder "/folderMain" in space "project101" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "3" entries
     And the search result of user "Alice" should contain only these entries:
@@ -177,7 +157,7 @@ Feature: Search
 
   Scenario Outline: search inside folder in shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "find data" with settings:
+    And user "Alice" has created a share inside of space "project101" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
       | role      | viewer     |
@@ -277,16 +257,24 @@ Feature: Search
 
   Scenario Outline: search resources using different search patterns (KQL feature)
     Given using spaces DAV path
-    And user "Alice" has created a folder "subfolder" in space "find data"
+    And user "Alice" has created a folder "subfolder" in space "project101"
     When user "Alice" searches for '<pattern>' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain these entries:
       | <search-result> |
     Examples:
-      | description                                            | pattern      | search-result                     |
-      | starts with                                            | fold*        | /folderMain                       |
-      | ends with                                              | *der1        | /folderMain/SubFolder1            |
-      | strict search                                          | subfolder    | /subfolder                        |
-      | using patern "name:"                                   | name:*der2   | /folderMain/SubFolder1/subFOLDER2 |
-      | using the pattern "name:" where the value is in quotes | name:"*der2" | /folderMain/SubFolder1/subFOLDER2 |
+      | pattern      | search-result                     | description                     |
+      | fold*        | /folderMain                       | starts with                     |
+      | *der1        | /folderMain/SubFolder1            | ends with                       |
+      | subfolder    | /subfolder                        | exact search                    |
+      | name:*der2   | /folderMain/SubFolder1/subFOLDER2 | patern 'name:''                 |
+      | name:"*der2" | /folderMain/SubFolder1/subFOLDER2 | pattern 'name:""' (with quotes) |
+
+  @issue-7812 @issue-8442
+  Scenario: try to search with invalid patterns
+    Given using spaces DAV path
+    And user "Alice" has uploaded file with content "test file" to "testFile.txt"
+    When user "Alice" searches for 'AND mediatype:document' using the WebDAV API
+    Then the HTTP status code should be "400"
+    And the value of the item "/d:error/s:message" in the response should be "error: bad request: the expression can't begin from a binary operator: 'AND'"
