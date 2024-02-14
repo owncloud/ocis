@@ -1922,3 +1922,145 @@ Feature: listing sharedWithMe when auto-sync is disabled
         }
       }
       """
+
+
+  Scenario: user who is also a member of group lists the file shared with them when auto-sync is disabled
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "textfile.txt"
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden": {
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize": {
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                            "grantedToV2",
+                            "id",
+                            "invitation",
+                            "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                            "grantedToV2",
+                            "id",
+                            "invitation",
+                            "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["group"],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["grp1"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
