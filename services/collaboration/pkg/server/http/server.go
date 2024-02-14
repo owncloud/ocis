@@ -48,7 +48,7 @@ func Server(opts ...Option) (http.Service, error) {
 		),
 		middleware.ExtractAccountUUID(
 			account.Logger(options.Logger),
-			account.JWTSecret(options.Config.Secret), // previously, secret came from Config.TokenManager.JWTSecret
+			account.JWTSecret(options.Config.JWTSecret), // previously, secret came from Config.TokenManager.JWTSecret
 		),
 		/*
 			// Need CORS? not in the original server

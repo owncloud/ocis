@@ -14,7 +14,7 @@ type Config struct {
 	Service Service `yaml:"-"`
 	App     App     `yaml:"app"`
 
-	Secret string `yaml:"secret" env:"COLLABORATION_SECRET" desc:"Used as JWT token and to encrypt access token."`
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;COLLABORATION_JWT_SECRET" desc:"Used as JWT token and to encrypt access token."`
 
 	GRPC    GRPC    `yaml:"grpc"`
 	HTTP    HTTP    `yaml:"http"`
@@ -23,7 +23,7 @@ type Config struct {
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	//Debug   Debug    `yaml:"debug"`
 
 	Context context.Context `yaml:"-"`
 }

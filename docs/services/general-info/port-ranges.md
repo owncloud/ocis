@@ -71,7 +71,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9285-9289  | FREE                                                                                   |
 | 9290-9294  | FREE                                                                                   |
 | 9295-9299  | FREE                                                                                   |
-| 9300-9304  | FREE                                                                                   |
+| 9300-9304  | [collaboration]({{< ref "../collaboration/_index.md" >}})                              |
 | 9305-9309  | FREE                                                                                   |
 | 9310-9314  | FREE                                                                                   |
 | 9315-9319  | FREE                                                                                   |
