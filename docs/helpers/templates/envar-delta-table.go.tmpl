@@ -29,9 +29,22 @@ type ConfigField struct {
 }
 
 func main() {
-	fmt.Println("Generating tables for env-var deltas")
+	fmt.Println("Generating tables for env-var deltas...")
+	curdir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fullYamlPath := filepath.Join(curdir, yamlSource)
 	var fields []ConfigField
-	configFields := make(map[string]ConfigField)
+	configFields := make(map[string]*ConfigField)
+	fmt.Printf("Reading existing variable definitions from %s\n", fullYamlPath)
+	yfile, err := os.ReadFile(fullYamlPath)
+	if err == nil {
+		err := yaml.Unmarshal(yfile, configFields)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	m := map[string]interface{}{
 		{{- range $key, $value := .}}
 			"{{$value}}": *pkg{{$key}}.FullDefaultConfig(),
@@ -43,18 +56,39 @@ func main() {
 			variants := strings.Split(field.Name, ";")
 			for _, variant := range variants {
 				if configFields[variant].Name == "" {
-					configFields[variant] = field
+					configFields[variant] = &field
 				} else {
-					fmt.Println("Duplicate key: ", variant)
+					fmt.Printf("%v, duplicate key, merging\n", variant)
+					if strings.TrimSpace(configFields[variant].DefaultValue) != "" && configFields[variant].DefaultValue != field.DefaultValue {
+						configFields[variant].DefaultValue = field.DefaultValue
+					}
+					if strings.TrimSpace(configFields[variant].Description) != "" && configFields[variant].Description != field.Description {
+						configFields[variant].Description = field.Description
+					}
+					if strings.TrimSpace(configFields[variant].Type) != "" && configFields[variant].Type != field.Type {
+						configFields[variant].Type = field.Type
+					}
+					if strings.TrimSpace(configFields[variant].IntroductionVersion) != "" && configFields[variant].IntroductionVersion != field.IntroductionVersion {
+						configFields[variant].IntroductionVersion = field.IntroductionVersion
+					}
+					if strings.TrimSpace(configFields[variant].DeprecationVersion) != "" && configFields[variant].DeprecationVersion != field.DeprecationVersion {
+						configFields[variant].DeprecationVersion = field.DeprecationVersion
+					}
+					if strings.TrimSpace(configFields[variant].RemovalVersion) != "" && configFields[variant].RemovalVersion != field.RemovalVersion {
+						configFields[variant].RemovalVersion = field.RemovalVersion
+					}
+					if strings.TrimSpace(configFields[variant].Name) != "" && configFields[variant].Name != field.Name {
+						configFields[variant].Name = field.Name
+					}
+					if strings.TrimSpace(configFields[variant].DeprecationInfo) != "" && configFields[variant].DeprecationInfo != field.DeprecationInfo {
+						// there might be multiple superseeding DeprecationInformations, we might want to keep track of those, that's why we are not overwriting the field
+						configFields[variant].DeprecationInfo = configFields[variant].DeprecationInfo + " | " + field.DeprecationInfo
+					}
 				}
 			}
 		}
 	}
-	curdir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fullYamlPath := filepath.Join(curdir, yamlSource)
+
 	output, err := yaml.Marshal(configFields)
 	if err != nil {
 		log.Fatalf("Could not marshall variables: %v", err)
