@@ -192,6 +192,7 @@ type PosixDriver struct {
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud."`
 	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_POSIX_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
+	ProjectLayout       string `yaml:"project_layout" env:"STORAGE_USERS_POSIX_PROJECT_LAYOUT" desc:"Template string for the project spaces storage layout."`
 	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'."`
 }
 
