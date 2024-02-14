@@ -2493,3 +2493,298 @@ Feature: listing sharedWithMe when auto-sync is disabled
         }
       }
       """
+
+
+  Scenario: user lists the folder with same name shared by two users with him/her when auto sync is disabled
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "folderToShare"
+    And user "Carol" has created folder "folderToShare"
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Carol" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "@UI.Hidden": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "@client.synchronize": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["displayName", "id"],
+                          "properties": {
+                            "displayName": {
+                              "type": "string",
+                              "enum": ["Carol King"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": ["folderToShare"]
+                    },
+                    "remoteItem": {
+                      "type": "object",
+                      "required": [
+                        "createdBy",
+                        "eTag",
+                        "folder",
+                        "id",
+                        "lastModifiedDateTime",
+                        "name",
+                        "parentReference",
+                        "permissions"
+                      ],
+                      "properties": {
+                        "createdBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["displayName","id"],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Carol King"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "name": {
+                          "type": "string",
+                          "enum": ["folderToShare"]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "object",
+                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "properties": {
+                                "grantedToV2": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Brian Murphy"]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Carol King"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "@UI.Hidden": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "@client.synchronize": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["displayName", "id"],
+                          "properties": {
+                            "displayName": {
+                              "type": "string",
+                              "enum": ["Alice Hansen"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": ["folderToShare"]
+                    },
+                    "remoteItem": {
+                      "type": "object",
+                      "required": [
+                        "createdBy",
+                        "eTag",
+                        "folder",
+                        "id",
+                        "lastModifiedDateTime",
+                        "name",
+                        "parentReference",
+                        "permissions"
+                      ],
+                      "properties": {
+                        "createdBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["displayName", "id"],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Alice Hansen"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "name": {
+                          "type": "string",
+                          "enum": ["folderToShare"]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "object",
+                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "properties": {
+                                "grantedToV2": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Brian Murphy"]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Alice Hansen"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
