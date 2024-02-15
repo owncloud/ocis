@@ -1,4 +1,32 @@
-Enhancement: Update Reva to version 2.18.0
+Enhancement: Update reva to latest edge version
+
+We update reva to the latest edge version to get the latest fixes and features.
+
+## Changelog for reva edge
+
+*   Bugfix [cs3org/reva#4454](https://github.com/cs3org/reva/pull/4454): Skip unnecessary share retrieval
+*   Bugfix [cs3org/reva#4461](https://github.com/cs3org/reva/pull/4461): CORS handling for WebDAV requests fixed
+*   Bugfix [cs3org/reva#4462](https://github.com/cs3org/reva/pull/4462): Prevent setting container specific permissions on files
+*   Bugfix [cs3org/reva#4463](https://github.com/cs3org/reva/pull/4463): Fix the resource name
+*   Bugfix [cs3org/reva#4466](https://github.com/cs3org/reva/pull/4466): Fix natsjskv store
+*   Bugfix [cs3org/reva#4469](https://github.com/cs3org/reva/pull/4469): Handle interrupted uploads
+*   Bugfix [cs3org/reva#4472](https://github.com/cs3org/reva/pull/4472): Fix concurrent access to a map
+*   Bugfix [cs3org/reva#4473](https://github.com/cs3org/reva/pull/4473): Decomposedfs now correctly lists sessions
+*   Bugfix [cs3org/reva#4474](https://github.com/cs3org/reva/pull/4474): Make /dav/meta consistent
+*   Bugfix [cs3org/reva#4475](https://github.com/cs3org/reva/pull/4475): Upload session specific processing flag
+*   Bugfix [cs3org/reva#4476](https://github.com/cs3org/reva/pull/4476): No need to unmark postprocessing when it was not started
+*   Bugfix [cs3org/reva#4479](https://github.com/cs3org/reva/pull/4479): Fix creating documents in the approvider
+*   Bugfix [cs3org/reva#4481](https://github.com/cs3org/reva/pull/4481): Distinguish failure and node metadata reversal
+*   Bugfix [cs3org/reva#4434](https://github.com/cs3org/reva/pull/4434): Fix the upload postprocessing
+*   Bugfix [cs3org/reva#4443](https://github.com/cs3org/reva/pull/4443): Fixed wrong status code when moving a file to a denied path
+*   Bugfix [cs3org/reva#4446](https://github.com/cs3org/reva/pull/4446): Disallow to delete a file during the processing
+*   Bugfix [cs3org/reva#4448](https://github.com/cs3org/reva/pull/4448): Fix truncating existing files
+*   Bugfix [cs3org/reva#4449](https://github.com/cs3org/reva/pull/4449): Keep failed processing status
+*   Bugfix [cs3org/reva#4452](https://github.com/cs3org/reva/pull/4452): More efficient share jail
+*   Bugfix [cs3org/reva#4456](https://github.com/cs3org/reva/pull/4456): Do not lose revisions when restoring the first revision
+*   Bugfix [cs3org/reva#4457](https://github.com/cs3org/reva/pull/4457): Fix concurrent map access in sharecache
+*   Enhancement [cs3org/reva#4453](https://github.com/cs3org/reva/pull/4453): Disable the password policy
+*   Enhancement [cs3org/reva#4477](https://github.com/cs3org/reva/pull/4477): Extend ResumePostprocessing event
 
 ## Changelog for reva 2.18.0 (2023-12-22)
 
@@ -93,6 +121,11 @@ reva users. The changes are ordered by importance.
 *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
 *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
+https://github.com/owncloud/ocis/pull/8287
+https://github.com/owncloud/ocis/pull/8278
+https://github.com/owncloud/ocis/pull/8264
+https://github.com/owncloud/ocis/pull/8100
+https://github.com/owncloud/ocis/pull/8100
 https://github.com/owncloud/ocis/pull/8038
 https://github.com/owncloud/ocis/pull/8056
 https://github.com/owncloud/ocis/pull/7949
