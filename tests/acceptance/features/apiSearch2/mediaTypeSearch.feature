@@ -70,16 +70,16 @@ Feature: media type search
 
   Scenario Outline: search for file inside project space using media type
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "find data" with the default quota using the Graph API
-    And user "Alice" has uploaded a file "filesForUpload/lorem.txt" to "/lorem.txt" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/simple.pdf" to "/simple.pdf" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "find data"
+    And user "Alice" has created a space "project101" with the default quota using the Graph API
+    And user "Alice" has uploaded a file "filesForUpload/lorem.txt" to "/lorem.txt" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/simple.pdf" to "/simple.pdf" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "project101"
     When user "Alice" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -128,19 +128,19 @@ Feature: media type search
       | *bzip2* | /uploadFolder/data.tar.bz2   |
 
 
-  Scenario Outline: sharee searches for files inside shared space using media type
+  Scenario Outline: space viewer searches for files using mediatype filter
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "find data" with the default quota using the Graph API
-    And user "Alice" has uploaded a file "filesForUpload/lorem.txt" to "/lorem.txt" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/simple.pdf" to "/simple.pdf" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "find data"
-    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "find data"
-    And user "Alice" has shared a space "find data" with settings:
+    And user "Alice" has created a space "project101" with the default quota using the Graph API
+    And user "Alice" has uploaded a file "filesForUpload/lorem.txt" to "/lorem.txt" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/simple.pdf" to "/simple.pdf" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.png" to "/testavatar.png" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.gz" to "/data.tar.gz" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar" to "/data.tar" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "project101"
+    And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "project101"
+    And user "Alice" has shared a space "project101" with settings:
       | shareWith | Brian  |
       | role      | viewer |
     When user "Brian" searches for "mediatype:<pattern>" using the WebDAV API
@@ -159,3 +159,51 @@ Feature: media type search
       | *7z*    | /data.7z        |
       | *rar*   | /data.rar       |
       | *bzip2* | /data.tar.bz2   |
+
+
+  Scenario: search files with different mediatype filter
+    Given user "Alice" has created folder "testFolder"
+    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
+    And user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
+    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "testavatar.png"
+    And user "Alice" has uploaded file "filesForUpload/example.gif" to "example.gif"
+    And user "Alice" has uploaded file "filesForUpload/data.tar.gz" to "data.tar.gz"
+    And user "Alice" has uploaded file "filesForUpload/data.tar" to "data.tar"
+    And user "Alice" has uploaded file "filesForUpload/data.7z" to "data.7z"
+    And user "Alice" has uploaded file "filesForUpload/data.rar" to "data.rar"
+    And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "data.tar.bz2"
+    When user "Alice" searches for "mediatype:folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain these entries:
+      | %spaceid%    |
+      | testFolder   |
+    When user "Alice" searches for "mediatype:document" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain these entries:
+      | lorem.txt  |
+      | simple.odt |
+    When user "Alice" searches for "mediatype:pdf" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain these entries:
+      | simple.pdf |
+    When user "Alice" searches for "mediatype:image" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "3" entries
+    And the search result of user "Alice" should contain these entries:
+      | testavatar.jpg |
+      | testavatar.png |
+      | example.gif    |
+    When user "Alice" searches for "mediatype:archive" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "5" entries
+    And the search result of user "Alice" should contain these entries:
+      | data.tar.gz  |
+      | data.tar     |
+      | data.7z      |
+      | data.rar     |
+      | data.tar.bz2 |
