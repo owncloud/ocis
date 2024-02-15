@@ -9,16 +9,16 @@ geekdocFilePath: 0024-msgpack-metadata.md
 
 
 * Status: accepted
-* Deciders: @butonic, @aduffeck
-* Date: [2023-03-13](https://github.com/cs3org/reva/pull/3711/commits/204253eee9dbb8e7fa93a01f3f94a2d28ce40a06)
+* Deciders: @butonic, @aduffeck, @micbar, @dragotin
+* Date: [2023-03-15](https://github.com/cs3org/reva/pull/3711/commits/204253eee9dbb8e7fa93a01f3f94a2d28ce40a06)
 
 ## Context and Problem Statement
 
-File metadata management is an important aspect for oCIS as a data platform. While using extended attributes to store metadata allows attaching the metadata to the actual file it causes a significant amount of syscalls that outweigh the benefits.
+File metadata management is an important aspect for oCIS as a data platform. While using extended attributes to store metadata allows attaching the metadata to the actual file it causes a significant amount of syscalls that outweigh the benefits. Furthermore, filesystems are subject to different limitations in the number of extended attributes or the value size that is available.
 
 ## Decision Drivers <!-- optional -->
 
-Performance of reading extended attributes suffers from the syscall overhead when listing and reading all attributes.
+Performance of reading extended attributes suffers from the syscall overhead when listing and reading all attributes. Getting rid of limitations imposed by the filesystem used to store decomposedfs metadata. 
 
 ## Considered Options
 
