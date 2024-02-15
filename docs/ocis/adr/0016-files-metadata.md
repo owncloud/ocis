@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0016-files-metadata.md
 ---
 
-* Status: proposed
+* Status: superseded by [ADR-0024]({{< ref "0024-msgpack-metadata.md" >}})
 * Deciders: @butonic, @dragotin, @micbar, @C0rby
 * Date: 2022-02-04
 
