@@ -2527,6 +2527,27 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param bool $isCacheClear
+	 *
+	 * @return void
+	 */
+	public function userListsResourcesSharedByHimOrHer(string $user, bool $isCacheClear = false) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		if ($isCacheClear) {
+			sleep(1);
+		}
+		$response = GraphHelper::getSharesSharedByMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password']
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user lists the shares shared by him/her using the Graph API
 	 *
 	 * @param string $user
@@ -2535,18 +2556,19 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userListsTheResourcesSharedByAUserUsingGraphApi(string $user): void {
-		$credentials = $this->getAdminOrUserCredentials($user);
-		//TODO
-		// look over wait this
-		sleep(1);
-		$this->featureContext->setResponse(
-			GraphHelper::getSharesSharedByMe(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials['username'],
-				$credentials['password']
-			)
-		);
+		$this->userListsResourcesSharedByHimOrHer($user);
+	}
+
+	/**
+	 * @When user :user lists the shares shared by him/her after clearing user/group cache using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsTheResourcesSharedByAUserAfterClearingUserSpaceUsingGraphApi(string $user): void {
+		$this->userListsResourcesSharedByHimOrHer($user, true);
 	}
 
 	/**
