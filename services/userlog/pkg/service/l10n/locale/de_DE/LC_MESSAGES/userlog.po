@@ -5,17 +5,17 @@
 # 
 # Translators:
 # Michael Barz <mbarz@owncloud.com>, 2023
-# Edith Parzefall, 2023
 # Jürgen Weigert <jnweiger@gmail.com>, 2023
+# Edith Parzefall, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-01-28 00:35+0000\n"
+"POT-Creation-Date: 2024-02-15 01:14+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
-"Last-Translator: Jürgen Weigert <jnweiger@gmail.com>, 2023\n"
+"Last-Translator: Edith Parzefall, 2024\n"
 "Language-Team: German (Germany) (https://app.transifex.com/owncloud-org/teams/6149/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,7 +68,7 @@ msgstr "Ressource geteilt"
 
 #: pkg/service/templates.go:49
 msgid "Resource unshared"
-msgstr "Resource nicht mehr geteilt"
+msgstr "Ressource nicht mehr geteilt"
 
 #: pkg/service/templates.go:54
 msgid "Share expired"
