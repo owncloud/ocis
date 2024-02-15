@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0025-distributed-search-index.md
 ---
 
-* Status: proposed
+* Status: draft
 * Deciders: @butonic, @fschade, @aduffeck
 * Date: 2024-02-09
 
