@@ -165,3 +165,50 @@ Feature: Share a file or folder that is inside a space
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist
+
+  @issue-enterprise-6423 @env-config
+  Scenario Outline: user cannot share items in the project space with share permission if resharing is denied
+    Given the config "OCIS_ENABLE_RESHARING" has been set to "false"
+    And user "Alice" has shared a space "share sub-item" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Alice" creates a share inside of space "share sub-item" with settings:
+      | path        | folder        |
+      | shareWith   | Bob           |
+      | role        | custom        |
+      | permissions | <permissions> |
+    Then the HTTP status code should be "400"
+    And the OCS status code should be "400"
+    And the OCS status message should be "No share permission"
+    Examples:
+      | permissions | description                  |
+      | 19          | view + edit                  |
+      | 21          | view + create                |
+      | 23          | view + create + edit         |
+      | 25          | view + delete                |
+      | 27          | view + edit + delete         |
+      | 29          | view + create + delete       |
+      | 31          | view + create + edit +delete |
+
+
+  @issue-enterprise-6423 @env-config
+  Scenario Outline: user cannot share items in the personal space with share permission if resharing is denied
+    Given the config "OCIS_ENABLE_RESHARING" has been set to "false"
+    And user "Alice" has uploaded file with content "some content" to "/file.txt"
+    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
+      | path        | file.txt      |
+      | shareWith   | Bob           |
+      | role        | custom        |
+      | permissions | <permissions> |
+    Then the HTTP status code should be "400"
+    And the OCS status code should be "400"
+    And the OCS status message should be "No share permission"
+    Examples:
+      | permissions | description                  |
+      | 19          | view + edit                  |
+      | 21          | view + create                |
+      | 23          | view + create + edit         |
+      | 25          | view + delete                |
+      | 27          | view + edit + delete         |
+      | 29          | view + create + delete       |
+      | 31          | view + create + edit +delete |
