@@ -1,7 +1,9 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-rc.1](#changelog-for-500-rc1-2023-12-27)
+* [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
+* [Changelog for 5.0.0-rc.4](#changelog-for-500-rc4-2024-02-07)
+* [Changelog for 4.0.5](#changelog-for-405-2023-12-21)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
 * [Changelog for 4.0.3](#changelog-for-403-2023-11-24)
 * [Changelog for 4.0.2](#changelog-for-402-2023-09-28)
@@ -10,8 +12,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -36,46 +38,16 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.6...master
 
 ## Summary
 
 * Bugfix - Fix search response: [#7815](https://github.com/owncloud/ocis/pull/7815)
-* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
-* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
-* Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
-* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
-* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
-* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
-* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
-* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
-* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
-* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
-* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
-* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
-* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
-* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
-* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
-* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
-* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
-* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
-* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
-* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
-* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
 * Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
-* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
 * Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
 * Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
 * Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
-* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
-* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
-* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
-* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
-* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
-* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
-* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
-* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
@@ -92,167 +64,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/7812
    https://github.com/owncloud/ocis/pull/7815
 
-* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
-
-   We fixed the race conditions in tests.
-
-   https://github.com/owncloud/ocis/issues/7846
-   https://github.com/owncloud/ocis/pull/7847
-
-* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
-
-   Removes jwt config of policies service
-
-   https://github.com/owncloud/ocis/pull/7893
-
-* Bugfix - Fix Service Account Roles on external IDP: [#8074](https://github.com/owncloud/ocis/pull/8074)
-
-   Service Account Roles wouldn't work when using with external IDP
-
-   https://github.com/owncloud/ocis/pull/8074
-
-* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
-
-   We fixed the upload postprocessing when the destination file does not exist
-   anymore.
-
-   https://github.com/owncloud/ocis/issues/7909
-   https://github.com/owncloud/ocis/pull/8117
-
-* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
-
-   We want to disallow deleting a file during the processing to prevent collecting
-   the orphan uploads.
-
-   https://github.com/owncloud/ocis/issues/8127
-   https://github.com/owncloud/ocis/pull/8132
-   https://github.com/cs3org/reva/pull/4446
-
-* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
-
-   Registers the registry under the correct name
-
-   https://github.com/owncloud/ocis/pull/8140
-
-* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
-
-   We now correctly reinitialize the CS3 backend session after the IDP service has
-   been restarted.
-
-   https://github.com/owncloud/ocis/pull/8142
-
-* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
-
-   User would not be able to patch their preferred language when the ldap backend
-   is set to `read-only`. This makes no sense as language is stored elsewhere.
-
-   https://github.com/owncloud/ocis/pull/8182
-
-* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
-
-   We changed the search service to not log cases where resources that were about
-   to be indexed can no longer be found. Those are expected cases, e.g. when the
-   file in question has already been deleted or renamed meanwhile.
-
-   https://github.com/owncloud/ocis/pull/8200
-
-* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
-
-   We fixed a bug when admin tried to update or reset the logo.
-
-   https://github.com/owncloud/ocis/issues/8101
-   https://github.com/owncloud/ocis/pull/8211
-
-* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
-
-   Main fix is using proto getters to avoid panics. But some other code
-   improvements were also done
-
-   https://github.com/owncloud/ocis/pull/8228
-
-* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
-
-   Now uses proto getters to avoid panics.
-
-   https://github.com/owncloud/ocis/pull/8230
-
-* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
-
-   We fixed a bug in the 'graph/v1beta1/me/drive/sharedWithMe' endpoint that caused
-   an error response when the user received shares from project spaces.
-   Additionally the endpoint now behaves more graceful in cases where the
-   displayname of the owner or creator of a share or shared resource couldn't be
-   resolved.
-
-   https://github.com/owncloud/ocis/issues/8027
-   https://github.com/owncloud/ocis/issues/8215
-   https://github.com/owncloud/ocis/pull/8233
-
-* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
-
-   Updating and Deleting the virtual drives for shares is currently not supported.
-   Instead of returning a generic 500 status we return a 405 response now.
-
-   https://github.com/owncloud/ocis/issues/7881
-   https://github.com/owncloud/ocis/pull/8235
-
-* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
-
-   Fixes nats authentication for registry/events/stores
-
-   https://github.com/owncloud/ocis/pull/8236
-
-* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
-
-   We fixed a problem where after renaming resource as sharer the receiver see a
-   new name.
-
-   https://github.com/owncloud/ocis/issues/8242
-   https://github.com/owncloud/ocis/pull/8246
-   https://github.com/cs3org/reva/pull/4463
-
-* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
-
-   We fixed a bug in the graph API for creating and updating shares so that
-   Spaceroot specific roles like 'Manager' and 'Co-owner' can no longer be assigned
-   for shares on files or directories.
-
-   https://github.com/owncloud/ocis/issues/8131
-   https://github.com/owncloud/ocis/pull/8247
-
-* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
-
-   We fixed the race condition that led to concurrent map access in a publicshare
-   manager.
-
-   https://github.com/owncloud/ocis/issues/8255
-   https://github.com/owncloud/ocis/pull/8269
-   https://github.com/cs3org/reva/pull/4472
-
-* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
-
-   The nats registry would behave badly when configuring `nats-js-kv` via envvar.
-   Reason is the way go-micro initializes. It took 5 developers to find the issue
-   and the fix so the details cannot be shared here. Just accept that it is working
-   now
-
-   https://github.com/owncloud/ocis/pull/8281
-
-* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
-
-   We have removed two spaces related environment variables (whether project spaces
-   and the share jail are enabled) and hardcoded the only allowed options. Misusing
-   those variables would have resulted in invalid config.
-
-   https://github.com/owncloud/ocis/pull/8303
-
-* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
-
-   We fixed setting the config for concurrent web requests, which did not work as
-   expected before.
-
-   https://github.com/owncloud/ocis/pull/8317
-
 * Bugfix - Fix Content-Disposition header for downloads: [#8381](https://github.com/owncloud/ocis/pull/8381)
 
    We have fixed a bug that caused downloads to fail on Chromebased browsers when
@@ -261,12 +72,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8361
    https://github.com/owncloud/ocis/pull/8381
    https://github.com/cs3org/reva/pull/4498
-
-* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
-
-   Signed urls now expire properly
-
-   https://github.com/owncloud/ocis/pull/8385
 
 * Bugfix - Fix an error when move: [#8396](https://github.com/owncloud/ocis/pull/8396)
 
@@ -297,76 +102,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8442
    https://github.com/owncloud/ocis/pull/8444
-
-* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
-
-   Introduce a new environment variable `IDP_LOGIN_BACKGROUND_URL` that overrides
-   the default background image of the IDP login page when present.
-
-   https://github.com/owncloud/ocis/issues/7674
-   https://github.com/owncloud/ocis/pull/7900
-
-* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
-
-   We add the environment variable that allow to disable the password policy.
-
-   https://github.com/owncloud/ocis/issues/7916
-   https://github.com/owncloud/ocis/pull/7985
-   https://github.com/cs3org/reva/pull/4409
-
-* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
-
-   We update the antivirus icap client library and optimize the antivirus scanning
-   service. ANTIVIRUS_ICAP_TIMEOUT is now deprecated and
-   ANTIVIRUS_ICAP_SCAN_TIMEOUT should be used instead.
-
-   ANTIVIRUS_ICAP_SCAN_TIMEOUT supports human durations like `1s`, `1m`, `1h` and
-   `1d`.
-
-   https://github.com/owncloud/ocis/issues/6764
-   https://github.com/owncloud/ocis/pull/8062
-
-* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
-
-   We have removed all deprecated environment variables that have been marked for
-   removal for 5.0.0
-
-   https://github.com/owncloud/ocis/issues/8025
-   https://github.com/owncloud/ocis/pull/8149
-
-* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
-
-   We reworked and moved disabling the password policy logic from the reva to the
-   ocis.
-
-   https://github.com/owncloud/ocis/issues/7916
-   https://github.com/owncloud/ocis/pull/8152
-   https://github.com/cs3org/reva/pull/4453
-
-* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
-
-   We update reva to the latest edge version to get the latest fixes and features.
-
-   https://github.com/owncloud/ocis/pull/8287
-   https://github.com/owncloud/ocis/pull/8278
-   https://github.com/owncloud/ocis/pull/8264
-   https://github.com/owncloud/ocis/pull/8100
-
-* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
-
-   Allows to restart all commands in a specific state.
-
-   https://github.com/owncloud/ocis/pull/8287
-
-* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
-
-   We have changed the default MaxConcurrency value from 100 to 5 to prevent too
-   frequent gc runs on low memory systems. We have also bumped reva to pull in the
-   related changes from there.
-
-   https://github.com/owncloud/ocis/issues/8257
-   https://github.com/owncloud/ocis/pull/8309
-   https://github.com/cs3org/reva/pull/4485
 
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 
@@ -432,11 +167,48 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8258
    https://github.com/owncloud/ocis/pull/8436
 
-# Changelog for [5.0.0-rc.1] (2023-12-27)
+# Changelog for [4.0.6] (2024-02-07)
 
-The following sections list the changes for 5.0.0-rc.1.
+The following sections list the changes for 4.0.6.
 
-[5.0.0-rc.1]: https://github.com/owncloud/ocis/compare/v4.0.4...v5.0.0-rc.1
+[4.0.6]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.4...v4.0.6
+
+## Summary
+
+* Bugfix - Fix RED metrics on the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+## Details
+
+* Bugfix - Fix RED metrics on the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
+
+   We connected some metrics to the metrics endpoint to support the RED method for
+   monitoring microservices.
+
+   - Request Rate: The number of requests per second. The total count of requests
+   is available under `ocis_proxy_requests_total`. - Error Rate: The number of
+   failed requests per second. The total count of failed requests is available
+   under `ocis_proxy_errors_total`. - Duration: The amount of time each request
+   takes. The duration of all requests is available under
+   `ocis_proxy_request_duration_seconds`. This is a histogram metric, so it also
+   provides information about the distribution of request durations.
+
+   The metrics are available under the following paths: `PROXY_DEBUG_ADDR/metrics`
+   in a prometheus compatible format and maybe secured by `PROXY_DEBUG_TOKEN`.
+
+   https://github.com/owncloud/ocis/pull/7994
+
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+   Signed urls now expire properly
+
+   https://github.com/owncloud/ocis/pull/8385
+
+# Changelog for [5.0.0-rc.4] (2024-02-07)
+
+The following sections list the changes for 5.0.0-rc.4.
+
+[5.0.0-rc.4]: https://github.com/owncloud/ocis/compare/v4.0.5...v5.0.0-rc.4
 
 ## Summary
 
@@ -463,8 +235,10 @@ The following sections list the changes for 5.0.0-rc.1.
 * Bugfix - Fix the tgz mime type: [#7772](https://github.com/owncloud/ocis/pull/7772)
 * Bugfix - Fix natsjs cache: [#7790](https://github.com/owncloud/ocis/pull/7790)
 * Bugfix - Fix search service start: [#7795](https://github.com/owncloud/ocis/pull/7795)
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 * Bugfix - Fix the public link update: [#7862](https://github.com/owncloud/ocis/pull/7862)
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
 * Bugfix - Password policy return code was wrong: [#7952](https://github.com/owncloud/ocis/pull/7952)
 * Bugfix - Removed outdated and unused dependency from idp package: [#7957](https://github.com/owncloud/ocis/issues/7957)
@@ -475,6 +249,25 @@ The following sections list the changes for 5.0.0-rc.1.
 * Bugfix - Non durable streams for sse service: [#7986](https://github.com/owncloud/ocis/pull/7986)
 * Bugfix - Fix empty trace ids: [#8023](https://github.com/owncloud/ocis/pull/8023)
 * Bugfix - Fix search by containing special characters: [#8050](https://github.com/owncloud/ocis/pull/8050)
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
+* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
+* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
@@ -511,6 +304,7 @@ The following sections list the changes for 5.0.0-rc.1.
 * Enhancement - Add search MediaType filter: [#7602](https://github.com/owncloud/ocis/pull/7602)
 * Enhancement - Add Sharing NG endpoints: [#7633](https://github.com/owncloud/ocis/pull/7633)
 * Enhancement - Configs for Web embed mode: [#7670](https://github.com/owncloud/ocis/pull/7670)
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 * Enhancement - Add preferred language to user settings: [#7720](https://github.com/owncloud/ocis/pull/7720)
 * Enhancement - Add user filter startswith and contains: [#7739](https://github.com/owncloud/ocis/pull/7739)
@@ -528,13 +322,19 @@ The following sections list the changes for 5.0.0-rc.1.
 * Enhancement - Add cli commands for trash-bin: [#7917](https://github.com/owncloud/ocis/pull/7917)
 * Enhancement - Add validation update public share: [#7978](https://github.com/owncloud/ocis/pull/7978)
 * Enhancement - Allow inmemory nats-js-kv stores: [#7979](https://github.com/owncloud/ocis/pull/7979)
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 * Enhancement - Allow authentication nats connections: [#7989](https://github.com/owncloud/ocis/pull/7989)
 * Enhancement - Add RED metrics to the metrics endpoint: [#7994](https://github.com/owncloud/ocis/pull/7994)
 * Enhancement - Add ocm and sciencemesh services: [#7998](https://github.com/owncloud/ocis/pull/7998)
 * Enhancement - Make nats-js-kv the default registry: [#8011](https://github.com/owncloud/ocis/pull/8011)
-* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
 * Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
+* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
 * Enhancement - Update web to v8.0.0-rc.3: [#8342](https://github.com/owncloud/ocis/pull/8342)
 
 ## Details
@@ -723,6 +523,13 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/7795
 
+* Bugfix - The race conditions in tests: [#7847](https://github.com/owncloud/ocis/pull/7847)
+
+   We fixed the race conditions in tests.
+
+   https://github.com/owncloud/ocis/issues/7846
+   https://github.com/owncloud/ocis/pull/7847
+
 * Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7859](https://github.com/owncloud/ocis/pull/7859)
 
    https://github.com/owncloud/ocis/pull/7859
@@ -735,6 +542,12 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/issues/7821
    https://github.com/owncloud/ocis/pull/7862
+
+* Bugfix - Fix jwt config of policies service: [#7893](https://github.com/owncloud/ocis/pull/7893)
+
+   Removes jwt config of policies service
+
+   https://github.com/owncloud/ocis/pull/7893
 
 * Bugfix - Updating logo with new theme structure: [#7930](https://github.com/owncloud/ocis/pull/7930)
 
@@ -808,6 +621,154 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/7990
    https://github.com/owncloud/ocis/pull/8050
    https://github.com/owncloud/ocis/pull/8035
+
+* Bugfix - Fix the upload postprocessing: [#8117](https://github.com/owncloud/ocis/pull/8117)
+
+   We fixed the upload postprocessing when the destination file does not exist
+   anymore.
+
+   https://github.com/owncloud/ocis/issues/7909
+   https://github.com/owncloud/ocis/pull/8117
+
+* Bugfix - Disallow to delete a file during the processing: [#8132](https://github.com/owncloud/ocis/pull/8132)
+
+   We want to disallow deleting a file during the processing to prevent collecting
+   the orphan uploads.
+
+   https://github.com/owncloud/ocis/issues/8127
+   https://github.com/owncloud/ocis/pull/8132
+   https://github.com/cs3org/reva/pull/4446
+
+* Bugfix - Fix wrong naming in nats-js-kv registry: [#8140](https://github.com/owncloud/ocis/pull/8140)
+
+   Registers the registry under the correct name
+
+   https://github.com/owncloud/ocis/pull/8140
+
+* Bugfix - IDP CS3 backend sessions now survive a restart: [#8142](https://github.com/owncloud/ocis/pull/8142)
+
+   We now correctly reinitialize the CS3 backend session after the IDP service has
+   been restarted.
+
+   https://github.com/owncloud/ocis/pull/8142
+
+* Bugfix - Fix patching of language: [#8182](https://github.com/owncloud/ocis/pull/8182)
+
+   User would not be able to patch their preferred language when the ldap backend
+   is set to `read-only`. This makes no sense as language is stored elsewhere.
+
+   https://github.com/owncloud/ocis/pull/8182
+
+* Bugfix - Fix search service to not log expected cases as errors: [#8200](https://github.com/owncloud/ocis/pull/8200)
+
+   We changed the search service to not log cases where resources that were about
+   to be indexed can no longer be found. Those are expected cases, e.g. when the
+   file in question has already been deleted or renamed meanwhile.
+
+   https://github.com/owncloud/ocis/pull/8200
+
+* Bugfix - Updating and reset logo failed: [#8211](https://github.com/owncloud/ocis/pull/8211)
+
+   We fixed a bug when admin tried to update or reset the logo.
+
+   https://github.com/owncloud/ocis/issues/8101
+   https://github.com/owncloud/ocis/pull/8211
+
+* Bugfix - Cleanup graph/pkg/service/v0/driveitems.go: [#8228](https://github.com/owncloud/ocis/pull/8228)
+
+   Main fix is using proto getters to avoid panics. But some other code
+   improvements were also done
+
+   https://github.com/owncloud/ocis/pull/8228
+
+* Bugfix - Cleanup `search/pkg/search/search.go`: [#8230](https://github.com/owncloud/ocis/pull/8230)
+
+   Now uses proto getters to avoid panics.
+
+   https://github.com/owncloud/ocis/pull/8230
+
+* Bugfix - Graph/sharedWithMe works for shares from project spaces now: [#8233](https://github.com/owncloud/ocis/pull/8233)
+
+   We fixed a bug in the 'graph/v1beta1/me/drive/sharedWithMe' endpoint that caused
+   an error response when the user received shares from project spaces.
+   Additionally the endpoint now behaves more graceful in cases where the
+   displayname of the owner or creator of a share or shared resource couldn't be
+   resolved.
+
+   https://github.com/owncloud/ocis/issues/8027
+   https://github.com/owncloud/ocis/issues/8215
+   https://github.com/owncloud/ocis/pull/8233
+
+* Bugfix - Fix PATCH/DELETE status code for drives that don't support them: [#8235](https://github.com/owncloud/ocis/pull/8235)
+
+   Updating and Deleting the virtual drives for shares is currently not supported.
+   Instead of returning a generic 500 status we return a 405 response now.
+
+   https://github.com/owncloud/ocis/issues/7881
+   https://github.com/owncloud/ocis/pull/8235
+
+* Bugfix - Fix nats authentication: [#8236](https://github.com/owncloud/ocis/pull/8236)
+
+   Fixes nats authentication for registry/events/stores
+
+   https://github.com/owncloud/ocis/pull/8236
+
+* Bugfix - Fix the resource name: [#8246](https://github.com/owncloud/ocis/pull/8246)
+
+   We fixed a problem where after renaming resource as sharer the receiver see a
+   new name.
+
+   https://github.com/owncloud/ocis/issues/8242
+   https://github.com/owncloud/ocis/pull/8246
+   https://github.com/cs3org/reva/pull/4463
+
+* Bugfix - Apply role constraints when creating shares via the graph API: [#8247](https://github.com/owncloud/ocis/pull/8247)
+
+   We fixed a bug in the graph API for creating and updating shares so that
+   Spaceroot specific roles like 'Manager' and 'Co-owner' can no longer be assigned
+   for shares on files or directories.
+
+   https://github.com/owncloud/ocis/issues/8131
+   https://github.com/owncloud/ocis/pull/8247
+
+* Bugfix - Fix concurrent access to a map: [#8269](https://github.com/owncloud/ocis/pull/8269)
+
+   We fixed the race condition that led to concurrent map access in a publicshare
+   manager.
+
+   https://github.com/owncloud/ocis/issues/8255
+   https://github.com/owncloud/ocis/pull/8269
+   https://github.com/cs3org/reva/pull/4472
+
+* Bugfix - Fix nats registry: [#8281](https://github.com/owncloud/ocis/pull/8281)
+
+   The nats registry would behave badly when configuring `nats-js-kv` via envvar.
+   Reason is the way go-micro initializes. It took 5 developers to find the issue
+   and the fix so the details cannot be shared here. Just accept that it is working
+   now
+
+   https://github.com/owncloud/ocis/pull/8281
+
+* Bugfix - Remove invalid environment variables: [#8303](https://github.com/owncloud/ocis/pull/8303)
+
+   We have removed two spaces related environment variables (whether project spaces
+   and the share jail are enabled) and hardcoded the only allowed options. Misusing
+   those variables would have resulted in invalid config.
+
+   https://github.com/owncloud/ocis/pull/8303
+
+* Bugfix - Fix concurrent shares config: [#8317](https://github.com/owncloud/ocis/pull/8317)
+
+   We fixed setting the config for concurrent web requests, which did not work as
+   expected before.
+
+   https://github.com/owncloud/ocis/pull/8317
+
+* Bugfix - Signed url verification: [#8385](https://github.com/owncloud/ocis/pull/8385)
+
+   Signed urls now expire properly
+
+   https://github.com/owncloud/ocis/pull/8385
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -1251,6 +1212,14 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/web/issues/9768
    https://github.com/owncloud/ocis/pull/7670
 
+* Enhancement - Support login page background configuration: [#7674](https://github.com/owncloud/ocis/issues/7674)
+
+   Introduce a new environment variable `IDP_LOGIN_BACKGROUND_URL` that overrides
+   the default background image of the IDP login page when present.
+
+   https://github.com/owncloud/ocis/issues/7674
+   https://github.com/owncloud/ocis/pull/7900
+
 * Enhancement - Add new permissions: [#7700](https://github.com/owncloud/ocis/pull/7700)
 
    Adds new permissions to admin/spaceadmin/user roles - Favorites.List allows /
@@ -1387,6 +1356,14 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/7979
 
+* Enhancement - Disable the password policy: [#7985](https://github.com/owncloud/ocis/pull/7985)
+
+   We add the environment variable that allow to disable the password policy.
+
+   https://github.com/owncloud/ocis/issues/7916
+   https://github.com/owncloud/ocis/pull/7985
+   https://github.com/cs3org/reva/pull/4409
+
 * Enhancement - Use kv store in natsjs registry: [#7987](https://github.com/owncloud/ocis/pull/7987)
 
    Replaces the nats object store with the nats kv store in the natsjs registry
@@ -1435,7 +1412,72 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/pull/8011
    https://github.com/owncloud/ocis/pull/8027
 
-* Enhancement - Update Reva to version 2.18.0: [#8038](https://github.com/owncloud/ocis/pull/8038)
+* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+
+   Use a hidden role for service accounts. It will not appear in ListRoles calls
+   but internally handled by settings service
+
+   https://github.com/owncloud/ocis/pull/8051
+   https://github.com/owncloud/ocis/pull/8074
+
+* Enhancement - Update antivirus service: [#8062](https://github.com/owncloud/ocis/pull/8062)
+
+   We update the antivirus icap client library and optimize the antivirus scanning
+   service. ANTIVIRUS_ICAP_TIMEOUT is now deprecated and
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT should be used instead.
+
+   ANTIVIRUS_ICAP_SCAN_TIMEOUT supports human durations like `1s`, `1m`, `1h` and
+   `1d`.
+
+   https://github.com/owncloud/ocis/issues/6764
+   https://github.com/owncloud/ocis/pull/8062
+
+* Enhancement - Remove deprecated environment variables: [#8149](https://github.com/owncloud/ocis/pull/8149)
+
+   We have removed all deprecated environment variables that have been marked for
+   removal for 5.0.0
+
+   https://github.com/owncloud/ocis/issues/8025
+   https://github.com/owncloud/ocis/pull/8149
+
+* Enhancement - Disable the password policy: [#8152](https://github.com/owncloud/ocis/pull/8152)
+
+   We reworked and moved disabling the password policy logic from the reva to the
+   ocis.
+
+   https://github.com/owncloud/ocis/issues/7916
+   https://github.com/owncloud/ocis/pull/8152
+   https://github.com/cs3org/reva/pull/4453
+
+* Enhancement - Update reva to latest edge version: [#8287](https://github.com/owncloud/ocis/pull/8287)
+
+   We update reva to the latest edge version to get the latest fixes and features.
+
+   ## Changelog for reva edge
+
+  *   Bugfix [cs3org/reva#4454](https://github.com/cs3org/reva/pull/4454): Skip unnecessary share retrieval
+  *   Bugfix [cs3org/reva#4461](https://github.com/cs3org/reva/pull/4461): CORS handling for WebDAV requests fixed
+  *   Bugfix [cs3org/reva#4462](https://github.com/cs3org/reva/pull/4462): Prevent setting container specific permissions on files
+  *   Bugfix [cs3org/reva#4463](https://github.com/cs3org/reva/pull/4463): Fix the resource name
+  *   Bugfix [cs3org/reva#4466](https://github.com/cs3org/reva/pull/4466): Fix natsjskv store
+  *   Bugfix [cs3org/reva#4469](https://github.com/cs3org/reva/pull/4469): Handle interrupted uploads
+  *   Bugfix [cs3org/reva#4472](https://github.com/cs3org/reva/pull/4472): Fix concurrent access to a map
+  *   Bugfix [cs3org/reva#4473](https://github.com/cs3org/reva/pull/4473): Decomposedfs now correctly lists sessions
+  *   Bugfix [cs3org/reva#4474](https://github.com/cs3org/reva/pull/4474): Make /dav/meta consistent
+  *   Bugfix [cs3org/reva#4475](https://github.com/cs3org/reva/pull/4475): Upload session specific processing flag
+  *   Bugfix [cs3org/reva#4476](https://github.com/cs3org/reva/pull/4476): No need to unmark postprocessing when it was not started
+  *   Bugfix [cs3org/reva#4479](https://github.com/cs3org/reva/pull/4479): Fix creating documents in the approvider
+  *   Bugfix [cs3org/reva#4481](https://github.com/cs3org/reva/pull/4481): Distinguish failure and node metadata reversal
+  *   Bugfix [cs3org/reva#4434](https://github.com/cs3org/reva/pull/4434): Fix the upload postprocessing
+  *   Bugfix [cs3org/reva#4443](https://github.com/cs3org/reva/pull/4443): Fixed wrong status code when moving a file to a denied path
+  *   Bugfix [cs3org/reva#4446](https://github.com/cs3org/reva/pull/4446): Disallow to delete a file during the processing
+  *   Bugfix [cs3org/reva#4448](https://github.com/cs3org/reva/pull/4448): Fix truncating existing files
+  *   Bugfix [cs3org/reva#4449](https://github.com/cs3org/reva/pull/4449): Keep failed processing status
+  *   Bugfix [cs3org/reva#4452](https://github.com/cs3org/reva/pull/4452): More efficient share jail
+  *   Bugfix [cs3org/reva#4456](https://github.com/cs3org/reva/pull/4456): Do not lose revisions when restoring the first revision
+  *   Bugfix [cs3org/reva#4457](https://github.com/cs3org/reva/pull/4457): Fix concurrent map access in sharecache
+  *   Enhancement [cs3org/reva#4453](https://github.com/cs3org/reva/pull/4453): Disable the password policy
+  *   Enhancement [cs3org/reva#4477](https://github.com/cs3org/reva/pull/4477): Extend ResumePostprocessing event
 
    ## Changelog for reva 2.18.0 (2023-12-22)
 
@@ -1530,6 +1572,11 @@ The following sections list the changes for 5.0.0-rc.1.
   *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
   *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
+   https://github.com/owncloud/ocis/pull/8287
+   https://github.com/owncloud/ocis/pull/8278
+   https://github.com/owncloud/ocis/pull/8264
+   https://github.com/owncloud/ocis/pull/8100
+   https://github.com/owncloud/ocis/pull/8100
    https://github.com/owncloud/ocis/pull/8038
    https://github.com/owncloud/ocis/pull/8056
    https://github.com/owncloud/ocis/pull/7949
@@ -1542,12 +1589,21 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/pull/7727
    https://github.com/owncloud/ocis/pull/7752
 
-* Enhancement - Service Account roles: [#8051](https://github.com/owncloud/ocis/pull/8051)
+* Enhancement - Allow restarting multiple uploads with one command: [#8287](https://github.com/owncloud/ocis/pull/8287)
 
-   Use a hidden role for service accounts. It will not appear in ListRoles calls
-   but internally handled by settings service
+   Allows to restart all commands in a specific state.
 
-   https://github.com/owncloud/ocis/pull/8051
+   https://github.com/owncloud/ocis/pull/8287
+
+* Enhancement - Modify the concurrency default: [#8309](https://github.com/owncloud/ocis/pull/8309)
+
+   We have changed the default MaxConcurrency value from 100 to 5 to prevent too
+   frequent gc runs on low memory systems. We have also bumped reva to pull in the
+   related changes from there.
+
+   https://github.com/owncloud/ocis/issues/8257
+   https://github.com/owncloud/ocis/pull/8309
+   https://github.com/cs3org/reva/pull/4485
 
 * Enhancement - Update web to v8.0.0-rc.3: [#8342](https://github.com/owncloud/ocis/pull/8342)
 
@@ -1797,6 +1853,7 @@ The following sections list the changes for 5.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/8342
    https://github.com/owncloud/ocis/pull/8154
+   https://github.com/owncloud/ocis/pull/8154
    https://github.com/owncloud/ocis/pull/8055
    https://github.com/owncloud/ocis/pull/7930
    https://github.com/owncloud/ocis/pull/7952
@@ -1804,11 +1861,59 @@ The following sections list the changes for 5.0.0-rc.1.
    https://github.com/owncloud/ocis/pull/7883
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
+   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
+
+# Changelog for [4.0.5] (2023-12-21)
+
+The following sections list the changes for 4.0.5.
+
+[4.0.5]: https://github.com/owncloud/ocis/compare/v4.0.4...v4.0.5
+
+## Summary
+
+* Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7941](https://github.com/owncloud/ocis/pull/7941)
+* Bugfix - Fix trace ids: [#8026](https://github.com/owncloud/ocis/pull/8026)
+* Enhancement - Add cli commands for trash-bin: [#7936](https://github.com/owncloud/ocis/pull/7936)
+
+## Details
+
+* Bugfix - Fix reva config of frontend service to avoid misleading error logs: [#7934](https://github.com/owncloud/ocis/pull/7934)
+
+   We set an empty Credentials chain for the frontend service now. In ocis all
+   non-reva token authentication is handled by the proxy. This avoids irritating
+   error messages about the missing 'auth-bearer' service.
+
+   https://github.com/owncloud/ocis/issues/6692
+   https://github.com/owncloud/ocis/pull/7934
+   https://github.com/owncloud/ocis/pull/7453
+   https://github.com/cs3org/reva/pull/4396
+   https://github.com/cs3org/reva/pull/4241
+
+* Bugfix - Do not purge expired upload sessions that are still postprocessing: [#7941](https://github.com/owncloud/ocis/pull/7941)
+
+   https://github.com/owncloud/ocis/pull/7941
+   https://github.com/owncloud/ocis/pull/7859
+   https://github.com/owncloud/ocis/pull/7958
+
+* Bugfix - Fix trace ids: [#8026](https://github.com/owncloud/ocis/pull/8026)
+
+   We changed the default tracing to produce non-empty traceids and fixed a problem
+   where traces got disconnected further down the stack.
+
+   https://github.com/owncloud/ocis/pull/8026
+
+* Enhancement - Add cli commands for trash-bin: [#7936](https://github.com/owncloud/ocis/pull/7936)
+
+   We added the `list` and `restore` commands to the trash-bin items to the CLI
+
+   https://github.com/owncloud/ocis/issues/7845
+   https://github.com/owncloud/ocis/pull/7936
 
 # Changelog for [4.0.4] (2023-12-07)
 
@@ -7125,7 +7230,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -7299,11 +7404,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -7476,24 +7599,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
