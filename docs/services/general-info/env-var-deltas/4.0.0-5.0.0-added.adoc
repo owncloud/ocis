@@ -28,8 +28,8 @@
 | `OCIS_EVENTS_AUTH_PASSWORD`
 | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 |
-| `ANTIVIRUS_ICAP_TIMEOUT`
-| Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.|
+| `ANTIVIRUS_ICAP_SCAN_TIMEOUT`
+| Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.| 5m0s
 
 | xref:{s-path}/audit.adoc[audit]
 | `OCIS_EVENTS_AUTH_USERNAME`
@@ -216,7 +216,7 @@
 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 |
 | `FRONTEND_AUTO_ACCEPT_SHARES`
-| Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.|
+| Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.| true
 |
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
 `FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE`
