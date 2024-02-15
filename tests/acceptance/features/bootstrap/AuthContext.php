@@ -595,7 +595,7 @@ class AuthContext implements Context {
 		if ($method === 'MOVE' || $method === 'COPY') {
 			$baseUrl = $this->featureContext->getBaseUrl();
 			$suffix = "";
-			if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES){
+			if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal") . "/";
 			}
 			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
