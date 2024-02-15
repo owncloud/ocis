@@ -7,14 +7,13 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0026-application-based-user-settings.md
 ---
 
-
-* Status: pending
+* Status: draft
 * Deciders: @butonic, @fschade, @kulmann
 * Date: 2024-02-09
 
 ## Context and Problem Statement
 
-To share user settings across devices applications want to store user specific settings on the server. The ePUB app wants to remeber which page the user is on. The iOS app wants to rember search queries. 
+To share user settings across devices applications want to store user specific settings on the server. The ePUB app wants to remeber which page the user is on. The iOS app wants to rember search queries. The Caldav app needs a space to store data.
 
 ## Decision Drivers <!-- optional -->
 
