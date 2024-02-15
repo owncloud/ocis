@@ -82,7 +82,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/tidwall/gjson v1.17.0
+	github.com/tidwall/gjson v1.17.1
 	github.com/tus/tusd v1.13.0
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
