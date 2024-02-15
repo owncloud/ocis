@@ -44,6 +44,12 @@ func RenderEnvVarDeltaTable(osArgs []string) {
 	if !semver.IsValid(osArgs[3]) {
 		log.Fatalf("Target version invalid semver: %s", osArgs[3])
 	}
+	if semver.Compare(osArgs[2], osArgs[3]) >= 0 {
+		log.Fatalf("Start version %s is not smaller than target version %s", osArgs[2], osArgs[3])
+	}
+	if semver.Compare(osArgs[2], "v5.0.0") < 0 {
+		log.Fatalf("This tool does not support versions prior v5.0.0, (given %s)", osArgs[2])
+	}
 	startVersion := osArgs[2]
 	endVersion := osArgs[3]
 	fmt.Printf("Generating tables for env-var deltas between version %s and %s...\n", startVersion, endVersion)
