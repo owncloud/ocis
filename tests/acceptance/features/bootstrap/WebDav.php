@@ -1752,9 +1752,12 @@ trait WebDav {
 			} else {
 				$actualResourceType = "folder";
 			}
-			Assert::fail(
-				"$entry '$path' should not exist. But it does exist and is a $actualResourceType"
-			);
+
+			if ($entry === $actualResourceType) {
+				Assert::fail(
+					"$entry '$path' should not exist. But it does."
+				);
+			}
 		}
 	}
 

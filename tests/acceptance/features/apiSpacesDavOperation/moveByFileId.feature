@@ -706,3 +706,37 @@ Feature: moving/renaming file using file id
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+  @issue-6739
+  Scenario Outline: try to move a file to space using its id as the destination
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "myspace" with the default quota using the Graph API
+    And user "Alice" has uploaded file with content "some data" to "textfile.txt"
+    When user "Alice" tries to move a file "textfile.txt" to space "<space>" using its id in destination path "<dav-path>"
+    Then the HTTP status code should be "400"
+    And for user "Alice" the space "Personal" should contain these entries:
+      | textfile.txt |
+    Examples:
+      | dav-path               | space    |
+      | /remote.php/dav/spaces | Personal |
+      | /dav/spaces            | Personal |
+      | /remote.php/dav/spaces | myspace  |
+      | /dav/spaces            | myspace  |
+
+  @issue-6739
+  Scenario Outline: move a file to folder using its id as the destination
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "myspace" with the default quota using the Graph API
+    And user "Alice" has uploaded file with content "some data" to "textfile.txt"
+    And user "Alice" has created folder "docs"
+    And user "Alice" has uploaded file with content "readme file" to "docs/readme.txt"
+    When user "Alice" moves a file "textfile.txt" to folder "docs" using its id in destination path "<dav-path>"
+    Then the HTTP status code should be "204"
+    And the content of file "docs" for user "Alice" should be "some data"
+    And as "Alice" file "textfile.txt" should not exist
+    And as "Alice" folder "docs" should not exist
+    And as "Alice" folder "docs" should exist in the trashbin of the space "Personal"
+    Examples:
+      | dav-path               |
+      | /remote.php/dav/spaces |
+      | /dav/spaces            |
