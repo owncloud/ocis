@@ -810,53 +810,41 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 			return nil, errors.Wrap(err, "sharesstorageprovider: error calling ListReceivedSharesRequest")
 		}
 
-		gatewayClient, err := s.gatewaySelector.Next()
-		if err != nil {
-			return nil, err
-		}
-
-		infos := []*provider.ResourceInfo{}
-		for _, share := range receivedShares {
-			if share.GetState() != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+		// Create map of shares that contains only the oldest share per shared resource. This is to avoid
+		// returning multiple resourceInfos for the same resource. But still be able to maintain a
+		// "somewhat" stable resourceID
+		oldestReceivedSharesByResourceID := make(map[string]*collaboration.ReceivedShare, len(receivedShares))
+		for _, receivedShare := range receivedShares {
+			if receivedShare.GetState() != collaboration.ShareState_SHARE_STATE_ACCEPTED {
 				continue
 			}
+			rIDStr := storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId())
+			if oldest, ok := oldestReceivedSharesByResourceID[rIDStr]; ok {
+				// replace if older than current oldest
+				if utils.TSToTime(receivedShare.GetShare().GetCtime()).Before(utils.TSToTime(oldest.GetShare().GetCtime())) {
+					oldestReceivedSharesByResourceID[rIDStr] = receivedShare
+				}
+			} else {
+				oldestReceivedSharesByResourceID[rIDStr] = receivedShare
+			}
+		}
 
+		// now compose the resourceInfos for the unified list of shares
+		infos := []*provider.ResourceInfo{}
+		for _, share := range oldestReceivedSharesByResourceID {
 			info := shareMd[share.GetShare().GetId().GetOpaqueId()]
 			if info == nil {
-				if share.GetShare().GetResourceId().GetSpaceId() == "" {
-					// convert backwards compatible share id
-					share.Share.ResourceId.StorageId, share.Share.ResourceId.SpaceId = storagespace.SplitStorageID(share.GetShare().GetResourceId().GetSpaceId())
-				}
-				statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
-					Opaque: req.Opaque,
-					Ref: &provider.Reference{
-						ResourceId: share.Share.ResourceId,
-						Path:       ".",
-					},
-					ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
-				})
-				switch {
-				case err != nil:
-					appctx.GetLogger(ctx).Error().
-						Err(err).
-						Interface("share", share).
-						Msg("sharesstorageprovider: could not make stat request when listing virtual root, skipping")
-					continue
-				case statRes.Status.Code != rpc.Code_CODE_OK:
-					appctx.GetLogger(ctx).Debug().
-						Interface("share", share).
-						Interface("status", statRes.Status).
-						Msg("sharesstorageprovider: could not stat share when listing virtual root, skipping")
-					continue
-				}
-				info = statRes.Info
+				appctx.GetLogger(ctx).Debug().
+					Interface("share", share).
+					Msg("sharesstorageprovider: no resource info for share")
+				continue
 			}
 
 			// override resource id info
 			info.Id = &provider.ResourceId{
 				StorageId: utils.ShareStorageProviderID,
 				SpaceId:   utils.ShareStorageSpaceID,
-				OpaqueId:  share.Share.Id.OpaqueId,
+				OpaqueId:  share.GetShare().GetId().GetOpaqueId(),
 			}
 			info.Path = filepath.Base(share.MountPoint.Path)
 			info.Name = info.Path
