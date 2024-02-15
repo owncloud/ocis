@@ -2567,7 +2567,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userListsTheResourcesSharedByAUserAfterClearingUserSpaceUsingGraphApi(string $user): void {
+	public function userListsTheResourcesSharedByAUserAfterClearingUserOrGroupSpaceUsingGraphApi(string $user): void {
 		$this->userListsResourcesSharedByHimOrHer($user, true);
 	}
 
