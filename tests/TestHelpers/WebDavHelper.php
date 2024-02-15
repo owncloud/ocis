@@ -729,19 +729,19 @@ class WebDavHelper {
 		?string $type = "files",
 		?string $spaceId = null
 	):string {
-		$newTrashbinDavPath = "remote.php/dav/trash-bin/$user/";
+		$newTrashbinDavPath = "/remote.php/dav/trash-bin/$user/";
 
 		switch ($type) {
 			case 'public-files':
 			case 'public-files-old':
-				return "public.php/webdav/";
+				return "/public.php/webdav/";
 			case 'public-files-new':
-				return "remote.php/dav/public-files/$user/";
+				return "/remote.php/dav/public-files/$user/";
 			case 'archive':
-				return "remote.php/dav/archive/$user/files";
+				return "/remote.php/dav/archive/$user/files";
 			case 'versions':
 			case 'customgroups':
-				return "remote.php/dav/";
+				return "/remote.php/dav/";
 			default:
 				break;
 		}
@@ -765,12 +765,12 @@ class WebDavHelper {
 				return "remote.php/webdav/";
 			} elseif ($davPathVersionToUse === self::DAV_VERSION_NEW) {
 				if ($type === "files") {
-					$path = 'remote.php/dav/files/';
+					$path = '/remote.php/dav/files/';
 					return $path . $user . '/';
 				} elseif ($type === "trash-bin") {
 					return $newTrashbinDavPath;
 				} else {
-					return "remote.php/dav";
+					return "/remote.php/dav";
 				}
 			} else {
 				throw new InvalidArgumentException(
