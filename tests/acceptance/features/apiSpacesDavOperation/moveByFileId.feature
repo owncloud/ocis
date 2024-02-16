@@ -713,15 +713,17 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "myspace" with the default quota using the Graph API
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     When user "Alice" tries to move file "textfile.txt" of space "Personal" to space "<space>" using its id in destination path "<dav-path>"
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the space "Personal" should contain these entries:
       | textfile.txt |
     Examples:
-      | dav-path               | space    |
-      | /remote.php/dav/spaces | Personal |
-      | /dav/spaces            | Personal |
-      | /remote.php/dav/spaces | myspace  |
-      | /dav/spaces            | myspace  |
+      | dav-path               | space    | http-status-code |
+      | /remote.php/dav/spaces | Personal | 400              |
+      | /dav/spaces            | Personal | 400              |
+      | /remote.php/dav/spaces | myspace  | 400              |
+      | /dav/spaces            | myspace  | 400              |
+      | /remote.php/dav/spaces | Shares   | 404              |
+      | /dav/spaces            | Shares   | 404              |
 
   @issue-6739
   Scenario Outline: try to move project file to other spaces using its id as the destination
@@ -729,15 +731,17 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "myspace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "myspace" with content "some data" to "textfile.txt"
     When user "Alice" tries to move file "textfile.txt" of space "myspace" to space "<space>" using its id in destination path "<dav-path>"
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the space "myspace" should contain these entries:
       | textfile.txt |
     Examples:
-      | dav-path               | space    |
-      | /remote.php/dav/spaces | Personal |
-      | /dav/spaces            | Personal |
-      | /remote.php/dav/spaces | myspace  |
-      | /dav/spaces            | myspace  |
+      | dav-path               | space    | http-status-code |
+      | /remote.php/dav/spaces | Personal | 400              |
+      | /dav/spaces            | Personal | 400              |
+      | /remote.php/dav/spaces | myspace  | 400              |
+      | /dav/spaces            | myspace  | 400              |
+      | /remote.php/dav/spaces | Shares   | 404              |
+      | /dav/spaces            | Shares   | 404              |
 
   @issue-6739
   Scenario Outline: move a file to folder using its id as the destination (Personal space)
