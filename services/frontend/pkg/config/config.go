@@ -35,7 +35,7 @@ type Config struct {
 	EnableFederatedSharingIncoming bool   `yaml:"enable_federated_sharing_incoming" env:"FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING" desc:"Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed." introductionVersion:"pre5.0"`
 	EnableFederatedSharingOutgoing bool   `yaml:"enable_federated_sharing_outgoing" env:"FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING" desc:"Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed." introductionVersion:"pre5.0"`
 	SearchMinLength                int    `yaml:"search_min_length" env:"FRONTEND_SEARCH_MIN_LENGTH" desc:"Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed." introductionVersion:"pre5.0"`
-	Edition                        string `yaml:"edition" env:"OCIS_EDITION;FRONTEND_EDITION" introductionVersion:"pre5.0"`
+	Edition                        string `yaml:"edition" env:"OCIS_EDITION;FRONTEND_EDITION" desc:"Edition of oCIS" introductionVersion:"pre5.0"`
 	DisableSSE                     bool   `yaml:"disable_sse" env:"OCIS_DISABLE_SSE;FRONTEND_DISABLE_SSE" desc:"When set to true, clients are informed that the Server-Sent Events endpoint is not accessible." introductionVersion:"pre5.0"`
 	DefaultLinkPermissions         int    `yaml:"default_link_permissions" env:"FRONTEND_DEFAULT_LINK_PERMISSIONS" desc:"Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1." introductionVersion:"pre5.0"`
 
@@ -48,7 +48,7 @@ type Config struct {
 	Checksums              Checksums   `yaml:"checksums"`
 	ReadOnlyUserAttributes []string    `yaml:"read_only_user_attributes" env:"FRONTEND_READONLY_USER_ATTRIBUTES" desc:"A list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.memberOf' (groups), 'user.accountEnabled' (login allowed), 'drive.quota' (quota). See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	LDAPServerWriteEnabled bool        `yaml:"ldap_server_write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;FRONTEND_LDAP_SERVER_WRITE_ENABLED" desc:"Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables)." introductionVersion:"pre5.0"`
-	FullTextSearch         bool        `yaml:"full_text_search" env:"FRONTEND_FULL_TEXT_SEARCH_ENABLED" descr:"Set to true to signal the web client that full-text search is enabled." introductionVersion:"pre5.0"`
+	FullTextSearch         bool        `yaml:"full_text_search" env:"FRONTEND_FULL_TEXT_SEARCH_ENABLED" desc:"Set to true to signal the web client that full-text search is enabled." introductionVersion:"pre5.0"`
 
 	Middleware Middleware `yaml:"middleware"`
 
