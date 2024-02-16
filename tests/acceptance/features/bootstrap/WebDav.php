@@ -5000,7 +5000,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -5027,7 +5027,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $destination);
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,

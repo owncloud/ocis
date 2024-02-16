@@ -599,7 +599,7 @@ class AuthContext implements Context {
 				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal") . "/";
 			}
 			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
-			$headers['Destination'] = "{$baseUrl}{$davPath}{$suffix}moved";
+			$headers['Destination'] = "{$baseUrl}/{$davPath}{$suffix}moved";
 		}
 
 		foreach ($table->getHash() as $row) {
