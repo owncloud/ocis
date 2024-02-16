@@ -8,7 +8,7 @@ geekdocFilePath: 0004-support-hot-migration.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1)
 * Date: 2021-03-16
 
 Technical Story: \[description | ticket/issue URL\]

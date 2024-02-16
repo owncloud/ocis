@@ -8,7 +8,7 @@ geekdocFilePath: 0015-events.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @micbar, @dragotin, @c0rby, @wkloucek
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@c0rby](https://github.com/c0rby), [@wkloucek](https://github.com/wkloucek)
 * Date: 2022-01-21
 
 ## Context and Problem Statement

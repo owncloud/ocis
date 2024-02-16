@@ -8,7 +8,7 @@ geekdocFilePath: 0007-api-for-spaces.md
 ---
 
 * Status: accepted
-* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1)
 * Date: 2021-03-19
 
 Technical Story: API to enable the concept of [Spaces](https://github.com/owncloud/enterprise/issues/3863)

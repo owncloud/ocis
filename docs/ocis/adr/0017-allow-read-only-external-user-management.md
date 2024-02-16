@@ -8,7 +8,7 @@ geekdocFilePath: 0017-allow-read-only-external-user-management.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @micbar, @rhafer
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@rhafer](https://github.com/rhafer)
 * Date: 2022-02-08
 
 ## Context and Problem Statement
