@@ -1,5 +1,5 @@
 ---
-title: "24. Index and store metadata"
+title: "24. Messagepack metadata"
 date: 2024-02-09T14:57:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
