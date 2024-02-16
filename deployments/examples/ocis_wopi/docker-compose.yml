@@ -11,6 +11,7 @@ services:
           - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+          - ${COMPANION_DOMAIN:-companion.owncloud.test}
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
       # letsencrypt configuration
@@ -89,6 +90,7 @@ services:
       NATS_NATS_PORT: 9233
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./config/ocis/${COMPANION_WEB_CONFIG_FILE_NAME:-web.yaml}:/etc/ocis/web.yaml
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
@@ -245,6 +247,32 @@ services:
       ocis-net:
     restart: always
 
+  companion:
+    image: ${COMPANION_IMAGE:-transloadit/companion:4.5.1}
+    networks:
+      ocis-net:
+    environment:
+      NODE_ENV: production
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      COMPANION_DATADIR: /tmp/companion/
+      COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
+      COMPANION_PROTOCOL: https
+      COMPANION_UPLOAD_URLS: "^https://${OCIS_DOMAIN:-ocis.owncloud.test}/"
+      COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
+      COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
+    volumes:
+      - companion-data:/tmp/companion/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.companion.entrypoints=https"
+      - "traefik.http.routers.companion.rule=Host(`${COMPANION_DOMAIN:-companion.owncloud.test}`)"
+      - "traefik.http.routers.companion.tls.certresolver=http"
+      - "traefik.http.routers.companion.service=companion"
+      - "traefik.http.services.companion.loadbalancer.server.port=3020"
+    logging:
+      driver: "local"
+    restart: always
+
   inbucket:
     image: inbucket/inbucket
     networks:
@@ -273,6 +301,7 @@ volumes:
   ocis-config:
   ocis-data:
   wopi-recovery:
+  companion-data:
 
 networks:
   ocis-net:

@@ -4,7 +4,9 @@
 ### Prerequisites
 
 * [ ] DEV/QA: Kickoff meeting [Kickoff meeting] (https://confluence.owncloud.com/display/QA/Technical+release+3.0.0+Overview)
-* [ ] DEV/QA: Define client versions and provide a list of new features  
+* [ ] DEV/QA: Define client versions and provide list of breaking changes for desktop/mobile team
+* [ ] DEV/QA: Check new strings and align with clients
+* [ ] DEV/DOCS: Create list of pending docs tasks 
 * [ ] DEV: Create branch `release-x.x.x-rc.x` -> CODEFREEZE
   * [ ] DEV: bump ocis version in necessary files
   * [ ] DEV: `changelog/CHANGELOG.tmpl`
@@ -53,6 +55,12 @@
 ### After QA Phase
 
 * [ ] Brief company-wide heads up via mail @tbsbdr
+* [ ] Create list of changed ENV vars and send to release-coordination@owncloud.com
+  * [ ] Variable Name
+  * [ ] Introduced in version
+  * [ ] Default Value
+  * [ ] Description
+  * [ ] dependencies with user other components
 * [ ] DEV: Create branch `release-x.x.x`
   * [ ] DEV: bump ocis version in necessary files
   * [ ] DEV: `ocis-pkg/version/version.go`

@@ -262,22 +262,56 @@ Feature: download file
       | dav-path-version |
       | spaces           |
 
-  @smokeTest
+  @smokeTest @issue-8361
   Scenario Outline: downloading a file should serve security headers
     Given using <dav-path-version> DAV path
-    When user "Alice" downloads file "/welcome.txt" using the WebDAV API
+    And user "Alice" has uploaded file with content "test file" to "/<file>"
+    When user "Alice" downloads file "/<file>" using the WebDAV API
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header                            | value                                                            |
-      | Content-Disposition               | attachment; filename*=UTF-8''welcome.txt; filename="welcome.txt" |
-      | Content-Security-Policy           | default-src 'none';                                              |
-      | X-Content-Type-Options            | nosniff                                                          |
-      | X-Download-Options                | noopen                                                           |
-      | X-Frame-Options                   | SAMEORIGIN                                                       |
-      | X-Permitted-Cross-Domain-Policies | none                                                             |
-      | X-Robots-Tag                      | none                                                             |
-      | X-XSS-Protection                  | 1; mode=block                                                    |
-    And the downloaded content should start with "Welcome"
+      | header                            | value                                                    |
+      | Content-Disposition               | attachment; filename*=UTF-8''"<file>"; filename="<file>" |
+      | Content-Security-Policy           | default-src 'none';                                      |
+      | X-Content-Type-Options            | nosniff                                                  |
+      | X-Download-Options                | noopen                                                   |
+      | X-Frame-Options                   | SAMEORIGIN                                               |
+      | X-Permitted-Cross-Domain-Policies | none                                                     |
+      | X-Robots-Tag                      | none                                                     |
+      | X-XSS-Protection                  | 1; mode=block                                            |
+    And the downloaded content should be "test file"
+    Examples:
+      | dav-path-version | file               |
+      | old              | textfile.txt       |
+      | old              | comma,.txt         |
+      | old              | 'quote'single'.txt |
+      | new              | textfile.txt       |
+      | new              | comma,.txt         |
+      | new              | 'quote'single'.txt |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file               |
+      | spaces           | textfile.txt       |
+      | spaces           | comma,.txt         |
+      | spaces           | 'quote'single'.txt |
+
+  @smokeTest @issue-8361
+  Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to '/"quote"double".txt'
+    When user "Alice" downloads file '/"quote"double".txt' using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the following headers should be set
+      | header                            | value                                                                            |
+      | Content-Disposition               | attachment; filename*=UTF-8''""quote"double".txt"; filename=""quote"double".txt" |
+      | Content-Security-Policy           | default-src 'none';                                                              |
+      | X-Content-Type-Options            | nosniff                                                                          |
+      | X-Download-Options                | noopen                                                                           |
+      | X-Frame-Options                   | SAMEORIGIN                                                                       |
+      | X-Permitted-Cross-Domain-Policies | none                                                                             |
+      | X-Robots-Tag                      | none                                                                             |
+      | X-XSS-Protection                  | 1; mode=block                                                                    |
+    And the downloaded content should be "test file"
     Examples:
       | dav-path-version |
       | old              |

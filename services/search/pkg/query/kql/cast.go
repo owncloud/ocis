@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
@@ -84,7 +85,7 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 
 	value, err := toString(in)
 	if err != nil {
-		return &from, &to, UnsupportedTimeRangeError{}
+		return &from, &to, &query.UnsupportedTimeRangeError{}
 	}
 
 	c := &now.Config{
@@ -131,7 +132,7 @@ func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
 	}
 
 	if from.IsZero() || to.IsZero() {
-		return nil, nil, UnsupportedTimeRangeError{}
+		return nil, nil, &query.UnsupportedTimeRangeError{}
 	}
 
 	return &from, &to, nil

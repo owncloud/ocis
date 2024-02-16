@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -37,11 +36,11 @@ import (
 type SyncPropagator struct {
 	treeSizeAccounting bool
 	treeTimeAccounting bool
-	lookup             lookup.PathLookup
+	lookup             node.PathLookup
 }
 
 // NewSyncPropagator returns a new AsyncPropagator instance
-func NewSyncPropagator(treeSizeAccounting, treeTimeAccounting bool, lookup lookup.PathLookup) SyncPropagator {
+func NewSyncPropagator(treeSizeAccounting, treeTimeAccounting bool, lookup node.PathLookup) SyncPropagator {
 	return SyncPropagator{
 		treeSizeAccounting: treeSizeAccounting,
 		treeTimeAccounting: treeTimeAccounting,

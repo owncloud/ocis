@@ -65,15 +65,10 @@ class SharingNgContext implements Context {
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
 		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
@@ -232,6 +227,61 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user updates the last share with the following using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userUpdatesTheLastShareWithFollowingUsingGraphApi($user, TableNode $table) {
+		$response = $this->featureContext->shareNgGetLastCreatedUserGroupShare();
+		$permissionID = json_decode($response->getBody()->getContents())->value[0]->id;
+		$this->featureContext->setResponse(
+			$this->updateResourceShare(
+				$user,
+				$table,
+				$permissionID
+			)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $body
+	 * @param string $permissionID
+	 *
+	 * @return ResponseInterface
+	 */
+	public function updateResourceShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+		$resource = $bodyRows['resource'];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		$body = [];
+
+		if (\array_key_exists('permissionsRole', $bodyRows)) {
+			$body["roles"] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
+		}
+
+		if (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body["expirationDateTime"] = $bodyRows['expirationDateTime'];
+		}
+
+		return GraphHelper::updateShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body),
+			$permissionID
+		);
+	}
+
+	/**
 	 * @When user :user sends the following share invitation with file-id :fileId using the Graph API:
 	 *
 	 * @param string $user
@@ -287,39 +337,39 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 */
 	public function userUpdatesLastPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
+		$this->featureContext->setResponse(
+			$this->updateLinkShare(
+				$user,
+				$body,
+				$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			)
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $body
+	 * @param string $permissionID
+	 *
+	 * @return ResponseInterface
+	 */
+	public function updateLinkShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		$body = [];
+
+		if (\array_key_exists('permissionsRole', $bodyRows)) {
+			$body["link"]["type"] = $bodyRows['permissionsRole'];
 		}
 
-		if (\array_key_exists('role', $bodyRows) && \array_key_exists('expirationDateTime', $bodyRows)) {
-			$body = [
-				"expirationDateTime" => $bodyRows['expirationDateTime'],
-				"link" => [
-					"type" => $bodyRows['permissionsRole']
-				]
-			];
-		} elseif (\array_key_exists('permissionsRole', $bodyRows)) {
-			$body = [
-				"link" => [
-					"type" => $bodyRows['permissionsRole']
-				]
-			];
-		} elseif (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body = [
-				"expirationDateTime" => $bodyRows['expirationDateTime']
-			];
-		} else {
-			throw new Error('Expiration date or role is missing to update for share link!');
+		if (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body["expirationDateTime"] =  $bodyRows['expirationDateTime'];
 		}
 
-		$response = GraphHelper::updateLinkShare(
+		return GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -327,9 +377,8 @@ class SharingNgContext implements Context {
 			$spaceId,
 			$itemId,
 			\json_encode($body),
-			$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			$permissionID
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -345,14 +394,9 @@ class SharingNgContext implements Context {
 	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resourceType = $bodyRows['resourceType'];
 		$resource = $bodyRows['resource'];
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		if ($resourceType === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		if (\array_key_exists('password', $bodyRows)) {
 			$body = [
@@ -378,7 +422,6 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $sharer
 	 * @param string $shareType (user|group)
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 * @param string|null $sharee can be both user or group
@@ -390,15 +433,12 @@ class SharingNgContext implements Context {
 	public function removeSharePermission(
 		string $sharer,
 		string $shareType,
-		string $resourceType,
 		string $resource,
 		string $space,
 		?string $sharee = null
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
-		$itemId = ($resourceType === 'folder')
-			? $this->spacesContext->getResourceId($sharer, $space, $resource)
-			: $this->spacesContext->getFileId($sharer, $space, $resource);
+		$itemId = $this->spacesContext->getResourceId($sharer, $space, $resource);
 
 		$permId = ($shareType === 'link')
 			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
@@ -416,12 +456,11 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $shareType (user|group)
 	 * @param string $sharee can be both user or group
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 *
@@ -433,20 +472,18 @@ class SharingNgContext implements Context {
 		string $sharer,
 		string $shareType,
 		string $sharee,
-		string $resourceType,
 		string $resource,
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, $shareType, $resourceType, $resource, $space)
+			$this->removeSharePermission($sharer, $shareType, $resource, $space)
 		);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of link from (file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the share permission of link from (?:file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
-	 * @param string $resourceType
 	 * @param string $resource
 	 * @param string $space
 	 *
@@ -456,12 +493,11 @@ class SharingNgContext implements Context {
 	 */
 	public function userRemovesSharePermissionOfAResourceInLinkShareUsingGraphAPI(
 		string $sharer,
-		string $resourceType,
 		string $resource,
 		string $space
 	):void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'link', $resourceType, $resource, $space)
+			$this->removeSharePermission($sharer, 'link', $resource, $space)
 		);
 	}
 

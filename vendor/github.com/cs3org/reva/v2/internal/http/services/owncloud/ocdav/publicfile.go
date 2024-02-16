@@ -26,7 +26,7 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
+	ocdaverrors "github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -96,7 +96,16 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "token_propfind")
 	defer span.End()
 
-	tokenStatInfo := ctx.Value(tokenStatInfoKey{}).(*provider.ResourceInfo)
+	tokenStatInfo, ok := TokenStatInfoFromContext(ctx)
+	if !ok {
+		span.RecordError(ocdaverrors.ErrTokenStatInfoMissing)
+		span.SetStatus(codes.Error, ocdaverrors.ErrTokenStatInfoMissing.Error())
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusInternalServerError))
+		w.WriteHeader(http.StatusInternalServerError)
+		b, err := ocdaverrors.Marshal(http.StatusInternalServerError, ocdaverrors.ErrTokenStatInfoMissing.Error(), "")
+		ocdaverrors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
+		return
+	}
 	sublog := appctx.GetLogger(ctx).With().Interface("tokenStatInfo", tokenStatInfo).Logger()
 	sublog.Debug().Msg("handlePropfindOnToken")
 
@@ -109,20 +118,20 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
-		errors.HandleWebdavError(&sublog, w, b, err)
+		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "")
+		ocdaverrors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
 
 	if depth == net.DepthInfinity && !s.c.AllowPropfindDepthInfinitiy {
-		span.RecordError(errors.ErrInvalidDepth)
+		span.RecordError(ocdaverrors.ErrInvalidDepth)
 		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
 		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
-		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
+		sublog.Debug().Str("depth", dh).Msg(ocdaverrors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
-		errors.HandleWebdavError(&sublog, w, b, err)
+		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "")
+		ocdaverrors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
 

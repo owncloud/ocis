@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -32,6 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"go.opentelemetry.io/otel"
@@ -40,22 +42,12 @@ import (
 
 var tracer trace.Tracer
 
+const (
+	_spaceTypePersonal = "personal"
+)
+
 func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
-}
-
-// PathLookup defines the interface for the lookup component
-type PathLookup interface {
-	NodeFromResource(ctx context.Context, ref *provider.Reference) (*node.Node, error)
-	NodeFromID(ctx context.Context, id *provider.ResourceId) (n *node.Node, err error)
-
-	InternalRoot() string
-	InternalPath(spaceID, nodeID string) string
-	Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (path string, err error)
-	MetadataBackend() metadata.Backend
-	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
-	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
-	TypeFromPath(ctx context.Context, path string) provider.ResourceType
 }
 
 // Lookup implements transformations from filepath to node and back
@@ -198,6 +190,16 @@ func (lu *Lookup) NodeFromSpaceID(ctx context.Context, spaceID string) (n *node.
 
 	node.SpaceRoot = node
 	return node, nil
+}
+
+// GenerateSpaceID generates a new space id and alias
+func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, error) {
+	switch spaceType {
+	case _spaceTypePersonal:
+		return owner.Id.OpaqueId, nil
+	default:
+		return uuid.New().String(), nil
+	}
 }
 
 // Path returns the path for node

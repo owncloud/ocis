@@ -231,16 +231,17 @@ default:
         - "%paths.base%/../features/apiSearch1"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
         - PublicWebDavContext:
-        - FeatureContext: *common_feature_context_params
         - SearchContext:
         - OCSContext:
         - SpacesTUSContext:
         - TagContext:
         - TUSContext:
+        - WebDavPropertiesContext:
 
     apiSearch2:
       paths:
@@ -316,6 +317,7 @@ default:
         - SharingNgContext:
         - PublicWebDavContext:
         - OcisConfigContext:
+        - SettingsContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

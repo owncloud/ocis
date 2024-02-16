@@ -24,6 +24,7 @@ import (
 	"io"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -115,6 +116,15 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusPreconditionFailed)
 		return
 	}
+
+	// Test if the target is a secret filedrop
+	var isSecretFileDrop bool
+	tokenStatInfo, ok := TokenStatInfoFromContext(ctx)
+	// We assume that when the uploader can create containers, but is not allowed to list them, it is a secret file drop
+	if ok && tokenStatInfo.GetPermissionSet().CreateContainer && !tokenStatInfo.GetPermissionSet().ListContainer {
+		isSecretFileDrop = true
+	}
+
 	// r.Header.Get(net.HeaderOCChecksum)
 	// TODO must be SHA1, ADLER32 or MD5 ... in capital letters????
 	// curl -X PUT https://demo.owncloud.com/remote.php/webdav/testcs.bin -u demo:demo -d '123' -v -H 'OC-Checksum: SHA1:40bd001563085fc35165329ea1ff5c5ecbdbbeef'
@@ -157,6 +167,22 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				w.WriteHeader(http.StatusPreconditionFailed)
 				return
 			}
+		}
+		if isSecretFileDrop {
+			// find next filename
+			newName, status, err := FindName(ctx, client, filepath.Base(ref.Path), sRes.GetInfo().GetParentId())
+			if err != nil {
+				log.Error().Err(err).Msg("error sending grpc stat request")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if status.GetCode() != rpc.Code_CODE_OK {
+				log.Error().Interface("status", status).Msg("error listing file")
+				errors.HandleErrorStatus(&log, w, status)
+				return
+			}
+			ref.Path = filepath.Join(filepath.Dir(ref.GetPath()), newName)
+			sRes.GetInfo().Name = newName
 		}
 	}
 

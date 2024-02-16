@@ -3,10 +3,11 @@ package service
 import (
 	"net/http"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/r3labs/sse/v2"
+
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
@@ -51,10 +52,12 @@ func (s SSE) ListenForEvents() {
 		default:
 			s.l.Error().Interface("event", ev).Msg("unhandled event")
 		case events.SendSSE:
-			s.sse.Publish(ev.UserID, &sse.Event{
-				Event: []byte(ev.Type),
-				Data:  ev.Message,
-			})
+			for _, uid := range ev.UserIDs {
+				s.sse.Publish(uid, &sse.Event{
+					Event: []byte(ev.Type),
+					Data:  ev.Message,
+				})
+			}
 		}
 	}
 }

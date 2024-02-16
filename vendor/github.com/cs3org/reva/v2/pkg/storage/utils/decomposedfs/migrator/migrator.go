@@ -25,7 +25,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/rs/zerolog"
 )
@@ -73,13 +73,13 @@ type Result string
 
 // Migrator runs migrations on an existing decomposedfs
 type Migrator struct {
-	lu     *lookup.Lookup
+	lu     node.PathLookup
 	states migrationStates
 	log    *zerolog.Logger
 }
 
 // New returns a new Migrator instance
-func New(lu *lookup.Lookup, log *zerolog.Logger) Migrator {
+func New(lu node.PathLookup, log *zerolog.Logger) Migrator {
 	return Migrator{
 		lu:  lu,
 		log: log,

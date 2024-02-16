@@ -48,7 +48,7 @@ type AsyncPropagator struct {
 	treeSizeAccounting bool
 	treeTimeAccounting bool
 	propagationDelay   time.Duration
-	lookup             lookup.PathLookup
+	lookup             node.PathLookup
 }
 
 // Change represents a change to the tree
@@ -58,7 +58,7 @@ type Change struct {
 }
 
 // NewAsyncPropagator returns a new AsyncPropagator instance
-func NewAsyncPropagator(treeSizeAccounting, treeTimeAccounting bool, o options.AsyncPropagatorOptions, lookup lookup.PathLookup) AsyncPropagator {
+func NewAsyncPropagator(treeSizeAccounting, treeTimeAccounting bool, o options.AsyncPropagatorOptions, lookup node.PathLookup) AsyncPropagator {
 	p := AsyncPropagator{
 		treeSizeAccounting: treeSizeAccounting,
 		treeTimeAccounting: treeTimeAccounting,

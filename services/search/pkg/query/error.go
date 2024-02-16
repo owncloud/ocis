@@ -1,4 +1,4 @@
-package kql
+package query
 
 import (
 	"fmt"
@@ -36,4 +36,12 @@ type UnsupportedTimeRangeError struct {
 
 func (e UnsupportedTimeRangeError) Error() string {
 	return fmt.Sprintf("unable to convert '%v' to a time range", e.Value)
+}
+
+func IsValidationError(err error) bool {
+	switch err.(type) {
+	case *StartsWithBinaryOperatorError, *NamedGroupInvalidNodesError, *UnsupportedTimeRangeError:
+		return true
+	}
+	return false
 }

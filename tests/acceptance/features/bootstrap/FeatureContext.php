@@ -1218,6 +1218,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
+		$url = $this->substituteInLineCodes($url, $user);
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null));
 	}
 
@@ -2747,30 +2748,6 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%group_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%space_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getSpaceIdRegex"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%user_id_pattern%",
-				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
-				],
-				"parameter" => []
-			],
-			[
 				"code" => "%user_id%",
 				"function" => [
 					$this, "getUserIdByUserName"
@@ -2783,6 +2760,22 @@ class FeatureContext extends BehatVariablesContext {
 					$this, "getGroupIdByGroupName"
 				],
 				"parameter" => [$group]
+			],
+			[
+				"code" => "%user_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%group_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
 			],
 			[
 				"code" => "%role_id_pattern%",
@@ -2809,6 +2802,14 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
+				"code" => "%space_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getSpaceIdRegex"
+				],
+				"parameter" => []
+			],
+			[
 				"code" => "%share_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
@@ -2817,7 +2818,7 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%eTag%",
+				"code" => "%etag_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
 					"getEtagRegex"
@@ -2881,6 +2882,20 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => [$group]
 				]
 			);
+
+			if (!OcisHelper::isTestingOnReva()) {
+				array_push(
+					$substitutions,
+					[
+						"code" => "%shares_drive_id%",
+						"function" => [
+							$this->spacesContext,
+							"getSpaceIdByName"
+						],
+						"parameter" => [$user, "Shares"]
+					]
+				);
+			}
 		}
 
 		if (!empty($additionalSubstitutions)) {

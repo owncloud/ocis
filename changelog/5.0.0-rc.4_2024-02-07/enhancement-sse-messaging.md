@@ -5,6 +5,5 @@ In order to be able to send more content to the client, we have moved the endpoi
 
 * notify postprocessing state changes.
 * notify file locking and unlocking.
-* ... @toDo
 
 https://github.com/owncloud/ocis/pull/6992

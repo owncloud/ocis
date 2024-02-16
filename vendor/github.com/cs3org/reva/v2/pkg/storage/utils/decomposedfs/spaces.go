@@ -44,11 +44,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -66,9 +66,13 @@ const (
 // CreateStorageSpace creates a storage space
 func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error) {
 	ctx = context.WithValue(ctx, utils.SpaceGrant, struct{}{})
+	u := ctxpkg.ContextMustGetUser(ctx)
 
 	// "everything is a resource" this is the unique ID for the Space resource.
-	spaceID := uuid.New().String()
+	spaceID, err := fs.lu.GenerateSpaceID(req.Type, req.GetOwner())
+	if err != nil {
+		return nil, err
+	}
 	// allow sending a space id
 	if reqSpaceID := utils.ReadPlainFromOpaque(req.Opaque, "spaceid"); reqSpaceID != "" {
 		spaceID = reqSpaceID
@@ -77,14 +81,12 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 	description := utils.ReadPlainFromOpaque(req.Opaque, "description")
 	// allow sending a spaceAlias
 	alias := utils.ReadPlainFromOpaque(req.Opaque, "spaceAlias")
-	u := ctxpkg.ContextMustGetUser(ctx)
 	if alias == "" {
 		alias = templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, fs.o.GeneralSpaceAliasTemplate)
 	}
 	// TODO enforce a uuid?
 	// TODO clarify if we want to enforce a single personal storage space or if we want to allow sending the spaceid
 	if req.Type == _spaceTypePersonal {
-		spaceID = req.GetOwner().GetId().GetOpaqueId()
 		alias = templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, fs.o.PersonalSpaceAliasTemplate)
 	}
 
@@ -620,7 +622,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 
 	}
 
-	if !restore && len(metadata) == 0 && !IsViewer(sp) {
+	if !restore && len(metadata) == 0 && !permissions.IsViewer(sp) {
 		// you may land here when making an update request without changes
 		// check if user has access to the drive before continuing
 		return &provider.UpdateStorageSpaceResponse{
@@ -628,10 +630,10 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 		}, nil
 	}
 
-	if !IsManager(sp) {
+	if !permissions.IsManager(sp) {
 		// We are not a space manager. We need to check for additional permissions.
 		k := []string{prefixes.NameAttr, prefixes.SpaceDescriptionAttr}
-		if !IsEditor(sp) {
+		if !permissions.IsEditor(sp) {
 			k = append(k, prefixes.SpaceReadmeAttr, prefixes.SpaceAliasAttr, prefixes.SpaceImageAttr)
 		}
 
@@ -800,7 +802,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 
 		if n.SpaceRoot.IsDisabled(ctx) {
 			rp, err := fs.p.AssemblePermissions(ctx, n)
-			if err != nil || !IsManager(rp) {
+			if err != nil || !permissions.IsManager(rp) {
 				return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s is not allowed to list deleted spaces %s", user.Username, n.ID))
 			}
 		}
@@ -1060,7 +1062,7 @@ func (fs *Decomposedfs) getSpaceRoot(spaceID string) string {
 // - a user with the "delete-all-spaces" permission may delete but not enable/disable any project space
 // - a user with the "Drive.ReadWriteEnabled" permission may enable/disable but not delete any project space
 // - a project space can always be enabled/disabled/deleted by its manager (i.e. users have the "remove" grant)
-func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool, n *node.Node, p Permissions) error {
+func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool, n *node.Node, p permissions.Permissions) error {
 	// delete-all-home spaces allows to disable and delete a personal space
 	if typ == "personal" {
 		if p.DeleteAllHomeSpaces(ctx) {
@@ -1070,7 +1072,7 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	}
 
 	// space managers are allowed to disable and delete their project spaces
-	if rp, err := p.AssemblePermissions(ctx, n); err == nil && IsManager(rp) {
+	if rp, err := p.AssemblePermissions(ctx, n); err == nil && permissions.IsManager(rp) {
 		return nil
 	}
 

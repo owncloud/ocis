@@ -66,7 +66,7 @@ type Blobstore interface {
 
 // Tree manages a hierarchical tree
 type Tree struct {
-	lookup     lookup.PathLookup
+	lookup     node.PathLookup
 	blobstore  Blobstore
 	propagator propagator.Propagator
 
@@ -79,7 +79,7 @@ type Tree struct {
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu lookup.PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
+func New(lu node.PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
 	return &Tree{
 		lookup:     lu,
 		blobstore:  bs,

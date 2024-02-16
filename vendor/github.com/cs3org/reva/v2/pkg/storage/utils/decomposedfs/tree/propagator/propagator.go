@@ -26,7 +26,6 @@ import (
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -45,7 +44,7 @@ type Propagator interface {
 	Propagate(ctx context.Context, node *node.Node, sizediff int64) error
 }
 
-func New(lookup lookup.PathLookup, o *options.Options) Propagator {
+func New(lookup node.PathLookup, o *options.Options) Propagator {
 	switch o.Propagator {
 	case "async":
 		return NewAsyncPropagator(o.TreeSizeAccounting, o.TreeTimeAccounting, o.AsyncPropagatorOptions, lookup)
@@ -54,7 +53,7 @@ func New(lookup lookup.PathLookup, o *options.Options) Propagator {
 	}
 }
 
-func calculateTreeSize(ctx context.Context, lookup lookup.PathLookup, childrenPath string) (uint64, error) {
+func calculateTreeSize(ctx context.Context, lookup node.PathLookup, childrenPath string) (uint64, error) {
 	ctx, span := tracer.Start(ctx, "calculateTreeSize")
 	defer span.End()
 	var size uint64

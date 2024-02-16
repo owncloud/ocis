@@ -49,9 +49,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
+
+//go:generate make --no-print-directory -C ../../../../.. mockery NAME=Tree
 
 var tracer trace.Tracer
 
@@ -83,6 +86,46 @@ const (
 	ProcessingStatus = "processing:"
 )
 
+// Tree is used to manage a tree hierarchy
+type Tree interface {
+	Setup() error
+
+	GetMD(ctx context.Context, node *Node) (os.FileInfo, error)
+	ListFolder(ctx context.Context, node *Node) ([]*Node, error)
+	// CreateHome(owner *userpb.UserId) (n *Node, err error)
+	CreateDir(ctx context.Context, node *Node) (err error)
+	TouchFile(ctx context.Context, node *Node, markprocessing bool, mtime string) error
+	// CreateReference(ctx context.Context, node *Node, targetURI *url.URL) error
+	Move(ctx context.Context, oldNode *Node, newNode *Node) (err error)
+	Delete(ctx context.Context, node *Node) (err error)
+	RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, target *Node) (*Node, *Node, func() error, error)
+	PurgeRecycleItemFunc(ctx context.Context, spaceid, key, purgePath string) (*Node, func() error, error)
+
+	WriteBlob(node *Node, source string) error
+	ReadBlob(node *Node) (io.ReadCloser, error)
+	DeleteBlob(node *Node) error
+
+	Propagate(ctx context.Context, node *Node, sizeDiff int64) (err error)
+}
+
+// PathLookup defines the interface for the lookup component
+type PathLookup interface {
+	NodeFromSpaceID(ctx context.Context, spaceID string) (n *Node, err error)
+	NodeFromResource(ctx context.Context, ref *provider.Reference) (*Node, error)
+	NodeFromID(ctx context.Context, id *provider.ResourceId) (n *Node, err error)
+
+	GenerateSpaceID(spaceType string, owner *userpb.User) (string, error)
+	InternalRoot() string
+	InternalPath(spaceID, nodeID string) string
+	Path(ctx context.Context, n *Node, hasPermission PermissionFunc) (path string, err error)
+	MetadataBackend() metadata.Backend
+	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
+	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
+	TypeFromPath(ctx context.Context, path string) provider.ResourceType
+	CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), lockedSource *lockedfile.File, acquireTargetLock bool) (err error)
+	CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), acquireTargetLock bool) (err error)
+}
+
 // Node represents a node in the tree and provides methods to get a Parent or Child instance
 type Node struct {
 	SpaceID   string
@@ -98,16 +141,6 @@ type Node struct {
 	lu          PathLookup
 	xattrsCache map[string][]byte
 	nodeType    *provider.ResourceType
-}
-
-// PathLookup defines the interface for the lookup component
-type PathLookup interface {
-	InternalRoot() string
-	InternalPath(spaceID, nodeID string) string
-	Path(ctx context.Context, n *Node, hasPermission PermissionFunc) (path string, err error)
-	MetadataBackend() metadata.Backend
-	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
-	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
 }
 
 // New returns a new instance of Node

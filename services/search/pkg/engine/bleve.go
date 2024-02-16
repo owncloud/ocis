@@ -22,6 +22,7 @@ import (
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
@@ -123,6 +124,9 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
 	createdQuery, err := b.queryCreator.Create(sir.Query)
 	if err != nil {
+		if searchQuery.IsValidationError(err) {
+			return nil, errtypes.BadRequest(err.Error())
+		}
 		return nil, err
 	}
 

@@ -32,8 +32,11 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
-          OCIS_DOCKER_TAG: 5.0.0-rc.3
+          OCIS_DOCKER_TAG: 4.0.0
           OCIS_DOMAIN: ocis.ocis-wopi.released.owncloud.works
+          COMPANION_DOMAIN: companion.ocis-wopi.released.owncloud.works
+          COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
+          COMPANION_WEB_CONFIG_FILE_NAME: web-released.yaml
           WOPISERVER_DOMAIN: wopiserver.ocis-wopi.released.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis-wopi.released.owncloud.works
           ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.released.owncloud.works
