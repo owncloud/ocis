@@ -889,3 +889,14 @@ Feature: List a sharing permissions
       }
     }
     """
+
+
+  Scenario: user send share invitation for all allowed roles defined in permission lists
+    Given user "Alice" has created folder "folder"
+    When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles from the above response:
+      | resource          | folder              |
+      | space             | Personal            |
+      | sharee            | Brian               |
+      | shareType         | user                |

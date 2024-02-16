@@ -667,4 +667,34 @@ class SharingNgContext implements Context {
 			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actualValue'"
 		);
 	}
+
+    /**
+     * @Then user :user should be able to send share invitation with all allowed permission roles from the above response:
+     *
+     * @param string $user
+     * @param TableNode $table
+     *
+     *
+     * @throws JsonException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function userCanSendShareInvitationToUserWithAllAllowedPermissionRolesForFolder( string $user, TableNode $table)
+    {
+        // Get all the permission saved in the above response
+        // make loop through all the allowed roles
+       // Make a share invitation request
+       // Make the assertion status code and also with response was there [one item in the array]
+       // delete the share response after
+        $listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
+        if(!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})){
+            Assert::fail('list permission did not have any permission roles allowed!');
+        }
+        Assert::assertNotEmpty($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'});
+        $allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
+
+        foreach ($allowedPermissionRoles as $role) {
+            $response = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionRole', $role->displayName]])));
+            var_dump($response);
+        }
+    }
 }
