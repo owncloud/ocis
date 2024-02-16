@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The following grep will filter out every line containing an `env` annotation
-# it will ignore every line that has allready a valid `introductionVersion` annotation
+# it will ignore every line that already has a valid `introductionVersion` annotation
 #
 # valid examples:
 #
