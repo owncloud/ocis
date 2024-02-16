@@ -81,5 +81,5 @@ type Status struct {
 	Product        string
 	ProductName    string
 	ProductVersion string
-	Edition        string `yaml:"edition" env:"OCIS_EDITION;OCDAV_EDITION" introductionVersion:"pre5.0"`
+	Edition        string `yaml:"edition" env:"OCIS_EDITION;OCDAV_EDITION" desc:"Edition of oCIS" introductionVersion:"pre5.0"`
 }
