@@ -1,11 +1,13 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"io/fs"
 	"net/http"
 	"os"
@@ -45,7 +47,7 @@ func (b *filesystemBackend) localCardDAVDir(ctx context.Context, components ...s
 		return "", err
 	}
 
-	return b.localDir(homeSetPath, components...)
+	return b.localDir(ctx, homeSetPath, components...)
 }
 
 func (b *filesystemBackend) safeLocalCardDAVPath(ctx context.Context, urlPath string) (string, error) {
@@ -54,7 +56,7 @@ func (b *filesystemBackend) safeLocalCardDAVPath(ctx context.Context, urlPath st
 		return "", err
 	}
 
-	return b.safeLocalPath(homeSetPath, urlPath)
+	return b.safeLocalPath(ctx, homeSetPath, urlPath)
 }
 
 func vcardPropFilter(card vcard.Card, props []string) vcard.Card {
@@ -78,20 +80,23 @@ func vcardPropFilter(card vcard.Card, props []string) vcard.Card {
 	return result
 }
 
-func vcardFromFile(path string, propFilter []string) (vcard.Card, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
+func (b *filesystemBackend) vcardFromFile(ctx context.Context, path string, propFilter []string) (vcard.Card, string, error) {
+	req := metadata.DownloadRequest{
+		Path: path,
 	}
-	defer f.Close()
+	response, err := b.storage.Download(ctx, req)
+	if err != nil {
+		return nil, "", err
+	}
 
-	dec := vcard.NewDecoder(f)
+	r := bytes.NewReader(response.Content)
+	dec := vcard.NewDecoder(r)
 	card, err := dec.Decode()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return vcardPropFilter(card, propFilter), nil
+	return vcardPropFilter(card, propFilter), response.Etag, nil
 }
 
 func (b *filesystemBackend) loadAllAddressObjects(ctx context.Context, urlPath string, propFilter []string) ([]carddav.AddressObject, error) {
@@ -113,12 +118,7 @@ func (b *filesystemBackend) loadAllAddressObjects(ctx context.Context, urlPath s
 			return nil
 		}
 
-		card, err := vcardFromFile(filename, propFilter)
-		if err != nil {
-			return err
-		}
-
-		etag, err := etagForFile(filename)
+		card, etag, err := b.vcardFromFile(ctx, filename, propFilter)
 		if err != nil {
 			return err
 		}
@@ -274,14 +274,9 @@ func (b *filesystemBackend) GetAddressObject(ctx context.Context, objPath string
 		propFilter = req.Props
 	}
 
-	card, err := vcardFromFile(localPath, propFilter)
+	card, etag, err := b.vcardFromFile(ctx, localPath, propFilter)
 	if err != nil {
 		log.Debug().Str("path", localPath).Err(err).Msg("error reading calendar")
-		return nil, err
-	}
-
-	etag, err := etagForFile(localPath)
-	if err != nil {
 		return nil, err
 	}
 
@@ -330,49 +325,41 @@ func (b *filesystemBackend) QueryAddressObjects(ctx context.Context, urlPath str
 func (b *filesystemBackend) PutAddressObject(ctx context.Context, objPath string, card vcard.Card, opts *carddav.PutAddressObjectOptions) (loc string, err error) {
 	log.Debug().Str("path", objPath).Msg("filesystem.PutAddressObject()")
 
-	// Object always get saved as <UID>.vcf
-	dirname, _ := path.Split(objPath)
-	objPath = path.Join(dirname, card.Value(vcard.FieldUID)+".vcf")
-
+	// TODO: validate carddav ???
 	localPath, err := b.safeLocalCardDAVPath(ctx, objPath)
 	if err != nil {
 		return "", err
 	}
 
-	flags := os.O_RDWR | os.O_CREATE | os.O_TRUNC
+	var buf bytes.Buffer
+	enc := vcard.NewEncoder(&buf)
+	err = enc.Encode(card)
+	if err != nil {
+		return "", err
+	}
+
+	req := metadata.UploadRequest{
+		Path:    localPath,
+		Content: buf.Bytes(),
+	}
+
 	// TODO handle IfNoneMatch == ETag
 	if opts.IfNoneMatch.IsWildcard() {
 		// Make sure we're not overwriting an existing file
-		flags |= os.O_EXCL
+		req.IfNoneMatch = []string{"*"}
 	} else if opts.IfMatch.IsWildcard() {
 		// Make sure we _are_ overwriting an existing file
-		flags &= ^os.O_CREATE
+		// TODO: not existing in UploadRequest
+		// req.IfMatch = []string{"*"}
 	} else if opts.IfMatch.IsSet() {
-		// Make sure we overwrite the _right_ file
-		etag, err := etagForFile(localPath)
-		if err != nil {
-			return "", webdav.NewHTTPError(http.StatusPreconditionFailed, err)
-		}
 		want, err := opts.IfMatch.ETag()
 		if err != nil {
 			return "", webdav.NewHTTPError(http.StatusBadRequest, err)
 		}
-		if want != etag {
-			err = fmt.Errorf("If-Match does not match current ETag (%s/%s)", want, etag)
-			return "", webdav.NewHTTPError(http.StatusPreconditionFailed, err)
-		}
+		req.IfMatchEtag = want
 	}
 
-	f, err := os.OpenFile(localPath, flags, 0666)
-	if os.IsExist(err) {
-		return "", carddav.NewPreconditionError(carddav.PreconditionNoUIDConflict)
-	} else if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	enc := vcard.NewEncoder(f)
-	err = enc.Encode(card)
+	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
 		return "", err
 	}

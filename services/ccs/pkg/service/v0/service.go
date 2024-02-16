@@ -5,16 +5,16 @@ import (
 	"errors"
 	"fmt"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/emersion/go-webdav"
 	"github.com/emersion/go-webdav/caldav"
 	"github.com/emersion/go-webdav/carddav"
-	"github.com/go-chi/chi/v5"
+	chi "github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	ocismiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/ccs/pkg/storage"
 	"net/http"
-	"os"
 )
 
 type userPrincipalBackend struct{}
@@ -97,12 +97,20 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 		account.JWTSecret(options.Config.JWTSecret),
 	),
 	)
-	// just some fake location for now
-	storageURL := "/tmp/caldav/"
-	os.Mkdir(storageURL, 0700)
+
+	conf := options.Config.Storage
+	s, err := metadata.NewCS3Storage(conf.GatewayAddress, conf.GatewayAddress, conf.SystemUserID, conf.SystemUserIDP, conf.SystemUserAPIKey)
+	if err != nil {
+		return nil, err
+	}
+	err = s.Init(options.Config.Context, "calendar-contacts-service")
+	if err != nil {
+		return nil, err
+	}
+
 	upBackend := &userPrincipalBackend{}
 
-	caldavBackend, _, err := storage.NewFilesystem(storageURL, "/calendar/", "/contacts/", upBackend)
+	caldavBackend, _, err := storage.NewFilesystem(s, "/calendar/", "/contacts/", upBackend)
 	if err != nil {
 		return nil, err
 	}

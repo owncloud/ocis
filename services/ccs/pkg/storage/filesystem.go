@@ -1,11 +1,9 @@
 package storage
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
+	"context"
 	"fmt"
-	"io"
-	"os"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -23,6 +21,7 @@ type filesystemBackend struct {
 	path          string
 	caldavPrefix  string
 	carddavPrefix string
+	storage       metadata.Storage
 }
 
 var (
@@ -30,38 +29,38 @@ var (
 	defaultResourceName = "default"
 )
 
-func NewFilesystem(fsPath, caldavPrefix, carddavPrefix string, userPrincipalBackend webdav.UserPrincipalBackend) (caldav.Backend, carddav.Backend, error) {
-	info, err := os.Stat(fsPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create filesystem backend: %s", err.Error())
-	}
-	if !info.IsDir() {
-		return nil, nil, fmt.Errorf("base path for filesystem backend must be a directory")
-	}
+func NewFilesystem(storage metadata.Storage, caldavPrefix, carddavPrefix string, userPrincipalBackend webdav.UserPrincipalBackend) (caldav.Backend, carddav.Backend, error) {
 	backend := &filesystemBackend{
 		UserPrincipalBackend: userPrincipalBackend,
-		path:                 fsPath,
+		path:                 "/",
 		caldavPrefix:         caldavPrefix,
 		carddavPrefix:        carddavPrefix,
+		storage:              storage,
 	}
 	return backend, backend, nil
 }
 
-func ensureLocalDir(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = os.MkdirAll(path, 0755)
+func (b *filesystemBackend) ensureLocalDir(ctx context.Context, path string) error {
+	segments := strings.Split(path, "/")
+	cwd := "/"
+	for _, segment := range segments {
+		if segment == "" {
+			continue
+		}
+		cwd = filepath.Join(cwd, segment)
+		err := b.storage.MakeDirIfNotExist(ctx, cwd)
 		if err != nil {
-			return fmt.Errorf("error creating '%s': %s", path, err.Error())
+			return fmt.Errorf("error creating '%s': %s", cwd, err.Error())
 		}
 	}
 	return nil
 }
 
-func (b *filesystemBackend) localDir(homeSetPath string, components ...string) (string, error) {
+func (b *filesystemBackend) localDir(ctx context.Context, homeSetPath string, components ...string) (string, error) {
 	c := append([]string{b.path}, homeSetPath)
 	c = append(c, components...)
 	localPath := filepath.Join(c...)
-	if err := ensureLocalDir(localPath); err != nil {
+	if err := b.ensureLocalDir(ctx, localPath); err != nil {
 		return "", err
 	}
 	return localPath, nil
@@ -69,9 +68,9 @@ func (b *filesystemBackend) localDir(homeSetPath string, components ...string) (
 
 // don't use this directly, use localCalDAVPath or localCardDAVPath instead.
 // note that homesetpath is expected to end in /
-func (b *filesystemBackend) safeLocalPath(homeSetPath string, urlPath string) (string, error) {
+func (b *filesystemBackend) safeLocalPath(ctx context.Context, homeSetPath string, urlPath string) (string, error) {
 	localPath := filepath.Join(b.path, homeSetPath)
-	if err := ensureLocalDir(localPath); err != nil {
+	if err := b.ensureLocalDir(ctx, localPath); err != nil {
 		return "", err
 	}
 
@@ -100,20 +99,4 @@ func (b *filesystemBackend) safeLocalPath(homeSetPath string, urlPath string) (s
 	}
 
 	return filepath.Join(localPath, dir, file), nil
-}
-
-func etagForFile(path string) (string, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	h := sha1.New()
-	if _, err := io.Copy(h, f); err != nil {
-		return "", err
-	}
-	csum := h.Sum(nil)
-
-	return base64.StdEncoding.EncodeToString(csum[:]), nil
 }

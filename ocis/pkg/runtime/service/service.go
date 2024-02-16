@@ -170,11 +170,6 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.AuthService.Commons = cfg.Commons
 		return authservice.Execute(cfg.AuthService)
 	})
-	reg(3, opts.Config.CCS.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.CCS.Context = ctx
-		cfg.CCS.Commons = cfg.Commons
-		return ccs.Execute(cfg.CCS)
-	})
 	reg(3, opts.Config.Clientlog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Clientlog.Context = ctx
 		cfg.Clientlog.Commons = cfg.Commons
@@ -304,6 +299,12 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.OCM.Context = ctx
 		cfg.OCM.Commons = cfg.Commons
 		return ocm.Execute(cfg.OCM)
+	})
+	// wait for system storage
+	reg(4, opts.Config.CCS.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.CCS.Context = ctx
+		cfg.CCS.Commons = cfg.Commons
+		return ccs.Execute(cfg.CCS)
 	})
 
 	// out of some unknown reason ci gets angry when frontend service starts in priority group 3
