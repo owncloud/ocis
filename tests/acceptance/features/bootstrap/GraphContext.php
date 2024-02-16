@@ -2529,13 +2529,16 @@ class GraphContext implements Context {
 	/**
 	 *
 	 * @param string $user
-	 * @param bool $isCacheClear
+	 * @param bool $waitForCacheExpiry
 	 *
 	 * @return void
 	 */
-	public function userListsResourcesSharedByHimOrHer(string $user, bool $isCacheClear = false) {
+	public function listSharesSharedByMe(string $user, bool $waitForCacheExpiry = false) {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		if ($isCacheClear) {
+		if ($waitForCacheExpiry) {
+			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
+			// which means 60 sec is required to clean up all the user|group cache once they are deleted
+			// for tests we have set the above ENV's to minimum which is 1 sec as we check the details for the deleted users
 			sleep(1);
 		}
 		$response = GraphHelper::getSharesSharedByMe(
@@ -2556,7 +2559,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userListsTheResourcesSharedByAUserUsingGraphApi(string $user): void {
-		$this->userListsResourcesSharedByHimOrHer($user);
+		$this->listSharesSharedByMe($user);
 	}
 
 	/**
@@ -2568,7 +2571,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userListsTheResourcesSharedByAUserAfterClearingUserOrGroupSpaceUsingGraphApi(string $user): void {
-		$this->userListsResourcesSharedByHimOrHer($user, true);
+		$this->listSharesSharedByMe($user, true);
 	}
 
 	/**
