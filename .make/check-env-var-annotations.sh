@@ -25,14 +25,15 @@ ERROR=0
 SEMVER_REGEX="([0-9]|[1-9][0-9]*)(\.([0-9]|[1-9][0-9]*)){1,2}(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"
 
 QUERY_INTRO=$(git grep -n "env:" -- '*.go' |grep -v -P "introductionVersion:\"($SEMVER_REGEX|(pre5\.0))\""|grep -v "_test.go"|grep -v "vendor/")
-
 RESULTS_INTRO=$(echo "${QUERY_INTRO}"|wc -l)
-if [ "${RESULTS_INTRO}" -gt 0 ]; then
+if [ "${QUERY_INTRO}" != "" ] && [ "${RESULTS_INTRO}" -gt 0 ]; then
   echo "==============================================================================================="
-  echo "The following ${RESULTS_INTRO} files contain an invalid introductionVersion annotation:"
+  echo "The following ${RESULTS_INTRO} items contain an invalid or missing introductionVersion annotation:"
   echo "==============================================================================================="
   echo "$QUERY_INTRO"
   ERROR=1
+else
+  echo "All introductionVersion annotations are valid"
 fi
 
 # The following grep will filter out every line containing an `env` annotation
@@ -41,11 +42,13 @@ fi
 QUERY_DESC=$(git grep -n "env:" -- '*.go' |grep -v -P "desc:\".{10,}\""|grep -v "_test.go"|grep -v "vendor/")
 
 RESULTS_DESC=$(echo "${QUERY_DESC}"|wc -l)
-if [ "${RESULTS_DESC}" -gt 0 ]; then
+if [ "${QUERY_DESC}" != "" ] && [ "${RESULTS_DESC}" -gt 0 ]; then
   echo "==============================================================================================="
-  echo "The following ${RESULTS_DESC} files contain an invalid description annotation:"
+  echo "The following ${RESULTS_DESC} items contain an invalid or missing description annotation:"
   echo "==============================================================================================="
   echo "$QUERY_DESC"
   ERROR=1
+else
+  echo "All description annotations are valid"
 fi
 exit ${ERROR}
