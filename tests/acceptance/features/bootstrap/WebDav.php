@@ -5766,7 +5766,7 @@ trait WebDav {
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
-		$spacesBaseUrl = webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
+		$spacesBaseUrl = "/" . webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
 		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
 		$results = [];
 		foreach ($searchResults as $item) {
