@@ -75,6 +75,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "ccs",
 		},
+		Storage: config.Storage{
+			GatewayAddress: "com.owncloud.api.storage-system",
+			SystemUserIDP:  "internal",
+		},
 	}
 }
 
@@ -104,6 +108,13 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 	if cfg.JWTSecret == "" && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.JWTSecret = cfg.Commons.TokenManager.JWTSecret
+	}
+	if cfg.Storage.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.Storage.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.Storage.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.Storage.SystemUserID = cfg.Commons.SystemUserID
 	}
 }
 

@@ -1,18 +1,19 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
-	"io/fs"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/rs/zerolog/log"
 	"net/http"
-	"os"
 	"path"
 	"path/filepath"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/emersion/go-ical"
 	"github.com/emersion/go-webdav"
@@ -31,9 +32,9 @@ func (b *filesystemBackend) CalendarHomeSetPath(ctx context.Context) (string, er
 
 func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav.Calendar) error {
 	resourceName := path.Base(calendar.Path)
-	localPath, err_ := b.localCalDAVDir(ctx, resourceName)
-	if err_ != nil {
-		return fmt.Errorf("error creating default calendar: %s", err_.Error())
+	localPath, err := b.localCalDAVDir(ctx, resourceName)
+	if err != nil {
+		return fmt.Errorf("error creating default calendar: %s", err.Error())
 	}
 
 	log.Debug().Str("local", localPath).Str("url", calendar.Path).Msg("filesystem.CreateCalendar()")
@@ -42,7 +43,7 @@ func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav
 	if err != nil {
 		return fmt.Errorf("error creating default calendar: %s", err.Error())
 	}
-	err = os.WriteFile(path.Join(localPath, calendarFileName), blob, 0644)
+	err = b.storage.SimpleUpload(ctx, path.Join(localPath, calendarFileName), blob)
 	if err != nil {
 		return fmt.Errorf("error writing default calendar: %s", err.Error())
 	}
@@ -55,7 +56,7 @@ func (b *filesystemBackend) localCalDAVDir(ctx context.Context, components ...st
 		return "", err
 	}
 
-	return b.localDir(homeSetPath, components...)
+	return b.localDir(ctx, homeSetPath, components...)
 }
 
 func (b *filesystemBackend) safeLocalCalDAVPath(ctx context.Context, urlPath string) (string, error) {
@@ -64,23 +65,26 @@ func (b *filesystemBackend) safeLocalCalDAVPath(ctx context.Context, urlPath str
 		return "", err
 	}
 
-	return b.safeLocalPath(homeSetPath, urlPath)
+	return b.safeLocalPath(ctx, homeSetPath, urlPath)
 }
 
-func calendarFromFile(path string, propFilter []string) (*ical.Calendar, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
+func (b *filesystemBackend) calendarFromFile(ctx context.Context, path string, propFilter []string) (*ical.Calendar, string, error) {
+	req := metadata.DownloadRequest{
+		Path: path,
 	}
-	defer f.Close()
+	response, err := b.storage.Download(ctx, req)
+	if err != nil {
+		return nil, "", err
+	}
 
-	dec := ical.NewDecoder(f)
+	r := bytes.NewReader(response.Content)
+	dec := ical.NewDecoder(r)
 	cal, err := dec.Decode()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return cal, nil
+	return cal, response.Etag, nil
 	// TODO implement
 	//return icalPropFilter(cal, propFilter), nil
 }
@@ -95,39 +99,32 @@ func (b *filesystemBackend) loadAllCalendarObjects(ctx context.Context, urlPath 
 
 	log.Debug().Str("path", localPath).Msg("loading calendar objects")
 
-	err = filepath.Walk(localPath, func(filename string, info os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("error accessing %s: %s", filename, err)
-		}
-
+	dir, err := b.storage.ListDir(ctx, localPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, f := range dir {
 		// Skip address book meta data files
-		if !info.Mode().IsRegular() || filepath.Ext(filename) != ".ics" {
-			return nil
+		if f.Type != providerv1beta1.ResourceType_RESOURCE_TYPE_FILE || filepath.Ext(f.Name) != ".ics" {
+			continue
 		}
 
-		cal, err := calendarFromFile(filename, propFilter)
+		cal, _, err := b.calendarFromFile(ctx, f.Path, propFilter)
 		if err != nil {
-			fmt.Printf("load calendar error for %s: %v\n", filename, err)
-			return err
+			fmt.Printf("load calendar error for %s: %v\n", f.Path, err)
+			// TODO: return err ???
+			continue
 		}
 
-		etag, err := etagForFile(filename)
-		if err != nil {
-			return err
-		}
-
-		// TODO can this potentially be called on a calendar object resource?
-		// Would work (as Walk() includes root), except for the path construction below
 		obj := caldav.CalendarObject{
-			Path:          path.Join(urlPath, filepath.Base(filename)),
-			ModTime:       info.ModTime(),
-			ContentLength: info.Size(),
-			ETag:          etag,
+			Path:          path.Join(urlPath, f.Name),
+			ModTime:       utils.TSToTime(f.Mtime),
+			ContentLength: int64(f.Size),
+			ETag:          f.Etag,
 			Data:          cal,
 		}
 		result = append(result, obj)
-		return nil
-	})
+	}
 
 	return result, err
 }
@@ -167,34 +164,30 @@ func (b *filesystemBackend) ListCalendars(ctx context.Context) ([]caldav.Calenda
 
 	var result []caldav.Calendar
 
-	err = filepath.Walk(localPath, func(filename string, info os.FileInfo, err error) error {
+	dir, err := b.storage.ListDir(ctx, localPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, f := range dir {
+		if f.Type != providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER || f.Path == localPath {
+			continue
+		}
+		calPath := path.Join(f.Path, calendarFileName)
+		calendar, err := b.readCalendar(ctx, calPath)
 		if err != nil {
-			return fmt.Errorf("error accessing %s: %s", filename, err.Error())
+			// TODO: how to handle
+			/*
+				if os.IsNotExist(err) {
+					return nil // not a calendar dir
+				} else {
+					return fmt.Errorf("error accessing %s: %s", calPath, err.Error())
+				}
+			*/
+			continue
 		}
 
-		if !info.IsDir() || filename == localPath {
-			return nil
-		}
-
-		calPath := path.Join(filename, calendarFileName)
-		data, err := os.ReadFile(calPath)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return nil // not a calendar dir
-			} else {
-				return fmt.Errorf("error accessing %s: %s", calPath, err.Error())
-			}
-		}
-
-		var calendar caldav.Calendar
-		err = json.Unmarshal(data, &calendar)
-		if err != nil {
-			return fmt.Errorf("error reading calendar %s: %s", calPath, err.Error())
-		}
-
-		result = append(result, calendar)
-		return nil
-	})
+		result = append(result, *calendar)
+	}
 
 	if err == nil && len(result) == 0 {
 		// Nothing here yet? Create the default calendar.
@@ -219,11 +212,18 @@ func (b *filesystemBackend) GetCalendar(ctx context.Context, urlPath string) (*c
 
 	log.Debug().Str("path", localPath).Msg("loading calendar")
 
-	data, err := os.ReadFile(localPath)
+	return b.readCalendar(ctx, localPath)
+}
+
+func (b *filesystemBackend) readCalendar(ctx context.Context, localPath string) (*caldav.Calendar, error) {
+	data, err := b.storage.SimpleDownload(ctx, localPath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, webdav.NewHTTPError(404, err)
-		}
+		// TODO: need to see how to handle this ....
+		/*
+			if os.IsNotExist(err) {
+				return nil, webdav.NewHTTPError(404, err)
+			}
+		*/
 		return nil, fmt.Errorf("error opening calendar: %s", err.Error())
 	}
 	var calendar caldav.Calendar
@@ -243,11 +243,15 @@ func (b *filesystemBackend) GetCalendarObject(ctx context.Context, objPath strin
 		return nil, err
 	}
 
-	info, err := os.Stat(localPath)
+	info, err := b.storage.Stat(ctx, localPath)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return nil, webdav.NewHTTPError(404, err)
-		}
+		// TODO: need to see what comes out of it ...
+		/*
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil, webdav.NewHTTPError(404, err)
+			}
+
+		*/
 		return nil, err
 	}
 
@@ -256,21 +260,16 @@ func (b *filesystemBackend) GetCalendarObject(ctx context.Context, objPath strin
 		propFilter = req.Props
 	}
 
-	calendar, err := calendarFromFile(localPath, propFilter)
+	calendar, etag, err := b.calendarFromFile(ctx, localPath, propFilter)
 	if err != nil {
 		log.Debug().Str("path", localPath).Err(err).Msg("error reading calendar")
 		return nil, err
 	}
 
-	etag, err := etagForFile(localPath)
-	if err != nil {
-		return nil, err
-	}
-
 	obj := caldav.CalendarObject{
 		Path:          objPath,
-		ModTime:       info.ModTime(),
-		ContentLength: info.Size(),
+		ModTime:       utils.TSToTime(info.Mtime),
+		ContentLength: int64(info.Size),
 		ETag:          etag,
 		Data:          calendar,
 	}
@@ -322,40 +321,35 @@ func (b *filesystemBackend) PutCalendarObject(ctx context.Context, objPath strin
 		return "", err
 	}
 
-	flags := os.O_RDWR | os.O_CREATE | os.O_TRUNC
+	var buf bytes.Buffer
+	enc := ical.NewEncoder(&buf)
+	err = enc.Encode(calendar)
+	if err != nil {
+		return "", err
+	}
+
+	req := metadata.UploadRequest{
+		Path:    localPath,
+		Content: buf.Bytes(),
+	}
+
 	// TODO handle IfNoneMatch == ETag
 	if opts.IfNoneMatch.IsWildcard() {
 		// Make sure we're not overwriting an existing file
-		flags |= os.O_EXCL
+		req.IfNoneMatch = []string{"*"}
 	} else if opts.IfMatch.IsWildcard() {
 		// Make sure we _are_ overwriting an existing file
-		flags &= ^os.O_CREATE
+		// TODO: not existing in UploadRequest
+		// req.IfMatch = []string{"*"}
 	} else if opts.IfMatch.IsSet() {
-		// Make sure we overwrite the _right_ file
-		etag, err := etagForFile(localPath)
-		if err != nil {
-			return "", webdav.NewHTTPError(http.StatusPreconditionFailed, err)
-		}
 		want, err := opts.IfMatch.ETag()
 		if err != nil {
 			return "", webdav.NewHTTPError(http.StatusBadRequest, err)
 		}
-		if want != etag {
-			err = fmt.Errorf("If-Match does not match current ETag (%s/%s)", want, etag)
-			return "", webdav.NewHTTPError(http.StatusPreconditionFailed, err)
-		}
+		req.IfMatchEtag = want
 	}
 
-	f, err := os.OpenFile(localPath, flags, 0666)
-	if os.IsExist(err) {
-		return "", caldav.NewPreconditionError(caldav.PreconditionNoUIDConflict)
-	} else if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	enc := ical.NewEncoder(f)
-	err = enc.Encode(calendar)
+	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -370,9 +364,5 @@ func (b *filesystemBackend) DeleteCalendarObject(ctx context.Context, path strin
 	if err != nil {
 		return err
 	}
-	err = os.Remove(localPath)
-	if err != nil {
-		return err
-	}
-	return nil
+	return b.storage.Delete(ctx, localPath)
 }
