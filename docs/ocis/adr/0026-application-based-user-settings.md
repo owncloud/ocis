@@ -13,7 +13,7 @@ geekdocFilePath: 0026-application-based-user-settings.md
 
 ## Context and Problem Statement
 
-To share user settings across devices applications want to store user specific settings on the server. The ePUB app wants to remeber which page the user is on. The iOS app wants to rember search queries. The Caldav app needs a space to store data.
+To share user settings across devices applications want to store user specific settings on the server. The ePUB app wants to remember which page the user is on. The iOS app wants to rember search queries. The Caldav app needs a space to store data.
 
 ## Decision Drivers <!-- optional -->
 
