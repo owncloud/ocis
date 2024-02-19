@@ -8,7 +8,7 @@ geekdocFilePath: 0026-application-based-user-settings.md
 ---
 
 * Status: draft
-* Deciders: @butonic, @fschade, @kulmann
+* Deciders: [@butonic](https://github.com/butonic), [@fschade](https://github.com/fschade), [@kulmann](https://github.com/kulmann)
 * Date: 2024-02-09
 
 ## Context and Problem Statement

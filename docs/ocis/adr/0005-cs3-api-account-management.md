@@ -8,7 +8,7 @@ geekdocFilePath: 0005-cs3-api-account-management.md
 ---
 
 * Status: proposed
-* Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
+* Deciders: [@refs](https://github.com/refs), [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@pmaier1](https://github.com/pmaier1)
 * Date: 2021-04-12
 
 Technical Story: [Write only management API for User and Group resources](https://github.com/cs3org/cs3apis/pull/119)

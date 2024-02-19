@@ -8,7 +8,7 @@ geekdocFilePath: 0014-microservices-runtime.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @micbar, @dragotin, @mstingl, @pmaier1, @fschade
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@mstingl](https://github.com/mstingl) [@pmaier1](https://github.com/pmaier1), [@fschade](https://github.com/fschade)
 * Date: 2022-01-21
 
 ## Context and Problem Statement
