@@ -28,7 +28,7 @@
 | OCIS_EVENTS_AUTH_USERNAME<br/>SHARING_EVENTS_AUTH_USERNAME | string |  | Username for the events broker.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>SHARING_EVENTS_AUTH_PASSWORD | string |  | Password for the events broker.|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
-| SHARING_USER_DRIVER | string | jsoncs3 | Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' and 'owncloudsql'.|
+| SHARING_USER_DRIVER | string | jsoncs3 | Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' (deprecated) and 'owncloudsql'.|
 | SHARING_USER_JSONCS3_PROVIDER_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SHARING_USER_JSONCS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
 | OCIS_SYSTEM_USER_IDP<br/>SHARING_USER_JSONCS3_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
@@ -45,7 +45,7 @@
 | SHARING_USER_OWNCLOUDSQL_DB_PORT | int | 3306 | Port that the database server is listening on.|
 | SHARING_USER_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID | string |  | Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares.|
-| SHARING_PUBLIC_DRIVER | string | jsoncs3 | Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3'.|
+| SHARING_PUBLIC_DRIVER | string | jsoncs3 | Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated).|
 | SHARING_PUBLIC_JSON_FILE | string | /var/lib/ocis/storage/publicshares.json | Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
 | SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SHARING_PUBLIC_JSONCS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
