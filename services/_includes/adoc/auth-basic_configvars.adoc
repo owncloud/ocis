@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-18-00-48-34]
+[#deprecation-note-2024-02-19-00-13-44]
 [caption=]
 .Deprecation notes for the auth-basic service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -263,7 +263,7 @@ LDAP DN to use for simple bind authentication with the target LDAP server.
 a|`OCIS_LDAP_BIND_PASSWORD` +
 `LDAP_BIND_PASSWORD` +
 `AUTH_BASIC_LDAP_BIND_PASSWORD` +
-xref:deprecation-note-2024-02-18-00-48-34[Deprecation Note]
+xref:deprecation-note-2024-02-19-00-13-44[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
