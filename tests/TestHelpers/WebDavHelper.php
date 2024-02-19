@@ -661,7 +661,7 @@ class WebDavHelper {
 			$urlParameter = \http_build_query($urlParameter, '', '&');
 			$path .= '?' . $urlParameter;
 		}
-		$fullUrl = self::sanitizeUrl($baseUrl . $davPath . $path);
+		$fullUrl = self::sanitizeUrl($baseUrl . "/$davPath" . $path);
 
 		if ($authType === 'bearer') {
 			$headers['Authorization'] = 'Bearer ' . $password;
@@ -750,12 +750,12 @@ class WebDavHelper {
 			// return spaces root path if spaceid is null
 			// REPORT request uses spaces root path
 			if ($spaceId === null) {
-				return "/remote.php/dav/spaces/";
+				return "remote.php/dav/spaces/";
 			}
 			if ($type === "trash-bin") {
-				return "/remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
+				return "remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
 			}
-			return "/remote.php/dav/spaces/" . $spaceId . '/';
+			return "remote.php/dav/spaces/" . $spaceId . '/';
 		} else {
 			if ($davPathVersionToUse === self::DAV_VERSION_OLD) {
 				if ($type === "trash-bin") {
