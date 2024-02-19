@@ -36,10 +36,10 @@ type Config struct {
 
 // Log holds Log config
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_SYSTEM_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_SYSTEM_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;STORAGE_SYSTEM_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;STORAGE_SYSTEM_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_SYSTEM_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_SYSTEM_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;STORAGE_SYSTEM_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;STORAGE_SYSTEM_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 // Service holds Service config
@@ -92,7 +92,7 @@ type Cache struct {
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_SYSTEM_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_SYSTEM_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_SYSTEM_CACHE_AUTH_USERNAME" desc:"Username for the configured store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_SYSTEM_CACHE_AUTH_PASSWORD" desc:"Password for the configured store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_SYSTEM_CACHE_AUTH_USERNAME" desc:"Username for the configured store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_SYSTEM_CACHE_AUTH_PASSWORD" desc:"Password for the configured store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }

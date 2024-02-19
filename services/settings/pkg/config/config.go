@@ -37,9 +37,9 @@ type Config struct {
 
 	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS" desc:"The default role assignments the demo users should be setup." introductionVersion:"pre5.0"`
 
-	ServiceAccountIDs []string `yaml:"service_account_ids" env:"SETTINGS_SERVICE_ACCOUNT_IDS;OCIS_SERVICE_ACCOUNT_ID" desc:"The list of all service account IDs. These will be assigned the hidden 'service-account' role. Note: When using 'OCIS_SERVICE_ACCOUNT_ID' this will contain only one value while 'SETTINGS_SERVICE_ACCOUNT_IDS' can have multiple. See the 'auth-service' service description for more details about service accounts." introductionVersion:"pre5.0"`
+	ServiceAccountIDs []string `yaml:"service_account_ids" env:"SETTINGS_SERVICE_ACCOUNT_IDS;OCIS_SERVICE_ACCOUNT_ID" desc:"The list of all service account IDs. These will be assigned the hidden 'service-account' role. Note: When using 'OCIS_SERVICE_ACCOUNT_ID' this will contain only one value while 'SETTINGS_SERVICE_ACCOUNT_IDS' can have multiple. See the 'auth-service' service description for more details about service accounts." introductionVersion:"5.0"`
 
-	DefaultLanguage string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details." introductionVersion:"pre5.0"`
+	DefaultLanguage string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details." introductionVersion:"5.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -64,7 +64,7 @@ type Cache struct {
 	DirectoryTable     string        `yaml:"directories_table" env:"SETTINGS_DIRECTORY_CACHE_TABLE" desc:"The database table the store should use for the directory cache." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;SETTINGS_CACHE_TTL" desc:"Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;SETTINGS_CACHE_SIZE" desc:"The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }

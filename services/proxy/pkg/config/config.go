@@ -35,7 +35,7 @@ type Config struct {
 	AccountBackend        string             `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
 	UserOIDCClaim         string             `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
 	UserCS3Claim          string             `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
-	MachineAuthAPIKey     string             `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey     string             `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"5.0"`
 	AutoprovisionAccounts bool               `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
 	EnableBasicAuth       bool               `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
 	InsecureBackends      bool               `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections." introductionVersion:"pre5.0"`
@@ -106,7 +106,7 @@ const (
 // with the configured oidc-provider
 type OIDC struct {
 	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
+	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"5.0"`
 	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
 	SkipUserInfo            bool   `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
 	UserinfoCache           *Cache `yaml:"user_info_cache"`
@@ -129,9 +129,9 @@ type Cache struct {
 	Table              string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }
 
 // RoleAssignment contains the configuration for how to assign roles to users during login
@@ -205,6 +205,6 @@ type RegexRuleConf struct {
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"pre5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"pre5.0"`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }

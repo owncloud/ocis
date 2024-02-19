@@ -111,26 +111,26 @@ type API struct {
 	GroupMembersPatchLimit  int    `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request." introductionVersion:"pre5.0"`
 	UsernameMatch           string `yaml:"graph_username_match" env:"GRAPH_USERNAME_MATCH" desc:"Apply restrictions to usernames. Supported values are 'default' and 'none'. When set to 'default', user names must not start with a number and are restricted to ASCII characters. When set to 'none', no restrictions are applied. The default value is 'default'." introductionVersion:"pre5.0"`
 	AssignDefaultUserRole   bool   `yaml:"graph_assign_default_user_role" env:"GRAPH_ASSIGN_DEFAULT_USER_ROLE" desc:"Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user." introductionVersion:"pre5.0"`
-	IdentitySearchMinLength int    `yaml:"graph_identity_search_min_length" env:"GRAPH_IDENTITY_SEARCH_MIN_LENGTH" desc:"The minimum length the search term needs to have for unprivileged users when searching for users or groups." introductionVersion:"pre5.0"`
+	IdentitySearchMinLength int    `yaml:"graph_identity_search_min_length" env:"GRAPH_IDENTITY_SEARCH_MIN_LENGTH" desc:"The minimum length the search term needs to have for unprivileged users when searching for users or groups." introductionVersion:"5.0"`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;GRAPH_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events." introductionVersion:"pre5.0"`
-	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;GRAPH_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
-	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;GRAPH_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
-	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;GRAPH_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
-	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;GRAPH_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;GRAPH_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;GRAPH_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;GRAPH_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events." introductionVersion:"5.0"`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;GRAPH_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"5.0"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;GRAPH_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"5.0"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;GRAPH_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"5.0"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;GRAPH_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;GRAPH_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;GRAPH_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;GRAPH_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;GRAPH_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;GRAPH_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;GRAPH_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"pre5.0"`
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;GRAPH_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;GRAPH_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;GRAPH_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;GRAPH_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"5.0"`
 }
 
 // Keycloak configuration
@@ -145,11 +145,11 @@ type Keycloak struct {
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"pre5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"pre5.0"`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }
 
 // FilesSharing is the configuration for the files sharing
 type FilesSharing struct {
-	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing." introductionVersion:"pre5.0"`
+	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing." introductionVersion:"5.0"`
 }

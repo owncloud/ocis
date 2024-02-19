@@ -41,9 +41,9 @@ type Config struct {
 	ServiceAccount    ServiceAccount    `yaml:"service_account"`
 
 	// CLI
-	RevaGatewayGRPCAddr      string `yaml:"gateway_addr" env:"OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR" desc:"The bind address of the gateway GRPC address." introductionVersion:"pre5.0"`
-	MachineAuthAPIKey        string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
-	CliMaxAttemptsRenameFile int    `yaml:"max_attempts_rename_file" env:"STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE" desc:"The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100." introductionVersion:"pre5.0"`
+	RevaGatewayGRPCAddr      string `yaml:"gateway_addr" env:"OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR" desc:"The bind address of the gateway GRPC address." introductionVersion:"5.0"`
+	MachineAuthAPIKey        string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"5.0"`
+	CliMaxAttemptsRenameFile int    `yaml:"max_attempts_rename_file" env:"STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE" desc:"The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100." introductionVersion:"5.0"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -51,10 +51,10 @@ type Config struct {
 
 // Log configures the logging
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_USERS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_USERS_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;STORAGE_USERS_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;STORAGE_USERS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_USERS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_USERS_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;STORAGE_USERS_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;STORAGE_USERS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 // Service holds general service configuration
@@ -188,14 +188,14 @@ type OwnCloudSQLDriver struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Addr              string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;STORAGE_USERS_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
-	ClusterID         string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;STORAGE_USERS_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"pre5.0"`
-	TLSInsecure       bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;STORAGE_USERS_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
-	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
-	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;STORAGE_USERS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	Addr              string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;STORAGE_USERS_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"5.0"`
+	ClusterID         string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;STORAGE_USERS_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"5.0"`
+	TLSInsecure       bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;STORAGE_USERS_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"5.0"`
+	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"5.0"`
+	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;STORAGE_USERS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 	NumConsumers      int    `yaml:"num_consumers" env:"STORAGE_USERS_EVENTS_NUM_CONSUMERS" desc:"The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1." introductionVersion:"pre5.0"`
-	AuthUsername      string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;STORAGE_USERS_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthPassword      string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;STORAGE_USERS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	AuthUsername      string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;STORAGE_USERS_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	AuthPassword      string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;STORAGE_USERS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }
 
 // FilemetadataCache holds cache config
@@ -205,9 +205,9 @@ type FilemetadataCache struct {
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_FILEMETADATA_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_USERS_FILEMETADATA_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }
 
 // IDCache holds cache config
@@ -217,9 +217,9 @@ type IDCache struct {
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_USERS_ID_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens have no expiration. Defaults to 300s which is derived from the underlaying package though not explicitly set as default. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_USERS_ID_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_ID_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_ID_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_ID_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_ID_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }
 
 // S3Driver is the storage driver configuration when using 's3' storage driver
@@ -303,6 +303,6 @@ type PurgeTrashBin struct {
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;STORAGE_USERS_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"pre5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;STORAGE_USERS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"pre5.0"`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;STORAGE_USERS_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;STORAGE_USERS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }

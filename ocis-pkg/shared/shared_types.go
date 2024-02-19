@@ -12,28 +12,28 @@ type EnvBinding struct {
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"pre5.0"`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"pre5.0"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"pre5.0"`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"pre5.0"`
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"5.0"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"5.0"`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"5.0"`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"5.0"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mask:"password" yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint and validate jwt tokens." introductionVersion:"pre5.0"`
+	JWTSecret string `mask:"password" yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint and validate jwt tokens." introductionVersion:"5.0"`
 }
 
 // Reva defines all available REVA client configuration.
 type Reva struct {
-	Address string        `yaml:"address" env:"OCIS_REVA_GATEWAY" desc:"The CS3 gateway endpoint." introductionVersion:"pre5.0"`
+	Address string        `yaml:"address" env:"OCIS_REVA_GATEWAY" desc:"The CS3 gateway endpoint." introductionVersion:"5.0"`
 	TLS     GRPCClientTLS `yaml:"tls"`
 }
 
@@ -62,9 +62,9 @@ type Cache struct {
 	Table              string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
@@ -79,7 +79,7 @@ type Commons struct {
 	OcisURL           string          `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users." introductionVersion:"pre5.0"`
 	TokenManager      *TokenManager   `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva           `yaml:"reva"`
-	MachineAuthAPIKey string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"5.0"`
 	TransferSecret    string          `mask:"password" yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET" desc:"reva transfer secret" introductionVersion:"pre5.0"`
 	SystemUserID      string          `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"pre5.0"`
 	SystemUserAPIKey  string          `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY" desc:"system user API key" introductionVersion:"pre5.0"`

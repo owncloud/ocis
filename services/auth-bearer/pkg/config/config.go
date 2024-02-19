@@ -27,10 +27,10 @@ type Config struct {
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_BEARER_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_BEARER_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_BEARER_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_BEARER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_BEARER_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_BEARER_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_BEARER_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_BEARER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 type Service struct {
@@ -53,7 +53,7 @@ type GRPCConfig struct {
 
 type OIDC struct {
 	Issuer   string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE" desc:"Allow insecure connections to the OIDC issuer." introductionVersion:"pre5.0"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE" desc:"Allow insecure connections to the OIDC issuer." introductionVersion:"5.0"`
 	IDClaim  string `yaml:"id_claim" env:"AUTH_BEARER_OIDC_ID_CLAIM" desc:"Name of the claim, which holds the user identifier." introductionVersion:"pre5.0"`
 	UIDClaim string `yaml:"uid_claim" env:"AUTH_BEARER_OIDC_UID_CLAIM" desc:"Name of the claim, which holds the UID." introductionVersion:"pre5.0"`
 	GIDClaim string `yaml:"gid_claim" env:"AUTH_BEARER_OIDC_GID_CLAIM" desc:"Name of the claim, which holds the GID." introductionVersion:"pre5.0"`

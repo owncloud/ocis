@@ -38,9 +38,9 @@ type FileSystemStorage struct {
 type Thumbnail struct {
 	Resolutions         []string          `yaml:"resolutions" env:"THUMBNAILS_RESOLUTIONS" desc:"The supported list of target resolutions in the format WidthxHeight like 32x32. You can define any resolution as required. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage"`
-	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the webdav source." introductionVersion:"pre5.0"`
-	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source." introductionVersion:"pre5.0"`
-	RevaGateway         string            `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"pre5.0"`
+	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the webdav source." introductionVersion:"5.0"`
+	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source." introductionVersion:"5.0"`
+	RevaGateway         string            `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"5.0"`
 	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE" desc:"The path to a font file for txt thumbnails." introductionVersion:"pre5.0"`
 	TransferSecret      string            `yaml:"transfer_secret" env:"THUMBNAILS_TRANSFER_TOKEN" desc:"The secret to sign JWT to download the actual thumbnail file." introductionVersion:"pre5.0"`
 	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT" desc:"The HTTP endpoint where the actual thumbnail file can be downloaded." introductionVersion:"pre5.0"`
