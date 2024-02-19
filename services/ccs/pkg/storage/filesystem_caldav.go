@@ -8,6 +8,7 @@ import (
 	"fmt"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/rs/zerolog/log"
@@ -109,7 +110,8 @@ func (b *filesystemBackend) loadAllCalendarObjects(ctx context.Context, urlPath 
 			continue
 		}
 
-		cal, _, err := b.calendarFromFile(ctx, f.Path, propFilter)
+		calPath := filepath.Join(localPath, f.Path)
+		cal, _, err := b.calendarFromFile(ctx, calPath, propFilter)
 		if err != nil {
 			fmt.Printf("load calendar error for %s: %v\n", f.Path, err)
 			// TODO: return err ???
@@ -218,12 +220,9 @@ func (b *filesystemBackend) GetCalendar(ctx context.Context, urlPath string) (*c
 func (b *filesystemBackend) readCalendar(ctx context.Context, localPath string) (*caldav.Calendar, error) {
 	data, err := b.storage.SimpleDownload(ctx, localPath)
 	if err != nil {
-		// TODO: need to see how to handle this ....
-		/*
-			if os.IsNotExist(err) {
-				return nil, webdav.NewHTTPError(404, err)
-			}
-		*/
+		if _, ok := err.(errtypes.NotFound); ok {
+			return nil, webdav.NewHTTPError(404, errors.New("Not found"))
+		}
 		return nil, fmt.Errorf("error opening calendar: %s", err.Error())
 	}
 	var calendar caldav.Calendar
@@ -245,13 +244,9 @@ func (b *filesystemBackend) GetCalendarObject(ctx context.Context, objPath strin
 
 	info, err := b.storage.Stat(ctx, localPath)
 	if err != nil {
-		// TODO: need to see what comes out of it ...
-		/*
-			if errors.Is(err, fs.ErrNotExist) {
-				return nil, webdav.NewHTTPError(404, err)
-			}
-
-		*/
+		if _, ok := err.(errtypes.NotFound); ok {
+			return nil, webdav.NewHTTPError(404, errors.New("Not found"))
+		}
 		return nil, err
 	}
 
