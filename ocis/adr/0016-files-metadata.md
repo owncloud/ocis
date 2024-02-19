@@ -8,7 +8,7 @@ geekdocFilePath: 0016-files-metadata.md
 ---
 
 * Status: superseded by [ADR-0024]({{< ref "0024-msgpack-metadata.md" >}})
-* Deciders: @butonic, @dragotin, @micbar, @C0rby
+* Deciders: [@butonic](https://github.com/butonic), [@dragotin](https://github.com/dragotin), [@micbar](https://github.com/micbar), [@c0rby](https://github.com/c0rby)
 * Date: 2022-02-04
 
 ## Context and Problem Statement

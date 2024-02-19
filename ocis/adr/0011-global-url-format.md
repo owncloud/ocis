@@ -8,7 +8,7 @@ geekdocFilePath: 0011-global-url-format.md
 ---
 
 * Status: accepted
-* Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade, @tbsbdr, @kulmann
+* Deciders: [@refs](https://github.com/refs), [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1), [@fschade](https://github.com/fschade), [@tbsbdr](https://github.com/tbsbdr), [@kulmann](https://github.com/kulmann)
 * Date: 2021-07-07
 
 ## Context and Problem Statement

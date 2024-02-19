@@ -8,7 +8,7 @@ geekdocFilePath: 0001-introduce-accounts-service.md
 ---
 
 * Status: superseded by [ADR-0003]({{< ref "0003-external-user-management.md" >}})
-* Deciders: @butonic, @felixboehm, @micbar, @pmaier1
+* Deciders: [@butonic](https://github.com/butonic), [@felixboehm](https://github.com/felixboehm), [@micbar](https://github.com/micbar), [@pmaier1](https://github.com/pmaier1)
 * Date: [2020-06-15](https://github.com/owncloud/ocis-accounts/pull/34/commits/2fd05e2b6fe2a47c687bd0c0bc5e1b5c48a585b2)
 
 Technical Story: [persist accounts](https://github.com/owncloud/ocis-accounts/pull/34)

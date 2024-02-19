@@ -9,7 +9,7 @@ geekdocFilePath: 0024-msgpack-metadata.md
 
 
 * Status: accepted
-* Deciders: @butonic, @aduffeck, @micbar, @dragotin
+* Deciders: [@butonic](https://github.com/butonic), [@aduffeck](https://github.com/aduffeck), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin)
 * Date: [2023-03-15](https://github.com/cs3org/reva/pull/3711/commits/204253eee9dbb8e7fa93a01f3f94a2d28ce40a06)
 
 ## Context and Problem Statement

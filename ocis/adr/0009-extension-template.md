@@ -8,7 +8,7 @@ geekdocFilePath: 0009-extension-template.md
 ---
 
 * Status: proposed
-* Deciders: @c0rby <!-- optional -->
+* Deciders: [@c0rby](https://github.com/c0rby) <!-- optional -->
 * Date: 2021-06-10
 
 Technical Story: [description | ticket/issue URL] <!-- optional -->
