@@ -153,6 +153,9 @@ type ObjectStoreConfig struct {
 	// Bucket-specific metadata
 	// NOTE: Metadata requires nats-server v2.10.0+
 	Metadata map[string]string `json:"metadata,omitempty"`
+	// Enable underlying stream compression.
+	// NOTE: Compression is supported for nats-server 2.10.0+
+	Compression bool
 }
 
 type ObjectStoreStatus interface {
@@ -174,6 +177,8 @@ type ObjectStoreStatus interface {
 	BackingStore() string
 	// Metadata is the user supplied metadata for the bucket
 	Metadata() map[string]string
+	// IsCompressed indicates if the data is compressed on disk
+	IsCompressed() bool
 }
 
 // ObjectMetaOptions
@@ -266,7 +271,10 @@ func (js *js) CreateObjectStore(cfg *ObjectStoreConfig) (ObjectStore, error) {
 	if maxBytes == 0 {
 		maxBytes = -1
 	}
-
+	var compression StoreCompression
+	if cfg.Compression {
+		compression = S2Compression
+	}
 	scfg := &StreamConfig{
 		Name:        fmt.Sprintf(objNameTmpl, name),
 		Description: cfg.Description,
@@ -280,6 +288,7 @@ func (js *js) CreateObjectStore(cfg *ObjectStoreConfig) (ObjectStore, error) {
 		AllowRollup: true,
 		AllowDirect: true,
 		Metadata:    cfg.Metadata,
+		Compression: compression,
 	}
 
 	// Create our stream.
@@ -384,7 +393,7 @@ func (obs *obs) Put(meta *ObjectMeta, r io.Reader, opts ...ObjectOpt) (*ObjectIn
 		case <-time.After(obs.js.opts.wait):
 		}
 		if err := obs.js.purgeStream(obs.stream, &StreamPurgeRequest{Subject: chunkSubj}); err != nil {
-			return fmt.Errorf("could not cleanup bucket after erronous put operation: %w", err)
+			return fmt.Errorf("could not cleanup bucket after erroneous put operation: %w", err)
 		}
 		return nil
 	}
@@ -535,11 +544,12 @@ func DecodeObjectDigest(data string) ([]byte, error) {
 // ObjectResult impl.
 type objResult struct {
 	sync.Mutex
-	info   *ObjectInfo
-	r      io.ReadCloser
-	err    error
-	ctx    context.Context
-	digest hash.Hash
+	info        *ObjectInfo
+	r           io.ReadCloser
+	err         error
+	ctx         context.Context
+	digest      hash.Hash
+	readTimeout time.Duration
 }
 
 func (info *ObjectInfo) isLink() bool {
@@ -623,7 +633,7 @@ func (obs *obs) Get(name string, opts ...GetObjectOpt) (ObjectResult, error) {
 		return lobs.Get(info.ObjectMeta.Opts.Link.Name)
 	}
 
-	result := &objResult{info: info, ctx: ctx}
+	result := &objResult{info: info, ctx: ctx, readTimeout: obs.js.opts.wait}
 	if info.Size == 0 {
 		return result, nil
 	}
@@ -1223,6 +1233,9 @@ func (s *ObjectBucketStatus) Metadata() map[string]string { return s.nfo.Config.
 // StreamInfo is the stream info retrieved to create the status
 func (s *ObjectBucketStatus) StreamInfo() *StreamInfo { return s.nfo }
 
+// IsCompressed indicates if the data is compressed on disk
+func (s *ObjectBucketStatus) IsCompressed() bool { return s.nfo.Config.Compression != NoCompression }
+
 // Status retrieves run-time status about a bucket
 func (obs *obs) Status() (ObjectStoreStatus, error) {
 	nfo, err := obs.js.StreamInfo(obs.stream)
@@ -1242,7 +1255,11 @@ func (obs *obs) Status() (ObjectStoreStatus, error) {
 func (o *objResult) Read(p []byte) (n int, err error) {
 	o.Lock()
 	defer o.Unlock()
+	readDeadline := time.Now().Add(o.readTimeout)
 	if ctx := o.ctx; ctx != nil {
+		if deadline, ok := ctx.Deadline(); ok {
+			readDeadline = deadline
+		}
 		select {
 		case <-ctx.Done():
 			if ctx.Err() == context.Canceled {
@@ -1261,7 +1278,7 @@ func (o *objResult) Read(p []byte) (n int, err error) {
 	}
 
 	r := o.r.(net.Conn)
-	r.SetReadDeadline(time.Now().Add(2 * time.Second))
+	r.SetReadDeadline(readDeadline)
 	n, err = r.Read(p)
 	if err, ok := err.(net.Error); ok && err.Timeout() {
 		if ctx := o.ctx; ctx != nil {
