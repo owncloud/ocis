@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
 * Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
 * Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
+* Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
@@ -103,6 +104,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8442
    https://github.com/owncloud/ocis/pull/8444
+
+* Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
+
+   The `cs3` user and public sharing drivers have already been replaced by
+   `jsoncs3`. We now mark them as deprecated in preparation to kill a lot of unused
+   code in reva.
+
+   https://github.com/owncloud/ocis/pull/8478
 
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 
