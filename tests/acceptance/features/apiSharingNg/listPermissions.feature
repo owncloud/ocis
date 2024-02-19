@@ -891,12 +891,25 @@ Feature: List a sharing permissions
     """
 
 
-  Scenario: user send share invitation for all allowed roles defined in permission lists
+  Scenario: user send share invitation for all allowed roles defined in permission lists for a file
+    Given user "Alice" has uploaded file with content "hello text" to "textfile.txt"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles from the above response:
+      | resource  | textfile.txt |
+      | space     | Personal     |
+      | sharee    | Brian        |
+      | shareType | user         |
+
+
+  Scenario: user send share invitation for all allowed roles defined in permission lists for a folder
     Given user "Alice" has created folder "folder"
+    And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send share invitation with all allowed permission roles from the above response:
-      | resource          | folder              |
-      | space             | Personal            |
-      | sharee            | Brian               |
-      | shareType         | user                |
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
