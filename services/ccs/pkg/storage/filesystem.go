@@ -8,10 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/emersion/go-webdav"
 	"github.com/emersion/go-webdav/caldav"
@@ -25,10 +22,6 @@ type filesystemBackend struct {
 	carddavPrefix string
 	storage       metadata.Storage
 }
-
-var (
-	validFilenameRegex = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]+(.[a-zA-Z]+)?$`)
-)
 
 func isNotFound(err error) bool {
 	var notFound errtypes.NotFound
@@ -100,13 +93,6 @@ func (b *filesystemBackend) safeLocalPath(ctx context.Context, homeSetPath strin
 	}
 	urlPath = strings.TrimPrefix(urlPath, homeSetPath)
 
-	// only accept simple file names for now
 	dir, file := path.Split(urlPath)
-	if file != "" && !validFilenameRegex.MatchString(file) {
-		log.Debug().Str("file", file).Msg("file name does not match regex")
-		err := fmt.Errorf("invalid file name: %s", file)
-		return "", webdav.NewHTTPError(400, err)
-	}
-
 	return filepath.Join(localPath, dir, file), nil
 }

@@ -265,7 +265,7 @@ func (b *filesystemBackend) GetAddressObject(ctx context.Context, objPath string
 
 	card, etag, err := b.vcardFromFile(ctx, localPath, propFilter)
 	if err != nil {
-		log.Debug().Str("path", localPath).Err(err).Msg("error reading calendar")
+		log.Debug().Str("path", localPath).Err(err).Msg("error reading addressbook")
 		return nil, err
 	}
 

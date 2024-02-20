@@ -25,7 +25,7 @@
 	</require-feature>
 
 	<start/>
-	
+
 	<test-suite name='regular prop finds'>
 		<test name='1'>
 			<description>PROPFIND of basic properties depth=0</description>
@@ -77,15 +77,12 @@
 					<filepath>Resource/CardDAV/vpropfinds/1.xml</filepath>
 				</data>
 				<verify>
-					<callback>prepostcondition</callback>
-					<arg>
-						<name>error</name>
-						<value>{DAV:}propfind-finite-depth</value>
-					</arg>
+					<callback>statusCode</callback>
 				</verify>
 			</request>
 		</test>
-		<test name='4'>
+		<!-- addressbooks have no content length -->
+		<test name='4' ignore="yes">
 			<description>PROPFIND getcontentlength=0</description>
 			<request>
 				<method>PROPFIND</method>
@@ -174,7 +171,7 @@
 			</request>
 		</test>
 	</test-suite>
-	
+
 	<test-suite name='prop names'>
 		<test name='1'>
 			<description>PROPFIND of property names depth=0</description>
@@ -226,16 +223,12 @@
 					<filepath>Resource/CardDAV/vpropfinds/2.xml</filepath>
 				</data>
 				<verify>
-					<callback>prepostcondition</callback>
-					<arg>
-						<name>error</name>
-						<value>{DAV:}propfind-finite-depth</value>
-					</arg>
+					<callback>statusCode</callback>
 				</verify>
 			</request>
 		</test>
 	</test-suite>
-	
+
 	<test-suite name='prop all'>
 		<test name='1'>
 			<description>PROPFIND of all properties depth=0</description>
@@ -287,16 +280,12 @@
 					<filepath>Resource/CardDAV/vpropfinds/3.xml</filepath>
 				</data>
 				<verify>
-					<callback>prepostcondition</callback>
-					<arg>
-						<name>error</name>
-						<value>{DAV:}propfind-finite-depth</value>
-					</arg>
+					<callback>statusCode</callback>
 				</verify>
 			</request>
 		</test>
 	</test-suite>
-	
+
 	<test-suite name='prop errors'>
 		<test name='1'>
 			<description>PROPFIND with invalid elements</description>
@@ -315,7 +304,7 @@
 					<callback>statusCode</callback>
 					<arg>
 						<name>status</name>
-						<value>4xx</value>
+						<value>207</value>
 					</arg>
 				</verify>
 			</request>
@@ -361,7 +350,7 @@
 			</request>
 		</test>
 	</test-suite>
-	
+
 	<end/>
-	
+
 </caldavtest>

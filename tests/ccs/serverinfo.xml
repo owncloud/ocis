@@ -20,6 +20,7 @@
 
 <serverinfo>
 	<!-- for local testing change this - ocis-server is used for drone ci -->
+	<!-- host>172.17.0.1</host -->
 	<host>ocis-server</host>
 	<nonsslport>9200</nonsslport>
 	<sslport>9200</sslport>
@@ -50,7 +51,7 @@
 		<feature>bulk-post</feature>					<!-- Bulk POST requests -->
 		<feature>ctag</feature>							<!-- ctag extension -->
 		<feature>current-user-principal</feature>		<!-- current-user-principal extension -->
-		<feature>directory listing</feature> 			<!-- GET on collection -->
+		<!-- feature>directory listing</feature --> 			<!-- GET on collection -->
 		<feature>extended-principal-search</feature>	<!-- Extended principal-property-search REPORT extension -->
 		<feature>expand-property</feature>				<!-- Expand property REPORT -->
 		<feature>only-proxy-groups</feature>			<!-- Group-membership only includes delegated-to groups -->

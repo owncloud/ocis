@@ -908,10 +908,17 @@ def ccsTests(storage):
         "commands": [
             "pwd",
             "ping ocis-server -c1",
+            // create some calendars and addressbooks
             "curl -X MKCOL https://ocis-server:9200/dav/calendars/einstein/calendar -kv -ueinstein:relativity",
             "curl -X MKCOL https://ocis-server:9200/dav/addressbooks/einstein/addressbook -kv -ueinstein:relativity",
+            // run caldav tests
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/well-known.xml",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/get.xml",
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/caldavIOP.xml",
+            // run carddav tests
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CardDAV/get.xml",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CardDAV/propfind.xml",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CardDAV/mkcol.xml",
         ],
     }]
 

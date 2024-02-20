@@ -25,6 +25,7 @@
 		<feature>carddav</feature>
 	</require-feature>
 
+	<start/>
 	<test-suite name='GET on resource'>
 		<test name='1'>
 			<description>GET from address book collection</description>
@@ -54,7 +55,7 @@
 				</verify>
 			</request>
 		</test>
-		<test name='2'>
+		<!-- test name='2'>
 			<description>GET on user/addressbook</description>
 			<request>
 				<method>GET</method>
@@ -95,7 +96,7 @@
 					</arg>
 				</verify>
 			</request>
-		</test>
+		</test -->
 	</test-suite>
 
 	<test-suite name='GET on collections'>

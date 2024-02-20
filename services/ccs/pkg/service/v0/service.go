@@ -120,9 +120,9 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 		r.Mount("/.well-known/caldav", &wellknownHandler)
 		r.Mount("/.well-known/carddav", &wellknownHandler)
 		r.Mount("/dav/", &handler)
-		r.Mount("/dav/principals/users/", &handler)
-		r.Mount("/dav/calendars/{user}/", &caldavHandler)
-		r.Mount("/dav/addressbooks/{user}/", &carddavHandler)
+		r.Mount("/dav/principals", &handler)
+		r.Mount("/dav/calendars", &caldavHandler)
+		r.Mount("/dav/addressbooks", &carddavHandler)
 	})
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {

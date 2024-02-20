@@ -65,7 +65,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>Location$$hostssl:/</value>
+						<value>Location$$root:</value>
 					</arg>
 				</verify>
 			</request>
@@ -86,7 +86,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>Location$$hostssl:/</value>
+						<value>Location$$root:</value>
 					</arg>
 				</verify>
 			</request>
@@ -142,7 +142,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>Location$$hostssl:/</value>
+						<value>Location$$root:</value>
 					</arg>
 				</verify>
 			</request>
@@ -167,7 +167,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>Location$$hostssl:/</value>
+						<value>Location$$root:</value>
 					</arg>
 				</verify>
 			</request>
@@ -214,7 +214,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>Location$$hostssl:/</value>
+						<value>Location$$root:</value>
 					</arg>
 				</verify>
 			</request>
