@@ -13,7 +13,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And user "Brian" has disabled the auto-sync share
 
 
-  Scenario: user lists the file shared with them when auto-sync is disabled
+  Scenario: user lists the file shared with them
     Given user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
       | resource        | textfile.txt |
@@ -280,7 +280,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user lists the folder shared with them when auto-sync is disabled
+  Scenario: user lists the folder shared with them
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following share invitation:
       | resource        | folderToShare |
@@ -517,9 +517,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: group member lists the file shared with them when auto-sync is disabled
-    Given user "Carol" has been created with default attributes and without skeleton files
-    And group "grp1" has been created
+  Scenario: group member lists the file shared with them
+    Given group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
@@ -789,9 +788,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: group member lists the folder shared with them when auto-sync is disabled
-    Given user "Carol" has been created with default attributes and without skeleton files
-    And group "grp1" has been created
+  Scenario: group member lists the folder shared with them
+    Given group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
@@ -1031,7 +1029,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user lists file shares shared with them from project-space when auto-sync is disabled
+  Scenario: user lists file shares shared with them from project-space
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1272,7 +1270,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user lists folder shares shared with them from project-space when auto-sync is disabled
+  Scenario: user lists folder shares shared with them from project-space
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1488,9 +1486,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: group member lists the file shared with them from project-space when auto-sync is disabled
+  Scenario: group member lists the file shared with them from project-space
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1721,9 +1718,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: group member lists the space folder shared with them from project-space when auto-sync is disabled
+  Scenario: group member lists the space folder shared with them from project-space
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1924,13 +1920,11 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user who is also a member of group lists the file shared with them when auto-sync is disabled
-    Given user "Carol" has been created with default attributes and without skeleton files
-    And group "grp1" has been created
+  Scenario: user who is also a member of group lists the file shared with them
+    Given group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
-      | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
@@ -2066,13 +2060,11 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user who is also a member of group lists the folder shared with them when auto-sync is disabled
-    Given user "Carol" has been created with default attributes and without skeleton files
-    And group "grp1" has been created
+  Scenario: user who is also a member of group lists the folder shared with them
+    Given group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
-      | Carol    | grp1      |
     And user "Alice" has created folder "folderToShare"
     And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
