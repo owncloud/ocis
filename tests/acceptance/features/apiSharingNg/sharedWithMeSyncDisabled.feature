@@ -1991,6 +1991,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                   "properties": {
                     "permissions": {
                       "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
                       "items": {
                         "oneOf": [
                           {
@@ -2129,6 +2131,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                   "properties": {
                     "permissions": {
                       "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
                       "items": {
                         "oneOf": [
                           {
