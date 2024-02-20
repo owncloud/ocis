@@ -1,6 +1,11 @@
-Enhancement: Update web to v8.0.0-rc.4
+Enhancement: Update web to v8.0.0-rc.5
 
 Tags: web
+
+We updated ownCloud Web to v8.0.0-rc.5. Please refer to the changelog (linked) for details on the web release.
+
+## Summary
+* Bugfix [owncloud/web#10473](https://github.com/owncloud/web/issues/10473): Public link file download
 
 We updated ownCloud Web to v8.0.0-rc.4. Please refer to the changelog (linked) for details on the web release.
 
@@ -141,6 +146,10 @@ We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog (linke
 * Enhancement [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support mandatory filter while listing users
 * Enhancement [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering quick actions as extension
 
+https://github.com/owncloud/ocis/pull/8491
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.5
+https://github.com/owncloud/ocis/pull/8468
+https://github.com/owncloud/web/releases/tag/v8.0.0-rc.4
 https://github.com/owncloud/ocis/pull/8342
 https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
 https://github.com/owncloud/ocis/pull/8154
