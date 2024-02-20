@@ -902,22 +902,14 @@ def ccsTests(storage):
     }
 
     return [{
-        "name": "setup calendars and address-books for testing",
-        "image": OC_CI_GOLANG,
-        "environment": {
-            "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
-        },
-        "commands": [
-            "ocis/bin/ocis ccs create-calendar --user-name einstein --calendar-name calendar",
-            "ocis/bin/ocis ccs create-addressbook --user-name einstein --addressbook-name addressbook",
-        ],
-    }, {
         "name": "ccsTests",
         "image": "deepdiver/ccs-caldavtester:latest",
         "environment": environment,
         "commands": [
             "pwd",
             "ping ocis-server -c1",
+            "curl -X MKCOL https://ocis-server:9200/dav/calendars/einstein/calendar -kv -ueinstein:relativity",
+            "curl -X MKCOL https://ocis-server:9200/dav/addressbooks/einstein/addressbook -kv -ueinstein:relativity",
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/caldavIOP.xml",
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CardDAV/get.xml",
         ],

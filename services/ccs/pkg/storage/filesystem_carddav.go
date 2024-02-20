@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
-	"io/fs"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"net/http"
-	"os"
 	"path"
 	"path/filepath"
 
@@ -28,7 +28,7 @@ func (b *filesystemBackend) AddressBookHomeSetPath(ctx context.Context) (string,
 	if !ok {
 		return "", errors.New("no user in context")
 	}
-	return fmt.Sprintf("/dav/contacts/%s/", user.Username), nil
+	return fmt.Sprintf("/dav/addressbooks/%s/", user.Username), nil
 }
 
 func (b *filesystemBackend) CreateAddressBook(ctx context.Context, addressBook *carddav.AddressBook) error {
@@ -52,6 +52,10 @@ func (b *filesystemBackend) CreateAddressBook(ctx context.Context, addressBook *
 	_, err = b.storage.Upload(ctx, req)
 
 	if err != nil {
+		if isAlreadyExists(err) {
+			return webdav.NewHTTPError(405, errors.New("the resource you tried to create already exists"))
+		}
+
 		return fmt.Errorf("error writing addressbook: %s", err.Error())
 	}
 	return nil
@@ -135,68 +139,35 @@ func (b *filesystemBackend) loadAllAddressObjects(ctx context.Context, urlPath s
 
 	log.Debug().Str("path", localPath).Msg("loading address objects")
 
-	err = filepath.Walk(localPath, func(filename string, info os.FileInfo, err error) error {
+	dir, err := b.storage.ListDir(ctx, localPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, f := range dir {
+		// Skip address book meta data files
+		if f.Type != providerv1beta1.ResourceType_RESOURCE_TYPE_FILE || filepath.Ext(f.Name) != ".vcf" {
+			continue
+		}
+
+		calPath := filepath.Join(localPath, f.Path)
+		card, _, err := b.vcardFromFile(ctx, calPath, propFilter)
 		if err != nil {
-			return fmt.Errorf("error accessing %s: %s", filename, err)
+			fmt.Printf("load event error for %s: %v\n", f.Path, err)
+			// TODO: return err ???
+			continue
 		}
 
-		if !info.Mode().IsRegular() || filepath.Ext(filename) != ".vcf" {
-			return nil
-		}
-
-		card, etag, err := b.vcardFromFile(ctx, filename, propFilter)
-		if err != nil {
-			return err
-		}
-
-		// TODO can this potentially be called on an address object resource?
-		// would work (as Walk() includes root), except for the path construction below
 		obj := carddav.AddressObject{
-			Path:          path.Join(urlPath, filepath.Base(filename)),
-			ModTime:       info.ModTime(),
-			ContentLength: info.Size(),
-			ETag:          etag,
+			Path:          path.Join(urlPath, f.Name),
+			ModTime:       utils.TSToTime(f.Mtime),
+			ContentLength: int64(f.Size),
+			ETag:          f.Etag,
 			Card:          card,
 		}
 		result = append(result, obj)
-		return nil
-	})
+	}
 
 	return result, err
-}
-
-func (b *filesystemBackend) createDefaultAddressBook(ctx context.Context) (*carddav.AddressBook, error) {
-	// TODO what should the default address book look like?
-	localPath, err_ := b.localCardDAVDir(ctx, defaultResourceName)
-	if err_ != nil {
-		return nil, fmt.Errorf("error creating default address book: %s", err_.Error())
-	}
-
-	homeSetPath, err_ := b.AddressBookHomeSetPath(ctx)
-	if err_ != nil {
-		return nil, fmt.Errorf("error creating default address book: %s", err_.Error())
-	}
-
-	urlPath := path.Join(homeSetPath, defaultResourceName) + "/"
-
-	log.Debug().Str("local", localPath).Str("url", urlPath).Msg("filesystem.createDefaultAddressBook()")
-
-	defaultAB := carddav.AddressBook{
-		Path:                 urlPath,
-		Name:                 "My contacts",
-		Description:          "Default address book",
-		MaxResourceSize:      1024,
-		SupportedAddressData: nil,
-	}
-	blob, err := json.MarshalIndent(defaultAB, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("error creating default address book: %s", err.Error())
-	}
-	err = os.WriteFile(path.Join(localPath, addressBookFileName), blob, 0644)
-	if err != nil {
-		return nil, fmt.Errorf("error writing default address book: %s", err.Error())
-	}
-	return &defaultAB, nil
 }
 
 func (b *filesystemBackend) ListAddressBooks(ctx context.Context) ([]carddav.AddressBook, error) {
@@ -211,43 +182,31 @@ func (b *filesystemBackend) ListAddressBooks(ctx context.Context) ([]carddav.Add
 
 	var result []carddav.AddressBook
 
-	err = filepath.Walk(localPath, func(filename string, info os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("error accessing %s: %s", filename, err.Error())
-		}
-
-		if !info.IsDir() || filename == localPath {
-			return nil
-		}
-
-		abPath := path.Join(filename, addressBookFileName)
-		data, err := os.ReadFile(abPath)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return nil // not an address book dir
-			} else {
-				return fmt.Errorf("error accessing %s: %s", abPath, err.Error())
-			}
-		}
-
-		var addressBook carddav.AddressBook
-		err = json.Unmarshal(data, &addressBook)
-		if err != nil {
-			return fmt.Errorf("error reading address book %s: %s", abPath, err.Error())
-		}
-
-		result = append(result, addressBook)
-		return nil
-	})
-
-	if err == nil && len(result) == 0 {
-		// Nothing here yet? Create the default address book
-		log.Debug().Msg("no address books found, creating default address book")
-		ab, err := b.createDefaultAddressBook(ctx)
-		if err == nil {
-			result = append(result, *ab)
-		}
+	dir, err := b.storage.ListDir(ctx, localPath)
+	if err != nil {
+		return nil, err
 	}
+	for _, f := range dir {
+		if f.Type != providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER || f.Path == localPath {
+			continue
+		}
+		calPath := path.Join(f.Path, addressBookFileName)
+		addressbook, err := b.readAddressbook(ctx, calPath)
+		if err != nil {
+			// TODO: how to handle
+			/*
+				if os.IsNotExist(err) {
+					return nil // not a calendar dir
+				} else {
+					return fmt.Errorf("error accessing %s: %s", calPath, err.Error())
+				}
+			*/
+			continue
+		}
+
+		result = append(result, *addressbook)
+	}
+
 	log.Debug().Int("results", len(result)).Err(err).Msg("filesystem.ListAddressBooks() done")
 	return result, err
 }
@@ -263,10 +222,14 @@ func (b *filesystemBackend) GetAddressBook(ctx context.Context, urlPath string) 
 
 	log.Debug().Str("path", localPath).Msg("loading addressbook")
 
-	data, err := os.ReadFile(localPath)
+	return b.readAddressbook(ctx, localPath)
+}
+
+func (b *filesystemBackend) readAddressbook(ctx context.Context, localPath string) (*carddav.AddressBook, error) {
+	data, err := b.storage.SimpleDownload(ctx, localPath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, webdav.NewHTTPError(404, err)
+		if isNotFound(err) {
+			return nil, webdav.NewHTTPError(404, errors.New("not found"))
 		}
 		return nil, fmt.Errorf("error opening address book: %s", err.Error())
 	}
@@ -287,10 +250,10 @@ func (b *filesystemBackend) GetAddressObject(ctx context.Context, objPath string
 		return nil, err
 	}
 
-	info, err := os.Stat(localPath)
+	info, err := b.storage.Stat(ctx, localPath)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return nil, webdav.NewHTTPError(404, err)
+		if isNotFound(err) {
+			return nil, webdav.NewHTTPError(404, errors.New("not found"))
 		}
 		return nil, err
 	}
@@ -308,8 +271,8 @@ func (b *filesystemBackend) GetAddressObject(ctx context.Context, objPath string
 
 	obj := carddav.AddressObject{
 		Path:          objPath,
-		ModTime:       info.ModTime(),
-		ContentLength: info.Size(),
+		ModTime:       utils.TSToTime(info.Mtime),
+		ContentLength: int64(info.Size),
 		ETag:          etag,
 		Card:          card,
 	}
@@ -400,9 +363,5 @@ func (b *filesystemBackend) DeleteAddressObject(ctx context.Context, path string
 	if err != nil {
 		return err
 	}
-	err = os.Remove(localPath)
-	if err != nil {
-		return err
-	}
-	return nil
+	return b.storage.Delete(ctx, localPath)
 }

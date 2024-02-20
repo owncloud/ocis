@@ -2,7 +2,9 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"path"
 	"path/filepath"
@@ -25,9 +27,17 @@ type filesystemBackend struct {
 }
 
 var (
-	validFilenameRegex  = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]+(.[a-zA-Z]+)?$`)
-	defaultResourceName = "default"
+	validFilenameRegex = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]+(.[a-zA-Z]+)?$`)
 )
+
+func isNotFound(err error) bool {
+	var notFound errtypes.NotFound
+	return errors.As(err, &notFound)
+}
+func isAlreadyExists(err error) bool {
+	var notFound errtypes.AlreadyExists
+	return errors.As(err, &notFound)
+}
 
 func NewFilesystem(storage metadata.Storage, caldavPrefix, carddavPrefix string, userPrincipalBackend webdav.UserPrincipalBackend) (caldav.Backend, carddav.Backend, error) {
 	backend := &filesystemBackend{

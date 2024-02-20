@@ -112,6 +112,7 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 		carddavBackend: carddavBackend,
 	}
 	caldavHandler := caldav.Handler{Backend: caldavBackend, Prefix: "/dav"}
+	carddavHandler := carddav.Handler{Backend: carddavBackend, Prefix: "/dav"}
 	wellknownHandler := wellknownHandler{}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -121,6 +122,7 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 		r.Mount("/dav/", &handler)
 		r.Mount("/dav/principals/users/", &handler)
 		r.Mount("/dav/calendars/{user}/", &caldavHandler)
+		r.Mount("/dav/addressbooks/{user}/", &carddavHandler)
 	})
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
