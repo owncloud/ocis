@@ -518,6 +518,73 @@ Feature: Create a share link for a resource
       }
       """
 
+
+  Scenario: remove expiration date of a file's link share
+    Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    And user "Alice" has created the following link share:
+      | resource           | textfile1.txt            |
+      | space              | Personal                 |
+      | permissionsRole    | view                     |
+      | password           | %public%                 |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    When user "Alice" updates the last public link share using the Graph API with
+      | resource           | textfile1.txt            |
+      | space              | Personal                 |
+      | expirationDateTime |                          |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "minItems": 5,
+            "maxItems": 5,
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.quickLink": {
+                "type": "boolean",
+                "enum": [false]
+              },
+              "preventsDownload": {
+                "type": "boolean",
+                "enum": [false]
+              },
+              "type": {
+                "type": "string",
+                "enum": ["view"]
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
   @env-config
   Scenario: set password on a file's link share
     Given the following configs have been set:

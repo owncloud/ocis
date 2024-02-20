@@ -266,7 +266,7 @@ class SharingNgContext implements Context {
 		}
 
 		if (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body["expirationDateTime"] = $bodyRows['expirationDateTime'];
+			$body["expirationDateTime"] = empty($bodyRows["expirationDateTime"]) ? null : $bodyRows["expirationDateTime"];
 		}
 
 		return GraphHelper::updateShare(
@@ -366,7 +366,7 @@ class SharingNgContext implements Context {
 		}
 
 		if (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body["expirationDateTime"] =  $bodyRows['expirationDateTime'];
+			$body["expirationDateTime"] = empty($bodyRows["expirationDateTime"]) ? null : $bodyRows["expirationDateTime"];
 		}
 
 		return GraphHelper::updateShare(
