@@ -92,7 +92,6 @@ func (g Graph) cs3ReceivedSharesToDriveItems(ctx context.Context, receivedShares
 
 		group.Go(func() error {
 			var err error // redeclare
-			resourceID := receivedShares[0].GetShare().GetResourceId()
 			shareStat, err := doStat(receivedShares[0].GetShare().GetResourceId())
 			if shareStat == nil || err != nil {
 				return err
@@ -100,17 +99,17 @@ func (g Graph) cs3ReceivedSharesToDriveItems(ctx context.Context, receivedShares
 
 			driveItem := libregraph.NewDriveItem()
 
-			// The id of the driveItem will be the composed of the StorageID and the SpaceID of the sharestorage
-			// appended with the ResourceID of the shared resource
-			// '<sharestorageid>$<sharespaceid>!<resource's storageid>:<resource's spaceid>:<resource's opaque id>'
-			driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
-				StorageId: utils.ShareStorageProviderID,
-				OpaqueId:  resourceID.GetStorageId() + ":" + resourceID.GetSpaceId() + ":" + resourceID.GetOpaqueId(),
-				SpaceId:   utils.ShareStorageSpaceID,
-			}))
 			permissions := make([]libregraph.Permission, 0, len(receivedShares))
 
+			var oldestReceivedShare *collaboration.ReceivedShare
 			for _, receivedShare := range receivedShares {
+				switch {
+				case oldestReceivedShare == nil:
+					fallthrough
+				case utils.TSToTime(receivedShare.GetShare().GetCtime()).Before(utils.TSToTime(oldestReceivedShare.GetShare().GetCtime())):
+					oldestReceivedShare = receivedShare
+				}
+
 				permission, err := g.cs3ReceivedShareToLibreGraphPermissions(ctx, receivedShare)
 				if err != nil {
 					return err
@@ -149,6 +148,23 @@ func (g Graph) cs3ReceivedSharesToDriveItems(ctx context.Context, receivedShares
 				permissions = append(permissions, *permission)
 
 			}
+
+			// To stay compatible with the usershareprovider and the webdav
+			// service the id of the driveItem is composed of the StorageID and
+			// SpaceID of the sharestorage appended with the opaque ID of
+			// the oldest share for the resource:
+			// '<sharestorageid>$<sharespaceid>!<share-opaque-id>
+			// Note: This means that the driveitem ID will change when the oldest
+			//   shared is removed. It would be good to have are more stable ID here (e.g.
+			//   derived from the shared resource's ID. But as we need to use the same
+			//   ID across all services this means we needed to make similar adjustments
+			//   to the sharejail (usershareprovider, webdav). Which we can't currently do
+			//   as some clients rely on the IDs used there having a special format.
+			driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+				StorageId: utils.ShareStorageProviderID,
+				OpaqueId:  oldestReceivedShare.GetShare().GetId().GetOpaqueId(),
+				SpaceId:   utils.ShareStorageSpaceID,
+			}))
 
 			if !driveItem.HasUIHidden() {
 				driveItem.SetUIHidden(false)

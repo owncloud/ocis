@@ -158,6 +158,7 @@ var _ = Describe("SharedWithMe", func() {
 								Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
 							},
 							Creator: getUserResponseShareCreator.User.Id,
+							Ctime:   utils.TSNow(),
 						},
 						MountPoint: &providerv1beta1.Reference{
 							ResourceId: &providerv1beta1.ResourceId{
@@ -213,6 +214,7 @@ var _ = Describe("SharedWithMe", func() {
 				Hidden: true,
 				Share: &collaborationv1beta1.Share{
 					ResourceId: toResourceID("7$8!9"),
+					Ctime:      utils.TSNow(),
 				},
 			})
 
@@ -405,6 +407,7 @@ var _ = Describe("SharedWithMe", func() {
 						Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
 					},
 					Creator: getUserResponseShareCreator.User.Id,
+					Ctime:   utils.TSNow(),
 					Grantee: &providerv1beta1.Grantee{
 						Type: providerv1beta1.GranteeType_GRANTEE_TYPE_GROUP,
 						Id: &providerv1beta1.Grantee_GroupId{
