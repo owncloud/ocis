@@ -1926,7 +1926,6 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
@@ -2068,7 +2067,6 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has created folder "folderToShare"
-    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
