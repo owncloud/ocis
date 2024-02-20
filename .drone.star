@@ -908,6 +908,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
         "Features",
     ]
 
+    ocis_bin = "ocis/bin/ocis"
     validatorTests = []
 
     for testgroup in testgroups:
@@ -958,19 +959,28 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                  [
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v10.3.0",
+                         "image": OC_CI_GOLANG,
                          "detach": True,
+                         "environment": {
+                             "MICRO_REGISTRY": "nats-js-kv",
+                             "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
+                             "COLLABORATION_LOG_LEVEL": "debug",
+                             "COLLABORATION_APP_NAME": "FakeOffice",
+                             "COLLABORATION_HTTP_ADDR": "wopiserver:9300",
+                             "COLLABORATION_HTTP_SCHEME": "http",
+                             "COLLABORATION_WOPIAPP_ADDR": "http://fakeoffice:8080",
+                             "COLLABORATION_WOPIAPP_INSECURE": "true",
+                             "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                         },
                          "commands": [
-                             "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
-                             "echo 123 > /etc/wopi/wopisecret",
-                             "/app/wopiserver.py",
+                             "%s collaboration server" % ocis_bin,
                          ],
                      },
                      {
                          "name": "wait-for-wopi-server",
                          "image": OC_CI_WAIT_FOR,
                          "commands": [
-                             "wait-for -it wopiserver:8880 -t 300",
+                             "wait-for -it wopiserver:9300 -t 300",
                          ],
                      },
                      {
@@ -987,7 +997,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "cat open.json",
                              "cat open.json | jq .form_parameters.access_token | tr -d '\"' > accesstoken",
                              "cat open.json | jq .form_parameters.access_token_ttl | tr -d '\"' > accesstokenttl",
-                             "echo -n 'http://wopiserver:8880/wopi/files/' > wopisrc",
+                             "echo -n 'http://wopiserver:9300/wopi/files/' > wopisrc",
                              "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
                          ],
                      },
@@ -2011,6 +2021,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "OCIS_EVENTS_ENABLE_TLS": False,
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+        "NATS_NATS_HOST": "0.0.0.0",
+        "NATS_NATS_PORT": 9233,
     }
 
     if deploy_type == "":
@@ -2025,12 +2037,13 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
+        environment["OCIS_ASYNC_UPLOADS"] = False  # disable async uploads because it could interfere with the wopi validator
         environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
         environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
-        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:8880"
+        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
         environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = "https://ocis-server:9200"
 
     if tika_enabled:
