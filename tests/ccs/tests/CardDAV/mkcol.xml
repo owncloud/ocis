@@ -24,9 +24,9 @@
 	</require-feature>
 
 	<start/>
-	
+
 	<test-suite name='OPTIONS header'>
-		<test name='1' ignore='yes'>
+		<test name='1'>
 			<description>OPTIONS DAV: header does not contain extended-mkcol</description>
 			<request>
 				<method>OPTIONS</method>
@@ -41,7 +41,7 @@
 			</request>
 		</test>
 		<test name='2'>
-			<description>OPTIONS Allow: header does not contain MKCOL</description>
+			<description>OPTIONS Allow: header does contain MKCOL</description>
 			<request>
 				<method>OPTIONS</method>
 				<ruri>$addressbookhome1:/</ruri>
@@ -49,7 +49,7 @@
 					<callback>header</callback>
 					<arg>
 						<name>header</name>
-						<value>*Allow!.*MKCOL.*</value>
+						<value>*Allow$.*MKCOL.*</value>
 					</arg>
 				</verify>
 			</request>
@@ -84,10 +84,11 @@
 					<callback>statusCode</callback>
 					<arg>
 						<name>status</name>
-						<value>403</value>
+						<value>201</value>
 					</arg>
 				</verify>
 			</request>
+			<!-- TODO: verify display name and description -->
 		</test>
 	</test-suite>
 

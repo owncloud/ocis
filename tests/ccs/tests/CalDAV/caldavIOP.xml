@@ -20,10 +20,13 @@
 
 <caldavtest>
 
+	<description>Test basic CalDAV operations</description>
+
 	<require-feature>
 		<feature>caldav</feature>
 	</require-feature>
 
+	<start/>
 	<test-suite name='1. Event Creation'>
 		<test name='1.1'>
 			<description>Create new single-instance meeting titled "Meeting 1.1" with the location "Durham".</description>
@@ -357,7 +360,7 @@
 	</test-suite>
 
 	<end>
-		<request user="$userid1:" pswd="$pswd1:">
+		<!-- request user="$userid1:" pswd="$pswd1:">
 			<method>DELETEALL</method>
 			<ruri>$calendarpath1:/</ruri>
 			<ruri>$inboxpath1:/</ruri>
@@ -369,7 +372,7 @@
 		<request user="$userid3:" pswd="$pswd3:">
 			<method>WAITDELETEALL 1</method>
 			<ruri>$inboxpath3:/</ruri>
-		</request>
+		</request -->
 		<request user="$userid2:" pswd="$pswd2:">
 			<method>DELETEALL</method>
 			<ruri>$calendarpath2:/</ruri>
