@@ -52,10 +52,10 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
-* Enhancement - Update web to v8.0.0-rc.4: [#8342](https://github.com/owncloud/ocis/pull/8342)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
 * Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
+* Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
 
 ## Details
 
@@ -152,9 +152,41 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8291
    https://github.com/owncloud/ocis/pull/8340
 
-* Enhancement - Update web to v8.0.0-rc.4: [#8342](https://github.com/owncloud/ocis/pull/8342)
+* Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
+
+   Sending multiple user ids in one sse event is now possible which reduces the
+   number of sent events.
+
+   https://github.com/owncloud/ocis/pull/8379
+   https://github.com/cs3org/reva/pull/4501
+
+* Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
+
+   The ocis version cmd listed all services by default. This is not always
+   intended, so we allow to skip the listing of the services by using the
+   --skip-services flag.
+
+   https://github.com/owncloud/ocis/issues/8070
+   https://github.com/owncloud/ocis/pull/8408
+
+* Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
+
+   We have added a make step `make validate-env-var-annotations` to validate the
+   env var annotations in to the environment variables.
+
+   https://github.com/owncloud/ocis/issues/8258
+   https://github.com/owncloud/ocis/pull/8436
+
+* Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
 
    Tags: web
+
+   We updated ownCloud Web to v8.0.0-rc.5. Please refer to the changelog (linked)
+   for details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#10473](https://github.com/owncloud/web/issues/10473): Public link
+   file download
 
    We updated ownCloud Web to v8.0.0-rc.4. Please refer to the changelog (linked)
    for details on the web release.
@@ -405,6 +437,8 @@ The following sections list the changes for unreleased.
    [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
    quick actions as extension
 
+   https://github.com/owncloud/ocis/pull/8491
+   https://github.com/owncloud/ocis/pull/8468
    https://github.com/owncloud/ocis/pull/8342
    https://github.com/owncloud/ocis/pull/8154
    https://github.com/owncloud/ocis/pull/8154
@@ -413,6 +447,8 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/7952
    https://github.com/owncloud/ocis/pull/7918
    https://github.com/owncloud/ocis/pull/7883
+   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.5
+   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.4
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
@@ -421,31 +457,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
-
-* Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
-
-   Sending multiple user ids in one sse event is now possible which reduces the
-   number of sent events.
-
-   https://github.com/owncloud/ocis/pull/8379
-   https://github.com/cs3org/reva/pull/4501
-
-* Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
-
-   The ocis version cmd listed all services by default. This is not always
-   intended, so we allow to skip the listing of the services by using the
-   --skip-services flag.
-
-   https://github.com/owncloud/ocis/issues/8070
-   https://github.com/owncloud/ocis/pull/8408
-
-* Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
-
-   We have added a make step `make validate-env-var-annotations` to validate the
-   env var annotations in to the environment variables.
-
-   https://github.com/owncloud/ocis/issues/8258
-   https://github.com/owncloud/ocis/pull/8436
 
 # Changelog for [4.0.6] (2024-02-07)
 
