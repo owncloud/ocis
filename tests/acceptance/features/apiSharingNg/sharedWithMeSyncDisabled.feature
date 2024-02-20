@@ -2200,11 +2200,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user lists the file with same name shared by two users with him/her when auto sync is disabled
+  Scenario: user lists the file with same name shared by two users with him/her
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
-    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
@@ -2227,6 +2226,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
             "items": {
               "oneOf": [
                 {
@@ -2495,11 +2496,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
       """
 
 
-  Scenario: user lists the folder with same name shared by two users with him/her when auto sync is disabled
+  Scenario: user lists the folder with same name shared by two users with him/her
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has created folder "folderToShare"
-    And user "Brian" has disabled the auto-sync share
     And user "Alice" has sent the following share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
@@ -2522,6 +2522,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
             "items": {
               "oneOf": [
                 {
