@@ -32,13 +32,39 @@ func (b *filesystemBackend) AddressBookHomeSetPath(ctx context.Context) (string,
 }
 
 func (b *filesystemBackend) CreateAddressBook(ctx context.Context, addressBook *carddav.AddressBook) error {
-	//TODO implement me
-	panic("implement me")
+	resourceName := path.Base(addressBook.Path)
+	localPath, err := b.localCardDAVDir(ctx, resourceName)
+	if err != nil {
+		return fmt.Errorf("error creating addressbook calendar: %s", err.Error())
+	}
+
+	log.Debug().Str("local", localPath).Str("url", addressBook.Path).Msg("filesystem.CreateAddressBook()")
+
+	blob, err := json.MarshalIndent(addressBook, "", "  ")
+	if err != nil {
+		return fmt.Errorf("error creating addressbook: %s", err.Error())
+	}
+	req := metadata.UploadRequest{
+		Path:        path.Join(localPath, addressBookFileName),
+		Content:     blob,
+		IfNoneMatch: []string{"*"},
+	}
+	_, err = b.storage.Upload(ctx, req)
+
+	if err != nil {
+		return fmt.Errorf("error writing addressbook: %s", err.Error())
+	}
+	return nil
 }
 
 func (b *filesystemBackend) DeleteAddressBook(ctx context.Context, path string) error {
-	//TODO implement me
-	panic("implement me")
+	log.Debug().Str("path", path).Msg("filesystem.DeleteAddressBook()")
+
+	localPath, err := b.safeLocalCardDAVPath(ctx, path)
+	if err != nil {
+		return err
+	}
+	return b.storage.Delete(ctx, localPath)
 }
 
 func (b *filesystemBackend) localCardDAVDir(ctx context.Context, components ...string) (string, error) {

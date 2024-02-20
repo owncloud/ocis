@@ -11,14 +11,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/emersion/go-ical"
+	"github.com/emersion/go-webdav"
+	"github.com/emersion/go-webdav/caldav"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"path"
 	"path/filepath"
-
-	"github.com/emersion/go-ical"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/caldav"
 )
 
 const calendarFileName = "calendar.json"
@@ -35,18 +34,23 @@ func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav
 	resourceName := path.Base(calendar.Path)
 	localPath, err := b.localCalDAVDir(ctx, resourceName)
 	if err != nil {
-		return fmt.Errorf("error creating default calendar: %s", err.Error())
+		return fmt.Errorf("error creating calendar: %s", err.Error())
 	}
 
 	log.Debug().Str("local", localPath).Str("url", calendar.Path).Msg("filesystem.CreateCalendar()")
 
 	blob, err := json.MarshalIndent(calendar, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error creating default calendar: %s", err.Error())
+		return fmt.Errorf("error creating calendar: %s", err.Error())
 	}
-	err = b.storage.SimpleUpload(ctx, path.Join(localPath, calendarFileName), blob)
+	req := metadata.UploadRequest{
+		Path:        path.Join(localPath, calendarFileName),
+		Content:     blob,
+		IfNoneMatch: []string{"*"},
+	}
+	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
-		return fmt.Errorf("error writing default calendar: %s", err.Error())
+		return fmt.Errorf("error writing calendar: %s", err.Error())
 	}
 	return nil
 }

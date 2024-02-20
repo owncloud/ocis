@@ -180,6 +180,10 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ccs",
 				},
 				{
+					Endpoint: "/dav/addressbooks/",
+					Service:  "com.owncloud.web.ccs",
+				},
+				{
 					// RegexRoute will be evaluated before PrefixRoute and QueryRoute
 					Type:     config.RegexRoute,
 					Method:   "REPORT",

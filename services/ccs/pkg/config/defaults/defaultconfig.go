@@ -112,7 +112,6 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Storage.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
 		cfg.Storage.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
-
 	if cfg.Storage.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.Storage.SystemUserID = cfg.Commons.SystemUserID
 	}

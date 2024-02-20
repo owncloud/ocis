@@ -866,6 +866,11 @@ def localApiTests(suite, storage, extra_environment = {}):
 def ccsTestPipeline(ctx):
     storage = "ocis"
 
+    setup_ccs_commands = [
+        "ocis/bin/ocis ccs create-calendar --user-name einstein --calendar-name calendar",
+        "ocis/bin/ocis ccs create-addressbook --user-name einstein --addressbook-name addressbook",
+    ]
+
     pipeline = {
         "kind": "pipeline",
         "type": "docker",
@@ -875,7 +880,7 @@ def ccsTestPipeline(ctx):
             "arch": "amd64",
         },
         "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, with_wrapper = False) +
+                 ocisServer(storage, with_wrapper = False, additional_commands = setup_ccs_commands) +
                  ccsTests(storage),
         "services": [],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
@@ -910,6 +915,7 @@ def ccsTests(storage):
             "ping ocis-server -c1",
             "curl https://ocis-server:9200/dav/ -kv -ueinstein:relativity",
             "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CalDAV/caldavIOP.xml",
+            "python3 /app/testcaldav.py --ssl --print-details-onfail --basedir tests/ccs CardDAV/get.xml",
         ],
     }]
 
@@ -2040,7 +2046,7 @@ def notify():
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, additional_commands = []):
     user = "0:0"
     environment = {
         "OCIS_URL": OCIS_URL,
@@ -2121,7 +2127,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-            ] + (wrapper_commands),
+            ] + (additional_commands) + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,
         },
