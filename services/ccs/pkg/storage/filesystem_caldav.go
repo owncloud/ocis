@@ -8,7 +8,6 @@ import (
 	"fmt"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/emersion/go-ical"
@@ -50,6 +49,10 @@ func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav
 	}
 	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
+		if isAlreadyExists(err) {
+			return webdav.NewHTTPError(405, errors.New("the resource you tried to create already exists"))
+		}
+
 		return fmt.Errorf("error writing calendar: %s", err.Error())
 	}
 	return nil
@@ -135,29 +138,6 @@ func (b *filesystemBackend) loadAllCalendarObjects(ctx context.Context, urlPath 
 	return result, err
 }
 
-func (b *filesystemBackend) createDefaultCalendar(ctx context.Context) (*caldav.Calendar, error) {
-	homeSetPath, err_ := b.CalendarHomeSetPath(ctx)
-	if err_ != nil {
-		return nil, fmt.Errorf("error creating default calendar: %s", err_.Error())
-	}
-	urlPath := path.Join(homeSetPath, defaultResourceName) + "/"
-
-	log.Debug().Str("url", urlPath).Msg("filesystem.CreateCalendar()")
-
-	defaultC := caldav.Calendar{
-		Path:            urlPath,
-		Name:            "My calendar",
-		Description:     "Default calendar",
-		MaxResourceSize: 4096,
-	}
-	err := b.CreateCalendar(ctx, &defaultC)
-	if err != nil {
-		return nil, err
-	}
-
-	return &defaultC, nil
-}
-
 func (b *filesystemBackend) ListCalendars(ctx context.Context) ([]caldav.Calendar, error) {
 	log.Debug().Msg("filesystem.ListCalendars()")
 
@@ -195,14 +175,6 @@ func (b *filesystemBackend) ListCalendars(ctx context.Context) ([]caldav.Calenda
 		result = append(result, *calendar)
 	}
 
-	if err == nil && len(result) == 0 {
-		// Nothing here yet? Create the default calendar.
-		log.Debug().Msg("no calendars found, creating default calendar")
-		cal, err := b.createDefaultCalendar(ctx)
-		if err == nil {
-			result = append(result, *cal)
-		}
-	}
 	log.Debug().Int("results", len(result)).Err(err).Msg("filesystem.ListCalendars() done")
 	return result, err
 }
@@ -224,8 +196,8 @@ func (b *filesystemBackend) GetCalendar(ctx context.Context, urlPath string) (*c
 func (b *filesystemBackend) readCalendar(ctx context.Context, localPath string) (*caldav.Calendar, error) {
 	data, err := b.storage.SimpleDownload(ctx, localPath)
 	if err != nil {
-		if _, ok := err.(errtypes.NotFound); ok {
-			return nil, webdav.NewHTTPError(404, errors.New("Not found"))
+		if isNotFound(err) {
+			return nil, webdav.NewHTTPError(404, errors.New("not found"))
 		}
 		return nil, fmt.Errorf("error opening calendar: %s", err.Error())
 	}
@@ -248,8 +220,8 @@ func (b *filesystemBackend) GetCalendarObject(ctx context.Context, objPath strin
 
 	info, err := b.storage.Stat(ctx, localPath)
 	if err != nil {
-		if _, ok := err.(errtypes.NotFound); ok {
-			return nil, webdav.NewHTTPError(404, errors.New("Not found"))
+		if isNotFound(err) {
+			return nil, webdav.NewHTTPError(404, errors.New("not found"))
 		}
 		return nil, err
 	}
