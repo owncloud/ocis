@@ -121,11 +121,11 @@
 		<feature>webcal</feature>						<!-- Internet calendar subscription via GET on calendar collection -->
 
 		<!-- CardDAV specific extension -->
-		<!--feature>carddav</feature --> 						<!-- Basic CardDAV feature enabler -->
-		<!--feature>default-addressbook</feature --> 			<!-- Default address book behavior -->
-		<!--feature>shared-addressbooks</feature -->			<!-- Shared address books extension -->
-		<!--feature>shared-addressbook-groups</feature -->	<!-- Shared address book groups extension -->
-		<!--feature>directory-gateway</feature -->			<!-- Directory gateway extension -->
+		<feature>carddav</feature> 						<!-- Basic CardDAV feature enabler -->
+		<feature>default-addressbook</feature> 			<!-- Default address book behavior -->
+		<feature>shared-addressbooks</feature>			<!-- Shared address books extension -->
+		<feature>shared-addressbook-groups</feature>	<!-- Shared address book groups extension -->
+		<feature>directory-gateway</feature>			<!-- Directory gateway extension -->
 
 	</features>
 
@@ -570,7 +570,7 @@
 			<!-- relative path to user addressbook home-->
 			<substitution>
 				<key>$addressbookhome%d:</key>
-				<value>$addressbooks:users/$userid%d:</value>
+				<value>$addressbooks:$userid%d:</value>
 			</substitution>
 			<!-- relative path to user addressbook-->
 			<substitution>

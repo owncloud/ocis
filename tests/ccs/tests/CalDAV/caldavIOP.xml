@@ -24,17 +24,6 @@
 		<feature>caldav</feature>
 	</require-feature>
 
-	<start>
-		<request end-delete="yes">
-			<method>MKCOL</method>
-			<ruri>$calendarpath1:</ruri>
-			<data>
-				<content-type>application/xml; charset="utf-8"</content-type>
-				<filepath>Resource/CalDAV/reports/put/1.xml</filepath>
-			</data>
-		</request>
-	</start>
-
 	<test-suite name='1. Event Creation'>
 		<test name='1.1'>
 			<description>Create new single-instance meeting titled "Meeting 1.1" with the location "Durham".</description>

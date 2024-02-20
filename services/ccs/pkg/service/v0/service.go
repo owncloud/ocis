@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	ocismiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ccs/pkg/storage"
 	"net/http"
 )
@@ -32,7 +33,8 @@ func (u *userPrincipalBackend) CurrentUserPrincipal(ctx context.Context) (string
 type groupwareHandler struct {
 	upBackend userPrincipalBackend
 	// authBackend    auth.AuthProvider
-	caldavBackend caldav.Backend
+	caldavBackend  caldav.Backend
+	carddavBackend carddav.Backend
 }
 
 func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -99,25 +101,15 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 	)
 
 	conf := options.Config.Storage
-	s, err := metadata.NewCS3Storage(conf.GatewayAddress, conf.GatewayAddress, conf.SystemUserID, conf.SystemUserIDP, conf.SystemUserAPIKey)
-	if err != nil {
-		return nil, err
-	}
-	err = s.Init(options.Config.Context, "calendar-contacts-service")
-	if err != nil {
-		return nil, err
-	}
-
-	upBackend := &userPrincipalBackend{}
-
-	caldavBackend, _, err := storage.NewFilesystem(s, "/calendar/", "/contacts/", upBackend)
+	upBackend, caldavBackend, carddavBackend, err := InitStorage(options.Config.Context, conf)
 	if err != nil {
 		return nil, err
 	}
 
 	handler := groupwareHandler{
-		upBackend:     *upBackend,
-		caldavBackend: caldavBackend,
+		upBackend:      *upBackend,
+		caldavBackend:  caldavBackend,
+		carddavBackend: carddavBackend,
 	}
 	caldavHandler := caldav.Handler{Backend: caldavBackend, Prefix: "/dav"}
 	wellknownHandler := wellknownHandler{}
@@ -137,4 +129,20 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 	})
 
 	return m, nil
+}
+
+func InitStorage(ctx context.Context, conf config.Storage) (*userPrincipalBackend, caldav.Backend, carddav.Backend, error) {
+	s, err := metadata.NewCS3Storage(conf.GatewayAddress, conf.GatewayAddress, conf.SystemUserID, conf.SystemUserIDP, conf.SystemUserAPIKey)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	err = s.Init(ctx, "calendar-contacts-service")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	upBackend := &userPrincipalBackend{}
+
+	caldavBackend, carddavBackend, err := storage.NewFilesystem(s, "/calendar/", "/addressbooks/", upBackend)
+	return upBackend, caldavBackend, carddavBackend, err
 }

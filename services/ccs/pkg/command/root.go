@@ -15,6 +15,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		Server(cfg),
 
 		// interaction with this service
+		CreateCalendar(cfg),
+		CreateAddressBook(cfg),
 
 		// infos about this service
 		Health(cfg),
@@ -26,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "ccs",
-		Usage:    "Provide Calendars and Constacts for oCIS",
+		Usage:    "Provide Calendars and Contacts for oCIS",
 		Commands: GetCommands(cfg),
 	})
 
