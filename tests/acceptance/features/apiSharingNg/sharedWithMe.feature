@@ -800,6 +800,8 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
                     "items": {
                       "oneOf": [
                         {
@@ -1131,6 +1133,8 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
                     "items": {
                       "oneOf": [
                         {
@@ -1491,6 +1495,8 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
                     "items": {
                       "oneOf": [
                         {
@@ -1790,6 +1796,8 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
                     "items": {
                       "oneOf": [
                         {
