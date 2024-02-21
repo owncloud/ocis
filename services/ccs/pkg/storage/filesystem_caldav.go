@@ -26,7 +26,7 @@ func (b *filesystemBackend) CalendarHomeSetPath(ctx context.Context) (string, er
 	if !ok {
 		return "", errors.New("no user in context")
 	}
-	return fmt.Sprintf("/dav/calendars/%s/", user.Username), nil
+	return fmt.Sprintf("/ccs/calendars/%s/", user.Username), nil
 }
 
 func (b *filesystemBackend) CreateCalendar(ctx context.Context, calendar *caldav.Calendar) error {
