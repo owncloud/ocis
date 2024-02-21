@@ -13,7 +13,7 @@ type FileInfo struct {
 	// A string value uniquely identifying the user currently accessing the file.
 	UserID string `json:"UserId,omitempty"`
 	// The size of the file in bytes, expressed as a long, a 64-bit signed integer.
-	Size int64 `json:"Size,omitempty"`
+	Size int64 `json:"Size"`
 	// The current version of the file based on the server’s file version schema, as a string. This value must change when the file changes, and version values must never repeat for a given file.
 	Version string `json:"Version,omitempty"`
 	// A string that is the name of the user, suitable for displaying in UI.
@@ -47,7 +47,7 @@ type FileInfo struct {
 	// A Boolean value that indicates that the user has permission to alter the file. Setting this to true tells the WOPI client that it can call PutFile on behalf of the user.
 	UserCanWrite bool `json:"UserCanWrite"`
 	// A Boolean value that indicates the WOPI client should close the window or tab when the user activates any Close UI in the WOPI client.
-	CloseButtonClosesWindow bool `json:"CloseButtonClosesWindow"`
+	CloseButtonClosesWindow bool `json:"CloseButtonClosesWindow,omitempty"`
 	// A string value indicating whether the WOPI client should disable Copy and Paste functionality within the application. The default is to permit all Copy and Paste functionality, i.e. the setting has no effect.
 	CopyPasteRestrictions string `json:"CopyPasteRestrictions,omitempty"`
 	// A Boolean value that indicates the WOPI client should disable all print functionality.
@@ -87,7 +87,7 @@ type FileInfo struct {
 	// A Boolean value that indicates a WOPI client may connect to Microsoft services to provide end-user functionality.
 	AllowAdditionalMicrosoftServices bool `json:"AllowAdditionalMicrosoftServices"`
 	// A Boolean value that indicates that in the event of an error, the WOPI client is permitted to prompt the user for permission to collect a detailed report about their specific error. The information gathered could include the user’s file and other session-specific state.
-	AllowErrorReportPrompt bool `json:"AllowErrorReportPrompt"`
+	AllowErrorReportPrompt bool `json:"AllowErrorReportPrompt,omitempty"`
 	// A Boolean value that indicates a WOPI client may allow connections to external services referenced in the file (for example, a marketplace of embeddable JavaScript apps).
 	AllowExternalMarketplace bool `json:"AllowExternalMarketplace"`
 	// A string value offering guidance to the WOPI client as to how to differentiate client throttling behaviors between the user and documents combinations from the WOPI host.
@@ -107,7 +107,7 @@ type FileInfo struct {
 	// A Boolean value that indicates that the host supports the following WOPI operations: CheckFolderInfo, EnumerateChildren (folders), DeleteFile
 	SupportsFolders bool `json:"SupportsFolders"`
 	// A Boolean value that indicates that the host supports the GetFileWopiSrc (ecosystem) operation.
-	SupportsGetFileWopiSrc bool `json:"SupportsGetFileWopiSrc"`
+	//SupportsGetFileWopiSrc bool `json:"SupportsGetFileWopiSrc"`  // wopivalidator is complaining and the property isn't used for now -> commented
 	// A Boolean value that indicates that the host supports the GetLock operation.
 	SupportsGetLock bool `json:"SupportsGetLock"`
 	// A Boolean value that indicates that the host supports the following WOPI operations: Lock, Unlock, RefreshLock, UnlockAndRelock operations for this file.

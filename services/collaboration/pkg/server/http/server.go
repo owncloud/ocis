@@ -109,6 +109,7 @@ func prepareRoutes(r *chi.Mux, demoapp *app.DemoApp) {
 				switch action {
 
 				case "LOCK":
+					// "UnlockAndRelock" operation goes through here
 					app.Lock(demoapp, w, r)
 				case "GET_LOCK":
 					app.GetLock(demoapp, w, r)

@@ -54,6 +54,7 @@ func DownloadFile(
 			downloadEndpoint = proto.DownloadEndpoint
 			downloadToken = proto.Token
 			hasDownloadToken = proto.Token != ""
+			break
 		}
 	}
 
@@ -89,7 +90,7 @@ func DownloadFile(
 		httpReq.Header.Add("X-Reva-Transfer", downloadToken)
 	}
 	// TODO: the access token shouldn't be needed
-	httpReq.Header.Add("x-access-token", token)
+	httpReq.Header.Add("X-Access-Token", token)
 
 	httpResp, err := httpClient.Do(httpReq)
 	if err != nil {

@@ -64,7 +64,8 @@ func CheckFileInfo(app *DemoApp, w http.ResponseWriter, r *http.Request) {
 		HostViewUrl: wopiContext.ViewAppUrl,
 		HostEditUrl: wopiContext.EditAppUrl,
 
-		EnableOwnerTermination: true,
+		//EnableOwnerTermination: true,  // enable only for collabora? wopivalidator is complaining
+		EnableOwnerTermination: false,
 
 		SupportsExtendedLockLength: true,
 
