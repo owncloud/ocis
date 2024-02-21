@@ -6,8 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/logging"
 
 	registryv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -31,7 +29,7 @@ type DemoApp struct {
 	Logger log.Logger
 }
 
-func New(cfg *config.Config) (*DemoApp, error) {
+func New(cfg *config.Config, logger log.Logger) (*DemoApp, error) {
 	app := &DemoApp{
 		Config: cfg,
 	}
@@ -43,7 +41,7 @@ func New(cfg *config.Config) (*DemoApp, error) {
 		}
 	}
 
-	app.Logger = logging.Configure("wopiserver", defaults.FullDefaultConfig().Log)
+	app.Logger = logger
 
 	return app, nil
 }
@@ -79,6 +77,10 @@ func (app *DemoApp) RegisterDemoApp(ctx context.Context) error {
 		mimeTypes = append(mimeTypes, m)
 	}
 
+	app.Logger.Debug().
+		Str("AppName", app.Config.App.Name).
+		Strs("Mimetypes", mimeTypes).
+		Msg("Registering mimetypes in the app provider")
 	// TODO: REVA has way to filter supported mimetypes (do we need to implement it here or is it in the registry?)
 
 	// TODO: an added app provider shouldn't last forever. Instead the registry should use a TTL
