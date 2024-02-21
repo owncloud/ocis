@@ -273,6 +273,12 @@
         },
         "location": {
           "$ref": "#/definitions/v0GeoCoordinates"
+        },
+        "image": {
+          "$ref": "#/definitions/v0Image"
+        },
+        "photo": {
+          "$ref": "#/definitions/v0Photo"
         }
       }
     },
@@ -290,6 +296,19 @@
         "longitude": {
           "type": "number",
           "format": "double"
+        }
+      }
+    },
+    "v0Image": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "height": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -318,6 +337,45 @@
           "type": "number",
           "format": "float",
           "title": "the match score"
+        }
+      }
+    },
+    "v0Photo": {
+      "type": "object",
+      "properties": {
+        "cameraMake": {
+          "type": "string"
+        },
+        "cameraModel": {
+          "type": "string"
+        },
+        "exposureDenominator": {
+          "type": "number",
+          "format": "float"
+        },
+        "exposureNumerator": {
+          "type": "number",
+          "format": "float"
+        },
+        "fNumber": {
+          "type": "number",
+          "format": "float"
+        },
+        "focalLength": {
+          "type": "number",
+          "format": "float"
+        },
+        "iso": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "orientation": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "takenDateTime": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

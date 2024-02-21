@@ -216,7 +216,9 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Highlights: getFragmentValue(hit.Fragments, "Content", 0),
 				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
+				Image:      getImageValue[searchMessage.Image](hit.Fields),
 				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
+				Photo:      getPhotoValue[searchMessage.Photo](hit.Fields),
 			},
 		}
 
@@ -335,7 +337,9 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Content:  getFieldValue[string](fields, "Content"),
 			Tags:     getFieldSliceValue[string](fields, "Tags"),
 			Audio:    getAudioValue[libregraph.Audio](fields),
+			Image:    getImageValue[libregraph.Image](fields),
 			Location: getLocationValue[libregraph.GeoCoordinates](fields),
+			Photo:    getPhotoValue[libregraph.Photo](fields),
 		},
 	}, nil
 }
@@ -389,10 +393,28 @@ func getAudioValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
+func getImageValue[T any](fields map[string]interface{}) *T {
+	var image = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(image, fields, "image."); ok {
+		return image
+	}
+
+	return nil
+}
+
 func getLocationValue[T any](fields map[string]interface{}) *T {
 	var location = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(location, fields, "location."); ok {
 		return location
+	}
+
+	return nil
+}
+
+func getPhotoValue[T any](fields map[string]interface{}) *T {
+	var photo = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(photo, fields, "photo."); ok {
+		return photo
 	}
 
 	return nil
