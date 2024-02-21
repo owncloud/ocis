@@ -4,6 +4,14 @@
 
 
 
+## v0.61.2 (2024-02-19)
+
+- Limit oidc check session iframe postMessage hook scope
+- Bump vite from 4.5.0 to 4.5.2 in /identifier
+- Bump follow-redirects from 1.14.8 to 1.15.4 in /identifier
+- Bump golang.org/x/crypto from 0.14.0 to 0.17.0
+
+
 ## v0.61.1 (2023-11-22)
 
 - Fix branding settings cache usage
