@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -90,6 +91,8 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		}
 
 		doc.Location = t.getLocation(meta)
+		doc.Image = t.getImage(meta)
+		doc.Photo = t.getPhoto(meta)
 
 		if contentType, err := getFirstValue(meta, "Content-Type"); err == nil && strings.HasPrefix(contentType, "audio/") {
 			doc.Audio = t.getAudio(meta)
@@ -101,6 +104,31 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 	}
 
 	return doc, nil
+}
+
+func (t Tika) getImage(meta map[string][]string) *libregraph.Image {
+	var image *libregraph.Image
+	initImage := func() {
+		if image == nil {
+			image = libregraph.NewImage()
+		}
+	}
+
+	if v, err := getFirstValue(meta, "tiff:ImageWidth"); err == nil {
+		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+			initImage()
+			image.SetWidth(int32(i))
+		}
+	}
+
+	if v, err := getFirstValue(meta, "tiff:ImageLength"); err == nil {
+		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+			initImage()
+			image.SetHeight(int32(i))
+		}
+	}
+
+	return image
 }
 
 func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
@@ -130,6 +158,69 @@ func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
 	}
 
 	return location
+}
+
+func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
+	var photo *libregraph.Photo
+	initPhoto := func() {
+		if photo == nil {
+			photo = libregraph.NewPhoto()
+		}
+	}
+
+	if v, err := getFirstValue(meta, "tiff:Make"); err == nil {
+		initPhoto()
+		photo.SetCameraMake(v)
+	}
+
+	if v, err := getFirstValue(meta, "tiff:Model"); err == nil {
+		initPhoto()
+		photo.SetCameraModel(v)
+	}
+
+	if v, err := getFirstValue(meta, "exif:FNumber"); err == nil {
+		if i, err := strconv.ParseFloat(v, 64); err == nil {
+			initPhoto()
+			photo.SetFNumber(i)
+		}
+	}
+
+	if v, err := getFirstValue(meta, "exif:FocalLength"); err == nil {
+		if i, err := strconv.ParseFloat(v, 64); err == nil {
+			initPhoto()
+			photo.SetFocalLength(i)
+		}
+	}
+
+	if v, err := getFirstValue(meta, "Base ISO"); err == nil {
+		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+			initPhoto()
+			photo.SetIso(int32(i))
+		}
+	}
+
+	if v, err := getFirstValue(meta, "tiff:Orientation"); err == nil {
+		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+			initPhoto()
+			photo.SetOrientation(int32(i))
+		}
+	}
+
+	if v, err := getFirstValue(meta, "exif:DateTimeOriginal"); err == nil {
+		layout := "2006-01-02T15:04:05"
+		if t, err := time.Parse(layout, v); err == nil {
+			initPhoto()
+			photo.SetTakenDateTime(t)
+		}
+	}
+
+	// TODO: no idea which keys to use for the next two values
+	// The denominator for the exposure time fraction from the camera. Read-only.
+	// ExposureDenominator *float64 `json:"exposureDenominator,omitempty"`
+	// The numerator for the exposure time fraction from the camera. Read-only.
+	// ExposureNumerator *float64 `json:"exposureNumerator,omitempty"`
+
+	return photo
 }
 
 func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
