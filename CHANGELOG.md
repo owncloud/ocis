@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
 * Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
 * Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
+* Enhancement - Bump reva: [#8502](https://github.com/owncloud/ocis/pull/8502)
 
 ## Details
 
@@ -468,6 +469,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
    https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
+
+* Enhancement - Bump reva: [#8502](https://github.com/owncloud/ocis/pull/8502)
+
+   We have bumped reva to drop the unnecessary grants exists check when creating
+   shares.
+
+   https://github.com/owncloud/ocis/pull/8502
 
 # Changelog for [4.0.6] (2024-02-07)
 
