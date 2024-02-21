@@ -7,16 +7,40 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
-func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1.Reference, gwc gatewayv1beta1.GatewayAPIClient, token string, lockID string, insecure bool, logger log.Logger) error {
+func UploadFile(
+	ctx context.Context,
+	content io.ReadCloser,
+	contentLength int64,
+	ref *providerv1beta1.Reference,
+	gwc gatewayv1beta1.GatewayAPIClient,
+	token string,
+	lockID string,
+	insecure bool,
+	logger log.Logger,
+) error {
+	opaque := &types.Opaque{
+		Map: make(map[string]*types.OpaqueEntry),
+	}
+
+	strContentLength := strconv.FormatInt(contentLength, 10)
+	if contentLength >= 0 {
+		opaque.Map["Upload-Length"] = &types.OpaqueEntry{
+			Decoder: "plain",
+			Value:   []byte(strContentLength),
+		}
+	}
 
 	req := &providerv1beta1.InitiateFileUploadRequest{
+		Opaque: opaque,
 		Ref:    ref,
 		LockId: lockID,
 		// TODO: if-match
@@ -31,6 +55,7 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 			Err(err).
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Msg("UploadHelper: InitiateFileUpload failed")
 		return err
 	}
@@ -39,10 +64,16 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 		logger.Error().
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Str("StatusCode", resp.Status.Code.String()).
 			Str("StatusMsg", resp.Status.Message).
 			Msg("UploadHelper: InitiateFileUpload failed with wrong status")
 		return errors.New("InitiateFileUpload failed with status " + resp.Status.Code.String())
+	}
+
+	// if content length is 0, we're done. We don't upload anything to the target endpoint
+	if contentLength == 0 {
+		return nil
 	}
 
 	uploadEndpoint := ""
@@ -62,6 +93,7 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 		logger.Error().
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Str("Endpoint", uploadEndpoint).
 			Bool("HasUploadToken", hasUploadToken).
 			Msg("UploadHelper: Upload endpoint or token is missing")
@@ -74,6 +106,7 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 				InsecureSkipVerify: insecure,
 			},
 		},
+		Timeout: 10 * time.Second,
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadEndpoint, content)
@@ -82,19 +115,25 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 			Err(err).
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Str("Endpoint", uploadEndpoint).
 			Bool("HasUploadToken", hasUploadToken).
 			Msg("UploadHelper: Could not create the request to the endpoint")
 		return err
 	}
+	// "content" is an *http.body and doesn't fill the httpReq.ContentLength automatically
+	// we need to fill the ContentLength ourselves, and must match the stream length in order
+	// to prevent issues
+	httpReq.ContentLength = contentLength
 
 	if uploadToken != "" {
 		// public link uploads have the token in the upload endpoint
 		httpReq.Header.Add("X-Reva-Transfer", uploadToken)
 	}
 	// TODO: the access token shouldn't be needed
-	httpReq.Header.Add("x-access-token", token)
+	httpReq.Header.Add("X-Access-Token", token)
 
+	httpReq.Header.Add("X-Lock-Id", lockID)
 	// TODO: better mechanism for the upload while locked, relies on patch in REVA
 	//if lockID, ok := ctxpkg.ContextGetLockID(ctx); ok {
 	//	httpReq.Header.Add("X-Lock-Id", lockID)
@@ -106,16 +145,19 @@ func UploadFile(ctx context.Context, content io.ReadCloser, ref *providerv1beta1
 			Err(err).
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Str("Endpoint", uploadEndpoint).
 			Bool("HasUploadToken", hasUploadToken).
 			Msg("UploadHelper: Put request to the upload endpoint failed")
 		return err
 	}
+	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
 		logger.Error().
 			Str("FileReference", ref.String()).
 			Str("RequestedLockID", lockID).
+			Str("UploadLength", strContentLength).
 			Str("Endpoint", uploadEndpoint).
 			Bool("HasUploadToken", hasUploadToken).
 			Int("HttpCode", httpResp.StatusCode).
