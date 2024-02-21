@@ -232,6 +232,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -256,6 +257,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -280,6 +282,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -304,6 +307,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -393,6 +397,7 @@ a| `OCIS_ENABLE_RESHARING`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/sharing.adoc[sharing] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -557,7 +562,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SSE_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=attributes+]
@@ -741,7 +746,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Ignore untrusted SSL certificates when connecting to the webdav source.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=attributes+]
@@ -806,7 +811,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=attributes+]
@@ -1038,7 +1043,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1054,7 +1059,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1101,7 +1106,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LDAP_INSECURE`
 
 a| [subs=attributes+]
@@ -1248,7 +1253,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1264,7 +1269,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1329,7 +1334,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=attributes+]
@@ -1748,7 +1753,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=attributes+]
@@ -1801,7 +1806,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 a| `OCIS_SERVICE_ACCOUNT_ID`
 
 a| [subs=attributes+]
@@ -1818,13 +1823,13 @@ a| [subs=attributes+]
 * xref:{s-path}/userlog.adoc[userlog] +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 
 a| [subs=-attributes]
-++ ++
+++[service-user-id] ++
 
 a| [subs=-attributes]
-The ID of the service account the service should use. See the 'auth-service' service description for more details.
+The list of all service account IDs. These will be assigned the hidden 'service-account' role. Note: When using 'OCIS_SERVICE_ACCOUNT_ID' this will contain only one value while 'SETTINGS_SERVICE_ACCOUNT_IDS' can have multiple. See the 'auth-service' service description for more details about service accounts.
 a| `OCIS_SERVICE_ACCOUNT_SECRET`
 
 a| [subs=attributes+]
@@ -2204,10 +2209,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++https://localhost:9200/ ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+Base url to navigate back from the app to the containing folder in the file list.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]

@@ -24,6 +24,46 @@ http:
   addr: 127.0.0.1:9158
   protocol: tcp
   prefix: data
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - POST
+    - HEAD
+    - PATCH
+    - OPTIONS
+    - GET
+    - DELETE
+    allow_headers:
+    - Authorization
+    - Origin
+    - X-Requested-With
+    - X-Request-Id
+    - X-HTTP-Method-Override
+    - Content-Type
+    - Upload-Length
+    - Upload-Offset
+    - Tus-Resumable
+    - Upload-Metadata
+    - Upload-Defer-Length
+    - Upload-Concat
+    - Upload-Incomplete
+    - Upload-Draft-Interop-Version
+    allow_credentials: true
+    expose_headers:
+    - Upload-Offset
+    - Location
+    - Upload-Length
+    - Tus-Version
+    - Tus-Resumable
+    - Tus-Max-Size
+    - Tus-Extension
+    - Upload-Metadata
+    - Upload-Defer-Length
+    - Upload-Concat
+    - Upload-Incomplete
+    - Upload-Draft-Interop-Version
+    max_age: 86400
 token_manager:
   jwt_secret: ""
 reva:
@@ -64,6 +104,12 @@ drivers:
     secret_key: ""
     endpoint: ""
     bucket: ""
+    put_object_disable_content_sha254: false
+    put_object_disable_multipart: false
+    put_object_send_content_md5: true
+    put_object_concurrent_stream_parts: true
+    put_object_num_threads: 4
+    put_object_part_size: 0
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
     share_folder: /Shares
