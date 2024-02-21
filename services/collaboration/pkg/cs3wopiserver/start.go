@@ -3,14 +3,15 @@ package cs3wopiserver
 import (
 	"context"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
 )
 
-func Start(cfg *config.Config) (*app.DemoApp, error) {
+func Start(cfg *config.Config, logger log.Logger) (*app.DemoApp, error) {
 	ctx := context.Background()
 
-	app, err := app.New(cfg)
+	app, err := app.New(cfg, logger)
 	if err != nil {
 		return nil, err
 	}

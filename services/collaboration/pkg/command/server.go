@@ -42,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}()
 			defer cancel()
 
-			app, err := cs3wopiserver.Start(cfg) // grpc server needs decoupling
+			app, err := cs3wopiserver.Start(cfg, logger) // grpc server needs decoupling
 			if err != nil {
 				return err
 			}
