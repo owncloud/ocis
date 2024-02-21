@@ -1516,24 +1516,6 @@ func (h *Handler) getResourceInfo(ctx context.Context, client gateway.GatewayAPI
 
 func (h *Handler) createCs3Share(ctx context.Context, w http.ResponseWriter, r *http.Request, client gateway.GatewayAPIClient, req *collaboration.CreateShareRequest) (*collaboration.Share, *ocsError) {
 	logger := appctx.GetLogger(ctx)
-	exists, err := h.granteeExists(ctx, req.Grant.Grantee, req.ResourceInfo.Id)
-	if err != nil {
-		return nil, &ocsError{
-			Code:    response.MetaServerError.StatusCode,
-			Message: "error sending a grpc list shares request",
-			Error:   err,
-		}
-	}
-
-	if exists {
-		// the grantee already has a share - should we jump to UpdateShare?
-		// for now - lets error
-		return nil, &ocsError{
-			Code:    response.MetaBadRequest.StatusCode,
-			Message: "grantee already has a share on this item",
-			Error:   nil,
-		}
-	}
 
 	expiry := r.PostFormValue("expireDate")
 	if expiry != "" {
@@ -1660,39 +1642,6 @@ func (h *Handler) getPoolClient() (gateway.GatewayAPIClient, error) {
 
 func (h *Handler) getHomeNamespace(u *userpb.User) string {
 	return templates.WithUser(u, h.homeNamespace)
-}
-
-func (h *Handler) granteeExists(ctx context.Context, g *provider.Grantee, rid *provider.ResourceId) (bool, error) {
-	client, err := h.getClient()
-	if err != nil {
-		return false, err
-	}
-
-	lsreq := collaboration.ListSharesRequest{
-		Filters: []*collaboration.Filter{
-			{
-				Type: collaboration.Filter_TYPE_RESOURCE_ID,
-				Term: &collaboration.Filter_ResourceId{
-					ResourceId: rid,
-				},
-			},
-		},
-	}
-	lsres, err := client.ListShares(ctx, &lsreq)
-	if err != nil {
-		return false, err
-	}
-	if lsres.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return false, fmt.Errorf("unexpected status code from ListShares: %v", lsres.GetStatus())
-	}
-
-	for _, s := range lsres.GetShares() {
-		if utils.GranteeEqual(g, s.GetGrantee()) {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
 
 func publicPwdEnforced(c *config.Config) passwordEnforced {
