@@ -24,7 +24,6 @@
 
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use GuzzleHttp\Exception\GuzzleException;
-use Helmich\JsonAssert\JsonAssertions;
 use rdx\behatvars\BehatVariablesContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
@@ -35,6 +34,7 @@ use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use Swaggest\JsonSchema\Schema as JsonSchema;
 use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
@@ -55,7 +55,6 @@ class FeatureContext extends BehatVariablesContext {
 	use Provisioning;
 	use Sharing;
 	use WebDav;
-	use JsonAssertions;
 
 	/**
 	 * Unix timestamp seconds
@@ -1205,6 +1204,18 @@ class FeatureContext extends BehatVariablesContext {
 			$arrayOfArrays
 		);
 		return $a;
+	}
+
+	/**
+	 * @param object $json
+	 * @param object $schema
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function assertJsonDocumentMatchesSchema(object $json, object $schema): void {
+		$schema = JsonSchema::import($schema);
+		$schema->in($json);
 	}
 
 	/**
