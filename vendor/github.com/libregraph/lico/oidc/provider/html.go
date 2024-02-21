@@ -188,7 +188,7 @@ c.u(b.B());c.u(n.substr(0,64-(d.f[1]+8&63)));c.c(d.f[0]<<3|d.f[0]>>>28);c.c(d.f[
 		window.addEventListener('message', function(event) {
 			// Only do something when receiving a message from our parent or
 			// from another window which shares our parent.
-			if (window.parent === event.source || window.parent === event.source.parent) {
+			if (window.parent === event.source || (window !== event.source && window.parent === event.source.parent)) {
 				var response = receiveMessage(event.origin, event.data);
 				event.source.postMessage(response, event.origin);
 			}
