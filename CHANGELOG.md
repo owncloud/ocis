@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix extended env parser: [#8409](https://github.com/owncloud/ocis/pull/8409)
 * Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
 * Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
+* Bugfix - Graph/sharedWithMe align IDs with webdav response: [#8467](https://github.com/owncloud/ocis/pull/8467)
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
@@ -104,6 +105,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8442
    https://github.com/owncloud/ocis/pull/8444
+
+* Bugfix - Graph/sharedWithMe align IDs with webdav response: [#8467](https://github.com/owncloud/ocis/pull/8467)
+
+   The IDs of the driveItems returned by the 'graph/v1beta1/me/drive/sharedWithMe'
+   endpoint are now aligned with the IDs returned in the PROPFIND response of the
+   webdav service.
+
+   https://github.com/owncloud/ocis/issues/8420
+   https://github.com/owncloud/ocis/issues/8080
+   https://github.com/owncloud/ocis/pull/8467
 
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 
