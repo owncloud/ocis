@@ -1992,6 +1992,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
                       "type": "array",
                       "minItems": 2,
                       "maxItems": 2,
+                      "uniqueItems": true,
                       "items": {
                         "oneOf": [
                           {
@@ -2131,6 +2132,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
                       "type": "array",
                       "minItems": 2,
                       "maxItems": 2,
+                      "uniqueItems": true,
                       "items": {
                         "oneOf": [
                           {
@@ -2228,6 +2230,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
             "type": "array",
             "minItems": 2,
             "maxItems": 2,
+            "uniqueItems": true,
             "items": {
               "oneOf": [
                 {
@@ -2524,6 +2527,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
             "type": "array",
             "minItems": 2,
             "maxItems": 2,
+            "uniqueItems": true,
             "items": {
               "oneOf": [
                 {
