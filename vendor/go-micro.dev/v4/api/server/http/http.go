@@ -9,19 +9,19 @@ import (
 	"sync"
 
 	"github.com/gorilla/handlers"
-
 	"go-micro.dev/v4/api/server"
 	"go-micro.dev/v4/api/server/cors"
 	log "go-micro.dev/v4/logger"
 )
 
 type httpServer struct {
-	mux  *http.ServeMux
 	opts server.Options
 
-	mtx     sync.RWMutex
-	address string
+	mux     *http.ServeMux
 	exit    chan chan error
+	address string
+
+	mtx sync.RWMutex
 }
 
 func NewServer(address string, opts ...server.Option) server.Server {
@@ -94,7 +94,7 @@ func (s *httpServer) Start() error {
 	go func() {
 		if err := http.Serve(l, s.mux); err != nil {
 			// temporary fix
-			//logger.Log(log.FatalLevel, err)
+			// logger.Log(log.FatalLevel, err)
 			logger.Log(log.ErrorLevel, err)
 		}
 	}()

@@ -79,3 +79,9 @@ func (ua UserAgent) IsTwitterbot() bool {
 func (ua UserAgent) IsFacebookbot() bool {
 	return ua.Name == FacebookExternalHit
 }
+
+// IsUnknown returns true if the package can't determine the user agent reliably.
+// Fields like Name, OS, etc. might still have values.
+func (ua UserAgent) IsUnknown() bool {
+	return !ua.Mobile && !ua.Tablet && !ua.Desktop && !ua.Bot
+}

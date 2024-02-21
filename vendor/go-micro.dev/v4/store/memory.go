@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// NewMemoryStore returns a memory store
+// NewMemoryStore returns a memory store.
 func NewMemoryStore(opts ...Option) Store {
 	s := &memoryStore{
 		options: Options{
@@ -32,10 +32,10 @@ type memoryStore struct {
 }
 
 type storeRecord struct {
+	expiresAt time.Time
+	metadata  map[string]interface{}
 	key       string
 	value     []byte
-	metadata  map[string]interface{}
-	expiresAt time.Time
 }
 
 func (m *memoryStore) key(prefix, key string) string {

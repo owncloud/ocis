@@ -90,9 +90,7 @@ func Service(opts ...Option) (micro.Service, error) {
 
 	if tp == nil {
 		topts := []rtrace.Option{
-			rtrace.WithExporter(sopts.TracingExporter),
 			rtrace.WithEndpoint(sopts.TracingEndpoint),
-			rtrace.WithCollector(sopts.TracingCollector),
 			rtrace.WithServiceName(sopts.Name),
 		}
 		if sopts.TracingEnabled {
@@ -100,6 +98,9 @@ func Service(opts ...Option) (micro.Service, error) {
 		}
 		if sopts.TracingInsecure {
 			topts = append(topts, rtrace.WithInsecure())
+		}
+		if sopts.TracingTransportCredentials != nil {
+			topts = append(topts, rtrace.WithTransportCredentials(sopts.TracingTransportCredentials))
 		}
 		tp = rtrace.NewTracerProvider(topts...)
 	}

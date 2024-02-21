@@ -1,7 +1,8 @@
-# Go Micro [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/go-micro.dev/v4?tab=doc) [![Go Report Card](https://goreportcard.com/badge/github.com/go-micro/go-micro)](https://goreportcard.com/report/github.com/go-micro/go-micro) [![](https://dcbadge.vercel.app/api/server/qV3HvnEJfB?style=flat-square&theme=default-inverted)](https://discord.gg/qV3HvnEJfB)
-
+# Go Micro [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/go-micro.dev/v4?tab=doc) [![Go Report Card](https://goreportcard.com/badge/github.com/go-micro/go-micro)](https://goreportcard.com/report/github.com/go-micro/go-micro) [![Discord](https://dcbadge.vercel.app/api/server/qV3HvnEJfB?style=flat-square&theme=default-inverted)](https://discord.gg/qV3HvnEJfB)
 
 Go Micro is a framework for distributed systems development.
+
+Note: V5 is in development. Leave feedback in this [form](https://forms.gle/41gEWAcSgnf88GKt7)
 
 ## Overview
 
@@ -52,14 +53,38 @@ Go Micro abstracts away the details of distributed systems. Here are the main fe
 
 ## Getting Started
 
-To make use of Go Micro
+To make use of Go Micro import it 
 
 ```golang
-import "go-micro.dev/v4"
+import "go-micro.dev/v4
+```
 
+Define a handler (protobuf is optionally supported - see [example](https://github.com/go-micro/examples/blob/main/helloworld/main.go)) 
+
+```golang
+type Request struct {
+        Name string `json:"name"`
+}
+
+type Response struct {
+        Message string `json:"message"`
+}
+
+type Helloworld struct{}
+
+func (h *Helloworld) Greeting(ctx context.Context, req *Request, rsp *Response) error {
+        rsp.Message = "Hello " + req.Name
+        return nil
+}
+```
+
+Create, initialise and run the service
+
+```golang
 // create a new service
 service := micro.NewService(
     micro.Name("helloworld"),
+    micro.Handle(new(Helloworld)),
 )
 
 // initialise flags
@@ -67,6 +92,25 @@ service.Init()
 
 // start the service
 service.Run()
+```
+
+Optionally set fixed address
+
+```golang
+service := micro.NewService(
+    // set address
+    micro.Handle(":8080"),
+)
+```
+
+Call it via curl
+
+```
+curl -XPOST \
+     -H 'Content-Type: application/json' \
+     -H 'Micro-Endpoint: Helloworld.Greeting' \
+     -d '{"name": "alice"}' \
+      http://localhost:8080
 ```
 
 See the [examples](https://github.com/go-micro/examples) for detailed information on usage.

@@ -16,54 +16,53 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
 	log "go-micro.dev/v4/logger"
 	"go-micro.dev/v4/util/mdns"
 )
 
 var (
-	// use a .micro domain rather than .local
+	// use a .micro domain rather than .local.
 	mdnsDomain = "micro"
 )
 
 type mdnsTxt struct {
+	Metadata  map[string]string
 	Service   string
 	Version   string
 	Endpoints []*Endpoint
-	Metadata  map[string]string
 }
 
 type mdnsEntry struct {
-	id   string
 	node *mdns.Server
+	id   string
 }
 
 type mdnsRegistry struct {
-	opts *Options
-	// the mdns domain
-	domain string
-
-	sync.Mutex
+	opts     *Options
 	services map[string][]*mdnsEntry
-
-	mtx sync.RWMutex
 
 	// watchers
 	watchers map[string]*mdnsWatcher
 
 	// listener
 	listener chan *mdns.ServiceEntry
+	// the mdns domain
+	domain string
+
+	mtx sync.RWMutex
+
+	sync.Mutex
 }
 
 type mdnsWatcher struct {
-	id   string
 	wo   WatchOptions
 	ch   chan *mdns.ServiceEntry
 	exit chan struct{}
-	// the mdns domain
-	domain string
 	// the registry
 	registry *mdnsRegistry
+	id       string
+	// the mdns domain
+	domain string
 }
 
 func encode(txt *mdnsTxt) ([]string, error) {
@@ -517,7 +516,6 @@ func (m *mdnsRegistry) Watch(opts ...WatchOption) (Watcher, error) {
 						m.mtx.RUnlock()
 					}
 				}
-
 			}()
 
 			// start listening, blocking call
@@ -614,7 +612,7 @@ func (m *mdnsWatcher) Stop() {
 	}
 }
 
-// NewRegistry returns a new default registry which is mdns
+// NewRegistry returns a new default registry which is mdns.
 func NewRegistry(opts ...Option) Registry {
 	return newRegistry(opts...)
 }

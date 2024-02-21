@@ -2,6 +2,9 @@
 package revaconfig
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 )
 
@@ -74,6 +77,31 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"nats_enable_tls":        cfg.Events.EnableTLS,
 					"nats_username":          cfg.Events.AuthUsername,
 					"nats_password":          cfg.Events.AuthPassword,
+					"data_txs": map[string]interface{}{
+						"simple": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"spaces": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+						},
+						"tus": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+							"cache_table":    "stat",
+							"cors_enabled":   true,
+							// allow_origin is configured as a regex in tusd, so we concatenate the configured values into a regex
+							"cors_allow_origin":      "(" + strings.ReplaceAll(strings.Join(cfg.HTTP.CORS.AllowedOrigins, "|"), "*", ".*") + ")",
+							"cors_allow_credentials": cfg.HTTP.CORS.AllowCredentials,
+							"cors_allow_methods":     strings.Join(cfg.HTTP.CORS.AllowedMethods, ","),
+							"cors_allow_headers":     strings.Join(cfg.HTTP.CORS.AllowedHeaders, ","),
+							"cors_max_age":           strconv.FormatUint(uint64(cfg.HTTP.CORS.MaxAge), 10),
+							"cors_expose_headers":    strings.Join(cfg.HTTP.CORS.ExposedHeaders, ","),
+						},
+					},
 				},
 			},
 		},

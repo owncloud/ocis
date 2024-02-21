@@ -22,15 +22,12 @@ import (
 	"context"
 	"fmt"
 
-	"go-micro.dev/v4/util/log"
-	"google.golang.org/grpc"
-
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	v1beta12 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -38,6 +35,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -190,7 +188,7 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 
 		if ev != nil {
 			if err := events.Publish(ctx, publisher, ev); err != nil {
-				log.Error(err)
+				appctx.GetLogger(ctx).Error().Err(err).Interface("event", ev).Msg("publishing event failed")
 			}
 		}
 
@@ -211,7 +209,7 @@ func NewStream() grpc.StreamServerInterceptor {
 
 // common interface to all responses
 type su interface {
-	GetStatus() *v1beta12.Status
+	GetStatus() *rpc.Status
 }
 
 func isSuccess(res su) bool {

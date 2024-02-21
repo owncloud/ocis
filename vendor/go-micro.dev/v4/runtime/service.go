@@ -15,29 +15,32 @@ import (
 )
 
 type service struct {
-	sync.RWMutex
-
-	running bool
-	closed  chan bool
-	err     error
 	updated time.Time
 
-	retries    int
-	maxRetries int
+	// to be used logger
+	Logger log.Logger
 
 	// output for logs
 	output io.Writer
 
-	// service to manage
-	*Service
+	err error
 	// process creator
 	Process *proc.Process
+	closed  chan bool
+
+	// service to manage
+	*Service
 	// Exec
 	Exec *process.Executable
 	// process pid
 	PID *process.PID
-	// to be used logger
-	Logger log.Logger
+
+	retries    int
+	maxRetries int
+
+	sync.RWMutex
+
+	running bool
 }
 
 func newService(s *Service, c CreateOptions, l log.Logger) *service {
@@ -96,7 +99,7 @@ func (s *service) Running() bool {
 	return s.running
 }
 
-// Start starts the service
+// Start starts the service.
 func (s *service) Start() error {
 	s.Lock()
 	defer s.Unlock()
@@ -141,7 +144,7 @@ func (s *service) Start() error {
 	return nil
 }
 
-// Status updates the status of the service. Assumes it's called under a lock as it mutates state
+// Status updates the status of the service. Assumes it's called under a lock as it mutates state.
 func (s *service) Status(status string, err error) {
 	s.Metadata["lastStatusUpdate"] = time.Now().Format(time.RFC3339)
 	s.Metadata["status"] = status
@@ -150,10 +153,9 @@ func (s *service) Status(status string, err error) {
 		return
 	}
 	s.Metadata["error"] = err.Error()
-
 }
 
-// Stop stops the service
+// Stop stops the service.
 func (s *service) Stop() error {
 	s.Lock()
 	defer s.Unlock()
@@ -187,14 +189,14 @@ func (s *service) Stop() error {
 	}
 }
 
-// Error returns the last error service has returned
+// Error returns the last error service has returned.
 func (s *service) Error() error {
 	s.RLock()
 	defer s.RUnlock()
 	return s.err
 }
 
-// Wait waits for the service to finish running
+// Wait waits for the service to finish running.
 func (s *service) Wait() {
 	// wait for process to exit
 	s.RLock()
