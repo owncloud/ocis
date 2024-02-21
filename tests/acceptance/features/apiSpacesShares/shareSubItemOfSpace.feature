@@ -179,7 +179,7 @@ Feature: Share a file or folder that is inside a space
       | permissions | <permissions> |
     Then the HTTP status code should be "400"
     And the OCS status code should be "400"
-    And the OCS status message should be "No share permission"
+    And the OCS status message should be "resharing not supported"
     Examples:
       | permissions | description                  |
       | 19          | view + edit                  |
@@ -202,7 +202,7 @@ Feature: Share a file or folder that is inside a space
       | permissions | <permissions> |
     Then the HTTP status code should be "400"
     And the OCS status code should be "400"
-    And the OCS status message should be "No share permission"
+    And the OCS status message should be "resharing not supported"
     Examples:
       | permissions | description                  |
       | 19          | view + edit                  |
