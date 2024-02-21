@@ -116,27 +116,31 @@ class TUSContext implements Context {
 	 * @param string $offset
 	 * @param string $data
 	 * @param string $checksum
+	 * @param array $header
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = ''): ResponseInterface {
+	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = '', ?array $header = null): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
+		$headers = [
+		'Content-Type' => 'application/offset+octet-stream',
+		'Tus-Resumable' => '1.0.0',
+		'Upload-Checksum' => $checksum,
+		'Upload-Offset' => $offset
+		];
+		$headers = (!empty($header)) ? array_merge($headers, $header) : $headers;
+	
 		return HttpRequestHelper::sendRequest(
 			$this->resourceLocation,
 			$this->featureContext->getStepLineRef(),
 			'PATCH',
 			$user,
 			$password,
-			[
-				'Content-Type' => 'application/offset+octet-stream',
-				'Tus-Resumable' => '1.0.0',
-				'Upload-Checksum' => $checksum,
-				'Upload-Offset' => $offset
-			],
+			$headers,
 			$data
 		);
 	}
