@@ -103,7 +103,7 @@ type ExternalApp struct {
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty" yaml:"url" env:"" desc:"" introductionVersion:"pre5.0"`
+	URL string `json:"url,omitempty" yaml:"url"`
 }
 
 // Web defines the available web configuration.
