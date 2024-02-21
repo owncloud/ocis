@@ -518,19 +518,20 @@ Feature: Create a share link for a resource
       }
       """
 
-
-  Scenario: remove expiration date of a file's link share
+  @issues-8405
+  Scenario Outline: remove expiration date of a resource link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    And user "Alice" has created folder "folder"
     And user "Alice" has created the following link share:
-      | resource           | textfile1.txt            |
+      | resource           | <path>                   |
       | space              | Personal                 |
       | permissionsRole    | view                     |
       | password           | %public%                 |
       | expirationDateTime | 2200-07-15T14:00:00.000Z |
     When user "Alice" updates the last public link share using the Graph API with
-      | resource           | textfile1.txt            |
-      | space              | Personal                 |
-      | expirationDateTime |                          |
+      | resource           | <path>   |
+      | space              | Personal |
+      | expirationDateTime |          |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -583,7 +584,10 @@ Feature: Create a share link for a resource
         }
       }
       """
-
+    Examples:
+      | path          |
+      | textfile1.txt |
+      | folder        |
 
   @env-config
   Scenario: set password on a file's link share

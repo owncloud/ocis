@@ -83,19 +83,20 @@ Feature: Update permission of a share
     """
 
 
-  Scenario: user removes expiration date of a share
+  Scenario Outline: user removes expiration date of a share
     Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has created folder "folder"
     And user "Alice" has sent the following share invitation:
-      | resource           | testfile.txt         |
+      | resource           | <path>               |
       | space              | Personal             |
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
     When user "Alice" updates the last share with the following using the Graph API:
-      | space              | Personal             |
-      | resource           | testfile.txt         |
-      | expirationDateTime |                      |
+      | space              | Personal |
+      | resource           | <path>   |
+      | expirationDateTime |          |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
@@ -150,6 +151,10 @@ Feature: Update permission of a share
       }
     }
     """
+    Examples:
+      | path         |
+      | testfile.txt |
+      | folder       |
 
 
   Scenario Outline: user updates role of a share

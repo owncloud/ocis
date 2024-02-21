@@ -262,11 +262,11 @@ class SharingNgContext implements Context {
 		$body = [];
 
 		if (\array_key_exists('permissionsRole', $bodyRows)) {
-			$body["roles"] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
+			$body['roles'] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
 		}
 
 		if (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body["expirationDateTime"] = empty($bodyRows["expirationDateTime"]) ? null : $bodyRows["expirationDateTime"];
+			$body['expirationDateTime'] = empty($bodyRows['expirationDateTime']) ? null : $bodyRows['expirationDateTime'];
 		}
 
 		return GraphHelper::updateShare(
@@ -357,16 +357,16 @@ class SharingNgContext implements Context {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resource = $bodyRows['resource'];
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))['id'];
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 		$body = [];
 
 		if (\array_key_exists('permissionsRole', $bodyRows)) {
-			$body["link"]["type"] = $bodyRows['permissionsRole'];
+			$body['link']['type'] = $bodyRows['permissionsRole'];
 		}
 
 		if (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body["expirationDateTime"] = empty($bodyRows["expirationDateTime"]) ? null : $bodyRows["expirationDateTime"];
+			$body['expirationDateTime'] = empty($bodyRows['expirationDateTime']) ? null : $bodyRows['expirationDateTime'];
 		}
 
 		return GraphHelper::updateShare(
