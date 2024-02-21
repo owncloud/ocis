@@ -17,7 +17,6 @@ import (
 
 type filesystemBackend struct {
 	webdav.UserPrincipalBackend
-	path          string
 	caldavPrefix  string
 	carddavPrefix string
 	storage       metadata.Storage
@@ -35,7 +34,6 @@ func isAlreadyExists(err error) bool {
 func NewFilesystem(storage metadata.Storage, caldavPrefix, carddavPrefix string, userPrincipalBackend webdav.UserPrincipalBackend) (caldav.Backend, carddav.Backend, error) {
 	backend := &filesystemBackend{
 		UserPrincipalBackend: userPrincipalBackend,
-		path:                 "/",
 		caldavPrefix:         caldavPrefix,
 		carddavPrefix:        carddavPrefix,
 		storage:              storage,
@@ -60,8 +58,7 @@ func (b *filesystemBackend) ensureLocalDir(ctx context.Context, path string) err
 }
 
 func (b *filesystemBackend) localDir(ctx context.Context, homeSetPath string, components ...string) (string, error) {
-	c := append([]string{b.path}, homeSetPath)
-	c = append(c, components...)
+	c := append([]string{homeSetPath}, components...)
 	localPath := filepath.Join(c...)
 	if err := b.ensureLocalDir(ctx, localPath); err != nil {
 		return "", err
@@ -72,13 +69,12 @@ func (b *filesystemBackend) localDir(ctx context.Context, homeSetPath string, co
 // don't use this directly, use localCalDAVPath or localCardDAVPath instead.
 // note that homesetpath is expected to end in /
 func (b *filesystemBackend) safeLocalPath(ctx context.Context, homeSetPath string, urlPath string) (string, error) {
-	localPath := filepath.Join(b.path, homeSetPath)
-	if err := b.ensureLocalDir(ctx, localPath); err != nil {
+	if err := b.ensureLocalDir(ctx, homeSetPath); err != nil {
 		return "", err
 	}
 
 	if urlPath == "" {
-		return localPath, nil
+		return homeSetPath, nil
 	}
 
 	// We are mapping to local filesystem path, so be conservative about what to accept
@@ -94,5 +90,5 @@ func (b *filesystemBackend) safeLocalPath(ctx context.Context, homeSetPath strin
 	urlPath = strings.TrimPrefix(urlPath, homeSetPath)
 
 	dir, file := path.Split(urlPath)
-	return filepath.Join(localPath, dir, file), nil
+	return filepath.Join(homeSetPath, dir, file), nil
 }

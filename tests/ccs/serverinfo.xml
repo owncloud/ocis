@@ -21,6 +21,7 @@
 <serverinfo>
 	<!-- for local testing change this - ocis-server is used for drone ci -->
 	<!-- host>172.17.0.1</host -->
+	<!-- host>ocis-server</host -->
 	<host>ocis-server</host>
 	<nonsslport>9200</nonsslport>
 	<sslport>9200</sslport>
@@ -176,7 +177,7 @@
 		<!-- relative path to caldav root-->
 		<substitution>
 			<key>$root:</key>
-			<value>/dav/</value>
+			<value>/ccs/</value>
 		</substitution>
 
 		<!-- relative path to main principal collection-->

@@ -26,8 +26,7 @@ func (u *userPrincipalBackend) CurrentUserPrincipal(ctx context.Context) (string
 		return "", errors.New("no user in context")
 	}
 
-	// TODO: use user.Id.OpaqueId ????
-	return fmt.Sprintf("/dav/principals/users/%s/", user.Username), nil
+	return fmt.Sprintf("/ccs/principals/users/%s/", user.Username), nil
 }
 
 type groupwareHandler struct {
@@ -43,14 +42,19 @@ func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
 
+	// Home-Set Folders Discovery
 	var homeSets []webdav.BackendSuppliedHomeSet
-	if u.caldavBackend != nil {
-		path, err := u.caldavBackend.CalendarHomeSetPath(r.Context())
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		} else {
-			homeSets = append(homeSets, caldav.NewCalendarHomeSet(path))
-		}
+	path, err := u.caldavBackend.CalendarHomeSetPath(r.Context())
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	} else {
+		homeSets = append(homeSets, caldav.NewCalendarHomeSet(path))
+	}
+	path, err = u.carddavBackend.AddressBookHomeSetPath(r.Context())
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	} else {
+		homeSets = append(homeSets, carddav.NewAddressBookHomeSet(path))
 	}
 
 	if r.URL.Path == userPrincipalPath {
@@ -66,27 +70,19 @@ func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		webdav.ServePrincipal(w, r, &opts)
 		return
 	}
+	// Current User Principal Discovery
 	opts := webdav.ServePrincipalOptions{
 		CurrentUserPrincipalPath: userPrincipalPath,
-		HomeSets:                 homeSets,
-		Capabilities: []webdav.Capability{
-			carddav.CapabilityAddressBook,
-			caldav.CapabilityCalendar,
-		},
 	}
 	webdav.ServePrincipal(w, r, &opts)
 	return
-
-	// TODO serve something on / that signals this being a DAV server?
-
-	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 }
 
 type wellknownHandler struct {
 }
 
 func (h *wellknownHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/dav/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/ccs/", http.StatusMovedPermanently)
 }
 
 // NewService returns a service implementation for Service.
@@ -111,18 +107,18 @@ func NewService(opts ...Option) (*chi.Mux, error) {
 		caldavBackend:  caldavBackend,
 		carddavBackend: carddavBackend,
 	}
-	caldavHandler := caldav.Handler{Backend: caldavBackend, Prefix: "/dav"}
-	carddavHandler := carddav.Handler{Backend: carddavBackend, Prefix: "/dav"}
+	caldavHandler := caldav.Handler{Backend: caldavBackend, Prefix: "/ccs"}
+	carddavHandler := carddav.Handler{Backend: carddavBackend, Prefix: "/ccs"}
 	wellknownHandler := wellknownHandler{}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Mount("/.well-known/caldav", &wellknownHandler)
 		r.Mount("/.well-known/carddav", &wellknownHandler)
-		r.Mount("/dav/", &handler)
-		r.Mount("/dav/principals", &handler)
-		r.Mount("/dav/calendars", &caldavHandler)
-		r.Mount("/dav/addressbooks", &carddavHandler)
+		r.Mount("/ccs", &handler)
+		r.Mount("/ccs/principals", &handler)
+		r.Mount("/ccs/calendars", &caldavHandler)
+		r.Mount("/ccs/addressbooks", &carddavHandler)
 	})
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
