@@ -28,7 +28,7 @@ func (b *filesystemBackend) AddressBookHomeSetPath(ctx context.Context) (string,
 	if !ok {
 		return "", errors.New("no user in context")
 	}
-	return fmt.Sprintf("/dav/addressbooks/%s/", user.Username), nil
+	return fmt.Sprintf("/ccs/addressbooks/%s/", user.Username), nil
 }
 
 func (b *filesystemBackend) CreateAddressBook(ctx context.Context, addressBook *carddav.AddressBook) error {

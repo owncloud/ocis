@@ -20,8 +20,6 @@
 
 <serverinfo>
 	<!-- for local testing change this - ocis-server is used for drone ci -->
-	<!-- host>172.17.0.1</host -->
-	<!-- host>ocis-server</host -->
 	<host>ocis-server</host>
 	<nonsslport>9200</nonsslport>
 	<sslport>9200</sslport>
