@@ -59,8 +59,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUserGroup/getUser.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L98)
 - [apiGraphUserGroup/getUser.feature:99](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L99)
 - [apiGraphUserGroup/getUser.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L100)
-- [apiGraphUserGroup/getUser.feature:650](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L650)
-- [apiGraphUserGroup/getUser.feature:651](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L651)
 - [apiGraphUserGroup/getUser.feature:652](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L652)
 - [apiGraphUserGroup/getUser.feature:653](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L653)
 - [apiGraphUserGroup/getUser.feature:654](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L654)
@@ -71,6 +69,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUserGroup/getUser.feature:659](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L659)
 - [apiGraphUserGroup/getUser.feature:660](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L660)
 - [apiGraphUserGroup/getUser.feature:661](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L661)
+- [apiGraphUserGroup/getUser.feature:662](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L662)
+- [apiGraphUserGroup/getUser.feature:663](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L663)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 
