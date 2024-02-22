@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2024-02-21T00:29:46.979419864Z
+date: 2024-02-22T03:50:33.860667977Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
