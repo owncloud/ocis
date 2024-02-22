@@ -218,46 +218,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -463,46 +463,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -726,46 +726,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -975,46 +975,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -1205,49 +1205,49 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": [
-                                      "displayName",
-                                      "id"
-                                    ],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": [
+                                        "displayName",
+                                        "id"
+                                      ],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -1427,51 +1427,51 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": [
-                                  "user"
-                                ],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": [
-                                      "displayName",
-                                      "id"
-                                    ],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": [
+                                    "user"
+                                  ],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": [
+                                        "displayName",
+                                        "id"
+                                      ],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -1656,46 +1656,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]
@@ -1866,46 +1866,46 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                   }
                                 }
                               }
-                            }
-                          },
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "required": ["user"],
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "required": ["displayName", "id"],
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%permissions_id_pattern%$"
+                            },
+                            "invitation": {
+                              "type": "object",
+                              "required": ["invitedBy"],
+                              "properties": {
+                                "invitedBy": {
+                                  "type": "object",
+                                  "required": ["user"],
+                                  "properties": {
+                                    "user": {
+                                      "type": "object",
+                                      "required": ["displayName", "id"],
+                                      "properties": {
+                                        "displayName": {
+                                          "type": "string",
+                                          "enum": ["Alice Hansen"]
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "pattern": "^%user_id_pattern%$"
+                                        }
                                       }
                                     }
                                   }
                                 }
                               }
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              ]
                             }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
                           }
                         }
                       ]

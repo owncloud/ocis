@@ -672,8 +672,10 @@ Feature: user GDPR (General Data Protection Regulation) report
                 "opaque_id"
               ],
               "properties": {
-                "type": "object",
-                "pattern": "^%user_id_pattern%:%user_id_pattern%:%user_id_pattern%$"
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%:%user_id_pattern%:%user_id_pattern%$"
+                }
               }
             },
             "Sharee": {

@@ -487,7 +487,7 @@ Feature: get groups and their members
             },
             "groupTypes": {
               "type": "array",
-              "enum": []
+              "const": []
             }
           }
         }

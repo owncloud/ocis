@@ -493,14 +493,16 @@ Feature: get users
                   "user"
                 ],
                 "properties": {
-                  "user": "string",
-                  "required": [
-                    "id"
-                  ],
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "enum": ["%user_id_pattern%"]
+                  "user": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "%user_id_pattern%"
+                      }
                     }
                   }
                 }

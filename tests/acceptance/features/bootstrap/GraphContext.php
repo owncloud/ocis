@@ -206,7 +206,11 @@ class GraphContext implements Context {
 	 */
 	public function theUserInformationShouldMatchTheJSON(string $user, PyStringNode $schemaString): void {
 		$response = $this->adminHasRetrievedUserUsingTheGraphApi($user);
-		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString, $response);
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$this->featureContext->assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->getJSONSchema($schemaString)
+		);
 	}
 
 	/**
