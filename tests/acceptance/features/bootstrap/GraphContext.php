@@ -209,7 +209,7 @@ class GraphContext implements Context {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
 
