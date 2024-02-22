@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/ccs/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ccs/pkg/storage"
 	"net/http"
+	"strings"
 )
 
 type userPrincipalBackend struct{}
@@ -30,16 +31,34 @@ func (u *userPrincipalBackend) CurrentUserPrincipal(ctx context.Context) (string
 }
 
 type groupwareHandler struct {
-	upBackend userPrincipalBackend
-	// authBackend    auth.AuthProvider
+	upBackend      userPrincipalBackend
 	caldavBackend  caldav.Backend
 	carddavBackend carddav.Backend
 }
 
+func (u *groupwareHandler) handleOptions(w http.ResponseWriter, r *http.Request) error {
+	caps := []string{"1", "3", "calendar-access", "addressbook"}
+	allow := []string{"PROPFIND"}
+
+	w.Header().Add("DAV", strings.Join(caps, ", "))
+	w.Header().Add("Allow", strings.Join(allow, ", "))
+	w.WriteHeader(http.StatusNoContent)
+	return nil
+}
+
 func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		err := u.handleOptions(w, r)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
+		return
+	}
+
 	userPrincipalPath, err := u.upBackend.CurrentUserPrincipal(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 
 	// Home-Set Folders Discovery
@@ -47,12 +66,14 @@ func (u *groupwareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path, err := u.caldavBackend.CalendarHomeSetPath(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	} else {
 		homeSets = append(homeSets, caldav.NewCalendarHomeSet(path))
 	}
 	path, err = u.carddavBackend.AddressBookHomeSetPath(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	} else {
 		homeSets = append(homeSets, carddav.NewAddressBookHomeSet(path))
 	}
