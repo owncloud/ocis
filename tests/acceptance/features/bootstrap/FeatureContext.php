@@ -1207,6 +1207,75 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * Validates against the requirements that array schema must adhere to
+	 *
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
+		$requiredValidators = ["maxItems", "minItems", "items"];
+		$optionalValidators = ["uniqueItems"];
+		$errMsg = "'%s' is required for array assertion";
+
+		foreach ($requiredValidators as $validator) {
+			$value = $schemaObj->$validator;
+			Assert::assertNotNull($value, sprintf($errMsg, $validator));
+
+			if ($validator === "items") {
+				Assert::assertIsObject($value, "'$validator' must be an object");
+				if ($value->allOf || $value->anyOf) {
+					Assert::fail("'allOf' and 'anyOf' are not allowed in array items");
+				}
+				if ($schemaObj->minItems > 1 && $value->oneOf !== null) {
+					$items = $value->oneOf;
+					Assert::assertIsArray($items, "'oneOf' must be an array");
+					Assert::assertEquals($schemaObj->minItems, \count($items), "There are more 'oneOf' items than expected by 'minItems'");
+					return;
+				}
+				Assert::fail("'oneOf' is required to assert more than one items");
+			}
+		}
+
+		foreach ($optionalValidators as $validator) {
+			$value = $schemaObj->$validator;
+			if ($validator === "uniqueItems") {
+				if ($schemaObj->minItems > 1) {
+					$errMsg = $value === null ? sprintf($errMsg, $validator) : "'$validator' must be true";
+					Assert::assertTrue($value, $errMsg);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Validates the json schema requirements
+	 *
+	 * @param JsonSchema $schema
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function validateSchemaRequirements(JsonSchema $schema): void {
+		$propNames = $schema->getPropertyNames();
+		$props = $schema->getProperties();
+		foreach ($propNames as $propName) {
+			switch ($props->$propName->type) {
+				case 'array':
+					$this->validateSchemaArrayEntries($props->$propName);
+					break;
+				default:
+					break;
+			}
+			// traverse for nested properties
+			if ($props->$propName->getProperties()) {
+				$this->validateSchemaRequirements($props->$propName);
+			}
+		}
+	}
+
+	/**
 	 * @param object $json
 	 * @param object $schema
 	 *
@@ -1215,6 +1284,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function assertJsonDocumentMatchesSchema(object $json, object $schema): void {
 		$schema = JsonSchema::import($schema);
+		$this->validateSchemaRequirements($schema);
 		$schema->in($json);
 	}
 
