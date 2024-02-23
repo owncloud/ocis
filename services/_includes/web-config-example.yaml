@@ -88,6 +88,7 @@ web:
     - pdf-viewer
     - external
     - admin-settings
+    - epub-reader
     applications: []
     external_apps:
     - id: preview
