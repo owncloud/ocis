@@ -262,6 +262,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/deletePermissions.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L141)
 - [apiSharingNg/deletePermissions.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L161)
 - [apiSharingNg/deletePermissions.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L179)
+- [apiSharingNg/listPermissions.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/listPermissions.feature#L10)
+- [apiSharingNg/listPermissions.feature:166](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/listPermissions.feature#L166)
+- [apiSharingNg/listPermissions.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/listPermissions.feature#L283)
+- [apiSharingNg/listPermissions.feature:431](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/listPermissions.feature#L431)
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
