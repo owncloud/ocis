@@ -68,7 +68,7 @@ type Config struct {
 
 	Mode    Mode // DEPRECATED
 	File    string
-	OcisURL string `yaml:"ocis_url" desc:"URL, where oCIS is reachable for users."`
+	OcisURL string `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 
 	Registry          string               `yaml:"registry"`
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`

@@ -32,7 +32,7 @@ func DefaultConfig() *config.Config {
 			Protocol:  "tcp",
 			Prefix:    "",
 			CORS: config.CORS{
-				AllowedOrigins: []string{"*"},
+				AllowedOrigins: []string{"https://localhost:9200"},
 				AllowedMethods: []string{
 					"OPTIONS",
 					"HEAD",
@@ -73,7 +73,7 @@ func DefaultConfig() *config.Config {
 					"X-HTTP-Method-Override",
 					"Cache-Control",
 				},
-				AllowCredentials: true,
+				AllowCredentials: false,
 			},
 		},
 		GRPC: config.GRPCConfig{
@@ -164,6 +164,11 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
 		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
+	}
+
+	if cfg.HTTP.CORS.AllowedOrigins == nil && cfg.Commons != nil && cfg.Commons.OcisURL != "" ||
+		len(cfg.HTTP.CORS.AllowedOrigins) == 1 && cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200" {
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
 
