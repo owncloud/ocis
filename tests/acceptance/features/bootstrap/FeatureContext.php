@@ -1221,7 +1221,7 @@ class FeatureContext extends BehatVariablesContext {
 
 		// validate required keywords
 		foreach ($requiredValidators as $validator) {
-			Assert::assertNotNull($schemaObj->$validator, sprintf($errMsg, $validator));
+			Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
 		}
 
 		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' must be equal for strict assertion");
@@ -1229,26 +1229,31 @@ class FeatureContext extends BehatVariablesContext {
 		// validate optional keywords
 		foreach ($optionalValidators as $validator) {
 			$value = $schemaObj->$validator;
-			if ($validator === "items" && $schemaObj->maxItems !== 0) {
-				Assert::assertNotNull($schemaObj->$validator, sprintf($errMsg, $validator));
-				Assert::assertIsObject($value, "'$validator' must be an object");
-				if ($value->allOf || $value->anyOf) {
-					Assert::fail("'allOf' and 'anyOf' are not allowed in array items");
-				}
-				if ($schemaObj->maxItems > 1 && $value->oneOf !== null) {
-					$items = $value->oneOf;
-					Assert::assertIsArray($items, "'oneOf' must be an array");
-					Assert::assertEquals($schemaObj->maxItems, \count($items), "There are more 'oneOf' items than expected by 'maxItems'");
-					return;
-				}
-				Assert::fail("'oneOf' is required to assert more than one items");
-			}
-
-			if ($validator === "uniqueItems") {
-				if ($schemaObj->minItems > 1) {
-					$errMsg = $value === null ? sprintf($errMsg, $validator) : "'$validator' must be true";
-					Assert::assertTrue($value, $errMsg);
-				}
+			switch ($validator) {
+				case 'items':
+					if ($schemaObj->maxItems === 0) break;
+					Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
+					if ($schemaObj->maxItems > 1) {
+						if (\is_array($value)){
+							foreach ($value as $element) {
+								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one items");
+							}
+							Assert::fail("'$validator' must be an object not an array");
+							break;
+						}
+						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array items");
+						Assert::assertNotNull($value->oneOf,"'oneOf' is required to assert more than one items");
+						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' items than expected by 'maxItems'");
+					}
+					Assert::assertTrue(\is_object($value), "'$validator' must be an object");
+					break;
+				case "uniqueItems":
+					if ($schemaObj->minItems > 1) {
+						$errMsg = $value === null ? \sprintf($errMsg, $validator) : "'$validator' must be true";
+						Assert::assertTrue($value, $errMsg);
+					}
+				default:
+					break;
 			}
 		}
 	}
