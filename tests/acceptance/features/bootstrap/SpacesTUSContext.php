@@ -297,7 +297,7 @@ class SpacesTUSContext implements Context {
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function userSendsAChunkToTheLastCreatedTusLocationWithOffsetAndDataWithChecksumWithHeaderViaTusInsideOfTheSpaceUsingTheWebdavApi(
+	public function userSendsAChunkToTheLastCreatedTusLocationWithDataInsideOfTheSpaceWithHeaders(
 		string $user,
 		string $data,
 		string $spaceName,

@@ -116,14 +116,14 @@ class TUSContext implements Context {
 	 * @param string $offset
 	 * @param string $data
 	 * @param string $checksum
-	 * @param array $header
+	 * @param array|null $extraHeaders
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = '', ?array $header = null): ResponseInterface {
+	public function sendsAChunkToTUSLocationWithOffsetAndData(string $user, string $offset, string $data, string $checksum = '', ?array $extraHeaders = null): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
@@ -132,7 +132,7 @@ class TUSContext implements Context {
 		'Upload-Checksum' => $checksum,
 		'Upload-Offset' => $offset
 		];
-		$headers = (!empty($header)) ? array_merge($headers, $header) : $headers;
+		$headers = empty($extraHeaders) ? $headers : array_merge($headers, $extraHeaders);
 	
 		return HttpRequestHelper::sendRequest(
 			$this->resourceLocation,
