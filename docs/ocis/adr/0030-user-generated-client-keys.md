@@ -1,5 +1,5 @@
 ---
-title: "30. User generated client keys"
+title: "30. User generated client API keys"
 date: 2024-02-22T15:30:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
