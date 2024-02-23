@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -42,7 +41,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -172,7 +170,7 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 			return errors.Wrap(err, "Decomposedfs: could not remove symlink child entry")
 		}
 	}
-	if errors.Is(err, iofs.ErrNotExist) || link != "../"+n.ID {
+	if errors.Is(err, fs.ErrNotExist) || link != "../"+n.ID {
 		relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
 		if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
 			return errors.Wrap(err, "Decomposedfs: could not symlink child entry")
@@ -529,6 +527,8 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 
 // RestoreRecycleItemFunc returns a node and a function to restore it from the trash.
 func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, targetNode *node.Node) (*node.Node, *node.Node, func() error, error) {
+	logger := appctx.GetLogger(ctx)
+
 	recycleNode, trashItem, deletedNodePath, origin, err := t.readRecycleItem(ctx, spaceid, key, trashPath)
 	if err != nil {
 		return nil, nil, nil, err
@@ -604,7 +604,7 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 			deletePath = filepath.Join(resolvedTrashRoot, trashPath)
 		}
 		if err = os.Remove(deletePath); err != nil {
-			log.Error().Err(err).Str("trashItem", trashItem).Msg("error deleting trash item")
+			logger.Error().Err(err).Str("trashItem", trashItem).Msg("error deleting trash item")
 		}
 
 		var sizeDiff int64
@@ -624,13 +624,22 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 
 // PurgeRecycleItemFunc returns a node and a function to purge it from the trash
 func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, path string) (*node.Node, func() error, error) {
+	logger := appctx.GetLogger(ctx)
+
 	rn, trashItem, deletedNodePath, _, err := t.readRecycleItem(ctx, spaceid, key, path)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	ts := ""
+	timeSuffix := strings.SplitN(filepath.Base(deletedNodePath), node.TrashIDDelimiter, 2)
+	if len(timeSuffix) == 2 {
+		ts = timeSuffix[1]
+	}
+
 	fn := func() error {
-		if err := t.removeNode(ctx, deletedNodePath, rn); err != nil {
+
+		if err := t.removeNode(ctx, deletedNodePath, ts, rn); err != nil {
 			return err
 		}
 
@@ -644,7 +653,7 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 			deletePath = filepath.Join(resolvedTrashRoot, path)
 		}
 		if err = os.Remove(deletePath); err != nil {
-			log.Error().Err(err).Str("deletePath", deletePath).Msg("error deleting trash item")
+			logger.Error().Err(err).Str("deletePath", deletePath).Msg("error deleting trash item")
 			return err
 		}
 
@@ -654,22 +663,41 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 	return rn, fn, nil
 }
 
-func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error {
+func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.Node) error {
+	logger := appctx.GetLogger(ctx)
+
+	if timeSuffix != "" {
+		n.ID = n.ID + node.TrashIDDelimiter + timeSuffix
+	}
+
+	if n.IsDir(ctx) {
+		item, err := t.ListFolder(ctx, n)
+		if err != nil {
+			logger.Error().Err(err).Str("path", path).Msg("error listing folder")
+		} else {
+			for _, child := range item {
+				if err := t.removeNode(ctx, child.InternalPath(), "", child); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	// delete the actual node
 	if err := utils.RemoveItem(path); err != nil {
-		log.Error().Err(err).Str("path", path).Msg("error purging node")
+		logger.Error().Err(err).Str("path", path).Msg("error purging node")
 		return err
 	}
 
 	if err := t.lookup.MetadataBackend().Purge(path); err != nil {
-		log.Error().Err(err).Str("path", t.lookup.MetadataBackend().MetadataPath(path)).Msg("error purging node metadata")
+		logger.Error().Err(err).Str("path", t.lookup.MetadataBackend().MetadataPath(path)).Msg("error purging node metadata")
 		return err
 	}
 
 	// delete blob from blobstore
 	if n.BlobID != "" {
 		if err := t.DeleteBlob(n); err != nil {
-			log.Error().Err(err).Str("blobID", n.BlobID).Msg("error purging nodes blob")
+			logger.Error().Err(err).Str("blobID", n.BlobID).Msg("error purging nodes blob")
 			return err
 		}
 	}
@@ -677,7 +705,7 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 	// delete revisions
 	revs, err := filepath.Glob(n.InternalPath() + node.RevisionIDDelimiter + "*")
 	if err != nil {
-		log.Error().Err(err).Str("path", n.InternalPath()+node.RevisionIDDelimiter+"*").Msg("glob failed badly")
+		logger.Error().Err(err).Str("path", n.InternalPath()+node.RevisionIDDelimiter+"*").Msg("glob failed badly")
 		return err
 	}
 	for _, rev := range revs {
@@ -687,18 +715,18 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 
 		bID, err := t.lookup.ReadBlobIDAttr(ctx, rev)
 		if err != nil {
-			log.Error().Err(err).Str("revision", rev).Msg("error reading blobid attribute")
+			logger.Error().Err(err).Str("revision", rev).Msg("error reading blobid attribute")
 			return err
 		}
 
 		if err := utils.RemoveItem(rev); err != nil {
-			log.Error().Err(err).Str("revision", rev).Msg("error removing revision node")
+			logger.Error().Err(err).Str("revision", rev).Msg("error removing revision node")
 			return err
 		}
 
 		if bID != "" {
 			if err := t.DeleteBlob(&node.Node{SpaceID: n.SpaceID, BlobID: bID}); err != nil {
-				log.Error().Err(err).Str("revision", rev).Str("blobID", bID).Msg("error removing revision node blob")
+				logger.Error().Err(err).Str("revision", rev).Str("blobID", bID).Msg("error removing revision node blob")
 				return err
 			}
 		}
@@ -761,6 +789,8 @@ var nodeIDRegep = regexp.MustCompile(`.*/nodes/([^.]*).*`)
 
 // TODO refactor the returned params into Node properties? would make all the path transformations go away...
 func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (recycleNode *node.Node, trashItem string, deletedNodePath string, origin string, err error) {
+	logger := appctx.GetLogger(ctx)
+
 	if key == "" {
 		return nil, "", "", "", errtypes.InternalError("key is empty")
 	}
@@ -823,7 +853,7 @@ func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (
 	if attrBytes, err = backend.Get(ctx, resolvedTrashItem, prefixes.TrashOriginAttr); err == nil {
 		origin = filepath.Join(string(attrBytes), path)
 	} else {
-		log.Error().Err(err).Str("trashItem", trashItem).Str("deletedNodePath", deletedNodePath).Msg("could not read origin path, restoring to /")
+		logger.Error().Err(err).Str("trashItem", trashItem).Str("deletedNodePath", deletedNodePath).Msg("could not read origin path, restoring to /")
 	}
 
 	return

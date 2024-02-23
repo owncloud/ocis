@@ -2048,7 +2048,7 @@ class SpacesContext implements Context {
 		if ($toSpaceName === 'Shares') {
 			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
 			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
-			$headers['Destination'] = $baseUrl . $davPath . $sharesPath;
+			$headers['Destination'] = $baseUrl . "/$davPath" . $sharesPath;
 		} else {
 			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
 		}
@@ -2058,6 +2058,48 @@ class SpacesContext implements Context {
 		} elseif ($actionType === 'moves' || $actionType === 'renames') {
 			$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path "([^"]*)"$/
+	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $sourceSpace
+	 * @param string $destinationType
+	 * @param string $destinationName
+	 * @param string $destinationPath
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function userMovesFileToResourceUsingItsIdAsDestinationPath(
+		string $user,
+		string $source,
+		string $sourceSpace,
+		string $destinationType,
+		string $destinationName,
+		string $destinationPath
+	): void {
+		$source = \trim($source, "/");
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$suffix = "";
+		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
+			$suffix = $this->getSpaceIdByName($user, $sourceSpace) . "/";
+		}
+		$fullUrl = $baseUrl . \rtrim($destinationPath, "/") . "/{$suffix}{$source}";
+
+		$destinationId = "";
+		if ($destinationType === "space") {
+			$destinationId = $this->getSpaceIdByName($user, $destinationName);
+		} else {
+			$destinationId = $this->getResourceId($user, $sourceSpace, $destinationName);
+		}
+		$headers['Destination'] = $baseUrl . \rtrim($destinationPath, "/") . "/$destinationId";
+
+		$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -2188,6 +2230,11 @@ class SpacesContext implements Context {
 			"expireDate" => $rows["expireDate"],
 			"role" => $rows["role"]
 		];
+
+		// share with custom permission
+		if (isset($rows["permissions"])) {
+			$body["permissions"] = $rows["permissions"];
+		}
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 		$response = $this->sendPostRequestToUrl(

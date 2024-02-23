@@ -1752,9 +1752,12 @@ trait WebDav {
 			} else {
 				$actualResourceType = "folder";
 			}
-			Assert::fail(
-				"$entry '$path' should not exist. But it does exist and is a $actualResourceType"
-			);
+
+			if ($entry === $actualResourceType) {
+				Assert::fail(
+					"$entry '$path' should not exist. But it does."
+				);
+			}
 		}
 	}
 
@@ -4997,7 +5000,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -5024,7 +5027,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $destination);
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . $davPath . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -5763,7 +5766,7 @@ trait WebDav {
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
-		$spacesBaseUrl = webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
+		$spacesBaseUrl = "/" . webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
 		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
 		$results = [];
 		foreach ($searchResults as $item) {

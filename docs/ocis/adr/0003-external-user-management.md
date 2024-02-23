@@ -8,7 +8,7 @@ geekdocFilePath: 0003-external-user-management.md
 ---
 
 * Status: superseded by [17. Allow read only external User Management]({{< ref "0017-allow-read-only-external-user-management.md" >}})
-* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1)
 * Date: 2022-02-08
 
 Technical Story: [Skip account-service by talking to CS3 user-api](https://github.com/owncloud/ocis/pull/1020)

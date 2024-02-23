@@ -308,7 +308,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:  "to",
-				Value: "cs3",
+				Value: "jsoncs3",
 				Usage: "Share manager to import the data into",
 			},
 		},
@@ -403,7 +403,7 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:  "to",
-				Value: "cs3",
+				Value: "jsoncs3",
 				Usage: "Public share manager to import the data into",
 			},
 		},

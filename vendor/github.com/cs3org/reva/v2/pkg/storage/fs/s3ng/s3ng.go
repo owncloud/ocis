@@ -44,7 +44,16 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 		return nil, fmt.Errorf("S3 configuration incomplete")
 	}
 
-	bs, err := blobstore.New(o.S3Endpoint, o.S3Region, o.S3Bucket, o.S3AccessKey, o.S3SecretKey)
+	defaultPutOptions := blobstore.Options{
+		DisableContentSha256:  o.DisableContentSha256,
+		DisableMultipart:      o.DisableMultipart,
+		SendContentMd5:        o.SendContentMd5,
+		ConcurrentStreamParts: o.ConcurrentStreamParts,
+		NumThreads:            o.NumThreads,
+		PartSize:              o.PartSize,
+	}
+
+	bs, err := blobstore.New(o.S3Endpoint, o.S3Region, o.S3Bucket, o.S3AccessKey, o.S3SecretKey, defaultPutOptions)
 	if err != nil {
 		return nil, err
 	}

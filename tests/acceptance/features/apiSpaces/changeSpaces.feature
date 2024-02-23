@@ -167,61 +167,61 @@ Feature: Change data of space
         },
         "special": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "size",
-                "name",
-                "specialFolder",
-                "file",
-                "id",
-                "eTag"
-              ],
-              "properties": {
-                "size": {
-                  "type": "number",
-                  "enum": [17]
-                },
-                "name": {
-                  "type": "string",
-                  "enum": ["readme.md"]
-                },
-                "specialFolder": {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "enum": ["readme"]
-                    }
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "size",
+              "name",
+              "specialFolder",
+              "file",
+              "id",
+              "eTag"
+            ],
+            "properties": {
+              "size": {
+                "type": "number",
+                "enum": [17]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["readme.md"]
+              },
+              "specialFolder": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["readme"]
                   }
-                },
-                "file": {
-                  "type": "object",
-                  "required": [
-                    "mimeType"
-                  ],
-                  "properties": {
-                    "mimeType": {
-                      "type": "string",
-                      "enum": ["text/markdown"]
-                    }
-                  }
-                },
-                "id": {
-                  "type": "string",
-                  "enum": ["%file_id%"]
-                },
-                "tag": {
-                  "type": "string",
-                  "enum": ["%eTag%"]
                 }
+              },
+              "file": {
+                "type": "object",
+                "required": [
+                  "mimeType"
+                ],
+                "properties": {
+                  "mimeType": {
+                    "type": "string",
+                    "enum": ["text/markdown"]
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "enum": ["%file_id%"]
+              },
+              "tag": {
+                "type": "string",
+                "enum": ["%eTag%"]
               }
             }
-          ]
+          }
         }
       }
     }
@@ -262,61 +262,61 @@ Feature: Change data of space
         },
         "special": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "size",
-                "name",
-                "specialFolder",
-                "file",
-                "id",
-                "eTag"
-              ],
-              "properties": {
-                "size": {
-                  "type": "number",
-                  "enum": [0]
-                },
-                "name": {
-                  "type": "string",
-                  "enum": ["<nameInResponse>"]
-                },
-                "specialFolder": {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "enum": ["image"]
-                    }
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "size",
+              "name",
+              "specialFolder",
+              "file",
+              "id",
+              "eTag"
+            ],
+            "properties": {
+              "size": {
+                "type": "number",
+                "enum": [0]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["<nameInResponse>"]
+              },
+              "specialFolder": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["image"]
                   }
-                },
-                "file": {
-                  "type": "object",
-                  "required": [
-                    "mimeType"
-                  ],
-                  "properties": {
-                   "mimeType": {
-                      "type": "string",
-                      "enum": ["<mimeType>"]
-                    }
-                  }
-                },
-                "id": {
-                  "type": "string",
-                  "enum": ["%file_id%"]
-                },
-                "tag": {
-                  "type": "string",
-                  "enum": ["%eTag%"]
                 }
+              },
+              "file": {
+                "type": "object",
+                "required": [
+                  "mimeType"
+                ],
+                "properties": {
+                  "mimeType": {
+                    "type": "string",
+                    "enum": ["<mimeType>"]
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "enum": ["%file_id%"]
+              },
+              "tag": {
+                "type": "string",
+                "enum": ["%eTag%"]
               }
             }
-          ]
+          }
         }
       }
     }
@@ -359,61 +359,61 @@ Feature: Change data of space
         },
         "special": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "size",
-                "name",
-                "specialFolder",
-                "file",
-                "id",
-                "eTag"
-              ],
-              "properties": {
-                "size": {
-                  "type": "number",
-                  "enum": [<expectedSize>]
-                },
-                "name": {
-                  "type": "string",
-                  "enum": ["readme.md"]
-                },
-                "specialFolder": {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "enum": ["readme"]
-                    }
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "size",
+              "name",
+              "specialFolder",
+              "file",
+              "id",
+              "eTag"
+            ],
+            "properties": {
+              "size": {
+                "type": "number",
+                "enum": [<expectedSize>]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["readme.md"]
+              },
+              "specialFolder": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["readme"]
                   }
-                },
-                "file": {
-                  "type": "object",
-                  "required": [
-                    "mimeType"
-                  ],
-                  "properties": {
-                    "mimeType": {
-                      "type": "string",
-                      "enum": ["text/markdown"]
-                    }
-                  }
-                },
-                "id": {
-                  "type": "string",
-                  "enum": ["%file_id%"]
-                },
-                "tag": {
-                  "type": "string",
-                  "enum": ["%eTag%"]
                 }
+              },
+              "file": {
+                "type": "object",
+                "required": [
+                  "mimeType"
+                ],
+                "properties": {
+                  "mimeType": {
+                    "type": "string",
+                    "enum": ["text/markdown"]
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "enum": ["%file_id%"]
+              },
+              "tag": {
+                "type": "string",
+                "enum": ["%eTag%"]
               }
             }
-          ]
+          }
         }
       }
     }
@@ -447,61 +447,61 @@ Feature: Change data of space
         },
         "special": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "size",
-                "name",
-                "specialFolder",
-                "file",
-                "id",
-                "eTag"
-              ],
-              "properties": {
-                "size": {
-                  "type": "number",
-                  "enum": [0]
-                },
-                "name": {
-                  "type": "string",
-                  "enum": ["newSpaceImage.png"]
-                },
-                "specialFolder": {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "enum": ["image"]
-                    }
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "size",
+              "name",
+              "specialFolder",
+              "file",
+              "id",
+              "eTag"
+            ],
+            "properties": {
+              "size": {
+                "type": "number",
+                "enum": [0]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["newSpaceImage.png"]
+              },
+              "specialFolder": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["image"]
                   }
-                },
-                "file": {
-                  "type": "object",
-                  "required": [
-                    "mimeType"
-                  ],
-                  "properties": {
-                    "mimeType": {
-                      "type": "string",
-                      "enum": ["image/png"]
-                    }
-                  }
-                },
-                "id": {
-                  "type": "string",
-                  "enum": ["%file_id%"]
-                },
-                "tag": {
-                  "type": "string",
-                  "enum": ["%eTag%"]
                 }
+              },
+              "file": {
+                "type": "object",
+                "required": [
+                  "mimeType"
+                ],
+                "properties": {
+                  "mimeType": {
+                    "type": "string",
+                    "enum": ["image/png"]
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "enum": ["%file_id%"]
+              },
+              "tag": {
+                "type": "string",
+                "enum": ["%eTag%"]
               }
             }
-          ]
+          }
         }
       }
     }

@@ -1,3 +1,12 @@
+Release v1.3.0
+==============
+
+**New Features**
+
+* Add support for double-quotes in filter path queries.
+* Add `PreserveDuplicateAttrs` to `ReadSettings`.
+* Add `ReindexChildren` to `Element`.
+
 Release v1.2.0
 ==============
 

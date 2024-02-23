@@ -55,6 +55,7 @@ type config struct {
 	Drivers               map[string]map[string]interface{} `mapstructure:"drivers"`
 	GatewayAddr           string                            `mapstructure:"gateway_addr"`
 	AllowedPathsForShares []string                          `mapstructure:"allowed_paths_for_shares"`
+	DisableResharing      bool                              `mapstructure:"disable_resharing"`
 }
 
 func (c *config) init() {
@@ -67,6 +68,7 @@ type service struct {
 	sm                    share.Manager
 	gatewaySelector       pool.Selectable[gateway.GatewayAPIClient]
 	allowedPathsForShares []*regexp.Regexp
+	disableResharing      bool
 }
 
 func getShareManager(c *config) (share.Manager, error) {
@@ -127,15 +129,16 @@ func NewDefault(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error
 		return nil, err
 	}
 
-	return New(gatewaySelector, sm, allowedPathsForShares), nil
+	return New(gatewaySelector, sm, allowedPathsForShares, c.DisableResharing), nil
 }
 
 // New creates a new user share provider svc
-func New(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], sm share.Manager, allowedPathsForShares []*regexp.Regexp) rgrpc.Service {
+func New(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], sm share.Manager, allowedPathsForShares []*regexp.Regexp, disableResharing bool) rgrpc.Service {
 	service := &service{
 		sm:                    sm,
 		gatewaySelector:       gatewaySelector,
 		allowedPathsForShares: allowedPathsForShares,
+		disableResharing:      disableResharing,
 	}
 
 	return service
@@ -156,6 +159,13 @@ func (s *service) isPathAllowed(path string) bool {
 func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
 	log := appctx.GetLogger(ctx)
 	user := ctxpkg.ContextMustGetUser(ctx)
+
+	// when resharing is disabled grants must not allow grant permissions
+	if s.disableResharing && HasGrantPermissions(req.GetGrant().GetPermissions().GetPermissions()) {
+		return &collaboration.CreateShareResponse{
+			Status: status.NewInvalidArg(ctx, "resharing not supported"),
+		}, nil
+	}
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -233,6 +243,10 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 		Status: status.NewOK(ctx),
 		Share:  createdShare,
 	}, nil
+}
+
+func HasGrantPermissions(p *provider.ResourcePermissions) bool {
+	return p.GetAddGrant() || p.GetUpdateGrant() || p.GetRemoveGrant() || p.GetDenyGrant()
 }
 
 func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShareRequest) (*collaboration.RemoveShareResponse, error) {
@@ -327,6 +341,14 @@ func (s *service) ListShares(ctx context.Context, req *collaboration.ListSharesR
 func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
 	log := appctx.GetLogger(ctx)
 	user := ctxpkg.ContextMustGetUser(ctx)
+
+	// when resharing is disabled grants must not allow grant permissions
+	if s.disableResharing && HasGrantPermissions(req.GetShare().GetPermissions().GetPermissions()) {
+		return &collaboration.UpdateShareResponse{
+			Status: status.NewInvalidArg(ctx, "resharing not supported"),
+		}, nil
+	}
+
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err

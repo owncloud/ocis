@@ -8,7 +8,7 @@ geekdocFilePath: 0008-configuration.md
 ---
 
 * Status: proposed
-* Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
+* Deciders: [@refs](https://github.com/refs), [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@pmaier1](https://github.com/pmaier1)
 * Date: 2021-05-03
 
 ## Context and Problem Statement

@@ -8,7 +8,7 @@ geekdocFilePath: 0010-policy-enforcement.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1), [@fschade](https://github.com/fschade)
 * Date: 2021-06-30
 
 ## Context and Problem Statement

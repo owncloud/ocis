@@ -131,35 +131,35 @@ Feature: get groups and their members
       "properties": {
         "members": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "onPremisesSamAccountName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Brian Murphy"]
-                },
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["brian@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Brian"]
-                }
+          "maxItems": 1,
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "displayName",
+              "id",
+              "mail",
+              "onPremisesSamAccountName"
+            ],
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "enum": ["Brian Murphy"]
+              },
+              "id" : {
+                "type": "string",
+                "pattern": "^%user_id_pattern%$"
+              },
+              "mail": {
+                "type": "string",
+                "enum": ["brian@example.org"]
+              },
+              "onPremisesSamAccountName": {
+                "type": "string",
+                "enum": ["Brian"]
               }
             }
-          ]
+          }
         }
       }
     }
@@ -174,62 +174,67 @@ Feature: get groups and their members
       "properties": {
         "members": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "onPremisesSamAccountName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Alice Hansen"]
-                },
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["alice@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Alice"]
+          "maxItems": 2,
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Alice Hansen"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["alice@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Alice"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Carol King"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["carol@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Carol"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "onPremisesSamAccountName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Carol King"]
-                },
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["carol@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Carol"]
-                }
-              }
-            }
-          ]
+            ]
+          }
         }
       }
     }
@@ -291,62 +296,67 @@ Feature: get groups and their members
       "properties": {
         "members": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "onPremisesSamAccountName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Alice Hansen"]
-                },
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["alice@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Alice"]
+          "maxItems": 2,
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Alice Hansen"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["alice@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Alice"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Brian Murphy"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["brian@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Brian"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "onPremisesSamAccountName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Brian Murphy"]
-                },
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["brian@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Brian"]
-                }
-              }
-            }
-          ]
+            ]
+          }
         }
       }
     }
@@ -471,23 +481,27 @@ Feature: get groups and their members
       "properties": {
         "value": {
           "type": "array",
-          "required": [
-            "displayName",
-            "id",
-            "groupTypes"
-          ],
-          "properties": {
-            "displayName": {
-              "type": "string",
-              "enum": ["tea-lover"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "%group_id_pattern%"
-            },
-            "groupTypes": {
-              "type": "array",
-              "enum": []
+          "maxItems": 1,
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "displayName",
+              "id",
+              "groupTypes"
+            ],
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "enum": ["tea-lover"]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "%group_id_pattern%"
+              },
+              "groupTypes": {
+                "const": []
+              }
             }
           }
         }

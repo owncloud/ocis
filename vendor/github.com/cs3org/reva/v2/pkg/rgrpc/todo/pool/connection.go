@@ -90,7 +90,7 @@ func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
 		),
-		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor(
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
 			otelgrpc.WithTracerProvider(
 				options.tracerProvider,
 			),
@@ -98,16 +98,6 @@ func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 				rtrace.Propagator,
 			),
 		)),
-		grpc.WithUnaryInterceptor(
-			otelgrpc.UnaryClientInterceptor(
-				otelgrpc.WithTracerProvider(
-					options.tracerProvider,
-				),
-				otelgrpc.WithPropagators(
-					rtrace.Propagator,
-				),
-			),
-		),
 	)
 	if err != nil {
 		return nil, err

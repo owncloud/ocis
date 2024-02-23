@@ -299,10 +299,10 @@ func indentLF(n int, source string) string {
 	}
 }
 
-// nextIndex returns the index of the next occurrence of sep in s,
-// starting from offset.  It returns -1 if the sep string is not found.
-func nextIndex(s, sep string, offset int) int {
-	switch i := strings.Index(s[offset:], sep); i {
+// nextIndex returns the index of the next occurrence of byte ch in s,
+// starting from offset.  It returns -1 if the byte is not found.
+func nextIndex(s string, ch byte, offset int) int {
+	switch i := strings.IndexByte(s[offset:], ch); i {
 	case -1:
 		return -1
 	default:
