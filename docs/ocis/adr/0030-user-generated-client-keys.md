@@ -4,7 +4,7 @@ date: 2024-02-22T15:30:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
-geekdocFilePath: 0030-user-generated-client-keys.md
+geekdocFilePath: 0030-user-generated-client-api-keys.md
 ---
 
 * Status: draft
