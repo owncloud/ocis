@@ -1207,7 +1207,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Validates against the requirements that array schema must adhere to
+	 * Validates against the requirements that array schema should adhere to
 	 *
 	 * @param JsonSchema $schemaObj
 	 *
@@ -1215,6 +1215,13 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
+		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
+		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
+		if ($schemaObj->enum || $schemaObj->const){
+			// do not try to validate of enum or const is present
+			return;
+		}
+
 		$requiredValidators = ["maxItems", "minItems"];
 		$optionalValidators = ["items", "uniqueItems"];
 		$errMsg = "'%s' is required for array assertion";
@@ -1224,7 +1231,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
 		}
 
-		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' must be equal for strict assertion");
+		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' should be equal for strict assertion");
 
 		// validate optional keywords
 		foreach ($optionalValidators as $validator) {
@@ -1236,20 +1243,21 @@ class FeatureContext extends BehatVariablesContext {
 					if ($schemaObj->maxItems > 1) {
 						if (\is_array($value)){
 							foreach ($value as $element) {
-								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one items");
+								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one elements");
 							}
-							Assert::fail("'$validator' must be an object not an array");
+							Assert::fail("'$validator' should be an object not an array");
 							break;
 						}
-						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array items");
-						Assert::assertNotNull($value->oneOf,"'oneOf' is required to assert more than one items");
-						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' items than expected by 'maxItems'");
+						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
+						Assert::assertNotNull($value->oneOf,"'oneOf' is required to assert more than one elements");
+						Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
+						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' elements than expected by 'maxItems'");
 					}
-					Assert::assertTrue(\is_object($value), "'$validator' must be an object");
+					Assert::assertTrue(\is_object($value), "'$validator' should be an object when expecting 1 element");
 					break;
 				case "uniqueItems":
 					if ($schemaObj->minItems > 1) {
-						$errMsg = $value === null ? \sprintf($errMsg, $validator) : "'$validator' must be true";
+						$errMsg = $value === null ? \sprintf($errMsg, $validator) : "'$validator' should be true";
 						Assert::assertTrue($value, $errMsg);
 					}
 				default:
@@ -1273,6 +1281,14 @@ class FeatureContext extends BehatVariablesContext {
 			switch ($props->$propName->type) {
 				case 'array':
 					$this->validateSchemaArrayEntries($props->$propName);
+					$items = $props->$propName->items;
+					if ($items && $items->oneOf){
+						foreach($items->oneOf as $oneOfItem) {
+							$this->validateSchemaRequirements($oneOfItem);
+						}
+						break;
+					}
+					elseif ($items) $this->validateSchemaRequirements($items);
 					break;
 				default:
 					break;
