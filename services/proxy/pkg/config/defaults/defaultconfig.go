@@ -73,6 +73,12 @@ func DefaultConfig() *config.Config {
 		PreSignedURL: config.PreSignedURL{
 			AllowedHTTPMethods: []string{"GET"},
 			Enabled:            true,
+			SigningKeys: &config.SigningKeys{
+				Store:              "nats-js-kv", // signing keys are written by ocs, so we cannot use memory. It is not shared.
+				Nodes:              []string{"127.0.0.1:9233"},
+				TTL:                time.Hour * 12,
+				DisablePersistence: true,
+			},
 		},
 		AccountBackend:        "cs3",
 		UserOIDCClaim:         "preferred_username",

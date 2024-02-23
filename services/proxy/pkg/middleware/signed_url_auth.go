@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
@@ -13,11 +12,10 @@ import (
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	microstore "go-micro.dev/v4/store"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -46,7 +44,7 @@ type SignedURLAuthenticator struct {
 	PreSignedURLConfig config.PreSignedURL
 	UserProvider       backend.UserBackend
 	UserRoleAssigner   userroles.UserRoleAssigner
-	Store              storesvc.StoreService
+	Store              microstore.Store
 	Now                func() time.Time
 }
 
@@ -147,17 +145,17 @@ func (m SignedURLAuthenticator) urlIsExpired(query url.Values) (err error) {
 
 func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) {
 	c := revactx.ContextMustGetUser(req.Context())
-	signingKey, err := m.getSigningKey(req.Context(), c.Id.OpaqueId)
+	signingKey, err := m.Store.Read(c.Id.OpaqueId)
 	if err != nil {
 		m.Logger.Error().Err(err).Msg("could not retrieve signing key")
 		return err
 	}
-	if len(signingKey) == 0 {
+	if len(signingKey[0].Value) == 0 {
 		m.Logger.Error().Err(err).Msg("signing key empty")
 		return err
 	}
 	u := m.buildUrlToSign(req)
-	computedSignature := m.createSignature(u, signingKey)
+	computedSignature := m.createSignature(u, signingKey[0].Value)
 	signatureInURL := req.URL.Query().Get(_paramOCSignature)
 	if computedSignature == signatureInURL {
 		return nil
@@ -204,21 +202,6 @@ func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) s
 	// fo golangs pbkdf2.Key we need to use 32 because it will be encoded into 64 hexits later
 	hash := pbkdf2.Key([]byte(url), signingKey, 10000, 32, sha512.New)
 	return hex.EncodeToString(hash)
-}
-
-func (m SignedURLAuthenticator) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
-	res, err := m.Store.Read(ctx, &storesvc.ReadRequest{
-		Options: &storemsg.ReadOptions{
-			Database: "proxy",
-			Table:    "signing-keys",
-		},
-		Key: ocisID,
-	})
-	if err != nil || len(res.Records) < 1 {
-		return nil, err
-	}
-
-	return res.Records[0].Value, nil
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via signed URL auth.
