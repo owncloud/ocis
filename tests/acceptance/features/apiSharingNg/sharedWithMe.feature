@@ -32,6 +32,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -210,90 +212,90 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": [
-                              "user"
-                            ],
-                            "properties": {
-                              "user": {
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Brian Murphy"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": [
+                            "user"
+                          ],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Brian Murphy"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
                                 }
                               }
                             }
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
-                                      }
+                          }
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "properties": {
+                            "invitedBy": {
+                              "type": "object",
+                              "properties": {
+                                "user": {
+                                  "type": "object",
+                                  "properties": {
+                                    "displayName": {
+                                      "type": "string",
+                                      "enum": ["Alice Hansen"]
                                     },
-                                    "required": [
-                                      "displayName",
-                                      "id"
-                                    ]
-                                  }
-                                },
-                                "required": [
-                                  "user"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "invitedBy"
-                            ]
+                                    "id": {
+                                      "type": "string",
+                                      "pattern": "^%user_id_pattern%$"
+                                    }
+                                  },
+                                  "required": [
+                                    "displayName",
+                                    "id"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "user"
+                              ]
+                            }
                           },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                          "required": [
+                            "invitedBy"
+                          ]
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "string",
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   }
                 }
               },
@@ -329,6 +331,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -500,90 +504,90 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": [
-                              "user"
-                            ],
-                            "properties": {
-                              "user": {
-                                "type": "object",
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Brian Murphy"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": [
+                            "user"
+                          ],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Brian Murphy"]
                                 },
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ]
-                              }
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              },
+                              "required": [
+                                "displayName",
+                                "id"
+                              ]
+                            }
+                          }
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "properties": {
+                            "invitedBy": {
+                              "type": "object",
+                              "properties": {
+                                "user": {
+                                  "type": "object",
+                                  "properties": {
+                                    "displayName": {
+                                      "type": "string",
+                                      "enum": ["Alice Hansen"]
+                                    },
+                                    "id": {
+                                      "type": "string",
+                                      "pattern": "^%user_id_pattern%$"
+                                    }
+                                  },
+                                  "required": [
+                                    "displayName",
+                                    "id"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "user"
+                              ]
                             }
                           },
-                          "invitation": {
-                            "type": "object",
-                            "properties": {
-                              "invitedBy": {
-                                "type": "object",
-                                "properties": {
-                                  "user": {
-                                    "type": "object",
-                                    "properties": {
-                                      "displayName": {
-                                        "type": "string",
-                                        "enum": ["Alice Hansen"]
-                                      },
-                                      "id": {
-                                        "type": "string",
-                                        "pattern": "^%user_id_pattern%$"
-                                      }
-                                    },
-                                    "required": [
-                                      "displayName",
-                                      "id"
-                                    ]
-                                  }
-                                },
-                                "required": [
-                                  "user"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "invitedBy"
-                            ]
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                          "required": [
+                            "invitedBy"
+                          ]
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "string",
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   }
                 }
               }
@@ -624,6 +628,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -870,12 +876,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         },
@@ -944,12 +950,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         }
@@ -1009,6 +1015,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -1204,12 +1212,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         },
@@ -1278,12 +1286,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         }
@@ -1341,6 +1349,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -1567,12 +1577,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         },
@@ -1641,12 +1651,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         }
@@ -1694,6 +1704,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -1869,12 +1881,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         },
@@ -1943,12 +1955,12 @@ Feature: an user gets the resources shared to them
                             },
                             "roles": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "string",
-                                  "pattern": "^%role_id_pattern%$"
-                                }
-                              ]
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "items": {
+                                "type": "string",
+                                "pattern": "^%role_id_pattern%$"
+                              }
                             }
                           }
                         }
@@ -1986,6 +1998,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -2156,78 +2170,76 @@ Feature: an user gets the resources shared to them
                     "type": "array",
                     "maxItems": 1,
                     "minItems": 1,
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": ["group"],
-                            "properties":{
-                              "group": {
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["grp1"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["grp1"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
                                 }
                               }
                             }
-                          },
-                          "id": {
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Alice Hansen"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
                             "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "user":{
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Alice Hansen"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   },
                   "size": {
                     "type": "number",
@@ -2270,6 +2282,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -2392,78 +2406,76 @@ Feature: an user gets the resources shared to them
                     "type": "array",
                     "maxItems": 1,
                     "minItems": 1,
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": ["group"],
-                            "properties":{
-                              "group": {
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["grp1"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["grp1"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
                                 }
                               }
                             }
-                          },
-                          "id": {
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Alice Hansen"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
                             "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "user":{
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Alice Hansen"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   },
                   "size": {
                     "type": "number",
@@ -2505,6 +2517,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -2645,78 +2659,76 @@ Feature: an user gets the resources shared to them
                     "type": "array",
                     "maxItems": 1,
                     "minItems": 1,
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": ["group"],
-                            "properties":{
-                              "group": {
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["grp1"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["grp1"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
                                 }
                               }
                             }
-                          },
-                          "id": {
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Alice Hansen"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
                             "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "user":{
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Alice Hansen"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   }
                 }
               }
@@ -2751,6 +2763,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -2852,78 +2866,76 @@ Feature: an user gets the resources shared to them
                     "type": "array",
                     "maxItems": 1,
                     "minItems": 1,
-                    "items": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "grantedToV2",
-                          "id",
-                          "invitation",
-                          "roles"
-                        ],
-                        "properties": {
-                          "grantedToV2": {
-                            "type": "object",
-                            "required": ["group"],
-                            "properties":{
-                              "group": {
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["grp1"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["grp1"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
                                 }
                               }
                             }
-                          },
-                          "id": {
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "type": "string",
+                                  "enum": ["Alice Hansen"]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "maxItems": 1,
+                          "minItems": 1,
+                          "items": {
                             "type": "string",
-                            "pattern": "^%permissions_id_pattern%$"
-                          },
-                          "invitation": {
-                            "type": "object",
-                            "required": ["invitedBy"],
-                            "properties": {
-                              "user":{
-                                "type": "object",
-                                "required": [
-                                  "displayName",
-                                  "id"
-                                ],
-                                "properties": {
-                                  "displayName": {
-                                    "type": "string",
-                                    "enum": ["Alice Hansen"]
-                                  },
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^%user_id_pattern%$"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "roles": {
-                            "type": "array",
-                            "items": [
-                              {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            ]
+                            "pattern": "^%role_id_pattern%$"
                           }
                         }
                       }
-                    ]
+                    }
                   }
                 }
               }
@@ -3044,12 +3056,34 @@ Feature: an user gets the resources shared to them
                         },
                         "permissions": {
                           "type": "array",
-                          "items": [
-                            {
+                          "maxItems": 1,
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "required": ["grantedToV2", "id", "invitation", "roles"],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "invitation": {
                               "type": "object",
-                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "required": ["invitedBy"],
                               "properties": {
-                                "grantedToV2": {
+                                "invitedBy": {
                                   "type": "object",
                                   "required": ["user"],
                                   "properties": {
@@ -3059,29 +3093,7 @@ Feature: an user gets the resources shared to them
                                       "properties": {
                                         "displayName": {
                                           "type": "string",
-                                          "enum": ["Brian Murphy"]
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "invitation": {
-                                "type": "object",
-                                "required": ["invitedBy"],
-                                "properties": {
-                                  "invitedBy": {
-                                    "type": "object",
-                                    "required": ["user"],
-                                    "properties": {
-                                      "user": {
-                                        "type": "object",
-                                        "required": ["displayName", "id"],
-                                        "properties": {
-                                          "displayName": {
-                                            "type": "string",
-                                            "enum": ["Carol King"]
-                                          }
+                                          "enum": ["Carol King"]
                                         }
                                       }
                                     }
@@ -3089,7 +3101,7 @@ Feature: an user gets the resources shared to them
                                 }
                               }
                             }
-                          ]
+                          }
                         }
                       }
                     }
@@ -3173,12 +3185,34 @@ Feature: an user gets the resources shared to them
                         },
                         "permissions": {
                           "type": "array",
-                          "items": [
-                            {
+                          "maxItems": 1,
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "required": ["grantedToV2", "id", "invitation", "roles"],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "invitation": {
                               "type": "object",
-                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "required": ["invitedBy"],
                               "properties": {
-                                "grantedToV2": {
+                                "invitedBy": {
                                   "type": "object",
                                   "required": ["user"],
                                   "properties": {
@@ -3188,29 +3222,7 @@ Feature: an user gets the resources shared to them
                                       "properties": {
                                         "displayName": {
                                           "type": "string",
-                                          "enum": ["Brian Murphy"]
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "invitation": {
-                                "type": "object",
-                                "required": ["invitedBy"],
-                                "properties": {
-                                  "invitedBy": {
-                                    "type": "object",
-                                    "required": ["user"],
-                                    "properties": {
-                                      "user": {
-                                        "type": "object",
-                                        "required": ["displayName", "id"],
-                                        "properties": {
-                                          "displayName": {
-                                            "type": "string",
-                                            "enum": ["Alice Hansen"]
-                                          }
+                                          "enum": ["Alice Hansen"]
                                         }
                                       }
                                     }
@@ -3218,7 +3230,7 @@ Feature: an user gets the resources shared to them
                                 }
                               }
                             }
-                          ]
+                          }
                         }
                       }
                     }
@@ -3341,12 +3353,34 @@ Feature: an user gets the resources shared to them
                         },
                         "permissions": {
                           "type": "array",
-                          "items": [
-                            {
+                          "maxItems": 1,
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "required": ["grantedToV2", "id", "invitation", "roles"],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "invitation": {
                               "type": "object",
-                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "required": ["invitedBy"],
                               "properties": {
-                                "grantedToV2": {
+                                "invitedBy": {
                                   "type": "object",
                                   "required": ["user"],
                                   "properties": {
@@ -3356,29 +3390,7 @@ Feature: an user gets the resources shared to them
                                       "properties": {
                                         "displayName": {
                                           "type": "string",
-                                          "enum": ["Brian Murphy"]
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "invitation": {
-                                "type": "object",
-                                "required": ["invitedBy"],
-                                "properties": {
-                                  "invitedBy": {
-                                    "type": "object",
-                                    "required": ["user"],
-                                    "properties": {
-                                      "user": {
-                                        "type": "object",
-                                        "required": ["displayName", "id"],
-                                        "properties": {
-                                          "displayName": {
-                                            "type": "string",
-                                            "enum": ["Carol King"]
-                                          }
+                                          "enum": ["Carol King"]
                                         }
                                       }
                                     }
@@ -3386,7 +3398,7 @@ Feature: an user gets the resources shared to them
                                 }
                               }
                             }
-                          ]
+                          }
                         }
                       }
                     }
@@ -3470,12 +3482,34 @@ Feature: an user gets the resources shared to them
                         },
                         "permissions": {
                           "type": "array",
-                          "items": [
-                            {
+                          "maxItems": 1,
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "required": ["grantedToV2", "id", "invitation", "roles"],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "invitation": {
                               "type": "object",
-                              "required": ["grantedToV2", "id", "invitation", "roles"],
+                              "required": ["invitedBy"],
                               "properties": {
-                                "grantedToV2": {
+                                "invitedBy": {
                                   "type": "object",
                                   "required": ["user"],
                                   "properties": {
@@ -3485,29 +3519,7 @@ Feature: an user gets the resources shared to them
                                       "properties": {
                                         "displayName": {
                                           "type": "string",
-                                          "enum": ["Brian Murphy"]
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "invitation": {
-                                "type": "object",
-                                "required": ["invitedBy"],
-                                "properties": {
-                                  "invitedBy": {
-                                    "type": "object",
-                                    "required": ["user"],
-                                    "properties": {
-                                      "user": {
-                                        "type": "object",
-                                        "required": ["displayName", "id"],
-                                        "properties": {
-                                          "displayName": {
-                                            "type": "string",
-                                            "enum": ["Alice Hansen"]
-                                          }
+                                          "enum": ["Alice Hansen"]
                                         }
                                       }
                                     }
@@ -3515,7 +3527,7 @@ Feature: an user gets the resources shared to them
                                 }
                               }
                             }
-                          ]
+                          }
                         }
                       }
                     }

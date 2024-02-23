@@ -389,12 +389,12 @@ Feature: user GDPR (General Data Protection Regulation) report
         },
         "groups": {
           "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "pattern": "^%group_id_pattern%$"
-            }
-          ]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^%group_id_pattern%$"
+          }
         },
         "uid_number": {
           "type": "number",

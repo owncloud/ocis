@@ -34,6 +34,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -48,6 +50,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -125,6 +129,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -139,6 +145,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -205,6 +213,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -219,6 +229,8 @@ Feature: Send a sharing invitations
                 },
                 "@libre.graph.permissions.actions": {
                   "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
@@ -296,6 +308,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -310,6 +324,8 @@ Feature: Send a sharing invitations
                 },
                 "@libre.graph.permissions.actions": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
@@ -396,6 +412,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -410,6 +428,8 @@ Feature: Send a sharing invitations
                 },
                 "@libre.graph.permissions.actions": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
@@ -493,6 +513,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -507,6 +529,8 @@ Feature: Send a sharing invitations
                 },
                 "@libre.graph.permissions.actions": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
@@ -589,6 +613,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -604,6 +630,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -684,6 +712,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -699,6 +729,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -773,6 +805,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -787,6 +821,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -1637,6 +1673,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -1673,6 +1711,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -1813,6 +1853,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -1849,6 +1891,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -2092,6 +2136,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -2128,6 +2174,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"
@@ -2181,6 +2229,8 @@ Feature: Send a sharing invitations
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "type": "object",
               "required": [
@@ -2195,6 +2245,8 @@ Feature: Send a sharing invitations
                 },
                 "roles": {
                   "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^%role_id_pattern%$"

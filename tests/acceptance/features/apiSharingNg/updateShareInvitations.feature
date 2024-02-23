@@ -71,12 +71,12 @@ Feature: Update permission of a share
         },
         "roles": {
           "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "pattern": "^%role_id_pattern%$"
-            }
-          ]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^%role_id_pattern%$"
+          }
         }
       }
     }
@@ -141,12 +141,12 @@ Feature: Update permission of a share
         },
         "roles": {
           "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "pattern": "^%role_id_pattern%$"
-            }
-          ]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^%role_id_pattern%$"
+          }
         }
       }
     }
@@ -212,12 +212,12 @@ Feature: Update permission of a share
         },
         "roles": {
           "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "pattern": "^%role_id_pattern%$"
-            }
-          ]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^%role_id_pattern%$"
+          }
         }
       }
     }
