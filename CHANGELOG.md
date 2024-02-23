@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#8340](https://github.com/owncloud/ocis/pull/8340)
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
+* Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
 * Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
 * Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
 * Enhancement - Bump reva: [#8502](https://github.com/owncloud/ocis/pull/8502)
@@ -191,6 +192,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8070
    https://github.com/owncloud/ocis/pull/8408
+
+* Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
+
+   We've added the new epub reader app to the web default apps, so it will be
+   enabled and usable by default.
+
+   https://github.com/owncloud/ocis/pull/8410
 
 * Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
 
