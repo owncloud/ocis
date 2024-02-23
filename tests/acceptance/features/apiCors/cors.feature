@@ -100,3 +100,37 @@ Feature: CORS headers
     And the following headers should be set
       | header                      | value               |
       | Access-Control-Allow-Origin | https://aphno.badal |
+
+
+  @issue-8380
+  Scenario: CORS headers should be returned when uploading file using Tus and when CORS domain sending origin header in the Webdav api
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+      | Upload-Length   | 5                         |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+      | Origin          | https://aphno.badal       |
+    When user "Alice" sends a chunk to the last created TUS Location with data "01234" inside of the space "Personal" with headers:
+      | Origin          | https://aphno.badal                  |
+      | Upload-Checksum | MD5 4100c4d44da9177247e44a5fc1546778 |
+      | Upload-Offset   | 0                                    |
+    Then the HTTP status code should be "204"
+    And the following headers should be set
+      | header                      | value               |
+      | Access-Control-Allow-Origin | https://aphno.badal |
+    And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "01234"
+
+
+  @issue-8380
+  Scenario: uploading file using Tus using different CORS headers
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+      | Upload-Length   | 5                         |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+      | Origin          | https://something.else    |
+    When user "Alice" sends a chunk to the last created TUS Location with data "01234" inside of the space "Personal" with headers:
+      | Origin          | https://something.else               |
+      | Upload-Checksum | MD5 4100c4d44da9177247e44a5fc1546778 |
+      | Upload-Offset   | 0                                    |
+    Then the HTTP status code should be "403"

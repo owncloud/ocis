@@ -287,6 +287,29 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" sends a chunk to the last created TUS Location with data "([^"]*)" inside of the space "([^"]*)" with headers:$/
+	 *
+	 * @param string $user
+	 * @param string $data
+	 * @param string $spaceName
+	 * @param TableNode $headers
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userSendsAChunkToTheLastCreatedTusLocationWithDataInsideOfTheSpaceWithHeaders(
+		string $user,
+		string $data,
+		string $spaceName,
+		TableNode $headers
+	): void {
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$rows = $headers->getRowsHash();
+		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $rows['Upload-Offset'], $data, $rows['Upload-Checksum'], ['Origin' => $rows['Origin']]);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" overwrites recently shared file with offset "([^"]*)" and data "([^"]*)" with checksum "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API with these headers:$/
 	 *
 	 * @param string $user
