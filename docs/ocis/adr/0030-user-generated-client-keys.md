@@ -16,7 +16,7 @@ geekdocFilePath: 0030-user-generated-client-api-keys.md
 Currently, the oCIS proxy is used to authenticate users based on an OpenID Connect access token or using basic auth.
 The current implementation is limited to a single identity provider, and we currently have no way to generate credentials for cli tools that do not yet support OpenID Connect
 
-The coming up calendar and contacts service requires this because most CalDAV and CardDAV clients require basic or digest authentication.
+The coming up calendar and contacts service (ccs) requires this because most CalDAV and CardDAV clients require basic or digest authentication.
 
 ## Decision Drivers <!-- optional -->
 
