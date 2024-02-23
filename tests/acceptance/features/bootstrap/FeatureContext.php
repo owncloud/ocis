@@ -1217,7 +1217,7 @@ class FeatureContext extends BehatVariablesContext {
 	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
 		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
-		if ($schemaObj->enum || $schemaObj->const){
+		if ($schemaObj->enum || $schemaObj->const) {
 			// do not try to validate of enum or const is present
 			return;
 		}
@@ -1238,10 +1238,12 @@ class FeatureContext extends BehatVariablesContext {
 			$value = $schemaObj->$validator;
 			switch ($validator) {
 				case 'items':
-					if ($schemaObj->maxItems === 0) break;
+					if ($schemaObj->maxItems === 0) {
+						break;
+					}
 					Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
 					if ($schemaObj->maxItems > 1) {
-						if (\is_array($value)){
+						if (\is_array($value)) {
 							foreach ($value as $element) {
 								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one elements");
 							}
@@ -1249,7 +1251,7 @@ class FeatureContext extends BehatVariablesContext {
 							break;
 						}
 						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
-						Assert::assertNotNull($value->oneOf,"'oneOf' is required to assert more than one elements");
+						Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
 						Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
 						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' elements than expected by 'maxItems'");
 					}
@@ -1260,6 +1262,7 @@ class FeatureContext extends BehatVariablesContext {
 						$errMsg = $value === null ? \sprintf($errMsg, $validator) : "'$validator' should be true";
 						Assert::assertTrue($value, $errMsg);
 					}
+					break;
 				default:
 					break;
 			}
@@ -1282,13 +1285,14 @@ class FeatureContext extends BehatVariablesContext {
 				case 'array':
 					$this->validateSchemaArrayEntries($props->$propName);
 					$items = $props->$propName->items;
-					if ($items && $items->oneOf){
-						foreach($items->oneOf as $oneOfItem) {
+					if ($items && $items->oneOf) {
+						foreach ($items->oneOf as $oneOfItem) {
 							$this->validateSchemaRequirements($oneOfItem);
 						}
 						break;
+					} elseif ($items) {
+						$this->validateSchemaRequirements($items);
 					}
-					elseif ($items) $this->validateSchemaRequirements($items);
 					break;
 				default:
 					break;
