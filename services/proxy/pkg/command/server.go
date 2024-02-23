@@ -31,7 +31,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/logging"
@@ -43,6 +42,7 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -65,6 +65,24 @@ func Server(cfg *config.Config) *cli.Command {
 				store.DisablePersistence(cfg.OIDC.UserinfoCache.DisablePersistence),
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
 			)
+
+			var signingKeyStore microstore.Store
+			if cfg.PreSignedURL.SigningKeys.Store == "ocisstoreservice" {
+				signingKeyStore = ocisstore.NewStore(
+					microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),
+					microstore.Database("proxy"),
+					microstore.Table("signing-keys"),
+				)
+			} else {
+				signingKeyStore = store.Create(
+					store.Store(cfg.PreSignedURL.SigningKeys.Store),
+					store.TTL(cfg.PreSignedURL.SigningKeys.TTL),
+					microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),
+					microstore.Database("proxy"),
+					microstore.Table("signing-keys"),
+					store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
+				)
+			}
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
@@ -130,7 +148,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, traceProvider, *m)
+				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m)
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
@@ -271,7 +289,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	render.JSON(w, r, nil)
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 	gatewaySelector, err := pool.GatewaySelector(
@@ -322,13 +340,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)
 	}
 
-	storeClient := storesvc.NewStoreService("com.owncloud.api.store", cfg.GrpcClient)
-	if err != nil {
-		logger.Error().Err(err).
-			Str("gateway", cfg.Reva.Address).
-			Msg("Failed to create reva gateway service client")
-	}
-
 	oidcHTTPClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -373,7 +384,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		PreSignedURLConfig: cfg.PreSignedURL,
 		UserProvider:       userProvider,
 		UserRoleAssigner:   roleAssigner,
-		Store:              storeClient,
+		Store:              signingKeyStore,
 		Now:                time.Now,
 	})
 

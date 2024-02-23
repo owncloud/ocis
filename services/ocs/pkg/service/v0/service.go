@@ -14,6 +14,7 @@ import (
 	ocsm "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Service defines the service handlers.
@@ -32,6 +33,7 @@ func NewService(opts ...Option) Service {
 		config: options.Config,
 		mux:    m,
 		logger: options.Logger,
+		store:  options.Store,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -61,6 +63,7 @@ type Ocs struct {
 	config *config.Config
 	logger log.Logger
 	mux    *chi.Mux
+	store  microstore.Store
 }
 
 // ServeHTTP implements the Service interface.

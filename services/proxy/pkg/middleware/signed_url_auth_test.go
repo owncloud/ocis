@@ -2,16 +2,15 @@ package middleware
 
 import (
 	"context"
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
-	"github.com/stretchr/testify/assert"
-	"go-micro.dev/v4/client"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/store"
 )
 
 func TestSignedURLAuth_shouldServe(t *testing.T) {
@@ -159,36 +158,6 @@ func TestSignedURLAuth_createSignature(t *testing.T) {
 	}
 }
 
-type MyStoreService struct {
-}
-
-func (s MyStoreService) Read(_ context.Context, _ *v0.ReadRequest, _ ...client.CallOption) (*v0.ReadResponse, error) {
-	r := v0.ReadResponse{
-		Records: []*storemsg.Record{{
-			Key:      "foo",
-			Value:    []byte("1234567890"),
-			Expiry:   0,
-			Metadata: nil,
-		}},
-	}
-	return &r, nil
-}
-func (s MyStoreService) Write(_ context.Context, _ *v0.WriteRequest, _ ...client.CallOption) (*v0.WriteResponse, error) {
-	return nil, nil
-}
-func (s MyStoreService) Delete(_ context.Context, _ *v0.DeleteRequest, _ ...client.CallOption) (*v0.DeleteResponse, error) {
-	return nil, nil
-}
-func (s MyStoreService) List(_ context.Context, _ *v0.ListRequest, _ ...client.CallOption) (v0.Store_ListService, error) {
-	return nil, nil
-}
-func (s MyStoreService) Databases(_ context.Context, _ *v0.DatabasesRequest, _ ...client.CallOption) (*v0.DatabasesResponse, error) {
-	return nil, nil
-}
-func (s MyStoreService) Tables(_ context.Context, _ *v0.TablesRequest, _ ...client.CallOption) (*v0.TablesResponse, error) {
-	return nil, nil
-}
-
 func TestSignedURLAuth_validate(t *testing.T) {
 	nowFunc := func() time.Time {
 		t, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
@@ -198,12 +167,17 @@ func TestSignedURLAuth_validate(t *testing.T) {
 		AllowedHTTPMethods: []string{"get"},
 		Enabled:            true,
 	}
-	store := MyStoreService{}
 	pua := SignedURLAuthenticator{
 		PreSignedURLConfig: cfg,
-		Store:              store,
+		Store:              store.NewMemoryStore(),
 		Now:                nowFunc,
 	}
+
+	pua.Store.Write(&store.Record{
+		Key:      "useri",
+		Value:    []byte("1234567890"),
+		Metadata: nil,
+	})
 
 	tests := []struct {
 		now          string
