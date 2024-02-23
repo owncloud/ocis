@@ -53,7 +53,7 @@ There will be a web frontend where users can:
 - list existing keys with display name, scope, user (but not the password - or shall we???)
 - delete a key from the list
 
-Within oCIS backend an authentication middleware will evaluate http authentication headers with schema basic and look up if the request is valid.
+An oCIS proxy authentication middleware will evaluate http authentication headers with schema basic and look up if the request is valid.
 
 #### Key generation
 The key id is a uuid. It will be used as ID in basic auth
