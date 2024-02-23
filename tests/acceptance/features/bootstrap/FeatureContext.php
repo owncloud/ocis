@@ -24,7 +24,6 @@
 
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use GuzzleHttp\Exception\GuzzleException;
-use Helmich\JsonAssert\JsonAssertions;
 use rdx\behatvars\BehatVariablesContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
@@ -35,6 +34,7 @@ use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use Swaggest\JsonSchema\Schema as JsonSchema;
 use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
@@ -55,7 +55,6 @@ class FeatureContext extends BehatVariablesContext {
 	use Provisioning;
 	use Sharing;
 	use WebDav;
-	use JsonAssertions;
 
 	/**
 	 * Unix timestamp seconds
@@ -1208,6 +1207,117 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * Validates against the requirements that array schema should adhere to
+	 *
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
+		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
+		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
+		if ($schemaObj->enum || $schemaObj->const) {
+			// do not try to validate of enum or const is present
+			return;
+		}
+
+		$requiredValidators = ["maxItems", "minItems"];
+		$optionalValidators = ["items", "uniqueItems"];
+		$errMsg = "'%s' is required for array assertion";
+
+		// validate required keywords
+		foreach ($requiredValidators as $validator) {
+			Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
+		}
+
+		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' should be equal for strict assertion");
+
+		// validate optional keywords
+		foreach ($optionalValidators as $validator) {
+			$value = $schemaObj->$validator;
+			switch ($validator) {
+				case 'items':
+					if ($schemaObj->maxItems === 0) {
+						break;
+					}
+					Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
+					if ($schemaObj->maxItems > 1) {
+						if (\is_array($value)) {
+							foreach ($value as $element) {
+								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one elements");
+							}
+							Assert::fail("'$validator' should be an object not an array");
+							break;
+						}
+						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
+						Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
+						Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
+						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' elements than expected by 'maxItems'");
+					}
+					Assert::assertTrue(\is_object($value), "'$validator' should be an object when expecting 1 element");
+					break;
+				case "uniqueItems":
+					if ($schemaObj->minItems > 1) {
+						$errMsg = $value === null ? \sprintf($errMsg, $validator) : "'$validator' should be true";
+						Assert::assertTrue($value, $errMsg);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Validates the json schema requirements
+	 *
+	 * @param JsonSchema $schema
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function validateSchemaRequirements(JsonSchema $schema): void {
+		$propNames = $schema->getPropertyNames();
+		$props = $schema->getProperties();
+		foreach ($propNames as $propName) {
+			switch ($props->$propName->type) {
+				case 'array':
+					$this->validateSchemaArrayEntries($props->$propName);
+					$items = $props->$propName->items;
+					if ($items && $items->oneOf) {
+						foreach ($items->oneOf as $oneOfItem) {
+							$this->validateSchemaRequirements($oneOfItem);
+						}
+						break;
+					} elseif ($items) {
+						$this->validateSchemaRequirements($items);
+					}
+					break;
+				default:
+					break;
+			}
+			// traverse for nested properties
+			if ($props->$propName->getProperties()) {
+				$this->validateSchemaRequirements($props->$propName);
+			}
+		}
+	}
+
+	/**
+	 * @param object $json
+	 * @param object $schema
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function assertJsonDocumentMatchesSchema(object $json, object $schema): void {
+		$schema = JsonSchema::import($schema);
+		$this->validateSchemaRequirements($schema);
+		$schema->in($json);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends HTTP method "([^"]*)" to URL "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1445,13 +1555,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @Then the JSON data of the response should match
 	 *
 	 * @param PyStringNode $schemaString
-	 * @param ResponseInterface|null $response
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString, ResponseInterface $response=null): void {
-		$responseBody = $this->getJsonDecodedResponseBodyContent($response);
+	public function theJsonDataOfTheResponseShouldMatch(PyStringNode $schemaString): void {
+		$responseBody = $this->getJsonDecodedResponseBodyContent();
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)

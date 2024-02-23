@@ -198,6 +198,7 @@ Feature: capabilities
                 "blacklisted_files": {
                   "type": "array",
                   "minItems": 1,
+                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "enum": [".htaccess"]

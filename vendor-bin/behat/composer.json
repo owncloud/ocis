@@ -22,6 +22,6 @@
       "laminas/laminas-ldap": "^2.15",
       "ankitpokhrel/tus-php": "^2.3",
       "wapmorgan/unified-archive": "^1.1.10",
-      "helmich/phpunit-json-assert": "^3.4"
+      "swaggest/json-schema": "^0.12.42"
     }
   }

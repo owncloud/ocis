@@ -493,14 +493,16 @@ Feature: get users
                   "user"
                 ],
                 "properties": {
-                  "user": "string",
-                  "required": [
-                    "id"
-                  ],
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "enum": ["%user_id_pattern%"]
+                  "user": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "%user_id_pattern%"
+                      }
                     }
                   }
                 }
@@ -583,32 +585,37 @@ Feature: get users
         },
         "memberOf": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["tea-lover"]
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "displayName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["tea-lover"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "displayName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["coffee-lover"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "displayName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["coffee-lover"]
-                }
-              }
-            }
-          ]
+            ]
+          }
         }
       }
     }
@@ -682,72 +689,76 @@ Feature: get users
       "properties": {
         "value": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "id",
-                "mail",
-                "onPremisesSamAccountName",
-                "accountEnabled",
-                "userType"
-              ],
-              "properties": {
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["alice@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Alice"]
-                },
-                "accountEnabled": {
-                  "type": "boolean",
-                  "enum": [true]
-                },
-                "userType": {
-                  "type": "string",
-                  "enum": ["Member"]
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName",
+                  "accountEnabled",
+                  "userType"
+                ],
+                "properties": {
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["alice@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Alice"]
+                  },
+                  "accountEnabled": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
+                  "userType": {
+                    "type": "string",
+                    "enum": ["Member"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "id",
+                  "mail",
+                  "onPremisesSamAccountName",
+                  "accountEnabled"
+                ],
+                "properties": {
+                  "id" : {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["brian@example.org"]
+                  },
+                  "onPremisesSamAccountName": {
+                    "type": "string",
+                    "enum": ["Brian"]
+                  },
+                  "accountEnabled": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
+                  "userType": {
+                    "type": "string",
+                    "enum": ["Member"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "id",
-                "mail",
-                "onPremisesSamAccountName",
-                "accountEnabled"
-              ],
-              "properties": {
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["brian@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Brian"]
-                },
-                "accountEnabled": {
-                  "type": "boolean",
-                  "enum": [true]
-                },
-                "userType": {
-                  "type": "string",
-                  "enum": ["Member"]
-                }
-              }
-            }
-          ],
-          "additionalItems": false
+            ]
+          }
         }
       }
     }
@@ -765,41 +776,40 @@ Feature: get users
       "properties": {
         "value": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "id",
-                "mail",
-                "onPremisesSamAccountName",
-                "accountEnabled",
-                "userType"
-              ],
-              "properties": {
-                "id" : {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["brian@example.org"]
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "enum": ["Brian"]
-                },
-                "accountEnabled": {
-                  "type": "boolean",
-                  "enum": [true]
-                },
-                "userType": {
-                  "type": "string",
-                  "enum": ["Member"]
-                }
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "mail",
+              "onPremisesSamAccountName",
+              "accountEnabled",
+              "userType"
+            ],
+            "properties": {
+              "id" : {
+                "type": "string",
+                "pattern": "^%user_id_pattern%$"
+              },
+              "mail": {
+                "type": "string",
+                "enum": ["brian@example.org"]
+              },
+              "onPremisesSamAccountName": {
+                "type": "string",
+                "enum": ["Brian"]
+              },
+              "accountEnabled": {
+                "type": "boolean",
+                "enum": [true]
+              },
+              "userType": {
+                "type": "string",
+                "enum": ["Member"]
               }
             }
-          ],
-          "additionalItems": false
+          }
         }
       }
     }
@@ -1354,28 +1364,33 @@ Feature: get users
       "properties": {
         "value": {
           "type": "array",
-          "required": [
-            "displayName",
-            "id",
-            "mail",
-            "userType"
-          ],
-          "properties": {
-            "displayName": {
-              "type": "string",
-              "enum": ["Alice Hansen"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%user_id_pattern%$"
-            },
-            "mail": {
-              "type": "string",
-              "enum": ["alice@example.org"]
-            },
-            "userType": {
-              "type": "string",
-              "enum": ["Member"]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "displayName",
+              "id",
+              "mail",
+              "userType"
+            ],
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "enum": ["Alice Hansen"]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%user_id_pattern%$"
+              },
+              "mail": {
+                "type": "string",
+                "enum": ["alice@example.org"]
+              },
+              "userType": {
+                "type": "string",
+                "enum": ["Member"]
+              }
             }
           }
         }
@@ -1458,28 +1473,33 @@ Feature: get users
       "properties": {
         "value": {
           "type": "array",
-          "required": [
-            "displayName",
-            "id",
-            "mail",
-            "userType"
-          ],
-          "properties": {
-            "displayName": {
-              "type": "string",
-              "enum": ["Alice Hansen"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%user_id_pattern%$"
-            },
-            "mail": {
-              "type": "string",
-              "enum": ["alice@example.org"]
-            },
-            "userType": {
-              "type": "string",
-              "enum": ["Member"]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "displayName",
+              "id",
+              "mail",
+              "userType"
+            ],
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "enum": ["Alice Hansen"]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%user_id_pattern%$"
+              },
+              "mail": {
+                "type": "string",
+                "enum": ["alice@example.org"]
+              },
+              "userType": {
+                "type": "string",
+                "enum": ["Member"]
+              }
             }
           }
         }
@@ -1502,28 +1522,33 @@ Feature: get users
       "properties": {
         "value": {
           "type": "array",
-          "required": [
-            "displayName",
-            "id",
-            "mail",
-            "userType"
-          ],
-          "properties": {
-            "displayName": {
-              "type": "string",
-              "enum": ["Alice Hansen"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%user_id_pattern%$"
-            },
-            "mail": {
-              "type": "string",
-              "enum": ["alice@example.org"]
-            },
-            "userType": {
-              "type": "string",
-              "enum": ["Member"]
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "displayName",
+              "id",
+              "mail",
+              "userType"
+            ],
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "enum": ["Alice Hansen"]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%user_id_pattern%$"
+              },
+              "mail": {
+                "type": "string",
+                "enum": ["alice@example.org"]
+              },
+              "userType": {
+                "type": "string",
+                "enum": ["Member"]
+              }
             }
           }
         }
@@ -1550,63 +1575,68 @@ Feature: get users
       ],
       "properties": {
         "value": {
-        "type": "array",
-         "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "userType"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Alice Hansen"]
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["alice@example.org"]
-                },
-                "userType": {
-                  "type": "string",
-                  "enum": ["Member"]
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "userType"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Alice Hansen"]
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["alice@example.org"]
+                  },
+                  "userType": {
+                    "type": "string",
+                    "enum": ["Member"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id",
+                  "mail",
+                  "userType"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["Alice Hansen"]
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "enum": ["another-alice@example.org"]
+                  },
+                  "userType": {
+                    "type": "string",
+                    "enum": ["Member"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "mail",
-                "userType"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["Alice Hansen"]
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "enum": ["another-alice@example.org"]
-                },
-                "userType": {
-                  "type": "string",
-                  "enum": ["Member"]
-                }
-              }
-            }
-          ]
+            ]
+          }
         }
       }
     }
