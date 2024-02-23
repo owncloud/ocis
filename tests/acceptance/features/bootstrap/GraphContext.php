@@ -206,7 +206,11 @@ class GraphContext implements Context {
 	 */
 	public function theUserInformationShouldMatchTheJSON(string $user, PyStringNode $schemaString): void {
 		$response = $this->adminHasRetrievedUserUsingTheGraphApi($user);
-		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString, $response);
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$this->featureContext->assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
+		);
 	}
 
 	/**
@@ -2527,6 +2531,30 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param bool $waitForCacheExpiry
+	 *
+	 * @return void
+	 */
+	public function listSharesSharedByMe(string $user, bool $waitForCacheExpiry = false) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		if ($waitForCacheExpiry) {
+			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
+			// which means 60 sec is required to clean up all the user|group cache once they are deleted
+			// for tests we have set the above ENV's to minimum which is 1 sec as we check the details for the deleted users
+			sleep(1);
+		}
+		$response = GraphHelper::getSharesSharedByMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password']
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user lists the shares shared by him/her using the Graph API
 	 *
 	 * @param string $user
@@ -2535,15 +2563,19 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userListsTheResourcesSharedByAUserUsingGraphApi(string $user): void {
-		$credentials = $this->getAdminOrUserCredentials($user);
-		$this->featureContext->setResponse(
-			GraphHelper::getSharesSharedByMe(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$credentials['username'],
-				$credentials['password']
-			)
-		);
+		$this->listSharesSharedByMe($user);
+	}
+
+	/**
+	 * @When user :user lists the shares shared by him/her after clearing user/group cache using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsTheResourcesSharedByAUserAfterClearingUserOrGroupSpaceUsingGraphApi(string $user): void {
+		$this->listSharesSharedByMe($user, true);
 	}
 
 	/**

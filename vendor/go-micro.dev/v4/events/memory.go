@@ -8,12 +8,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-
 	log "go-micro.dev/v4/logger"
 	"go-micro.dev/v4/store"
 )
 
-// NewStream returns an initialized memory stream
+// NewStream returns an initialized memory stream.
 func NewStream(opts ...Option) (Stream, error) {
 	// parse the options
 	options := NewOptions(opts...)
@@ -22,15 +21,16 @@ func NewStream(opts ...Option) (Stream, error) {
 }
 
 type subscriber struct {
-	Group   string
-	Topic   string
 	Channel chan Event
 
-	sync.RWMutex
 	retryMap   map[string]int
+	Group      string
+	Topic      string
 	retryLimit int
-	autoAck    bool
 	ackWait    time.Duration
+
+	sync.RWMutex
+	autoAck bool
 }
 
 type mem struct {
@@ -143,7 +143,7 @@ func (m *mem) Consume(topic string, opts ...ConsumeOption) (<-chan Event, error)
 }
 
 // lookupPreviousEvents finds events for a subscriber which occurred before a given time and sends
-// them into the subscribers channel
+// them into the subscribers channel.
 func (m *mem) lookupPreviousEvents(sub *subscriber, startTime time.Time) {
 	// lookup all events which match the topic (a blank topic will return all results)
 	recs, err := m.store.Read(sub.Topic+"/", store.ReadPrefix())

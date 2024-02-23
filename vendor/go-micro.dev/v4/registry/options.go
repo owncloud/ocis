@@ -9,30 +9,30 @@ import (
 )
 
 type Options struct {
+	Logger logger.Logger
+	// Other options for implementations of the interface
+	// can be stored in a context
+	Context   context.Context
+	TLSConfig *tls.Config
 	Addrs     []string
 	Timeout   time.Duration
 	Secure    bool
-	TLSConfig *tls.Config
-	Logger    logger.Logger
-	// Other options for implementations of the interface
-	// can be stored in a context
-	Context context.Context
 }
 
 type RegisterOptions struct {
-	TTL time.Duration
 	// Other options for implementations of the interface
 	// can be stored in a context
 	Context context.Context
+	TTL     time.Duration
 }
 
 type WatchOptions struct {
-	// Specify a service to watch
-	// If blank, the watch is for all services
-	Service string
 	// Other options for implementations of the interface
 	// can be stored in a context
 	Context context.Context
+	// Specify a service to watch
+	// If blank, the watch is for all services
+	Service string
 }
 
 type DeregisterOptions struct {
@@ -60,7 +60,7 @@ func NewOptions(opts ...Option) *Options {
 	return &options
 }
 
-// Addrs is the registry addresses to use
+// Addrs is the registry addresses to use.
 func Addrs(addrs ...string) Option {
 	return func(o *Options) {
 		o.Addrs = addrs
@@ -73,14 +73,14 @@ func Timeout(t time.Duration) Option {
 	}
 }
 
-// Secure communication with the registry
+// Secure communication with the registry.
 func Secure(b bool) Option {
 	return func(o *Options) {
 		o.Secure = b
 	}
 }
 
-// Specify TLS Config
+// Specify TLS Config.
 func TLSConfig(t *tls.Config) Option {
 	return func(o *Options) {
 		o.TLSConfig = t
@@ -99,7 +99,7 @@ func RegisterContext(ctx context.Context) RegisterOption {
 	}
 }
 
-// Watch a service
+// Watch a service.
 func WatchService(name string) WatchOption {
 	return func(o *WatchOptions) {
 		o.Service = name
@@ -153,7 +153,7 @@ func getServiceRecords(ctx context.Context) map[string]map[string]*record {
 	return services
 }
 
-// Services is an option that preloads service data
+// Services is an option that preloads service data.
 func Services(s map[string][]*Service) Option {
 	return func(o *Options) {
 		if o.Context == nil {
@@ -163,7 +163,7 @@ func Services(s map[string][]*Service) Option {
 	}
 }
 
-// Logger sets the underline logger
+// Logger sets the underline logger.
 func Logger(l logger.Logger) Option {
 	return func(o *Options) {
 		o.Logger = l

@@ -116,6 +116,19 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" tries to download file "([^"]*)" from the last public link using own basic auth and new public WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function userTriesToDownloadFileFromPublicLinkUsingBasicAuthAndPublicWebdav(string $user, string $path): void {
+		$response = $this->downloadFromPublicLinkAsUser($path, $user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^the public deletes (?:file|folder|entry) "([^"]*)" from the last public link share using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $fileName
@@ -283,6 +296,38 @@ class PublicWebDavContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
+	/**
+	 * @param string $path
+	 * @param string $user
+	 * @param bool $shareNg
+	 *
+	 * @return ResponseInterface
+	 */
+	public function downloadFromPublicLinkAsUser(string $path, string $user, bool $shareNg = false): ResponseInterface {
+		$path = \ltrim($path, "/");
+		if ($shareNg) {
+			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$token = $this->featureContext->getLastCreatedPublicShareToken();
+		}
+
+		$davPath = WebDavHelper::getDavPath(
+			$token,
+			0,
+			"public-files-new"
+		);
+
+		$username = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$path";
+
+		return HttpRequestHelper::get(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$username,
+			$password
+		);
+	}
 	/**
 	 * @param string $path
 	 * @param string $password

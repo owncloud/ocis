@@ -8,7 +8,7 @@ geekdocFilePath: 0020-file-search-query-language.md
 ---
 
 * Status: accepted
-* Deciders: @butonic, @micbar, @dragotin, @C0rby, @kulmann, @felix-schwarz, @JammingBen
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@c0rby](https://github.com/c0rby), [@kulmann](https://github.com/kulmann), [@felix-schwarz](https://github.com/felix-schwarz), [@JammingBen](https://github.com/JammingBen)
 * Date: 2023-06-23
 
 ## Context and Problem Statement

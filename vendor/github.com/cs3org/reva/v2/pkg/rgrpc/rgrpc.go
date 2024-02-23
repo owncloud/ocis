@@ -326,10 +326,6 @@ func (s *Server) getInterceptors(unprotected []string) ([]grpc.ServerOption, err
 	}
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
-		otelgrpc.UnaryServerInterceptor(
-			otelgrpc.WithTracerProvider(s.tracerProvider),
-			otelgrpc.WithPropagators(rtrace.Propagator),
-		),
 		appctx.NewUnary(s.log, s.tracerProvider),
 		token.NewUnary(),
 		useragent.NewUnary(),
@@ -372,10 +368,6 @@ func (s *Server) getInterceptors(unprotected []string) ([]grpc.ServerOption, err
 	}
 
 	streamInterceptors := []grpc.StreamServerInterceptor{
-		otelgrpc.StreamServerInterceptor(
-			otelgrpc.WithTracerProvider(s.tracerProvider),
-			otelgrpc.WithPropagators(rtrace.Propagator),
-		),
 		appctx.NewStream(s.log, s.tracerProvider),
 		token.NewStream(),
 		useragent.NewStream(),
@@ -391,6 +383,9 @@ func (s *Server) getInterceptors(unprotected []string) ([]grpc.ServerOption, err
 	streamChain := grpc_middleware.ChainStreamServer(streamInterceptors...)
 
 	opts := []grpc.ServerOption{
+		grpc.StatsHandler(otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(s.tracerProvider),
+			otelgrpc.WithPropagators(rtrace.Propagator))),
 		grpc.UnaryInterceptor(unaryChain),
 		grpc.StreamInterceptor(streamChain),
 	}

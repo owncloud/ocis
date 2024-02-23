@@ -68,32 +68,37 @@ Feature: get user's own information
         },
         "memberOf": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "displayName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["tea-lover"]
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "displayName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["tea-lover"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "displayName"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "enum": ["coffee-lover"]
+                  }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "displayName"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": ["coffee-lover"]
-                }
-              }
-            }
-          ]
+            ]
+          }
         }
       }
     }

@@ -8,7 +8,7 @@ geekdocFilePath: 0006-service-discovery.md
 ---
 
 * Status: accepted
-* Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
+* Deciders: [@refs](https://github.com/refs), [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@pmaier1](https://github.com/pmaier1)
 * Date: 2021-04-19
 
 Technical Story: [Introduce Named Services.](https://github.com/cs3org/reva/pull/1509)

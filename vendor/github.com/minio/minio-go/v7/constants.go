@@ -94,6 +94,8 @@ const (
 	minIOBucketReplicationDeleteMarker = "X-Minio-Source-DeleteMarker"
 	minIOBucketReplicationProxyRequest = "X-Minio-Source-Proxy-Request"
 	minIOBucketReplicationRequest      = "X-Minio-Source-Replication-Request"
+	minIOBucketReplicationCheck        = "X-Minio-Source-Replication-Check"
+
 	// Header indicates last tag update time on source
 	minIOBucketReplicationTaggingTimestamp = "X-Minio-Source-Replication-Tagging-Timestamp"
 	// Header indicates last retention update time on source
@@ -103,4 +105,6 @@ const (
 	minIOForceDelete                               = "x-minio-force-delete"
 	// Header indicates delete marker replication request can be sent by source now.
 	minioTgtReplicationReady = "X-Minio-Replication-Ready"
+	// Header asks if delete marker replication request can be sent by source now.
+	isMinioTgtReplicationReady = "X-Minio-Check-Replication-Ready"
 )

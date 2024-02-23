@@ -55,7 +55,6 @@ Feature: edit user
         "onPremisesSamAccountName"
       ],
       "properties": {
-          "type": "string",
         "onPremisesSamAccountName": {
           "enum": ["<newUserName>"]
         }

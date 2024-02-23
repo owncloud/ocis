@@ -24,6 +24,7 @@ func WithEnabled() Option {
 }
 
 // WithExporter option
+// Deprecated: unused
 func WithExporter(v string) Option {
 	return func(o *Options) {
 		o.Exporter = v
@@ -38,6 +39,7 @@ func WithInsecure() Option {
 }
 
 // WithCollector option
+// Deprecated: unused
 func WithCollector(v string) Option {
 	return func(o *Options) {
 		o.Collector = v
@@ -55,5 +57,12 @@ func WithEndpoint(v string) Option {
 func WithServiceName(v string) Option {
 	return func(o *Options) {
 		o.ServiceName = v
+	}
+}
+
+// WithTransportCredentials option
+func WithTransportCredentials(v credentials.TransportCredentials) Option {
+	return func(o *Options) {
+		o.TransportCredentials = v
 	}
 }

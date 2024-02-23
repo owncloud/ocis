@@ -50,148 +50,151 @@ Feature: List a sharing permissions
             "type": "array",
             "minItems": 4,
             "maxItems": 4,
-            "items": [
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      1
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Allows upload file or folder"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Uploader"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "1c996275-f1c9-4e71-abdf-a42f6495e960"
-                    ]
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [
+                        1
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "Allows upload file or folder"
+                      ]
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "enum": [
+                        "Uploader"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "1c996275-f1c9-4e71-abdf-a42f6495e960"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [
+                        2
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "Allows reading the shared file or folder"
+                      ]
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "enum": [
+                        "Viewer"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [
+                        3
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "Allows reading and updating file"
+                      ]
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "enum": [
+                        "Editor"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [
+                        4
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "Allows creating, reading, updating and deleting the shared file or folder"
+                      ]
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "enum": [
+                        "Editor"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "fb6c3e19-e378-47e5-b277-9732f9de6e21"
+                      ]
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      2
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Allows reading the shared file or folder"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Viewer"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
-                    ]
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      3
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Allows reading and updating file"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Editor"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
-                    ]
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "type": "integer",
-                    "enum": [
-                      4
-                    ]
-                  },
-                  "description": {
-                    "type": "string",
-                    "enum": [
-                      "Allows creating, reading, updating and deleting the shared file or folder"
-                    ]
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "enum": [
-                      "Editor"
-                    ]
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "fb6c3e19-e378-47e5-b277-9732f9de6e21"
-                    ]
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }

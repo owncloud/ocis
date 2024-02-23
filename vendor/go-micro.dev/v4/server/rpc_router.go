@@ -1,11 +1,5 @@
 package server
 
-// Copyright 2009 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-//
-// Meh, we need to get rid of this shit
-
 import (
 	"context"
 	"errors"
@@ -20,7 +14,6 @@ import (
 
 	"go-micro.dev/v4/codec"
 	merrors "go-micro.dev/v4/errors"
-
 	log "go-micro.dev/v4/logger"
 )
 
@@ -33,19 +26,19 @@ var (
 )
 
 type methodType struct {
-	sync.Mutex  // protects counters
-	method      reflect.Method
 	ArgType     reflect.Type
 	ReplyType   reflect.Type
 	ContextType reflect.Type
+	method      reflect.Method
+	sync.Mutex  // protects counters
 	stream      bool
 }
 
 type service struct {
-	name   string                 // name of service
-	rcvr   reflect.Value          // receiver of methods for the service
 	typ    reflect.Type           // type of the receiver
 	method map[string]*methodType // registered methods
+	rcvr   reflect.Value          // receiver of methods for the service
+	name   string                 // name of service
 }
 
 type request struct {
@@ -60,28 +53,32 @@ type response struct {
 
 // router represents an RPC router.
 type router struct {
-	name string
-	ops  RouterOptions
+	ops RouterOptions
 
-	mu         sync.Mutex // protects the serviceMap
 	serviceMap map[string]*service
 
-	reqLock sync.Mutex // protects freeReq
 	freeReq *request
 
-	respLock sync.Mutex // protects freeResp
 	freeResp *response
+
+	subscribers map[string][]*subscriber
+	name        string
 
 	// handler wrappers
 	hdlrWrappers []HandlerWrapper
 	// subscriber wrappers
 	subWrappers []SubscriberWrapper
 
-	su          sync.RWMutex
-	subscribers map[string][]*subscriber
+	su sync.RWMutex
+
+	mu sync.Mutex // protects the serviceMap
+
+	reqLock sync.Mutex // protects freeReq
+
+	respLock sync.Mutex // protects freeResp
 }
 
-// rpcRouter encapsulates functions that become a server.Router
+// rpcRouter encapsulates functions that become a Router.
 type rpcRouter struct {
 	h func(context.Context, Request, interface{}) error
 	m func(context.Context, Message) error
@@ -97,7 +94,7 @@ func (r rpcRouter) ServeRequest(ctx context.Context, req Request, rsp Response) 
 
 func newRpcRouter(opts ...RouterOption) *router {
 	return &router{
-		ops:         newRouterOptions(opts...),
+		ops:         NewRouterOptions(opts...),
 		serviceMap:  make(map[string]*service),
 		subscribers: make(map[string][]*subscriber),
 	}
@@ -181,11 +178,13 @@ func prepareMethod(method reflect.Method, logger log.Logger) *methodType {
 		logger.Logf(log.ErrorLevel, "method %v has wrong number of outs: %v", mname, mtype.NumOut())
 		return nil
 	}
+
 	// The return type of the method must be error.
 	if returnType := mtype.Out(0); returnType != typeOfError {
 		logger.Logf(log.ErrorLevel, "method %v returns %v not error", mname, returnType.String())
 		return nil
 	}
+
 	return &methodType{method: method, ArgType: argType, ReplyType: replyType, ContextType: contextType, stream: stream}
 }
 
@@ -196,10 +195,13 @@ func (router *router) sendResponse(sending sync.Locker, req *request, reply inte
 	resp.msg = msg
 
 	resp.msg.Id = req.msg.Id
+
 	sending.Lock()
 	err := cc.Write(resp.msg, reply)
 	sending.Unlock()
+
 	router.freeResponse(resp)
+
 	return err
 }
 
@@ -262,6 +264,7 @@ func (s *service) call(ctx context.Context, router *router, sending *sync.Mutex,
 	// Invoke the method, providing a new value for the reply.
 	fn := func(ctx context.Context, req Request, stream interface{}) error {
 		returnValues = function.Call([]reflect.Value{s.rcvr, mtype.prepareContext(ctx), reflect.ValueOf(stream)})
+
 		if err := returnValues[0].Interface(); err != nil {
 			// the function returned an error, we use that
 			return err.(error)
@@ -289,11 +292,14 @@ func (m *methodType) prepareContext(ctx context.Context) reflect.Value {
 	if contextv := reflect.ValueOf(ctx); contextv.IsValid() {
 		return contextv
 	}
+
 	return reflect.Zero(m.ContextType)
 }
 
 func (router *router) getRequest() *request {
 	router.reqLock.Lock()
+	defer router.reqLock.Unlock()
+
 	req := router.freeReq
 	if req == nil {
 		req = new(request)
@@ -301,19 +307,22 @@ func (router *router) getRequest() *request {
 		router.freeReq = req.next
 		*req = request{}
 	}
-	router.reqLock.Unlock()
+
 	return req
 }
 
 func (router *router) freeRequest(req *request) {
 	router.reqLock.Lock()
+	defer router.reqLock.Unlock()
+
 	req.next = router.freeReq
 	router.freeReq = req
-	router.reqLock.Unlock()
 }
 
 func (router *router) getResponse() *response {
 	router.respLock.Lock()
+	defer router.respLock.Unlock()
+
 	resp := router.freeResp
 	if resp == nil {
 		resp = new(response)
@@ -321,15 +330,16 @@ func (router *router) getResponse() *response {
 		router.freeResp = resp.next
 		*resp = response{}
 	}
-	router.respLock.Unlock()
+
 	return resp
 }
 
 func (router *router) freeResponse(resp *response) {
 	router.respLock.Lock()
+	defer router.respLock.Unlock()
+
 	resp.next = router.freeResp
 	router.freeResp = resp
-	router.respLock.Unlock()
 }
 
 func (router *router) readRequest(r Request) (service *service, mtype *methodType, req *request, argv, replyv reflect.Value, keepReading bool, err error) {
@@ -342,8 +352,10 @@ func (router *router) readRequest(r Request) (service *service, mtype *methodTyp
 		}
 		// discard body
 		cc.ReadBody(nil)
+
 		return
 	}
+
 	// is it a streaming request? then we don't read the body
 	if mtype.stream {
 		if cc.(codec.Codec).String() != "grpc" {
@@ -360,10 +372,12 @@ func (router *router) readRequest(r Request) (service *service, mtype *methodTyp
 		argv = reflect.New(mtype.ArgType)
 		argIsValue = true
 	}
+
 	// argv guaranteed to be a pointer now.
 	if err = cc.ReadBody(argv.Interface()); err != nil {
 		return
 	}
+
 	if argIsValue {
 		argv = argv.Elem()
 	}
@@ -371,6 +385,7 @@ func (router *router) readRequest(r Request) (service *service, mtype *methodTyp
 	if !mtype.stream {
 		replyv = reflect.New(mtype.ReplyType.Elem())
 	}
+
 	return
 }
 
@@ -388,6 +403,7 @@ func (router *router) readHeader(cc codec.Reader) (service *service, mtype *meth
 			return
 		}
 		err = errors.New("rpc: router cannot decode request: " + err.Error())
+
 		return
 	}
 
@@ -400,28 +416,33 @@ func (router *router) readHeader(cc codec.Reader) (service *service, mtype *meth
 		err = errors.New("rpc: service/endpoint request ill-formed: " + req.msg.Endpoint)
 		return
 	}
+
 	// Look up the request.
 	router.mu.Lock()
 	service = router.serviceMap[serviceMethod[0]]
 	router.mu.Unlock()
+
 	if service == nil {
 		err = errors.New("rpc: can't find service " + serviceMethod[0])
 		return
 	}
+
 	mtype = service.method[serviceMethod[1]]
 	if mtype == nil {
 		err = errors.New("rpc: can't find method " + serviceMethod[1])
 	}
+
 	return
 }
 
 func (router *router) NewHandler(h interface{}, opts ...HandlerOption) Handler {
-	return newRpcHandler(h, opts...)
+	return NewRpcHandler(h, opts...)
 }
 
 func (router *router) Handle(h Handler) error {
 	router.mu.Lock()
 	defer router.mu.Unlock()
+
 	if router.serviceMap == nil {
 		router.serviceMap = make(map[string]*service)
 	}
@@ -429,6 +450,7 @@ func (router *router) Handle(h Handler) error {
 	if len(h.Name()) == 0 {
 		return errors.New("rpc.Handle: handler has no name")
 	}
+
 	if !isExported(h.Name()) {
 		return errors.New("rpc.Handle: type " + h.Name() + " is not exported")
 	}
@@ -461,6 +483,7 @@ func (router *router) Handle(h Handler) error {
 
 	// save handler
 	router.serviceMap[s.name] = s
+
 	return nil
 }
 
@@ -475,8 +498,10 @@ func (router *router) ServeRequest(ctx context.Context, r Request, rsp Response)
 		if req != nil {
 			router.freeRequest(req)
 		}
+
 		return err
 	}
+
 	return service.call(ctx, router, sending, mtype, req, argv, replyv, rsp.Codec())
 }
 
@@ -489,6 +514,7 @@ func (router *router) Subscribe(s Subscriber) error {
 	if !ok {
 		return fmt.Errorf("invalid subscriber: expected *subscriber")
 	}
+
 	if len(sub.handlers) == 0 {
 		return fmt.Errorf("invalid subscriber: no handler functions")
 	}
@@ -518,10 +544,9 @@ func (router *router) ProcessMessage(ctx context.Context, msg Message) (err erro
 		}
 	}()
 
-	router.su.RLock()
 	// get the subscribers by topic
+	router.su.RLock()
 	subs, ok := router.subscribers[msg.Topic()]
-	// unlock since we only need to get the subs
 	router.su.RUnlock()
 	if !ok {
 		return nil
@@ -570,7 +595,7 @@ func (router *router) ProcessMessage(ctx context.Context, msg Message) (err erro
 				return err
 			}
 
-			// create the handler which will honour the SubscriberFunc type
+			// create the handler which will honor the SubscriberFunc type
 			fn := func(ctx context.Context, msg Message) error {
 				var vals []reflect.Value
 				if sub.typ.Kind() != reflect.Func {

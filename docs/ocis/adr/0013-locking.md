@@ -8,7 +8,7 @@ geekdocFilePath: 0013-locking.md
 ---
 
 - Status: accepted
-- Deciders: @hodyroff, @pmaier1, @jojowein, @dragotin, @micbar, @tbsbdr, @wkloucek
+- Deciders: [@hodyroff](https://github.com/hodyroff), [@pmaier1](https://github.com/pmaier1), [@jojowein](https://github.com/jojowein), [@dragotin](https://github.com/dragotin), [@micbar](https://github.com/micbar), [@tbsbdr](https://github.com/tbsbdr), [@wkloucek](https://github.com/wkloucek)
 - Date: 2021-11-03
 
 ## Context and Problem Statement

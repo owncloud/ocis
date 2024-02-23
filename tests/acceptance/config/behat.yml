@@ -150,6 +150,8 @@ default:
         - GraphContext:
         - OcisConfigContext:
         - SettingsContext:
+        - TUSContext:
+        - SpacesTUSContext:
 
     apiDepthInfinity:
       paths:

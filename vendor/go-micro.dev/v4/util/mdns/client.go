@@ -9,49 +9,48 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	"go-micro.dev/v4/logger"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
-
-	"go-micro.dev/v4/logger"
 )
 
-// ServiceEntry is returned after we query for a service
+// ServiceEntry is returned after we query for a service.
 type ServiceEntry struct {
 	Name       string
 	Host       string
+	Info       string
 	AddrV4     net.IP
 	AddrV6     net.IP
-	Port       int
-	Info       string
 	InfoFields []string
-	TTL        int
-	Type       uint16
 
 	Addr net.IP // @Deprecated
+
+	Port int
+	TTL  int
+	Type uint16
 
 	hasTXT bool
 	sent   bool
 }
 
-// complete is used to check if we have all the info we need
+// complete is used to check if we have all the info we need.
 func (s *ServiceEntry) complete() bool {
-
 	return (len(s.AddrV4) > 0 || len(s.AddrV6) > 0 || len(s.Addr) > 0) && s.Port != 0 && s.hasTXT
 }
 
-// QueryParam is used to customize how a Lookup is performed
+// QueryParam is used to customize how a Lookup is performed.
 type QueryParam struct {
-	Service             string               // Service to lookup
-	Domain              string               // Lookup domain, default "local"
-	Type                uint16               // Lookup type, defaults to dns.TypePTR
 	Context             context.Context      // Context
-	Timeout             time.Duration        // Lookup timeout, default 1 second. Ignored if Context is provided
 	Interface           *net.Interface       // Multicast interface to use
 	Entries             chan<- *ServiceEntry // Entries Channel
+	Service             string               // Service to lookup
+	Domain              string               // Lookup domain, default "local"
+	Timeout             time.Duration        // Lookup timeout, default 1 second. Ignored if Context is provided
+	Type                uint16               // Lookup type, defaults to dns.TypePTR
 	WantUnicastResponse bool                 // Unicast response desired, as per 5.4 in RFC
 }
 
-// DefaultParams is used to return a default set of QueryParam's
+// DefaultParams is used to return a default set of QueryParam's.
 func DefaultParams(service string) *QueryParam {
 	return &QueryParam{
 		Service:             service,
@@ -100,7 +99,7 @@ func Query(params *QueryParam) error {
 	return client.query(params)
 }
 
-// Listen listens indefinitely for multicast updates
+// Listen listens indefinitely for multicast updates.
 func Listen(entries chan<- *ServiceEntry, exit chan struct{}) error {
 	// Create a new client
 	client, err := newClient()
@@ -156,7 +155,7 @@ func Listen(entries chan<- *ServiceEntry, exit chan struct{}) error {
 	return nil
 }
 
-// Lookup is the same as Query, however it uses all the default parameters
+// Lookup is the same as Query, however it uses all the default parameters.
 func Lookup(service string, entries chan<- *ServiceEntry) error {
 	params := DefaultParams(service)
 	params.Entries = entries
@@ -164,7 +163,7 @@ func Lookup(service string, entries chan<- *ServiceEntry) error {
 }
 
 // Client provides a query interface that can be used to
-// search for service providers using mDNS
+// search for service providers using mDNS.
 type client struct {
 	ipv4UnicastConn *net.UDPConn
 	ipv6UnicastConn *net.UDPConn
@@ -172,13 +171,14 @@ type client struct {
 	ipv4MulticastConn *net.UDPConn
 	ipv6MulticastConn *net.UDPConn
 
-	closed    bool
 	closedCh  chan struct{} // TODO(reddaly): This doesn't appear to be used.
 	closeLock sync.Mutex
+
+	closed bool
 }
 
 // NewClient creates a new mdns Client that can be used to query
-// for records
+// for records.
 func newClient() (*client, error) {
 	// TODO(reddaly): At least attempt to bind to the port required in the spec.
 	// Create a IPv4 listener
@@ -253,7 +253,7 @@ func newClient() (*client, error) {
 	return c, nil
 }
 
-// Close is used to cleanup the client
+// Close is used to cleanup the client.
 func (c *client) Close() error {
 	c.closeLock.Lock()
 	defer c.closeLock.Unlock()
@@ -281,8 +281,8 @@ func (c *client) Close() error {
 	return nil
 }
 
-// setInterface is used to set the query interface, uses sytem
-// default if not provided
+// setInterface is used to set the query interface, uses system
+// default if not provided.
 func (c *client) setInterface(iface *net.Interface, loopback bool) error {
 	p := ipv4.NewPacketConn(c.ipv4UnicastConn)
 	if err := p.JoinGroup(iface, &net.UDPAddr{IP: mdnsGroupIPv4}); err != nil {
@@ -309,7 +309,7 @@ func (c *client) setInterface(iface *net.Interface, loopback bool) error {
 	return nil
 }
 
-// query is used to perform a lookup and stream results
+// query is used to perform a lookup and stream results.
 func (c *client) query(params *QueryParam) error {
 	// Create the service name
 	serviceAddr := fmt.Sprintf("%s.%s.", trimDot(params.Service), trimDot(params.Domain))
@@ -385,7 +385,7 @@ func (c *client) query(params *QueryParam) error {
 	}
 }
 
-// sendQuery is used to multicast a query out
+// sendQuery is used to multicast a query out.
 func (c *client) sendQuery(q *dns.Msg) error {
 	buf, err := q.Pack()
 	if err != nil {
@@ -400,7 +400,7 @@ func (c *client) sendQuery(q *dns.Msg) error {
 	return nil
 }
 
-// recv is used to receive until we get a shutdown
+// recv is used to receive until we get a shutdown.
 func (c *client) recv(l *net.UDPConn, msgCh chan *dns.Msg) {
 	if l == nil {
 		return
@@ -429,7 +429,7 @@ func (c *client) recv(l *net.UDPConn, msgCh chan *dns.Msg) {
 	}
 }
 
-// ensureName is used to ensure the named node is in progress
+// ensureName is used to ensure the named node is in progress.
 func ensureName(inprogress map[string]*ServiceEntry, name string, typ uint16) *ServiceEntry {
 	if inp, ok := inprogress[name]; ok {
 		return inp
@@ -442,7 +442,7 @@ func ensureName(inprogress map[string]*ServiceEntry, name string, typ uint16) *S
 	return inp
 }
 
-// alias is used to setup an alias between two entries
+// alias is used to setup an alias between two entries.
 func alias(inprogress map[string]*ServiceEntry, src, dst string, typ uint16) {
 	srcEntry := ensureName(inprogress, src, typ)
 	inprogress[dst] = srcEntry

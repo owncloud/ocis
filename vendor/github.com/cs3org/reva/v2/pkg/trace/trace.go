@@ -21,25 +21,21 @@ package trace
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"os"
-	"strings"
 	"sync"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 var (
@@ -66,7 +62,7 @@ func NewTracerProvider(opts ...Option) trace.TracerProvider {
 	}
 
 	if !options.Enabled {
-		return trace.NewNoopTracerProvider()
+		return noop.NewTracerProvider()
 	}
 
 	// default to 'reva' as service name if not set
@@ -74,12 +70,7 @@ func NewTracerProvider(opts ...Option) trace.TracerProvider {
 		options.ServiceName = "reva"
 	}
 
-	switch options.Exporter {
-	case "otlp":
-		return getOtlpTracerProvider(options)
-	default:
-		return getJaegerTracerProvider(options)
-	}
+	return getOtlpTracerProvider(options)
 }
 
 // SetDefaultTracerProvider sets the default trace provider
@@ -97,11 +88,10 @@ func InitDefaultTracerProvider(collector, endpoint string) {
 	defaultProvider.mutex.Lock()
 	defer defaultProvider.mutex.Unlock()
 	if !defaultProvider.initialized {
-		SetDefaultTracerProvider(getJaegerTracerProvider(Options{
-			Enabled:     true,
-			Collector:   collector,
+		SetDefaultTracerProvider(getOtlpTracerProvider(Options{
 			Endpoint:    endpoint,
-			ServiceName: "reva default jaeger provider",
+			ServiceName: "reva default otlp provider",
+			Insecure:    true,
 		}))
 	}
 }
@@ -114,89 +104,19 @@ func DefaultProvider() trace.TracerProvider {
 	return otel.GetTracerProvider()
 }
 
-// getJaegerTracerProvider returns a new TracerProvider, configure for the specified service
-func getJaegerTracerProvider(options Options) trace.TracerProvider {
-	var exp *jaeger.Exporter
-	var err error
-
-	if options.Endpoint != "" {
-		var agentHost string
-		var agentPort string
-
-		agentHost, agentPort, err = parseAgentConfig(options.Endpoint)
-		if err != nil {
-			panic(err)
-		}
-
-		exp, err = jaeger.New(
-			jaeger.WithAgentEndpoint(
-				jaeger.WithAgentHost(agentHost),
-				jaeger.WithAgentPort(agentPort),
-			),
-		)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if options.Collector != "" {
-		exp, err = jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(options.Collector)))
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	hostname, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-
-	return sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exp),
-		sdktrace.WithResource(resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(options.ServiceName),
-			semconv.HostNameKey.String(hostname),
-		)),
-	)
-}
-
-func parseAgentConfig(ae string) (string, string, error) {
-	u, err := url.Parse(ae)
-	// as per url.go:
-	// [...] Trying to parse a hostname and path
-	// without a scheme is invalid but may not necessarily return an
-	// error, due to parsing ambiguities.
-	if err == nil && u.Hostname() != "" && u.Port() != "" {
-		return u.Hostname(), u.Port(), nil
-	}
-
-	p := strings.Split(ae, ":")
-	if len(p) != 2 {
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
-	}
-
-	switch {
-	case p[0] == "" && p[1] == "": // case ae = ":"
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
-	case p[0] == "":
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
-	}
-	return p[0], p[1], nil
-}
-
 // getOtelTracerProvider returns a new TracerProvider, configure for the specified service
 func getOtlpTracerProvider(options Options) trace.TracerProvider {
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+	transportCredentials := options.TransportCredentials
+	if options.Insecure {
+		transportCredentials = insecure.NewCredentials()
+	}
 	conn, err := grpc.DialContext(ctx, options.Endpoint,
-		// Note the use of insecure transport here. TLS is recommended in production.
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
+		grpc.WithTransportCredentials(transportCredentials),
 	)
 	if err != nil {
-		panic(fmt.Errorf("failed to create gRPC connection to collector: %w", err))
+		panic(fmt.Errorf("failed to create gRPC connection to endpoint: %w", err))
 	}
 	exporter, err := otlptracegrpc.New(
 		context.Background(),

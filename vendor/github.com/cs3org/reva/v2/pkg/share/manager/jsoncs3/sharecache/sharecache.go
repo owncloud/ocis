@@ -137,6 +137,11 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 			log.Debug().Msg("precondition failed when persisting added share: etag changed. retrying...")
 			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
 			// continue with sync below
+		case errtypes.AlreadyExists:
+			log.Debug().Msg("already exists when persisting added share. retrying...")
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added share failed")
@@ -330,6 +335,7 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 	if us.Etag == "" {
 		ur.IfNoneMatch = []string{"*"}
 	}
+
 	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
@@ -337,6 +343,7 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 		return err
 	}
 	us.Etag = res.Etag
+
 	span.SetStatus(codes.Ok, "")
 	return nil
 }

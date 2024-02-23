@@ -84,6 +84,17 @@ type HTTPConfig struct {
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"STORAGE_USERS_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
 	Prefix    string
+	CORS      CORS `yaml:"cors"`
+}
+
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;STORAGE_USERS_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details."`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;STORAGE_USERS_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details."`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;STORAGE_USERS_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details."`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;STORAGE_USERS_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials."`
+	ExposedHeaders   []string `yaml:"expose_headers" env:"OCIS_CORS_EXPOSE_HEADERS;STORAGE_USERS_CORS_EXPOSE_HEADERS" desc:"A list of exposed CORS headers. See following chapter for more details: *Access-Control-Expose-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers. See the Environment Variable Types description for more details."`
+	MaxAge           uint     `yaml:"max_age" env:"OCIS_CORS_MAX_AGE;STORAGE_USERS_CORS_MAX_AGE" desc:"The max cache duration of preflight headers. See following chapter for more details: *Access-Control-Max-Age* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age. See the Environment Variable Types description for more details."`
 }
 
 // Drivers combine all storage driver configurations
@@ -132,14 +143,20 @@ type S3NGDriver struct {
 	Propagator             string                 `yaml:"propagator" env:"OCIS_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_S3NG_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option."`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
-	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_S3NG_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
-	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'."`
-	Region              string `yaml:"region" env:"STORAGE_USERS_S3NG_REGION" desc:"Region of the S3 bucket."`
-	AccessKey           string `yaml:"access_key" env:"STORAGE_USERS_S3NG_ACCESS_KEY" desc:"Access key for the S3 bucket."`
-	SecretKey           string `yaml:"secret_key" env:"STORAGE_USERS_S3NG_SECRET_KEY" desc:"Secret key for the S3 bucket."`
-	Endpoint            string `yaml:"endpoint" env:"STORAGE_USERS_S3NG_ENDPOINT" desc:"Endpoint for the S3 bucket."`
-	Bucket              string `yaml:"bucket" env:"STORAGE_USERS_S3NG_BUCKET" desc:"Name of the S3 bucket."`
+	Root                  string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
+	UserLayout            string `yaml:"user_layout" env:"STORAGE_USERS_S3NG_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
+	PermissionsEndpoint   string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'."`
+	Region                string `yaml:"region" env:"STORAGE_USERS_S3NG_REGION" desc:"Region of the S3 bucket."`
+	AccessKey             string `yaml:"access_key" env:"STORAGE_USERS_S3NG_ACCESS_KEY" desc:"Access key for the S3 bucket."`
+	SecretKey             string `yaml:"secret_key" env:"STORAGE_USERS_S3NG_SECRET_KEY" desc:"Secret key for the S3 bucket."`
+	Endpoint              string `yaml:"endpoint" env:"STORAGE_USERS_S3NG_ENDPOINT" desc:"Endpoint for the S3 bucket."`
+	Bucket                string `yaml:"bucket" env:"STORAGE_USERS_S3NG_BUCKET" desc:"Name of the S3 bucket."`
+	DisableContentSha256  bool   `yaml:"put_object_disable_content_sha254" env:"STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_CONTENT_SHA256" desc:"Disable sending content sha256 when copying objects to S3."`
+	DisableMultipart      bool   `yaml:"put_object_disable_multipart" env:"STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART" desc:"Disable multipart uploads when copying objects to S3"`
+	SendContentMd5        bool   `yaml:"put_object_send_content_md5" env:"STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5" desc:"Send a Content-MD5 header when copying objects to S3."`
+	ConcurrentStreamParts bool   `yaml:"put_object_concurrent_stream_parts" env:"STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS" desc:"Always precreate parts when copying objects to S3."`
+	NumThreads            uint   `yaml:"put_object_num_threads" env:"STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS" desc:"Number of concurrent uploads to use when copying objects to S3."`
+	PartSize              uint64 `yaml:"put_object_part_size" env:"STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE" desc:"Part size for concurrent uploads to S3."`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
 	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases."`
