@@ -194,6 +194,9 @@ type PosixDriver struct {
 	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_POSIX_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
 	ProjectLayout       string `yaml:"project_layout" env:"STORAGE_USERS_POSIX_PROJECT_LAYOUT" desc:"Template string for the project spaces storage layout."`
 	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'."`
+
+	WatchType string `yaml:"watch_type" env:"STORAGE_USERS_POSIX_WATCH_TYPE" desc:"Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default) and 'gpfsfileauditlogging'."`
+	WatchPath string `yaml:"watch_path" env:"STORAGE_USERS_POSIX_WATCH_PATH" desc:"Path to the watch directory/file. Only applies to the 'gpfsfileauditlogling' watcher, in which case it is the path of the file audit log file."`
 }
 
 // Events combines the configuration options for the event bus.

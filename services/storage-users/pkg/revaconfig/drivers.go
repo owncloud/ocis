@@ -94,6 +94,9 @@ func Posix(cfg *config.Config) map[string]interface{} {
 		"permissionssvc_tls_mode": cfg.Commons.GRPCClientTLS.Mode,
 		"treetime_accounting":     true,
 		"treesize_accounting":     true,
+
+		"watch_type": cfg.Drivers.Posix.WatchType,
+		"watch_path": cfg.Drivers.Posix.WatchPath,
 	}
 }
 
