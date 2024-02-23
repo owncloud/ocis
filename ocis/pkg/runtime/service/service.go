@@ -57,7 +57,6 @@ import (
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storageSystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/command"
-	store "github.com/owncloud/ocis/v2/services/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/command"
 	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/command"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/command"
@@ -244,11 +243,6 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.StorageUsers.Context = ctx
 		cfg.StorageUsers.Commons = cfg.Commons
 		return storageusers.Execute(cfg.StorageUsers)
-	})
-	reg(3, opts.Config.Store.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.Store.Context = ctx
-		cfg.Store.Commons = cfg.Commons
-		return store.Execute(cfg.Store)
 	})
 	reg(3, opts.Config.Thumbnails.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Thumbnails.Context = ctx
