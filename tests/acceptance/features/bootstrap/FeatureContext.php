@@ -1215,31 +1215,35 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
-		$requiredValidators = ["maxItems", "minItems", "items"];
-		$optionalValidators = ["uniqueItems"];
+		$requiredValidators = ["maxItems", "minItems"];
+		$optionalValidators = ["items", "uniqueItems"];
 		$errMsg = "'%s' is required for array assertion";
 
+		// validate required keywords
 		foreach ($requiredValidators as $validator) {
-			$value = $schemaObj->$validator;
-			Assert::assertNotNull($value, sprintf($errMsg, $validator));
+			Assert::assertNotNull($schemaObj->$validator, sprintf($errMsg, $validator));
+		}
 
-			if ($validator === "items") {
+		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' must be equal for strict assertion");
+
+		// validate optional keywords
+		foreach ($optionalValidators as $validator) {
+			$value = $schemaObj->$validator;
+			if ($validator === "items" && $schemaObj->maxItems !== 0) {
+				Assert::assertNotNull($schemaObj->$validator, sprintf($errMsg, $validator));
 				Assert::assertIsObject($value, "'$validator' must be an object");
 				if ($value->allOf || $value->anyOf) {
 					Assert::fail("'allOf' and 'anyOf' are not allowed in array items");
 				}
-				if ($schemaObj->minItems > 1 && $value->oneOf !== null) {
+				if ($schemaObj->maxItems > 1 && $value->oneOf !== null) {
 					$items = $value->oneOf;
 					Assert::assertIsArray($items, "'oneOf' must be an array");
-					Assert::assertEquals($schemaObj->minItems, \count($items), "There are more 'oneOf' items than expected by 'minItems'");
+					Assert::assertEquals($schemaObj->maxItems, \count($items), "There are more 'oneOf' items than expected by 'maxItems'");
 					return;
 				}
 				Assert::fail("'oneOf' is required to assert more than one items");
 			}
-		}
 
-		foreach ($optionalValidators as $validator) {
-			$value = $schemaObj->$validator;
 			if ($validator === "uniqueItems") {
 				if ($schemaObj->minItems > 1) {
 					$errMsg = $value === null ? sprintf($errMsg, $validator) : "'$validator' must be true";
