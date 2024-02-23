@@ -72,7 +72,9 @@ The payload above with generate a JWT similar to this:
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjM0NjNiZS1mMDcwLTQwOTctOGM3OS00MmNlYWMyMGViMWIifQ.PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU
 ```
 
-The signature is the last segment: ```PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU```
+The signature is the last segment: `PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU`
+
+Only the *username* `163463be-f070-4097-8c79-42ceac20eb1b` and *password* `PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU` are presented to the user. They can be used to grant access to applications only supporting basic auth.
 
 ### Authentication
 Key id and key secret will be read from the http authentication header and the JWT is reconstructed with the given key id.
