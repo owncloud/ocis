@@ -40,7 +40,7 @@ Chosen option: *???*
 
 ### oCIS proxy middleware with micro store
 
-We use the built-in micro store to save generated access keys.
+We use a micro store implementation to save generated access keys.
 Generated access keys will have a scope attached to limit access to oCIS services or endpoints.
 
 These scopes need to be defined - for ccs it would be sufficient to use /ccs/ endpoint.
