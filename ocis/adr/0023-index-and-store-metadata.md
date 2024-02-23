@@ -9,7 +9,7 @@ geekdocFilePath: 0023-index-and-store-metadata.md
 
 
 * Status: accepted
-* Deciders: @butonic, @dschmidt, @micbar, @dragotin
+* Deciders: [@butonic](https://github.com/butonic), [@theonering](https://github.com/dschmidt), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin)
 * Date: 2023-10-17
 
 ## Context and Problem Statement

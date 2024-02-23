@@ -8,7 +8,7 @@ geekdocFilePath: 0002-persist-accounts-using-cs3-storage.md
 ---
 
 * Status: accepted
-* Deciders: @butonic, @felixboehm
+* Deciders: [@butonic](https://github.com/butonic), [@felixboehm](https://github.com/felixboehm)
 * Date: 2020-08-21
 
 Technical Story: [File system based indexing](https://github.com/owncloud/ocis-accounts/pull/92)

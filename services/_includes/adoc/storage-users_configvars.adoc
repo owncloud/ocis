@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-23-00-49-18]
+[#deprecation-note-2024-02-23-14-09-22]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -177,6 +177,66 @@ a| [subs=-attributes]
 ++tcp ++
 a| [subs=-attributes]
 The transport protocol of the HTTP service.
+
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`STORAGE_USERS_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`STORAGE_USERS_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[POST HEAD PATCH OPTIONS GET DELETE] ++
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`STORAGE_USERS_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin X-Requested-With X-Request-Id X-HTTP-Method-Override Content-Type Upload-Length Upload-Offset Tus-Resumable Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`STORAGE_USERS_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
+a|`OCIS_CORS_EXPOSE_HEADERS` +
+`STORAGE_USERS_CORS_EXPOSE_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Upload-Offset Location Upload-Length Tus-Version Tus-Resumable Tus-Max-Size Tus-Extension Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
+a| [subs=-attributes]
+A list of exposed CORS headers. See following chapter for more details: *Access-Control-Expose-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_MAX_AGE` +
+`STORAGE_USERS_CORS_MAX_AGE` +
+
+a| [subs=-attributes]
+++uint ++
+a| [subs=-attributes]
+++86400 ++
+a| [subs=-attributes]
+The max cache duration of preflight headers. See following chapter for more details: *Access-Control-Max-Age* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age. See the Environment Variable Types description for more details.
 
 a|`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET` +
@@ -472,6 +532,60 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Name of the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_CONTENT_SHA256` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable sending content sha256 when copying objects to S3.
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable multipart uploads when copying objects to S3
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Send a Content-MD5 header when copying objects to S3.
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Always precreate parts when copying objects to S3.
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS` +
+
+a| [subs=-attributes]
+++uint ++
+a| [subs=-attributes]
+++4 ++
+a| [subs=-attributes]
+Number of concurrent uploads to use when copying objects to S3.
+
+a|`STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE` +
+
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Part size for concurrent uploads to S3.
 
 a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE` +
 

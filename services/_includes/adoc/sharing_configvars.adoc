@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-23-00-49-18]
+[#deprecation-note-2024-02-23-14-09-22]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -276,6 +276,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
 
+a|`OCIS_ENABLE_RESHARING` +
+`SHARING_ENABLE_RESHARING` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables the support for resharing.
+
 a|`SHARING_USER_DRIVER` +
 
 a| [subs=-attributes]
@@ -283,7 +293,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++jsoncs3 ++
 a| [subs=-attributes]
-Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' and 'owncloudsql'.
+Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' (deprecated) and 'owncloudsql'.
 
 a|`SHARING_USER_JSONCS3_PROVIDER_ADDR` +
 
@@ -442,7 +452,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++jsoncs3 ++
 a| [subs=-attributes]
-Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3'.
+Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated).
 
 a|`SHARING_PUBLIC_JSON_FILE` +
 

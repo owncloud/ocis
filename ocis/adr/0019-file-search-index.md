@@ -7,8 +7,8 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0019-file-search-index.md
 ---
 
-* Status: proposed
-* Deciders: @butonic, @micbar, @dragotin, @C0rby
+* Status: accepted
+* Deciders: [@butonic](https://github.com/butonic), [@micbar](https://github.com/micbar), [@dragotin](https://github.com/dragotin), [@c0rby](https://github.com/c0rby)
 * Date: 2022-03-18
 
 ## Context and Problem Statement

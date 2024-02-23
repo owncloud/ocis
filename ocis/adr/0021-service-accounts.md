@@ -8,7 +8,7 @@ geekdocFilePath: 0021-service-accounts.md
 ---
 
 * Status: proposed
-* Deciders: @butonic, @C0rby
+* Deciders: [@butonic](https://github.com/butonic), [@c0rby](https://github.com/c0rby)
 * Date: 2023-01-18
 
 ## Context and Problem Statement

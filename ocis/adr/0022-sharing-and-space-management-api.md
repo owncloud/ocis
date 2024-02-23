@@ -8,7 +8,7 @@ geekdocFilePath: 0022-sharing-and-space-management-api.md
 ---
 
 * Status: accepted
-* Deciders: @jammingben @butonic @theonering @kobergj @micbar
+* Deciders: [@JammingBen](https://github.com/JammingBen) [@butonic](https://github.com/butonic) [@theonering](https://github.com/theonering) [@kobergj](https://github.com/kobergj) [@micbar](https://github.com/micbar)
 * Date: 2023-08-08
 
 Technical Story: [Public issue](https://github.com/owncloud/ocis/issues/6993)
