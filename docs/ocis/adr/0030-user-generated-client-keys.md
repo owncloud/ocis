@@ -86,7 +86,7 @@ If the signatures match:
 - validate scope
 - grant access if aplicable
 
-
+- Good, the middleware can differentiate basic auth for user generated client API keys from username:password authentication without making an RPC and additional network latency.
 - Good, invented by us :dancers:
 - Bad, ???
 
