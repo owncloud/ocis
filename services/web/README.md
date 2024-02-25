@@ -1,6 +1,6 @@
 # Web
 
-The web service embeds and serves the static files for the [Infinite Scale Web Client](https://github.com/owncloud/web).  
+The web service embeds and serves the static files for the [Infinite Scale Web Client](https://github.com/owncloud/web).
 Note that clients will respond with a connection error if the web service is not available.
 
 The web service also provides a minimal API for branding functionality like changing the logo shown.
@@ -15,7 +15,7 @@ Note that single configuration settings of the embedded web UI can be defined vi
 
 ### Web UI Options
 
-Beside theming, the behavior of the web UI can be configured via options. See the environment variables `WEB_OPTION_xxx` for more details.
+Besides theming, the behavior of the web UI can be configured via options. See the environment variables `WEB_OPTION_xxx` for more details.
 
 ### Web UI Config File
 
@@ -24,3 +24,102 @@ When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuratio
 ### Embedding Web
 
 Web can be consumed by another application in a stripped down version called “Embed mode”. This mode is supposed to be used in the context of selecting or sharing resources. For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/). See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
+
+# Web Apps
+
+Custom web applications can be provided to the users.
+This feature is useful for organizations that have specific web applications that they want to provide to their users.
+
+It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
+and does not support injection of dynamic web applications (custom dynamic backends).
+
+## Loading Applications
+
+Loading applications is provided in three ways:
+
+* By loading a web application from a user-provided path, by setting the `WEB_APPS_PATH` environment variable.
+* By loading a web application from the default ocis home directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps`.
+* By embedding a web application into the ocis binary which is a build-time option,
+  e.g. `ocis_src_path/services/web/assets/apps` followed by a build.
+
+The list of available applications is composed of the build in extensions and the custom applications
+provided by the administrator, e.g. `WEB_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
+
+for example, if ocis contains a build in extension `image-viewer-dfx` and the administrator provides a custom
+application `image-viewer-obj` in the `WEB_APPS_PATH` directory,the user will be able to access both applications
+from the web ui.
+
+## Application Structure
+
+Applications always have to follow a strict structure, which is as follows:
+
+* an application must be a directory
+* an application must contain a `manifest.json` file
+
+everything else is skipped and not considered as an application.
+
+The `manifest.json` file contain the following fields:
+
+* `name` - the name of the application must be unique across all applications
+* `entrypoint` - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
+* `config` - a list of key-value pairs that are passed to the global web application configuration
+
+## Application Configuration
+
+it's important to note that an application manifest should never be changed manually;
+if a custom configuration is needed, the administrator should provide the required configuration inside the
+`$OCIS_BASE_DATA_PATH/config/web.apps.config.yaml` file.
+
+The `web.apps.config.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
+For example, if the `image-viewer-obj` application contains the following configuration:
+
+```json
+{
+  "name": "image-viewer-obj",
+  "entrypoint": "index.js",
+  "config": {
+    "maxWith": 1280,
+    "maxHeight": 1280
+  }
+}
+```
+
+and the `web.apps.config.yaml` file contains the following configuration:
+
+```yaml
+image-viewer-obj:
+  config:
+    maxHeight: 640
+    maxSize: 512
+```
+
+the final configuration for web will be:
+
+```json
+{
+  "name": "image-viewer-obj",
+  "entrypoint": "index.js",
+  "config": {
+    "maxWith": 1280,
+    "maxHeight": 640,
+    "maxSize": 512
+  }
+}
+```
+
+the local provided configuration will always override the shipped application manifest configuration.
+
+## Fallback Mechanism
+
+Besides the configuration and application registration, there is one further important aspect to now;
+in the process of loading the application assets, the system uses a fallback mechanism to load the assets.
+
+This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or a favicon.
+
+Consider the following, ocis is shipped with a default extension called `image-viewer-dfx` which contains a logo,
+but the administrator wants to provide a custom logo for the `image-viewer-dfx` application.
+
+This can be achieved by providing a custom logo in the `WEB_APPS_PATH` directory, e.g. `WEB_APPS_PATH/image-viewer-dfx/logo.png`.
+Every other asset is loaded from the build in extension, but the logo is loaded from the custom directory.
+
+The same applies for the `manifest.json` file, if the administrator wants to provide a custom `manifest.json` file.

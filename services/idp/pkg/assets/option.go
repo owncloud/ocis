@@ -3,8 +3,8 @@ package assets
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fs"
 	"github.com/owncloud/ocis/v2/services/idp"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 )
@@ -12,7 +12,8 @@ import (
 // New returns a new http filesystem to serve assets.
 func New(opts ...Option) http.FileSystem {
 	options := newOptions(opts...)
-	return assetsfs.New(idp.Assets, options.Config.Asset.Path, options.Logger)
+
+	return http.FS(fsx.NewFallbackFS(fsx.MustSub(idp.Assets, "assets"), options.Config.Asset.Path))
 }
 
 // Option defines a single option function.

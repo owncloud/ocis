@@ -80,7 +80,8 @@ func DefaultConfig() *config.Config {
 			Name: "web",
 		},
 		Asset: config.Asset{
-			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
+			WebPath:  filepath.Join(defaults.BaseDataPath(), "web/assets/web"),
+			AppsPath: filepath.Join(defaults.BaseDataPath(), "web/assets/apps"),
 		},
 		GatewayAddress: "com.owncloud.api.gateway",
 		Web: config.Web{

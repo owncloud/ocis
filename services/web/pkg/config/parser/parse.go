@@ -28,6 +28,12 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
+	// web apps are a special case, as they are not part of the main config, but are loaded from a separate config file
+	_, err = ociscfg.BindSourcesToStructs(cfg.Service.Name+".apps", &cfg.Apps)
+	if err != nil {
+		return err
+	}
+
 	defaults.Sanitize(cfg)
 
 	return Validate(cfg)

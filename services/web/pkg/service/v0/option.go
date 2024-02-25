@@ -5,9 +5,10 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.

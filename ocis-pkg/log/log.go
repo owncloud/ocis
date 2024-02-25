@@ -6,27 +6,34 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	mzlog "github.com/go-micro/plugins/v4/logger/zerolog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/logger"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
 var (
 	RequestIDString = "request-id"
+	defaultLogger   atomic.Value
 )
 
 func init() {
 	// this is ugly, but "logger.DefaultLogger" is a global variable and we need to set it _before_ anybody uses it
 	setMicroLogger()
+
+	// set the default logger for ocis
+	setDefaultLogger()
 }
 
-// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
-// want to expose to the end user the internal framework logs unless explicitly specified.
+// For logging reasons, we don't want the same logging level on both oCIS and micro.
+// As a framework builder,
+// we do not want to expose to the end user the internal framework logs unless explicitly specified.
 func setMicroLogger() {
 	if os.Getenv("MICRO_LOG_LEVEL") == "" {
 		_ = os.Setenv("MICRO_LOG_LEVEL", "error")
@@ -42,6 +49,35 @@ func setMicroLogger() {
 			"system": "go-micro",
 		}),
 	)
+}
+
+// setDefaultLogger creates an environment-specific logger and sets it as the default logger.
+func setDefaultLogger() {
+	var opts []Option
+
+	if level := os.Getenv("OCIS_LOG_LEVEL"); level != "" {
+		opts = append(opts, Level(level))
+	}
+
+	if pretty := os.Getenv("OCIS_LOG_PRETTY"); pretty == "true" {
+		opts = append(opts, Pretty(true))
+	}
+
+	if color := os.Getenv("OCIS_LOG_COLOR"); color == "true" {
+		opts = append(opts, Color(true))
+	}
+
+	if file := os.Getenv("OCIS_LOG_FILE"); file != "" {
+		opts = append(opts, File(file))
+	}
+
+	l := NewLogger(opts...)
+	defaultLogger.Store(&l)
+}
+
+// Default returns the default pre-configured logger.
+func Default() *Logger {
+	return defaultLogger.Load().(*Logger)
 }
 
 // Logger simply wraps the zerolog logger.
