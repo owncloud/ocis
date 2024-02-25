@@ -27,7 +27,7 @@ Web can be consumed by another application in a stripped down version called “
 
 # Web Apps
 
-Custom web applications can be provided to the users.
+The administrator of the environment is capable of providing custom web applications to the users.
 This feature is useful for organizations that have specific web applications that they want to provide to their users.
 
 It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
@@ -60,22 +60,22 @@ everything else is skipped and not considered as an application.
 
 The `manifest.json` file contain the following fields:
 
-* `name` - the name of the application must be unique across all applications
-* `entrypoint` - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
-* `config` - a list of key-value pairs that are passed to the global web application configuration
+* `id` - required - the name of the application must be unique across all applications
+* `entrypoint` - required - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
+* `config` - optional - a list of key-value pairs that are passed to the global web application configuration
 
 ## Application Configuration
 
 it's important to note that an application manifest should never be changed manually;
 if a custom configuration is needed, the administrator should provide the required configuration inside the
-`$OCIS_BASE_DATA_PATH/config/web.apps.config.yaml` file.
+`$OCIS_BASE_DATA_PATH/config/web.apps.yaml` file.
 
-The `web.apps.config.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
+The `web.apps.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
 For example, if the `image-viewer-obj` application contains the following configuration:
 
 ```json
 {
-  "name": "image-viewer-obj",
+  "id": "image-viewer-obj",
   "entrypoint": "index.js",
   "config": {
     "maxWith": 1280,
@@ -84,7 +84,7 @@ For example, if the `image-viewer-obj` application contains the following config
 }
 ```
 
-and the `web.apps.config.yaml` file contains the following configuration:
+and the `web.apps.yaml` file contains the following configuration:
 
 ```yaml
 image-viewer-obj:
@@ -97,17 +97,25 @@ the final configuration for web will be:
 
 ```json
 {
-  "name": "image-viewer-obj",
-  "entrypoint": "index.js",
-  "config": {
-    "maxWith": 1280,
-    "maxHeight": 640,
-    "maxSize": 512
-  }
+  "external_apps": [
+    {
+      "id": "image-viewer-obj",
+      "path": "index.js",
+      "config": {
+        "maxWith": 1280,
+        "maxHeight": 640,
+        "maxSize": 512
+      }
+    }
+  ]
 }
 ```
 
-the local provided configuration will always override the shipped application manifest configuration.
+besides the configuration from the `manifest.json` file, the `web.apps.yaml` file can also contain the following fields:
+
+* `disabled` - optional - defaults to `false` - if set to `true`, the application will not be loaded
+
+The local provided configuration yaml will always override the shipped application manifest configuration.
 
 ## Fallback Mechanism
 
@@ -123,3 +131,7 @@ This can be achieved by providing a custom logo in the `WEB_APPS_PATH` directory
 Every other asset is loaded from the build in extension, but the logo is loaded from the custom directory.
 
 The same applies for the `manifest.json` file, if the administrator wants to provide a custom `manifest.json` file.
+
+## Miscellaneous
+
+Please note that ocis needs a restart to load new applications or changes to the `web.apps.yaml` file.

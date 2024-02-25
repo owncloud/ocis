@@ -21,7 +21,7 @@ type Config struct {
 	Asset Asset  `yaml:"asset"`
 	File  string `yaml:"file" env:"WEB_UI_CONFIG_FILE" desc:"Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details."`
 	Web   Web    `yaml:"web"`
-	Apps  map[string]Apps
+	Apps  map[string]App
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
@@ -112,9 +112,10 @@ type Web struct {
 	Config      WebConfig `yaml:"config"`
 }
 
-// Apps defines the available apps configuration.
-type Apps struct {
-	Config map[string]any `yaml:"config"`
+// App defines the individual app configuration.
+type App struct {
+	Disabled bool           `yaml:"disabled"`
+	Config   map[string]any `yaml:"config"`
 }
 
 // TokenManager is the config for using the reva token manager

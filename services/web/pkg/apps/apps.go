@@ -53,7 +53,7 @@ func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 // List returns a list of applications from the given filesystems,
 // individual filesystems are searched for applications, and the list is merged.
 // Last finding gets priority in case of conflicts, so the order of the filesystems is important.
-func List(appsConf map[string]config.Apps, fSystems ...fs.FS) ([]Application, error) {
+func List(appsData map[string]config.App, fSystems ...fs.FS) ([]Application, error) {
 	registry := map[string]Application{}
 
 	for _, fSystem := range fSystems {
@@ -64,14 +64,20 @@ func List(appsConf map[string]config.Apps, fSystems ...fs.FS) ([]Application, er
 		}
 
 		for _, entry := range entries {
-			var conf map[string]interface{}
+			var appData config.App
 			name := entry.Name()
 
-			if appConf, ok := appsConf[name]; ok {
-				conf = appConf.Config
+			// configuration for the application is optional, if it is not present, the default configuration is used
+			if data, ok := appsData[name]; ok {
+				appData = data
 			}
 
-			application, err := Get(fSystem, name, conf)
+			if appData.Disabled {
+				// if the app is disabled, skip it
+				continue
+			}
+
+			application, err := Get(fSystem, name, appData.Config)
 			if err != nil {
 				// if app creation fails, log the error and continue with the next app
 				logger.Debug().Err(err).Str("path", entry.Name()).Msg("failed to load application")

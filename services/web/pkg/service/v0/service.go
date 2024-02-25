@@ -28,6 +28,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
+var (
+	_customAppsEndpoint = "/vendor/apps"
+)
+
 // ErrConfigInvalid is returned when the config parse is invalid.
 var ErrConfigInvalid = `Invalid or missing config`
 
@@ -63,7 +67,7 @@ func NewService(opts ...Option) Service {
 			for _, application := range applications {
 				options.Config.Web.Config.ExternalApps = append(
 					options.Config.Web.Config.ExternalApps,
-					application.ToExternal(path.Join(options.Config.HTTP.Root, "/vendor/apps")),
+					application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
 				)
 			}
 		}
@@ -87,9 +91,9 @@ func NewService(opts ...Option) Service {
 			r.Post("/", svc.UploadLogo)
 			r.Delete("/", svc.ResetLogo)
 		})
-		r.Mount("/vendor/apps", svc.Static(
+		r.Mount(_customAppsEndpoint, svc.Static(
 			fsx.NewFallbackFS(appsFS, options.Config.Asset.AppsPath),
-			path.Join(svc.config.HTTP.Root, "/vendor/apps"),
+			path.Join(svc.config.HTTP.Root, _customAppsEndpoint),
 			options.Config.HTTP.CacheTTL,
 		))
 		r.Mount("/", svc.Static(
