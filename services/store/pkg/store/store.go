@@ -68,6 +68,8 @@ func NewStore(opts ...store.Option) store.Store {
 	return s
 }
 
+// Init initializes the store by configuring a storeservice and initializing
+// a grpc client if it has not been passed as a context option.
 func (s *oss) Init(opts ...store.Option) error {
 	for _, o := range opts {
 		o(&s.options)
@@ -91,10 +93,13 @@ func (s *oss) configure() error {
 	return nil
 }
 
+// Options allows you to view the current options.
 func (s *oss) Options() store.Options {
 	return s.options
 }
 
+// Read takes a single key name and optional ReadOptions. It returns matching []*Record or an error.
+// Only database and table options are used.
 func (s *oss) Read(key string, opts ...store.ReadOption) ([]*store.Record, error) {
 	options := store.ReadOptions{
 		Database: s.options.Database,
@@ -136,8 +141,9 @@ func (s *oss) Read(key string, opts ...store.ReadOption) ([]*store.Record, error
 		records = append(records, r)
 	}
 	return records, nil
-
 }
+
+// Write() writes a record to the store, and returns an error if the record was not written.
 func (s *oss) Write(r *store.Record, opts ...store.WriteOption) error {
 	options := store.WriteOptions{
 		Database: s.options.Database,
@@ -161,15 +167,23 @@ func (s *oss) Write(r *store.Record, opts ...store.WriteOption) error {
 
 	return err
 }
+
+// Delete is not implemented for the ocis service
 func (s *oss) Delete(key string, opts ...store.DeleteOption) error {
 	return errors.ErrUnsupported
 }
+
+// List is not implemented for the ocis service
 func (s *oss) List(opts ...store.ListOption) ([]string, error) {
 	return nil, errors.ErrUnsupported
 }
+
+// Close does nothing
 func (s *oss) Close() error {
 	return nil
 }
+
+// String returns the name of the implementation.
 func (s *oss) String() string {
 	return "ocisstoreservice"
 }
