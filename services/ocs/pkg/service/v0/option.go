@@ -5,6 +5,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
+	"go-micro.dev/v4/store"
 )
 
 // Option defines a single option function.
@@ -15,6 +16,7 @@ type Options struct {
 	Logger     log.Logger
 	Config     *config.Config
 	Middleware []func(http.Handler) http.Handler
+	Store      store.Store
 }
 
 // newOptions initializes the available default options.
@@ -46,5 +48,12 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// Store provides a function to set the store option.
+func Store(s store.Store) Option {
+	return func(o *Options) {
+		o.Store = s
 	}
 }

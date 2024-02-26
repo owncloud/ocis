@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
@@ -37,6 +38,11 @@ func DefaultConfig() *config.Config {
 		},
 		Service: config.Service{
 			Name: "ocs",
+		},
+		SigningKeys: &config.SigningKeys{
+			Store: "nats-js-kv", // signing keys are read by proxy, so we cannot use memory. It is not shared.
+			Nodes: []string{"127.0.0.1:9233"},
+			TTL:   time.Hour * 12,
 		},
 	}
 }
