@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fs"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/idp"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 )

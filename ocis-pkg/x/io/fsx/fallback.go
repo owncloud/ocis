@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/path/filepath"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/path/filepathx"
 )
 
 // FallbackFS is a FileSystem that tries to load from assetPath first

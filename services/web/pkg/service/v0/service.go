@@ -21,7 +21,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fs"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"

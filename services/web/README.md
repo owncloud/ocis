@@ -122,7 +122,7 @@ The local provided configuration yaml will always override the shipped applicati
 Besides the configuration and application registration, there is one further important aspect to now;
 in the process of loading the application assets, the system uses a fallback mechanism to load the assets.
 
-This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or a favicon.
+This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or similar.
 
 Consider the following, ocis is shipped with a default extension called `image-viewer-dfx` which contains a logo,
 but the administrator wants to provide a custom logo for the `image-viewer-dfx` application.
