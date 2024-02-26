@@ -29,6 +29,8 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	// web apps are a special case, as they are not part of the main config, but are loaded from a separate config file
+	// fixme: loading from a file named web.apps.yml indicates the system is only capable of loading static web apps,
+	// instead i prefer to have something like extensions.yml to be able to also inject proxy routes etc.
 	_, err = ociscfg.BindSourcesToStructs(cfg.Service.Name+".apps", &cfg.Apps)
 	if err != nil {
 		return err
