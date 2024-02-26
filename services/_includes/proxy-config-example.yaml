@@ -159,6 +159,14 @@ pre_signed_url:
   allowed_http_methods:
   - GET
   enabled: true
+  signing_keys:
+    store: nats-js-kv
+    addresses:
+    - 127.0.0.1:9233
+    ttl: 12h0m0s
+    disable_persistence: true
+    username: ""
+    password: ""
 account_backend: cs3
 user_oidc_claim: preferred_username
 user_cs3_claim: username

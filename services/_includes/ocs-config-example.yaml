@@ -43,5 +43,12 @@ http:
     cert: ""
     key: ""
 grpc_client_tls: null
+signing_keys:
+  store: nats-js-kv
+  addresses:
+  - 127.0.0.1:9233
+  ttl: 12h0m0s
+  username: ""
+  password: ""
 token_manager:
   jwt_secret: ""
