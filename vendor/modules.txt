@@ -1882,7 +1882,7 @@ go-micro.dev/v4/util/ring
 go-micro.dev/v4/util/signal
 go-micro.dev/v4/util/socket
 go-micro.dev/v4/util/tls
-# go.etcd.io/bbolt v1.3.8
+# go.etcd.io/bbolt v1.3.9
 ## explicit; go 1.17
 go.etcd.io/bbolt
 # go.etcd.io/etcd/api/v3 v3.5.12

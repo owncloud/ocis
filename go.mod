@@ -87,7 +87,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.10.2
-	go.etcd.io/bbolt v1.3.8
+	go.etcd.io/bbolt v1.3.9
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0
 	go.opentelemetry.io/contrib/zpages v0.48.0
 	go.opentelemetry.io/otel v1.23.1
