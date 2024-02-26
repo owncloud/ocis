@@ -293,8 +293,12 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, share 
 	}
 
 	if uRes.Status.Code != rpc.Code_CODE_OK {
-		if uRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
+		switch uRes.Status.Code {
+		case rpc.Code_CODE_NOT_FOUND:
 			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "not found", nil)
+			return
+		case rpc.Code_CODE_LOCKED:
+			response.WriteOCSError(w, r, response.MetaLocked.StatusCode, uRes.GetStatus().GetMessage(), nil)
 			return
 		}
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc delete share request failed", err)

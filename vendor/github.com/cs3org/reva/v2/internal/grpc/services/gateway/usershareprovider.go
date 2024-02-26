@@ -106,6 +106,15 @@ func (s *svc) ListShares(ctx context.Context, req *collaboration.ListSharesReque
 }
 
 func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+	// TODO: update wopi server
+	// FIXME This is a workaround that should prevent removing or changing the share permissions when the file is locked.
+	// https://github.com/owncloud/ocis/issues/8474
+	if status, err := s.checkLock(ctx, req.GetShare().GetId()); err != nil {
+		return &collaboration.UpdateShareResponse{
+			Status: status,
+		}, nil
+	}
+
 	c, err := pool.GetUserShareProviderClient(s.c.UserShareProviderEndpoint)
 	if err != nil {
 		appctx.GetLogger(ctx).
@@ -657,6 +666,15 @@ func (s *svc) removeShare(ctx context.Context, req *collaboration.RemoveShareReq
 		share = getShareRes.Share
 	}
 
+	// TODO: update wopi server
+	// FIXME This is a workaround that should prevent removing or changing the share permissions when the file is locked.
+	// https://github.com/owncloud/ocis/issues/8474
+	if status, err := s.checkShareLock(ctx, share); err != nil {
+		return &collaboration.RemoveShareResponse{
+			Status: status,
+		}, nil
+	}
+
 	res, err := c.RemoveShare(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling RemoveShare")
@@ -710,6 +728,55 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), ref)
 	s.providerCache.RemoveListStorageProviders(ref)
 	return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
+}
+
+func (s *svc) checkLock(ctx context.Context, shareId *collaboration.ShareId) (*rpc.Status, error) {
+	logger := appctx.GetLogger(ctx)
+	getShareRes, err := s.GetShare(ctx, &collaboration.GetShareRequest{
+		Ref: &collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Id{Id: shareId},
+		},
+	})
+	if err != nil {
+		msg := "gateway: error calling GetShare"
+		logger.Err(err).Interface("share_id", shareId).Msg(msg)
+		return status.NewInternal(ctx, msg), errors.Wrap(err, msg)
+	}
+	if getShareRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		msg := "can not get share stat " + getShareRes.GetStatus().GetMessage()
+		logger.Debug().Interface("share", shareId).Msg(msg)
+		if getShareRes.GetStatus().GetCode() != rpc.Code_CODE_NOT_FOUND {
+			return status.NewNotFound(ctx, msg), errors.New(msg)
+		}
+		return status.NewInternal(ctx, msg), errors.New(msg)
+	}
+	return s.checkShareLock(ctx, getShareRes.Share)
+}
+
+func (s *svc) checkShareLock(ctx context.Context, share *collaboration.Share) (*rpc.Status, error) {
+	logger := appctx.GetLogger(ctx)
+	sRes, err := s.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: share.GetResourceId()},
+		ArbitraryMetadataKeys: []string{"lockdiscovery"}})
+	if err != nil {
+		msg := "failed to stat shared resource"
+		logger.Err(err).Interface("resource_id", share.GetResourceId()).Msg(msg)
+		return status.NewInternal(ctx, msg), errors.Wrap(err, msg)
+	}
+	if sRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		msg := "can not get share stat " + sRes.GetStatus().GetMessage()
+		logger.Debug().Interface("lock", sRes.GetInfo().GetLock()).Msg(msg)
+		if sRes.GetStatus().GetCode() != rpc.Code_CODE_NOT_FOUND {
+			return status.NewNotFound(ctx, msg), errors.New(msg)
+		}
+		return status.NewInternal(ctx, msg), errors.New(msg)
+	}
+
+	if sRes.GetInfo().GetLock() != nil {
+		msg := "can not chane grants, the shared resource is locked"
+		logger.Debug().Interface("lock", sRes.GetInfo().GetLock()).Msg(msg)
+		return status.NewLocked(ctx, msg), errors.New(msg)
+	}
+	return nil, nil
 }
 
 func refIsSpaceRoot(ref *provider.ResourceId) bool {
