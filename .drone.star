@@ -2146,21 +2146,8 @@ def skipIfUnchanged(ctx, type):
     }]
 
 def example_deploys(ctx):
-    on_merge_deploy = [
-        "ocis_ldap/latest.yml",
-        "ocis_keycloak/latest.yml",
-        "ocis_traefik/latest.yml",
-        "ocis_wopi/latest.yml",
-        "ocis_s3/latest.yml",
-    ]
-    nightly_deploy = [
-        "ocis_ldap/released.yml",
-        "ocis_keycloak/released.yml",
-        "ocis_traefik/released.yml",
-        "ocis_wopi/released.yml",
-        "ocis_traefik/daily.yml",
-        "ocis_wopi/daily.yml",
-    ]
+    on_merge_deploy = []
+    nightly_deploy = []
 
     # if on master branch:
     configs = on_merge_deploy
