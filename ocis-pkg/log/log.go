@@ -55,16 +55,13 @@ func setMicroLogger() {
 func setDefaultLogger() {
 	var opts []Option
 
+	opts = append(opts,
+		Pretty(os.Getenv("OCIS_LOG_PRETTY") == "true"),
+		Color(os.Getenv("OCIS_LOG_COLOR") == "true"),
+	)
+
 	if level := os.Getenv("OCIS_LOG_LEVEL"); level != "" {
 		opts = append(opts, Level(level))
-	}
-
-	if pretty := os.Getenv("OCIS_LOG_PRETTY"); pretty == "true" {
-		opts = append(opts, Pretty(true))
-	}
-
-	if color := os.Getenv("OCIS_LOG_COLOR"); color == "true" {
-		opts = append(opts, Color(true))
 	}
 
 	if file := os.Getenv("OCIS_LOG_FILE"); file != "" {
@@ -119,7 +116,6 @@ func NewLogger(opts ...Option) Logger {
 
 	// set GlobalLevel() to the minimum value -1 = TraceLevel, so that only the services' log level matter
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
-
 	var logLevel zerolog.Level
 	switch strings.ToLower(options.Level) {
 	case "panic":
