@@ -50,6 +50,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
 * Bugfix - Graph/sharedWithMe align IDs with webdav response: [#8467](https://github.com/owncloud/ocis/pull/8467)
 * Bugfix - Bump reva to pull in changes to fix recursive trashcan purge: [#8505](https://github.com/owncloud/ocis/pull/8505)
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
 * Enhancement - Use environment variables in yaml config files: [#8339](https://github.com/owncloud/ocis/pull/8339)
@@ -128,6 +129,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8473
    https://github.com/owncloud/ocis/pull/8505
    https://github.com/cs3org/reva/pull/4533
+
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+
+   We wrapped the store service in a micro store implementation and changed the
+   default to the built-in NATS instance.
+
+   https://github.com/owncloud/ocis/pull/8419
 
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 
