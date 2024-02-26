@@ -82,12 +82,15 @@ func TestFallbackFS_Open(t *testing.T) {
 	defer cleanup()
 
 	foo, _ := fsys.Open(m["foo.txt"])
+	defer foo.Close()
 	testFallbackFSContent(t, foo, "foo - fs")
 
 	bar, _ := fsys.Open(m["bar.txt"])
+	defer bar.Close()
 	testFallbackFSContent(t, bar, "bar - fs")
 
 	baz, _ := fsys.Open(m["baz.txt"])
+	defer baz.Close()
 	testFallbackFSContent(t, baz, "baz - embedded")
 }
 
@@ -99,12 +102,15 @@ func TestFallbackFS_OpenEmbedded(t *testing.T) {
 	defer cleanup()
 
 	foo, _ := fsys.OpenEmbedded(m["foo.txt"])
+	defer foo.Close()
 	testFallbackFSContent(t, foo, "foo - embedded")
 
 	bar, _ := fsys.OpenEmbedded(m["bar.txt"])
+	defer bar.Close()
 	testFallbackFSContent(t, bar, "bar - embedded")
 
 	baz, _ := fsys.OpenEmbedded(m["baz.txt"])
+	defer baz.Close()
 	testFallbackFSContent(t, baz, "baz - embedded")
 }
 
@@ -117,6 +123,7 @@ func TestFallbackFS_Create(t *testing.T) {
 
 	baz, _ := fsys.Open("baz.txt")
 	testFallbackFSContent(t, baz, "baz - embedded")
+	_ = baz.Close()
 
 	// parent directory access is here to test the jail join
 	f, err := fsys.Create("../././././././baz.txt")
@@ -133,4 +140,5 @@ func TestFallbackFS_Create(t *testing.T) {
 
 	baz, _ = fsys.Open("baz.txt")
 	testFallbackFSContent(t, baz, "baz - fs")
+	_ = baz.Close()
 }

@@ -27,6 +27,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"

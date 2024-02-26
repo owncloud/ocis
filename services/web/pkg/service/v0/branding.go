@@ -188,6 +188,7 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	if err != nil {
 		return err
 	}
+	defer dst.Close()
 
 	return json.NewEncoder(dst).Encode(m)
 }

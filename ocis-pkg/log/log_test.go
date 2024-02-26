@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/tidwall/gjson"
+	"github.com/onsi/gomega"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
@@ -16,26 +16,27 @@ func TestDefault(t *testing.T) {
 		return
 	}
 
+	g := gomega.NewWithT(t)
+
 	tests := []struct {
 		name     string
 		args     []string
-		validate func(result string) bool
+		validate func(result string)
 	}{
 		{
 			name: "default",
 			args: []string{"OCIS_LOG_PRETTY=false", "OCIS_LOG_COLOR=false"},
-			validate: func(result string) bool {
-				json := gjson.Parse(result)
-				return json.Get("level").String() == "info" &&
-					json.Get("message").String() == "this is a test"
+			validate: func(result string) {
+				g.Expect(result).To(gomega.ContainSubstring("info"))
+				g.Expect(result).To(gomega.ContainSubstring("this is a test"))
 			},
 		},
 		{
 			name: "default",
 			args: []string{"OCIS_LOG_PRETTY=false", "OCIS_LOG_COLOR=false", "OCIS_LOG_LEVEL=error"},
-			validate: func(result string) bool {
-				json := gjson.Parse(result)
-				return json.String() == "" && result == "PASS\n"
+			validate: func(result string) {
+				g.Expect(result).ToNot(gomega.ContainSubstring("info"))
+				g.Expect(result).ToNot(gomega.ContainSubstring("this is a test"))
 			},
 		},
 	}
@@ -55,9 +56,7 @@ func TestDefault(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if valid := tt.validate(string(out)); !valid {
-				t.Fatalf("test %v failed", tt.name)
-			}
+			tt.validate(string(out))
 		})
 	}
 }

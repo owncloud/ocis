@@ -29,10 +29,12 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// not every fs contains a file named index.html,
 		// therefore, we need to check if the file exists and stop the recursion if it doesn't
-		if _, err := f.fsys.Open(r.URL.Path); err != nil {
+		file, err := f.fsys.Open(r.URL.Path)
+		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
+		defer file.Close()
 
 		f.ServeHTTP(w, r)
 	}

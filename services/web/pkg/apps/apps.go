@@ -114,6 +114,7 @@ func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error)
 		// manifest.json is required
 		return Application{}, errors.Join(err, ErrMissingManifest)
 	}
+	defer reader.Close()
 
 	var application Application
 	if json.NewDecoder(reader).Decode(&application) != nil {
