@@ -1,4 +1,4 @@
-Enhancement: bump reva
+Enhancement: drop the unnecessary grants exists check when creating shares
 
 We have bumped reva to drop the unnecessary grants exists check when creating shares.
 
