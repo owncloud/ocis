@@ -85,7 +85,7 @@ Feature: Notification
                 },
                 "id": {
                   "type": "string",
-                  "enim": ["%user_id%"]
+                  "pattern": "^%user_id_pattern%$"
                 },
                 "name": {
                   "type": "string",
