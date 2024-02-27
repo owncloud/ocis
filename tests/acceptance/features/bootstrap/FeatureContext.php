@@ -579,7 +579,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		$this->originalAdminPassword = $this->adminPassword;
 
-		$this->jsonSchemaValidators = array_keys(JsonSchema::properties()->getDataKeyMap());
+		$this->jsonSchemaValidators = \array_keys(JsonSchema::properties()->getDataKeyMap());
 	}
 
 	/**
@@ -1221,9 +1221,9 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	private function checkInvalidValidator(JsonSchema $schemaObj): void {
-		$validators = array_keys((array)$schemaObj->jsonSerialize());
+		$validators = \array_keys((array)$schemaObj->jsonSerialize());
 		foreach ($validators as $validator) {
-			Assert::assertContains(trim($validator, "$"), $this->jsonSchemaValidators, "Invalid schema validator: '$validator'");
+			Assert::assertContains(\ltrim($validator, "$"), $this->jsonSchemaValidators, "Invalid schema validator: '$validator'");
 		}
 	}
 
@@ -1238,6 +1238,10 @@ class FeatureContext extends BehatVariablesContext {
 	public function validateSchemaObject(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
+		if (!$this->isJsonObject($schemaObj)) {
+			return;
+		}
+
 		$notAllowedValidators = ["items", "maxItems", "minItems", "uniqueItems"];
 
 		// check invalid validators
@@ -1248,8 +1252,8 @@ class FeatureContext extends BehatVariablesContext {
 		$propNames = $schemaObj->getPropertyNames();
 		$props = $schemaObj->getProperties();
 		foreach ($propNames as $propName) {
-			switch ($props->$propName->type) {
-				case 'array':
+			switch (true) {
+				case $this->isJsonArray($props->$propName):
 					$this->validateSchemaArray($props->$propName);
 					break;
 				default:
@@ -1273,6 +1277,10 @@ class FeatureContext extends BehatVariablesContext {
 	private function validateSchemaArray(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
+		if (!$this->isJsonArray($schemaObj)) {
+			return;
+		}
+
 		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
 		if ($schemaObj->enum || $schemaObj->const) {
@@ -1287,7 +1295,7 @@ class FeatureContext extends BehatVariablesContext {
 
 		// check invalid validators
 		foreach ($notAllowedValidators as $validator) {
-			Assert::assertTrue(null === $schemaObj->$validator, "'$validator' should not be used in array type");
+			Assert::assertNull($schemaObj->$validator, "'$validator' should not be used in array type");
 		}
 
 		// check required validators
@@ -1301,7 +1309,7 @@ class FeatureContext extends BehatVariablesContext {
 		foreach ($optionalValidators as $validator) {
 			$value = $schemaObj->$validator;
 			switch ($validator) {
-				case 'items':
+				case "items":
 					if ($schemaObj->maxItems === 0) {
 						break;
 					}
@@ -1343,6 +1351,24 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return bool
+	 */
+	private function isJsonObject(JsonSchema $schemaObj): bool {
+		return $schemaObj->type === "object" || $schemaObj->properties !== null || $schemaObj->required !== null;
+	}
+
+	/**
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return bool
+	 */
+	private function isJsonArray(JsonSchema $schemaObj): bool {
+		return $schemaObj->type === "array" || $schemaObj->items !== null || $schemaObj->minItems !== null || $schemaObj->maxItems !== null;
+	}
+
+	/**
 	 * Validates the json schema requirements
 	 *
 	 * @param JsonSchema $schema
@@ -1351,11 +1377,11 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function validateSchemaRequirements(JsonSchema $schema): void {
-		switch ($schema->type) {
-			case "object":
+		switch (true) {
+			case $this->isJsonObject($schema):
 				$this->validateSchemaObject($schema);
 				break;
-			case 'array':
+			case $this->isJsonArray($schema):
 				$this->validateSchemaArray($schema);
 				break;
 			default:
