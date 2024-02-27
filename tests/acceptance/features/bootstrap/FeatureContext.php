@@ -1238,31 +1238,27 @@ class FeatureContext extends BehatVariablesContext {
 	public function validateSchemaObject(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
-		if (!$this->isJsonObject($schemaObj)) {
-			return;
-		}
+		if ($schemaObj->type && $schemaObj->type !== "object") return;
 
 		$notAllowedValidators = ["items", "maxItems", "minItems", "uniqueItems"];
 
 		// check invalid validators
 		foreach ($notAllowedValidators as $validator) {
-			Assert::assertTrue(null === $schemaObj->$validator, "'$validator' should not be used in object type");
+			Assert::assertTrue(null === $schemaObj->$validator, "'$validator' should not be used with object type");
 		}
 
 		$propNames = $schemaObj->getPropertyNames();
 		$props = $schemaObj->getProperties();
 		foreach ($propNames as $propName) {
-			switch (true) {
-				case $this->isJsonArray($props->$propName):
+			switch ($props->type) {
+				case "array":
 					$this->validateSchemaArray($props->$propName);
 					break;
 				default:
 					break;
 			}
 			// traverse for nested properties
-			if ($props->$propName->getProperties()) {
-				$this->validateSchemaObject($props->$propName);
-			}
+			$this->validateSchemaObject($props->$propName);
 		}
 	}
 
@@ -1277,9 +1273,7 @@ class FeatureContext extends BehatVariablesContext {
 	private function validateSchemaArray(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
-		if (!$this->isJsonArray($schemaObj)) {
-			return;
-		}
+		if ($schemaObj->type && $schemaObj->type !== "array") return;
 
 		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
@@ -1295,7 +1289,7 @@ class FeatureContext extends BehatVariablesContext {
 
 		// check invalid validators
 		foreach ($notAllowedValidators as $validator) {
-			Assert::assertNull($schemaObj->$validator, "'$validator' should not be used in array type");
+			Assert::assertTrue($schemaObj->$validator === null, "'$validator' should not be used with array type");
 		}
 
 		// check required validators
@@ -1351,24 +1345,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param JsonSchema $schemaObj
-	 *
-	 * @return bool
-	 */
-	private function isJsonObject(JsonSchema $schemaObj): bool {
-		return $schemaObj->type === "object" || $schemaObj->properties !== null || $schemaObj->required !== null;
-	}
-
-	/**
-	 * @param JsonSchema $schemaObj
-	 *
-	 * @return bool
-	 */
-	private function isJsonArray(JsonSchema $schemaObj): bool {
-		return $schemaObj->type === "array" || $schemaObj->items !== null || $schemaObj->minItems !== null || $schemaObj->maxItems !== null;
-	}
-
-	/**
 	 * Validates the json schema requirements
 	 *
 	 * @param JsonSchema $schema
@@ -1377,11 +1353,13 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function validateSchemaRequirements(JsonSchema $schema): void {
-		switch (true) {
-			case $this->isJsonObject($schema):
+		Assert::assertNotNull($schema->type, "'type' is required for root level schema");
+
+		switch ($schema->type) {
+			case "object":
 				$this->validateSchemaObject($schema);
 				break;
-			case $this->isJsonArray($schema):
+			case "array":
 				$this->validateSchemaArray($schema);
 				break;
 			default:
