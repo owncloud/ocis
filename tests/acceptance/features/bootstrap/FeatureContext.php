@@ -57,6 +57,12 @@ class FeatureContext extends BehatVariablesContext {
 	use WebDav;
 
 	/**
+	 * json schema validator keywords
+	 * See: https://json-schema.org/draft-06/draft-wright-json-schema-validation-01#rfc.section.6
+	 */
+	private array $jsonSchemaValidators = [];
+
+	/**
 	 * Unix timestamp seconds
 	 */
 	private int $scenarioStartTime;
@@ -572,6 +578,8 @@ class FeatureContext extends BehatVariablesContext {
 			$this->publicLinkSharePassword = $publicLinkSharePasswordFromEnvironment;
 		}
 		$this->originalAdminPassword = $this->adminPassword;
+
+		$this->jsonSchemaValidators = array_keys(JsonSchema::properties()->getDataKeyMap());
 	}
 
 	/**
@@ -1207,6 +1215,54 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function checkInvalidValidator(JsonSchema $schemaObj): void {
+		$validators = array_keys((array)$schemaObj->jsonSerialize());
+		foreach ($validators as $validator) {
+			Assert::assertContains(trim($validator, "$"), $this->jsonSchemaValidators, "Invalid schema validator: '$validator'");
+		}
+	}
+
+	/**
+	 * Validates against the requirements that object schema should adhere to
+	 *
+	 * @param JsonSchema $schemaObj
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function validateSchemaObject(JsonSchema $schemaObj): void {
+		$this->checkInvalidValidator($schemaObj);
+
+		$notAllowedValidators = ["items", "maxItems", "minItems", "uniqueItems"];
+
+		// check invalid validators
+		foreach ($notAllowedValidators as $validator) {
+			Assert::assertTrue(null === $schemaObj->$validator, "'$validator' should not be used in object type");
+		}
+
+		$propNames = $schemaObj->getPropertyNames();
+		$props = $schemaObj->getProperties();
+		foreach ($propNames as $propName) {
+			switch ($props->$propName->type) {
+				case 'array':
+					$this->validateSchemaArray($props->$propName);
+					break;
+				default:
+					break;
+			}
+			// traverse for nested properties
+			if ($props->$propName->getProperties()) {
+				$this->validateSchemaObject($props->$propName);
+			}
+		}
+	}
+
+	/**
 	 * Validates against the requirements that array schema should adhere to
 	 *
 	 * @param JsonSchema $schemaObj
@@ -1214,7 +1270,9 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 * @throws Exception
 	 */
-	private function validateSchemaArrayEntries(JsonSchema $schemaObj): void {
+	private function validateSchemaArray(JsonSchema $schemaObj): void {
+		$this->checkInvalidValidator($schemaObj);
+
 		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
 		if ($schemaObj->enum || $schemaObj->const) {
@@ -1224,16 +1282,22 @@ class FeatureContext extends BehatVariablesContext {
 
 		$requiredValidators = ["maxItems", "minItems"];
 		$optionalValidators = ["items", "uniqueItems"];
+		$notAllowedValidators = ["properties", "minProperties", "maxProperties", "required"];
 		$errMsg = "'%s' is required for array assertion";
 
-		// validate required keywords
+		// check invalid validators
+		foreach ($notAllowedValidators as $validator) {
+			Assert::assertTrue(null === $schemaObj->$validator, "'$validator' should not be used in array type");
+		}
+
+		// check required validators
 		foreach ($requiredValidators as $validator) {
 			Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
 		}
 
 		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' should be equal for strict assertion");
 
-		// validate optional keywords
+		// check optional validators
 		foreach ($optionalValidators as $validator) {
 			$value = $schemaObj->$validator;
 			switch ($validator) {
@@ -1267,6 +1331,15 @@ class FeatureContext extends BehatVariablesContext {
 					break;
 			}
 		}
+
+		$items = $schemaObj->items;
+		if ($items !== null && $items->oneOf !== null) {
+			foreach ($items->oneOf as $oneOfItem) {
+				$this->validateSchemaObject($oneOfItem);
+			}
+		} elseif ($items !== null) {
+			$this->validateSchemaObject($items);
+		}
 	}
 
 	/**
@@ -1278,29 +1351,15 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function validateSchemaRequirements(JsonSchema $schema): void {
-		$propNames = $schema->getPropertyNames();
-		$props = $schema->getProperties();
-		foreach ($propNames as $propName) {
-			switch ($props->$propName->type) {
-				case 'array':
-					$this->validateSchemaArrayEntries($props->$propName);
-					$items = $props->$propName->items;
-					if ($items && $items->oneOf) {
-						foreach ($items->oneOf as $oneOfItem) {
-							$this->validateSchemaRequirements($oneOfItem);
-						}
-						break;
-					} elseif ($items) {
-						$this->validateSchemaRequirements($items);
-					}
-					break;
-				default:
-					break;
-			}
-			// traverse for nested properties
-			if ($props->$propName->getProperties()) {
-				$this->validateSchemaRequirements($props->$propName);
-			}
+		switch ($schema->type) {
+			case "object":
+				$this->validateSchemaObject($schema);
+				break;
+			case 'array':
+				$this->validateSchemaArray($schema);
+				break;
+			default:
+				break;
 		}
 	}
 
