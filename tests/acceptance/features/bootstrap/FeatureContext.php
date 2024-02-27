@@ -1238,7 +1238,9 @@ class FeatureContext extends BehatVariablesContext {
 	public function validateSchemaObject(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
-		if ($schemaObj->type && $schemaObj->type !== "object") return;
+		if ($schemaObj->type && $schemaObj->type !== "object") {
+			return;
+		}
 
 		$notAllowedValidators = ["items", "maxItems", "minItems", "uniqueItems"];
 
@@ -1273,7 +1275,9 @@ class FeatureContext extends BehatVariablesContext {
 	private function validateSchemaArray(JsonSchema $schemaObj): void {
 		$this->checkInvalidValidator($schemaObj);
 
-		if ($schemaObj->type && $schemaObj->type !== "array") return;
+		if ($schemaObj->type && $schemaObj->type !== "array") {
+			return;
+		}
 
 		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
