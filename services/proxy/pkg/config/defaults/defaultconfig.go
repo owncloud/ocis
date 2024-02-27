@@ -65,7 +65,7 @@ func DefaultConfig() *config.Config {
 					{RoleName: "admin", ClaimValue: "ocisAdmin"},
 					{RoleName: "spaceadmin", ClaimValue: "ocisSpaceAdmin"},
 					{RoleName: "user", ClaimValue: "ocisUser"},
-					{RoleName: "guest", ClaimValue: "ocisGuest"},
+					{RoleName: "user-light", ClaimValue: "ocisGuest"},
 				},
 			},
 		},
