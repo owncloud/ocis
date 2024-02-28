@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.0-rc.5](#changelog-for-500-rc5-2024-02-26)
 * [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
 * [Changelog for 4.0.5](#changelog-for-405-2023-12-21)
@@ -32,6 +33,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.5...master
+
+## Summary
+
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+
+## Details
+
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+
+   We wrapped the store service in a micro store implementation and changed the
+   default to the built-in NATS instance.
+
+   https://github.com/owncloud/ocis/pull/8419
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
