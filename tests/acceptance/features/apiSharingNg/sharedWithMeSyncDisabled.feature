@@ -2814,3 +2814,346 @@ Feature: listing sharedWithMe when auto-sync is disabled
         }
       }
       """
+
+
+  Scenario: user who is also a member of group lists file shared with them from project-space
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | projectSpace |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | File Editor  |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | projectSpace |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden": {
+                  "const": false
+                },
+                "@client.synchronize": {
+                  "const": false
+                },
+                "name": {
+                  "const": "textfile.txt"
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Brian Murphy"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["group"],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "grp1"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%group_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user who is also a member of group lists folder shared with them from project-space
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden": {
+                  "const": false
+                },
+                "@client.synchronize": {
+                  "const": false
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Brian Murphy"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["group"],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "grp1"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%group_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
