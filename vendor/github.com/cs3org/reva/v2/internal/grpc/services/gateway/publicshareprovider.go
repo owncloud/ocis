@@ -21,11 +21,9 @@ package gateway
 import (
 	"context"
 
-	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/pkg/errors"
 )
@@ -39,15 +37,7 @@ func (s *svc) CreatePublicShare(ctx context.Context, req *link.CreatePublicShare
 		return nil, err
 	}
 
-	res, err := c.CreatePublicShare(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.GetShare() != nil {
-		s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), res.Share.ResourceId)
-	}
-	return res, nil
+	return c.CreatePublicShare(ctx, req)
 }
 
 func (s *svc) RemovePublicShare(ctx context.Context, req *link.RemovePublicShareRequest) (*link.RemovePublicShareResponse, error) {
@@ -58,13 +48,7 @@ func (s *svc) RemovePublicShare(ctx context.Context, req *link.RemovePublicShare
 	if err != nil {
 		return nil, err
 	}
-	res, err := driver.RemovePublicShare(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: How to find out the resourceId? -> get public share first, then delete
-	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), nil)
-	return res, nil
+	return driver.RemovePublicShare(ctx, req)
 }
 
 func (s *svc) GetPublicShareByToken(ctx context.Context, req *link.GetPublicShareByTokenRequest) (*link.GetPublicShareByTokenResponse, error) {
@@ -137,17 +121,5 @@ func (s *svc) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicShare
 		}, nil
 	}
 
-	res, err := pClient.UpdatePublicShare(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "error updating share")
-	}
-	if res.GetShare() != nil {
-		s.statCache.RemoveStatContext(ctx,
-			&userprovider.UserId{
-				OpaqueId: res.Share.Owner.GetOpaqueId(),
-			},
-			res.Share.ResourceId,
-		)
-	}
-	return res, nil
+	return pClient.UpdatePublicShare(ctx, req)
 }

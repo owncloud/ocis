@@ -28,7 +28,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
-	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
@@ -52,9 +51,4 @@ func EmitFileUploadedEvent(spaceOwnerOrManager, executant *userv1beta1.UserId, r
 	}
 
 	return events.Publish(context.Background(), publisher, uploadedEv)
-}
-
-// InvalidateCache is a helper function which invalidates the stat cache
-func InvalidateCache(owner *userv1beta1.UserId, ref *provider.Reference, statCache cache.StatCache) {
-	statCache.RemoveStatContext(context.TODO(), owner, ref.GetResourceId())
 }

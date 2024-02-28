@@ -20,7 +20,6 @@ package gateway
 
 import (
 	"context"
-	"strings"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -84,38 +83,7 @@ func (c *cachedRegistryClient) GetHome(ctx context.Context, in *registry.GetHome
 
 type cachedAPIClient struct {
 	c                        provider.ProviderAPIClient
-	statCache                cache.StatCache
 	createPersonalSpaceCache cache.CreatePersonalSpaceCache
-}
-
-// Stat looks in cache first before forwarding to storage provider
-func (c *cachedAPIClient) Stat(ctx context.Context, in *provider.StatRequest, opts ...grpc.CallOption) (*provider.StatResponse, error) {
-	key := c.statCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId(), in.GetRef(), in.GetArbitraryMetadataKeys(), in.GetFieldMask().GetPaths())
-	if key != "" {
-		s := &provider.StatResponse{}
-		if err := c.statCache.PullFromCache(key, s); err == nil {
-			return s, nil
-		}
-	}
-
-	resp, err := c.c.Stat(ctx, in, opts...)
-	switch {
-	case err != nil:
-		return nil, err
-	case resp.Status.Code != rpc.Code_CODE_OK:
-		return resp, nil
-	case key == "":
-		return resp, nil
-	case strings.Contains(key, "sid:"+utils.ShareStorageProviderID):
-		// We cannot cache shares at the moment:
-		// we do not know when to invalidate them
-		// FIXME: find a way to cache/invalidate them too
-		return resp, nil
-	case utils.ReadPlainFromOpaque(resp.GetInfo().GetOpaque(), "status") == "processing":
-		return resp, nil
-	default:
-		return resp, c.statCache.PushToCache(key, resp)
-	}
 }
 
 // CreateHome caches calls to CreateHome locally - anyways they only need to be called once per user
@@ -140,8 +108,37 @@ func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHom
 	}
 }
 
+// CreateStorageSpace creates a storage space
+func (c *cachedAPIClient) CreateStorageSpace(ctx context.Context, in *provider.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.CreateStorageSpaceResponse, error) {
+	if in.Type == "personal" {
+		key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
+		if key != "" {
+			s := &provider.CreateStorageSpaceResponse{}
+			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
+				return s, nil
+			}
+		}
+		resp, err := c.c.CreateStorageSpace(ctx, in, opts...)
+		switch {
+		case err != nil:
+			return nil, err
+		case resp.Status.Code != rpc.Code_CODE_OK && resp.Status.Code != rpc.Code_CODE_ALREADY_EXISTS:
+			return resp, nil
+		case key == "":
+			return resp, nil
+		default:
+			return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
+		}
+	}
+	return c.c.CreateStorageSpace(ctx, in, opts...)
+}
+
 // methods below here are not cached, they just call the client directly
 
+// Stat returns the Resoure info for a given resource
+func (c *cachedAPIClient) Stat(ctx context.Context, in *provider.StatRequest, opts ...grpc.CallOption) (*provider.StatResponse, error) {
+	return c.c.Stat(ctx, in, opts...)
+}
 func (c *cachedAPIClient) AddGrant(ctx context.Context, in *provider.AddGrantRequest, opts ...grpc.CallOption) (*provider.AddGrantResponse, error) {
 	return c.c.AddGrant(ctx, in, opts...)
 }
@@ -229,29 +226,6 @@ func (c *cachedAPIClient) Unlock(ctx context.Context, in *provider.UnlockRequest
 func (c *cachedAPIClient) GetHome(ctx context.Context, in *provider.GetHomeRequest, opts ...grpc.CallOption) (*provider.GetHomeResponse, error) {
 	return c.c.GetHome(ctx, in, opts...)
 }
-func (c *cachedAPIClient) CreateStorageSpace(ctx context.Context, in *provider.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.CreateStorageSpaceResponse, error) {
-	if in.Type == "personal" {
-		key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
-		if key != "" {
-			s := &provider.CreateStorageSpaceResponse{}
-			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
-				return s, nil
-			}
-		}
-		resp, err := c.c.CreateStorageSpace(ctx, in, opts...)
-		switch {
-		case err != nil:
-			return nil, err
-		case resp.Status.Code != rpc.Code_CODE_OK && resp.Status.Code != rpc.Code_CODE_ALREADY_EXISTS:
-			return resp, nil
-		case key == "":
-			return resp, nil
-		default:
-			return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
-		}
-	}
-	return c.c.CreateStorageSpace(ctx, in, opts...)
-}
 func (c *cachedAPIClient) ListStorageSpaces(ctx context.Context, in *provider.ListStorageSpacesRequest, opts ...grpc.CallOption) (*provider.ListStorageSpacesResponse, error) {
 	return c.c.ListStorageSpaces(ctx, in, opts...)
 }
@@ -261,7 +235,6 @@ func (c *cachedAPIClient) UpdateStorageSpace(ctx context.Context, in *provider.U
 func (c *cachedAPIClient) DeleteStorageSpace(ctx context.Context, in *provider.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*provider.DeleteStorageSpaceResponse, error) {
 	return c.c.DeleteStorageSpace(ctx, in, opts...)
 }
-
 func (c *cachedAPIClient) TouchFile(ctx context.Context, in *provider.TouchFileRequest, opts ...grpc.CallOption) (*provider.TouchFileResponse, error) {
 	return c.c.TouchFile(ctx, in, opts...)
 }
