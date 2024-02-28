@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# fnoopv <fnoopv@outlook.com>, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2024-02-28 00:20+0000\n"
+"PO-Revision-Date: 2023-03-15 08:28+0000\n"
+"Last-Translator: fnoopv <fnoopv@outlook.com>, 2024\n"
+"Language-Team: Chinese Simplified (https://app.transifex.com/owncloud-org/teams/6149/zh-Hans/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: pkg/service/templates.go:40
+msgid "Access to Space {space} lost"
+msgstr "已失去对空间 {space} 的访问权限"
+
+#: pkg/service/templates.go:55
+msgid "Access to {resource} expired"
+msgstr "对 {resource} 的访问权限已过期"
+
+#: pkg/service/templates.go:60
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr "注意！实例将在{date}关闭并取消预配。请在该日期之前下载所有数据，因为该日期后将无法访问。"
+
+#: pkg/service/templates.go:15
+msgid "File {resource} was deleted because it violates the policies"
+msgstr "文件 {resource} 因违反了策略已被删除"
+
+#: pkg/service/templates.go:59
+msgid "Instance will be shut down and deprovisioned"
+msgstr "实例将被关闭并取消配置"
+
+#: pkg/service/templates.go:39
+msgid "Membership expired"
+msgstr "成员身份过期"
+
+#: pkg/service/templates.go:14
+msgid "Policies enforced"
+msgstr "策略已执行"
+
+#: pkg/service/templates.go:24
+msgid "Removed from Space"
+msgstr "已从空间中删除"
+
+#: pkg/service/templates.go:44
+msgid "Resource shared"
+msgstr "资源已共享"
+
+#: pkg/service/templates.go:49
+msgid "Resource unshared"
+msgstr "资源未共享"
+
+#: pkg/service/templates.go:54
+msgid "Share expired"
+msgstr "共享已过期"
+
+#: pkg/service/templates.go:34
+msgid "Space deleted"
+msgstr "空间已删除"
+
+#: pkg/service/templates.go:29
+msgid "Space disabled"
+msgstr "空间已禁用"
+
+#: pkg/service/templates.go:19
+msgid "Space shared"
+msgstr "空间已共享"
+
+#: pkg/service/templates.go:9
+msgid "Virus found"
+msgstr "发现病毒"
+
+#: pkg/service/templates.go:10
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr "在 {resource} 中发现了病毒。 上传无法完成。病毒： {virus}"
+
+#: pkg/service/templates.go:20
+msgid "{user} added you to Space {space}"
+msgstr "{user} 已将你加入空间 {space}"
+
+#: pkg/service/templates.go:35
+msgid "{user} deleted Space {space}"
+msgstr "{user} 删除了空间 {space}"
+
+#: pkg/service/templates.go:30
+msgid "{user} disabled Space {space}"
+msgstr "{user} 禁用了空间 {space}"
+
+#: pkg/service/templates.go:25
+msgid "{user} removed you from Space {space}"
+msgstr "{user} 已将你从空间 {space} 中移除"
+
+#: pkg/service/templates.go:45
+msgid "{user} shared {resource} with you"
+msgstr "{user} 和你共享了 {resource}"
+
+#: pkg/service/templates.go:50
+msgid "{user} unshared {resource} with you"
+msgstr "{user} 已取消和你共享 {resource}"
