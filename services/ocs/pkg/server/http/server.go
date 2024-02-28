@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/store"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -10,7 +11,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ocsmw "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0"
+	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
 	"go-micro.dev/v4"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server initializes the http service and server.
@@ -32,6 +35,24 @@ func Server(opts ...Option) (http.Service, error) {
 			Err(err).
 			Msg("Error initializing http service")
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
+	}
+
+	var signingKeyStore microstore.Store
+	if options.Config.SigningKeys.Store == "ocisstoreservice" {
+		signingKeyStore = ocisstore.NewStore(
+			microstore.Nodes(options.Config.SigningKeys.Nodes...),
+			microstore.Database("proxy"),
+			microstore.Table("signing-keys"),
+		)
+	} else {
+		signingKeyStore = store.Create(
+			store.Store(options.Config.SigningKeys.Store),
+			store.TTL(options.Config.SigningKeys.TTL),
+			microstore.Nodes(options.Config.SigningKeys.Nodes...),
+			microstore.Database("proxy"),
+			microstore.Table("signing-keys"),
+			store.Authentication(options.Config.SigningKeys.AuthUsername, options.Config.SigningKeys.AuthPassword),
+		)
 	}
 
 	handle := svc.NewService(
@@ -56,6 +77,7 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Logger(options.Logger),
 			ocsmw.LogTrace,
 		),
+		svc.Store(signingKeyStore),
 	)
 
 	{

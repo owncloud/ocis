@@ -5,19 +5,16 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"go-micro.dev/v4/store"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -45,8 +42,6 @@ type Options struct {
 	OIDCIss string
 	// RevaGatewaySelector to send requests to the reva gateway
 	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	// Store for persisting data
-	Store storesvc.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
 	// UserOIDCClaim to read from the oidc claims
@@ -148,13 +143,6 @@ func CredentialsByUserAgent(v map[string]string) Option {
 func WithRevaGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.RevaGatewaySelector = val
-	}
-}
-
-// Store provides a function to set the store option.
-func Store(sc storesvc.StoreService) Option {
-	return func(o *Options) {
-		o.Store = sc
 	}
 }
 
