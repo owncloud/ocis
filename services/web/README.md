@@ -68,9 +68,9 @@ The `manifest.json` file contain the following fields:
 
 it's important to note that an application manifest should never be changed manually;
 if a custom configuration is needed, the administrator should provide the required configuration inside the
-`$OCIS_BASE_DATA_PATH/config/web.apps.yaml` file.
+`$OCIS_BASE_DATA_PATH/config/apps.yaml` file.
 
-The `web.apps.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
+The `apps.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
 For example, if the `image-viewer-obj` application contains the following configuration:
 
 ```json
@@ -84,7 +84,7 @@ For example, if the `image-viewer-obj` application contains the following config
 }
 ```
 
-and the `web.apps.yaml` file contains the following configuration:
+and the `apps.yaml` file contains the following configuration:
 
 ```yaml
 image-viewer-obj:
@@ -111,7 +111,7 @@ the final configuration for web will be:
 }
 ```
 
-besides the configuration from the `manifest.json` file, the `web.apps.yaml` file can also contain the following fields:
+besides the configuration from the `manifest.json` file, the `apps.yaml` file can also contain the following fields:
 
 * `disabled` - optional - defaults to `false` - if set to `true`, the application will not be loaded
 
@@ -134,4 +134,4 @@ The same applies for the `manifest.json` file, if the administrator wants to pro
 
 ## Miscellaneous
 
-Please note that ocis needs a restart to load new applications or changes to the `web.apps.yaml` file.
+Please note that ocis needs a restart to load new applications or changes to the `apps.yaml` file.
