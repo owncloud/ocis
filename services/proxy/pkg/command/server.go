@@ -313,11 +313,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		chimiddleware.RequestID,
 		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
-		middleware.OIDCWellKnownRewrite(
-			logger, cfg.OIDC.Issuer,
-			cfg.OIDC.RewriteWellKnown,
-			oidcHTTPClient,
-		),
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,

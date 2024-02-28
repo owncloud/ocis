@@ -7,16 +7,21 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	microstore "go-micro.dev/v4/store"
 	"net/http"
+	"net/url"
+	"path"
 )
 
 // StaticRouteHandler defines a Route Handler for static routes
 type StaticRouteHandler struct {
-	Prefix        string
-	Proxy         http.Handler
-	UserInfoCache microstore.Store
-	Logger        log.Logger
-	Config        config.Config
-	OidcClient    oidc.OIDCClient
+	Prefix         string
+	Proxy          http.Handler
+	UserInfoCache  microstore.Store
+	Logger         log.Logger
+	Config         config.Config
+	OidcClient     oidc.OIDCClient
+	OidcHttpClient *http.Client
+
+	oidcURL *url.URL
 }
 
 type jse struct {
@@ -25,13 +30,19 @@ type jse struct {
 }
 
 func (s *StaticRouteHandler) Handler() http.Handler {
+	s.oidcURL, _ = url.Parse(s.Config.OIDC.Issuer)
+	s.oidcURL.Path = path.Join(s.oidcURL.Path, wellKnownPath)
 	m := chi.NewMux()
 	m.Route(s.Prefix, func(r chi.Router) {
+
 		// Wrapper for backchannel logout
 		r.Post("/backchannel_logout", s.backchannelLogout)
 
-		// TODO: migrate oidc well knowns here in a second wrapper
-
+		// openid .well-known
+		if s.Config.OIDC.RewriteWellKnown {
+			r.Get("/.well-known/openid-configuration", s.OIDCWellKnownRewrite)
+		}
+		
 		// Send all requests to the proxy handler
 		r.HandleFunc("/*", s.Proxy.ServeHTTP)
 	})
