@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-02-28-00-35-33]
+[#deprecation-note-2024-02-28-14-13-40]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -432,6 +432,66 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Allow OCS to get a signing key to sign requests.
+
+a|`OCIS_CACHE_STORE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the signing key store. Supported values are: 'redis-sentinel', 'nats-js-kv' and 'ocisstoreservice' (deprecated). See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_TTL` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++12h0m0s ++
+a| [subs=-attributes]
+Default time to live for signing keys. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`PROXY_ACCOUNT_BACKEND_TYPE` +
 
