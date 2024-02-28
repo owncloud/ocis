@@ -118,13 +118,7 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 		}
 	}
 
-	// We call it a success if all shares could successfully be rejected, otherwise
-	// we return an error
-	if len(errs) != 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+	return errors.Join(errs...)
 }
 
 // MountShare mounts a share
