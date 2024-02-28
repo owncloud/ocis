@@ -137,8 +137,13 @@ func WaitForConnection() bool {
 		Transport: transport,
 	}
 
-	req, _ := http.NewRequest("GET", config.Get("url")+"/graph/v1.0/me/drives", nil)
-	req.SetBasicAuth(config.Get("adminUsername"), config.Get("adminPassword"))
+	var req *http.Request
+	if config.Get("adminUsername") != "" && config.Get("adminPassword") != "" {
+		req, _ = http.NewRequest("GET", config.Get("url")+"/graph/v1.0/me/drives", nil)
+		req.SetBasicAuth(config.Get("adminUsername"), config.Get("adminPassword"))
+	} else {
+		req, _ = http.NewRequest("GET", config.Get("url")+"/ocs/v1.php/cloud/capabilities?format=json", nil)
+	}
 
 	timeout := time.After(timeoutValue)
 

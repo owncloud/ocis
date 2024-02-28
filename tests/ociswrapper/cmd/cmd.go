@@ -47,8 +47,8 @@ func serveCmd() *cobra.Command {
 	serveCmd.Flags().StringP("url", "", ocisConfig.Get("url"), "oCIS server url")
 	serveCmd.Flags().StringP("retry", "", ocisConfig.Get("retry"), "Number of retries to start oCIS server")
 	serveCmd.Flags().StringP("port", "p", wrapperConfig.Get("port"), "Wrapper API server port")
-	serveCmd.Flags().StringP("admin-username", "", ocisConfig.Get("adminUsername"), "admin username for oCIS server")
-	serveCmd.Flags().StringP("admin-password", "", ocisConfig.Get("adminPassword"), "admin password for oCIS server")
+	serveCmd.Flags().StringP("admin-username", "", "", "admin username for oCIS server")
+	serveCmd.Flags().StringP("admin-password", "", "", "admin password for oCIS server")
 
 	return serveCmd
 }

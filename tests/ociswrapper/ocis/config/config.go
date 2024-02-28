@@ -4,8 +4,8 @@ var config = map[string]string{
 	"bin":           "/usr/bin/ocis",
 	"url":           "https://localhost:9200",
 	"retry":         "5",
-	"adminUsername": "admin",
-	"adminPassword": "admin",
+	"adminUsername": "",
+	"adminPassword": "",
 }
 
 func Set(key string, value string) {
