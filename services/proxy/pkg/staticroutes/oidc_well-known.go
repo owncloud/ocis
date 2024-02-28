@@ -9,9 +9,6 @@ var (
 	wellKnownPath = "/.well-known/openid-configuration"
 )
 
-//oidcURL, _ := url.Parse(oidcISS)
-//oidcURL.Path = path.Join(oidcURL.Path, wellKnownPath)
-
 // OIDCWellKnownRewrite is a middleware that rewrites the /.well-known/openid-configuration endpoint for external IDPs.
 func (s *StaticRouteHandler) OIDCWellKnownRewrite(w http.ResponseWriter, r *http.Request) {
 	wellKnownRes, err := s.OidcHttpClient.Get(s.oidcURL.String())

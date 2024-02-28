@@ -5,4 +5,6 @@ is responsible for serving static files and oidc well-known endpoint `/.well-kno
 We have removed the well-known middleware for OIDC and moved it
 to the newly introduced static routes module in the proxy.
 
+https://github.com/owncloud/ocis/issues/6095
 https://github.com/owncloud/ocis/pull/8541
+
