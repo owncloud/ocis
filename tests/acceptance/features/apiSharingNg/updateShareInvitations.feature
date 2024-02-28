@@ -102,8 +102,6 @@ Feature: Update permission of a share
     """
     {
       "type": "object",
-      "minItems": 3,
-      "maxItems": 3,
       "required": [
         "grantedToV2",
         "id",

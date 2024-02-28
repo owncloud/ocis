@@ -553,8 +553,6 @@ Feature: Create a share link for a resource
           },
           "link": {
             "type": "object",
-            "minItems": 5,
-            "maxItems": 5,
             "required": [
               "@libre.graph.displayName",
               "@libre.graph.quickLink",
