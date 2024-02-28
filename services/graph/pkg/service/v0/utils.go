@@ -228,7 +228,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			// the oldest share for the resource:
 			// '<sharestorageid>$<sharespaceid>!<share-opaque-id>
 			// Note: This means that the driveitem ID will change when the oldest
-			//   shared is removed. It would be good to have are more stable ID here (e.g.
+			//   share is removed. It would be good to have are more stable ID here (e.g.
 			//   derived from the shared resource's ID. But as we need to use the same
 			//   ID across all services this means we needed to make similar adjustments
 			//   to the sharejail (usershareprovider, webdav). Which we can't currently do
@@ -320,8 +320,8 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 					if err != nil {
 						// TODO: define a proper error behavior here. We don't
 						// want the whole request to fail just because a single
-						// resource owner couldn't be resolved. But, should be
-						// really return the affect share in the response?
+						// resource owner couldn't be resolved. But, should we
+						// really return the affected share in the response?
 						// For now we just log a warning. The returned
 						// identitySet will just contain the userid.
 						logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get owner of shared resource")
