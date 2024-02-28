@@ -43,6 +43,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+* Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 
 ## Details
 
@@ -52,6 +53,13 @@ The following sections list the changes for unreleased.
    default to the built-in NATS instance.
 
    https://github.com/owncloud/ocis/pull/8419
+
+* Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
+
+   Functionality for mounting (accepting) and unmounting (rejecting) received
+   shares has been added to the graph API.
+
+   https://github.com/owncloud/ocis/pull/7885
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
