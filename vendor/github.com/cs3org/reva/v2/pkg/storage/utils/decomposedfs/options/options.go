@@ -73,9 +73,10 @@ type Options struct {
 
 	Tokens TokenOptions `mapstructure:"tokens"`
 
-	StatCache         cache.Config `mapstructure:"statcache"`
+	// FileMetadataCache for file metadata
 	FileMetadataCache cache.Config `mapstructure:"filemetadatacache"`
-	IDCache           cache.Config `mapstructure:"idcache"`
+	// IDCache for symlink lookups of direntry to node id
+	IDCache cache.Config `mapstructure:"idcache"`
 
 	MaxAcquireLockCycles    int `mapstructure:"max_acquire_lock_cycles"`
 	LockCycleDurationFactor int `mapstructure:"lock_cycle_duration_factor"`

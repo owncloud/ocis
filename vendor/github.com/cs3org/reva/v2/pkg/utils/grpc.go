@@ -38,8 +38,13 @@ var (
 )
 
 // GetServiceUserContext returns an authenticated context of the given service user
+// Deprecated: Use GetServiceUserContextWithContext()
 func GetServiceUserContext(serviceUserID string, gwc gateway.GatewayAPIClient, serviceUserSecret string) (context.Context, error) {
-	ctx := context.Background()
+	return GetServiceUserContextWithContext(context.Background(), gwc, serviceUserID, serviceUserSecret)
+}
+
+// GetServiceUserContextWithContext returns an authenticated context of the given service user
+func GetServiceUserContextWithContext(ctx context.Context, gwc gateway.GatewayAPIClient, serviceUserID string, serviceUserSecret string) (context.Context, error) {
 	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "serviceaccounts",
 		ClientId:     serviceUserID,
@@ -57,8 +62,14 @@ func GetServiceUserContext(serviceUserID string, gwc gateway.GatewayAPIClient, s
 }
 
 // GetUser gets the specified user
+// Deprecated: Use GetUserWithContext()
 func GetUser(userID *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
-	getUserResponse, err := gwc.GetUser(context.Background(), &user.GetUserRequest{UserId: userID})
+	return GetUserWithContext(context.Background(), userID, gwc)
+}
+
+// GetUserWithContext gets the specified user
+func GetUserWithContext(ctx context.Context, userID *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
+	getUserResponse, err := gwc.GetUser(ctx, &user.GetUserRequest{UserId: userID})
 	if err != nil {
 		return nil, err
 	}

@@ -43,7 +43,8 @@ type UploadRequest struct {
 
 // UploadResponse represents a upload response
 type UploadResponse struct {
-	Etag string
+	Etag   string
+	FileID string // only for cs3 storage
 }
 
 // DownloadRequest represents a download request and its options
