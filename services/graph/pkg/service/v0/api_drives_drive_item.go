@@ -50,6 +50,7 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
+// UnmountShare unmounts a share from the sharejail
 func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID storageprovider.ResourceId) error {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -236,6 +237,7 @@ func NewDrivesDriveItemApi(drivesDriveItemService DrivesDriveItemProvider, logge
 	}, nil
 }
 
+// DeleteDriveItem deletes a drive item
 func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
