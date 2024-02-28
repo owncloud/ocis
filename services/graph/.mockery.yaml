@@ -5,12 +5,20 @@ outpkg: "mocks"
 packages:
     github.com/owncloud/ocis/v2/services/graph/pkg/service/v0:
         config:
-          dir: "mocks"
+            dir: "mocks"
         interfaces:
+            DrivesDriveItemProvider:
             HTTPClient:
             Permissions:
             Publisher:
             RoleService:
+    github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool:
+        config:
+            dir: "mocks"
+        interfaces:
+            Selectable:
+              config:
+                filename: "gateway_selector.go"
     github.com/owncloud/ocis/v2/services/graph/pkg/identity:
         config:
             dir: "pkg/identity/mocks"

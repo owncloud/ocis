@@ -5,46 +5,32 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
 var _ = Describe("Utils", func() {
-	var (
-		svc service.Graph
-	)
-
-	BeforeEach(func() {
-		cfg := defaults.FullDefaultConfig()
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-
-		identityBackend := &identitymocks.Backend{}
-		svc, _ = service.NewService(
-			service.Config(cfg),
-			service.WithIdentityBackend(identityBackend),
-		)
-	})
-
 	DescribeTable("GetDriveAndItemIDParam",
 		func(driveID, itemID string, shouldPass bool) {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", driveID)
 			rctx.URLParams.Add("itemID", itemID)
 
-			extractedDriveID, extractedItemID, err := svc.GetDriveAndItemIDParam(
+			extractedDriveID, extractedItemID, err := service.GetDriveAndItemIDParam(
 				httptest.NewRequest(http.MethodGet, "/", nil).
 					WithContext(
 						context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 					),
+				conversions.ToPointer(log.NopLogger()),
 			)
 
 			switch shouldPass {
@@ -87,6 +73,35 @@ var _ = Describe("Utils", func() {
 		Entry("spaceID and opaqueID unequal", &provider.ResourceId{
 			OpaqueId: "2",
 			SpaceId:  "3",
+		}, false),
+	)
+
+	DescribeTable("IsShareJail",
+		func(resourceID provider.ResourceId, isShareJail bool) {
+			Expect(service.IsShareJail(resourceID)).To(Equal(isShareJail))
+		},
+		Entry("valid: share jail", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   utils.ShareStorageSpaceID,
+		}, true),
+		Entry("invalid: empty storageId", provider.ResourceId{
+			SpaceId: utils.ShareStorageSpaceID,
+		}, false),
+		Entry("invalid: empty spaceId", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+		}, false),
+		Entry("invalid: empty storageId and spaceId", provider.ResourceId{}, false),
+		Entry("invalid: non share jail storageId", provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   utils.ShareStorageSpaceID,
+		}, false),
+		Entry("invalid: non share jail spaceId", provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   "123",
+		}, false),
+		Entry("invalid: non share jail storageID and spaceId", provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   "123",
 		}, false),
 	)
 })

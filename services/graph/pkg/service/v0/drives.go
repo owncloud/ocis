@@ -932,17 +932,17 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 		tmp := id
 		var identitySet libregraph.IdentitySet
 		if _, ok := groupsMap[id]; ok {
-			group, err := g.identityCache.GetGroup(ctx, tmp)
+			identity, err := groupIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("groupid", tmp).Msg("Group not found by id")
 			}
-			identitySet = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp, DisplayName: group.GetDisplayName()}}
+			identitySet = libregraph.IdentitySet{Group: &identity}
 		} else {
-			user, err := g.identityCache.GetUser(ctx, tmp)
+			identity, err := userIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}
-			identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
+			identitySet = libregraph.IdentitySet{User: &identity}
 		}
 
 		p := libregraph.Permission{
