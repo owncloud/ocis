@@ -51,6 +51,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph/sharedWithMe align IDs with webdav response: [#8467](https://github.com/owncloud/ocis/pull/8467)
 * Bugfix - Bump reva to pull in changes to fix recursive trashcan purge: [#8505](https://github.com/owncloud/ocis/pull/8505)
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
+* Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 * Enhancement - Improve ocis single binary start: [#8320](https://github.com/owncloud/ocis/pull/8320)
@@ -141,6 +142,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8273
    https://github.com/owncloud/ocis/pull/8529
    https://github.com/cs3org/reva/pull/4534
+
+* Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
+
+   The default config for the OIDC role mapping was incorrect. Lightweight users
+   are now assignable.
+
+   https://github.com/owncloud/ocis/pull/8534
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
