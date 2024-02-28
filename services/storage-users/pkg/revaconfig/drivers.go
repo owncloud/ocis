@@ -94,6 +94,16 @@ func Posix(cfg *config.Config) map[string]interface{} {
 		"permissionssvc_tls_mode": cfg.Commons.GRPCClientTLS.Mode,
 		"treetime_accounting":     true,
 		"treesize_accounting":     true,
+		"idcache": map[string]interface{}{
+			"cache_store":               cfg.IDCache.Store,
+			"cache_nodes":               cfg.IDCache.Nodes,
+			"cache_database":            cfg.IDCache.Database,
+			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_size":                cfg.IDCache.Size,
+			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
+		},
 
 		"watch_type": cfg.Drivers.Posix.WatchType,
 		"watch_path": cfg.Drivers.Posix.WatchPath,
