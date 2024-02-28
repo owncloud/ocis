@@ -57,7 +57,7 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 	}
 
 	// This is a a bit of a hack. We should not rely on a specific format of the item id.
-	// (But currently the ShareID is
+	// But currently there is no other way to get the ShareID.
 	shareId := resourceID.GetOpaqueId()
 
 	// Now, find out the resourceID of the shared resource
