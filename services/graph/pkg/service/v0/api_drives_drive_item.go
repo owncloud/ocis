@@ -244,7 +244,7 @@ func NewDrivesDriveItemApi(drivesDriveItemService DrivesDriveItemProvider, logge
 
 func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
 		msg := "invalid driveID or itemID"
 		api.logger.Debug().Err(err).Msg(msg)
@@ -252,7 +252,12 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// fixMe: check if itemID is a share jail?
+	if !IsShareJail(driveID) {
+		msg := "invalid driveID, must be share jail"
+		api.logger.Debug().Interface("driveID", driveID).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
 
 	if err := api.drivesDriveItemService.UnmountShare(ctx, itemID); err != nil {
 		msg := "unmounting share failed"
