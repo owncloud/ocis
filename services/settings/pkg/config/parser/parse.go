@@ -49,5 +49,9 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingAdminUserID(cfg.Service.Name)
 	}
 
+	if len(cfg.ServiceAccountIDs) == 0 {
+		return shared.MissingServiceAccountID(cfg.Service.Name)
+	}
+
 	return nil
 }

@@ -69,3 +69,19 @@ func MissingAdminUserID(service string) error {
 		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
+
+func MissingServiceAccountID(service string) error {
+	return fmt.Errorf("The service account id has not been configured for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}
+
+func MissingServiceAccountSecret(service string) error {
+	return fmt.Errorf("The service account secret has not been configured for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}
