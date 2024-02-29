@@ -28,14 +28,14 @@ Web can be consumed by another application in a stripped down version called “
 # Web Apps
 
 The administrator of the environment is capable of providing custom web applications to the users.
-This feature is useful for organizations that have specific web applications that they want to provide to their users.
+This feature is useful for organizations that want to provide third party or custom apps to their users.
 
 It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
 and does not support injection of dynamic web applications (custom dynamic backends).
 
 ## Loading Applications
 
-Loading applications is provided in three ways:
+Loading applications is achieved in three ways:
 
 * By loading a web application from a user-provided path, by setting the `WEB_APPS_PATH` environment variable.
 * By loading a web application from the default ocis home directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps`.
@@ -58,7 +58,7 @@ Applications always have to follow a strict structure, which is as follows:
 
 everything else is skipped and not considered as an application.
 
-The `manifest.json` file contain the following fields:
+The `manifest.json` file contains the following fields:
 
 * `id` - required - the name of the application must be unique across all applications
 * `entrypoint` - required - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
@@ -66,7 +66,7 @@ The `manifest.json` file contain the following fields:
 
 ## Application Configuration
 
-it's important to note that an application manifest should never be changed manually;
+It's important to note that an application manifest should never be changed manually;
 if a custom configuration is needed, the administrator should provide the required configuration inside the
 `$OCIS_BASE_DATA_PATH/config/apps.yaml` file.
 
@@ -119,7 +119,7 @@ The local provided configuration yaml will always override the shipped applicati
 
 ## Fallback Mechanism
 
-Besides the configuration and application registration, there is one further important aspect to now;
+Besides the configuration and application registration, there is one further important aspect to know;
 in the process of loading the application assets, the system uses a fallback mechanism to load the assets.
 
 This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or similar.
