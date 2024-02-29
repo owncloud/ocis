@@ -772,7 +772,7 @@ func (s *svc) checkShareLock(ctx context.Context, share *collaboration.Share) (*
 	}
 
 	if sRes.GetInfo().GetLock() != nil {
-		msg := "can not chane grants, the shared resource is locked"
+		msg := "can not change grants, the shared resource is locked"
 		logger.Debug().Interface("lock", sRes.GetInfo().GetLock()).Msg(msg)
 		return status.NewLocked(ctx, msg), errors.New(msg)
 	}
