@@ -296,6 +296,7 @@ func readLocksIntoOpaque(ctx context.Context, n *Node, ri *provider.ResourceInfo
 		Decoder: "json",
 		Value:   b,
 	}
+	ri.Lock = lock
 	return err
 }
 
