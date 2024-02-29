@@ -2,39 +2,31 @@ package fsx_test
 
 import (
 	"bytes"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
 	"testing/fstest"
 
+	"github.com/onsi/gomega"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 )
 
-func testFallbackFSENV() (*fsx.FallbackFS, map[string]string, func(), error) {
-	nf := func(n, c string) (*os.File, error) {
-		f, err := os.CreateTemp("", n)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-
-		_, err = f.Write([]byte(c))
-		if err != nil {
-			return nil, err
-		}
-
-		return f, nil
+func createFallbackFS(d string) (*fsx.FallbackFS, map[string]string, error) {
+	if err := os.Mkdir(d, 0700); err != nil {
+		return nil, nil, err
 	}
 
-	foo, err := nf("foo.txt", "foo - fs")
+	foo, err := createFile(d, "foo.txt", "foo - fs")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	bar, err := nf("bar.txt", "bar - fs")
+	bar, err := createFile(d, "bar.txt", "bar - fs")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	m := map[string]string{
@@ -55,90 +47,136 @@ func testFallbackFSENV() (*fsx.FallbackFS, map[string]string, func(), error) {
 		},
 	}
 
-	fbsys := fsx.NewFallbackFS(fsys, os.TempDir())
-
-	return fbsys, m, func() {
-		_ = os.Remove(foo.Name())
-		_ = os.Remove(bar.Name())
-	}, nil
+	return fsx.NewFallbackFS(fsys, d), m, nil
 }
 
-func testFallbackFSContent(t *testing.T, f fs.File, c string) {
+func readFrom(r io.Reader) (string, error) {
 	buf := bytes.NewBuffer(nil)
-	if _, err := buf.ReadFrom(f); err != nil {
-		t.Fatalf("expected to read from file, but got %v", err)
+	_, err := buf.ReadFrom(r)
+	if err != nil {
+		return "", err
 	}
 
-	if buf.String() != c {
-		t.Fatalf("expected to read from fs, but got %s", buf.String())
+	return buf.String(), nil
+}
+
+func createFile(d, n, c string) (*os.File, error) {
+	f, err := os.CreateTemp(d, n)
+
+	if err != nil {
+		return nil, err
 	}
+	defer f.Close()
+
+	_, err = f.Write([]byte(c))
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
 }
 
 func TestFallbackFS_Open(t *testing.T) {
-	fsys, m, cleanup, err := testFallbackFSENV()
-	if err != nil {
-		t.Fatalf("expected to create test environment, but got %v", err)
-	}
-	defer cleanup()
+	d := filepath.Join(t.TempDir(), "allowed")
+	g := gomega.NewWithT(t)
 
-	foo, _ := fsys.Open(m["foo.txt"])
+	fsys, m, err := createFallbackFS(d)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+
+	foo, err := fsys.Open(m["foo.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer foo.Close()
-	testFallbackFSContent(t, foo, "foo - fs")
+	content, err := readFrom(foo)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("foo - fs"))
 
-	bar, _ := fsys.Open(m["bar.txt"])
+	bar, err := fsys.Open(m["bar.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer bar.Close()
-	testFallbackFSContent(t, bar, "bar - fs")
+	content, err = readFrom(bar)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("bar - fs"))
 
-	baz, _ := fsys.Open(m["baz.txt"])
+	baz, err := fsys.Open(m["baz.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer baz.Close()
-	testFallbackFSContent(t, baz, "baz - embedded")
+	content, err = readFrom(baz)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("baz - embedded"))
+
+	// parent directory access is here to test the jail join
+	forbiddenPath := filepath.Join(d, "../forbidden")
+	g.Expect(os.Mkdir(forbiddenPath, 0700)).ToNot(gomega.HaveOccurred())
+	forbiddenFile, err := createFile(forbiddenPath, "forbidden.txt", "forbidden - fs")
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	forbiddenFile, err = os.Open(forbiddenFile.Name())
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	defer forbiddenFile.Close()
+	content, err = readFrom(forbiddenFile)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("forbidden - fs"))
+	_, err = fsys.Open(filepath.Join("../forbidden", filepath.Base(forbiddenFile.Name())))
+	g.Expect(err).To(gomega.BeAssignableToTypeOf(&fs.PathError{}))
+	g.Expect(err.Error()).To(gomega.ContainSubstring("file does not exist"))
 }
 
 func TestFallbackFS_OpenEmbedded(t *testing.T) {
-	fsys, m, cleanup, err := testFallbackFSENV()
-	if err != nil {
-		t.Fatalf("expected to create test environment, but got %v", err)
-	}
-	defer cleanup()
+	d := filepath.Join(t.TempDir(), "allowed")
+	g := gomega.NewWithT(t)
 
-	foo, _ := fsys.OpenEmbedded(m["foo.txt"])
+	fsys, m, err := createFallbackFS(d)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+
+	foo, err := fsys.OpenEmbedded(m["foo.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer foo.Close()
-	testFallbackFSContent(t, foo, "foo - embedded")
+	content, err := readFrom(foo)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("foo - embedded"))
 
-	bar, _ := fsys.OpenEmbedded(m["bar.txt"])
+	bar, err := fsys.OpenEmbedded(m["bar.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer bar.Close()
-	testFallbackFSContent(t, bar, "bar - embedded")
+	content, err = readFrom(bar)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("bar - embedded"))
 
-	baz, _ := fsys.OpenEmbedded(m["baz.txt"])
+	baz, err := fsys.OpenEmbedded(m["baz.txt"])
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 	defer baz.Close()
-	testFallbackFSContent(t, baz, "baz - embedded")
+	content, err = readFrom(baz)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("baz - embedded"))
+
 }
 
 func TestFallbackFS_Create(t *testing.T) {
-	fsys, _, cleanup, err := testFallbackFSENV()
-	if err != nil {
-		t.Fatalf("expected to create test environment, but got %v", err)
-	}
-	defer cleanup()
+	d := filepath.Join(t.TempDir(), "allowed")
+	g := gomega.NewWithT(t)
 
-	baz, _ := fsys.Open("baz.txt")
-	testFallbackFSContent(t, baz, "baz - embedded")
+	fsys, _, err := createFallbackFS(d)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+
+	baz, err := fsys.Open("baz.txt")
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	content, err := readFrom(baz)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("baz - embedded"))
 	_ = baz.Close()
 
 	// parent directory access is here to test the jail join
-	f, err := fsys.Create("../././././././baz.txt")
-	if err != nil {
-		t.Fatalf("expected to create file, but got %v", err)
-	}
+	f, err := fsys.Create("../../../../../../../baz.txt")
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(f.Name()).To(gomega.Equal(filepath.Join(d, "baz.txt")))
 	defer f.Close()
 	defer os.Remove(f.Name())
 
 	_, err = f.Write([]byte("baz - fs"))
-	if err != nil {
-		t.Fatalf("expected to write to file, but got %v", err)
-	}
+	g.Expect(err).ToNot(gomega.HaveOccurred())
 
 	baz, _ = fsys.Open("baz.txt")
-	testFallbackFSContent(t, baz, "baz - fs")
+	content, err = readFrom(baz)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(content).To(gomega.Equal("baz - fs"))
 	_ = baz.Close()
 }

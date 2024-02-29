@@ -23,6 +23,7 @@ func TestApplication_ToExternal(t *testing.T) {
 
 	externalApp := app.ToExternal("path")
 
+	g.Expect(externalApp.ID).To(gomega.Equal("app"))
 	g.Expect(externalApp.Path).To(gomega.Equal("path/app/entrypoint.js"))
 	g.Expect(externalApp.Config).To(gomega.Equal(app.Config))
 }

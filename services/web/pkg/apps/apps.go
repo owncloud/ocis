@@ -53,7 +53,7 @@ type Application struct {
 // ToExternal converts an Application to an ExternalApp configuration
 func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 	return config.ExternalApp{
-		ID:     filepath.Base(a.Entrypoint),
+		ID:     filepath.Dir(a.Entrypoint),
 		Path:   filepathx.JailJoin(entrypoint, a.Entrypoint),
 		Config: a.Config,
 	}
