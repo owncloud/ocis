@@ -110,7 +110,7 @@ func TestList(t *testing.T) {
 	applications = apps.List(log.NopLogger(), map[string]config.App{}, fstest.MapFS{})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	appContainer := &fstest.MapFile{
+	dir := &fstest.MapFile{
 		Mode: fs.ModeDir,
 	}
 
@@ -119,14 +119,14 @@ func TestList(t *testing.T) {
 			Disabled: true,
 		},
 	}, fstest.MapFS{
-		"app": appContainer,
+		"app": dir,
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
 	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app": {},
 	}, fstest.MapFS{
-		"app": appContainer,
+		"app": dir,
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
@@ -138,20 +138,24 @@ func TestList(t *testing.T) {
 			},
 		},
 	}, fstest.MapFS{
-		"app-1": appContainer,
+		"app-1":               dir,
+		"app-1/entrypoint.js": &fstest.MapFile{},
 		"app-1/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app-1", "entrypoint":"entrypoint.js", "config": {"foo": "fs1"}}`),
 		},
-		"app-2": appContainer,
+		"app-2":               dir,
+		"app-2/entrypoint.js": &fstest.MapFile{},
 		"app-2/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app-2", "entrypoint":"entrypoint.js", "config": {"foo": "fs1"}}`),
 		},
 	}, fstest.MapFS{
-		"app-1": appContainer,
+		"app-1":               dir,
+		"app-1/entrypoint.js": &fstest.MapFile{},
 		"app-1/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app-1", "entrypoint":"entrypoint.js", "config": {"foo": "fs2"}}`),
 		},
-		"app-3": appContainer,
+		"app-3":               dir,
+		"app-3/entrypoint.js": &fstest.MapFile{},
 		"app-3/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app-3", "entrypoint":"entrypoint.js", "config": {"foo": "fs2"}}`),
 		},
