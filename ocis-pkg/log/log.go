@@ -180,3 +180,10 @@ func (l Logger) SubloggerWithRequestID(c context.Context) Logger {
 		l.With().Str(RequestIDString, chimiddleware.GetReqID(c)).Logger(),
 	}
 }
+
+// Deprecation logs a deprecation message,
+// it is used to inform the user that a certain feature is deprecated and will be removed in the future.
+// Do not use a logger here because the message MUST be visible independent of the log level.
+func Deprecation(a ...any) {
+	fmt.Printf("\033[1;31mDEPRECATION: %s\033[0m\n", a...)
+}

@@ -1,15 +1,14 @@
 package fsx_test
 
 import (
-	"errors"
 	"io/fs"
-	"os"
 	"os/exec"
 	"testing"
 	"testing/fstest"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/onsi/gomega"
 
+	"github.com/owncloud/ocis/v2/internal/testenv"
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 )
 
@@ -34,16 +33,15 @@ func TestMustSub(t *testing.T) {
 }
 
 func TestMustSub_Exit(t *testing.T) {
-	if os.Getenv("WITH_EXIT") == "1" {
+	cmdTest := testenv.NewCMDTest(t.Name())
+	if cmdTest.ShouldRun() {
 		_ = fsx.MustSub(fstest.MapFS{}, "./c")
 		return
 	}
 
-	cmd := exec.Command(os.Args[0], "-test.run=TestMustSub_Exit")
-	cmd.Env = append(os.Environ(), "WITH_EXIT=1")
-	err := cmd.Run()
+	out, err := cmdTest.Run()
 
-	var e *exec.ExitError
-	assert.Equal(t, true, errors.As(err, &e))
-	assert.Equal(t, "exit status 1", e.Error())
+	g := gomega.NewWithT(t)
+	g.Expect(err).To(gomega.BeAssignableToTypeOf(&exec.ExitError{}))
+	g.Expect(string(out)).To(gomega.ContainSubstring("Cannot load subtree fs"))
 }

@@ -1,17 +1,17 @@
 package log_test
 
 import (
-	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/onsi/gomega"
 
+	"github.com/owncloud/ocis/v2/internal/testenv"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 func TestDefault(t *testing.T) {
-	if os.Getenv("TestDefault") == "true" {
+	cmdTest := testenv.NewCMDTest(t.Name())
+	if cmdTest.ShouldRun() {
 		log.Default().Info().Msg("this is a test")
 		return
 	}
@@ -20,20 +20,20 @@ func TestDefault(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		args     []string
+		env      []string
 		validate func(result string)
 	}{
 		{
 			name: "default",
-			args: []string{"OCIS_LOG_PRETTY=false", "OCIS_LOG_COLOR=false"},
+			env:  []string{},
 			validate: func(result string) {
 				g.Expect(result).To(gomega.ContainSubstring("info"))
 				g.Expect(result).To(gomega.ContainSubstring("this is a test"))
 			},
 		},
 		{
-			name: "default",
-			args: []string{"OCIS_LOG_PRETTY=false", "OCIS_LOG_COLOR=false", "OCIS_LOG_LEVEL=error"},
+			name: "error level",
+			env:  []string{"OCIS_LOG_LEVEL=error"},
 			validate: func(result string) {
 				g.Expect(result).ToNot(gomega.ContainSubstring("info"))
 				g.Expect(result).ToNot(gomega.ContainSubstring("this is a test"))
@@ -47,16 +47,24 @@ func TestDefault(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cmd := exec.Command(os.Args[0], "-test.run=TestDefault")
-			cmd.Env = append(os.Environ(), "TestDefault=true")
-			cmd.Env = append(cmd.Env, tt.args...)
-
-			out, err := cmd.CombinedOutput()
-			if err != nil {
-				t.Fatal(err)
-			}
+			out, err := cmdTest.Run(tt.env...)
+			g.Expect(err).ToNot(gomega.HaveOccurred())
 
 			tt.validate(string(out))
 		})
 	}
+}
+
+func TestDeprecation(t *testing.T) {
+	cmdTest := testenv.NewCMDTest(t.Name())
+	if cmdTest.ShouldRun() {
+		log.Deprecation("this is a deprecation")
+		return
+	}
+
+	out, err := cmdTest.Run()
+
+	g := gomega.NewWithT(t)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(string(out)).To(gomega.HavePrefix("\033[1;31mDEPRECATION: this is a deprecation"))
 }

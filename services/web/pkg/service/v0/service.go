@@ -29,7 +29,8 @@ import (
 )
 
 var (
-	_customAppsEndpoint = "/vendor/apps"
+	// _customAppsEndpoint path is used to make app artifacts available by the web service.
+	_customAppsEndpoint = "/assets/apps"
 )
 
 // ErrConfigInvalid is returned when the config parse is invalid.
@@ -60,9 +61,9 @@ func NewService(opts ...Option) Service {
 	)
 
 	// obtain the list of applications from the apps and add them to the config
-	appsFS := fsx.MustSub(web.Apps, "apps")
+	appsFS := fsx.MustSub(web.Assets, "assets/apps")
 
-	for _, application := range apps.List(options.Config.Apps, os.DirFS(options.Config.Asset.AppsPath), appsFS) {
+	for _, application := range apps.List(options.Config.Apps, appsFS, os.DirFS(options.Config.Asset.AppsPath)) {
 		options.Config.Web.Config.ExternalApps = append(
 			options.Config.Web.Config.ExternalApps,
 			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
@@ -73,7 +74,7 @@ func NewService(opts ...Option) Service {
 		logger:          options.Logger,
 		config:          options.Config,
 		mux:             m,
-		fs:              fsx.NewFallbackFS(fsx.MustSub(web.Assets, "assets"), options.Config.Asset.WebPath),
+		fs:              fsx.NewFallbackFS(fsx.MustSub(web.Assets, "assets/core"), options.Config.Asset.CorePath),
 		gatewaySelector: options.GatewaySelector,
 	}
 
