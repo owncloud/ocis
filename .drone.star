@@ -29,6 +29,7 @@ PLUGINS_MANIFEST = "plugins/manifest:1"
 PLUGINS_S3 = "plugins/s3:latest"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 PLUGINS_SLACK = "plugins/slack:1"
+PLUGINS_MATRIX = "plugins/matrix"
 REDIS = "redis:6-alpine"
 SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:5.0"
@@ -143,8 +144,8 @@ config = {
         "skip": False,
     },
     "rocketchat": {
-        "channel": "ocis-internal",
-        "from_secret": "rocketchat_chat_webhook",
+        "channel": "infinitescale",
+        "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
@@ -1934,9 +1935,11 @@ def notify():
                 "refs/heads/master",
                 "refs/heads/release*",
                 "refs/tags/**",
+                "refs/pull/**",
             ],
             "status": [
                 "failure",
+                "success",
             ],
         },
     }
