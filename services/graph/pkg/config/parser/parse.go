@@ -65,6 +65,13 @@ func Validate(cfg *config.Config) error {
 			"graph", defaults2.BaseConfigPath())
 	}
 
+	if cfg.ServiceAccount.ServiceAccountID == "" {
+		return shared.MissingServiceAccountID(cfg.Service.Name)
+	}
+	if cfg.ServiceAccount.ServiceAccountSecret == "" {
+		return shared.MissingServiceAccountSecret(cfg.Service.Name)
+	}
+
 	return nil
 }
 
