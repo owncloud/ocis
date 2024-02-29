@@ -43,5 +43,5 @@ func TestMustSub_Exit(t *testing.T) {
 
 	g := gomega.NewWithT(t)
 	g.Expect(err).To(gomega.BeAssignableToTypeOf(&exec.ExitError{}))
-	g.Expect(string(out)).To(gomega.ContainSubstring("Cannot load subtree fs"))
+	g.Expect(string(out)).To(gomega.ContainSubstring("unable to load subtree fs"))
 }
