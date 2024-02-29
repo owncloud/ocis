@@ -63,7 +63,7 @@ func NewService(opts ...Option) Service {
 	// obtain the list of applications from the apps and add them to the config
 	appsFS := fsx.MustSub(web.Assets, "assets/apps")
 
-	for _, application := range apps.List(options.Config.Apps, appsFS, os.DirFS(options.Config.Asset.AppsPath)) {
+	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS, os.DirFS(options.Config.Asset.AppsPath)) {
 		options.Config.Web.Config.ExternalApps = append(
 			options.Config.Web.Config.ExternalApps,
 			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),

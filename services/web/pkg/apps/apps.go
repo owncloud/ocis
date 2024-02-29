@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"dario.cat/mergo"
-
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/maps"
 
@@ -18,7 +17,6 @@ import (
 
 var (
 	validate           *validator.Validate
-	logger             = log.Default()
 	ErrInvalidApp      = errors.New("invalid app")
 	ErrMissingManifest = errors.New("missing manifest")
 	ErrInvalidManifest = errors.New("invalid manifest")
@@ -57,7 +55,7 @@ func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 // List returns a list of applications from the given filesystems,
 // individual filesystems are searched for applications, and the list is merged.
 // Last finding gets priority in case of conflicts, so the order of the filesystems is important.
-func List(appsData map[string]config.App, fSystems ...fs.FS) []Application {
+func List(logger log.Logger, appsData map[string]config.App, fSystems ...fs.FS) []Application {
 	registry := map[string]Application{}
 
 	for _, fSystem := range fSystems {

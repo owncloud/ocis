@@ -9,52 +9,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
-func TestDefault(t *testing.T) {
-	cmdTest := testenv.NewCMDTest(t.Name())
-	if cmdTest.ShouldRun() {
-		log.Default().Info().Msg("this is a test")
-		return
-	}
-
-	g := gomega.NewWithT(t)
-
-	tests := []struct {
-		name     string
-		env      []string
-		validate func(result string)
-	}{
-		{
-			name: "default",
-			env:  []string{},
-			validate: func(result string) {
-				g.Expect(result).To(gomega.ContainSubstring("info"))
-				g.Expect(result).To(gomega.ContainSubstring("this is a test"))
-			},
-		},
-		{
-			name: "error level",
-			env:  []string{"OCIS_LOG_LEVEL=error"},
-			validate: func(result string) {
-				g.Expect(result).ToNot(gomega.ContainSubstring("info"))
-				g.Expect(result).ToNot(gomega.ContainSubstring("this is a test"))
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			out, err := cmdTest.Run(tt.env...)
-			g.Expect(err).ToNot(gomega.HaveOccurred())
-
-			tt.validate(string(out))
-		})
-	}
-}
-
 func TestDeprecation(t *testing.T) {
 	cmdTest := testenv.NewCMDTest(t.Name())
 	if cmdTest.ShouldRun() {

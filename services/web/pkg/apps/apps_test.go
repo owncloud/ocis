@@ -7,6 +7,7 @@ import (
 
 	"github.com/onsi/gomega"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
@@ -84,20 +85,20 @@ func TestBuild(t *testing.T) {
 func TestList(t *testing.T) {
 	g := gomega.NewWithT(t)
 
-	applications := apps.List(map[string]config.App{})
+	applications := apps.List(log.NopLogger(), map[string]config.App{})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = apps.List(map[string]config.App{}, nil)
+	applications = apps.List(log.NopLogger(), map[string]config.App{}, nil)
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = apps.List(map[string]config.App{}, fstest.MapFS{})
+	applications = apps.List(log.NopLogger(), map[string]config.App{}, fstest.MapFS{})
 	g.Expect(applications).To(gomega.BeEmpty())
 
 	appContainer := &fstest.MapFile{
 		Mode: fs.ModeDir,
 	}
 
-	applications = apps.List(map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app": {
 			Disabled: true,
 		},
@@ -106,14 +107,14 @@ func TestList(t *testing.T) {
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = apps.List(map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app": {},
 	}, fstest.MapFS{
 		"app": appContainer,
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = apps.List(map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app-3": {
 			Config: map[string]any{
 				"foo": "local conf 1",
