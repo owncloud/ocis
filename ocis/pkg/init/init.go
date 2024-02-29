@@ -83,6 +83,10 @@ type FrontendService struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
+type OcmService struct {
+	ServiceAccount ServiceAccount `yaml:"service_account"`
+}
+
 type AuthbasicService struct {
 	AuthProviders LdapBasedService `yaml:"auth_providers"`
 }
@@ -194,6 +198,7 @@ type OcisConfig struct {
 	Users             UsersAndGroupsService
 	Groups            UsersAndGroupsService
 	Ocdav             InsecureService
+	Ocm               OcmService
 	Thumbnails        ThumbnailService
 	Search            Search
 	Audit             Audit
@@ -391,6 +396,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			ServiceAccount: serviceAccount,
 		},
 		Frontend: FrontendService{
+			ServiceAccount: serviceAccount,
+		},
+		Ocm: OcmService{
 			ServiceAccount: serviceAccount,
 		},
 		Clientlog: Clientlog{

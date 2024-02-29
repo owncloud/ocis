@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config/defaults"
@@ -37,6 +38,13 @@ func ParseConfig(cfg *config.Config) error {
 func Validate(cfg *config.Config) error {
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+
+	if cfg.ServiceAccount.ID == "" {
+		return shared.MissingServiceAccountID(cfg.Service.Name)
+	}
+	if cfg.ServiceAccount.Secret == "" {
+		return shared.MissingServiceAccountSecret(cfg.Service.Name)
 	}
 
 	return nil

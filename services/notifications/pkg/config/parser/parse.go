@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/logging"
@@ -52,5 +53,13 @@ func Validate(cfg *config.Config) error {
 			)
 		}
 	}
+
+	if cfg.ServiceAccount.ServiceAccountID == "" {
+		return shared.MissingServiceAccountID(cfg.Service.Name)
+	}
+	if cfg.ServiceAccount.ServiceAccountSecret == "" {
+		return shared.MissingServiceAccountSecret(cfg.Service.Name)
+	}
+
 	return nil
 }
