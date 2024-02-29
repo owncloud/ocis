@@ -15,8 +15,7 @@ import (
 func TestApplication_ToExternal(t *testing.T) {
 	g := gomega.NewWithT(t)
 	app := apps.Application{
-		ID:         "id",
-		Entrypoint: "entrypoint.js",
+		Entrypoint: "app/entrypoint.js",
 		Config: map[string]interface{}{
 			"foo": "bar",
 		},
@@ -24,14 +23,13 @@ func TestApplication_ToExternal(t *testing.T) {
 
 	externalApp := app.ToExternal("path")
 
-	g.Expect(externalApp.ID).To(gomega.Equal("id"))
-	g.Expect(externalApp.Path).To(gomega.Equal("path/id/entrypoint.js"))
+	g.Expect(externalApp.Path).To(gomega.Equal("path/app/entrypoint.js"))
 	g.Expect(externalApp.Config).To(gomega.Equal(app.Config))
 }
 
 func TestBuild(t *testing.T) {
 	g := gomega.NewWithT(t)
-	appContainer := &fstest.MapFile{
+	dir := &fstest.MapFile{
 		Mode: fs.ModeDir,
 	}
 
@@ -41,18 +39,18 @@ func TestBuild(t *testing.T) {
 	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidApp))
 
 	_, err = apps.Build(fstest.MapFS{
-		"app": appContainer,
+		"app": dir,
 	}, "app", map[string]any{})
 	g.Expect(err).To(gomega.MatchError(apps.ErrMissingManifest))
 
 	_, err = apps.Build(fstest.MapFS{
-		"app":               appContainer,
-		"app/manifest.json": appContainer,
+		"app":               dir,
+		"app/manifest.json": dir,
 	}, "app", map[string]any{})
 	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidManifest))
 
 	_, err = apps.Build(fstest.MapFS{
-		"app": appContainer,
+		"app": dir,
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte("{}"),
 		},
@@ -60,23 +58,41 @@ func TestBuild(t *testing.T) {
 	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidManifest))
 
 	_, err = apps.Build(fstest.MapFS{
-		"app": appContainer,
+		"app":               dir,
+		"app/entrypoint.js": &fstest.MapFile{},
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js"}`),
 		},
 	}, "app", map[string]any{})
 	g.Expect(err).ToNot(gomega.HaveOccurred())
 
+	_, err = apps.Build(fstest.MapFS{
+		"app":               dir,
+		"app/entrypoint.js": dir,
+		"app/manifest.json": &fstest.MapFile{
+			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js"}`),
+		},
+	}, "app", map[string]any{})
+	g.Expect(err).To(gomega.MatchError(apps.ErrEntrypointDoesNotExist))
+
+	_, err = apps.Build(fstest.MapFS{
+		"app": dir,
+		"app/manifest.json": &fstest.MapFile{
+			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js"}`),
+		},
+	}, "app", map[string]any{})
+	g.Expect(err).To(gomega.MatchError(apps.ErrEntrypointDoesNotExist))
+
 	application, err := apps.Build(fstest.MapFS{
-		"app": appContainer,
+		"app":               dir,
+		"app/entrypoint.js": &fstest.MapFile{},
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js", "config": {"foo": "1", "bar": "2"}}`),
 		},
 	}, "app", map[string]any{"foo": "overwritten-1", "baz": "injected-1"})
 	g.Expect(err).ToNot(gomega.HaveOccurred())
 
-	g.Expect(application.ID).To(gomega.Equal("app"))
-	g.Expect(application.Entrypoint).To(gomega.Equal("entrypoint.js"))
+	g.Expect(application.Entrypoint).To(gomega.Equal("app/entrypoint.js"))
 	g.Expect(application.Config).To(gomega.Equal(map[string]interface{}{
 		"foo": "overwritten-1", "baz": "injected-1", "bar": "2",
 	}))
@@ -144,15 +160,15 @@ func TestList(t *testing.T) {
 
 	for _, application := range applications {
 		switch {
-		case application.ID == "app-1":
+		case application.Entrypoint == "app-1/entrypoint.js":
 			g.Expect(application.Config["foo"]).To(gomega.Equal("fs2"))
-		case application.ID == "app-2":
+		case application.Entrypoint == "app-2/entrypoint.js":
 			g.Expect(application.Config["foo"]).To(gomega.Equal("fs1"))
-		case application.ID == "app-3":
+		case application.Entrypoint == "app-3/entrypoint.js":
 			g.Expect(application.Config["foo"]).To(gomega.Equal("local conf 1"))
 			g.Expect(application.Config["bar"]).To(gomega.Equal("local conf 2"))
 		default:
-			t.Fatalf("unexpected application %s", application.ID)
+			t.Fatalf("unexpected application %s", application.Entrypoint)
 		}
 	}
 

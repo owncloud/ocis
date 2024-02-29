@@ -37,16 +37,16 @@ and does not support injection of dynamic web applications (custom dynamic backe
 
 Loading applications is achieved in three ways:
 
-* By loading a web application from a user-provided path, by setting the `WEB_APPS_PATH` environment variable.
+* By loading a web application from a user-provided path, by setting the `WEB_ASSET_APPS_PATH` environment variable.
 * By loading a web application from the default ocis home directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps`.
 * By embedding a web application into the ocis binary which is a build-time option,
   e.g. `ocis_src_path/services/web/assets/apps` followed by a build.
 
 The list of available applications is composed of the build in extensions and the custom applications
-provided by the administrator, e.g. `WEB_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
+provided by the administrator, e.g. `WEB_ASSET_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
 
 for example, if ocis contains a build in extension `image-viewer-dfx` and the administrator provides a custom
-application `image-viewer-obj` in the `WEB_APPS_PATH` directory,the user will be able to access both applications
+application `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory,the user will be able to access both applications
 from the web ui.
 
 ## Application Structure
@@ -60,7 +60,6 @@ everything else is skipped and not considered as an application.
 
 The `manifest.json` file contains the following fields:
 
-* `id` - required - the name of the application must be unique across all applications
 * `entrypoint` - required - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
 * `config` - optional - a list of key-value pairs that are passed to the global web application configuration
 
@@ -75,7 +74,6 @@ For example, if the `image-viewer-obj` application contains the following config
 
 ```json
 {
-  "id": "image-viewer-obj",
   "entrypoint": "index.js",
   "config": {
     "maxWith": 1280,
@@ -127,7 +125,8 @@ This is incredibly useful for cases where just a single asset should be overwrit
 Consider the following, ocis is shipped with a default extension called `image-viewer-dfx` which contains a logo,
 but the administrator wants to provide a custom logo for the `image-viewer-dfx` application.
 
-This can be achieved by providing a custom logo in the `WEB_APPS_PATH` directory, e.g. `WEB_APPS_PATH/image-viewer-dfx/logo.png`.
+This can be achieved by providing a custom logo in the `WEB_ASSET_APPS_PATH` directory,
+e.g. `WEB_ASSET_APPS_PATH/image-viewer-dfx/logo.png`.
 Every other asset is loaded from the build in extension, but the logo is loaded from the custom directory.
 
 The same applies for the `manifest.json` file, if the administrator wants to provide a custom `manifest.json` file.

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/fs"
 	"path"
+	"path/filepath"
 
 	"dario.cat/mergo"
 	"github.com/go-playground/validator/v10"
@@ -16,10 +17,19 @@ import (
 )
 
 var (
-	validate           *validator.Validate
-	ErrInvalidApp      = errors.New("invalid app")
+	validate *validator.Validate
+
+	// ErrInvalidApp is the error when an app is invalid
+	ErrInvalidApp = errors.New("invalid app")
+
+	// ErrMissingManifest is the error when the manifest is missing
 	ErrMissingManifest = errors.New("missing manifest")
+
+	// ErrInvalidManifest is the error when the manifest is invalid
 	ErrInvalidManifest = errors.New("invalid manifest")
+
+	// ErrEntrypointDoesNotExist is the error when the entrypoint does not exist or is not a file
+	ErrEntrypointDoesNotExist = errors.New("entrypoint does not exist")
 )
 
 const (
@@ -33,21 +43,18 @@ func init() {
 
 // Application contains the metadata of an application
 type Application struct {
-	// ID is the unique identifier of the application
-	ID string `json:"id" validate:"required"`
-
 	// Entrypoint is the entrypoint of the application within the bundle
 	Entrypoint string `json:"entrypoint" validate:"required"`
 
-	// Config contains the application specific configuration
+	// Config contains the application-specific configuration
 	Config map[string]interface{} `json:"config,omitempty"`
 }
 
 // ToExternal converts an Application to an ExternalApp configuration
 func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 	return config.ExternalApp{
-		ID:     a.ID,
-		Path:   filepathx.JailJoin(entrypoint, a.ID, a.Entrypoint),
+		ID:     filepath.Base(a.Entrypoint),
+		Path:   filepathx.JailJoin(entrypoint, a.Entrypoint),
 		Config: a.Config,
 	}
 }
@@ -91,7 +98,7 @@ func List(logger log.Logger, appsData map[string]config.App, fSystems ...fs.FS) 
 			}
 
 			// everything is fine, add the application to the list of applications
-			registry[application.ID] = application
+			registry[name] = application
 		}
 	}
 
@@ -106,7 +113,7 @@ func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error)
 	}
 
 	// read the manifest.json from the app directory.
-	manifest := path.Join(path.Base(name), _manifest)
+	manifest := path.Join(name, _manifest)
 	reader, err := fSystem.Open(manifest)
 	if err != nil {
 		// manifest.json is required
@@ -128,6 +135,16 @@ func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error)
 	// overload the default configuration with the application-specific configuration,
 	// the application-specific configuration has priority, and failing is fine here
 	_ = mergo.Merge(&application.Config, conf, mergo.WithOverride)
+
+	// the entrypoint is jailed to the app directory
+	application.Entrypoint = filepathx.JailJoin(name, application.Entrypoint)
+	info, err := fs.Stat(fSystem, application.Entrypoint)
+	switch {
+	case err != nil:
+		return Application{}, errors.Join(err, ErrEntrypointDoesNotExist)
+	case info.IsDir():
+		return Application{}, ErrEntrypointDoesNotExist
+	}
 
 	return application, nil
 }
