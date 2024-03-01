@@ -199,3 +199,149 @@ Feature: List a sharing permissions
         }
       }
       """
+
+
+  Scenario: user lists permissions of a project space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    When user "Alice" lists the permissions of space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "@libre.graph.permissions.actions.allowedValues",
+        "@libre.graph.permissions.roles.allowedValues"
+      ],
+      "properties": {
+        "@libre.graph.permissions.actions.allowedValues": {
+          "const": [
+            "libre.graph/driveItem/permissions/create",
+            "libre.graph/driveItem/children/create",
+            "libre.graph/driveItem/standard/delete",
+            "libre.graph/driveItem/path/read",
+            "libre.graph/driveItem/quota/read",
+            "libre.graph/driveItem/content/read",
+            "libre.graph/driveItem/upload/create",
+            "libre.graph/driveItem/permissions/read",
+            "libre.graph/driveItem/children/read",
+            "libre.graph/driveItem/versions/read",
+            "libre.graph/driveItem/deleted/read",
+            "libre.graph/driveItem/path/update",
+            "libre.graph/driveItem/permissions/delete",
+            "libre.graph/driveItem/deleted/delete",
+            "libre.graph/driveItem/versions/update",
+            "libre.graph/driveItem/deleted/update",
+            "libre.graph/driveItem/basic/read",
+            "libre.graph/driveItem/permissions/update",
+            "libre.graph/driveItem/permissions/deny"
+          ]
+        },
+        "@libre.graph.permissions.roles.allowedValues": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "oneOf":  [
+              {
+                "type": "object",
+                "required": [
+                  "@libre.graph.weight",
+                  "description",
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "@libre.graph.weight": {
+                    "const": 1
+                  },
+                  "description": {
+                    "const": "Allows reading the shared space"
+                  },
+                  "displayName": {
+                    "const": "Space Viewer"
+                  },
+                  "id": {
+                    "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "@libre.graph.weight",
+                  "description",
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "@libre.graph.weight": {
+                    "const": 2
+                  },
+                  "description": {
+                    "const": "Allows creating, reading, updating and deleting file or folder in the shared space"
+                  },
+                  "displayName": {
+                    "const": "Space Editor"
+                  },
+                  "id": {
+                    "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "@libre.graph.weight",
+                  "description",
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "@libre.graph.weight": {
+                    "const": 3
+                  },
+                  "description": {
+                    "const": "Grants co-owner permissions on a resource"
+                  },
+                  "displayName": {
+                    "const": "Co Owner"
+                  },
+                  "id": {
+                    "const": "3a4ba8e9-6a0d-4235-9140-0e7a34007abe"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "@libre.graph.weight",
+                  "description",
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "@libre.graph.weight": {
+                    "const": 4
+                  },
+                  "description": {
+                    "const": "Grants manager permissions on a resource. Semantically equivalent to co-owner"
+                  },
+                  "displayName": {
+                    "const": "Manager"
+                  },
+                  "id": {
+                    "const": "312c0871-5ef7-4b3a-85b6-0e4074c64049"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
