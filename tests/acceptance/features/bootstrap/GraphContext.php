@@ -2511,14 +2511,22 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user lists the shares shared with him/her using the Graph API
+	 * @When /^user "([^"]*)" lists the shares shared with (?:him|her)(| after clearing user cache) using the Graph API$/
 	 *
 	 * @param string $user
+	 * @param string $cacheStepString
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user): void {
+	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user, string $cacheStepString): void {
+		if ($cacheStepString !== '') {
+			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
+			// which means 60 sec is required to clean up all the user|group cache once they are deleted
+			// for tests we have set the above ENV's to minimum which is 1 sec as we check the details for the deleted users
+			sleep(1);
+		}
+
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
 			GraphHelper::getSharesSharedWithMe(
