@@ -517,6 +517,30 @@
 `OCM_TRACING_COLLECTOR`
 | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
 
+| xref:{s-path}/ocs.adoc[ocs]
+| `OCIS_CACHE_STORE` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE`
+| The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
+|
+| `OCIS_CACHE_STORE_NODES` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`
+| A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_TTL` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL`
+| Default time to live for signing keys. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
 | xref:{s-path}/policies.adoc[policies]
 | `OCIS_EVENTS_AUTH_USERNAME` +
 `POLICIES_EVENTS_AUTH_USERNAME`
@@ -593,6 +617,36 @@
 | `OCIS_CACHE_AUTH_PASSWORD` +
 `PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD`
 | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_STORE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE`
+| The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
+|
+| `OCIS_CACHE_STORE_NODES` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`
+| A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_TTL` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL`
+| Default time to live for signing keys. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE`
+| Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true.|
+
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
 |
 | `OCIS_SERVICE_ACCOUNT_ID` +
 `PROXY_SERVICE_ACCOUNT_ID`
