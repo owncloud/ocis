@@ -143,8 +143,8 @@ config = {
         "skip": False,
     },
     "rocketchat": {
-        "channel": "ocis-internal",
-        "from_secret": "rocketchat_chat_webhook",
+        "channel": "infinitescale",
+        "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
