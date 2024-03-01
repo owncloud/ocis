@@ -45,18 +45,16 @@ Loading applications is achieved in three ways:
 The list of available applications is composed of the build in extensions and the custom applications
 provided by the administrator, e.g. `WEB_ASSET_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
 
-for example, if ocis contains a build in extension `image-viewer-dfx` and the administrator provides a custom
-application `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory,the user will be able to access both applications
-from the web ui.
+For example, if ocis would contain a build in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both applications from the web ui.
 
 ## Application Structure
 
 Applications always have to follow a strict structure, which is as follows:
 
-* an application must be a directory
-* an application must contain a `manifest.json` file
+* each application must be in its own directory
+* each application directory must contain a `manifest.json` file
 
-everything else is skipped and not considered as an application.
+Everything else is skipped and not considered as an application.
 
 The `manifest.json` file contains the following fields:
 
@@ -122,7 +120,7 @@ in the process of loading the application assets, the system uses a fallback mec
 
 This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or similar.
 
-Consider the following, ocis is shipped with a default extension called `image-viewer-dfx` which contains a logo,
+Consider the following, ocis is shipped with a default extension named `image-viewer-dfx` which contains a logo,
 but the administrator wants to provide a custom logo for the `image-viewer-dfx` application.
 
 This can be achieved by providing a custom logo in the `WEB_ASSET_APPS_PATH` directory,
