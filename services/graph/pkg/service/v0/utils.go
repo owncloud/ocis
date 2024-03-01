@@ -3,14 +3,22 @@ package svc
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
+	"io/fs"
 	"net/http"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
@@ -424,4 +432,93 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	}
 
 	return permission, nil
+}
+
+func (g Graph) getCS3Client(gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId) (context.Context, *metadata.CS3, error) {
+	mdc := metadata.NewCS3(g.config.Reva.Address, "com.owncloud.api.storage-users")
+	mdc.SpaceRoot = root
+	ctx, err := utils.GetServiceUserContext(g.config.ServiceAccount.ServiceAccountID, gwc, g.config.ServiceAccount.ServiceAccountSecret)
+	return ctx, mdc, err
+}
+
+func applyTemplate(ctx context.Context, mdc *metadata.CS3, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, fsys fs.ReadDirFS) error {
+	entries, err := fsys.ReadDir(".")
+	if err != nil {
+		return err
+	}
+
+	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
+		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
+		// the original storage space.
+		StorageSpace: &storageprovider.StorageSpace{
+			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: storagespace.FormatResourceID(*root),
+			},
+			Root: root,
+		},
+	}
+
+	updateSpaceRequest.StorageSpace.Opaque, err = uploadFolder(ctx, mdc, "", "", updateSpaceRequest.StorageSpace.Opaque, fsys, entries)
+	if err != nil {
+		return err
+	}
+
+	if len(updateSpaceRequest.StorageSpace.Opaque.Map) == 0 {
+		return nil
+	}
+
+	resp, err := gwc.UpdateStorageSpace(ctx, updateSpaceRequest)
+	switch {
+	case err != nil:
+		return err
+	case resp.Status.Code == rpc.Code_CODE_OK:
+		return nil
+	default:
+		return errors.New(resp.Status.Message)
+	}
+}
+
+func uploadFolder(ctx context.Context, mdc *metadata.CS3, pathOnDisc, pathOnSpace string, opaque *v1beta1.Opaque, fsys fs.ReadDirFS, entries []os.DirEntry) (*v1beta1.Opaque, error) {
+	for _, entry := range entries {
+		spacePath := filepath.Join(pathOnSpace, entry.Name())
+		discPath := filepath.Join(pathOnDisc, entry.Name())
+
+		if entry.IsDir() {
+			err := mdc.MakeDirIfNotExist(ctx, spacePath)
+			if err != nil {
+				return opaque, err
+			}
+
+			entries, err := fsys.ReadDir(discPath)
+			if err != nil {
+				return opaque, err
+			}
+
+			opaque, err = uploadFolder(ctx, mdc, discPath, spacePath, opaque, fsys, entries)
+			if err != nil {
+				return opaque, err
+			}
+			continue
+		}
+
+		b, err := fs.ReadFile(fsys, discPath)
+		if err != nil {
+			return opaque, err
+		}
+
+		if err := mdc.SimpleUpload(ctx, spacePath, b); err != nil {
+			return opaque, err
+		}
+
+		// TODO: use upload to avoid second stat
+		i, err := mdc.Stat(ctx, spacePath)
+		if err != nil {
+			return opaque, err
+		}
+
+		identifier := strings.TrimSuffix(entry.Name(), filepath.Ext(entry.Name()))
+		opaque = utils.AppendPlainToOpaque(opaque, identifier, storagespace.FormatResourceID(*i.Id))
+	}
+
+	return opaque, nil
 }

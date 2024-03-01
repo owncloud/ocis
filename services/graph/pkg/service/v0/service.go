@@ -3,6 +3,7 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"embed"
 	"errors"
 	"fmt"
 	"net/http"
@@ -33,6 +34,11 @@ const (
 	// HeaderPurge defines the header name for the purge header.
 	HeaderPurge     = "Purge"
 	displayNameAttr = "displayName"
+)
+
+var (
+	//go:embed spacetemplate/*
+	_spaceTemplateFS embed.FS
 )
 
 // Service defines the service handlers.
