@@ -129,7 +129,7 @@ func listAllServices(startTime time.Time, timeout time.Duration) {
 	timeoutS := timeout * time.Second
 
 	c := exec.Command(config.Get("bin"), "list")
-	output, err := c.CombinedOutput()
+	_, err := c.CombinedOutput()
 	if err != nil {
 		if time.Since(startTime) <= timeoutS {
 			time.Sleep(500 * time.Millisecond)
@@ -137,7 +137,7 @@ func listAllServices(startTime time.Time, timeout time.Duration) {
 		}
 		return
 	}
-	log.Println(string(output))
+	log.Println("All services are up")
 }
 
 func WaitForConnection() bool {
