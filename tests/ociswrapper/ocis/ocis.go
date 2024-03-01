@@ -125,7 +125,18 @@ func Stop() {
 	waitUntilCompleteShutdown()
 }
 
+func listAllService() {
+	c := exec.Command(config.Get("bin"), "list")
+	output, err := c.CombinedOutput()
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println(string(output))
+}
+
 func WaitForConnection() bool {
+	listAllService()
+
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
