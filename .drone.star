@@ -1988,7 +1988,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s" % (dirs["ocisWrapper"], ocis_bin, OCIS_URL),
+        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, OCIS_URL),
     ]
 
     wait_for_ocis = {

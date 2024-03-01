@@ -125,7 +125,24 @@ func Stop() {
 	waitUntilCompleteShutdown()
 }
 
+func listAllServices(startTime time.Time, timeout time.Duration) {
+	timeoutS := timeout * time.Second
+
+	c := exec.Command(config.Get("bin"), "list")
+	_, err := c.CombinedOutput()
+	if err != nil {
+		if time.Since(startTime) <= timeoutS {
+			time.Sleep(500 * time.Millisecond)
+			listAllServices(startTime, timeout)
+		}
+		return
+	}
+	log.Println("All services are up")
+}
+
 func WaitForConnection() bool {
+	listAllServices(time.Now(), 30)
+
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -137,7 +154,14 @@ func WaitForConnection() bool {
 		Transport: transport,
 	}
 
-	req, _ := http.NewRequest("GET", config.Get("url")+"/ocs/v1.php/cloud/capabilities?format=json", nil)
+	var req *http.Request
+	if config.Get("adminUsername") != "" && config.Get("adminPassword") != "" {
+		req, _ = http.NewRequest("GET", config.Get("url")+"/graph/v1.0/me/drives", nil)
+		req.SetBasicAuth(config.Get("adminUsername"), config.Get("adminPassword"))
+	} else {
+		req, _ = http.NewRequest("GET", config.Get("url")+"/ocs/v1.php/cloud/capabilities?format=json", nil)
+	}
+
 	timeout := time.After(timeoutValue)
 
 	for {
