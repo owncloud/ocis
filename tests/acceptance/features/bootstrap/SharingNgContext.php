@@ -92,6 +92,34 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $space
+	 * @param string $resource
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 */
+	public function getPermissionsList(string $user, string $fileOrFolder, string $space, ?string $resource = ''):ResponseInterface {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		if ($fileOrFolder === 'folder') {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		} else {
+			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		return GraphHelper::getPermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" gets permissions list for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
@@ -102,23 +130,24 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserPermissionsListOfResource(string $user, string $fileOrFolder, string $resource, string $space):void {
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-
-		if ($fileOrFolder === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
-		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
-		}
+	public function userGetsPermissionsListForResourceOfTheSpaceUsingTheGraphiAPI(string $user, string $fileOrFolder, string $resource, string $space):void {
 		$this->featureContext->setResponse(
-			GraphHelper::getPermissionsList(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$spaceId,
-				$itemId
-			)
+			$this->getPermissionsList($user, $fileOrFolder, $space, $resource)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists the permissions of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userListsThePermissionsOfSpaceUsingTheGraphApi($user, $space):void {
+		$this->featureContext->setResponse(
+			$this->getPermissionsList($user, 'folder', $space)
 		);
 	}
 
