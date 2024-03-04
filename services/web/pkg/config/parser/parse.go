@@ -49,7 +49,10 @@ func Validate(cfg *config.Config) error {
 	// log a warning and copy the value to the setting that is actually used
 	// this is to ensure a smooth transition from the old to the new core asset path (pre 5.1 to 5.1)
 	if cfg.Asset.DeprecatedPath != "" {
-		cfg.Asset.CorePath = cfg.Asset.DeprecatedPath
+		if cfg.Asset.CorePath == "" {
+			cfg.Asset.CorePath = cfg.Asset.DeprecatedPath
+		}
+
 		// message should be logged to the console,
 		// do not use a logger here because the message MUST be visible independent of the log level
 		log.Deprecation("WEB_ASSET_PATH is deprecated and will be removed in the future. Use WEB_ASSET_CORE_PATH instead.")

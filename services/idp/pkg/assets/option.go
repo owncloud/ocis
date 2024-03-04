@@ -13,13 +13,20 @@ import (
 func New(opts ...Option) http.FileSystem {
 	options := newOptions(opts...)
 
-	return http.FS(fsx.NewFallbackFS(fsx.MustSub(idp.Assets, "assets"), options.Config.Asset.Path))
+	var assetFS fsx.FS = fsx.NewBasePathFs(fsx.FromIOFS(idp.Assets), "assets")
+
+	// only use a fsx.NewFallbackFS and fsx.OsFs if a path is set, use the embedded fs only otherwise
+	if options.Config.Asset.Path != "" {
+		assetFS = fsx.NewFallbackFS(fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.Path), assetFS)
+	}
+
+	return http.FS(assetFS.IOFS())
 }
 
 // Option defines a single option function.
 type Option func(o *Options)
 
-// Options defines the available options for this package.
+// Options define the available options for this package.
 type Options struct {
 	Logger log.Logger
 	Config *config.Config

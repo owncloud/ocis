@@ -15,7 +15,8 @@ import (
 func TestApplication_ToExternal(t *testing.T) {
 	g := gomega.NewWithT(t)
 	app := apps.Application{
-		Entrypoint: "app/entrypoint.js",
+		ID:         "app",
+		Entrypoint: "entrypoint.js",
 		Config: map[string]interface{}{
 			"foo": "bar",
 		},
@@ -24,7 +25,7 @@ func TestApplication_ToExternal(t *testing.T) {
 	externalApp := app.ToExternal("path")
 
 	g.Expect(externalApp.ID).To(gomega.Equal("app"))
-	g.Expect(externalApp.Path).To(gomega.Equal("path/app/entrypoint.js"))
+	g.Expect(externalApp.Path).To(gomega.Equal("path/entrypoint.js"))
 	g.Expect(externalApp.Config).To(gomega.Equal(app.Config))
 }
 

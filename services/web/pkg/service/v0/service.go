@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -22,15 +21,8 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
-	"github.com/owncloud/ocis/v2/services/web"
-	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
-)
-
-var (
-	// _customAppsEndpoint path is used to make app artifacts available by the web service.
-	_customAppsEndpoint = "/assets/apps"
 )
 
 // ErrConfigInvalid is returned when the config parse is invalid.
@@ -60,21 +52,11 @@ func NewService(opts ...Option) Service {
 		),
 	)
 
-	// obtain the list of applications from the apps and add them to the config
-	appsFS := fsx.MustSub(web.Assets, "assets/apps")
-
-	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS, os.DirFS(options.Config.Asset.AppsPath)) {
-		options.Config.Web.Config.ExternalApps = append(
-			options.Config.Web.Config.ExternalApps,
-			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
-		)
-	}
-
 	svc := Web{
 		logger:          options.Logger,
 		config:          options.Config,
 		mux:             m,
-		fs:              fsx.NewFallbackFS(fsx.MustSub(web.Assets, "assets/core"), options.Config.Asset.CorePath),
+		coreFS:          options.CoreFS,
 		gatewaySelector: options.GatewaySelector,
 	}
 
@@ -88,13 +70,13 @@ func NewService(opts ...Option) Service {
 			r.Post("/", svc.UploadLogo)
 			r.Delete("/", svc.ResetLogo)
 		})
-		r.Mount(_customAppsEndpoint, svc.Static(
-			fsx.NewFallbackFS(appsFS, options.Config.Asset.AppsPath),
-			path.Join(svc.config.HTTP.Root, _customAppsEndpoint),
+		r.Mount(options.AppsHTTPEndpoint, svc.Static(
+			options.AppFS,
+			path.Join(svc.config.HTTP.Root, options.AppsHTTPEndpoint),
 			options.Config.HTTP.CacheTTL,
 		))
 		r.Mount("/", svc.Static(
-			svc.fs,
+			svc.coreFS.IOFS(),
 			svc.config.HTTP.Root,
 			options.Config.HTTP.CacheTTL,
 		))
@@ -113,7 +95,7 @@ type Web struct {
 	logger          log.Logger
 	config          *config.Config
 	mux             *chi.Mux
-	fs              *fsx.FallbackFS
+	coreFS          *fsx.FallbackFS
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 

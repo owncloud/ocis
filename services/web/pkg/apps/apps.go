@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/fs"
 	"path"
-	"path/filepath"
 
 	"dario.cat/mergo"
 	"github.com/go-playground/validator/v10"
@@ -43,6 +42,9 @@ func init() {
 
 // Application contains the metadata of an application
 type Application struct {
+	// ID is the unique identifier of the application
+	ID string
+
 	// Entrypoint is the entrypoint of the application within the bundle
 	Entrypoint string `json:"entrypoint" validate:"required"`
 
@@ -53,7 +55,7 @@ type Application struct {
 // ToExternal converts an Application to an ExternalApp configuration
 func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 	return config.ExternalApp{
-		ID:     filepath.Dir(a.Entrypoint),
+		ID:     a.ID,
 		Path:   filepathx.JailJoin(entrypoint, a.Entrypoint),
 		Config: a.Config,
 	}
@@ -62,7 +64,7 @@ func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 // List returns a list of applications from the given filesystems,
 // individual filesystems are searched for applications, and the list is merged.
 // Last finding gets priority in case of conflicts, so the order of the filesystems is important.
-func List(logger log.Logger, appsData map[string]config.App, fSystems ...fs.FS) []Application {
+func List(logger log.Logger, data map[string]config.App, fSystems ...fs.FS) []Application {
 	registry := map[string]Application{}
 
 	for _, fSystem := range fSystems {
@@ -81,7 +83,7 @@ func List(logger log.Logger, appsData map[string]config.App, fSystems ...fs.FS) 
 			name := entry.Name()
 
 			// configuration for the application is optional, if it is not present, the default configuration is used
-			if data, ok := appsData[name]; ok {
+			if data, ok := data[name]; ok {
 				appData = data
 			}
 
@@ -105,15 +107,15 @@ func List(logger log.Logger, appsData map[string]config.App, fSystems ...fs.FS) 
 	return maps.Values(registry)
 }
 
-func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error) {
+func Build(fSystem fs.FS, id string, conf map[string]any) (Application, error) {
 	// skip non-directory listings, every app needs to be contained inside a directory
-	entry, err := fs.Stat(fSystem, name)
+	entry, err := fs.Stat(fSystem, id)
 	if err != nil || !entry.IsDir() {
 		return Application{}, ErrInvalidApp
 	}
 
 	// read the manifest.json from the app directory.
-	manifest := path.Join(name, _manifest)
+	manifest := path.Join(id, _manifest)
 	reader, err := fSystem.Open(manifest)
 	if err != nil {
 		// manifest.json is required
@@ -137,7 +139,7 @@ func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error)
 	_ = mergo.Merge(&application.Config, conf, mergo.WithOverride)
 
 	// the entrypoint is jailed to the app directory
-	application.Entrypoint = filepathx.JailJoin(name, application.Entrypoint)
+	application.Entrypoint = filepathx.JailJoin(id, application.Entrypoint)
 	info, err := fs.Stat(fSystem, application.Entrypoint)
 	switch {
 	case err != nil:
@@ -145,6 +147,8 @@ func Build(fSystem fs.FS, name string, conf map[string]any) (Application, error)
 	case info.IsDir():
 		return Application{}, ErrEntrypointDoesNotExist
 	}
+
+	application.ID = id
 
 	return application, nil
 }

@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"io/fs"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -8,19 +9,23 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
 // Option defines a single option function.
 type Option func(o *Options)
 
-// Options defines the available options for this package.
+// Options define the available options for this package.
 type Options struct {
-	Logger          log.Logger
-	Config          *config.Config
-	Middleware      []func(http.Handler) http.Handler
-	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	TraceProvider   trace.TracerProvider
+	Logger           log.Logger
+	Config           *config.Config
+	Middleware       []func(http.Handler) http.Handler
+	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	TraceProvider    trace.TracerProvider
+	AppFS            fs.FS
+	AppsHTTPEndpoint string
+	CoreFS           *fsx.FallbackFS
 }
 
 // newOptions initializes the available default options.
@@ -66,5 +71,26 @@ func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) 
 func TraceProvider(val trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TraceProvider = val
+	}
+}
+
+// AppFS provides a function to set the appFS option.
+func AppFS(val fs.FS) Option {
+	return func(o *Options) {
+		o.AppFS = val
+	}
+}
+
+// AppsHTTPEndpoint provides a function to set the appsHTTPEndpoint option.
+func AppsHTTPEndpoint(val string) Option {
+	return func(o *Options) {
+		o.AppsHTTPEndpoint = val
+	}
+}
+
+// CoreFS provides a function to set the coreFS option.
+func CoreFS(val *fsx.FallbackFS) Option {
+	return func(o *Options) {
+		o.CoreFS = val
 	}
 }

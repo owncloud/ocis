@@ -1,51 +1,37 @@
 package fsx
 
 import (
-	"io/fs"
-	"os"
-	"path/filepath"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/path/filepathx"
+	"github.com/spf13/afero"
 )
 
-// FallbackFS is a FileSystem that tries to load from assetPath first
-// and falls back to fs if that is not possible
+var (
+	// assert interfaces implemented
+	_ afero.Fs = (*FallbackFS)(nil)
+	_ FS       = (*FallbackFS)(nil)
+)
+
+// FallbackFS is a filesystem that layers a primary filesystem on top of a secondary filesystem.
 type FallbackFS struct {
-	fsys    fs.FS
-	sysPath string
+	FS
+	primary   *BaseFS
+	secondary *BaseFS
 }
 
-// Open checks if assetPath is set and tries to load from there. Falls back to fs if that is not possible
-func (f *FallbackFS) Open(name string) (fs.File, error) {
-	if f.sysPath != "" {
-		file, err := os.Open(filepathx.JailJoin(f.sysPath, name))
-		if err == nil {
-			return file, nil
-		}
-	}
-
-	return f.fsys.Open(name)
+// Primary returns the primary filesystem.
+func (d *FallbackFS) Primary() *BaseFS {
+	return d.primary
 }
 
-// OpenEmbedded opens a file from the embedded filesystem only
-func (f *FallbackFS) OpenEmbedded(name string) (fs.File, error) {
-	return f.fsys.Open(name)
+// Secondary returns the secondary filesystem.
+func (d *FallbackFS) Secondary() *BaseFS {
+	return d.secondary
 }
 
-// Create creates a new file in the assetPath
-func (f *FallbackFS) Create(name string) (*os.File, error) {
-	fullPath := filepathx.JailJoin(f.sysPath, name)
-	if err := os.MkdirAll(filepath.Dir(fullPath), 0770); err != nil {
-		return nil, err
-	}
-
-	return os.Create(fullPath)
-}
-
-// NewFallbackFS return a new EmbeddedFallbackFS instance
-func NewFallbackFS(fsys fs.FS, sysPath string) *FallbackFS {
+// NewFallbackFS returns a new FallbackFS instance.
+func NewFallbackFS(primary, secondary FS) *FallbackFS {
 	return &FallbackFS{
-		fsys:    fsys,
-		sysPath: sysPath,
+		FS:        FromAfero(afero.NewCopyOnWriteFs(secondary, primary)),
+		primary:   &BaseFS{Fs: primary},
+		secondary: &BaseFS{Fs: secondary},
 	}
 }

@@ -109,7 +109,7 @@ func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, err := p.fs.OpenEmbedded(_themesConfigPath)
+	f, err := p.coreFS.Secondary().Open(_themesConfigPath)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -129,7 +129,7 @@ func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p Web) storeAsset(name string, asset io.Reader) error {
-	dst, err := p.fs.Create(name)
+	dst, err := p.coreFS.Create(name)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func (p Web) getLogoPath(r io.Reader) (string, error) {
 }
 
 func (p Web) updateLogoThemeConfig(logoPath string) error {
-	f, err := p.fs.Open(_themesConfigPath)
+	f, err := p.coreFS.Open(_themesConfigPath)
 	if err == nil {
 		defer f.Close()
 	}
@@ -184,7 +184,7 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	logoCfg["login"] = logoPath
 	logoCfg["topbar"] = logoPath
 
-	dst, err := p.fs.Create(_themesConfigPath)
+	dst, err := p.coreFS.Create(_themesConfigPath)
 	if err != nil {
 		return err
 	}
