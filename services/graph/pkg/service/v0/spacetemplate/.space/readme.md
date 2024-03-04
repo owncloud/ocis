@@ -1,1 +1,1 @@
-Space description goes here
+Here you can add a description for this Space.

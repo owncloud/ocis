@@ -45,7 +45,7 @@ type Spaces struct {
 	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL" desc:"Max TTL in seconds for the spaces property cache." introductionVersion:"pre5.0"`
 	UsersCacheTTL                   int    `yaml:"users_cache_ttl" env:"GRAPH_SPACES_USERS_CACHE_TTL" desc:"Max TTL in seconds for the spaces users cache." introductionVersion:"pre5.0"`
 	GroupsCacheTTL                  int    `yaml:"groups_cache_ttl" env:"GRAPH_SPACES_GROUPS_CACHE_TTL" desc:"Max TTL in seconds for the spaces groups cache." introductionVersion:"pre5.0"`
-	TemplatePath                    string `yaml:"template_path" env:"GRAPH_SPACES_TEMPLATE_PATH" desc:"The path to a folder containg files and folder that should be created on any space." introductionVersion:"5.0"`
+	StorageUsersAddress             string `yaml:"storage_users_address" env:"GRAPH_SPACES_STORAGE_USERS_ADDRESS" desc:"The address of the storage-users service." introductionVersion:"5.0"`
 }
 
 type LDAP struct {
