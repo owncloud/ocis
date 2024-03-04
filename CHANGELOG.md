@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 * Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
+* Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
@@ -67,6 +68,10 @@ The following sections list the changes for unreleased.
    are now assignable.
 
    https://github.com/owncloud/ocis/pull/8534
+
+* Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
+
+   https://github.com/owncloud/ocis/pull/8570
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
