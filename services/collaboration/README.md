@@ -17,6 +17,6 @@ There are a few variables that you need to set:
 
 * `COLLABORATION_WOPIAPP_ADDR`: The URL of the WOPI app (onlyoffice, collabora, etc). For example: "https://office.mycloud.prv".
 * `COLLABORATION_HTTP_ADDR`: The external address of the collaboration service. The target app (onlyoffice, collabora) will use this address to read and write files from ocis. For example: "wopiserver.mycloud.prv"
-* `COLLABORATION_HTTP_SCHEME`: The scheme to be used when accessing the collaboration service. Either "http" or "https". This will be used to build the URL that the WOPI app needs in order to contact this service.
+* `COLLABORATION_HTTP_SCHEME`: The scheme to be used when accessing the collaboration service. Either "http" or "https". This will be used to finally build the URL that the WOPI app needs in order to contact this service.
 
 The rest of the configuration options available can be left with the default values.

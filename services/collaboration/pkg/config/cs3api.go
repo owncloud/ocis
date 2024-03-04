@@ -7,7 +7,7 @@ type CS3Api struct {
 }
 
 type Gateway struct {
-	Name string `yaml: "name" env:"COLLABORATION_CS3API_GATEWAY_NAME" desc:"The service name of the CS3API gateway."`
+	Name string `yaml: "name" env:"OCIS_REVA_GATEWAY;COLLABORATION_CS3API_GATEWAY_NAME" desc:"The service name of the CS3API gateway."`
 }
 
 type DataGateway struct {
