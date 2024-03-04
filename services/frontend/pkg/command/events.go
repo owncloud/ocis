@@ -67,12 +67,6 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 		return err
 	}
 
-	gwc, err := gatewaySelector.Next()
-	if err != nil {
-		l.Error().Err(err).Msg("cannot get gateway client")
-		return err
-	}
-
 	traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot initialize tracing")
@@ -99,7 +93,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 			default:
 				l.Error().Interface("event", e).Msg("unhandled event")
 			case events.ShareCreated:
-				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gwc, valueService, cfg.ServiceAccount)
+				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount)
 			}
 		case <-ctx.Done():
 			l.Info().Msg("context cancelled")
@@ -109,19 +103,29 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 }
 
 // AutoAcceptShares automatically accepts shares if configured by the admin or user
-func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gwc gateway.GatewayAPIClient, vs settingssvc.ValueService, cfg config.ServiceAccount) {
+func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], vs settingssvc.ValueService, cfg config.ServiceAccount) {
+	gwc, err := gatewaySelector.Next()
+	if err != nil {
+		l.Error().Err(err).Msg("cannot get gateway client")
+		return
+	}
 	ctx, err := utils.GetServiceUserContext(cfg.ServiceAccountID, gwc, cfg.ServiceAccountSecret)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot impersonate user")
 		return
 	}
 
-	uids, err := getUserIDs(ctx, gwc, ev.GranteeUserID, ev.GranteeGroupID)
+	uids, err := getUserIDs(ctx, gatewaySelector, ev.GranteeUserID, ev.GranteeGroupID)
 	if err != nil {
-		l.Error().Err(err).Msg("cannot get granteess")
+		l.Error().Err(err).Msg("cannot get grantees")
 		return
 	}
 
+	gwc, err = gatewaySelector.Next()
+	if err != nil {
+		l.Error().Err(err).Msg("cannot get gateway client")
+		return
+	}
 	info, err := utils.GetResourceByID(ctx, ev.ItemID, gwc)
 	if err != nil {
 		l.Error().Err(err).Msg("error getting resource")
@@ -133,13 +137,18 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 			continue
 		}
 
-		mountpoint, err := getMountpoint(ctx, ev.ItemID, uid, gwc, info)
+		mountpoint, err := getMountpoint(ctx, l, ev.ItemID, uid, gatewaySelector, info)
 		if err != nil {
 			l.Error().Err(err).Msg("error getting mountpoint")
 			continue
 
 		}
 
+		gwc, err := gatewaySelector.Next()
+		if err != nil {
+			l.Error().Err(err).Msg("cannot get gateway client")
+			continue
+		}
 		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid, mountpoint))
 		if err != nil {
 			l.Error().Err(err).Msg("error sending grpc request")
@@ -153,8 +162,8 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 
 }
 
-func getMountpoint(ctx context.Context, itemid *provider.ResourceId, uid *user.UserId, gwc gateway.GatewayAPIClient, info *provider.ResourceInfo) (string, error) {
-	lrs, err := getSharesList(ctx, gwc, uid)
+func getMountpoint(ctx context.Context, l log.Logger, itemid *provider.ResourceId, uid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], info *provider.ResourceInfo) (string, error) {
+	lrs, err := getSharesList(ctx, gatewaySelector, uid)
 	if err != nil {
 		return "", err
 	}
@@ -185,7 +194,12 @@ func getMountpoint(ctx context.Context, itemid *provider.ResourceId, uid *user.U
 	for i, ms := range mountedShares {
 		if ms.MountPoint.Path == mount {
 			// does the shared resource still exist?
-			_, err := utils.GetResourceByID(ctx, ms.Share.ResourceId, gwc)
+			gwc, err := gatewaySelector.Next()
+			if err != nil {
+				l.Error().Err(err).Msg("cannot get gateway client")
+				continue
+			}
+			_, err = utils.GetResourceByID(ctx, ms.Share.ResourceId, gwc)
 			if err == nil {
 				// The mount point really already exists, we need to insert a number into the filename
 				ext := filepath.Ext(base)
@@ -204,11 +218,15 @@ func getMountpoint(ctx context.Context, itemid *provider.ResourceId, uid *user.U
 	return mount, nil
 }
 
-func getUserIDs(ctx context.Context, gwc gateway.GatewayAPIClient, uid *user.UserId, gid *group.GroupId) ([]*user.UserId, error) {
+func getUserIDs(ctx context.Context, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], uid *user.UserId, gid *group.GroupId) ([]*user.UserId, error) {
 	if uid != nil {
 		return []*user.UserId{uid}, nil
 	}
 
+	gwc, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 	res, err := gwc.GetGroup(ctx, &group.GetGroupRequest{GroupId: gid})
 	if err != nil {
 		return nil, err
@@ -251,8 +269,12 @@ func updateShareRequest(shareID *collaboration.ShareId, uid *user.UserId, path s
 }
 
 // getSharesList gets the list of all shares for the given user.
-func getSharesList(ctx context.Context, client gateway.GatewayAPIClient, uid *user.UserId) (*collaboration.ListReceivedSharesResponse, error) {
-	shares, err := client.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
+func getSharesList(ctx context.Context, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], uid *user.UserId) (*collaboration.ListReceivedSharesResponse, error) {
+	gwc, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	shares, err := gwc.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 		Opaque: utils.AppendJSONToOpaque(nil, "userid", uid),
 	})
 	if err != nil {
