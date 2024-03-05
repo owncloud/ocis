@@ -16,6 +16,7 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/leonelquinteros/gotext"
@@ -52,7 +53,7 @@ type OC10Notification struct {
 // Converter is responsible for converting eventhistory events to OC10Notifications
 type Converter struct {
 	locale                string
-	gwc                   gateway.GatewayAPIClient
+	gatewaySelector       pool.Selectable[gateway.GatewayAPIClient]
 	serviceName           string
 	translationPath       string
 	defaultLanguage       string
@@ -65,10 +66,10 @@ type Converter struct {
 }
 
 // NewConverter returns a new Converter
-func NewConverter(ctx context.Context, loc string, gwc gateway.GatewayAPIClient, name, translationPath, defaultLanguage string) *Converter {
+func NewConverter(ctx context.Context, loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], name, translationPath, defaultLanguage string) *Converter {
 	return &Converter{
 		locale:                loc,
-		gwc:                   gwc,
+		gatewaySelector:       gatewaySelector,
 		serviceName:           name,
 		translationPath:       translationPath,
 		defaultLanguage:       defaultLanguage,
@@ -320,7 +321,11 @@ func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovi
 	if space, ok := c.spaces[spaceID]; ok {
 		return space, nil
 	}
-	space, err := utils.GetSpace(ctx, spaceID, c.gwc)
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	space, err := utils.GetSpace(ctx, spaceID, gwc)
 	if err == nil {
 		c.spaces[spaceID] = space
 	}
@@ -331,7 +336,11 @@ func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider
 	if r, ok := c.resources[resourceID.GetOpaqueId()]; ok {
 		return r, nil
 	}
-	resource, err := utils.GetResourceByID(ctx, resourceID, c.gwc)
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	resource, err := utils.GetResourceByID(ctx, resourceID, gwc)
 	if err == nil {
 		c.resources[resourceID.GetOpaqueId()] = resource
 	}
@@ -342,7 +351,11 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	if u, ok := c.users[userID.GetOpaqueId()]; ok {
 		return u, nil
 	}
-	usr, err := utils.GetUser(userID, c.gwc)
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	usr, err := utils.GetUser(userID, gwc)
 	if err == nil {
 		c.users[userID.GetOpaqueId()] = usr
 	}
