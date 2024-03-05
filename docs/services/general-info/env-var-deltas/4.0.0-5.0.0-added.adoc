@@ -12,7 +12,8 @@
 | `OCIS_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured.| `false`
 |
-| `MICRO_REGISTRY` (important change)
+| `MICRO_REGISTRY` +
+(important change)
 | The Go micro registry type to use. Supported types are: 'memory', 'nats-js-kv' (default) and 'kubernetes'. Note that 'nats', 'etcd', 'consul' and 'mdns' are deprecated and will be removed in a later version. Only change on supervision of ownCloud Support.| nats-js-kv
 |
 | `MICRO_REGISTRY_AUTH_PASSWORD`
@@ -838,7 +839,8 @@
 `STORAGE_USERS_GATEWAY_GRPC_ADDR`
 | The bind address of the gateway GRPC address.|
 |
-| `OCIS_MACHINE_AUTH_API_KEY`
+| `OCIS_MACHINE_AUTH_API_KEY` +
+`STORAGE_USERS_MACHINE_AUTH_API_KEY`
 | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 |
 | `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE`
