@@ -7,23 +7,34 @@ The web service also provides a minimal API for branding functionality like chan
 
 ## Custom Compiled Web Assets
 
-If you want to use your custom compiled web client assets instead of the embedded ones, then you can do that by setting the `WEB_ASSET_PATH` variable to point to your compiled files. See [ownCloud Web / Getting Started](https://owncloud.dev/clients/web/getting-started/) and [ownCloud Web / Setup with oCIS](https://owncloud.dev/clients/web/backend-ocis/) for more details.
+If you want to use your custom compiled web client assets instead of the embedded ones,
+then you can do that by setting the `WEB_ASSET_PATH` variable to point to your compiled files.
+See [ownCloud Web / Getting Started](https://owncloud.dev/clients/web/getting-started/) and [ownCloud Web / Setup with oCIS](https://owncloud.dev/clients/web/backend-ocis/) for more details.
 
 ## Web UI Configuration
 
-Note that single configuration settings of the embedded web UI can be defined via `WEB_OPTION_xxx` environment variables. If a json based configuration file is used via the `WEB_UI_CONFIG_FILE` environment variable, these configurations take precedence over single options set.
+Note that single configuration settings of the embedded web UI can be defined via `WEB_OPTION_xxx` environment variables.
+
+If a json based configuration file is used via the `WEB_UI_CONFIG_FILE` environment variable, these configurations take
+precedence over single options set.
 
 ### Web UI Options
 
-Besides theming, the behavior of the web UI can be configured via options. See the environment variables `WEB_OPTION_xxx` for more details.
+Besides theming, the behavior of the web UI can be configured via options. See the environment variables `WEB_OPTION_xxx`
+for more details.
 
 ### Web UI Config File
 
-When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuration of the web UI can be made with a [json based](https://github.com/owncloud/web/tree/master/config) file.
+When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuration of the web UI can be made
+with a [json based](https://github.com/owncloud/web/tree/master/config) file.
 
 ### Embedding Web
 
-Web can be consumed by another application in a stripped down version called “Embed mode”. This mode is supposed to be used in the context of selecting or sharing resources. For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/). See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
+Web can be consumed by another application in a stripped down version called “Embed mode”.
+This mode is supposed to be used in the context of selecting or sharing resources.
+
+For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/).
+See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
 
 # Web Apps
 
@@ -35,17 +46,20 @@ and does not support injection of dynamic web applications (custom dynamic backe
 
 ## Loading Applications
 
-Loading applications is achieved in three ways:
+Web applications are loaded from the buildin FS in the ocis binary, e.g. `ocis_src_path/services/web/assets/apps`
+this cannot be manipulated at runtime only at build-time.
 
+Additionally, the administrator can provide custom applications in one of the following ways:
+
+* By loading a web application from the default ocis base directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps` (default behavior).
 * By loading a web application from a user-provided path, by setting the `WEB_ASSET_APPS_PATH` environment variable.
-* By loading a web application from the default ocis home directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps`.
-* By embedding a web application into the ocis binary which is a build-time option,
-  e.g. `ocis_src_path/services/web/assets/apps` followed by a build.
 
 The list of available applications is composed of the build in extensions and the custom applications
 provided by the administrator, e.g. `WEB_ASSET_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
 
-For example, if ocis would contain a build in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both applications from the web ui.
+For example, if ocis would contain a build in extension named `image-viewer-dfx` and the administrator provides a custom
+application named `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
+applications from the web ui.
 
 ## Application Structure
 
