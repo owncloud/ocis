@@ -79,6 +79,10 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 	}
 
 	// Find all accepted shares for this resource
+	gatewayClient, err = s.gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
 	receivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 		Filters: []*collaboration.Filter{
 			{
@@ -188,6 +192,10 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 			UpdateMask: updateMask,
 		}
 
+		gatewayClient, err = s.gatewaySelector.Next()
+		if err != nil {
+			return libregraph.DriveItem{}, err
+		}
 		updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
 		switch errCode := errorcode.FromCS3Status(updateReceivedShareResponse.GetStatus(), err); {
 		case errCode == nil:
