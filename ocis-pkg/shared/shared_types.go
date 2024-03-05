@@ -62,7 +62,7 @@ type Cache struct {
 	Table              string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h." introductionVersion:"pre5.0"`
 	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
+	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
 	AuthUsername       string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 	AuthPassword       string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 }
