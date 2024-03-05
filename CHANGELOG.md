@@ -42,11 +42,23 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 
 ## Details
+
+* Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
+
+   This is a workaround that should prevent removing or changing the share
+   permissions when the file is locked. These limitations have to be removed after
+   the wopi server will be able to unlock the file properly. These limitations are
+   not spread on the files inside the shared folder.
+
+   https://github.com/owncloud/ocis/issues/8273
+   https://github.com/owncloud/ocis/pull/8529
+   https://github.com/cs3org/reva/pull/4534
 
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 
