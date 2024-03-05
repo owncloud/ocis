@@ -67,7 +67,9 @@ http:
     - X-HTTP-Method-Override
     allow_credentials: true
 asset:
-  path: /var/lib/ocis/web/assets
+  path: ""
+  core_path: /var/lib/ocis/web/assets/core
+  apps_path: /var/lib/ocis/web/assets/apps
 file: ""
 web:
   theme_server: https://localhost:9200
@@ -142,6 +144,7 @@ web:
     styles: []
     scripts: []
     custom_translations: []
+apps: {}
 token_manager:
   jwt_secret: ""
 gateway_addr: com.owncloud.api.gateway

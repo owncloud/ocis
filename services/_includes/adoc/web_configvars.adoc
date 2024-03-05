@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-05-10-34-10]
+[#deprecation-note-2024-03-05-13-13-38]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| The WEB_ASSET_PATH is deprecated and will be removed in the future.
+| 5.1.0
+| 6.0.0
+| Use WEB_ASSET_CORE_PATH instead.
 |===
 
 endif::[]
@@ -237,13 +242,31 @@ a| [subs=-attributes]
 Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`WEB_ASSET_PATH` +
+xref:deprecation-note-2024-03-05-13-13-38[Deprecation Note]
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
+
+a|`WEB_ASSET_CORE_PATH` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++/var/lib/ocis/web/assets ++
+++/var/lib/ocis/web/assets/core ++
 a| [subs=-attributes]
 Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
+
+a|`WEB_ASSET_APPS_PATH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/web/assets/apps ++
+a| [subs=-attributes]
+Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets.
 
 a|`WEB_UI_CONFIG_FILE` +
 
