@@ -78,7 +78,7 @@ func (cl *ClientlogService) Run() error {
 func (cl *ClientlogService) processEvent(event events.Event) {
 	gwc, err := cl.gatewaySelector.Next()
 	if err != nil {
-		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gatway client")
+		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
 		return
 	}
 
@@ -88,6 +88,11 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		return
 	}
 
+	gwc, err = cl.gatewaySelector.Next()
+	if err != nil {
+		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
+		return
+	}
 	var (
 		users  []string
 		evType string
@@ -109,6 +114,11 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			ItemID:       storagespace.FormatResourceID(*info.GetId()),
 		}
 
+		gwc, err := cl.gatewaySelector.Next()
+		if err != nil {
+			cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
+			return
+		}
 		users, err = utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
 	}
 
