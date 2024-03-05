@@ -295,12 +295,13 @@ func NewErrtypeFromStatus(status *rpc.Status) error {
 	case rpc.Code_CODE_UNIMPLEMENTED:
 		return NotSupported(status.Message)
 	case rpc.Code_CODE_PERMISSION_DENIED:
-		// FIXME add locked status!
-		if strings.HasPrefix(status.Message, "set lock: error: locked by ") {
-			return Locked(strings.TrimPrefix(status.Message, "set lock: error: locked by "))
-		}
 		return PermissionDenied(status.Message)
 	case rpc.Code_CODE_LOCKED:
+		// FIXME make something better for that
+		msg := strings.Split(status.Message, "error: locked by ")
+		if len(msg) > 1 {
+			return Locked(msg[len(msg)-1])
+		}
 		return Locked(status.Message)
 	// case rpc.Code_CODE_DATA_LOSS: ?
 	//	IsPartialContent
@@ -348,5 +349,39 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 		return ChecksumMismatch(message)
 	default:
 		return InternalError(message)
+	}
+}
+
+// NewHTTPStatusCodeFromErrtype maps an errtype to an http status
+func NewHTTPStatusCodeFromErrtype(err error) int {
+	switch err.(type) {
+	case NotFound:
+		return http.StatusNotFound
+	case AlreadyExists:
+		return http.StatusConflict
+	case NotSupported:
+		return http.StatusNotImplemented
+	case NotModified:
+		return http.StatusNotModified
+	case InvalidCredentials:
+		return http.StatusUnauthorized
+	case PermissionDenied:
+		return http.StatusForbidden
+	case Locked:
+		return http.StatusLocked
+	case Aborted:
+		return http.StatusPreconditionFailed
+	case PreconditionFailed:
+		return http.StatusMethodNotAllowed
+	case InsufficientStorage:
+		return http.StatusInsufficientStorage
+	case BadRequest:
+		return http.StatusBadRequest
+	case PartialContent:
+		return http.StatusPartialContent
+	case ChecksumMismatch:
+		return StatusChecksumMismatch
+	default:
+		return http.StatusInternalServerError
 	}
 }
