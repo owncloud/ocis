@@ -32,8 +32,8 @@ type Config struct {
 // Asset defines the available asset configuration.
 type Asset struct {
 	DeprecatedPath string `yaml:"path" env:"WEB_ASSET_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." deprecationVersion:"5.1.0" removalVersion:"6.0.0" deprecationInfo:"The WEB_ASSET_PATH is deprecated and will be removed in the future." deprecationReplacement:"Use WEB_ASSET_CORE_PATH instead."`
-	CorePath       string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets."`
-	AppsPath       string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets."`
+	CorePath       string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
+	AppsPath       string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
 }
 
 // CustomStyle references additional css to be loaded into ownCloud Web.
