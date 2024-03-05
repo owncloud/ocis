@@ -13,25 +13,25 @@ var (
 // FallbackFS is a filesystem that layers a primary filesystem on top of a secondary filesystem.
 type FallbackFS struct {
 	FS
-	layer *BaseFS
-	base  *BaseFS
+	primary   *BaseFS
+	secondary *BaseFS
 }
 
 // Primary returns the primary filesystem.
 func (d *FallbackFS) Primary() *BaseFS {
-	return d.base
+	return d.primary
 }
 
 // Secondary returns the secondary filesystem.
 func (d *FallbackFS) Secondary() *BaseFS {
-	return d.layer
+	return d.secondary
 }
 
 // NewFallbackFS returns a new FallbackFS instance.
-func NewFallbackFS(base, layer FS) *FallbackFS {
+func NewFallbackFS(primary, secondary FS) *FallbackFS {
 	return &FallbackFS{
-		FS:    FromAfero(afero.NewCopyOnWriteFs(layer, base)),
-		base:  &BaseFS{Fs: base},
-		layer: &BaseFS{Fs: layer},
+		FS:        FromAfero(afero.NewCopyOnWriteFs(secondary, primary)),
+		primary:   &BaseFS{Fs: primary},
+		secondary: &BaseFS{Fs: secondary},
 	}
 }

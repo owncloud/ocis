@@ -10,13 +10,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 )
 
-func mustRead(t *testing.T, r io.Reader) string {
-	g := gomega.NewWithT(t)
-	b, err := io.ReadAll(r)
-	g.Expect(err).ToNot(gomega.HaveOccurred())
-	return string(b)
-}
-
 func TestLayeredFS(t *testing.T) {
 	g := gomega.NewWithT(t)
 
