@@ -11,6 +11,7 @@ import (
 	permissionsapi "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/spf13/afero"
 )
 
 var (
@@ -67,7 +68,7 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fp := filepath.Join("branding", filepath.Join("/", fileHeader.Filename))
-	err = p.storeAsset(fp, file)
+	err = afero.WriteReader(p.coreFS, fp, file)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -109,7 +110,7 @@ func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, err := p.fs.OpenEmbedded(_themesConfigPath)
+	f, err := p.coreFS.Secondary().Open(_themesConfigPath)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -126,17 +127,6 @@ func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-}
-
-func (p Web) storeAsset(name string, asset io.Reader) error {
-	dst, err := p.fs.Create(name)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	_, err = io.Copy(dst, asset)
-	return err
 }
 
 func (p Web) getLogoPath(r io.Reader) (string, error) {
@@ -159,7 +149,7 @@ func (p Web) getLogoPath(r io.Reader) (string, error) {
 }
 
 func (p Web) updateLogoThemeConfig(logoPath string) error {
-	f, err := p.fs.Open(_themesConfigPath)
+	f, err := p.coreFS.Open(_themesConfigPath)
 	if err == nil {
 		defer f.Close()
 	}
@@ -184,10 +174,11 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	logoCfg["login"] = logoPath
 	logoCfg["topbar"] = logoPath
 
-	dst, err := p.fs.Create(_themesConfigPath)
+	dst, err := p.coreFS.Create(_themesConfigPath)
 	if err != nil {
 		return err
 	}
+	defer dst.Close()
 
 	return json.NewEncoder(dst).Encode(m)
 }

@@ -2,17 +2,27 @@ package http
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"go-micro.dev/v4"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
+	"github.com/owncloud/ocis/v2/services/web"
+	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	webmid "github.com/owncloud/ocis/v2/services/web/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/web/pkg/service/v0"
-	"go-micro.dev/v4"
+)
+
+var (
+	// _customAppsEndpoint path is used to make app artifacts available by the web service.
+	_customAppsEndpoint = "/assets/apps"
 )
 
 // Server initializes the http service and server.
@@ -46,8 +56,28 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, err
 	}
 
+	coreFS := fsx.NewFallbackFS(
+		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
+		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/core"),
+	)
+	appsFS := fsx.NewFallbackFS(
+		fsx.NewReadOnlyFs(fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.AppsPath)),
+		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/apps"),
+	)
+
+	// build and inject the list of applications into the config
+	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS.Secondary().IOFS(), appsFS.Primary().IOFS()) {
+		options.Config.Web.Config.ExternalApps = append(
+			options.Config.Web.Config.ExternalApps,
+			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
+		)
+	}
+
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
+		svc.CoreFS(coreFS),
+		svc.AppFS(appsFS.IOFS()),
+		svc.AppsHTTPEndpoint(_customAppsEndpoint),
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(

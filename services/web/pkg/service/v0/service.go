@@ -3,8 +3,10 @@ package svc
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -12,15 +14,15 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
+	"github.com/riandyrn/otelchi"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
-	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/services/web"
+	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
-	"github.com/riandyrn/otelchi"
 )
 
 // ErrConfigInvalid is returned when the config parse is invalid.
@@ -49,11 +51,12 @@ func NewService(opts ...Option) Service {
 			otelchi.WithPropagators(tracing.GetPropagator()),
 		),
 	)
+
 	svc := Web{
 		logger:          options.Logger,
 		config:          options.Config,
 		mux:             m,
-		fs:              assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
+		coreFS:          options.CoreFS,
 		gatewaySelector: options.GatewaySelector,
 	}
 
@@ -67,7 +70,16 @@ func NewService(opts ...Option) Service {
 			r.Post("/", svc.UploadLogo)
 			r.Delete("/", svc.ResetLogo)
 		})
-		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
+		r.Mount(options.AppsHTTPEndpoint, svc.Static(
+			options.AppFS,
+			path.Join(svc.config.HTTP.Root, options.AppsHTTPEndpoint),
+			options.Config.HTTP.CacheTTL,
+		))
+		r.Mount("/", svc.Static(
+			svc.coreFS.IOFS(),
+			svc.config.HTTP.Root,
+			options.Config.HTTP.CacheTTL,
+		))
 	})
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
@@ -78,12 +90,12 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-// Web defines implements the business logic for Service.
+// Web defines the handlers for the web service.
 type Web struct {
 	logger          log.Logger
 	config          *config.Config
 	mux             *chi.Mux
-	fs              *assetsfs.FileSystem
+	coreFS          *fsx.FallbackFS
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
@@ -127,8 +139,8 @@ func (p Web) Config(w http.ResponseWriter, _ *http.Request) {
 }
 
 // Static simply serves all static files.
-func (p Web) Static(ttl int) http.HandlerFunc {
-	rootWithSlash := p.config.HTTP.Root
+func (p Web) Static(f fs.FS, root string, ttl int) http.HandlerFunc {
+	rootWithSlash := root
 
 	if !strings.HasSuffix(rootWithSlash, "/") {
 		rootWithSlash = rootWithSlash + "/"
@@ -136,7 +148,7 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 	static := http.StripPrefix(
 		rootWithSlash,
-		assets.FileServer(p.fs),
+		assets.FileServer(f),
 	)
 
 	lastModified := time.Now().UTC().Format(http.TimeFormat)

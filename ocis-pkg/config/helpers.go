@@ -5,6 +5,7 @@ import (
 
 	gofig "github.com/gookit/config/v2"
 	gooyaml "github.com/gookit/config/v2/yaml"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 )
 
@@ -25,8 +26,7 @@ func BindSourcesToStructs(service string, dst interface{}) (*gofig.Config, error
 	})
 	cnf.AddDriver(gooyaml.Driver)
 
-	cfgFile := path.Join(defaults.BaseConfigPath(), service+".yaml")
-	_ = cnf.LoadFiles([]string{cfgFile}...)
+	_ = cnf.LoadFiles(path.Join(defaults.BaseConfigPath(), service+".yaml"))
 
 	err := cnf.BindStruct("", &dst)
 	if err != nil {

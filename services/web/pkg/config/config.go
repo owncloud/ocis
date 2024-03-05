@@ -21,6 +21,7 @@ type Config struct {
 	Asset Asset  `yaml:"asset"`
 	File  string `yaml:"file" env:"WEB_UI_CONFIG_FILE" desc:"Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details."`
 	Web   Web    `yaml:"web"`
+	Apps  map[string]App
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
@@ -30,7 +31,9 @@ type Config struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"path" env:"WEB_ASSET_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets."`
+	DeprecatedPath string `yaml:"path" env:"WEB_ASSET_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." deprecationVersion:"5.1.0" removalVersion:"6.0.0" deprecationInfo:"The WEB_ASSET_PATH is deprecated and will be removed in the future." deprecationReplacement:"Use WEB_ASSET_CORE_PATH instead."`
+	CorePath       string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
+	AppsPath       string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
 }
 
 // CustomStyle references additional css to be loaded into ownCloud Web.
@@ -108,6 +111,12 @@ type Web struct {
 	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path."`  // used to build Theme in WebConfig
 	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Subpath/file to load the theme. Will be appended to the URL of the theme server."` // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`
+}
+
+// App defines the individual app configuration.
+type App struct {
+	Disabled bool           `yaml:"disabled"`
+	Config   map[string]any `yaml:"config"`
 }
 
 // TokenManager is the config for using the reva token manager

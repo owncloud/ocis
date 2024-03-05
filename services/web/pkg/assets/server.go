@@ -3,6 +3,7 @@ package assets
 import (
 	"bytes"
 	"io"
+	"io/fs"
 	"mime"
 	"net/http"
 	"path"
@@ -12,32 +13,42 @@ import (
 )
 
 type fileServer struct {
-	root http.FileSystem
+	fsys http.FileSystem
 }
 
-func FileServer(root http.FileSystem) http.Handler {
-	return &fileServer{root}
+func FileServer(fsys fs.FS) http.Handler {
+	return &fileServer{http.FS(fsys)}
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	upath := path.Clean(path.Join("/", r.URL.Path))
-	r.URL.Path = upath
+	uPath := path.Clean(path.Join("/", r.URL.Path))
+	r.URL.Path = uPath
 
-	fallbackIndex := func() {
+	tryIndex := func() {
 		r.URL.Path = "/index.html"
+
+		// not every fs contains a file named index.html,
+		// therefore, we need to check if the file exists and stop the recursion if it doesn't
+		file, err := f.fsys.Open(r.URL.Path)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer file.Close()
+
 		f.ServeHTTP(w, r)
 	}
 
-	asset, err := f.root.Open(upath)
+	asset, err := f.fsys.Open(uPath)
 	if err != nil {
-		fallbackIndex()
+		tryIndex()
 		return
 	}
 	defer asset.Close()
 
 	s, _ := asset.Stat()
 	if s.IsDir() {
-		fallbackIndex()
+		tryIndex()
 		return
 	}
 
