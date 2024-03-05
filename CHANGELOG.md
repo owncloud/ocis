@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
+* Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
 
 ## Details
 
@@ -93,6 +94,20 @@ The following sections list the changes for unreleased.
    enabled and usable by default.
 
    https://github.com/owncloud/ocis/pull/8410
+
+* Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
+
+   We've added a new feature which allows the administrator of the environment to
+   provide custom web applications to the users. This feature is useful for
+   organizations that have specific web applications that they want to provide to
+   their users.
+
+   The users will then be able to access these custom web applications from the web
+   ui. For a detailed description of the feature, please read the WEB service
+   README.md file.
+
+   https://github.com/owncloud/ocis/issues/8392
+   https://github.com/owncloud/ocis/pull/8523
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
