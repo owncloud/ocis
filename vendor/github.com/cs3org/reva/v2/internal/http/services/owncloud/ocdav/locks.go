@@ -21,6 +21,7 @@ package ocdav
 import (
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,13 +35,12 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
+	ocdavErrors "github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/prop"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
@@ -172,7 +172,7 @@ type cs3LS struct {
 }
 
 func (cls *cs3LS) Confirm(ctx context.Context, now time.Time, name0, name1 string, conditions ...Condition) (func(), error) {
-	return nil, errors.ErrNotImplemented
+	return nil, ocdavErrors.ErrNotImplemented
 }
 
 func (cls *cs3LS) Create(ctx context.Context, now time.Time, details LockDetails) (string, error) {
@@ -180,7 +180,7 @@ func (cls *cs3LS) Create(ctx context.Context, now time.Time, details LockDetails
 	/*
 		if !details.ZeroDepth {
 		 The CS3 Lock api currently has no depth property, it only locks single resources
-			return "", errors.ErrUnsupportedLockInfo
+			return "", ocdavErrors.ErrUnsupportedLockInfo
 		}
 	*/
 
@@ -225,20 +225,19 @@ func (cls *cs3LS) Create(ctx context.Context, now time.Time, details LockDetails
 	if err != nil {
 		return "", err
 	}
-	switch res.Status.Code {
+	switch res.GetStatus().GetCode() {
 	case rpc.Code_CODE_OK:
 		return lockTokenPrefix + token.String(), nil
-	case rpc.Code_CODE_FAILED_PRECONDITION:
-		return "", errtypes.Aborted("file is already locked")
 	default:
-		return "", errtypes.NewErrtypeFromStatus(res.Status)
+		return "", ocdavErrors.NewErrFromStatus(res.GetStatus())
 	}
 
 }
 
 func (cls *cs3LS) Refresh(ctx context.Context, now time.Time, token string, duration time.Duration) (LockDetails, error) {
-	return LockDetails{}, errors.ErrNotImplemented
+	return LockDetails{}, ocdavErrors.ErrNotImplemented
 }
+
 func (cls *cs3LS) Unlock(ctx context.Context, now time.Time, ref *provider.Reference, token string) error {
 	u := ctxpkg.ContextMustGetUser(ctx)
 
@@ -260,14 +259,11 @@ func (cls *cs3LS) Unlock(ctx context.Context, now time.Time, ref *provider.Refer
 		return err
 	}
 
-	switch res.Status.Code {
-	case rpc.Code_CODE_OK:
-		return nil
-	case rpc.Code_CODE_FAILED_PRECONDITION:
-		return errtypes.Aborted("file is not locked")
-	default:
-		return errtypes.NewErrtypeFromStatus(res.Status)
+	newErr := ocdavErrors.NewErrFromStatus(res.GetStatus())
+	if newErr != nil {
+		appctx.GetLogger(ctx).Error().Str("token", token).Interface("unlock", ref).Msg("could not unlock " + res.GetStatus().GetMessage())
 	}
+	return newErr
 }
 
 // LockDetails are a lock's metadata.
@@ -302,7 +298,7 @@ func readLockInfo(r io.Reader) (li lockInfo, status int, err error) {
 				// http://www.webdav.org/specs/rfc4918.html#refreshing-locks
 				return lockInfo{}, 0, nil
 			}
-			err = errors.ErrInvalidLockInfo
+			err = ocdavErrors.ErrInvalidLockInfo
 		}
 		return lockInfo{}, http.StatusBadRequest, err
 	}
@@ -349,15 +345,15 @@ func parseTimeout(s string) (time.Duration, error) {
 	}
 	const pre = "Second-"
 	if !strings.HasPrefix(s, pre) {
-		return 0, errors.ErrInvalidTimeout
+		return 0, ocdavErrors.ErrInvalidTimeout
 	}
 	s = s[len(pre):]
 	if s == "" || s[0] < '0' || '9' < s[0] {
-		return 0, errors.ErrInvalidTimeout
+		return 0, ocdavErrors.ErrInvalidTimeout
 	}
 	n, err := strconv.ParseInt(s, 10, 64)
 	if err != nil || 1<<32-1 < n {
-		return 0, errors.ErrInvalidTimeout
+		return 0, ocdavErrors.ErrInvalidTimeout
 	}
 	return time.Duration(n) * time.Second, nil
 }
@@ -420,7 +416,7 @@ func (s *svc) handleLock(w http.ResponseWriter, r *http.Request, ns string) (ret
 		return http.StatusInternalServerError, err
 	}
 	if cs3Status.Code != rpc.Code_CODE_OK {
-		return http.StatusInternalServerError, errtypes.NewErrtypeFromStatus(cs3Status)
+		return http.StatusInternalServerError, ocdavErrors.NewErrFromStatus(cs3Status)
 	}
 
 	return s.lockReference(ctx, w, r, ref)
@@ -444,12 +440,12 @@ func (s *svc) lockReference(ctx context.Context, w http.ResponseWriter, r *http.
 	sublog := appctx.GetLogger(ctx).With().Interface("ref", ref).Logger()
 	duration, err := parseTimeout(r.Header.Get(net.HeaderTimeout))
 	if err != nil {
-		return http.StatusBadRequest, errors.ErrInvalidTimeout
+		return http.StatusBadRequest, ocdavErrors.ErrInvalidTimeout
 	}
 
 	li, status, err := readLockInfo(r.Body)
 	if err != nil {
-		return status, errors.ErrInvalidLockInfo
+		return status, ocdavErrors.ErrInvalidLockInfo
 	}
 
 	u := ctxpkg.ContextMustGetUser(ctx)
@@ -459,17 +455,17 @@ func (s *svc) lockReference(ctx context.Context, w http.ResponseWriter, r *http.
 		// An empty lockInfo means to refresh the lock.
 		ih, ok := parseIfHeader(r.Header.Get(net.HeaderIf))
 		if !ok {
-			return http.StatusBadRequest, errors.ErrInvalidIfHeader
+			return http.StatusBadRequest, ocdavErrors.ErrInvalidIfHeader
 		}
 		if len(ih.lists) == 1 && len(ih.lists[0].conditions) == 1 {
 			token = ih.lists[0].conditions[0].Token
 		}
 		if token == "" {
-			return http.StatusBadRequest, errors.ErrInvalidLockToken
+			return http.StatusBadRequest, ocdavErrors.ErrInvalidLockToken
 		}
 		ld, err = s.LockSystem.Refresh(ctx, now, token, duration)
 		if err != nil {
-			if err == errors.ErrNoSuchLock {
+			if err == ocdavErrors.ErrNoSuchLock {
 				return http.StatusPreconditionFailed, err
 			}
 			return http.StatusInternalServerError, err
@@ -484,7 +480,7 @@ func (s *svc) lockReference(ctx context.Context, w http.ResponseWriter, r *http.
 			if depth != 0 && depth != infiniteDepth {
 				// Section 9.10.3 says that "Values other than 0 or infinity must not be
 				// used with the Depth header on a LOCK method".
-				return http.StatusBadRequest, errors.ErrInvalidDepth
+				return http.StatusBadRequest, ocdavErrors.ErrInvalidDepth
 			}
 		}
 		/* our url path has been shifted, so we don't need to do this?
@@ -505,15 +501,16 @@ func (s *svc) lockReference(ctx context.Context, w http.ResponseWriter, r *http.
 		//      should we do that in the decomposedfs as well? the node does not exist
 		//      this actually is a name based lock ... ugh
 		token, err = s.LockSystem.Create(ctx, now, ld)
+
+		//
 		if err != nil {
-			switch err.(type) {
-			case errtypes.Aborted:
+			switch {
+			case errors.Is(err, ocdavErrors.ErrLocked):
 				return http.StatusLocked, err
-			case errtypes.PermissionDenied:
+			case errors.Is(err, ocdavErrors.ErrForbidden):
 				return http.StatusForbidden, err
 			default:
 				return http.StatusInternalServerError, err
-
 			}
 		}
 
@@ -611,7 +608,7 @@ func (s *svc) handleUnlock(w http.ResponseWriter, r *http.Request, ns string) (s
 		return http.StatusInternalServerError, err
 	}
 	if cs3Status.Code != rpc.Code_CODE_OK {
-		return http.StatusInternalServerError, errtypes.NewErrtypeFromStatus(cs3Status)
+		return http.StatusInternalServerError, ocdavErrors.NewErrFromStatus(cs3Status)
 	}
 
 	return s.unlockReference(ctx, w, r, ref)
@@ -639,16 +636,14 @@ func (s *svc) unlockReference(ctx context.Context, _ http.ResponseWriter, r *htt
 		t = t[1 : len(t)-1]
 	}
 
-	switch err := s.LockSystem.Unlock(ctx, time.Now(), ref, t); err {
-	case nil:
-		return http.StatusNoContent, err
-	case errors.ErrForbidden:
-		return http.StatusForbidden, err
-	case errors.ErrLocked:
+	err := s.LockSystem.Unlock(ctx, time.Now(), ref, t)
+	switch {
+	case err == nil:
+		return http.StatusNoContent, nil
+	case errors.Is(err, ocdavErrors.ErrLocked):
 		return http.StatusLocked, err
-	case errors.ErrNoSuchLock:
-		return http.StatusConflict, err
-	default:
-		return http.StatusInternalServerError, err
+	case errors.Is(err, ocdavErrors.ErrForbidden):
+		return http.StatusForbidden, err
 	}
+	return http.StatusInternalServerError, err
 }
