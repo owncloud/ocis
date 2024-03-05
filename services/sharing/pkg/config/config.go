@@ -27,7 +27,7 @@ type Config struct {
 	UserSharingDrivers             UserSharingDrivers   `yaml:"user_sharing_drivers"`
 	PublicSharingDriver            string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`
 	PublicSharingDrivers           PublicSharingDrivers `yaml:"public_sharing_drivers"`
-	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service." introductionVersion:"pre5.0"`
+	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service." introductionVersion:"5.0"`
 	PublicShareMustHavePassword    bool                 `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
 	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup"`
 	Supervised                     bool                 `yaml:"-"`
@@ -155,13 +155,13 @@ type Events struct {
 	TLSInsecure       bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;SHARING_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
 	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
 	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;SHARING_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthUsername      string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;SHARING_EVENTS_AUTH_USERNAME" desc:"Username for the events broker." introductionVersion:"pre5.0"`
-	AuthPassword      string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;SHARING_EVENTS_AUTH_PASSWORD" desc:"Password for the events broker." introductionVersion:"pre5.0"`
+	AuthUsername      string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;SHARING_EVENTS_AUTH_USERNAME" desc:"Username for the events broker." introductionVersion:"5.0"`
+	AuthPassword      string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;SHARING_EVENTS_AUTH_PASSWORD" desc:"Password for the events broker." introductionVersion:"5.0"`
 }
 
 // PasswordPolicy configures reva password policy
 type PasswordPolicy struct {
-	Disabled               bool   `yaml:"disabled,omitempty" env:"OCIS_PASSWORD_POLICY_DISABLED;SHARING_PASSWORD_POLICY_DISABLED" desc:"Disable the password policy. Defaults to false if not set." introductionVersion:"pre5.0"`
+	Disabled               bool   `yaml:"disabled,omitempty" env:"OCIS_PASSWORD_POLICY_DISABLED;SHARING_PASSWORD_POLICY_DISABLED" desc:"Disable the password policy. Defaults to false if not set." introductionVersion:"5.0"`
 	MinCharacters          int    `yaml:"min_characters,omitempty" env:"OCIS_PASSWORD_POLICY_MIN_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_CHARACTERS" desc:"Define the minimum password length. Defaults to 8 if not set." introductionVersion:"5.0"`
 	MinLowerCaseCharacters int    `yaml:"min_lowercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS" desc:"Define the minimum number of uppercase letters. Defaults to 1 if not set." introductionVersion:"5.0"`
 	MinUpperCaseCharacters int    `yaml:"min_uppercase_characters" env:"OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS" desc:"Define the minimum number of lowercase letters. Defaults to 1 if not set." introductionVersion:"5.0"`
