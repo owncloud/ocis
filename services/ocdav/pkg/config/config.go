@@ -23,7 +23,7 @@ type Config struct {
 	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDAV_WEBDAV_NAMESPACE" desc:"Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties." introductionVersion:"pre5.0"`
 	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE" desc:"Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties." introductionVersion:"pre5.0"`
 	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE" desc:"The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally." introductionVersion:"pre5.0"`
-	OCMNamespace    string `yaml:"ocm_namespace" env:"OCDAV_OCM_NAMESPACE" desc:"The human readable path prefix for the ocm shares." introductionVersion:"pre5.0"`
+	OCMNamespace    string `yaml:"ocm_namespace" env:"OCDAV_OCM_NAMESPACE" desc:"The human readable path prefix for the ocm shares." introductionVersion:"5.0"`
 	// PublicURL used to redirect /s/{token} URLs to
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;OCDAV_PUBLIC_URL" desc:"URL where oCIS is reachable for users." introductionVersion:"pre5.0"`
 
