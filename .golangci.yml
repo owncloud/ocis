@@ -45,6 +45,11 @@ linters:
 linters-settings:
   gocyclo:
     min-complexity: 35 # there are some func unforuntately who need this - should we refactor them?
+  gomoddirectives:
+    replace-allow-list:
+      - github.com/go-micro/plugins/v4/store/nats-js-kv
+      - github.com/studio-b12/gowebdav
+      - github.com/egirna/icap-client
 
 severity:
   default-severity: error
