@@ -75,6 +75,9 @@
 | `AUTH_SERVICE_DEBUG_ADDR`
 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 |
+| `AUTH_SERVICE_DEBUG_PPROF`
+| Enables pprof, which can be used for profiling.|
+|
 | `AUTH_SERVICE_DEBUG_TOKEN`
 | Enables pprof, which can be used for profiling.|
 |
@@ -211,9 +214,6 @@
 | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 
 | xref:{s-path}/frontend.adoc[frontend]
-| `OCIS_ENABLE_RESHARING`
-| Changing this value is NOT supported. Enables the support for resharing in the clients.|
-|
 | `FRONTEND_DEFAULT_LINK_PERMISSIONS`
 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 |
@@ -224,12 +224,24 @@
 `FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE`
 | Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.| false
 |
+| `OCIS_CACHE_AUTH_USERNAME` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD`
+| The password to use for authentication. Only applies when using the 'nats-js-kv' store type.|
+|
 | `FRONTEND_OCS_LIST_OCM_SHARES`
 | Include OCM shares when listing shares. See the OCM service documentation for more details.|
 |
 | `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 `FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
 | Set this to true if you want to enforce passwords on all public shares.|
+|
+| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+`FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 |
 | `FRONTEND_OCS_INCLUDE_OCM_SHAREES`
 | nclude OCM sharees when listing sharees.|
@@ -249,6 +261,10 @@
 | `FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 |
 | `OCIS_EVENTS_ENABLE_TLS` +
 `FRONTEND_EVENTS_ENABLE_TLS`
@@ -270,9 +286,13 @@
 `FRONTEND_SERVICE_ACCOUNT_SECRET`
 | The service account secret.|
 |
+| `OCIS_PASSWORD_POLICY_DISABLED` +
+`FRONTEND_PASSWORD_POLICY_DISABLED`
+| Define the minimum password length. Defaults to 0 if not set.| 0
+|
 | `OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`
-| Define the minimum password length. Defaults to 0 if not set.| 0
+| Disable the password policy. Defaults to false if not set.|
 |
 | `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
@@ -295,15 +315,6 @@
 | Path to the 'banned passwords list' file. See the documentation for more details.|
 
 | xref:{s-path}/gateway.adoc[gateway]
-| `GATEWAY_STORAGE_REGISTRY_DRIVER`
-| The driver name of the storage registry to use.|
-|
-| `GATEWAY_STORAGE_REGISTRY_RULES`
-| The rules for the storage registry. See the Environment Variable Types description for more details.|
-|
-| `GATEWAY_STORAGE_REGISTRY_CONFIG_JSON`
-| Additional configuration for the storage registry in json format.|
-|
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_STAT_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the stat cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
@@ -312,9 +323,25 @@
 `GATEWAY_PROVIDER_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
 |
+| `OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_PROVIDER_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_PROVIDER_CACHE_AUTH_PASSWORD`
+| The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_CREATE_HOME_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the create home cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_PASSWORDv`
+| The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
 
 | xref:{s-path}/graph.adoc[graph]
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
@@ -352,6 +379,10 @@
 | `OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING`
 | Changing this value is NOT supported. Enables the support for resharing in the clients.|
+
+| xref:{s-path}/idp.adoc[idp]
+| `IDP_LOGIN_BACKGROUND_URL`
+| Configure an alternative URL to the background image for the login page.|
 
 | xref:{s-path}/notifications.adoc[notifications]
 | `OCIS_DEFAULT_LANGUAGE`
@@ -709,9 +740,25 @@
 | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 
 | xref:{s-path}/sharing.adoc[sharing]
+| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+`SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.|
+|
 | `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 `SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
 | Set this to true if you want to enforce passwords on all public shares.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`SHARING_EVENTS_AUTH_USERNAME`
+| Username for the events broker.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`SHARING_EVENTS_AUTH_PASSWORD`
+| Password for the events broker.|
+|
+| `OCIS_PASSWORD_POLICY_DISABLED` +
+`SHARING_PASSWORD_POLICY_DISABLED`
+| Disable the password policy. Defaults to false if not set.|
 |
 | `OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_CHARACTERS`
@@ -842,6 +889,18 @@
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_SYSTEM_CACHE_AUTH_USERNAME`
+| Username for the configured store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_SYSTEM_CACHE_AUTH_PASSWORD`
+| Password for the configured store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_MACHINE_AUTH_API_KEY` +
+`STORAGE_USERS_MACHINE_AUTH_API_KEY`
+| Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 
 | xref:{s-path}/storage-users.adoc[storage-users]
 | `OCIS_GATEWAY_GRPC_ADDR` +
@@ -871,9 +930,25 @@
 `STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the file metadata cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
 |
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
 | `OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE`
 | Disables persistence of the id cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_ID_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_ID_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
 |
 | `OCIS_SERVICE_ACCOUNT_ID` +
 `STORAGE_USERS_SERVICE_ACCOUNT_ID`
