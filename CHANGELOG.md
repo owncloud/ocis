@@ -49,6 +49,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
 
 ## Details
 
@@ -108,6 +109,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8392
    https://github.com/owncloud/ocis/pull/8523
+
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
+
+   We have updated go to version 1.22.
+
+   https://github.com/owncloud/ocis/pull/8586
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
