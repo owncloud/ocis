@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
 
 ## Details
 
@@ -77,6 +78,12 @@ The following sections list the changes for unreleased.
    shares has been added to the graph API.
 
    https://github.com/owncloud/ocis/pull/7885
+
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
+
+   We have updated go to version 1.22.
+
+   https://github.com/owncloud/ocis/pull/8586
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
