@@ -1,7 +1,7 @@
 package service
 
-// FileReadyEvent is emitted when the postprocessing of a file is finished
-type FileReadyEvent struct {
+// FileEvent is emitted when a file is uploaded/renamed/deleted/...
+type FileEvent struct {
 	ParentItemID string `json:"parentitemid"`
 	ItemID       string `json:"itemid"`
 }

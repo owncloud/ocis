@@ -26,6 +26,10 @@ import (
 // all events we care about
 var _registeredEvents = []events.Unmarshaller{
 	events.UploadReady{},
+	events.ItemTrashed{},
+	events.ItemRestored{},
+	events.ItemMoved{},
+	events.ContainerCreated{},
 }
 
 // Server is the entrypoint for the server command.
