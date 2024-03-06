@@ -103,4 +103,4 @@ Here is an example of data returned:
 }
 ```
 
-Refer to the [Authorization](../../../apis/http/authorization.md) section for example usages and details.
+Refer to the [Authorization](../../../apis/http/authorization/) section for example usages and details.
