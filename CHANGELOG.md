@@ -50,6 +50,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
 * Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
+* Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
 
 ## Details
 
@@ -115,6 +116,13 @@ The following sections list the changes for unreleased.
    We have updated go to version 1.22.
 
    https://github.com/owncloud/ocis/pull/8586
+
+* Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
+
+   We added sse events for `ItemTrashed`, `ItemRestored`,`ContainerCreated` and
+   `FileRenamed`
+
+   https://github.com/owncloud/ocis/pull/8587
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
