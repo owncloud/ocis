@@ -754,6 +754,13 @@ def codestyle(ctx):
                                      "make test-php-style",
                                  ],
                              },
+                             {
+                                 "name": "check-env-var-annotations",
+                                 "image": OC_CI_PHP % phpVersion,
+                                 "commands": [
+                                     "make check-env-var-annotations",
+                                 ],
+                             },
                          ],
                 "depends_on": [],
                 "trigger": {
