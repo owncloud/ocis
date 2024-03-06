@@ -76,7 +76,7 @@ See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.h
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.21. Note that you need as prerequisite a C compile environment installed because some dependences like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need as prerequisite a C compile environment installed because some dependences like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
 
 ```console
 # get the source
