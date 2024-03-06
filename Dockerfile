@@ -21,7 +21,7 @@ COPY ./ /ocis/
 WORKDIR /ocis/ocis
 RUN make ci-node-generate
 
-FROM owncloudci/golang:1.19 as build
+FROM owncloudci/golang:1.22 as build
 
 COPY --from=generate /ocis /ocis
 
