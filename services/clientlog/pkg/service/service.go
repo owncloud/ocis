@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"go.opentelemetry.io/otel/trace"
 
@@ -102,7 +103,29 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		users, data, err = processFileEvent(ctx, e.FileRef, gwc)
 	case events.ItemTrashed:
 		evType = "item-trashed"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+
+		var resp *provider.ListRecycleResponse
+		resp, err = gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
+			Ref: e.Ref,
+		})
+		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			cl.log.Error().Err(err).Interface("event", event).Str("status code", resp.GetStatus().GetMessage()).Msg("error listing recycle")
+			return
+		}
+
+		for _, item := range resp.GetRecycleItems() {
+			if item.GetKey() == e.ID.GetOpaqueId() {
+
+				data = FileEvent{
+					ItemID: storagespace.FormatResourceID(*e.ID),
+					// TODO: check with web if parentID is needed
+					// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
+				}
+
+				users, err = utils.GetSpaceMembers(ctx, e.ID.GetSpaceId(), gwc, utils.ViewerRole)
+				break
+			}
+		}
 	case events.ItemRestored:
 		evType = "item-restored"
 		users, data, err = processFileEvent(ctx, e.Ref, gwc)
@@ -119,7 +142,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 
 	if err != nil {
-		cl.log.Info().Err(err).Interface("event", event).Msg("error gathering members for event")
+		cl.log.Error().Err(err).Interface("event", event).Msg("error gathering members for event")
 		return
 	}
 
