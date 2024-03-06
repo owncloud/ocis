@@ -47,11 +47,11 @@ $(GO_LICENSES): $(BINGO_DIR)/go-licenses.mod
 	@echo "(re)installing $(GOBIN)/go-licenses-v1.5.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=go-licenses.mod -o=$(GOBIN)/go-licenses-v1.5.0 "github.com/google/go-licenses"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.51.2
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.56.2
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v1.51.2"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.51.2 "github.com/golangci/golangci-lint/cmd/golangci-lint"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v1.56.2"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.56.2 "github.com/golangci/golangci-lint/cmd/golangci-lint"
 
 GOVULNCHECK := $(GOBIN)/govulncheck-v1.0.1
 $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
@@ -59,11 +59,11 @@ $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
 	@echo "(re)installing $(GOBIN)/govulncheck-v1.0.1"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=govulncheck.mod -o=$(GOBIN)/govulncheck-v1.0.1 "golang.org/x/vuln/cmd/govulncheck"
 
-HUGO := $(GOBIN)/hugo-v0.115.2
+HUGO := $(GOBIN)/hugo-v0.123.7
 $(HUGO): $(BINGO_DIR)/hugo.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/hugo-v0.115.2"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.115.2 "github.com/gohugoio/hugo"
+	@echo "(re)installing $(GOBIN)/hugo-v0.123.7"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.123.7 "github.com/gohugoio/hugo"
 
 MOCKERY := $(GOBIN)/mockery-v2.40.2
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
@@ -71,17 +71,17 @@ $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@echo "(re)installing $(GOBIN)/mockery-v2.40.2"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.40.2 "github.com/vektra/mockery/v2"
 
-MUTAGEN := $(GOBIN)/mutagen-v0.13.1
+MUTAGEN := $(GOBIN)/mutagen-v0.14.0
 $(MUTAGEN): $(BINGO_DIR)/mutagen.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mutagen-v0.13.1"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.13.1 "github.com/mutagen-io/mutagen/cmd/mutagen"
+	@echo "(re)installing $(GOBIN)/mutagen-v0.14.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.14.0 "github.com/mutagen-io/mutagen/cmd/mutagen"
 
-PIGEON := $(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8
+PIGEON := $(GOBIN)/pigeon-v1.2.1
 $(PIGEON): $(BINGO_DIR)/pigeon.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=pigeon.mod -o=$(GOBIN)/pigeon-v1.1.1-0.20230620190048-b0211796baa8 "github.com/mna/pigeon"
+	@echo "(re)installing $(GOBIN)/pigeon-v1.2.1"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=pigeon.mod -o=$(GOBIN)/pigeon-v1.2.1 "github.com/mna/pigeon"
 
 PROTOC_GEN_DOC := $(GOBIN)/protoc-gen-doc-v1.5.1
 $(PROTOC_GEN_DOC): $(BINGO_DIR)/protoc-gen-doc.mod
