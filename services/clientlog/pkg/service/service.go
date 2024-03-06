@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -97,19 +98,24 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	default:
 		err = errors.New("unhandled event")
 	case events.UploadReady:
-		info, err := utils.GetResource(ctx, e.FileRef, gwc)
-		if err != nil {
-			cl.log.Error().Err(err).Interface("event", event).Msg("error getting resource")
+		evType = "postprocessing-finished"
+		users, data, err = processFileEvent(ctx, e.FileRef, gwc)
+	case events.ItemTrashed:
+		evType = "item-trashed"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+	case events.ItemRestored:
+		evType = "item-restored"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+	case events.ContainerCreated:
+		evType = "folder-created"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+	case events.ItemMoved:
+		// we are only interested in the rename case
+		if !utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
 			return
 		}
-
-		evType = "postprocessing-finished"
-		data = FileReadyEvent{
-			ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
-			ItemID:       storagespace.FormatResourceID(*info.GetId()),
-		}
-
-		users, err = utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
+		evType = "item-renamed"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
 	}
 
 	if err != nil {
@@ -135,4 +141,19 @@ func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interf
 		Type:    evType,
 		Message: b,
 	})
+}
+
+func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient) ([]string, FileEvent, error) {
+	info, err := utils.GetResource(ctx, ref, gwc)
+	if err != nil {
+		return nil, FileEvent{}, err
+	}
+
+	data := FileEvent{
+		ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
+		ItemID:       storagespace.FormatResourceID(*info.GetId()),
+	}
+
+	users, err := utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
+	return users, data, err
 }
