@@ -42,6 +42,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 * Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
 * Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
@@ -54,6 +55,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
 
 ## Details
+
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
+
+   We fixed a bug when anonymous user with viewer role in public link of a folder
+   can lock/unlock a file inside it
+
+   https://github.com/owncloud/ocis/issues/7785
+   https://github.com/owncloud/ocis/pull/8472
 
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 
