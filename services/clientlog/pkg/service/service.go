@@ -139,6 +139,12 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		}
 		evType = "item-renamed"
 		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+	case events.FileLocked:
+		evType = "file-locked"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+	case events.FileUnlocked:
+		evType = "file-unlocked"
+		users, data, err = processFileEvent(ctx, e.Ref, gwc)
 	}
 
 	if err != nil {

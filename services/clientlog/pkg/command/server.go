@@ -30,6 +30,8 @@ var _registeredEvents = []events.Unmarshaller{
 	events.ItemRestored{},
 	events.ItemMoved{},
 	events.ContainerCreated{},
+	events.FileLocked{},
+	events.FileUnlocked{},
 }
 
 // Server is the entrypoint for the server command.
