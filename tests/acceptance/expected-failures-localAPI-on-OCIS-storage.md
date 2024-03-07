@@ -238,15 +238,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:500](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L500)
 - [apiLocks/lockFiles.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L501)
 
-### [anonymous user with viewer role in public link of a folder can lock a file inside it](https://github.com/owncloud/ocis/issues/7785)
-
-- [apiLocks/lockFiles.feature:452](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L452)
-- [apiLocks/lockFiles.feature:453](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L453)
-- [apiLocks/lockFiles.feature:454](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L454)
-- [apiLocks/lockFiles.feature:455](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L455)
-- [apiLocks/lockFiles.feature:456](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L456)
-- [apiLocks/lockFiles.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L457)
-
 ### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
 
 - [apiSharingNg/linkShare.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L78)
