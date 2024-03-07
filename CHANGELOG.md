@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v4.0.6...master
+
+## Summary
+
+* Enhancement - Update to go 1.22: [#8597](https://github.com/owncloud/ocis/pull/8597)
+
+## Details
+
+* Enhancement - Update to go 1.22: [#8597](https://github.com/owncloud/ocis/pull/8597)
+
+   We have updated go to version 1.22.
+
+   https://github.com/owncloud/ocis/pull/8597
 # Changelog for [4.0.6] (2024-02-07)
 
 The following sections list the changes for 4.0.6.
@@ -2042,10 +2059,10 @@ The following sections list the changes for 3.0.0.
    via the IDPs userinfo endpoint. The claim name and the mapping between claim values and ocis
    role name can be configured via the configuration of the proxy service. Example:
 
-   ```yaml role_assignment: driver: oidc oidc_role_mapper: role_claim: ocisRoles
-   role_mapping: - role_name: admin claim_value: myAdminRole - role_name: spaceadmin
-   claim_value: mySpaceAdminRole - role_name: user claim_value: myUserRole - role_name:
-   guest: claim_value: myGuestRole ```
+   ``` role_assignment: driver: oidc oidc_role_mapper: role_claim: ocisRoles role_mapping:
+   - role_name: admin claim_value: myAdminRole - role_name: spaceadmin claim_value:
+   mySpaceAdminRole - role_name: user claim_value: myUserRole - role_name: guest:
+   claim_value: myGuestRole ```
 
    https://github.com/owncloud/ocis/pull/6048
 
