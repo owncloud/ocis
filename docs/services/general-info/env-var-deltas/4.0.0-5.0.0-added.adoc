@@ -262,10 +262,6 @@
 `OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 |
-| `OCIS_CACHE_AUTH_USERNAME` +
-`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME`
-| The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
-|
 | `OCIS_EVENTS_ENABLE_TLS` +
 `FRONTEND_EVENTS_ENABLE_TLS`
 | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
