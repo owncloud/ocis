@@ -27,7 +27,7 @@ type Config struct {
 	Events                     Events                `yaml:"events"`
 	Engine                     Engine                `yaml:"engine"`
 	Extractor                  Extractor             `yaml:"extractor"`
-	ContentExtractionSizeLimit uint64                `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction."`
+	ContentExtractionSizeLimit uint64                `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction." introductionVersion:"pre5.0"`
 
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
@@ -36,6 +36,6 @@ type Config struct {
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;SEARCH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;SEARCH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;SEARCH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;SEARCH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }

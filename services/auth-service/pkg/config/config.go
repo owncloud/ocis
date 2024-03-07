@@ -26,10 +26,10 @@ type Config struct {
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_SERVICE_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'."`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_SERVICE_LOG_PRETTY" desc:"Activates pretty log output."`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_SERVICE_LOG_COLOR" desc:"Activates colorized log output."`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_SERVICE_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_SERVICE_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_SERVICE_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_SERVICE_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_SERVICE_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 type Service struct {
@@ -37,21 +37,21 @@ type Service struct {
 }
 
 type Debug struct {
-	Addr   string `yaml:"addr" env:"AUTH_SERVICE_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
-	Token  string `yaml:"token" env:"AUTH_SERVICE_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
-	Pprof  bool   `yaml:"pprof" env:"AUTH_SERVICE_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
-	Zpages bool   `yaml:"zpages" env:"AUTH_SERVICE_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
+	Addr   string `yaml:"addr" env:"AUTH_SERVICE_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed." introductionVersion:"5.0"`
+	Token  string `yaml:"token" env:"AUTH_SERVICE_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint." introductionVersion:"5.0"`
+	Pprof  bool   `yaml:"pprof" env:"AUTH_SERVICE_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling." introductionVersion:"5.0"`
+	Zpages bool   `yaml:"zpages" env:"AUTH_SERVICE_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces." introductionVersion:"5.0"`
 }
 
 type GRPCConfig struct {
-	Addr      string                 `yaml:"addr" env:"AUTH_SERVICE_GRPC_ADDR" desc:"The bind address of the GRPC service."`
+	Addr      string                 `yaml:"addr" env:"AUTH_SERVICE_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"AUTH_SERVICE_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
+	Protocol  string                 `yaml:"protocol" env:"AUTH_SERVICE_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
 }
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;AUTH_SERVICE_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details."`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret."`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;AUTH_SERVICE_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }
