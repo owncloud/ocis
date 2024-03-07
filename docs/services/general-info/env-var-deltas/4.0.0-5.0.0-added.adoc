@@ -244,7 +244,7 @@
 | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 |
 | `FRONTEND_OCS_INCLUDE_OCM_SHAREES`
-| nclude OCM sharees when listing sharees.|
+| Include OCM sharees when listing sharees.|
 |
 | `OCIS_EVENTS_ENDPOINT` +
 `FRONTEND_EVENTS_ENDPOINT`
@@ -497,7 +497,7 @@
 | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 |
 | `OCM_WEBAPP_TEMPLATE`
-| 'Template for the webapp url.|
+| Template for the webapp url.|
 |
 | `OCM_OCM_SHAREPROVIDER_JSON_FILE`
 | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
