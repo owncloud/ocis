@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-07-07-35-45]
+[#deprecation-note-2024-03-07-10-32-15]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -365,7 +365,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Community ++
 a| [subs=-attributes]
-
+Edition of oCIS. Used for branding pruposes.
 
 a|`OCIS_DISABLE_SSE` +
 `FRONTEND_DISABLE_SSE` +
@@ -658,7 +658,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-
+Set to true to signal the web client that full-text search is enabled.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `FRONTEND_EVENTS_ENDPOINT` +

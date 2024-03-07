@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-07-07-35-45]
+[#deprecation-note-2024-03-07-10-32-15]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -1090,6 +1090,7 @@ a| [subs=-attributes]
 The bind address of the gateway GRPC address.
 
 a|`OCIS_MACHINE_AUTH_API_KEY` +
+`STORAGE_USERS_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
 ++string ++

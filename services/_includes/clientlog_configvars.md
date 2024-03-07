@@ -15,7 +15,7 @@
 | CLIENTLOG_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | CLIENTLOG_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCIS_JWT_SECRET<br/>CLIENTLOG_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
+| OCIS_REVA_GATEWAY<br/>CLIENTLOG_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
 | OCIS_EVENTS_ENDPOINT<br/>CLIENTLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>CLIENTLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>CLIENTLOG_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

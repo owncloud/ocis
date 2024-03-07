@@ -37,7 +37,7 @@
 | FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|
-| OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | |
+| OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | Edition of oCIS. Used for branding pruposes.|
 | OCIS_DISABLE_SSE<br/>FRONTEND_DISABLE_SSE | bool | false | When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.|
 | FRONTEND_DEFAULT_LINK_PERMISSIONS | int | 1 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
@@ -68,7 +68,7 @@
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE | string | sha1 | The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.|
 | FRONTEND_READONLY_USER_ATTRIBUTES | []string | [] | A list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.memberOf' (groups), 'user.accountEnabled' (login allowed), 'drive.quota' (quota). See the Environment Variable Types description for more details.|
 | OCIS_LDAP_SERVER_WRITE_ENABLED<br/>FRONTEND_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).|
-| FRONTEND_FULL_TEXT_SEARCH_ENABLED | bool | false | |
+| FRONTEND_FULL_TEXT_SEARCH_ENABLED | bool | false | Set to true to signal the web client that full-text search is enabled.|
 | OCIS_EVENTS_ENDPOINT<br/>FRONTEND_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>FRONTEND_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>FRONTEND_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
