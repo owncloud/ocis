@@ -482,12 +482,25 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), webDavBaseURL, resp.StorageSpace)
+	if driveType == _spaceTypeProject {
+		opaque, err := g.applySpaceTemplate(gatewayClient, resp.GetStorageSpace().GetRoot(), r.URL.Query().Get("template"))
+		if err != nil {
+			logger.Error().Err(err).Msg("could not apply template to space")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		resp.StorageSpace.Opaque = utils.MergeOpaques(resp.GetStorageSpace().GetOpaque(), opaque)
+	}
+
+	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), webDavBaseURL, resp.GetStorageSpace())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not create drive: error parsing drive")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
+	newDrive.Special = g.getSpecialDriveItems(r.Context(), webDavBaseURL, resp.GetStorageSpace())
+
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, newDrive)
 }
