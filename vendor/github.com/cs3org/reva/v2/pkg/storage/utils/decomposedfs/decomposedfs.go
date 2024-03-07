@@ -40,7 +40,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/utils/download"
 	"github.com/cs3org/reva/v2/pkg/storage"
-	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/aspects"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
@@ -108,7 +107,6 @@ type Decomposedfs struct {
 	p            permissions.Permissions
 	chunkHandler *chunking.ChunkHandler
 	stream       events.Stream
-	cache        cache.StatCache
 	sessionStore SessionStore
 
 	UserCache       *ttlcache.Cache
@@ -209,7 +207,6 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 		p:               aspects.Permissions,
 		chunkHandler:    chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
 		stream:          aspects.EventStream,
-		cache:           cache.GetStatCache(o.StatCache),
 		UserCache:       ttlcache.NewCache(),
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
@@ -323,9 +320,6 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			}
 
 			fs.sessionStore.Cleanup(ctx, session, revertNodeMetadata, keepUpload, unmarkPostprocessing)
-
-			// remove cache entry in gateway
-			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 
 			if err := events.Publish(
 				ctx,
@@ -494,9 +488,6 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			}
 
 			metrics.UploadSessionsScanned.Inc()
-
-			// remove cache entry in gateway
-			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
 		default:
 			log.Error().Interface("event", ev).Msg("Unknown event")
 		}

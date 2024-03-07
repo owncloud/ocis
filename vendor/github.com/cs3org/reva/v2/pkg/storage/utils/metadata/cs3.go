@@ -51,30 +51,41 @@ func init() {
 
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
+	SpaceRoot *provider.ResourceId
+
 	providerAddr      string
 	gatewayAddr       string
+	useSystemUser     bool
 	serviceUser       *user.User
 	machineAuthAPIKey string
+
 	dataGatewayClient *http.Client
-	SpaceRoot         *provider.ResourceId
 }
 
-// NewCS3Storage returns a new cs3 storage instance
-func NewCS3Storage(gwAddr, providerAddr, serviceUserID, serviceUserIDP, machineAuthAPIKey string) (s Storage, err error) {
-	c := http.DefaultClient
-
+// NewCS3 returns a new CS3 instance. Use an authenticated context and be sure to define SpaceRoot manually.
+func NewCS3(gwAddr, providerAddr string) (s *CS3) {
 	return &CS3{
 		providerAddr:      providerAddr,
 		gatewayAddr:       gwAddr,
-		dataGatewayClient: c,
-		machineAuthAPIKey: machineAuthAPIKey,
-		serviceUser: &user.User{
-			Id: &user.UserId{
-				OpaqueId: serviceUserID,
-				Idp:      serviceUserIDP,
-			},
+		dataGatewayClient: http.DefaultClient,
+	}
+}
+
+// NewCS3Storage returns a new cs3 storage instance. Context passed to methods is irrelevant as the service user will be used.
+// Be sure to call Init before using the storage.
+func NewCS3Storage(gwAddr, providerAddr, serviceUserID, serviceUserIDP, machineAuthAPIKey string) (s Storage, err error) {
+	cs3 := NewCS3(gwAddr, providerAddr)
+
+	cs3.useSystemUser = true
+	cs3.machineAuthAPIKey = machineAuthAPIKey
+	cs3.serviceUser = &user.User{
+		Id: &user.UserId{
+			OpaqueId: serviceUserID,
+			Idp:      serviceUserIDP,
 		},
-	}, nil
+	}
+
+	return cs3, nil
 }
 
 // Backend returns the backend name of the storage
@@ -228,7 +239,8 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 		etag = ocEtag
 	}
 	return &UploadResponse{
-		Etag: etag,
+		Etag:   etag,
+		FileID: resp.Header.Get("OC-Fileid"),
 	}, nil
 }
 
@@ -505,6 +517,10 @@ func (cs3 *CS3) providerClient() (provider.ProviderAPIClient, error) {
 }
 
 func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
+	if !cs3.useSystemUser {
+		return ctx, nil
+	}
+
 	// we need to start a new context to get rid of an existing x-access-token in the outgoing context
 	authCtx := context.Background()
 	authCtx, span := tracer.Start(authCtx, "getAuthContext", trace.WithLinks(trace.LinkFromContext(ctx)))

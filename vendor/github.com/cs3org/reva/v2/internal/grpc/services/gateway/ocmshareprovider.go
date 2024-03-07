@@ -52,21 +52,17 @@ func (s *svc) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareRequest
 	}
 
 	status, err := s.addGrant(ctx, req.ResourceId, req.Grantee, req.AccessMethods[0].GetWebdavOptions().Permissions, req.Expiration, nil)
-	if err != nil {
+	switch {
+	case err != nil:
 		appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg(err.Error())
 		return nil, errors.Wrap(err, "gateway: error adding grant to storage")
-	}
-
-	switch status.Code {
-	case rpc.Code_CODE_OK:
-		s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceId)
-	case rpc.Code_CODE_UNIMPLEMENTED:
+	case status.Code == rpc.Code_CODE_UNIMPLEMENTED:
 		appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants not supported, ignoring")
-	default:
+	case status.Code != rpc.Code_CODE_OK:
 		appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants is not successful")
 		return &ocm.CreateOCMShareResponse{
 			Status: status,
-		}, err
+		}, nil
 	}
 
 	return res, nil

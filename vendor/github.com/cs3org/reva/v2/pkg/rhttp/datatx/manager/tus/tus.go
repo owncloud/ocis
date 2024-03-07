@@ -37,7 +37,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
-	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/mitchellh/mapstructure"
 )
@@ -47,7 +46,6 @@ func init() {
 }
 
 type TusConfig struct {
-	cache.Config
 	CorsEnabled          bool   `mapstructure:"cors_enabled"`
 	CorsAllowOrigin      string `mapstructure:"cors_allow_origin"`
 	CorsAllowCredentials bool   `mapstructure:"cors_allow_credentials"`
@@ -60,7 +58,6 @@ type TusConfig struct {
 type manager struct {
 	conf      *TusConfig
 	publisher events.Publisher
-	statCache cache.StatCache
 }
 
 func parseConfig(m map[string]interface{}) (*TusConfig, error) {
@@ -81,7 +78,6 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 	return &manager{
 		conf:      c,
 		publisher: publisher,
-		statCache: cache.GetStatCache(c.Config),
 	}, nil
 }
 
@@ -142,7 +138,6 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 					up := ups[0]
 					executant := up.Executant()
 					ref := up.Reference()
-					datatx.InvalidateCache(&executant, &ref, m.statCache)
 					if m.publisher != nil {
 						if err := datatx.EmitFileUploadedEvent(up.SpaceOwner(), &executant, &ref, m.publisher); err != nil {
 							appctx.GetLogger(context.Background()).Error().Err(err).Msg("failed to publish FileUploaded event")

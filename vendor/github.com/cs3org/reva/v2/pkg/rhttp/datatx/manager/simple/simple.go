@@ -48,7 +48,6 @@ func init() {
 type manager struct {
 	conf      *cache.Config
 	publisher events.Publisher
-	statCache cache.StatCache
 }
 
 func parseConfig(m map[string]interface{}) (*cache.Config, error) {
@@ -70,7 +69,6 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 	return &manager{
 		conf:      c,
 		publisher: publisher,
-		statCache: cache.GetStatCache(*c),
 	}, nil
 }
 
@@ -110,7 +108,6 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				Body:   r.Body,
 				Length: r.ContentLength,
 			}, func(spaceOwner, owner *userpb.UserId, ref *provider.Reference) {
-				datatx.InvalidateCache(owner, ref, m.statCache)
 				if err := datatx.EmitFileUploadedEvent(spaceOwner, owner, ref, m.publisher); err != nil {
 					sublog.Error().Err(err).Msg("failed to publish FileUploaded event")
 				}
