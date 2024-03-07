@@ -244,7 +244,7 @@
 | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 |
 | `FRONTEND_OCS_INCLUDE_OCM_SHAREES`
-| nclude OCM sharees when listing sharees.|
+| Include OCM sharees when listing sharees.|
 |
 | `OCIS_EVENTS_ENDPOINT` +
 `FRONTEND_EVENTS_ENDPOINT`
@@ -261,10 +261,6 @@
 | `FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
-|
-| `OCIS_CACHE_AUTH_USERNAME` +
-`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME`
-| The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 |
 | `OCIS_EVENTS_ENABLE_TLS` +
 `FRONTEND_EVENTS_ENABLE_TLS`
@@ -497,7 +493,7 @@
 | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 |
 | `OCM_WEBAPP_TEMPLATE`
-| 'Template for the webapp url.|
+| Template for the webapp url.|
 |
 | `OCM_OCM_SHAREPROVIDER_JSON_FILE`
 | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
