@@ -1057,11 +1057,11 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 		return lsRes.Share, lsRes.Status, nil
 	}
 
-	// we currently need to list all shares and match the path if the request is relative to the share jail root
+	// we currently need to list all accepted shares and match the path if the
+	// request is relative to the share jail root. Also we need to Stat() the
+	// shared resource's id to check whether that still exist. There might be
+	// old shares using the same path but for an already vanished resource id.
 	if ref.ResourceId.OpaqueId == utils.ShareStorageProviderID && ref.Path != "." {
-		// we need to list accepted shares and match the path
-
-		// look up share for this resourceid
 		lsRes, err := sharingCollaborationClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 			Filters: []*collaboration.Filter{
 				{
@@ -1080,15 +1080,32 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 			return nil, lsRes.Status, nil
 		}
 		for _, receivedShare := range lsRes.Shares {
-			// make sure to skip unaccepted shares
-			if receivedShare.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
-				continue
-			}
 			if isMountPointForPath(receivedShare.MountPoint.Path, ref.Path) {
+				// Only return this share if the resource still exists.
+				gatewayClient, err := s.gatewaySelector.Next()
+				if err != nil {
+					return nil, nil, err
+				}
+				sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+					Ref: &provider.Reference{ResourceId: receivedShare.GetShare().GetResourceId()},
+				})
+				if err != nil {
+					appctx.GetLogger(ctx).Debug().
+						Err(err).
+						Interface("resourceID", receivedShare.GetShare().GetResourceId()).
+						Msg("resolveAcceptedShare: failed to stat shared resource")
+					continue
+				}
+				if sRes.Status.Code != rpc.Code_CODE_OK {
+					appctx.GetLogger(ctx).Debug().
+						Interface("resourceID", receivedShare.GetShare().GetResourceId()).
+						Interface("status", sRes.Status).
+						Msg("resolveAcceptedShare: failed to stat shared resource")
+					continue
+				}
 				return receivedShare, lsRes.Status, nil
 			}
 		}
-
 	}
 
 	return nil, status.NewNotFound(ctx, "sharesstorageprovider: not found "+ref.String()), nil

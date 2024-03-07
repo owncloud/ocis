@@ -21,6 +21,7 @@ package errors
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
 	"net/http"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -191,5 +192,22 @@ func HandleWebdavError(log *zerolog.Logger, w http.ResponseWriter, b []byte, err
 	_, err = w.Write(b)
 	if err != nil {
 		log.Err(err).Msg("error writing response")
+	}
+}
+
+func NewErrFromStatus(s *rpc.Status) error {
+	switch s.GetCode() {
+	case rpc.Code_CODE_OK:
+		return nil
+	case rpc.Code_CODE_DEADLINE_EXCEEDED:
+		return ErrInvalidTimeout
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		return ErrForbidden
+	case rpc.Code_CODE_LOCKED, rpc.Code_CODE_FAILED_PRECONDITION:
+		return ErrLocked
+	case rpc.Code_CODE_UNIMPLEMENTED:
+		return ErrNotImplemented
+	default:
+		return fmt.Errorf(s.GetMessage())
 	}
 }
