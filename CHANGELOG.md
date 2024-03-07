@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 * Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
@@ -71,6 +72,13 @@ The following sections list the changes for unreleased.
    are now assignable.
 
    https://github.com/owncloud/ocis/pull/8534
+
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
+
+   We fixed the issue when sharing of personal drive is allowed via graph
+
+   https://github.com/owncloud/ocis/issues/8494
+   https://github.com/owncloud/ocis/pull/8538
 
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 
