@@ -78,6 +78,7 @@ spaces:
   extended_space_properties_cache_ttl: 60000000000
   users_cache_ttl: 60000000000
   groups_cache_ttl: 60000000000
+  storage_users_address: com.owncloud.api.storage-users
 identity:
   backend: ldap
   ldap:

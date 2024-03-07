@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-07-11-54-58]
+[#deprecation-note-2024-03-07-12-41-47]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -469,6 +469,15 @@ a| [subs=-attributes]
 ++60000000000 ++
 a| [subs=-attributes]
 Max TTL in seconds for the spaces groups cache.
+
+a|`GRAPH_SPACES_STORAGE_USERS_ADDRESS` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.storage-users ++
+a| [subs=-attributes]
+The address of the storage-users service.
 
 a|`GRAPH_IDENTITY_BACKEND` +
 
