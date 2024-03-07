@@ -17,11 +17,11 @@ GO     ?= $(shell which go)
 #	@echo "Running bingo"
 #	@$(BINGO) <flags/args..>
 #
-BINGO := $(GOBIN)/bingo-v0.8.0
+BINGO := $(GOBIN)/bingo-v0.9.0
 $(BINGO): $(BINGO_DIR)/bingo.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/bingo-v0.8.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=bingo.mod -o=$(GOBIN)/bingo-v0.8.0 "github.com/bwplotka/bingo"
+	@echo "(re)installing $(GOBIN)/bingo-v0.9.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=bingo.mod -o=$(GOBIN)/bingo-v0.9.0 "github.com/bwplotka/bingo"
 
 BUF := $(GOBIN)/buf-v1.3.1
 $(BUF): $(BINGO_DIR)/buf.mod
@@ -59,17 +59,17 @@ $(HUGO): $(BINGO_DIR)/hugo.mod
 	@echo "(re)installing $(GOBIN)/hugo-v0.123.7"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.123.7 "github.com/gohugoio/hugo"
 
-MOCKERY := $(GOBIN)/mockery-v2.22.1
+MOCKERY := $(GOBIN)/mockery-v2.40.2
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v2.22.1"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.22.1 "github.com/vektra/mockery/v2"
+	@echo "(re)installing $(GOBIN)/mockery-v2.40.2"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.40.2 "github.com/vektra/mockery/v2"
 
-MUTAGEN := $(GOBIN)/mutagen-v0.17.5
+MUTAGEN := $(GOBIN)/mutagen-v0.14.0
 $(MUTAGEN): $(BINGO_DIR)/mutagen.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mutagen-v0.17.5"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.17.5 "github.com/mutagen-io/mutagen/cmd/mutagen"
+	@echo "(re)installing $(GOBIN)/mutagen-v0.14.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.14.0 "github.com/mutagen-io/mutagen/cmd/mutagen"
 
 PROTOC_GEN_DOC := $(GOBIN)/protoc-gen-doc-v1.5.1
 $(PROTOC_GEN_DOC): $(BINGO_DIR)/protoc-gen-doc.mod
