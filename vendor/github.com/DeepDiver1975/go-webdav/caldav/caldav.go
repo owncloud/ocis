@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/internal"
 	"github.com/emersion/go-ical"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/internal"
 )
 
 var CapabilityCalendar = webdav.Capability("calendar-access")
@@ -67,8 +67,10 @@ type Calendar struct {
 	Path                  string
 	Name                  string
 	Description           string
+	Color                 string
 	MaxResourceSize       int64
 	SupportedComponentSet []string
+	Timezone              string
 }
 
 type CalendarCompRequest struct {

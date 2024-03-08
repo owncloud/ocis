@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/emersion/go-webdav/internal"
+	"github.com/DeepDiver1975/go-webdav/internal"
 )
 
 // LocalFileSystem implements FileSystem for a local directory.

@@ -3,7 +3,7 @@ package webdav
 import (
 	"encoding/xml"
 
-	"github.com/emersion/go-webdav/internal"
+	"github.com/DeepDiver1975/go-webdav/internal"
 )
 
 var (
