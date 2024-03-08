@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
 * Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
+* Enhancement - Send SSE when file is locked/unlocked: [#8602](https://github.com/owncloud/ocis/pull/8602)
 
 ## Details
 
@@ -140,6 +141,12 @@ The following sections list the changes for unreleased.
    `FileRenamed`
 
    https://github.com/owncloud/ocis/pull/8587
+
+* Enhancement - Send SSE when file is locked/unlocked: [#8602](https://github.com/owncloud/ocis/pull/8602)
+
+   Send sse events when a file is locked or unlocked.
+
+   https://github.com/owncloud/ocis/pull/8602
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
