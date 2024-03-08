@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/caldav"
-	"github.com/emersion/go-webdav/carddav"
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/caldav"
+	"github.com/DeepDiver1975/go-webdav/carddav"
 )
 
 type filesystemBackend struct {

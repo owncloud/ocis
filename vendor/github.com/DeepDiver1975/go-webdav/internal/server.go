@@ -66,7 +66,7 @@ type Backend interface {
 	HeadGet(w http.ResponseWriter, r *http.Request) error
 	PropFind(r *http.Request, pf *PropFind, depth Depth) (*MultiStatus, error)
 	PropPatch(r *http.Request, pu *PropertyUpdate) (*Response, error)
-	Put(r *http.Request) (*Href, error)
+	Put(w http.ResponseWriter, r *http.Request) error
 	Delete(r *http.Request) error
 	Mkcol(r *http.Request) error
 	Copy(r *http.Request, dest *Href, recursive, overwrite bool) (created bool, err error)
@@ -88,17 +88,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case http.MethodGet, http.MethodHead:
 			err = h.Backend.HeadGet(w, r)
 		case http.MethodPut:
-			var href *Href
-			href, err = h.Backend.Put(r)
-			if err == nil {
-				// TODO: Last-Modified, ETag, Content-Type if the request has
-				// been copied verbatim
-				if href != nil {
-					w.Header().Set("Location", (*url.URL)(href).String())
-				}
-				// TODO: http.StatusNoContent if the resource already existed
-				w.WriteHeader(http.StatusCreated)
-			}
+			err = h.Backend.Put(w, r)
 		case http.MethodDelete:
 			// TODO: send a multistatus in case of partial failure
 			err = h.Backend.Delete(r)
@@ -173,7 +163,7 @@ func (h *Handler) handlePropfind(w http.ResponseWriter, r *http.Request) error {
 type PropFindFunc func(raw *RawXMLValue) (interface{}, error)
 
 func NewPropFindResponse(path string, propfind *PropFind, props map[xml.Name]PropFindFunc) (*Response, error) {
-	resp := NewOKResponse(path)
+	resp := &Response{Hrefs: []Href{Href{Path: path}}}
 
 	if _, ok := props[ResourceTypeName]; !ok {
 		props[ResourceTypeName] = func(*RawXMLValue) (interface{}, error) {

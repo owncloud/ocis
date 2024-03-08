@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/internal"
 	"github.com/emersion/go-ical"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/internal"
 )
 
 // TODO if nothing more Caldav-specific needs to be added this should be merged with carddav.PutAddressObjectOptions
@@ -38,7 +38,7 @@ type Backend interface {
 	GetCalendarObject(ctx context.Context, path string, req *CalendarCompRequest) (*CalendarObject, error)
 	ListCalendarObjects(ctx context.Context, path string, req *CalendarCompRequest) ([]CalendarObject, error)
 	QueryCalendarObjects(ctx context.Context, path string, query *CalendarQuery) ([]CalendarObject, error)
-	PutCalendarObject(ctx context.Context, path string, calendar *ical.Calendar, opts *PutCalendarObjectOptions) (loc string, err error)
+	PutCalendarObject(ctx context.Context, path string, calendar *ical.Calendar, opts *PutCalendarObjectOptions) (*CalendarObject, error)
 	DeleteCalendarObject(ctx context.Context, path string) error
 
 	webdav.UserPrincipalBackend
@@ -78,7 +78,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Backend: h.Backend,
 			Prefix:  strings.TrimSuffix(h.Prefix, "/"),
 		}
-		hh := internal.Handler{&b}
+		hh := internal.Handler{Backend: &b}
 		hh.ServeHTTP(w, r)
 	}
 
@@ -568,6 +568,20 @@ func (b *backend) propFindCalendar(ctx context.Context, propfind *internal.PropF
 			return &calendarDescription{Description: cal.Description}, nil
 		}
 	}
+	if cal.Color != "" {
+		props[calendarColorName] = func(*internal.RawXMLValue) (interface{}, error) {
+			return &calendarColor{
+				Color: cal.Color,
+			}, nil
+		}
+	}
+	if cal.Timezone != "" {
+		props[calendarTimezoneName] = func(*internal.RawXMLValue) (interface{}, error) {
+			return &calendarTimezone{
+				Timezone: cal.Timezone,
+			}, nil
+		}
+	}
 	if cal.MaxResourceSize > 0 {
 		props[maxResourceSizeName] = func(*internal.RawXMLValue) (interface{}, error) {
 			return &maxResourceSize{Size: cal.MaxResourceSize}, nil
@@ -668,7 +682,7 @@ func (b *backend) PropPatch(r *http.Request, update *internal.PropertyUpdate) (*
 	return nil, internal.HTTPErrorf(http.StatusNotImplemented, "caldav: PropPatch not implemented")
 }
 
-func (b *backend) Put(r *http.Request) (*internal.Href, error) {
+func (b *backend) Put(w http.ResponseWriter, r *http.Request) error {
 	ifNoneMatch := webdav.ConditionalMatch(r.Header.Get("If-None-Match"))
 	ifMatch := webdav.ConditionalMatch(r.Header.Get("If-Match"))
 
@@ -679,26 +693,39 @@ func (b *backend) Put(r *http.Request) (*internal.Href, error) {
 
 	t, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "caldav: malformed Content-Type: %v", err)
+		return internal.HTTPErrorf(http.StatusBadRequest, "caldav: malformed Content-Type: %v", err)
 	}
 	if t != ical.MIMEType {
 		// TODO: send CALDAV:supported-calendar-data error
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "caldav: unsupported Content-Type %q", t)
+		return internal.HTTPErrorf(http.StatusBadRequest, "caldav: unsupported Content-Type %q", t)
 	}
 
 	// TODO: check CALDAV:max-resource-size precondition
 	cal, err := ical.NewDecoder(r.Body).Decode()
 	if err != nil {
 		// TODO: send CALDAV:valid-calendar-data error
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "caldav: failed to parse iCalendar: %v", err)
+		return internal.HTTPErrorf(http.StatusBadRequest, "caldav: failed to parse iCalendar: %v", err)
 	}
 
-	loc, err := b.Backend.PutCalendarObject(r.Context(), r.URL.Path, cal, &opts)
+	co, err := b.Backend.PutCalendarObject(r.Context(), r.URL.Path, cal, &opts)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &internal.Href{Path: loc}, nil
+	if co.ETag != "" {
+		w.Header().Set("ETag", internal.ETag(co.ETag).String())
+	}
+	if !co.ModTime.IsZero() {
+		w.Header().Set("Last-Modified", co.ModTime.UTC().Format(http.TimeFormat))
+	}
+	if co.Path != "" {
+		w.Header().Set("Location", co.Path)
+	}
+
+	// TODO: http.StatusNoContent if the resource already existed
+	w.WriteHeader(http.StatusCreated)
+
+	return nil
 }
 
 func (b *backend) Delete(r *http.Request) error {
@@ -724,7 +751,14 @@ func (b *backend) Mkcol(r *http.Request) error {
 			return internal.HTTPErrorf(http.StatusBadRequest, "carddav: unexpected resource type")
 		}
 		cal.Name = m.DisplayName
-		// TODO ...
+		cal.Description = m.Description
+		cal.Color = strings.TrimSpace(m.CalendarColor)
+		cal.Timezone = strings.TrimSpace(m.CalemdarTimeZone)
+
+		cal.SupportedComponentSet = make([]string, len(m.SupportedCalendarComponentSet.Comp))
+		for i, v := range m.SupportedCalendarComponentSet.Comp {
+			cal.SupportedComponentSet[i] = v.Name
+		}
 	}
 
 	return b.Backend.CreateCalendar(r.Context(), &cal)
@@ -756,7 +790,7 @@ const (
 )
 
 func NewPreconditionError(err PreconditionType) error {
-	name := xml.Name{"urn:ietf:params:xml:ns:caldav", string(err)}
+	name := xml.Name{Space: "urn:ietf:params:xml:ns:caldav", Local: string(err)}
 	elem := internal.NewRawXMLElement(name, nil, nil)
 	return &internal.HTTPError{
 		Code: 409,

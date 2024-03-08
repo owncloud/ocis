@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/caldav"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaContext "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/emersion/go-ical"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/caldav"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"path"
@@ -279,24 +279,24 @@ func (b *filesystemBackend) QueryCalendarObjects(ctx context.Context, urlPath st
 	return filtered, err
 }
 
-func (b *filesystemBackend) PutCalendarObject(ctx context.Context, objPath string, calendar *ical.Calendar, opts *caldav.PutCalendarObjectOptions) (loc string, err error) {
+func (b *filesystemBackend) PutCalendarObject(ctx context.Context, objPath string, calendar *ical.Calendar, opts *caldav.PutCalendarObjectOptions) (*caldav.CalendarObject, error) {
 	log.Debug().Str("path", objPath).Msg("filesystem.PutCalendarObject()")
 
-	_, _, err = caldav.ValidateCalendarObject(calendar)
+	_, _, err := caldav.ValidateCalendarObject(calendar)
 	if err != nil {
-		return "", caldav.NewPreconditionError(caldav.PreconditionValidCalendarObjectResource)
+		return nil, caldav.NewPreconditionError(caldav.PreconditionValidCalendarObjectResource)
 	}
 
 	localPath, err := b.safeLocalCalDAVPath(ctx, objPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var buf bytes.Buffer
 	enc := ical.NewEncoder(&buf)
 	err = enc.Encode(calendar)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	req := metadata.UploadRequest{
@@ -315,17 +315,21 @@ func (b *filesystemBackend) PutCalendarObject(ctx context.Context, objPath strin
 	} else if opts.IfMatch.IsSet() {
 		want, err := opts.IfMatch.ETag()
 		if err != nil {
-			return "", webdav.NewHTTPError(http.StatusBadRequest, err)
+			return nil, webdav.NewHTTPError(http.StatusBadRequest, err)
 		}
 		req.IfMatchEtag = want
 	}
 
 	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+	calendarObject, err := b.GetCalendarObject(ctx, objPath, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	return objPath, nil
+	return calendarObject, nil
 }
 
 func (b *filesystemBackend) DeleteCalendarObject(ctx context.Context, path string) error {

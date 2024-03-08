@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/internal"
 	"github.com/emersion/go-vcard"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/internal"
 )
 
 type PutAddressObjectOptions struct {
@@ -35,7 +35,7 @@ type Backend interface {
 	GetAddressObject(ctx context.Context, path string, req *AddressDataRequest) (*AddressObject, error)
 	ListAddressObjects(ctx context.Context, path string, req *AddressDataRequest) ([]AddressObject, error)
 	QueryAddressObjects(ctx context.Context, path string, query *AddressBookQuery) ([]AddressObject, error)
-	PutAddressObject(ctx context.Context, path string, card vcard.Card, opts *PutAddressObjectOptions) (loc string, err error)
+	PutAddressObject(ctx context.Context, path string, card vcard.Card, opts *PutAddressObjectOptions) (*AddressObject, error)
 	DeleteAddressObject(ctx context.Context, path string) error
 
 	webdav.UserPrincipalBackend
@@ -75,7 +75,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Backend: h.Backend,
 			Prefix:  strings.TrimSuffix(h.Prefix, "/"),
 		}
-		hh := internal.Handler{&b}
+		hh := internal.Handler{Backend: &b}
 		hh.ServeHTTP(w, r)
 	}
 
@@ -170,7 +170,7 @@ func (h *Handler) handleQuery(r *http.Request, w http.ResponseWriter, query *add
 	for _, el := range query.Filter.Props {
 		pf, err := decodePropFilter(&el)
 		if err != nil {
-			return &internal.HTTPError{http.StatusBadRequest, err}
+			return &internal.HTTPError{Code: http.StatusBadRequest, Err: err}
 		}
 		q.PropFilters = append(q.PropFilters, *pf)
 	}
@@ -653,7 +653,7 @@ func (b *backend) PropPatch(r *http.Request, update *internal.PropertyUpdate) (*
 	return resp, nil
 }
 
-func (b *backend) Put(r *http.Request) (*internal.Href, error) {
+func (b *backend) Put(w http.ResponseWriter, r *http.Request) error {
 	ifNoneMatch := webdav.ConditionalMatch(r.Header.Get("If-None-Match"))
 	ifMatch := webdav.ConditionalMatch(r.Header.Get("If-Match"))
 
@@ -664,27 +664,39 @@ func (b *backend) Put(r *http.Request) (*internal.Href, error) {
 
 	t, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "carddav: malformed Content-Type: %v", err)
+		return internal.HTTPErrorf(http.StatusBadRequest, "carddav: malformed Content-Type: %v", err)
 	}
 	if t != vcard.MIMEType {
 		// TODO: send CARDDAV:supported-address-data error
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "carddav: unsupporetd Content-Type %q", t)
+		return internal.HTTPErrorf(http.StatusBadRequest, "carddav: unsupporetd Content-Type %q", t)
 	}
 
 	// TODO: check CARDDAV:max-resource-size precondition
 	card, err := vcard.NewDecoder(r.Body).Decode()
 	if err != nil {
 		// TODO: send CARDDAV:valid-address-data error
-		return nil, internal.HTTPErrorf(http.StatusBadRequest, "carddav: failed to parse vCard: %v", err)
+		return internal.HTTPErrorf(http.StatusBadRequest, "carddav: failed to parse vCard: %v", err)
 	}
 
 	// TODO: add support for the CARDDAV:no-uid-conflict error
-	loc, err := b.Backend.PutAddressObject(r.Context(), r.URL.Path, card, &opts)
+	ao, err := b.Backend.PutAddressObject(r.Context(), r.URL.Path, card, &opts)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	if ao.ETag != "" {
+		w.Header().Set("ETag", internal.ETag(ao.ETag).String())
+	}
+	if !ao.ModTime.IsZero() {
+		w.Header().Set("Last-Modified", ao.ModTime.UTC().Format(http.TimeFormat))
+	}
+	if ao.Path != "" {
+		w.Header().Set("Location", ao.Path)
 	}
 
-	return &internal.Href{Path: loc}, nil
+	// TODO: http.StatusNoContent if the resource already existed
+	w.WriteHeader(http.StatusCreated)
+
+	return nil
 }
 
 func (b *backend) Delete(r *http.Request) error {
@@ -731,7 +743,7 @@ func (b *backend) Move(r *http.Request, dest *internal.Href, overwrite bool) (cr
 	return false, internal.HTTPErrorf(http.StatusNotImplemented, "carddav: Move not implemented")
 }
 
-// https://tools.ietf.org/rfcmarkup?doc=6352#section-6.3.2.1
+// PreconditionType as defined in https://tools.ietf.org/rfcmarkup?doc=6352#section-6.3.2.1
 type PreconditionType string
 
 const (
@@ -742,7 +754,7 @@ const (
 )
 
 func NewPreconditionError(err PreconditionType) error {
-	name := xml.Name{"urn:ietf:params:xml:ns:carddav", string(err)}
+	name := xml.Name{Space: "urn:ietf:params:xml:ns:carddav", Local: string(err)}
 	elem := internal.NewRawXMLElement(name, nil, nil)
 	return &internal.HTTPError{
 		Code: 409,

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/emersion/go-webdav/internal"
+	"github.com/DeepDiver1975/go-webdav/internal"
 )
 
 const namespace = "urn:ietf:params:xml:ns:caldav"
@@ -21,8 +21,16 @@ var (
 	calendarQueryName    = xml.Name{namespace, "calendar-query"}
 	calendarMultigetName = xml.Name{namespace, "calendar-multiget"}
 
-	calendarName     = xml.Name{namespace, "calendar"}
-	calendarDataName = xml.Name{namespace, "calendar-data"}
+	calendarName      = xml.Name{namespace, "calendar"}
+	calendarDataName  = xml.Name{namespace, "calendar-data"}
+	calendarColorName = xml.Name{
+		Space: "http://apple.com/ns/ical/",
+		Local: "calendar-color",
+	}
+	calendarTimezoneName = xml.Name{
+		Space: namespace,
+		Local: "calendar-timezone",
+	}
 )
 
 // https://tools.ietf.org/html/rfc4791#section-6.2.1
@@ -39,6 +47,16 @@ func (a *calendarHomeSet) GetXMLName() xml.Name {
 type calendarDescription struct {
 	XMLName     xml.Name `xml:"urn:ietf:params:xml:ns:caldav calendar-description"`
 	Description string   `xml:",chardata"`
+}
+
+type calendarColor struct {
+	XMLName xml.Name `xml:"http://apple.com/ns/ical/ calendar-color"`
+	Color   string   `xml:",chardata"`
+}
+
+type calendarTimezone struct {
+	XMLName  xml.Name `xml:"urn:ietf:params:xml:ns:caldav calendar-timezone"`
+	Timezone string   `xml:",chardata"`
 }
 
 // https://tools.ietf.org/html/rfc4791#section-5.2.4
@@ -230,8 +248,11 @@ func (r *reportReq) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 }
 
 type mkcolReq struct {
-	XMLName      xml.Name              `xml:"DAV: mkcol"`
-	ResourceType internal.ResourceType `xml:"set>prop>resourcetype"`
-	DisplayName  string                `xml:"set>prop>displayname"`
-	// TODO this could theoretically contain all addressbook properties?
+	XMLName                       xml.Name                      `xml:"DAV: mkcol"`
+	ResourceType                  internal.ResourceType         `xml:"set>prop>resourcetype"`
+	DisplayName                   string                        `xml:"set>prop>displayname"`
+	Description                   string                        `xml:"set>prop>calendar-description"`
+	CalendarColor                 string                        `xml:"set>prop>calendar-color"`
+	CalemdarTimeZone              string                        `xml:"set>prop>calendar-timezone"`
+	SupportedCalendarComponentSet supportedCalendarComponentSet `xml:"set>prop>supported-calendar-component-set"`
 }

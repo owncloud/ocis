@@ -16,9 +16,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/carddav"
 	"github.com/emersion/go-vcard"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/carddav"
 )
 
 const addressBookFileName = "addressbook.json"
@@ -311,20 +311,20 @@ func (b *filesystemBackend) QueryAddressObjects(ctx context.Context, urlPath str
 	return filtered, err
 }
 
-func (b *filesystemBackend) PutAddressObject(ctx context.Context, objPath string, card vcard.Card, opts *carddav.PutAddressObjectOptions) (loc string, err error) {
+func (b *filesystemBackend) PutAddressObject(ctx context.Context, objPath string, card vcard.Card, opts *carddav.PutAddressObjectOptions) (*carddav.AddressObject, error) {
 	log.Debug().Str("path", objPath).Msg("filesystem.PutAddressObject()")
 
 	// TODO: validate carddav ???
 	localPath, err := b.safeLocalCardDAVPath(ctx, objPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var buf bytes.Buffer
 	enc := vcard.NewEncoder(&buf)
 	err = enc.Encode(card)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	req := metadata.UploadRequest{
@@ -343,17 +343,17 @@ func (b *filesystemBackend) PutAddressObject(ctx context.Context, objPath string
 	} else if opts.IfMatch.IsSet() {
 		want, err := opts.IfMatch.ETag()
 		if err != nil {
-			return "", webdav.NewHTTPError(http.StatusBadRequest, err)
+			return nil, webdav.NewHTTPError(http.StatusBadRequest, err)
 		}
 		req.IfMatchEtag = want
 	}
 
 	_, err = b.storage.Upload(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return objPath, nil
+	return b.GetAddressObject(ctx, objPath, nil)
 }
 
 func (b *filesystemBackend) DeleteAddressObject(ctx context.Context, path string) error {

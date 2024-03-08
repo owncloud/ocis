@@ -14,6 +14,12 @@ github.com/BurntSushi/toml/internal
 # github.com/CiscoM31/godata v1.0.10
 ## explicit; go 1.19
 github.com/CiscoM31/godata
+# github.com/DeepDiver1975/go-webdav v0.0.0-20240308110728-8857da010229
+## explicit; go 1.13
+github.com/DeepDiver1975/go-webdav
+github.com/DeepDiver1975/go-webdav/caldav
+github.com/DeepDiver1975/go-webdav/carddav
+github.com/DeepDiver1975/go-webdav/internal
 # github.com/KimMachineGun/automemlimit v0.5.0
 ## explicit; go 1.19
 github.com/KimMachineGun/automemlimit
@@ -782,12 +788,6 @@ github.com/emersion/go-ical
 # github.com/emersion/go-vcard v0.0.0-20230815062825-8fda7d206ec9
 ## explicit; go 1.13
 github.com/emersion/go-vcard
-# github.com/emersion/go-webdav v0.5.1-0.20240208161504-ad1fe1c5a88b
-## explicit; go 1.13
-github.com/emersion/go-webdav
-github.com/emersion/go-webdav/caldav
-github.com/emersion/go-webdav/carddav
-github.com/emersion/go-webdav/internal
 # github.com/emirpasic/gods v1.18.1
 ## explicit; go 1.2
 github.com/emirpasic/gods/containers

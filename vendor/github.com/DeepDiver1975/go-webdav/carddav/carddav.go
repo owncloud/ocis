@@ -6,9 +6,9 @@ package carddav
 import (
 	"time"
 
+	"github.com/DeepDiver1975/go-webdav"
+	"github.com/DeepDiver1975/go-webdav/internal"
 	"github.com/emersion/go-vcard"
-	"github.com/emersion/go-webdav"
-	"github.com/emersion/go-webdav/internal"
 )
 
 var CapabilityAddressBook = webdav.Capability("addressbook")

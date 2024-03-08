@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	dario.cat/mergo v1.0.0
 	github.com/CiscoM31/godata v1.0.10
+	github.com/DeepDiver1975/go-webdav v0.0.0-20240308110728-8857da010229
 	github.com/KimMachineGun/automemlimit v0.5.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
@@ -21,7 +22,6 @@ require (
 	github.com/egirna/icap-client v0.1.1
 	github.com/emersion/go-ical v0.0.0-20220601085725-0864dccc089f
 	github.com/emersion/go-vcard v0.0.0-20230815062825-8fda7d206ec9
-	github.com/emersion/go-webdav v0.5.1-0.20240208161504-ad1fe1c5a88b
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/ggwhite/go-masker v1.1.0
 	github.com/go-chi/chi/v5 v5.0.12
