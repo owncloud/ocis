@@ -84,7 +84,7 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 	switch ev := event.(type) {
 	default:
 		return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
-		// file related
+	// file related
 	case events.PostprocessingStepFinished:
 		switch ev.FinishedStep {
 		case events.PPStepAntivirus:
@@ -95,6 +95,7 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 		default:
 			return OC10Notification{}, fmt.Errorf("unknown postprocessing step: %s", ev.FinishedStep)
 		}
+
 	// space related
 	case events.SpaceDisabled:
 		return c.spaceMessage(eventid, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
