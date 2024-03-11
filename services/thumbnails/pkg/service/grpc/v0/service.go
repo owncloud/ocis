@@ -220,7 +220,14 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	if src.WebdavAuthorization != "" {
 		ctx = imgsource.ContextSetAuthorization(ctx, src.WebdavAuthorization)
 	}
-	imgURL.RawQuery = ""
+
+	// add signature and expiration to webdav url
+	signature, expiration := imgURL.Query().Get("signature"), imgURL.Query().Get("expiration")
+	params := url.Values{}
+	params.Add("signature", signature)
+	params.Add("expiration", expiration)
+	imgURL.RawQuery = params.Encode()
+
 	r, err := g.webdavSource.Get(ctx, imgURL.String())
 	if err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
