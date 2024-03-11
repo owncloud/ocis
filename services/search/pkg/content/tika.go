@@ -3,6 +3,7 @@ package content
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -214,11 +215,13 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 		}
 	}
 
-	// TODO: no idea which keys to use for the next two values
-	// The denominator for the exposure time fraction from the camera. Read-only.
-	// ExposureDenominator *float64 `json:"exposureDenominator,omitempty"`
-	// The numerator for the exposure time fraction from the camera. Read-only.
-	// ExposureNumerator *float64 `json:"exposureNumerator,omitempty"`
+	if v, err := getFirstValue(meta, "exif:ExposureTime"); err == nil {
+		if i, err := strconv.ParseFloat(v, 64); err == nil {
+			initPhoto()
+			photo.SetExposureNumerator(1)
+			photo.SetExposureDenominator(math.Round(1 / i))
+		}
+	}
 
 	return photo
 }

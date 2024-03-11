@@ -162,6 +162,62 @@ var _ = Describe("Tika", func() {
 			Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
 		})
 
+		It("adds image content", func() {
+			fullResponse = `[
+				{
+					"Content-Type": "image/png",
+					"width": "100",
+					"height": "100"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			image := doc.Image
+			Expect(image).ToNot(BeNil())
+
+			Expect(image.Width).To(Equal(libregraph.PtrInt32(100)))
+			Expect(image.Height).To(Equal(libregraph.PtrInt32(100)))
+		})
+
+		It("adds photo content", func() {
+			fullResponse = `[
+				{
+					"Content-Type": "image/png",
+					"cameraMake": "Canon",
+					"cameraModel": "Canon EOS 5D",
+					"exposureNumerator": "1",
+					"exposureDenominator": "1000",
+					"fNumber": "1.8",
+					"focalLength": "50",
+					"iso": "100",
+					"orientation": "1",
+					"takenDateTime": "2019-02-19T13:42:40.000Z",
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			photo := doc.Photo
+			Expect(photo).ToNot(BeNil())
+
+			Expect(photo.CameraMake).To(Equal(libregraph.PtrString("Canon")))
+			Expect(photo.CameraModel).To(Equal(libregraph.PtrString("Canon EOS 5D")))
+			Expect(photo.ExposureNumerator).To(Equal(libregraph.PtrInt32(1)))
+			Expect(photo.ExposureDenominator).To(Equal(libregraph.PtrInt32(1000)))
+			Expect(photo.FNumber).To(Equal(libregraph.PtrFloat64(1.8)))
+			Expect(photo.FocalLength).To(Equal(libregraph.PtrFloat64(50)))
+			Expect(photo.Iso).To(Equal(libregraph.PtrInt32(100)))
+			Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
+			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrString("2019-02-19T13:42:40.000Z")))
+		})
+
 		It("removes stop words", func() {
 			body = "body to test stop words!!! against almost everyone"
 			language = "en"

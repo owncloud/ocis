@@ -378,6 +378,76 @@ var _ = Describe("Driveitems", func() {
 				Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
 				Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
 			})
+
+			It("returns the image facet if metadata is available", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "image/jpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.image.width":  "1234",
+									"libre.graph.image.height": "987",
+								},
+							},
+						},
+					},
+				}, nil)
+
+				res := assertItemsList(1)
+				image := res.Value[0].Image
+
+				Expect(image).ToNot(BeNil())
+				Expect(image.Width).To(Equal(libregraph.PtrInt32(1234)))
+				Expect(image.Height).To(Equal(libregraph.PtrInt32(987)))
+			})
+
+			It("returns the photo facet if metadata is available", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "image/jpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.photo.cameraMake":          "Canon",
+									"libre.graph.photo.cameraModel":         "Cannon EOS 5D Mark III",
+									"libre.graph.photo.exposureDenominator": "100",
+									"libre.graph.photo.exposureNumerator":   "1",
+									"libre.graph.photo.fNumber":             "1.8",
+									"libre.graph.photo.focalLength":         "50",
+									"libre.graph.photo.iso":                 "400",
+									"libre.graph.photo.orientation":         "1",
+									"libre.graph.photo.takenDateTime":       "2018-01-01T12:34:56Z",
+								},
+							},
+						},
+					},
+				}, nil)
+
+				res := assertItemsList(1)
+				photo := res.Value[0].Photo
+
+				Expect(photo).ToNot(BeNil())
+				Expect(photo.CameraMake).To(Equal(libregraph.PtrString("Canon")))
+				Expect(photo.CameraModel).To(Equal(libregraph.PtrString("Cannon EOS 5D Mark III")))
+				Expect(photo.ExposureDenominator).To(Equal(libregraph.PtrFloat64(100)))
+				Expect(photo.ExposureNumerator).To(Equal(libregraph.PtrFloat64(1)))
+				Expect(photo.FNumber).To(Equal(libregraph.PtrFloat64(1.8)))
+				Expect(photo.FocalLength).To(Equal(libregraph.PtrFloat64(50)))
+				Expect(photo.Iso).To(Equal(libregraph.PtrInt32(400)))
+				Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
+				Expect(photo.TakenDateTime).To(Equal(libregraph.PtrTime(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
+			})
 		})
 	})
 })
