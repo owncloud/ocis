@@ -4,4 +4,5 @@ package service
 type FileEvent struct {
 	ParentItemID string `json:"parentitemid"`
 	ItemID       string `json:"itemid"`
+	SpaceID      string `json:"spaceid"`
 }

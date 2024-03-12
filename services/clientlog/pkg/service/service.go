@@ -120,6 +120,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 					ItemID: storagespace.FormatResourceID(*e.ID),
 					// TODO: check with web if parentID is needed
 					// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
+					SpaceID: e.ID.GetSpaceId(),
 				}
 
 				users, err = utils.GetSpaceMembers(ctx, e.ID.GetSpaceId(), gwc, utils.ViewerRole)
@@ -181,6 +182,7 @@ func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.
 	data := FileEvent{
 		ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
 		ItemID:       storagespace.FormatResourceID(*info.GetId()),
+		SpaceID:      info.GetSpace().GetId().GetOpaqueId(),
 	}
 
 	users, err := utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
