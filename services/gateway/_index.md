@@ -1,6 +1,6 @@
 ---
 title: Gateway
-date: 2024-03-11T00:43:07.795846942Z
+date: 2024-03-12T00:04:23.015861858Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/gateway
