@@ -184,6 +184,15 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 			if isSuccess(v) {
 				ev = FileTouched(v, req.(*provider.TouchFileRequest), ownerID, executantID)
 			}
+		case *provider.SetLockResponse:
+			fmt.Println("set lock response", v)
+			if isSuccess(v) {
+				ev = FileLocked(v, req.(*provider.SetLockRequest), ownerID, executantID)
+			}
+		case *provider.UnlockResponse:
+			if isSuccess(v) {
+				ev = FileUnlocked(v, req.(*provider.UnlockRequest), ownerID, executantID)
+			}
 		}
 
 		if ev != nil {

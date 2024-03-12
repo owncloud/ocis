@@ -70,7 +70,6 @@ type Tree struct {
 
 	options *options.Options
 
-	// used to cache symlink lookups for child names to node ids
 	idCache store.Store
 }
 

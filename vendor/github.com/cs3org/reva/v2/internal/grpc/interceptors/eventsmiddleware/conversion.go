@@ -216,6 +216,24 @@ func FileDownloaded(r *provider.InitiateFileDownloadResponse, req *provider.Init
 	}
 }
 
+// FileLocked converts the response to an events
+func FileLocked(r *provider.SetLockResponse, req *provider.SetLockRequest, owner, executant *user.UserId) events.FileLocked {
+	return events.FileLocked{
+		Executant: executant,
+		Ref:       req.Ref,
+		Timestamp: utils.TSNow(),
+	}
+}
+
+// FileUnlocked converts the response to an event
+func FileUnlocked(r *provider.UnlockResponse, req *provider.UnlockRequest, owner, executant *user.UserId) events.FileUnlocked {
+	return events.FileUnlocked{
+		Executant: executant,
+		Ref:       req.Ref,
+		Timestamp: utils.TSNow(),
+	}
+}
+
 // ItemTrashed converts the response to an event
 func ItemTrashed(r *provider.DeleteResponse, req *provider.DeleteRequest, spaceOwner, executant *user.UserId) events.ItemTrashed {
 	opaqueID := utils.ReadPlainFromOpaque(r.Opaque, "opaque_id")

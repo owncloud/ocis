@@ -255,7 +255,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 				sig := q.Get("signature")
 				expiration := q.Get("expiration")
 				// We restrict the pre-signed urls to downloads.
-				if sig != "" && expiration != "" && r.Method != http.MethodGet {
+				if sig != "" && expiration != "" && !(r.Method == http.MethodGet || r.Method == http.MethodHead) {
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}

@@ -154,6 +154,7 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 		}
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), res.Share.ResourceId)
 	return res, nil
 }
 
@@ -197,6 +198,7 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 		return res, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.GetShare().GetResourceId())
 	s.providerCache.RemoveListStorageProviders(req.GetShare().GetResourceId())
 	return res, nil
 }
@@ -280,6 +282,7 @@ func (s *svc) UpdateReceivedShare(ctx context.Context, req *collaboration.Update
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Share.Share.ResourceId)
 	return c.UpdateReceivedShare(ctx, req)
 	/*
 		    TODO: Leftover from master merge. Do we need this?
@@ -548,7 +551,7 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 	}
 
 	if s.c.CommitShareToStorageGrant {
-		// If the share is a denial we call denyGrant instead.
+		// If the share is a denial we call  denyGrant instead.
 		var status *rpc.Status
 		if grants.PermissionsEqual(req.Grant.Permissions.Permissions, &provider.ResourcePermissions{}) {
 			status, err = s.denyGrant(ctx, req.ResourceInfo.Id, req.Grant.Grantee, nil)
@@ -566,7 +569,7 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 
 		switch status.Code {
 		case rpc.Code_CODE_OK:
-			// ok
+			s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
 		case rpc.Code_CODE_UNIMPLEMENTED:
 			appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants not supported, ignoring")
 			rollBackFn(status)
@@ -583,8 +586,8 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 
 func (s *svc) addSpaceShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
 	if refIsSpaceRoot(req.GetResourceInfo().GetId()) &&
-		req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypePersonal {
-		return nil, errors.New("gateway: space type is not eligible for sharing")
+		(req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypePersonal || req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypeVirtual) {
+		return &collaboration.CreateShareResponse{Status: status.NewInvalid(ctx, "space type is not eligible for sharing")}, nil
 	}
 	// If the share is a denial we call  denyGrant instead.
 	var st *rpc.Status
@@ -614,6 +617,7 @@ func (s *svc) addSpaceShare(ctx context.Context, req *collaboration.CreateShareR
 
 	switch st.Code {
 	case rpc.Code_CODE_OK:
+		s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
 		s.providerCache.RemoveListStorageProviders(req.ResourceInfo.Id)
 	case rpc.Code_CODE_UNIMPLEMENTED:
 		appctx.GetLogger(ctx).Debug().Interface("status", st).Interface("req", req).Msg("storing grants not supported, ignoring")
@@ -692,6 +696,7 @@ func (s *svc) removeShare(ctx context.Context, req *collaboration.RemoveShareReq
 		}
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), share.ResourceId)
 	return res, nil
 }
 
@@ -724,6 +729,7 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 			Status: removeGrantStatus,
 		}, err
 	}
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), ref)
 	s.providerCache.RemoveListStorageProviders(ref)
 	return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
 }

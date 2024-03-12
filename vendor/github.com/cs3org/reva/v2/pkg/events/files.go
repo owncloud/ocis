@@ -88,6 +88,36 @@ func (FileDownloaded) Unmarshal(v []byte) (interface{}, error) {
 	return e, err
 }
 
+// FileLocked is emitted when a file is locked
+type FileLocked struct {
+	Executant *user.UserId
+	Ref       *provider.Reference
+	Owner     *user.UserId
+	Timestamp *types.Timestamp
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (FileLocked) Unmarshal(v []byte) (interface{}, error) {
+	e := FileLocked{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}
+
+// FileUnlocked is emitted when a file is unlocked
+type FileUnlocked struct {
+	Executant *user.UserId
+	Ref       *provider.Reference
+	Owner     *user.UserId
+	Timestamp *types.Timestamp
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (FileUnlocked) Unmarshal(v []byte) (interface{}, error) {
+	e := FileUnlocked{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}
+
 // ItemTrashed is emitted when a file or folder is trashed
 type ItemTrashed struct {
 	SpaceOwner *user.UserId
