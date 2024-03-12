@@ -2037,7 +2037,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
-        environment["OCIS_ASYNC_UPLOADS"] = False  # disable async uploads because it could interfere with the wopi validator
         environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
