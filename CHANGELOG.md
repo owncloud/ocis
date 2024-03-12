@@ -55,6 +55,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
 * Enhancement - Send SSE when file is locked/unlocked: [#8602](https://github.com/owncloud/ocis/pull/8602)
 * Enhancement - Bump Reva: [#8606](https://github.com/owncloud/ocis/pull/8606)
+* Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 
 ## Details
 
@@ -154,6 +155,12 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/8606
+
+* Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
+
+   Adds the spaceID to all clientlog sse messages
+
+   https://github.com/owncloud/ocis/pull/8614
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
