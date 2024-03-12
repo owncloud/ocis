@@ -33,7 +33,6 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.URL.Query().Get("access_token")
 		if accessToken == "" {
-			fmt.Println("wopicontext", "accesstoken empty")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -49,13 +48,11 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 		})
 
 		if err != nil {
-			fmt.Println("wopicontext", err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
 		if err := claims.Valid(); err != nil {
-			fmt.Println("wopicontext", err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -64,7 +61,6 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 
 		wopiContextAccessToken, err := DecryptAES([]byte(app.Config.JWTSecret), claims.WopiContext.AccessToken)
 		if err != nil {
-			fmt.Println("wopicontext", err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
