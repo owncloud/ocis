@@ -15,12 +15,10 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"google.golang.org/grpc"
 )
 
 type DemoApp struct {
-	gwc        gatewayv1beta1.GatewayAPIClient
-	grpcServer *grpc.Server
+	gwc gatewayv1beta1.GatewayAPIClient
 
 	AppURLs map[string]map[string]string
 

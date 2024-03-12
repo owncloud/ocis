@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"path"
@@ -51,7 +52,8 @@ func CheckFileInfo(app *DemoApp, w http.ResponseWriter, r *http.Request) {
 	}
 
 	fileInfo := FileInfo{
-		OwnerID:           statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp,
+		// OwnerID must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
+		OwnerID:           hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp)),
 		Size:              int64(statRes.Info.Size),
 		Version:           statRes.Info.Mtime.String(),
 		BaseFileName:      path.Base(statRes.Info.Path),
@@ -90,10 +92,11 @@ func CheckFileInfo(app *DemoApp, w http.ResponseWriter, r *http.Request) {
 	// user logic from reva wopi driver #TODO: refactor
 	var isPublicShare bool = false
 	if wopiContext.User != nil {
+		// UserID must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
 		if wopiContext.User.Id.Type == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
-			fileInfo.UserID = statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp
+			fileInfo.UserID = hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp))
 		} else {
-			fileInfo.UserID = wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp
+			fileInfo.UserID = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
 		}
 
 		if wopiContext.User.Opaque != nil {
@@ -103,12 +106,12 @@ func CheckFileInfo(app *DemoApp, w http.ResponseWriter, r *http.Request) {
 		}
 		if !isPublicShare {
 			fileInfo.UserFriendlyName = wopiContext.User.Username
-			fileInfo.UserID = wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp
+			fileInfo.UserID = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
 		}
 	}
 	if wopiContext.User == nil || isPublicShare {
 		randomID, _ := uuid.NewUUID()
-		fileInfo.UserID = "guest-" + randomID.String()
+		fileInfo.UserID = hex.EncodeToString([]byte("guest-" + randomID.String()))
 		fileInfo.UserFriendlyName = "Guest " + randomID.String()
 		fileInfo.IsAnonymousUser = true
 	}
@@ -132,6 +135,16 @@ func CheckFileInfo(app *DemoApp, w http.ResponseWriter, r *http.Request) {
 		Msg("CheckFileInfo: success")
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonFileInfo)
 	w.WriteHeader(http.StatusOK)
+	bytes, err := w.Write(jsonFileInfo)
+	if err != nil {
+		app.Logger.Error().
+			Err(err).
+			Str("FileReference", wopiContext.FileReference.String()).
+			Str("ViewMode", wopiContext.ViewMode.String()).
+			Str("Requester", wopiContext.User.GetId().String()).
+			Int("TotalBytes", len(jsonFileInfo)).
+			Int("WrittenBytes", bytes).
+			Msg("CheckFileInfo: failed to write contents in the HTTP response")
+	}
 }

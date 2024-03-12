@@ -65,8 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 				if err != nil {
 					return err
 				}
-				grpcServer.Serve(l)
-				return nil
+				return grpcServer.Serve(l)
 			},
 				func(_ error) {
 					logger.Error().
