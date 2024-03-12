@@ -136,28 +136,16 @@ func (s *service) Authenticate(ctx context.Context, req *provider.AuthenticateRe
 	password := req.ClientSecret
 
 	u, scope, err := s.authmgr.Authenticate(ctx, username, password)
-	switch v := err.(type) {
-	case nil:
-		log.Info().Msgf("user %s authenticated", u.Id)
+	if err != nil {
+		log.Debug().Str("client_id", username).Err(err).Msg("authsvc: error in Authenticate")
 		return &provider.AuthenticateResponse{
-			Status:     status.NewOK(ctx),
-			User:       u,
-			TokenScope: scope,
-		}, nil
-	case errtypes.InvalidCredentials:
-		return &provider.AuthenticateResponse{
-			Status: status.NewPermissionDenied(ctx, v, "wrong password"),
-		}, nil
-	case errtypes.NotFound:
-		log.Debug().Str("client_id", username).Msg("unknown client id")
-		return &provider.AuthenticateResponse{
-			Status: status.NewNotFound(ctx, "unknown client id"),
-		}, nil
-	default:
-		err = errors.Wrap(err, "authsvc: error in Authenticate")
-		return &provider.AuthenticateResponse{
-			Status: status.NewUnauthenticated(ctx, err, "error authenticating user"),
+			Status: status.NewStatusFromErrType(ctx, "authsvc: error in Authenticate", err),
 		}, nil
 	}
-
+	log.Info().Msgf("user %s authenticated", u.Id)
+	return &provider.AuthenticateResponse{
+		Status:     status.NewOK(ctx),
+		User:       u,
+		TokenScope: scope,
+	}, nil
 }

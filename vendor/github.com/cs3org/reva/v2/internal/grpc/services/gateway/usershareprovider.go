@@ -583,8 +583,8 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 
 func (s *svc) addSpaceShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
 	if refIsSpaceRoot(req.GetResourceInfo().GetId()) &&
-		req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypePersonal {
-		return nil, errors.New("gateway: space type is not eligible for sharing")
+		(req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypePersonal || req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypeVirtual) {
+		return &collaboration.CreateShareResponse{Status: status.NewInvalid(ctx, "space type is not eligible for sharing")}, nil
 	}
 	// If the share is a denial we call  denyGrant instead.
 	var st *rpc.Status

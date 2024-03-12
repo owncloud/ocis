@@ -144,7 +144,7 @@ func (e BadRequest) Error() string { return "error: bad request: " + string(e) }
 // IsBadRequest implements the IsBadRequest interface.
 func (e BadRequest) IsBadRequest() {}
 
-// ChecksumMismatch is the error to use when the sent hash does not match the calculated hash.
+// ChecksumMismatch is the error to use when the transmitted hash does not match the calculated hash.
 type ChecksumMismatch string
 
 func (e ChecksumMismatch) Error() string { return "error: checksum mismatch: " + string(e) }
@@ -178,7 +178,7 @@ type NotModified string
 
 func (e NotModified) Error() string { return "error: not modified: " + string(e) }
 
-// NotModified implements the IsNotModified interface.
+// IsNotModified implements the IsNotModified interface.
 func (e NotModified) IsNotModified() {}
 
 // StatusCode returns StatusInsufficientStorage, this implementation is needed to allow TUS to cast the correct http errors.
@@ -196,7 +196,7 @@ func (e InsufficientStorage) Body() []byte {
 const StatusInsufficientStorage = 507
 
 // IsNotFound is the interface to implement
-// to specify that an a resource is not found.
+// to specify that a resource is not found.
 type IsNotFound interface {
 	IsNotFound()
 }
@@ -238,7 +238,7 @@ type IsPermissionDenied interface {
 }
 
 // IsLocked is the interface to implement
-// to specify that an resource is locked.
+// to specify that a resource is locked.
 type IsLocked interface {
 	IsLocked()
 }
@@ -279,7 +279,7 @@ type IsInsufficientStorage interface {
 	IsInsufficientStorage()
 }
 
-// NewErrtypeFromStatus maps an rpc status to an errtype
+// NewErrtypeFromStatus maps a rpc status to an errtype
 func NewErrtypeFromStatus(status *rpc.Status) error {
 	switch status.Code {
 	case rpc.Code_CODE_OK:
@@ -318,7 +318,7 @@ func NewErrtypeFromStatus(status *rpc.Status) error {
 	}
 }
 
-// NewErrtypeFromHTTPStatusCode maps an http status to an errtype
+// NewErrtypeFromHTTPStatusCode maps a http status to an errtype
 func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 	switch code {
 	case http.StatusOK:
@@ -352,7 +352,7 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 	}
 }
 
-// NewHTTPStatusCodeFromErrtype maps an errtype to an http status
+// NewHTTPStatusCodeFromErrtype maps an errtype to a http status
 func NewHTTPStatusCodeFromErrtype(err error) int {
 	switch err.(type) {
 	case NotFound:

@@ -38,6 +38,7 @@ import (
 const (
 	_spaceTypePersonal = "personal"
 	_spaceTypeProject  = "project"
+	_spaceTypeVirtual  = "virtual"
 )
 
 func init() {
