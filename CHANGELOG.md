@@ -47,6 +47,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
 * Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
+* Bugfix - Fix sharing invite on virtual drive: [#8609](https://github.com/owncloud/ocis/pull/8609)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
@@ -95,6 +96,13 @@ The following sections list the changes for unreleased.
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 
    https://github.com/owncloud/ocis/pull/8570
+
+* Bugfix - Fix sharing invite on virtual drive: [#8609](https://github.com/owncloud/ocis/pull/8609)
+
+   We fixed the issue when sharing of virtual drive with other users was allowed
+
+   https://github.com/owncloud/ocis/issues/8495
+   https://github.com/owncloud/ocis/pull/8609
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
