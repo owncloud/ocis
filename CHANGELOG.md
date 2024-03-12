@@ -42,7 +42,9 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
@@ -50,6 +52,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v8.0.0: [#8613](https://github.com/owncloud/ocis/pull/8613)
 
 ## Details
+
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
+
+   We fixed a bug when anonymous user with viewer role in public link of a folder
+   can lock/unlock a file inside it
+
+   https://github.com/owncloud/ocis/issues/7785
+   https://github.com/owncloud/ocis/pull/8472
 
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 
@@ -61,6 +71,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8273
    https://github.com/owncloud/ocis/pull/8529
    https://github.com/cs3org/reva/pull/4534
+
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
+
+   We fixed the issue when sharing of personal drive is allowed via graph
+
+   https://github.com/owncloud/ocis/issues/8494
+   https://github.com/owncloud/ocis/pull/8538
 
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 
