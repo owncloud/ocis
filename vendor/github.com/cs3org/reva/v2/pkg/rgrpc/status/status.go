@@ -166,10 +166,14 @@ func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Statu
 	switch e := err.(type) {
 	case nil:
 		return NewOK(ctx)
+	case errtypes.NotFound:
+		return NewNotFound(ctx, msg+": "+err.Error())
 	case errtypes.IsNotFound:
 		return NewNotFound(ctx, msg+": "+err.Error())
 	case errtypes.AlreadyExists:
 		return NewAlreadyExists(ctx, err, msg+": "+err.Error())
+	case errtypes.InvalidCredentials:
+		return NewPermissionDenied(ctx, e, msg+": "+err.Error())
 	case errtypes.IsInvalidCredentials:
 		// TODO this maps badly
 		return NewUnauthenticated(ctx, err, msg+": "+err.Error())
