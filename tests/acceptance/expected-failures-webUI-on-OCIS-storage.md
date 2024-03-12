@@ -14,7 +14,3 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 - [webUILogin/openidLogin.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L50)
 - [webUILogin/openidLogin.feature:60](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L60)
-
-### [empty subfolder inside a folder to be uploaded is not created on the server](https://github.com/owncloud/web/issues/6348)
-
-- [webUIUpload/upload.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L36)
