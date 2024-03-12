@@ -1167,11 +1167,15 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
 def e2eTests(ctx):
     test_suites = {
         "suite1": {
-            "path": "tests/e2e/cucumber/features/*/*[!.oc10].feature",
+            "path": "tests/e2e/cucumber/features/{smoke,journeys}/*.feature",
             "tikaNeeded": False,
         },
         "suite2": {
-            "path": "tests/e2e/cucumber/features/smoke/*[!app-provider]/*[!.oc10].feature",
+            "path": "tests/e2e/cucumber/features/smoke/{spaces,admin-settings}/*.feature",
+            "tikaNeeded": False,
+        },
+        "suite3": {
+            "path": "tests/e2e/cucumber/features/smoke/{search,shares}/*.feature",
             "tikaNeeded": True,
         },
     }
