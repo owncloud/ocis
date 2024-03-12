@@ -161,6 +161,7 @@ The following sections list the changes for unreleased.
    Adds the spaceID to all clientlog sse messages
 
    https://github.com/owncloud/ocis/pull/8614
+   https://github.com/owncloud/ocis/pull/8624
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
