@@ -33,6 +33,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -230,6 +231,11 @@ func (s *service) UnsetArbitraryMetadata(ctx context.Context, req *provider.Unse
 
 // SetLock puts a lock on the given reference
 func (s *service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*provider.SetLockResponse, error) {
+	if !canLockPublicShare(ctx) {
+		return &provider.SetLockResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to lock the share"),
+		}, nil
+	}
 	err := s.storage.SetLock(ctx, req.Ref, req.Lock)
 
 	return &provider.SetLockResponse{
@@ -249,6 +255,12 @@ func (s *service) GetLock(ctx context.Context, req *provider.GetLockRequest) (*p
 
 // RefreshLock refreshes an existing lock on the given reference
 func (s *service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequest) (*provider.RefreshLockResponse, error) {
+	if !canLockPublicShare(ctx) {
+		return &provider.RefreshLockResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to refresh the share lock"),
+		}, nil
+	}
+
 	err := s.storage.RefreshLock(ctx, req.Ref, req.Lock, req.ExistingLockId)
 
 	return &provider.RefreshLockResponse{
@@ -258,6 +270,12 @@ func (s *service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequ
 
 // Unlock removes an existing lock from the given reference
 func (s *service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*provider.UnlockResponse, error) {
+	if !canLockPublicShare(ctx) {
+		return &provider.UnlockResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "no permission to unlock the share"),
+		}, nil
+	}
+
 	err := s.storage.Unlock(ctx, req.Ref, req.Lock)
 
 	return &provider.UnlockResponse{
@@ -1284,4 +1302,10 @@ func estreamFromConfig(c eventconfig) (events.Stream, error) {
 	}
 
 	return stream.NatsFromConfig("storageprovider", false, stream.NatsConfig(c))
+}
+
+func canLockPublicShare(ctx context.Context) bool {
+	u := ctxpkg.ContextMustGetUser(ctx)
+	psr := utils.ReadPlainFromOpaque(u.Opaque, "public-share-role")
+	return psr == "" || psr == conversions.RoleEditor
 }

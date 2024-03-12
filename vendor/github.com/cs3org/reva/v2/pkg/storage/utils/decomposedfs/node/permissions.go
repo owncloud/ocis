@@ -99,6 +99,7 @@ func ServiceAccountPermissions() provider.ResourcePermissions {
 		PurgeRecycle:         true, // for purge-trash-bin command
 		RestoreRecycleItem:   true, // for cli restore command
 		Delete:               true, // for cli restore command with replace option
+		CreateContainer:      true, // for space provisioning
 	}
 }
 
