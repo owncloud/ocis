@@ -3077,23 +3077,23 @@ Feature: an user gets the resources shared to them
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Carol King"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Carol King"]
+                                          }
                                         }
                                       }
                                     }
@@ -3206,23 +3206,23 @@ Feature: an user gets the resources shared to them
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Alice Hansen"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Alice Hansen"]
+                                          }
                                         }
                                       }
                                     }
@@ -3374,23 +3374,23 @@ Feature: an user gets the resources shared to them
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Carol King"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Carol King"]
+                                          }
                                         }
                                       }
                                     }
@@ -3503,23 +3503,23 @@ Feature: an user gets the resources shared to them
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Alice Hansen"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Alice Hansen"]
+                                          }
                                         }
                                       }
                                     }
