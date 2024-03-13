@@ -344,7 +344,8 @@ def testPipelines(ctx):
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
@@ -895,7 +896,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
     }
 
-def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
+def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 4):
     testgroups = [
         "BaseWopiViewing",
         "CheckFileInfoSchema",
@@ -910,6 +911,43 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
 
     ocis_bin = "ocis/bin/ocis"
     validatorTests = []
+
+    wopiServer = []
+    if wopiServerType == "cs3":
+        wopiServer = [
+            {
+                "name": "wopiserver",
+                "image": "cs3org/wopiserver:v10.3.0",
+                "detach": True,
+                "commands": [
+                    "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
+                    "echo 123 > /etc/wopi/wopisecret",
+                    "/app/wopiserver.py",
+                ],
+            },
+        ]
+    else:
+        wopiServer = [
+            {
+                "name": "wopiserver",
+                "image": OC_CI_GOLANG,
+                "detach": True,
+                "environment": {
+                    "MICRO_REGISTRY": "nats-js-kv",
+                    "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
+                    "COLLABORATION_LOG_LEVEL": "debug",
+                    "COLLABORATION_APP_NAME": "FakeOffice",
+                    "COLLABORATION_HTTP_ADDR": "wopiserver:9300",
+                    "COLLABORATION_HTTP_SCHEME": "http",
+                    "COLLABORATION_WOPIAPP_ADDR": "http://fakeoffice:8080",
+                    "COLLABORATION_WOPIAPP_INSECURE": "true",
+                    "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                },
+                "commands": [
+                    "%s collaboration server" % ocis_bin,
+                ],
+            },
+        ]
 
     for testgroup in testgroups:
         validatorTests.append({
@@ -930,7 +968,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "wopiValidatorTests-%s" % (storage),
+        "name": "wopiValidatorTests-%s-%s" % (wopiServerType, storage),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -956,26 +994,8 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                  ] +
                  ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
+                 wopiServer +
                  [
-                     {
-                         "name": "wopiserver",
-                         "image": OC_CI_GOLANG,
-                         "detach": True,
-                         "environment": {
-                             "MICRO_REGISTRY": "nats-js-kv",
-                             "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
-                             "COLLABORATION_LOG_LEVEL": "debug",
-                             "COLLABORATION_APP_NAME": "FakeOffice",
-                             "COLLABORATION_HTTP_ADDR": "wopiserver:9300",
-                             "COLLABORATION_HTTP_SCHEME": "http",
-                             "COLLABORATION_WOPIAPP_ADDR": "http://fakeoffice:8080",
-                             "COLLABORATION_WOPIAPP_INSECURE": "true",
-                             "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
-                         },
-                         "commands": [
-                             "%s collaboration server" % ocis_bin,
-                         ],
-                     },
                      {
                          "name": "wait-for-wopi-server",
                          "image": OC_CI_WAIT_FOR,
