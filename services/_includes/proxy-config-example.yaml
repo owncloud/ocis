@@ -148,7 +148,7 @@ role_assignment:
       claim_value: ocisSpaceAdmin
     - role_name: user
       claim_value: ocisUser
-    - role_name: guest
+    - role_name: user-light
       claim_value: ocisGuest
 policy_selector:
   static:
