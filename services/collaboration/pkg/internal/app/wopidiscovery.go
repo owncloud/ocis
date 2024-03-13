@@ -45,6 +45,8 @@ func getAppURLs(wopiAppUrl string, insecure bool, logger log.Logger) (map[string
 		return nil, err
 	}
 
+	defer httpResp.Body.Close()
+
 	if httpResp.StatusCode != http.StatusOK {
 		logger.Error().
 			Str("WopiAppUrl", wopiAppUrl).
@@ -52,8 +54,6 @@ func getAppURLs(wopiAppUrl string, insecure bool, logger log.Logger) (map[string
 			Msg("WopiDiscovery: wopi app url failed with unexpected code")
 		return nil, errors.New("status code was not 200")
 	}
-
-	defer httpResp.Body.Close()
 
 	var appURLs map[string]map[string]string
 
