@@ -2352,23 +2352,23 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Carol King"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Carol King"]
+                                          }
                                         }
                                       }
                                     }
@@ -2481,23 +2481,23 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Alice Hansen"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Alice Hansen"]
+                                          }
                                         }
                                       }
                                     }
@@ -2649,23 +2649,23 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Carol King"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Carol King"]
+                                          }
                                         }
                                       }
                                     }
@@ -2778,23 +2778,23 @@ Feature: listing sharedWithMe when auto-sync is disabled
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "invitedBy": {
-                                  "type": "object",
-                                  "required": ["user"],
-                                  "properties": {
-                                    "user": {
-                                      "type": "object",
-                                      "required": ["displayName", "id"],
-                                      "properties": {
-                                        "displayName": {
-                                          "type": "string",
-                                          "enum": ["Alice Hansen"]
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "invitedBy": {
+                                    "type": "object",
+                                    "required": ["user"],
+                                    "properties": {
+                                      "user": {
+                                        "type": "object",
+                                        "required": ["displayName", "id"],
+                                        "properties": {
+                                          "displayName": {
+                                            "type": "string",
+                                            "enum": ["Alice Hansen"]
+                                          }
                                         }
                                       }
                                     }
