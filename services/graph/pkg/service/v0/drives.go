@@ -25,7 +25,6 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"golang.org/x/sync/errgroup"
 
-	revaConversions "github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -78,7 +77,7 @@ func (g Graph) GetDrives(version APIVersion) http.HandlerFunc {
 // GetDrivesV1 attempts to retrieve the current users drives;
 // it lists all drives the current user has access to.
 func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrives(r, false)
+	spaces, errCode := g.getDrives(r, false, APIVersion_1)
 	if errCode != nil {
 		errCode.Render(w, r)
 		return
@@ -99,7 +98,7 @@ func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrivesBeta(r, false)
+	spaces, errCode := g.getDrives(r, false, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errCode.Render(w, r)
 		return
@@ -133,7 +132,7 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 // GetAllDrivesV1 attempts to retrieve the current users drives;
 // it includes another user's drives, if the current user has the permission.
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrives(r, true)
+	spaces, errCode := g.getDrives(r, true, APIVersion_1)
 	if errCode != nil {
 		errCode.Render(w, r)
 		return
@@ -153,7 +152,7 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	drives, errCode := g.getDrivesBeta(r, true)
+	drives, errCode := g.getDrives(r, true, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errCode.Render(w, r)
 		return
@@ -169,66 +168,8 @@ func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getDrivesBeta retrieves the drives associated with the given request 'r'.
-// It updates the 'GrantedToIdentities' to 'GrantedToV2',
-// which represents the transition from legacy identity representation to a newer version.
-// It also maps the old role names to their new unified role identifiers.
-func (g Graph) getDrivesBeta(r *http.Request, unrestricted bool) ([]*libregraph.Drive, *errorcode.Error) {
-	drives, errCode := g.getDrives(r, unrestricted)
-	if errCode != nil {
-		return nil, errCode
-	}
-
-	for _, drive := range drives {
-		for i, permission := range drive.GetRoot().Permissions {
-			grantedToIdentities := permission.GetGrantedToIdentities()
-
-			if len(grantedToIdentities) < 1 {
-				continue
-			}
-
-			permission.GrantedToIdentities = nil
-			grantedToIdentity := grantedToIdentities[0]
-
-			permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
-				User:  grantedToIdentity.User,
-				Group: grantedToIdentity.Group,
-			}
-
-			for i, role := range permission.GetRoles() {
-
-				// v1 implementation for getDrives > ** > cs3PermissionsToLibreGraph
-				// does not use space related role names, we first need to resolve the correct descriptor.
-				switch role {
-				case revaConversions.RoleViewer:
-					role = revaConversions.RoleSpaceViewer
-				case revaConversions.RoleEditor:
-					role = revaConversions.RoleSpaceEditor
-				}
-
-				cs3Role := revaConversions.RoleFromName(role, g.config.FilesSharing.EnableResharing)
-				uniRole := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
-					*cs3Role.CS3ResourcePermissions(),
-					unifiedrole.UnifiedRoleConditionOwner,
-					g.config.FilesSharing.EnableResharing,
-				)
-
-				if uniRole == nil {
-					continue
-				}
-
-				permission.Roles[i] = uniRole.GetId()
-			}
-
-			drive.Root.Permissions[i] = permission
-		}
-	}
-
-	return drives, nil
-}
-
 // getDrives implements the Service interface.
-func (g Graph) getDrives(r *http.Request, unrestricted bool) ([]*libregraph.Drive, *errorcode.Error) {
+func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, *errorcode.Error) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().
 		Interface("query", r.URL.Query()).
@@ -286,7 +227,7 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool) ([]*libregraph.Driv
 		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
 		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
@@ -346,7 +287,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -493,7 +434,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		resp.StorageSpace.Opaque = utils.MergeOpaques(resp.GetStorageSpace().GetOpaque(), opaque)
 	}
 
-	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), webDavBaseURL, resp.GetStorageSpace())
+	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), webDavBaseURL, resp.GetStorageSpace(), APIVersion_1)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not create drive: error parsing drive")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -653,7 +594,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace})
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -664,7 +605,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion) ([]*libregraph.Drive, error) {
 	errg, ctx := errgroup.WithContext(ctx)
 	work := make(chan *storageprovider.StorageSpace, len(storageSpaces))
 	results := make(chan *libregraph.Drive, len(storageSpaces))
@@ -690,7 +631,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for storageSpace := range work {
-				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace)
+				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion)
 				if err != nil {
 					return err
 				}
@@ -781,7 +722,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
+func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion) (*libregraph.Drive, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	if space.Root == nil {
 		logger.Error().Msg("unable to parse space: space has no root")
@@ -793,7 +734,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 	spaceID := storagespace.FormatResourceID(spaceRid)
 
-	permissions := g.cs3PermissionsToLibreGraph(ctx, space)
+	permissions := g.cs3PermissionsToLibreGraph(ctx, space, apiVersion)
 
 	drive := &libregraph.Drive{
 		Id:   libregraph.PtrString(spaceID),
@@ -889,7 +830,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	return drive, nil
 }
 
-func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace) []libregraph.Permission {
+func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
 	if space.Opaque == nil {
 		return nil
 	}
@@ -943,41 +884,56 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 		// libregraph.Identity and if we pass the pointer from the loop every identity
 		// will have the same id.
 		tmp := id
-		var identitySet libregraph.IdentitySet
+		isGroup := false
+		var identity libregraph.Identity
+		var err error
+		var p libregraph.Permission
 		if _, ok := groupsMap[id]; ok {
-			identity, err := groupIdToIdentity(ctx, g.identityCache, tmp)
+			identity, err = groupIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("groupid", tmp).Msg("Group not found by id")
 			}
-			identitySet = libregraph.IdentitySet{Group: &identity}
+			isGroup = true
 		} else {
-			identity, err := userIdToIdentity(ctx, g.identityCache, tmp)
+			identity, err = userIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}
-			identitySet = libregraph.IdentitySet{User: &identity}
 		}
-
-		p := libregraph.Permission{
-			GrantedToIdentities: []libregraph.IdentitySet{identitySet},
+		switch apiVersion {
+		case APIVersion_1:
+			var identitySet libregraph.IdentitySet
+			if isGroup {
+				identitySet.SetGroup(identity)
+			} else {
+				identitySet.SetUser(identity)
+			}
+			p.SetGrantedToIdentities([]libregraph.IdentitySet{identitySet})
+		case APIVersion_1_Beta_1:
+			var identitySet libregraph.SharePointIdentitySet
+			if isGroup {
+				identitySet.SetGroup(identity)
+			} else {
+				identitySet.SetUser(identity)
+			}
+			p.SetGrantedToV2(identitySet)
 		}
 
 		if exp := permissionsExpirations[id]; exp != nil {
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		// we need to map the permissions to the roles
-		switch {
-		// having RemoveGrant qualifies you as a manager
-		case perm.RemoveGrant:
-			p.SetRoles([]string{"manager"})
-		// InitiateFileUpload means you are an editor
-		case perm.InitiateFileUpload:
-			p.SetRoles([]string{"editor"})
-		// Stat permission at least makes you a viewer
-		case perm.Stat:
-			p.SetRoles([]string{"viewer"})
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionOwner, false); role != nil {
+			switch apiVersion {
+			case APIVersion_1:
+				if r := unifiedrole.GetLegacyName(*role); r != "" {
+					p.SetRoles([]string{r})
+				}
+			case APIVersion_1_Beta_1:
+				p.SetRoles([]string{role.GetId()})
+			}
 		}
+
 		permissions = append(permissions, p)
 	}
 	return permissions

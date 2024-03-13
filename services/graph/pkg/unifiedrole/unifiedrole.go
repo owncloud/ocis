@@ -56,6 +56,18 @@ const (
 	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
 )
 
+var legacyNames map[string]string = map[string]string{
+	UnifiedRoleViewerID: conversions.RoleViewer,
+	// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
+	// we need to stay compatible with that
+	UnifiedRoleSpaceViewerID: "viewer",
+	UnifiedRoleSpaceEditorID: "editor",
+	UnifiedRoleEditorID:      conversions.RoleEditor,
+	UnifiedRoleFileEditorID:  conversions.RoleFileEditor,
+	UnifiedRoleUploaderID:    conversions.RoleUploader,
+	UnifiedRoleManagerID:     conversions.RoleManager,
+}
+
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
 func NewViewerUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewViewerRole(sharing)
@@ -381,6 +393,10 @@ func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (
 		actions = append(actions, DriveItemPermissionsDeny)
 	}
 	return actions
+}
+
+func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
+	return legacyNames[role.GetId()]
 }
 
 // CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied

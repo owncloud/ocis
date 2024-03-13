@@ -23,6 +23,7 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -520,16 +521,17 @@ var _ = Describe("Graph", func() {
 
 				check(jsonData)
 			},
-			Entry("injects grantedToV2", func(jsonData gjson.Result) {}, provider.ResourcePermissions{RemoveGrant: true}),
+			Entry("injects grantedToV2", func(jsonData gjson.Result) {},
+				*conversions.NewSpaceViewerRole().CS3ResourcePermissions()),
 			Entry("remaps manager role to the unified counterpart", func(jsonData gjson.Result) {
 				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleManagerID))
-			}, provider.ResourcePermissions{RemoveGrant: true}),
+			}, *conversions.NewManagerRole().CS3ResourcePermissions()),
 			Entry("remaps editor role to the unified counterpart", func(jsonData gjson.Result) {
 				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleSpaceEditorID))
-			}, provider.ResourcePermissions{InitiateFileUpload: true}),
+			}, *conversions.NewSpaceEditorRole().CS3ResourcePermissions()),
 			Entry("remaps viewer role to the unified counterpart", func(jsonData gjson.Result) {
 				Expect(jsonData.Get("0.root.permissions.0.roles.0").Str).To(Equal(unifiedrole.UnifiedRoleSpaceViewerID))
-			}, provider.ResourcePermissions{Stat: true}),
+			}, *conversions.NewSpaceViewerRole().CS3ResourcePermissions()),
 		)
 		Describe("Create Drive", func() {
 			It("cannot create a space without valid user in context", func() {
