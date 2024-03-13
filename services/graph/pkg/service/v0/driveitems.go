@@ -408,14 +408,45 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	driveItems := make(driveItemsByResourceID)
-	driveItems, err = g.listUserShares(ctx, []*collaboration.Filter{
-		share.ResourceIDFilter(conversions.ToPointer(itemID)),
-	}, driveItems)
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		// this is a space root, get permissions via storage space API
+		filters := []*storageprovider.ListStorageSpacesRequest_Filter{
+			listStorageSpacesIDFilter(statResponse.GetInfo().GetSpace().GetId().GetOpaqueId()),
+		}
+		res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
+		switch {
+		case err != nil:
+			g.logger.Error().Err(err).Msg("could not get drive: transport error")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		case res.Status.Code != cs3rpc.Code_CODE_OK:
+			if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+				// the client is doing a lookup for a specific space, therefore we need to return
+				// not found to the caller
+				g.logger.Debug().Msg("could not get drive: not found")
+				errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+				return
+			}
+			g.logger.Debug().
+				Str("grpcmessage", res.GetStatus().GetMessage()).
+				Msg("could not get drive: grpc error")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+			return
+		}
+		permissions := g.cs3PermissionsToLibreGraph(ctx, res.GetStorageSpaces()[0], APIVersion_1_Beta_1)
+		collectionOfPermissions.Value = permissions
+	} else {
+		// "normal" driveItem, populate user  permissions via share providers
+		driveItems, err = g.listUserShares(ctx, []*collaboration.Filter{
+			share.ResourceIDFilter(conversions.ToPointer(itemID)),
+		}, driveItems)
+		if err != nil {
+			errorcode.RenderError(w, r, err)
+			return
+		}
 
+	}
+	// finally get public shares, which are possible for spaceroots and "normal" resources
 	driveItems, err = g.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
 		publicshare.ResourceIDFilter(conversions.ToPointer(itemID)),
 	}, driveItems)
