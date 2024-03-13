@@ -18,7 +18,7 @@ import (
 
 func UploadFile(
 	ctx context.Context,
-	content io.ReadCloser,
+	content io.Reader, // content won't be closed inside the method
 	contentLength int64,
 	ref *providerv1beta1.Reference,
 	gwc gatewayv1beta1.GatewayAPIClient,

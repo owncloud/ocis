@@ -170,7 +170,7 @@ func (s *Service) OpenInApp(
 		ViewAppUrl:    viewAppURL,
 	}
 
-	cs3Claims := &jwt.StandardClaims{}
+	cs3Claims := &jwt.RegisteredClaims{}
 	cs3JWTparser := jwt.Parser{}
 	_, _, err = cs3JWTparser.ParseUnverified(req.AccessToken, cs3Claims)
 	if err != nil {
@@ -185,7 +185,7 @@ func (s *Service) OpenInApp(
 
 	claims := &app.Claims{
 		WopiContext: wopiContext,
-		StandardClaims: jwt.StandardClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: cs3Claims.ExpiresAt,
 		},
 	}
@@ -220,7 +220,7 @@ func (s *Service) OpenInApp(
 				// these parameters will be passed to the web server by the app provider application
 				"access_token": accessToken,
 				// milliseconds since Jan 1, 1970 UTC as required in https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/concepts#access_token_ttl
-				"access_token_ttl": strconv.FormatInt(claims.ExpiresAt*1000, 10),
+				"access_token_ttl": strconv.FormatInt(claims.ExpiresAt.UnixMilli(), 10),
 			},
 		},
 	}, nil

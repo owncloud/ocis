@@ -92,7 +92,9 @@ func DownloadFile(
 	// TODO: the access token shouldn't be needed
 	httpReq.Header.Add("X-Access-Token", token)
 
-	httpResp, err := httpClient.Do(httpReq)
+	// TODO: this needs a refactor to comply with the "bodyclose" linter
+	// response body is closed in the caller method for now
+	httpResp, err := httpClient.Do(httpReq) //nolint:bodyclose
 	if err != nil {
 		logger.Error().
 			Err(err).
