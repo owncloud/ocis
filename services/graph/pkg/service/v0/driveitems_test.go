@@ -1027,7 +1027,7 @@ var _ = Describe("Driveitems", func() {
 		})
 
 		It("fails with wrong role", func() {
-			driveItemInvite.Roles = []string{unifiedrole.NewCoownerUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.NewManagerUnifiedRole().GetId()}
 			svc.Invite(
 				rr,
 				httptest.NewRequest(http.MethodPost, "/", toJSONReader(driveItemInvite)).

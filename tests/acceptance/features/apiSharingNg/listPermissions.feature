@@ -242,8 +242,8 @@ Feature: List a sharing permissions
         },
         "@libre.graph.permissions.roles.allowedValues": {
           "type": "array",
-          "minItems": 4,
-          "maxItems": 4,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true,
           "items": {
             "oneOf":  [
@@ -304,29 +304,6 @@ Feature: List a sharing permissions
                 "properties": {
                   "@libre.graph.weight": {
                     "const": 3
-                  },
-                  "description": {
-                    "const": "Grants co-owner permissions on a resource"
-                  },
-                  "displayName": {
-                    "const": "Co Owner"
-                  },
-                  "id": {
-                    "const": "3a4ba8e9-6a0d-4235-9140-0e7a34007abe"
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "@libre.graph.weight",
-                  "description",
-                  "displayName",
-                  "id"
-                ],
-                "properties": {
-                  "@libre.graph.weight": {
-                    "const": 4
                   },
                   "description": {
                     "const": "Grants manager permissions on a resource. Semantically equivalent to co-owner"
