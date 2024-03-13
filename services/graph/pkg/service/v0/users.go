@@ -174,7 +174,7 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get personal drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -513,7 +513,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			user.Drive = &libregraph.Drive{}
 		}
 		for _, sp := range lspr.GetStorageSpaces() {
-			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, APIVersion_1)
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
 				continue
