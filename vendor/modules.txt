@@ -1237,8 +1237,8 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.17.5
-## explicit; go 1.19
+# github.com/klauspost/compress v1.17.7
+## explicit; go 1.20
 github.com/klauspost/compress/flate
 github.com/klauspost/compress/internal/race
 github.com/klauspost/compress/s2
@@ -1390,10 +1390,10 @@ github.com/mohae/deepcopy
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
-# github.com/nats-io/jwt/v2 v2.5.3
+# github.com/nats-io/jwt/v2 v2.5.5
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.10
+# github.com/nats-io/nats-server/v2 v2.10.12
 ## explicit; go 1.20
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand
@@ -2017,7 +2017,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zapgrpc
-# golang.org/x/crypto v0.19.0
+# golang.org/x/crypto v0.21.0
 ## explicit; go 1.18
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
@@ -2099,7 +2099,7 @@ golang.org/x/oauth2/internal
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.17.0
+# golang.org/x/sys v0.18.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
@@ -2110,7 +2110,7 @@ golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.17.0
+# golang.org/x/term v0.18.0
 ## explicit; go 1.18
 golang.org/x/term
 # golang.org/x/text v0.14.0

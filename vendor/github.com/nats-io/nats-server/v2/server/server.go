@@ -124,6 +124,7 @@ type Server struct {
 	stats
 	scStats
 	mu                  sync.RWMutex
+	reloadMu            sync.RWMutex // Write-locked when a config reload is taking place ONLY
 	kp                  nkeys.KeyPair
 	xkp                 nkeys.KeyPair
 	xpub                string
@@ -1143,9 +1144,11 @@ func (s *Server) configureAccounts(reloading bool) (map[string]struct{}, error) 
 		// If we have leafnodes they need to be updated.
 		if reloading && a == s.gacc {
 			a.mu.Lock()
-			var mappings []*mapping
+			mappings := make(map[string]*mapping)
 			if len(a.mappings) > 0 && a.nleafs > 0 {
-				mappings = append(mappings, a.mappings...)
+				for _, em := range a.mappings {
+					mappings[em.src] = em
+				}
 			}
 			a.mu.Unlock()
 			if len(mappings) > 0 || len(oldGMappings) > 0 {
@@ -1156,7 +1159,10 @@ func (s *Server) configureAccounts(reloading bool) (map[string]struct{}, error) 
 					}
 					// Remove any old ones if needed.
 					for _, em := range oldGMappings {
-						lc.forceRemoveFromSmap(em.src)
+						// Only remove if not in the new ones.
+						if _, ok := mappings[em.src]; !ok {
+							lc.forceRemoveFromSmap(em.src)
+						}
 					}
 				}
 				a.lmu.RUnlock()
@@ -2679,7 +2685,9 @@ func (s *Server) acceptConnections(l net.Listener, acceptName string, createFunc
 		}
 		tmpDelay = ACCEPT_MIN_SLEEP
 		if !s.startGoRoutine(func() {
+			s.reloadMu.RLock()
 			createFunc(conn)
+			s.reloadMu.RUnlock()
 			s.grWG.Done()
 		}) {
 			conn.Close()

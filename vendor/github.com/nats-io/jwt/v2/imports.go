@@ -40,6 +40,7 @@ type Import struct {
 	LocalSubject RenamingSubject `json:"local_subject,omitempty"`
 	Type         ExportType      `json:"type,omitempty"`
 	Share        bool            `json:"share,omitempty"`
+	AllowTrace   bool            `json:"allow_trace,omitempty"`
 }
 
 // IsService returns true if the import is of type service
@@ -65,6 +66,9 @@ func (i *Import) Validate(actPubKey string, vr *ValidationResults) {
 	}
 	if !i.IsService() && !i.IsStream() {
 		vr.AddError("invalid import type: %q", i.Type)
+	}
+	if i.IsService() && i.AllowTrace {
+		vr.AddError("AllowTrace only valid for stream import")
 	}
 
 	if i.Account == "" {
