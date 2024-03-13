@@ -4692,3 +4692,113 @@ Feature: an user gets the resources shared to them
       }
     }
     """
+
+  @issue-8471
+  Scenario: user list resources with same name shared from different users
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "folder"
+    And user "Brian" has uploaded file with content "hello world" to "/textfile.txt"
+    And user "Carol" has created folder "folder"
+    And user "Carol" has uploaded file with content "hello world" to "/textfile.txt"
+    And user "Brian" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Brian" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Carol" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Carol" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    When user "Alice" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "type": "array",
+          "maxItems": 4,
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": [
+                      "folder"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": [
+                      "folder (2)"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": [
+                      "textfile.txt"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": [
+                      "textfile (1).txt"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
