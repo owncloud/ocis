@@ -80,7 +80,7 @@
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | com.owncloud.api.users | Endpoint of the users provider.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
 | STORAGE_USERS_DATA_GATEWAY_URL | string | https://localhost:9200/data | URL of the data gateway server|
-| STORAGE_USERS_TRANSFER_EXPIRES | int64 | 86400 | the time after which the token for upload postprocessing expires|
+| STORAGE_USERS_TRANSFER_EXPIRES | int64 | 86400 | The time after which the token for upload postprocessing expires|
 | OCIS_EVENTS_ENDPOINT<br/>STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>STORAGE_USERS_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
