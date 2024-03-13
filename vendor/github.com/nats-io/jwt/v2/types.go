@@ -177,9 +177,17 @@ func (s Subject) Validate(vr *ValidationResults) {
 	v := string(s)
 	if v == "" {
 		vr.AddError("subject cannot be empty")
+		// No other checks after that make sense
+		return
 	}
 	if strings.Contains(v, " ") {
 		vr.AddError("subject %q cannot have spaces", v)
+	}
+	if v[0] == '.' || v[len(v)-1] == '.' {
+		vr.AddError("subject %q cannot start or end with a `.`", v)
+	}
+	if strings.Contains(v, "..") {
+		vr.AddError("subject %q cannot contain consecutive `.`", v)
 	}
 }
 

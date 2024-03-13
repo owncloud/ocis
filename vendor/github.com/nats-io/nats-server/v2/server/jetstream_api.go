@@ -277,6 +277,9 @@ const (
 	// JSAdvisoryStreamRestoreCompletePre notification that a restore was completed.
 	JSAdvisoryStreamRestoreCompletePre = "$JS.EVENT.ADVISORY.STREAM.RESTORE_COMPLETE"
 
+	// JSAdvisoryDomainLeaderElectedPre notification that a jetstream domain has elected a leader.
+	JSAdvisoryDomainLeaderElected = "$JS.EVENT.ADVISORY.DOMAIN.LEADER_ELECTED"
+
 	// JSAdvisoryStreamLeaderElectedPre notification that a replicated stream has elected a leader.
 	JSAdvisoryStreamLeaderElectedPre = "$JS.EVENT.ADVISORY.STREAM.LEADER_ELECTED"
 
@@ -3709,7 +3712,13 @@ func (s *Server) streamSnapshot(ci *ClientInfo, acc *Account, mset *stream, sr *
 
 	// Create our ack flow handler.
 	// This is very simple for now.
-	acks := make(chan struct{}, 1)
+	ackSize := defaultSnapshotWindowSize / chunkSize
+	if ackSize < 8 {
+		ackSize = 8
+	} else if ackSize > 8*1024 {
+		ackSize = 8 * 1024
+	}
+	acks := make(chan struct{}, ackSize)
 	acks <- struct{}{}
 
 	// Track bytes outstanding.
@@ -3731,7 +3740,7 @@ func (s *Server) streamSnapshot(ci *ClientInfo, acc *Account, mset *stream, sr *
 	defer mset.unsubscribe(ackSub)
 
 	// TODO(dlc) - Add in NATS-Chunked-Sequence header
-
+	var hdr []byte
 	for index := 1; ; index++ {
 		chunk := make([]byte, chunkSize)
 		n, err := r.Read(chunk)
@@ -3748,19 +3757,27 @@ func (s *Server) streamSnapshot(ci *ClientInfo, acc *Account, mset *stream, sr *
 		if atomic.LoadInt32(&out) > defaultSnapshotWindowSize {
 			select {
 			case <-acks:
-			case <-inch: // Lost interest
+				// ok to proceed.
+			case <-inch:
+				// Lost interest
+				hdr = []byte("NATS/1.0 408 No Interest\r\n\r\n")
 				goto done
-			case <-time.After(10 * time.Millisecond):
+			case <-time.After(2 * time.Second):
+				hdr = []byte("NATS/1.0 408 No Flow Response\r\n\r\n")
+				goto done
 			}
 		}
 		ackReply := fmt.Sprintf("%s.%d.%d", ackSubj, len(chunk), index)
+		if hdr == nil {
+			hdr = []byte("NATS/1.0 204\r\n\r\n")
+		}
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, ackReply, nil, chunk, nil, 0))
 		atomic.AddInt32(&out, int32(len(chunk)))
 	}
 done:
 	// Send last EOF
 	// TODO(dlc) - place hash in header
-	mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, nil, nil, nil, 0))
+	mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
 }
 
 // For determining consumer request type.
