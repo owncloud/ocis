@@ -1893,4 +1893,44 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $share
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function declineShare(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $share
+	):ResponseInterface {
+		$response = self::getSharesSharedWithMe(
+			$baseUrl,
+			$xRequestId,
+			$user,
+			$password,
+		);
+		$responseBody = json_decode($response->getBody()->getContents(), true);
+		foreach ($responseBody["value"] as $value) {
+			if (isset($value["name"]) && $value["name"] === $share) {
+				$itemId = $value["id"];
+				$driveId = $value["parentReference"]["id"];
+			}
+		}
+		$url = self::getBetaFullUrl($baseUrl, "drives/$driveId/items/$itemId");
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }

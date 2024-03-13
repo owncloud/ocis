@@ -2536,6 +2536,7 @@ class GraphContext implements Context {
 				$credentials['password']
 			)
 		);
+		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 
 	/**
@@ -2622,5 +2623,38 @@ class GraphContext implements Context {
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
+	}
+
+	/**
+	 * send request to decline accepted share
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return ResponseInterface
+	 */
+	public function declineShares($user, string $resource) {
+		$resource = ltrim($resource, '/');
+		return GraphHelper::declineShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$resource
+		);
+	}
+
+	/**
+	 * @When user :user declines share :share using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userDeclinesShareUsingTheGraphApi($user, $share) {
+		$this->featureContext->setResponse($this->declineShares($user, $share));
+		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 }
