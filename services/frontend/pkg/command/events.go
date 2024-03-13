@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -171,48 +171,52 @@ func getMountpoint(ctx context.Context, l log.Logger, itemid *provider.ResourceI
 	// we need to sort the received shares by mount point in order to make things easier to evaluate.
 	base := path.Base(info.GetPath())
 	mount := base
-	mountedShares := make([]*collaboration.ReceivedShare, 0, len(lrs.Shares))
+	mounts := make([]string, 0, len(lrs.Shares))
+	var exists bool
+
 	for _, s := range lrs.Shares {
 		if s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
 			// we don't care about unaccepted shares
 			continue
 		}
 
-		if utils.ResourceIDEqual(s.Share.ResourceId, itemid) {
+		if utils.ResourceIDEqual(s.GetShare().GetResourceId(), itemid) {
 			// a share to the same resource already exists and is mounted
-			return s.MountPoint.Path, nil
+			return s.GetMountPoint().GetPath(), nil
 		}
 
-		mountedShares = append(mountedShares, s)
-	}
-
-	sort.Slice(mountedShares, func(i, j int) bool {
-		return mountedShares[i].MountPoint.Path > mountedShares[j].MountPoint.Path
-	})
-
-	// now we have a list of shares, we want to iterate over all of them and check for name collisions
-	for i, ms := range mountedShares {
-		if ms.MountPoint.Path == mount {
+		if s.GetMountPoint().GetPath() == mount {
 			// does the shared resource still exist?
 			gwc, err := gatewaySelector.Next()
 			if err != nil {
 				l.Error().Err(err).Msg("cannot get gateway client")
 				continue
 			}
-			_, err = utils.GetResourceByID(ctx, ms.Share.ResourceId, gwc)
+			_, err = utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
 			if err == nil {
-				// The mount point really already exists, we need to insert a number into the filename
-				ext := filepath.Ext(base)
-				name := strings.TrimSuffix(base, ext)
-				// be smart about .tar.(gz|bz) files
-				if strings.HasSuffix(name, ".tar") {
-					name = strings.TrimSuffix(name, ".tar")
-					ext = ".tar" + ext
-				}
-
-				mount = fmt.Sprintf("%s (%s)%s", name, strconv.Itoa(i+1), ext)
+				exists = true
 			}
 			// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
+		}
+		// collect all mount points
+		mounts = append(mounts, s.GetMountPoint().GetPath())
+	}
+
+	// If the mount point really already exists, we need to insert a number into the filename
+	if exists {
+		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
+		for i := 1; i <= len(mounts)+1; i++ {
+			ext := filepath.Ext(base)
+			name := strings.TrimSuffix(base, ext)
+			// be smart about .tar.(gz|bz) files
+			if strings.HasSuffix(name, ".tar") {
+				name = strings.TrimSuffix(name, ".tar")
+				ext = ".tar" + ext
+			}
+			mount = name + " (" + strconv.Itoa(i) + ")" + ext
+			if !slices.Contains(mounts, mount) {
+				return mount, nil
+			}
 		}
 	}
 	return mount, nil
