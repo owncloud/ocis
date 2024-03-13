@@ -27,7 +27,6 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
 		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
 		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
-		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceViewer, rConversions.NewSpaceViewerRole(), unifiedrole.NewSpaceViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
@@ -53,7 +52,6 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), true),
 		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), true),
 		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), true),
-		Entry(rConversions.RoleCoowner, rConversions.NewCoownerRole(), unifiedrole.NewCoownerUnifiedRole(), true),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), true),
 		Entry("no match", rConversions.NewFileEditorRole(true), unifiedrole.NewManagerUnifiedRole(), false),
 	)
@@ -218,7 +216,6 @@ var _ = Describe("unifiedroles", func() {
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSpaceViewerUnifiedRole(),
 					unifiedrole.NewSpaceEditorUnifiedRole(),
-					unifiedrole.NewCoownerUnifiedRole(),
 					unifiedrole.NewManagerUnifiedRole(),
 				},
 			),

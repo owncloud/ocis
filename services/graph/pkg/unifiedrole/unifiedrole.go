@@ -23,8 +23,6 @@ const (
 	UnifiedRoleSpaceEditorID = "58c63c02-1d89-4572-916a-870abc5a1b7d"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
-	// UnifiedRoleCoownerID Unified role coowner id.
-	UnifiedRoleCoownerID = "3a4ba8e9-6a0d-4235-9140-0e7a34007abe"
 	// UnifiedRoleUploaderID Unified role uploader id.
 	UnifiedRoleUploaderID = "1c996275-f1c9-4e71-abdf-a42f6495e960"
 	// UnifiedRoleManagerID Unified role manager id.
@@ -143,23 +141,6 @@ func NewFileEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-// NewCoownerUnifiedRole creates a coowner role.
-func NewCoownerUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewCoownerRole()
-	return &libregraph.UnifiedRoleDefinition{
-		Id:          proto.String(UnifiedRoleCoownerID),
-		Description: proto.String("Grants co-owner permissions on a resource"),
-		DisplayName: displayName(r),
-		RolePermissions: []libregraph.UnifiedRolePermission{
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionOwner),
-			},
-		},
-		LibreGraphWeight: proto.Int32(0),
-	}
-}
-
 // NewUploaderUnifiedRole creates an uploader role
 func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewUploaderRole()
@@ -214,7 +195,6 @@ func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefin
 		NewEditorUnifiedRole(resharing),
 		NewSpaceEditorUnifiedRole(),
 		NewFileEditorUnifiedRole(resharing),
-		NewCoownerUnifiedRole(),
 		NewUploaderUnifiedRole(),
 		NewManagerUnifiedRole(),
 	}
@@ -463,8 +443,6 @@ func displayName(role *conversions.Role) *string {
 		displayName = "Space Editor"
 	case conversions.RoleFileEditor:
 		displayName = "File Editor"
-	case conversions.RoleCoowner:
-		displayName = "Co Owner"
 	case conversions.RoleUploader:
 		displayName = "Uploader"
 	case conversions.RoleManager:

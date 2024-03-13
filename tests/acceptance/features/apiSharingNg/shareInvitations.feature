@@ -1037,7 +1037,6 @@ Feature: Send a sharing invitations
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
       | Editor           | FolderToShare  |
-      | Co Owner         | FolderToShare  |
       | Uploader         | FolderToShare  |
       | Manager          | FolderToShare  |
 
@@ -1546,11 +1545,9 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-role | path           |
-      | Co Owner         | /textfile1.txt |
       | Manager          | /textfile1.txt |
       | Space Viewer     | /textfile1.txt |
       | Space Editor     | /textfile1.txt |
-      | Co Owner         | FolderToShare  |
       | Manager          | FolderToShare  |
       | Space Viewer     | FolderToShare  |
       | Space Editor     | FolderToShare  |
@@ -1728,7 +1725,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
@@ -1775,7 +1771,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
@@ -1823,7 +1818,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
@@ -1908,7 +1902,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
@@ -1961,7 +1954,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
@@ -2015,7 +2007,6 @@ Feature: Send a sharing invitations
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Co Owner         |
       | Manager          |
 
 
