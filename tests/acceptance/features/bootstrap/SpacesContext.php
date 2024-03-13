@@ -3596,8 +3596,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" using the WebDAV API$/
-	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
 	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -3611,7 +3610,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?string $folderDepth = "0"): void {
+	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?string $folderDepth = "1"): void {
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
 		);
@@ -3639,7 +3638,7 @@ class SpacesContext implements Context {
 			$headers[$row['header']] = $row ['value'];
 		}
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers)
+			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers, '0')
 		);
 	}
 
@@ -3655,7 +3654,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws JsonException
 	 */
-	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = [], ?string $folderDepth = "0"): ResponseInterface {
+	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = [], ?string $folderDepth = "1"): ResponseInterface {
 		$this->setSpaceIDByName($user, $spaceName);
 		$properties = [
 			'oc:id',

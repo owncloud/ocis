@@ -15,7 +15,7 @@ Feature: lock files
     When user "Alice" locks file "textfile.txt" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -37,7 +37,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-5000 |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -59,7 +59,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -100,7 +100,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
-    When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a space "Project" with these key and value pairs:
       | key                                                  | value        |
@@ -127,7 +127,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
-    When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a space "Project" with these key and value pairs:
       | key                                                  | value        |
@@ -168,7 +168,7 @@ Feature: lock files
     When user "Brian" locks file "/Shares/textfile.txt" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -192,7 +192,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -229,7 +229,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "423"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
@@ -250,7 +250,7 @@ Feature: lock files
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "423"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a space "Alice Hansen" with these key and value pairs:
       | key                                                  | value        |
