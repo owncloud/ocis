@@ -1252,15 +1252,16 @@ class FeatureContext extends BehatVariablesContext {
 		$propNames = $schemaObj->getPropertyNames();
 		$props = $schemaObj->getProperties();
 		foreach ($propNames as $propName) {
-			switch ($props->type) {
+			$schema = $props->$propName;
+			switch ($schema->type) {
 				case "array":
-					$this->validateSchemaArray($props->$propName);
+					$this->validateSchemaArray($schema);
 					break;
 				default:
 					break;
 			}
 			// traverse for nested properties
-			$this->validateSchemaObject($props->$propName);
+			$this->validateSchemaObject($schema);
 		}
 	}
 
@@ -1318,12 +1319,11 @@ class FeatureContext extends BehatVariablesContext {
 								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one elements");
 							}
 							Assert::fail("'$validator' should be an object not an array");
-							break;
 						}
 						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
 						Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
 						Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
-						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "There are more 'oneOf' elements than expected by 'maxItems'");
+						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf));
 					}
 					Assert::assertTrue(\is_object($value), "'$validator' should be an object when expecting 1 element");
 					break;
