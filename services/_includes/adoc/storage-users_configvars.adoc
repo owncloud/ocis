@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-13-08-02-04]
+[#deprecation-note-2024-03-13-08-20-43]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -756,7 +756,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++86400 ++
 a| [subs=-attributes]
-the time after which the token for upload postprocessing expires
+The time after which the token for upload postprocessing expires
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `STORAGE_USERS_EVENTS_ENDPOINT` +
