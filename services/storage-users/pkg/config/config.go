@@ -102,6 +102,7 @@ type Drivers struct {
 	OCIS        OCISDriver        `yaml:"ocis"`
 	S3NG        S3NGDriver        `yaml:"s3ng"`
 	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
+	Posix       PosixDriver       `yaml:"posix"`
 
 	S3    S3Driver    `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -184,6 +185,19 @@ type OwnCloudSQLDriver struct {
 	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0"`
 	DBName                string `yaml:"db_name" env:"STORAGE_USERS_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0"`
 	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT" desc:"Endpoint of the users provider." introductionVersion:"pre5.0"`
+}
+
+// PosixDriver is the storage driver configuration when using 'posix' storage driver
+type PosixDriver struct {
+	// Root is the absolute path to the location of the data
+	Root                string `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud."`
+	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_POSIX_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
+	ProjectLayout       string `yaml:"project_layout" env:"STORAGE_USERS_POSIX_PROJECT_LAYOUT" desc:"Template string for the project spaces storage layout."`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'."`
+
+	WatchType               string `yaml:"watch_type" env:"STORAGE_USERS_POSIX_WATCH_TYPE" desc:"Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default) and 'gpfsfileauditlogging'."`
+	WatchPath               string `yaml:"watch_path" env:"STORAGE_USERS_POSIX_WATCH_PATH" desc:"Path to the watch directory/file. Only applies to the 'gpfsfileauditlogling' watcher, in which case it is the path of the file audit log file."`
+	WatchFolderKafkaBrokers string `yaml:"watch_folder_kafka_hosts" env:"STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS" desc:"Comma-separate list of kafka brokers to connect to to read the watchfolder events from."`
 }
 
 // Events combines the configuration options for the event bus.

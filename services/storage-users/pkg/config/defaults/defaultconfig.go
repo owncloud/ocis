@@ -136,6 +136,11 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor:    30,
 				AsyncUploads:               true,
 			},
+			Posix: config.PosixDriver{
+				UserLayout:          "users/{{.User.Username}}",
+				ProjectLayout:       "projects/{{.SpaceId}}",
+				PermissionsEndpoint: "com.owncloud.api.settings",
+			},
 		},
 		Events: config.Events{
 			Addr:      "127.0.0.1:9233",
