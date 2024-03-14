@@ -916,6 +916,7 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 			} else {
 				identitySet.SetUser(identity)
 			}
+			p.SetId(identitySetToSpacePermissionID(identitySet))
 			p.SetGrantedToV2(identitySet)
 		}
 

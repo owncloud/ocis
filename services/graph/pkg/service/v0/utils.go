@@ -131,6 +131,21 @@ func groupIdToIdentity(ctx context.Context, cache identity.IdentityCache, groupI
 	return identity, err
 }
 
+// identitySetToSpacePermissionID generates an Id for a permission from an identitySet. In libregraph
+// permissions need to have an id. For user share permission we just use the cs3 share id as the permission-id
+// As permissions on space to not map to a cs3 share we need something else of the ids. So we just
+// construct the id for the id of the user or group that the permission applies to and prefix that
+// with a "u:" for userids and "g:" for group ids.
+func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet) (id string) {
+	switch {
+	case identitySet.HasUser():
+		id = "u:" + identitySet.User.GetId()
+	case identitySet.HasGroup():
+		id = "g:" + identitySet.Group.GetId()
+	}
+	return id
+}
+
 func cs3ReceivedSharesToDriveItems(ctx context.Context,
 	logger *log.Logger,
 	gatewayClient gateway.GatewayAPIClient,
