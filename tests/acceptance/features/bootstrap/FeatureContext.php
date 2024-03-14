@@ -1401,6 +1401,34 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" sends HTTP method "([^"]*)" to URL "([^"]*)" with headers$/
+	 *
+	 * @param string $user
+	 * @param string $verb
+	 * @param string $url
+	 * @param string $headersTable
+	 *
+	 * @return void
+	 */
+	public function userSendsHTTPMethodToUrlWithHeaders(string $user, string $verb, string $url, TableNode $headersTable): void {
+		$this->verifyTableNodeColumns(
+			$headersTable,
+			['header', 'value']
+		);
+
+		$user = $this->getActualUsername($user);
+		$url = $this->substituteInLineCodes($url, $user);
+		$url = "/" . \ltrim(\str_replace($this->getBaseUrl(), "", $url), "/");
+
+		$headers = [];
+		foreach ($headersTable as $row) {
+			$headers[$row['header']] = $row['value'];
+		}
+		$response = $this->sendingToWithDirectUrl($user, $verb, $url, null, null, $headers);
+		$this->setResponse($response);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has sent HTTP method "([^"]*)" to URL "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1463,18 +1491,19 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string|null $url
 	 * @param string|null $body
 	 * @param string|null $password
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, string $body = null, ?string $password = null): ResponseInterface {
+	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, string $body = null, ?string $password = null, ?array $headers=null): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . $url;
 
 		if ($password === null) {
 			$password = $this->getPasswordForUser($user);
 		}
 
-		$headers = $this->guzzleClientHeaders;
+		$reqHeaders = $this->guzzleClientHeaders;
 
 		$config = null;
 		if ($this->sourceIpAddress !== null) {
@@ -1491,7 +1520,11 @@ class FeatureContext extends BehatVariablesContext {
 		}
 
 		if (isset($this->requestToken)) {
-			$headers['requesttoken'] = $this->requestToken;
+			$reqHeaders['requesttoken'] = $this->requestToken;
+		}
+
+		if ($headers) {
+			$reqHeaders = \array_merge($headers, $reqHeaders);
 		}
 
 		return HttpRequestHelper::sendRequest(
@@ -1500,7 +1533,7 @@ class FeatureContext extends BehatVariablesContext {
 			$verb,
 			$user,
 			$password,
-			$headers,
+			$reqHeaders,
 			$body,
 			$config,
 			$cookies
@@ -3001,6 +3034,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getEtagRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%tus_upload_location%",
+				"function" => [
+					$this->tusContext,
+					"getTusResourceLocation"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
@@ -3402,10 +3443,13 @@ class FeatureContext extends BehatVariablesContext {
 		// that calls BasicStructure.php
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
+		$this->tusContext = new TusContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
+		$this->tusContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
+		$environment->registerContext($this->tusContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();

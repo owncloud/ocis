@@ -120,7 +120,6 @@ Feature: CORS headers
       | Access-Control-Allow-Origin | https://aphno.badal |
     And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "01234"
 
-
   @issue-8380
   Scenario: uploading file using Tus using different CORS headers
     Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
@@ -134,3 +133,28 @@ Feature: CORS headers
       | Upload-Checksum | MD5 4100c4d44da9177247e44a5fc1546778 |
       | Upload-Offset   | 0                                    |
     Then the HTTP status code should be "403"
+
+  @issue-8380
+  Scenario Outline: CORS headers should be returned when an preflight request is sent with Tus upload
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+      | Upload-Length   | 5                         |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    When user "Alice" sends HTTP method "OPTIONS" to URL "<endpoint>" with headers
+      | header                         | value                                                                                                                                                                                                                                                                                                                                                 |
+      | Origin                         | https://aphno.badal                                                                                                                                                                                                                                                                                                                                   |
+      | Access-Control-Request-Headers | Origin, Accept, Content-Type, Depth, Authorization, Ocs-Apirequest, If-None-Match, If-Match, Destination, Overwrite, X-Request-Id, X-Requested-With, Tus-Resumable, Tus-Checksum-Algorithm, Upload-Concat, Upload-Length, Upload-Metadata, Upload-Defer-Length, Upload-Expires, Upload-Checksum, Upload-Offset, X-Http-Method-Override, Cache-Control |
+      | Access-Control-Request-Method  | <request_method>                                                                                                                                                                                                                                                                                                                                      |
+    And the HTTP status code should be "204"
+    And the following headers should be set
+      | header                       | value                                                                                                                                                                                                                                                                                                                                                 |
+      | Access-Control-Allow-Headers | Origin, Accept, Content-Type, Depth, Authorization, Ocs-Apirequest, If-None-Match, If-Match, Destination, Overwrite, X-Request-Id, X-Requested-With, Tus-Resumable, Tus-Checksum-Algorithm, Upload-Concat, Upload-Length, Upload-Metadata, Upload-Defer-Length, Upload-Expires, Upload-Checksum, Upload-Offset, X-Http-Method-Override, Cache-Control |
+      | Access-Control-Allow-Origin  | https://aphno.badal                                                                                                                                                                                                                                                                                                                                   |
+      | Access-Control-Allow-Methods | <request_method>                                                                                                                                                                                                                                                                                                                                     |
+    Examples:
+      | endpoint               | request_method |
+      | /%tus_upload_location% | PUT            |
+      | /%tus_upload_location% | POST           |
+      | /%tus_upload_location% | HEAD           |
+      | /%tus_upload_location% | PATCH          |
