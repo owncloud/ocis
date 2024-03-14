@@ -136,10 +136,8 @@ Feature: Tag
       | space-role | resource-type | resource                       | http-status-code | should-or-not |
       | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should not    |
       | editor     | file          | folderMain/insideTheFolder.txt | 200              | should        |
-      | manager    | file          | folderMain/insideTheFolder.txt | 200              | should        |
       | viewer     | folder        | folderMain                     | 403              | should not    |
       | editor     | folder        | folderMain                     | 200              | should        |
-      | manager    | folder        | folderMain                     | 200              | should        |
 
 
   Scenario Outline: recipient of the shared resource tries to remove a tag
@@ -163,10 +161,8 @@ Feature: Tag
       | space-role | resource-type | resource                       | http-status-code | should-or-not |
       | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should        |
       | editor     | file          | folderMain/insideTheFolder.txt | 200              | should not    |
-      | manager    | file          | folderMain/insideTheFolder.txt | 200              | should not    |
       | viewer     | folder        | folderMain                     | 403              | should        |
       | editor     | folder        | folderMain                     | 200              | should not    |
-      | manager    | folder        | folderMain                     | 200              | should not    |
 
 
   Scenario: user removes folder tags

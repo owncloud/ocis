@@ -37,11 +37,11 @@ Feature: propfind a shares
     And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
       | key            | value      |
       | oc:name        | <resource> |
-      | oc:permissions | SR         |
+      | oc:permissions | S          |
     And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
       | key            | value        |
       | oc:name        | <resource-2> |
-      | oc:permissions | SR           |
+      | oc:permissions | S            |
     Examples:
       | resource      | resource-2        |
       | textfile.txt  | textfile (1).txt  |
@@ -76,12 +76,12 @@ Feature: propfind a shares
       | key            | value             |
       | oc:fileid      | UUIDof:<resource> |
       | oc:name        | <resource>        |
-      | oc:permissions | SR                |
+      | oc:permissions | S                 |
     And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
       | key            | value               |
       | oc:fileid      | UUIDof:<resource-2> |
       | oc:name        | <resource-2>        |
-      | oc:permissions | SR                  |
+      | oc:permissions | S                   |
     Examples:
       | dav-path-version | resource      | resource-2        |
       | old              | textfile.txt  | textfile (1).txt  |
@@ -114,9 +114,9 @@ Feature: propfind a shares
       | key            | value                    |
       | oc:fileid      | UUIDof:folderToShare (1) |
       | oc:name        | folderToShare            |
-      | oc:permissions | SR                       |
+      | oc:permissions | S                        |
     And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
       | key            | value               |
       | oc:fileid      | UUIDof:textfile.txt |
       | oc:name        | textfile.txt        |
-      | oc:permissions | SR                  |
+      | oc:permissions | S                   |

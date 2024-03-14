@@ -145,26 +145,6 @@ default:
         - WebDavPropertiesContext:
         - OcisConfigContext:
 
-    coreApiShareReshareToShares1:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToShares1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
-    coreApiShareReshareToShares2:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToShares2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
     coreApiShareUpdateToShares:
       paths:
         - "%paths.base%/../features/coreApiShareUpdateToShares"

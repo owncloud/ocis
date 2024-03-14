@@ -24,8 +24,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
 
-- [apiSpacesShares/copySpaces.feature:510](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L510)
-- [apiSpacesShares/copySpaces.feature:523](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L523)
+- [apiSpacesShares/copySpaces.feature:512](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L512)
+- [apiSpacesShares/copySpaces.feature:525](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L525)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -284,6 +284,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:463](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L463)
 - [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
+
+### [Delete resharing tests ](https://github.com/owncloud/ocis/pull/8704)
+- [apiSpacesShares/shareSubItemOfSpace.feature:119](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L119)
+- [apiSpacesShares/shareSubItemOfSpace.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L132)
+- [apiSpacesShares/shareSubItemOfSpace.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L145)
+- [apiSpacesShares/shareSubItemOfSpace.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L156)
 
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

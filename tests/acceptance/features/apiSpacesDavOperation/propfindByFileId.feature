@@ -110,7 +110,7 @@ Feature: propfind a file using file id
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Brian Murphy" with these key and value pairs:
       | key            | value        |
       | oc:name        | textfile.txt |
-      | oc:permissions | SRNVW        |
+      | oc:permissions | SNVW         |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
@@ -128,7 +128,7 @@ Feature: propfind a file using file id
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Brian Murphy" with these key and value pairs:
       | key            | value        |
       | oc:name        | textfile.txt |
-      | oc:permissions | RDNVWZP      |
+      | oc:permissions | DNVW         |
     Examples:
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |

@@ -136,10 +136,10 @@ Feature: sharing
     And as "Alice" file "Shares/TMP" should not exist
 
 
-  Scenario: receiver renames a received share with share, read, change permissions inside the Shares folder
+  Scenario: receiver renames a received share with read, change permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
-    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "share,read,change"
+    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "read,change"
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -151,10 +151,10 @@ Feature: sharing
     But as "Alice" file "/folderToShare/fileInside" should not exist
 
 
-  Scenario: receiver tries to rename a received share with share, read permissions inside the Shares folder
+  Scenario: receiver tries to rename a received share with read permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
-    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "share,read"
+    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "read"
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -205,22 +205,22 @@ Feature: sharing
     But as "Alice" folder "myFolder" should not exist
 
 
-  Scenario: receiver renames a received file share with read,update,share permissions inside the Shares folder in group sharing
+  Scenario: receiver renames a received file share with read,update permissions inside the Shares folder in group sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read,update,share"
+    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read,update"
     When user "Brian" moves folder "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "/Shares/newFile.txt" should not exist
 
 
-  Scenario: receiver renames a received folder share with share, read, change permissions inside the Shares folder in group sharing
+  Scenario: receiver renames a received folder share with read, change permissions inside the Shares folder in group sharing
     Given group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "share,read,change"
+    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "read,change"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -231,18 +231,18 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "share,read"
+    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read"
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "/Shares/newFile.txt" should not exist
 
 
-  Scenario: receiver renames a received folder share with share, read permissions inside the Shares folder in group sharing
+  Scenario: receiver renames a received folder share with read permissions inside the Shares folder in group sharing
     Given group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "share,read"
+    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "read"
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -270,19 +270,19 @@ Feature: sharing
       | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    |
 
   @issue-2141
-  Scenario Outline: receiver renames a received file share to name with special characters with share, read, change permissions in group sharing
+  Scenario Outline: receiver renames a received file share to name with special characters with read, change permissions in group sharing
     Given group "grp1" has been created
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "<sharer-folder>"
     And user "Alice" has created folder "<group-folder>"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<sharer-folder>/fileInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<group-folder>/fileInside"
-    And user "Alice" has shared folder "<sharer-folder>" with user "Brian" with permissions "share,read,change"
+    And user "Alice" has shared folder "<sharer-folder>" with user "Brian" with permissions "read,change"
     When user "Brian" moves folder "/Shares/<sharer-folder>/fileInside" to "/Shares/<sharer-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<sharer-folder>/<receiver_file>" should exist
     And as "Brian" file "/Shares/<sharer-folder>/<receiver_file>" should exist
-    When user "Alice" shares folder "<group-folder>" with group "grp1" with permissions "share,read,change" using the sharing API
+    When user "Alice" shares folder "<group-folder>" with group "grp1" with permissions "read,change" using the sharing API
     And user "Carol" moves folder "/Shares/<group-folder>/fileInside" to "/Shares/<group-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<group-folder>/<receiver_file>" should exist

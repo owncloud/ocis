@@ -271,7 +271,6 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-action |
-      | permissions/create |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -283,10 +282,7 @@ Feature: Send a sharing invitations
       | basic/read         |
       | versions/update    |
       | deleted/update     |
-      | permissions/update |
-      | permissions/delete |
       | deleted/delete     |
-      | permissions/deny   |
 
 
   Scenario Outline: send share invitation for a folder to user with different permissions
@@ -366,7 +362,6 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-action |
-      | permissions/create |
       | children/create    |
       | upload/create      |
       | path/read          |
@@ -380,11 +375,8 @@ Feature: Send a sharing invitations
       | path/update        |
       | versions/update    |
       | deleted/update     |
-      | permissions/update |
       | standard/delete    |
-      | permissions/delete |
       | deleted/delete     |
-      | permissions/deny   |
 
 
   Scenario Outline: send share invitation for a file to group with different permissions
@@ -470,7 +462,6 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-action |
-      | permissions/create |
       | upload/create      |
       | path/read          |
       | quota/read         |
@@ -482,10 +473,7 @@ Feature: Send a sharing invitations
       | basic/read         |
       | versions/update    |
       | deleted/update     |
-      | permissions/update |
-      | permissions/delete |
       | deleted/delete     |
-      | permissions/deny   |
 
 
   Scenario Outline: send share invitation for a folder to group with different permissions
@@ -571,7 +559,6 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-action |
-      | permissions/create |
       | children/create    |
       | upload/create      |
       | path/read          |
@@ -585,11 +572,8 @@ Feature: Send a sharing invitations
       | path/update        |
       | versions/update    |
       | deleted/update     |
-      | permissions/update |
       | standard/delete    |
-      | permissions/delete |
       | deleted/delete     |
-      | permissions/deny   |
 
 
   Scenario Outline: send share invitation with expiration date to user with different roles
@@ -2376,3 +2360,32 @@ Feature: Send a sharing invitations
       | Space Editor     | space type is not eligible for sharing                                                             |
       | Manager          | space type is not eligible for sharing                                                             |
       | Co Owner         | Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag |
+
+
+  Scenario Outline: try to send share invitation with re-sharing permissions
+    Given group "grp1" has been created
+    And user "Alice" has created folder "FolderToShare"
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+    And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource          | textfile1.txt        |
+      | space             | Personal             |
+      | sharee            | grp1                 |
+      | shareType         | group                |
+      | permissionsAction | <permissions-action> |
+    Then the HTTP status code should be "400" 
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource          | FolderToShare        |
+      | space             | Personal             |
+      | sharee            | Brian                |
+      | shareType         | user                 |
+      | permissionsAction | <permissions-action> |
+    Then the HTTP status code should be "400" 
+    Examples:
+      | permissions-action |
+      | permissions/create |
+      | permissions/update |
+      | permissions/delete |
+      | permissions/deny   |

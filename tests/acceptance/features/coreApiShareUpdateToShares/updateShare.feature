@@ -8,26 +8,6 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @smokeTest
-  Scenario Outline: allow modification of reshare
-    Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
-      | username |
-      | Brian    |
-      | Carol    |
-    And user "Alice" has created folder "/TMP"
-    And user "Alice" has shared folder "TMP" with user "Brian"
-    And user "Brian" has shared folder "/Shares/TMP" with user "Carol"
-    When user "Brian" updates the last share using the sharing API with
-      | permissions | read |
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "200"
-    And user "Carol" should not be able to upload file "filesForUpload/textfile.txt" to "/Shares/TMP/textfile.txt"
-    And user "Brian" should be able to upload file "filesForUpload/textfile.txt" to "/Shares/TMP/textfile.txt"
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
 
   @issue-1289 @issue-7555
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
@@ -120,36 +100,6 @@ Feature: sharing
       | 1               | 200              | create,delete |
       | 2               | 400              | create,delete |
 
-  @issue-2201
-  Scenario: share ownership change after moving a shared file outside of an outer share
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | Brian    |
-      | Carol    |
-    And user "Alice" has created folder "/folder1"
-    And user "Alice" has created folder "/folder1/folder2"
-    And user "Brian" has created folder "/moved-out"
-    And user "Alice" has shared folder "/folder1" with user "Brian" with permissions "all"
-    And user "Brian" has shared folder "/Shares/folder1/folder2" with user "Carol" with permissions "all"
-    When user "Brian" moves folder "/Shares/folder1/folder2" to "/moved-out/folder2" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the response when user "Brian" gets the info of the last share should include
-      | id                | A_STRING             |
-      | item_type         | folder               |
-      | item_source       | A_STRING             |
-      | share_type        | user                 |
-      | file_source       | A_STRING             |
-      | file_target       | /Shares/folder2      |
-      | permissions       | all                  |
-      | stime             | A_NUMBER             |
-      | storage           | A_STRING             |
-      | mail_send         | 0                    |
-      | uid_owner         | %username%           |
-      | displayname_owner | %displayname%        |
-      | mimetype          | httpd/unix-directory |
-    And as "Alice" folder "/Shares/folder1/folder2" should not exist
-    And as "Carol" folder "/Shares/folder2" should exist
-
   @issue-2442
   Scenario: share ownership change after moving a shared file to another share
     Given these users have been created with default attributes and without skeleton files:
@@ -162,23 +112,7 @@ Feature: sharing
     And user "Alice" has shared folder "/Alice-folder" with user "Brian" with permissions "all"
     And user "Carol" has shared folder "/Carol-folder" with user "Brian" with permissions "all"
     When user "Brian" moves folder "/Shares/Alice-folder/folder2" to "/Shares/Carol-folder/folder2" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the response when user "Carol" gets the info of the last share should include
-      | id                | A_STRING             |
-      | item_type         | folder               |
-      | item_source       | A_STRING             |
-      | share_type        | user                 |
-      | file_source       | A_STRING             |
-      | file_target       | /Carol-folder        |
-      | permissions       | all                  |
-      | stime             | A_NUMBER             |
-      | storage           | A_STRING             |
-      | mail_send         | 0                    |
-      | uid_owner         | %username%           |
-      | displayname_owner | %displayname%        |
-      | mimetype          | httpd/unix-directory |
-    And as "Alice" folder "/Alice-folder/folder2" should not exist
-    And as "Carol" folder "/Carol-folder/folder2" should exist
+    Then the HTTP status code should be "502"
 
   @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below

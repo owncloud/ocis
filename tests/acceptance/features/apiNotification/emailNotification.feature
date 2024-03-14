@@ -30,7 +30,7 @@ Feature: Email notification
 
   Scenario: user gets an email notification when someone shares a file
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    When user "Alice" shares file "lorem.txt" with user "Brian" with permissions "17" using the sharing API
+    When user "Alice" shares file "lorem.txt" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"

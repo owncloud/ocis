@@ -242,7 +242,7 @@ Feature: Notification
 
   Scenario Outline: get a notification about a file share in various languages
     Given user "Brian" has switched the system language to "<language>" using the <api> API
-    And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
+    And user "Alice" has shared entry "textfile1.txt" with user "Brian"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "<subject>" and the message-details should match
@@ -272,7 +272,7 @@ Feature: Notification
   @env-config
   Scenario: get a notification about a file share in default languages
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
-    And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
+    And user "Alice" has shared entry "textfile1.txt" with user "Brian"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Neue Freigabe" and the message-details should match
