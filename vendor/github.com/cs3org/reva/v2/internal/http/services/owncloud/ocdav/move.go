@@ -162,6 +162,28 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	isParent, err := s.referenceIsChildOf(ctx, s.gatewaySelector, src, dst)
+	if err != nil {
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			w.WriteHeader(http.StatusNotFound)
+		case errtypes.IsNotSupported:
+			log.Error().Err(err).Msg("can not detect recursive move operation. missing machine auth configuration?")
+			w.WriteHeader(http.StatusForbidden)
+		default:
+			log.Error().Err(err).Msg("error while trying to detect recursive move operation")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if isParent {
+		w.WriteHeader(http.StatusConflict)
+		b, err := errors.Marshal(http.StatusBadRequest, "can not move a folder into its parent", "")
+		errors.HandleWebdavError(&log, w, b, err)
+		return
+
+	}
+
 	oh := r.Header.Get(net.HeaderOverwrite)
 	log.Debug().Str("overwrite", oh).Msg("move")
 
