@@ -51,6 +51,7 @@ func Migrate(cfg *config.Config) *cli.Command {
 			MigrateShares(cfg),
 			MigratePublicShares(cfg),
 			RebuildJSONCS3Indexes(cfg),
+			StartMigrationAPI(cfg),
 		},
 	}
 }
