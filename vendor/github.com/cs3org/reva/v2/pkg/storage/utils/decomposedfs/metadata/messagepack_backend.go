@@ -21,6 +21,7 @@ package metadata
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -151,10 +152,11 @@ func (b MessagePackBackend) saveAttributes(ctx context.Context, path string, set
 		_, subspan := tracer.Start(ctx, "lockedfile.OpenFile")
 		f, err = lockedfile.OpenFile(lockPath, os.O_RDWR|os.O_CREATE, 0600)
 		subspan.End()
+		if err != nil {
+			fmt.Println("Error opening lock file", lockPath, err) // make sure error is logged
+			return err
+		}
 		defer f.Close()
-	}
-	if err != nil {
-		return err
 	}
 
 	// Read current state
