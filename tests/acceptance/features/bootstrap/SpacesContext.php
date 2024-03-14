@@ -3596,7 +3596,26 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" using the WebDAV API$/
 	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param ?string $folderDepth
+	 *
+	 * @return void
+	 *
+	 * @throws JsonException
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userSendsPropfindRequestToSpaceUsingTheWebdavApi(string $user, string $spaceName, ?string $folderDepth = "1"): void {
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToSpace($user, $spaceName, "", null, $folderDepth)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -3610,7 +3629,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?string $folderDepth = "1"): void {
+	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, ?string $resource = "", ?string $folderDepth = "1"): void {
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
 		);
