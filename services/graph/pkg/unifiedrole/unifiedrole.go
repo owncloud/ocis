@@ -215,9 +215,10 @@ func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefin
 // GetApplicableRoleDefinitionsForActions returns a list of role definitions
 // that match the provided actions and constraints
 func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, resharing, descending bool) []*libregraph.UnifiedRoleDefinition {
-	var definitions []*libregraph.UnifiedRoleDefinition
+	builtin := GetBuiltinRoleDefinitionList(resharing)
+	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
-	for _, definition := range GetBuiltinRoleDefinitionList(resharing) {
+	for _, definition := range builtin {
 		definitionMatch := true
 
 		for _, permission := range definition.GetRolePermissions() {
