@@ -17,6 +17,7 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -1156,6 +1157,7 @@ var _ = Describe("Driveitems", func() {
 			listSharesResponse       *collaboration.ListSharesResponse
 			listPublicSharesMock     *mock.Call
 			listPublicSharesResponse *link.ListPublicSharesResponse
+			rctx                     *chi.Context
 		)
 
 		toResourceID := func(in string) *provider.ResourceId {
@@ -1166,10 +1168,7 @@ var _ = Describe("Driveitems", func() {
 		}
 
 		BeforeEach(func() {
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("driveID", "1$2")
-			rctx.URLParams.Add("itemID", "1$2!3")
-
+			rctx = chi.NewRouteContext()
 			ctx = context.WithValue(ctx, chi.RouteCtxKey, rctx)
 			ctx = revactx.ContextSetUser(ctx, currentUser)
 
@@ -1210,6 +1209,9 @@ var _ = Describe("Driveitems", func() {
 		})
 
 		It("lists permissions", func() {
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+
 			svc.ListPermissions(
 				rr,
 				httptest.NewRequest(http.MethodGet, "/", nil).
@@ -1230,6 +1232,62 @@ var _ = Describe("Driveitems", func() {
 			Expect(value.Get("#").Num).To(Equal(float64(1)))
 			Expect(value.Get("0.id").Str).To(Equal("123"))
 		})
+		It("lists permissions on a storage space", func() {
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!2")
+			statResponse.Info.Id.OpaqueId = "2"
+			grantMap := map[string]*provider.ResourcePermissions{
+				"userid": roleconversions.NewSpaceViewerRole().CS3ResourcePermissions(),
+			}
+			grantMapJSON, _ := json.Marshal(grantMap)
+			spaceOpaque := &types.Opaque{
+				Map: map[string]*types.OpaqueEntry{
+					"grants": {
+						Decoder: "json",
+						Value:   grantMapJSON,
+					},
+				},
+			}
+
+			listSpacesMock := gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything)
+			listSpacesResponse := &provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id: &provider.StorageSpaceId{
+							OpaqueId: "2",
+						},
+						Opaque: spaceOpaque,
+					},
+				},
+			}
+			listSpacesMock.Return(listSpacesResponse, nil)
+
+			getUserMock := gatewayClient.On("GetUser", mock.Anything, mock.Anything)
+			getUserMockResponse := &userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id:          &userpb.UserId{OpaqueId: "userid"},
+					DisplayName: "Test User",
+				},
+			}
+			getUserMock.Return(getUserMockResponse, nil)
+
+			svc.ListPermissions(
+				rr,
+				httptest.NewRequest(http.MethodGet, "/", nil).
+					WithContext(ctx),
+			)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			p := libregraph.NewCollectionOfPermissions()
+			err := json.Unmarshal(rr.Body.Bytes(), p)
+			Expect(err).To(BeNil())
+			permissions := p.GetValue()
+			Expect(len(permissions)).To(Equal(1))
+			Expect(permissions[0].GetId()).ToNot(Equal(""))
+		})
+
 	})
 
 	Describe("GetRootDriveChildren", func() {
