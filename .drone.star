@@ -1957,6 +1957,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "OCIS_EVENTS_ENABLE_TLS": False,
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+        "OCIS_ENABLE_RESHARING": True,
     }
 
     if deploy_type == "":
