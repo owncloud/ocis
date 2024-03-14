@@ -169,6 +169,7 @@ class FeatureContext extends BehatVariablesContext {
 	private array $guzzleClientHeaders = [];
 	public OCSContext $ocsContext;
 	public AuthContext $authContext;
+	public TUSContext $tusContext;
 	public GraphContext $graphContext;
 	public SpacesContext $spacesContext;
 	private array $initialTrustedServer;
@@ -1397,7 +1398,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
 		$url = $this->substituteInLineCodes($url, $user);
-		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null));
+		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url));
 	}
 
 	/**
@@ -1486,9 +1487,9 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string|null $user
-	 * @param string|null $verb
-	 * @param string|null $url
+	 * @param string $user
+	 * @param string $verb
+	 * @param string $url
 	 * @param string|null $body
 	 * @param string|null $password
 	 * @param array|null $headers
@@ -1496,7 +1497,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendingToWithDirectUrl(?string $user, ?string $verb, ?string $url, string $body = null, ?string $password = null, ?array $headers=null): ResponseInterface {
+	public function sendingToWithDirectUrl(string $user, string $verb, string $url, ?string $body = null, ?string $password = null, ?array $headers = null): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . $url;
 
 		if ($password === null) {
@@ -3443,7 +3444,7 @@ class FeatureContext extends BehatVariablesContext {
 		// that calls BasicStructure.php
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
-		$this->tusContext = new TusContext();
+		$this->tusContext = new TUSContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
 		$this->tusContext->setUpScenario($scope);

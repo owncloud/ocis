@@ -135,7 +135,7 @@ Feature: CORS headers
     Then the HTTP status code should be "403"
 
   @issue-8380
-  Scenario Outline: CORS headers should be returned when an preflight request is sent with Tus upload
+  Scenario Outline: CORS headers should be returned when an preflight request is sent to Tus upload
     Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
@@ -151,7 +151,7 @@ Feature: CORS headers
       | header                       | value                                                                                                                                                                                                                                                                                                                                                 |
       | Access-Control-Allow-Headers | Origin, Accept, Content-Type, Depth, Authorization, Ocs-Apirequest, If-None-Match, If-Match, Destination, Overwrite, X-Request-Id, X-Requested-With, Tus-Resumable, Tus-Checksum-Algorithm, Upload-Concat, Upload-Length, Upload-Metadata, Upload-Defer-Length, Upload-Expires, Upload-Checksum, Upload-Offset, X-Http-Method-Override, Cache-Control |
       | Access-Control-Allow-Origin  | https://aphno.badal                                                                                                                                                                                                                                                                                                                                   |
-      | Access-Control-Allow-Methods | <request_method>                                                                                                                                                                                                                                                                                                                                     |
+      | Access-Control-Allow-Methods | <request_method>                                                                                                                                                                                                                                                                                                                                      |
     Examples:
       | endpoint               | request_method |
       | /%tus_upload_location% | PUT            |

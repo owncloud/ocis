@@ -43,7 +43,7 @@ class TUSContext implements Context {
 	private ?string $resourceLocation = null;
 
 	/**
-	 * @return string|null
+	 * @return string
 	 */
 	public function getTusResourceLocation(): string {
 		return $this->resourceLocation ?: "";
