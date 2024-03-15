@@ -105,7 +105,7 @@ drivers:
     endpoint: ""
     bucket: ""
     put_object_disable_content_sha254: false
-    put_object_disable_multipart: false
+    put_object_disable_multipart: true
     put_object_send_content_md5: true
     put_object_concurrent_stream_parts: true
     put_object_num_threads: 4

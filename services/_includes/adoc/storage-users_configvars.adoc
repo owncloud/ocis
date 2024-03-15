@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-15-10-16-49]
+[#deprecation-note-2024-03-15-16-56-11]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -547,7 +547,7 @@ a|`STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART` +
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++false ++
+++true ++
 a| [subs=-attributes]
 Disable multipart uploads when copying objects to S3
 
