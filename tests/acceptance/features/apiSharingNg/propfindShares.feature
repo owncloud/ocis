@@ -10,7 +10,7 @@ Feature: propfind a shares
       | Brian    |
       | Carol    |
 
-
+  @issue-4421
   Scenario: sharee PROPFIND a shares when multiple user shares resources with same name
     Given user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
