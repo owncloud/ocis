@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -50,11 +51,10 @@ program will be to call one of the Serve methods.
 Calling ServeBackground will CORRECTLY start the supervisor running in a
 new goroutine. It is risky to directly run
 
-  go supervisor.Serve()
+	go supervisor.Serve()
 
 because that will briefly create a race condition as it starts up, if you
 try to .Add() services immediately afterward.
-
 */
 type Supervisor struct {
 	Name string
@@ -97,7 +97,6 @@ type Supervisor struct {
 }
 
 /*
-
 New is the full constructor function for a supervisor.
 
 The name is a friendly human name for the supervisor, used in logging. Suture
@@ -105,21 +104,26 @@ does not care if this is unique, but it is good for your sanity if it is.
 
 If not set, the following values are used:
 
- * EventHook:         A function is created that uses log.Print.
- * FailureDecay:      30 seconds
- * FailureThreshold:  5 failures
- * FailureBackoff:    15 seconds
- * Timeout:           10 seconds
- * BackoffJitter:     DefaultJitter
+  - EventHook:         A function is created that uses log.Print.
+  - FailureDecay:      30 seconds
+  - FailureThreshold:  5 failures
+  - FailureBackoff:    15 seconds
+  - Timeout:           10 seconds
+  - BackoffJitter:     DefaultJitter
 
 The EventHook function will be called when errors occur. Suture will log the
 following:
 
- * When a service has failed, with a descriptive message about the
-   current backoff status, and whether it was immediately restarted
- * When the supervisor has gone into its backoff mode, and when it
-   exits it
- * When a service fails to stop
+  - When a service has failed, with a descriptive message about the
+    current backoff status, and whether it was immediately restarted
+  - When the supervisor has gone into its backoff mode, and when it
+    exits it
+  - When a service fails to stop
+
+A slog-based EventHook is provided in the submodule sutureslog. Note
+that it is a separate Go module, in order to avoid imposing a Go 1.21
+requirement on this module, so a separate go get step will be
+necessary to use it.
 
 The failureRate, failureThreshold, and failureBackoff controls how failures
 are handled, in order to avoid the supervisor failure case where the
@@ -145,7 +149,6 @@ DontPropagateTermination indicates whether this supervisor tree will
 propagate a ErrTerminateTree if a child process returns it. If false,
 this supervisor will itself return an error that will terminate its
 parent. If true, it will merely return ErrDoNotRestart. false by default.
-
 */
 func New(name string, spec Spec) *Supervisor {
 	spec.configureDefaults(name)
@@ -254,7 +257,6 @@ supervisor being added will copy the EventHook function from the Supervisor it
 is being added to. This allows factoring out providing a Supervisor
 from its logging. This unconditionally overwrites the child Supervisor's
 logging functions.
-
 */
 func (s *Supervisor) Add(service Service) ServiceToken {
 	if s == nil {
@@ -277,7 +279,7 @@ func (s *Supervisor) Add(service Service) ServiceToken {
 		s.restartQueue = append(s.restartQueue, id)
 
 		s.m.Unlock()
-		return ServiceToken{uint64(s.id)<<32 | uint64(id)}
+		return ServiceToken{supervisor: s.id, service: id}
 	}
 	s.m.Unlock()
 
@@ -285,7 +287,7 @@ func (s *Supervisor) Add(service Service) ServiceToken {
 	if s.sendControl(addService{service, serviceName(service), response}) != nil {
 		return ServiceToken{}
 	}
-	return ServiceToken{uint64(s.id)<<32 | uint64(<-response)}
+	return ServiceToken{supervisor: s.id, service: <-response}
 }
 
 // ServeBackground starts running a supervisor in its own goroutine. When
@@ -652,7 +654,7 @@ SHUTTING_DOWN_SERVICES:
 				SupervisorPath: []*Supervisor{s},
 				Service:        serviceWithName.Service,
 				Name:           serviceWithName.name,
-				ServiceToken:   ServiceToken{uint64(s.id)<<32 | uint64(serviceID)},
+				ServiceToken:   ServiceToken{supervisor: s.id, service: serviceID},
 			})
 		}
 		s.m.Lock()
@@ -694,11 +696,10 @@ The ServiceID token comes from the Add() call. This returns without waiting
 for the service to stop.
 */
 func (s *Supervisor) Remove(id ServiceToken) error {
-	sID := supervisorID(id.id >> 32)
-	if sID != s.id {
+	if id.supervisor != s.id {
 		return ErrWrongSupervisor
 	}
-	err := s.sendControl(removeService{serviceID(id.id & 0xffffffff), nil})
+	err := s.sendControl(removeService{id.service, nil})
 	if err == ErrSupervisorNotRunning {
 		// No meaningful error handling if the supervisor is stopped.
 		return nil
@@ -717,8 +718,7 @@ passes, ErrTimeout is returned. (If this isn't even the right supervisor
 ErrWrongSupervisor is returned.)
 */
 func (s *Supervisor) RemoveAndWait(id ServiceToken, timeout time.Duration) error {
-	sID := supervisorID(id.id >> 32)
-	if sID != s.id {
+	if id.supervisor != s.id {
 		return ErrWrongSupervisor
 	}
 
@@ -732,7 +732,7 @@ func (s *Supervisor) RemoveAndWait(id ServiceToken, timeout time.Duration) error
 
 	notificationC := make(chan struct{})
 
-	sentControlErr := s.sendControl(removeService{serviceID(id.id & 0xffffffff), notificationC})
+	sentControlErr := s.sendControl(removeService{id.service, notificationC})
 
 	if sentControlErr != nil {
 		return sentControlErr
@@ -756,10 +756,8 @@ func (s *Supervisor) RemoveAndWait(id ServiceToken, timeout time.Duration) error
 }
 
 /*
-
 Services returns a []Service containing a snapshot of the services this
 Supervisor is managing.
-
 */
 func (s *Supervisor) Services() []Service {
 	ls := listServices{make(chan []Service)}
@@ -770,20 +768,17 @@ func (s *Supervisor) Services() []Service {
 	return nil
 }
 
-var currentSupervisorIDL sync.Mutex
 var currentSupervisorID uint32
 
 func nextSupervisorID() supervisorID {
-	currentSupervisorIDL.Lock()
-	defer currentSupervisorIDL.Unlock()
-	currentSupervisorID++
-	return supervisorID(currentSupervisorID)
+	return supervisorID(atomic.AddUint32(&currentSupervisorID, 1))
 }
 
 // ServiceToken is an opaque identifier that can be used to terminate a service that
 // has been Add()ed to a Supervisor.
 type ServiceToken struct {
-	id uint64
+	supervisor supervisorID
+	service    serviceID
 }
 
 // An UnstoppedService is the component member of an
