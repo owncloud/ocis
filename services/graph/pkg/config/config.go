@@ -152,5 +152,5 @@ type ServiceAccount struct {
 
 // FilesSharing is the configuration for the files sharing
 type FilesSharing struct {
-	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing." introductionVersion:"5.0"`
+	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;GRAPH_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing." introductionVersion:"5.0" deprecationVersion:"5.0" deprecationInfo:"Resharing will be removed in the future."`
 }
