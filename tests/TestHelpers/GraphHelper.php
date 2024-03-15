@@ -1928,53 +1928,33 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
-	 * @param string $share
+	 * @param string $itemId
+	 * @param string $shareSpaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function acceptShare(
+	public static function mountShare(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
 		string $password,
-		string $share
+		string $itemId,
+		string $shareSpaceId
 	): ResponseInterface {
-		$response = self::getSharesSharedWithMe(
-			$baseUrl,
-			$xRequestId,
-			$user,
-			$password,
-		);
-		$responseBody = json_decode($response->getBody()->getContents(), true);
-		foreach ($responseBody["value"] as $value) {
-			if (isset($value["name"]) && $value["name"] === $share) {
-				$remoteId = $value["remoteItem"]["id"];
-				$permissionId = $value["remoteItem"]["permissions"][0]["id"];
-				$driveId = $value["parentReference"]["id"];
-			}
-		}
-
 		$body = [
-			"name" => $share,
 			"remoteItem" => [
-				"id" => $remoteId,
-				"permissions" => [
-					[
-						"id" => $permissionId
-					]
-				]
+				"id" => $itemId
 			]
 		];
-		$body = \json_encode($body);
-		$url = self::getBetaFullUrl($baseUrl, "drives/$driveId/root/children");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/root/children");
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			\json_encode($body)
 		);
 	}
 }

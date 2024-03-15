@@ -54,3 +54,35 @@ Feature:  mount or unmount incoming share
       | resource      |
       | textfile0.txt |
       | FolderToShare |
+
+
+  Scenario Outline: mount shared resource when auto-sync is disabled
+    Given user "Brian" has disabled the auto-sync share
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" mounts share "<resource>" offered by "Alice" from "Personal" space using the Graph API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+        """
+        {
+          "type": "object",
+          "required": [
+            "@client.synchronize"
+          ],
+          "properties": {
+            "@client.synchronize": {
+              "const": true
+            }
+          }
+        }
+        """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | folder        |

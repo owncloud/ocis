@@ -594,4 +594,30 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse($this->unmountShare($user, $itemId, $shareSpaceId));
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
+
+	/**
+	 * @When user :user mounts share :share offered by :offeredBy from :space space using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $offeredBy
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userMountsShareOfferedByFromSpaceUsingTheGraphApi(string $user, string $share, string $offeredBy, string $space):void {
+		$share = ltrim($share, '/');
+		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$response =  GraphHelper::mountShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
 }

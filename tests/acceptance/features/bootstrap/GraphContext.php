@@ -2624,36 +2624,4 @@ class GraphContext implements Context {
 			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
-
-	/**
-	 * send request to accepts pending share
-	 *
-	 * @param string $user
-	 * @param string $resource
-	 *
-	 * @return ResponseInterface
-	 */
-	public function acceptShares(string $user, string $resource):ResponseInterface {
-		$resource = ltrim($resource, '/');
-		return GraphHelper::acceptShare(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
-			$resource
-		);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" accepts share "([^"]*)" using the Graph API$/
-	 *
-	 * @param string $user
-	 * @param string $share
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userAcceptsShareUsingTheGraphApi(string $user, string $share):void {
-		$this->featureContext->setResponse($this->acceptShares($user, $share));
-	}
 }
