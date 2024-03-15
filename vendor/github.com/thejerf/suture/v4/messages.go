@@ -21,7 +21,10 @@ type removeService struct {
 func (rs removeService) isSupervisorMessage() {}
 
 func (s *Supervisor) sync() {
-	s.control <- syncSupervisor{}
+	select {
+	case s.control <- syncSupervisor{}:
+	case <-s.liveness:
+	}
 }
 
 type syncSupervisor struct {
@@ -30,7 +33,10 @@ type syncSupervisor struct {
 func (ss syncSupervisor) isSupervisorMessage() {}
 
 func (s *Supervisor) fail(id serviceID, panicVal interface{}, stacktrace []byte) {
-	s.control <- serviceFailed{id, panicVal, stacktrace}
+	select {
+	case s.control <- serviceFailed{id, panicVal, stacktrace}:
+	case <-s.liveness:
+	}
 }
 
 type serviceFailed struct {
