@@ -813,6 +813,75 @@ var _ = Describe("Driveitems", func() {
 			linkType := res.Link.GetType()
 			Expect(string(linkType)).To(Equal("edit"))
 		})
+		It("updates the public share to internal link", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+
+			getPublicShareMock := gatewayClient.On("GetPublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+			getPublicShareMockResponse = &link.GetPublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share: &link.PublicShare{
+					Id: &link.PublicShareId{
+						OpaqueId: "permissionid",
+					},
+					ResourceId: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+					PasswordProtected: true,
+					Permissions: &link.PublicSharePermissions{
+						Permissions: linktype.NewFileEditLinkPermissionSet().GetPermissions(),
+					},
+					Token: "token",
+				},
+			}
+			getPublicShareMock.Return(getPublicShareMockResponse, nil)
+
+			newLink := libregraph.NewSharingLink()
+			newLinkType, err := libregraph.NewSharingLinkTypeFromValue("internal")
+			Expect(err).ToNot(HaveOccurred())
+			newLink.SetType(*newLinkType)
+
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share.Permissions = &link.PublicSharePermissions{
+				Permissions: linktype.NewInternalLinkPermissionSet().Permissions,
+			}
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetLink(*newLink)
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := libregraph.Permission{}
+
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+			linkType := res.Link.GetType()
+			Expect(string(linkType)).To(Equal("internal"))
+			pp, hasPP := res.GetHasPasswordOk()
+			Expect(hasPP).To(Equal(true))
+			Expect(*pp).To(Equal(false))
+		})
 		It("updates the password on a public share", func() {
 			getShareMockResponse.Share = nil
 			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")

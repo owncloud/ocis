@@ -133,6 +133,9 @@ func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.Reso
 		g.logger.Debug().Interface("createLink", createLink).Msg(err.Error())
 		return nil, errorcode.New(errorcode.InvalidRequest, "invalid link type")
 	}
+	if createLink.GetType() == libregraph.INTERNAL && len(createLink.GetPassword()) > 0 {
+		return nil, errorcode.New(errorcode.InvalidRequest, "password is redundant for the internal link")
+	}
 	req := link.CreatePublicShareRequest{
 		ResourceInfo: statResp.GetInfo(),
 		Grant: &link.Grant{
@@ -311,6 +314,13 @@ func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID stri
 		perm, err = g.updatePublicLink(ctx, permissionID, update)
 		if err != nil {
 			return nil, err
+		}
+		// reset the password for the internal link
+		if changedLink == libregraph.INTERNAL {
+			perm, err = g.updatePublicLinkPassword(ctx, permissionID, "")
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
