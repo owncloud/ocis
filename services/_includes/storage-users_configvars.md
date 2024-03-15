@@ -57,7 +57,7 @@
 | STORAGE_USERS_S3NG_ENDPOINT | string |  | Endpoint for the S3 bucket.|
 | STORAGE_USERS_S3NG_BUCKET | string |  | Name of the S3 bucket.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_CONTENT_SHA256 | bool | false | Disable sending content sha256 when copying objects to S3.|
-| STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART | bool | false | Disable multipart uploads when copying objects to S3|
+| STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART | bool | true | Disable multipart uploads when copying objects to S3|
 | STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5 | bool | true | Send a Content-MD5 header when copying objects to S3.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS | bool | true | Always precreate parts when copying objects to S3.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS | uint | 4 | Number of concurrent uploads to use when copying objects to S3.|
