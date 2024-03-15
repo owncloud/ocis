@@ -121,6 +121,7 @@ func DefaultConfig() *config.Config {
 				MaxAcquireLockCycles:       20,
 				MaxConcurrency:             5,
 				LockCycleDurationFactor:    30,
+				DisableMultipart:           true,
 			},
 			OCIS: config.OCISDriver{
 				MetadataBackend:            "messagepack",
