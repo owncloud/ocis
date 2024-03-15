@@ -20,6 +20,15 @@ When hard-stopping Infinite Scale, for example with the `kill <pid>` command (SI
 
 ## CLI Commands
 
+For any command listed, use `--help` to get more details and possible options and arguments.
+
+To authenticate CLI commands use:
+
+*   `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and
+*   `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`.
+
+The `storage-users` CLI tool uses the default address to establish the connection to the `gateway` service. If the connection fails, check your custom `gateway` service `GATEWAY_GRPC_ADDR` configuration and set the same address in `storage-users` `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
+
 ### Manage Unfinished Uploads
 
 <!-- referencing: [oCIS FS] clean up aborted uploads https://github.com/owncloud/ocis/issues/2622 -->
@@ -105,89 +114,60 @@ Incomplete uploads:
  - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
 ```
 
-### Purge Expired Space Trash-Bins Items
+### Manage Trash-Bin Items
 
-<!-- referencing: https://github.com/owncloud/ocis/pull/5500 -->
-
-This command is about the trash-bin to get an overview of items, restore items and purging old items of `project` spaces (spaces that have been created manually) and `personal` spaces.
+This command set provides commands to get an overview of trash-bin items, restore items and purge old items of `personal` spaces and `project` spaces (spaces that have been created manually). `trash-bin` commands require a `spaceID` as parameter. See [List all spaces
+](https://owncloud.dev/apis/http/graph/spaces/#list-all-spaces-get-drives) or [Listing Space IDs](https://doc.owncloud.com/ocis/5.0/maintenance/space-ids/space-ids.html) for details of how to get them.
 
 ```bash
 ocis storage-users trash-bin <command>
 ```
 
-#### Purge-expired
 ```plaintext
 COMMANDS:
-   purge-expired     Purge all expired items from the trashbin
+   purge-expired  Purge expired trash-bin items
+   list           Print a list of all trash-bin items of a space.
+   restore-all    Restore all trash-bin items for a space.
+   restore        Restore a trash-bin item by ID.
 ```
 
-The configuration for the `purge-expired` command is done by using the following environment variables.
+#### Purge Expired
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID` is used to obtain space trash-bin information and takes the system admin user as the default which is the `OCIS_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OCIS_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
+Purge all expired items from the trash-bin.
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
+```bash
+ocis storage-users trash-bin purge-expired
+```
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` has a default value of `30 days`, which means the command will delete all files older than `30 days`. The value is human-readable, valid values are `24h`, `60m`, `60s` etc. `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+The behaviour of the `purge-expired` command can be configured by using the following environment variables.
+
+*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID`  
+Used to obtain space trash-bin information and takes the system admin user as the default which is the `OCIS_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OCIS_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
+
+*   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`  
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
+
+*   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`  
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
 
 #### List and Restore Trash-Bins Items
 
-To authenticate the cli command use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
-service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE`
-defines a maximum number of attempts to rename a file when the user restores the file with `--option keep-both` to existing destination with the same name.
+The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename a file when the admin restores the file with the CLI option `--option keep-both` to an existing destination with the same name.
 
-The ID sources:
--   personal 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+personal`
--   project 'spaceID' in a `https://{host}/graph/v1.0/me/drives?$filter=driveType+eq+project`
+*   Print a list of all trash-bin items of a space
+    ```bash
+    ocis storage-users trash-bin list
+    ```
 
-```bash
-NAME:
-   ocis storage-users trash-bin list - Print a list of all trash-bin items of a space.
+* Restore all trash-bin items for a space
+    ```bash
+    ocis storage-users trash-bin restore-all
+    ```
 
-USAGE:
-   ocis storage-users trash-bin list command [command options] ['spaceID' required]
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-OPTIONS:
-   --verbose, -v  Get more verbose output (default: false)
-   --help, -h     show help
-
-```
-
-```bash
-NAME:
-   ocis storage-users trash-bin restore-all - Restore all trash-bin items for a space.
-
-USAGE:
-   ocis storage-users trash-bin restore-all command [command options] ['spaceID' required]
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-OPTIONS:
-   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
-   --verbose, -v             Get more verbose output (default: false)
-   --yes, -y                 Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively. (default: false)
-   --help, -h                show help
-
-```
-
-```bash
-NAME:
-   ocis storage-users trash-bin restore - Restore a trash-bin item by ID.
-
-USAGE:
-   ocis storage-users trash-bin restore command [command options] ['spaceID' required] ['itemID' required]
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-OPTIONS:
-   --option value, -o value  The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. (default: The default value is 'skip' overwriting an existing file)
-   --verbose, -v             Get more verbose output (default: false)
-   --help, -h                show help
-```
+* Restore a trash-bin item by ID
+    ```bash
+    ocis storage-users trash-bin restore
+    ```
 
 ## Caching
 
