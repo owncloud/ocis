@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-15-00-46-14]
+[#deprecation-note-2024-03-15-09-52-08]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| Resharing will be removed in the future.
+| 5.0
+| 
+| 
 |===
 
 endif::[]
@@ -1027,7 +1032,7 @@ The service account secret.
 
 a|`OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING` +
-
+xref:deprecation-note-2024-03-15-09-52-08[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
