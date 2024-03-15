@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-15-03-54-44]
+[#deprecation-note-2024-03-15-10-16-49]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| Resharing will be removed in the future.
+| 5.0
+| 
+| 
 |===
 
 endif::[]
@@ -322,7 +327,7 @@ The default upload protocol to use in clients. Currently only 'tus' is avaliable
 
 a|`OCIS_ENABLE_RESHARING` +
 `FRONTEND_ENABLE_RESHARING` +
-
+xref:deprecation-note-2024-03-15-10-16-49[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
