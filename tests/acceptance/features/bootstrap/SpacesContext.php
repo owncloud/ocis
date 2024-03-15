@@ -3620,8 +3620,8 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param ?string $resource
-	 * @param ?string $folderDepth
+	 * @param string $resource
+	 * @param string $folderDepth
 	 *
 	 * @return void
 	 *
@@ -3629,7 +3629,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, ?string $resource = "", ?string $folderDepth = "1"): void {
+	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, string $resource, string $folderDepth): void {
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
 		);

@@ -26,7 +26,7 @@ Feature: propfind a shares
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "/" with depth "1" using the WebDAV API
+    When user "Brian" sends PROPFIND request to space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
       | key       | value         |
