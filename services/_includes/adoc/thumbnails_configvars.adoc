@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-18-14-25-24]
+[#deprecation-note-2024-03-18-15-40-59]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
