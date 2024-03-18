@@ -29,6 +29,7 @@ http:
     - GET
     - PUT
     - POST
+    - PATCH
     - DELETE
     - MKCOL
     - PROPFIND

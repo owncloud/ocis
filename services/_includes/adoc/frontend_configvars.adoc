@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-18-10-55-55]
+[#deprecation-note-2024-03-18-11-34-59]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -190,7 +190,7 @@ a|`OCIS_CORS_ALLOW_METHODS` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+++[OPTIONS HEAD GET PUT POST PATCH DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
 
@@ -327,7 +327,7 @@ The default upload protocol to use in clients. Currently only 'tus' is avaliable
 
 a|`OCIS_ENABLE_RESHARING` +
 `FRONTEND_ENABLE_RESHARING` +
-xref:deprecation-note-2024-03-18-10-55-55[Deprecation Note]
+xref:deprecation-note-2024-03-18-11-34-59[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
