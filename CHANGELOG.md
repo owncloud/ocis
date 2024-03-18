@@ -49,6 +49,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the mount points naming: [#8543](https://github.com/owncloud/ocis/pull/8543)
 * Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
 * Bugfix - Fix sharing invite on virtual drive: [#8609](https://github.com/owncloud/ocis/pull/8609)
+* Bugfix - Prevent copying a file to a parent folder: [#8649](https://github.com/owncloud/ocis/pull/8649)
 * Bugfix - Disable Multipart uploads: [#8666](https://github.com/owncloud/ocis/pull/8666)
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
@@ -116,6 +117,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8495
    https://github.com/owncloud/ocis/pull/8609
+
+* Bugfix - Prevent copying a file to a parent folder: [#8649](https://github.com/owncloud/ocis/pull/8649)
+
+   When copying a file to a parent folder, the file would be copied to the parent
+   folder, but the file would not be removed from the original folder.
+
+   https://github.com/owncloud/ocis/issues/1230
+   https://github.com/owncloud/ocis/pull/8649
+   https://github.com/cs3org/reva/pull/4571
+   %60
 
 * Bugfix - Disable Multipart uploads: [#8666](https://github.com/owncloud/ocis/pull/8666)
 
