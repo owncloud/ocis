@@ -15,7 +15,7 @@ Feature: Propfind test
 
   Scenario: space-admin checks the PROPFIND request of a space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    When user "Alice" sends PROPFIND request to space "new-space" using the WebDAV API
+    When user "Alice" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
       | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
@@ -33,7 +33,7 @@ Feature: Propfind test
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    When user "Brian" sends PROPFIND request to space "new-space" using the WebDAV API
+    When user "Brian" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
       | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
@@ -56,7 +56,7 @@ Feature: Propfind test
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value             |
@@ -77,7 +77,7 @@ Feature: Propfind test
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value                                   |
@@ -98,7 +98,7 @@ Feature: Propfind test
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "testfile.txt" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "new-space" to the resource "testfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value               |

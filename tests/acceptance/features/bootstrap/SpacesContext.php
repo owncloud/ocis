@@ -3597,11 +3597,11 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" using the WebDAV API$/
-	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param ?string $resource
+	 * @param ?string $folderDepth
 	 *
 	 * @return void
 	 *
@@ -3609,9 +3609,29 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): void {
+	public function userSendsPropfindRequestToSpaceUsingTheWebdavApi(string $user, string $spaceName, ?string $folderDepth = "1"): void {
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, $resource)
+			$this->sendPropfindRequestToSpace($user, $spaceName, "", null, $folderDepth)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $resource
+	 * @param string $folderDepth
+	 *
+	 * @return void
+	 *
+	 * @throws JsonException
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, string $resource, string $folderDepth): void {
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
 		);
 	}
 
@@ -3637,7 +3657,7 @@ class SpacesContext implements Context {
 			$headers[$row['header']] = $row ['value'];
 		}
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers)
+			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers, '0')
 		);
 	}
 
@@ -3646,15 +3666,36 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string|null $resource
 	 * @param array|null $headers
+	 * @param string|null $folderDepth
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 *
 	 * @throws JsonException
 	 */
-	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = []): ResponseInterface {
+	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = [], ?string $folderDepth = "1"): ResponseInterface {
 		$this->setSpaceIDByName($user, $spaceName);
-		$properties = ['oc:permissions','oc:file-parent','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype','oc:tags','d:lockdiscovery','d:activelock'];
+		$properties = [
+			'oc:id',
+			'oc:fileid',
+			'oc:spaceid',
+			'oc:file-parent',
+			'oc:shareid',
+			'oc:name',
+			'd:displayname',
+			'd:getetag',
+			'oc:permissions',
+			'd:resourcetype',
+			'oc:size',
+			'd:getlastmodified',
+			'oc:tags',
+			'oc:favorite',
+			'oc:share-types',
+			'oc:privatelink',
+			'd:getcontenttype',
+			'd:lockdiscovery',
+			'd:activelock'
+		];
 		return  WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
@@ -3662,10 +3703,10 @@ class SpacesContext implements Context {
 			$resource,
 			$properties,
 			$this->featureContext->getStepLineRef(),
-			"0",
+			$folderDepth,
 			"files",
 			WebDavHelper::DAV_VERSION_SPACES,
-			"",
+			null,
 			$headers
 		);
 	}
@@ -3718,50 +3759,62 @@ class SpacesContext implements Context {
 		$xmlRes = $this->featureContext->getResponseXml();
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
+			$xmlResponses = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem");
 			Assert::assertNotEmpty(
-				$xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem"),
+				$xmlResponses,
 				'The xml response "' . $xmlRes->asXML() . '" did not contain "<' . $findItem . '>" element'
 			);
-			$responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
+
+			$responseValues = [];
+			foreach ($xmlResponses as $xmlResponse) {
+				$responseValues[] = $xmlResponse[0]->__toString();
+			}
+
 			$value = str_replace('UUIDof:', '', $row['value']);
 			switch ($findItem) {
 				case "oc:fileid":
 					$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
 					if ($method === 'PROPFIND') {
 						if (!$resourceType) {
-							Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
 						} else {
-							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertContainsEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
 						}
 					} else {
 						if ($resourceType === 'httpd/unix-directory') {
-							Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
 						} else {
-							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertContainsEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
 						}
 					}
 					break;
 				case "oc:file-parent":
-					Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong file-parentId in the response');
+					Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong file-parentId in the response');
 					break;
 				case "oc:privatelink":
-					Assert::assertEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValue, 'cannot find private link for space or resource in the response');
+					Assert::assertContainsEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValues, 'cannot find private link for space or resource in the response');
 					break;
 				case "oc:tags":
 					// The value should be a comma-separated string of tag names.
 					// We do not care what order they happen to be in, so compare as sorted lists.
 					$expectedTags = \explode(",", $value);
-					$expectedTags = \sort($expectedTags);
-					$actualTags = \explode(",", $responseValue);
-					$actualTags = \sort($actualTags);
-					Assert::assertEquals($expectedTags, $actualTags, "wrong $findItem in the response");
+					\sort($expectedTags);
+					$expectedTags = \implode(",", $expectedTags);
+					$actualTags = [];
+					foreach ($responseValues as $responseValue) {
+						$responseValue = \explode(",", $responseValue);
+						\sort($responseValue);
+						$responseValue = \implode(",", $responseValue);
+						$actualTags[] = $responseValue;
+					}
+					Assert::assertContainsEquals($expectedTags, $actualTags, "wrong $findItem in the response");
 					break;
 				case "d:lockdiscovery/d:activelock/d:timeout":
 					if ($value === "Infinity") {
-						Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
+						Assert::assertContainsEquals($value, $responseValues, "wrong $findItem in the response");
 					} else {
 						// some time may be required between a lock and propfind request.
-						$responseValue = explode('-', $responseValue);
+						$responseValue = explode('-', $responseValues[0]);
 						$responseValue = \intval($responseValue[1]);
 						$value = explode('-', $value);
 						$value = \intval($value[1]);
@@ -3769,7 +3822,7 @@ class SpacesContext implements Context {
 					}
 					break;
 				default:
-					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
+					Assert::assertContainsEquals($value, $responseValues, "wrong $findItem in the response");
 					break;
 			}
 		}

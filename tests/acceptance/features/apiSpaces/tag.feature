@@ -26,7 +26,7 @@ Feature: Tag
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value                                      |
@@ -34,7 +34,7 @@ Feature: Tag
     When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
       | fileTag |
     Then the HTTP status code should be "200"
-    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value   |
@@ -64,12 +64,12 @@ Feature: Tag
       | fileTag                       |
       | tag with symbol @^$#^%$@%!_+) |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "folderMain" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
       | key     | value            |
       | oc:tags | my tag,important |
-    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "file.txt" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "file.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
       | key     | value                                 |
@@ -177,7 +177,7 @@ Feature: Tag
     When user "Alice" removes the following tags for folder "folderMain" of space "use-tag":
       | folderTag |
       | marketing |
-    And user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    And user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value       |
@@ -255,7 +255,7 @@ Feature: Tag
     When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
       | finance,नेपाल |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value         |
@@ -263,7 +263,7 @@ Feature: Tag
     When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
       | file,नेपाल,Tag |
     Then the HTTP status code should be "200"
-    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value          |
@@ -283,7 +283,7 @@ Feature: Tag
     When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
       | engineering,finance,qa |
     Then the HTTP status code should be "200"
-    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value                     |
