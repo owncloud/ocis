@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#8606](https://github.com/owncloud/ocis/pull/8606)
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 * Enhancement - Update web to v9.0.0-alpha.2: [#8634](https://github.com/owncloud/ocis/pull/8634)
+* Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 
 ## Details
 
@@ -230,6 +231,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8634
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.2
+
+* Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
+
+   We enhanced the 'graph/v1beta1/drives/{{driveid}}/items/{{itemid}}/permissions'
+   endpoint to list permission of the space when the 'itemid' refers to a space
+   root.
+
+   https://github.com/owncloud/ocis/issues/8352
+   https://github.com/owncloud/ocis/pull/8642
 
 # Changelog for [5.0.0-rc.5] (2024-02-26)
 
