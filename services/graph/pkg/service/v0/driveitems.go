@@ -42,6 +42,15 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
+type PermissionType int
+
+const (
+	Unknown PermissionType = iota
+	Public
+	User
+	Space
+)
+
 // CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
 // An upload session allows your app to upload ranges of the file in sequential API requests, which allows the
 // transfer to be resumed if a connection is dropped while the upload is in progress.
@@ -409,31 +418,11 @@ func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
 
 	driveItems := make(driveItemsByResourceID)
 	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		// this is a space root, get permissions via storage space API
-		filters := []*storageprovider.ListStorageSpacesRequest_Filter{
-			listStorageSpacesIDFilter(statResponse.GetInfo().GetSpace().GetId().GetOpaqueId()),
-		}
-		res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
-		switch {
-		case err != nil:
-			g.logger.Error().Err(err).Msg("could not get drive: transport error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		case res.Status.Code != cs3rpc.Code_CODE_OK:
-			if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-				// the client is doing a lookup for a specific space, therefore we need to return
-				// not found to the caller
-				g.logger.Debug().Msg("could not get drive: not found")
-				errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
-				return
-			}
-			g.logger.Debug().
-				Str("grpcmessage", res.GetStatus().GetMessage()).
-				Msg("could not get drive: grpc error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		permissions, err := g.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId())
+		if err != nil {
+			errorcode.RenderError(w, r, err)
 			return
 		}
-		permissions := g.cs3PermissionsToLibreGraph(ctx, res.GetStorageSpaces()[0], APIVersion_1_Beta_1)
 		collectionOfPermissions.Value = permissions
 	} else {
 		// "normal" driveItem, populate user  permissions via share providers
@@ -695,15 +684,26 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	isUserPermission := true
+	var permissionType PermissionType
 
-	// Check if the id is referring to a User Share
-	sharedResourceID, err := g.getUserPermissionResourceID(ctx, permissionID)
-	var errcode errorcode.Error
-	if err != nil && errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
-		// there is no user share with that ID, so lets check if it is referring to a public link
-		isUserPermission = false
-		sharedResourceID, err = g.getLinkPermissionResourceID(ctx, permissionID)
+	sharedResourceID, err := g.getLinkPermissionResourceID(ctx, permissionID)
+	switch {
+	// Check if the ID is referring to a public share
+	case err == nil:
+		permissionType = Public
+	// If the item id is referring to a space root an this is not a public share
+	// we have to deal with space permissions
+	case IsSpaceRoot(&itemID):
+		permissionType = Space
+		sharedResourceID = &itemID
+		err = nil
+	// If this is neither a public share nor a space permission, check if this is a
+	// user share
+	default:
+		sharedResourceID, err = g.getUserPermissionResourceID(ctx, permissionID)
+		if err == nil {
+			permissionType = User
+		}
 	}
 
 	if err != nil {
@@ -719,10 +719,13 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isUserPermission {
+	switch permissionType {
+	case User:
 		err = g.removeUserShare(ctx, permissionID)
-	} else {
+	case Public:
 		err = g.removePublicShare(ctx, permissionID)
+	case Space:
+		err = g.removeSpacePermission(ctx, permissionID, sharedResourceID)
 	}
 
 	if err != nil {
@@ -761,6 +764,20 @@ func (g Graph) getPermissionByID(ctx context.Context, permissionID string) (*lib
 
 	return nil, nil, err
 
+}
+
+func (g Graph) getSpaceRootPermissions(ctx context.Context, spaceID *storageprovider.StorageSpaceId) ([]libregraph.Permission, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+	space, err := utils.GetSpace(ctx, spaceID.GetOpaqueId(), gatewayClient)
+	if err != nil {
+		return nil, err
+	}
+
+	return g.cs3SpacePermissionsToLibreGraph(ctx, space, APIVersion_1_Beta_1), nil
 }
 
 func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
@@ -891,6 +908,60 @@ func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
+}
+
+func (g Graph) removeSpacePermission(ctx context.Context, permissionID string, resourceId *storageprovider.ResourceId) error {
+	grantee, err := spacePermissionIdToCS3Grantee(permissionID)
+	if err != nil {
+		return err
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
+	}
+	removeShareResp, err := gatewayClient.RemoveShare(ctx, &collaboration.RemoveShareRequest{
+		Ref: &collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Key{
+				Key: &collaboration.ShareKey{
+					ResourceId: resourceId,
+					Grantee:    &grantee,
+				},
+			},
+		},
+	})
+
+	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
+		return *errCode
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
+}
+
+func spacePermissionIdToCS3Grantee(permissionID string) (storageprovider.Grantee, error) {
+	// the permission ID for space permission is made of two parts
+	// the grantee type ('u' or user, 'g' for group) and the user or group id
+	var grantee storageprovider.Grantee
+	parts := strings.SplitN(permissionID, ":", 2)
+	if len(parts) != 2 {
+		return grantee, errorcode.New(errorcode.InvalidRequest, "invalid space permission id")
+	}
+	switch parts[0] {
+	case "u":
+		grantee.Type = storageprovider.GranteeType_GRANTEE_TYPE_USER
+	case "g":
+		grantee.Type = storageprovider.GranteeType_GRANTEE_TYPE_GROUP
+	default:
+		return grantee, errorcode.New(errorcode.InvalidRequest, "invalid space permission id")
+	}
+
+	grantee.Id = &storageprovider.Grantee_UserId{
+		UserId: &userpb.UserId{
+			OpaqueId: parts[1],
+		},
+	}
+	return grantee, nil
 }
 
 func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {

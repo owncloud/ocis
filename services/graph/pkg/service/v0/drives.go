@@ -734,7 +734,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 	spaceID := storagespace.FormatResourceID(spaceRid)
 
-	permissions := g.cs3PermissionsToLibreGraph(ctx, space, apiVersion)
+	permissions := g.cs3SpacePermissionsToLibreGraph(ctx, space, apiVersion)
 
 	drive := &libregraph.Drive{
 		Id:   libregraph.PtrString(spaceID),
@@ -830,7 +830,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	return drive, nil
 }
 
-func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
+func (g Graph) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
 	if space.Opaque == nil {
 		return nil
 	}
