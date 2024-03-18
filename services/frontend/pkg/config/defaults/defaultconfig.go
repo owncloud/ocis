@@ -38,6 +38,7 @@ func DefaultConfig() *config.Config {
 					"GET",
 					"PUT",
 					"POST",
+					"PATCH",
 					"DELETE",
 					"MKCOL",
 					"PROPFIND",
