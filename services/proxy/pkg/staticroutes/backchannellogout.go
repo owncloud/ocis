@@ -1,10 +1,11 @@
 package staticroutes
 
 import (
+	"net/http"
+
 	"github.com/go-chi/render"
 	"github.com/pkg/errors"
 	microstore "go-micro.dev/v4/store"
-	"net/http"
 )
 
 // handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest

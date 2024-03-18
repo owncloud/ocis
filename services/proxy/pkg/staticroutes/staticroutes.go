@@ -1,14 +1,15 @@
 package staticroutes
 
 import (
+	"net/http"
+	"net/url"
+	"path"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	microstore "go-micro.dev/v4/store"
-	"net/http"
-	"net/url"
-	"path"
 )
 
 // StaticRouteHandler defines a Route Handler for static routes
@@ -40,9 +41,9 @@ func (s *StaticRouteHandler) Handler() http.Handler {
 
 		// openid .well-known
 		if s.Config.OIDC.RewriteWellKnown {
-			r.Get("/.well-known/openid-configuration", s.OIDCWellKnownRewrite)
+			r.Get("/.well-known/openid-configuration", s.oIDCWellKnownRewrite)
 		}
-		
+
 		// Send all requests to the proxy handler
 		r.HandleFunc("/*", s.Proxy.ServeHTTP)
 	})
