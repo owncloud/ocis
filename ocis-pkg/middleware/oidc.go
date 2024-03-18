@@ -44,7 +44,7 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 		)
 	}
 	var provider OIDCProvider
-	getProviderOnce := sync.Once{}
+	initializeProviderLock := sync.Mutex{}
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -52,13 +52,22 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 			authHeader := r.Header.Get("Authorization")
 			switch {
 			case strings.HasPrefix(authHeader, "Bearer "):
-				getProviderOnce.Do(func() {
+				if provider == nil {
+					// lazy initialize provider
+					initializeProviderLock.Lock()
 					var err error
-					provider, err = providerFunc()
+					// ensure no other request initialized the provider
+					if provider == nil {
+						provider, err = providerFunc()
+					}
+					initializeProviderLock.Unlock()
 					if err != nil {
+						opt.Logger.Error().Err(err).Msg("could not initialize OIDC provider")
+						w.WriteHeader(http.StatusInternalServerError)
 						return
 					}
-				})
+					opt.Logger.Debug().Msg("initialized OIDC provider")
+				}
 
 				oauth2Token := &oauth2.Token{
 					AccessToken: strings.TrimPrefix(authHeader, "Bearer "),
