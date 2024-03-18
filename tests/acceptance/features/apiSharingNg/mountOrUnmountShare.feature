@@ -20,7 +20,7 @@ Feature:  mount or unmount incoming share
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Brian" declines share "<resource>" using the Graph API
+    When user "Brian" unmounts share "<resource>" using the Graph API
     And user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the JSON data of the response should match

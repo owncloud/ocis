@@ -568,7 +568,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function declineShares(string $user, string $itemId, string $shareSpaceId): ResponseInterface {
+	public function unmountShare(string $user, string $itemId, string $shareSpaceId): ResponseInterface {
 		return GraphHelper::unmountShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -580,24 +580,18 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user declines share :share using the Graph API
+	 * @When user :user unmounts share :share using the Graph API
 	 *
 	 * @param string $user
-	 * @param string $share
-	 * @param string $offeredBy
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userDeclinesShareUsingTheGraphApi(
-		string $user,
-		string $share,
-		string $offeredBy
-	):void {
-		$shareSpaceId = ($this->spacesContext->getSpaceByName($user, "Shares"))["id"];
+	public function userUnmountsShareUsingTheGraphApi(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareItemId;
-		$this->featureContext->setResponse($this->declineShares($user, $itemId, $shareSpaceId));
+		$this->featureContext->setResponse($this->unmountShare($user, $itemId, $shareSpaceId));
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 }
