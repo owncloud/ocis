@@ -1,7 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
-* [Changelog for 5.0.0-rc.5](#changelog-for-500-rc5-2024-02-26)
+* [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
 * [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
 * [Changelog for 4.0.5](#changelog-for-405-2023-12-21)
 * [Changelog for 4.0.4](#changelog-for-404-2023-12-07)
@@ -12,8 +12,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -38,7 +38,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0-rc.5...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0...master
 
 ## Summary
 
@@ -269,11 +269,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8352
    https://github.com/owncloud/ocis/pull/8642
 
-# Changelog for [5.0.0-rc.5] (2024-02-26)
+# Changelog for [5.0.0] (2024-03-18)
 
-The following sections list the changes for 5.0.0-rc.5.
+The following sections list the changes for 5.0.0.
 
-[5.0.0-rc.5]: https://github.com/owncloud/ocis/compare/v4.0.6...v5.0.0-rc.5
+[5.0.0]: https://github.com/owncloud/ocis/compare/v4.0.6...v5.0.0
 
 ## Summary
 
@@ -340,12 +340,19 @@ The following sections list the changes for 5.0.0-rc.5.
 * Bugfix - Graph/drives/permission Expiration date update: [#8413](https://github.com/owncloud/ocis/pull/8413)
 * Bugfix - Fix search error message: [#8444](https://github.com/owncloud/ocis/pull/8444)
 * Bugfix - Graph/sharedWithMe align IDs with webdav response: [#8467](https://github.com/owncloud/ocis/pull/8467)
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
 * Bugfix - Bump reva to pull in changes to fix recursive trashcan purge: [#8505](https://github.com/owncloud/ocis/pull/8505)
+* Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
+* Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
+* Bugfix - Correct the default mapping of roles: [#8639](https://github.com/owncloud/ocis/pull/8639)
+* Bugfix - Disable Multipart uploads: [#8667](https://github.com/owncloud/ocis/pull/8667)
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 * Change - Auto-Accept Shares: [#7097](https://github.com/owncloud/ocis/pull/7097)
 * Change - Change the default TUS chunk size: [#7273](https://github.com/owncloud/ocis/pull/7273)
 * Change - Remove privacyURL and imprintURL from the config: [#7938](https://github.com/owncloud/ocis/pull/7938/)
 * Change - Remove accessDeniedHelpUrl from the config: [#7970](https://github.com/owncloud/ocis/pull/7970)
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 * Enhancement - Add the Banned Passwords List: [#4197](https://github.com/cs3org/reva/pull/4197)
 * Enhancement - Introduce service accounts: [#6427](https://github.com/owncloud/ocis/pull/6427)
@@ -390,6 +397,7 @@ The following sections list the changes for 5.0.0-rc.5.
 * Enhancement - Add user list requires filter config: [#7866](https://github.com/owncloud/ocis/pull/7866)
 * Enhancement - Retry antivirus postprocessing step in case of problems: [#7874](https://github.com/owncloud/ocis/pull/7874)
 * Enhancement - Add validation to public share provider: [#7877](https://github.com/owncloud/ocis/pull/7877)
+* Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
 * Enhancement - Allow regular users to list other users: [#7887](https://github.com/owncloud/ocis/pull/7887)
 * Enhancement - Add edit public share to sharing NG: [#7908](https://github.com/owncloud/ocis/pull/7908/)
@@ -414,9 +422,11 @@ The following sections list the changes for 5.0.0-rc.5.
 * Enhancement - Allow sending multiple user ids in one sse event: [#8379](https://github.com/owncloud/ocis/pull/8379)
 * Enhancement - Allow to skip service listing: [#8408](https://github.com/owncloud/ocis/pull/8408)
 * Enhancement - Add a make step to validate the env var annotations: [#8436](https://github.com/owncloud/ocis/pull/8436)
-* Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
 * Enhancement - Drop the unnecessary grants exists check when creating shares: [#8502](https://github.com/owncloud/ocis/pull/8502)
-* Enhancement - Update reva to 2.19.0: [#8519](https://github.com/owncloud/ocis/pull/8519)
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
+* Enhancement - Update web to v8.0.0: [#8613](https://github.com/owncloud/ocis/pull/8613)
+* Enhancement - Update web to v8.0.1: [#8626](https://github.com/owncloud/ocis/pull/8626)
+* Enhancement - Update reva to 2.19.2: [#8638](https://github.com/owncloud/ocis/pull/8638)
 
 ## Details
 
@@ -907,6 +917,14 @@ The following sections list the changes for 5.0.0-rc.5.
    https://github.com/owncloud/ocis/issues/8080
    https://github.com/owncloud/ocis/pull/8467
 
+* Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
+
+   We fixed a bug when anonymous user with viewer role in public link of a folder
+   can lock/unlock a file inside it
+
+   https://github.com/owncloud/ocis/issues/7785
+   https://github.com/owncloud/ocis/pull/8472
+
 * Bugfix - Bump reva to pull in changes to fix recursive trashcan purge: [#8505](https://github.com/owncloud/ocis/pull/8505)
 
    We have fixed a bug in the trashcan purge process that did not delete folder
@@ -915,6 +933,41 @@ The following sections list the changes for 5.0.0-rc.5.
    https://github.com/owncloud/ocis/issues/8473
    https://github.com/owncloud/ocis/pull/8505
    https://github.com/cs3org/reva/pull/4533
+
+* Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
+
+   This is a workaround that should prevent removing or changing the share
+   permissions when the file is locked. These limitations have to be removed after
+   the wopi server will be able to unlock the file properly. These limitations are
+   not spread on the files inside the shared folder.
+
+   https://github.com/owncloud/ocis/issues/8273
+   https://github.com/owncloud/ocis/pull/8529
+   https://github.com/cs3org/reva/pull/4534
+
+* Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
+
+   We fixed the issue when sharing of personal drive is allowed via graph
+
+   https://github.com/owncloud/ocis/issues/8494
+   https://github.com/owncloud/ocis/pull/8538
+
+* Bugfix - We now always select the next clients when autoaccepting shares: [#8570](https://github.com/owncloud/ocis/pull/8570)
+
+   https://github.com/owncloud/ocis/pull/8570
+
+* Bugfix - Correct the default mapping of roles: [#8639](https://github.com/owncloud/ocis/pull/8639)
+
+   The default config for the OIDC role mapping was incorrect. Lightweight users
+   are now assignable.
+
+   https://github.com/owncloud/ocis/pull/8639
+
+* Bugfix - Disable Multipart uploads: [#8667](https://github.com/owncloud/ocis/pull/8667)
+
+   Disables multiparts uploads as they lead to high memory consumption
+
+   https://github.com/owncloud/ocis/pull/8667
 
 * Bugfix - Fix last month search: [#31145](https://github.com/golang/go/issues/31145)
 
@@ -963,6 +1016,13 @@ The following sections list the changes for 5.0.0-rc.5.
    not just Web, it should be configured via the theme.json file.
 
    https://github.com/owncloud/ocis/pull/7970
+
+* Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+
+   We wrapped the store service in a micro store implementation and changed the
+   default to the built-in NATS instance.
+
+   https://github.com/owncloud/ocis/pull/8419
 
 * Change - Deprecate sharing cs3 backends: [#8478](https://github.com/owncloud/ocis/pull/8478)
 
@@ -1462,6 +1522,13 @@ The following sections list the changes for 5.0.0-rc.5.
    https://github.com/owncloud/ocis/issues/6993
    https://github.com/owncloud/ocis/pull/7877
 
+* Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
+
+   Functionality for mounting (accepting) and unmounting (rejecting) received
+   shares has been added to the graph API.
+
+   https://github.com/owncloud/ocis/pull/7885
+
 * Enhancement - Store and index metadata: [#7886](https://github.com/owncloud/ocis/pull/7886)
 
    Location metadata is now extracted and stored by the search service. It is
@@ -1683,287 +1750,6 @@ The following sections list the changes for 5.0.0-rc.5.
    https://github.com/owncloud/ocis/issues/8258
    https://github.com/owncloud/ocis/pull/8436
 
-* Enhancement - Update web to v8.0.0-rc.5: [#8491](https://github.com/owncloud/ocis/pull/8491)
-
-   Tags: web
-
-   We updated ownCloud Web to v8.0.0-rc.5. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10473](https://github.com/owncloud/web/issues/10473): Public link
-   file download
-
-   We updated ownCloud Web to v8.0.0-rc.4. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10489](https://github.com/owncloud/web/pull/10489): Wrong share
-   permissions when resharing off
-
-   We updated ownCloud Web to v8.0.0-rc.3. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10318](https://github.com/owncloud/web/pull/10318): Scrollable
-   account page * Bugfix
-   [owncloud/web#10321](https://github.com/owncloud/web/pull/10321): Private link
-   error messages * Bugfix
-   [owncloud/web#10347](https://github.com/owncloud/web/pull/10347): Readonly user
-   attributes have no effect on group memberships * Bugfix
-   [owncloud/web#10424](https://github.com/owncloud/web/pull/10424): Restore space
-   * Enhancement [owncloud/web#10356](https://github.com/owncloud/web/pull/10356):
-   Preview app add reset button for images
-
-   We updated ownCloud Web to v8.0.0-rc.2. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10176](https://github.com/owncloud/web/pull/10176): Turned off
-   file extensions not always respected * Bugfix
-   [owncloud/web#10232](https://github.com/owncloud/web/pull/10232): Skip searchbar
-   preview fetch on reload
-
-   We updated ownCloud Web to v8.0.0-rc.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10224](https://github.com/owncloud/web/issues/10224): Harmonize
-   AppSwitcher icon colors * Bugfix
-   [owncloud/web#10230](https://github.com/owncloud/web/issues/10230): Configurable
-   concurrent requests * Bugfix
-   [owncloud/web#10158](https://github.com/owncloud/web/issues/10158): GDPR export
-   polling * Bugfix
-   [owncloud/web#10220](https://github.com/owncloud/web/issues/10220): Loading
-   indicator during conflict dialog * Bugfix
-   [owncloud/web#10156](https://github.com/owncloud/web/issues/10156): Uploading
-   the same files parallel * Bugfix
-   [owncloud/web#10179](https://github.com/owncloud/web/issues/10179): Space
-   navigate to trash missing * Bugfix
-   [owncloud/web#10118](https://github.com/owncloud/web/issues/10118): Tilesview
-   has whitespace * Bugfix
-   [owncloud/web#10182](https://github.com/owncloud/web/issues/10182): Make
-   versions panel readonly in viewers and editors
-
-   We updated ownCloud Web to v8.0.0-beta.2. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying
-   full video in their dimensions * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files
-   list previews cropped * Bugfix
-   [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces
-   overview tile previews zoomed * Bugfix
-   [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving
-   links without drive alias
-
-   We updated ownCloud Web to v8.0.0-beta.1. Please refer to the changelog (linked)
-   for details on the web release.
-
-   ## Summary * Change
-   [owncloud/web#9698](https://github.com/owncloud/web/pull/9698): Theme handling *
-   Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111):
-   Registering right sidebar panels as extension * Enhancement
-   [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar
-   in viewer and editor apps
-
-   We updated ownCloud Web to v8.0.0-alpha.13. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Enhancement
-   [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link
-   modal
-
-   We updated ownCloud Web to v8.0.0-alpha.12. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#9257](https://github.com/owncloud/web/issues/9257): Filter out
-   shares without display name * Bugfix
-   [owncloud/web#9483](https://github.com/owncloud/web/issues/9483): PDF loading
-   Safari * Bugfix [owncloud/web#9513](https://github.com/owncloud/web/pull/9513):
-   Set or remove expiration date on group share not possible * Bugfix
-   [owncloud/web#9529](https://github.com/owncloud/web/pull/9529): Shared with
-   action menu label alignment * Bugfix
-   [owncloud/web#9587](https://github.com/owncloud/web/pull/9587): Internal public
-   link resolving * Bugfix
-   [owncloud/web#9593](https://github.com/owncloud/web/issues/9593): Audio- &
-   video-loading on Shared with me page * Bugfix
-   [owncloud/web#9649](https://github.com/owncloud/web/pull/9649): Add project
-   space filter * Bugfix
-   [owncloud/web#9663](https://github.com/owncloud/web/pull/9663): Respect the
-   open-in-new-tab-config for external apps * Bugfix
-   [owncloud/web#9670](https://github.com/owncloud/web/pull/9670): Tiles view
-   accessibility * Bugfix
-   [owncloud/web#9694](https://github.com/owncloud/web/issues/9694): Special
-   characters in username * Bugfix
-   [owncloud/web#9788](https://github.com/owncloud/web/issues/9788): Create .space
-   folder if it does not exist * Bugfix
-   [owncloud/web#9799](https://github.com/owncloud/web/issues/9799): Link resolving
-   into default app * Bugfix
-   [owncloud/web#9832](https://github.com/owncloud/web/pull/9832): Copy quicklinks
-   for webkit navigator * Bugfix
-   [owncloud/web#9843](https://github.com/owncloud/web/pull/9843): Fix display path
-   on resources * Bugfix
-   [owncloud/web#9844](https://github.com/owncloud/web/pull/9844): Upload space
-   image * Bugfix [owncloud/web#9861](https://github.com/owncloud/web/pull/9861):
-   Duplicated file search request * Bugfix
-   [owncloud/web#9873](https://github.com/owncloud/web/pull/9873): Tags are no
-   longer editable for a locked file * Bugfix
-   [owncloud/web#9881](https://github.com/owncloud/web/pull/9881): Prevent
-   rendering of old/wrong set of resources in search list * Bugfix
-   [owncloud/web#9915](https://github.com/owncloud/web/pull/9915): Keep both
-   folders conflict in same-named folders * Bugfix
-   [owncloud/web#9931](https://github.com/owncloud/web/pull/9931): Enabling "invite
-   people" for password-protected folder/file * Bugfix
-   [owncloud/web#10031](https://github.com/owncloud/web/issues/10031): Icon
-   extension mapping * Bugfix
-   [owncloud/web#10065](https://github.com/owncloud/web/pull/10065): Logout page
-   after token expiry * Bugfix
-   [owncloud/web#10083](https://github.com/owncloud/web/pull/10083): Disable
-   expiration date for alias link (internal) * Bugfix
-   [owncloud/web#10092](https://github.com/owncloud/web/pull/10092): Allow empty
-   search query in "in-here" search * Bugfix
-   [owncloud/web#10096](https://github.com/owncloud/web/pull/10096): Remove
-   password buttons on input if disabled * Change
-   [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove
-   deprecated code * Enhancement
-   [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317): Make login url
-   configurable * Enhancement
-   [owncloud/web#7497](https://github.com/owncloud/ocis/issues/7497): Permission
-   checks for shares and favorites * Enhancement
-   [owncloud/web#7600](https://github.com/owncloud/web/issues/7600): Scroll to
-   newly created folder * Enhancement
-   [owncloud/web#9302](https://github.com/owncloud/web/issues/9302): Application
-   unification * Enhancement
-   [owncloud/web#9423](https://github.com/owncloud/web/pull/9423): Show local
-   loading spinner in sharing button * Enhancement
-   [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): File versions
-   tooltip with absolute date * Enhancement
-   [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): Disabling
-   extensions * Enhancement
-   [owncloud/web#9451](https://github.com/owncloud/web/pull/9451): Add SSE to get
-   notifications instantly * Enhancement
-   [owncloud/web#9525](https://github.com/owncloud/web/pull/9525): Tags form
-   improved * Enhancement
-   [owncloud/web#9527](https://github.com/owncloud/web/pull/9527): Don't display
-   confirmation dialog on file deletion * Enhancement
-   [owncloud/web#9531](https://github.com/owncloud/web/issues/9531): Personal
-   shares can be shown and hidden * Enhancement
-   [owncloud/web#9552](https://github.com/owncloud/web/pull/9552): Upload
-   preparation time * Enhancement
-   [owncloud/web#9561](https://github.com/owncloud/web/pull/9561): Indicate
-   processing state * Enhancement
-   [owncloud/web#9566](https://github.com/owncloud/web/pull/9566): Display locking
-   information * Enhancement
-   [owncloud/web#9584](https://github.com/owncloud/web/pull/9584): Moving share's
-   "set expiration date" function * Enhancement
-   [owncloud/web#9625](https://github.com/owncloud/web/pull/9625): Add keyboard
-   navigation to spaces overview * Enhancement
-   [owncloud/web#9627](https://github.com/owncloud/web/pull/9627): Add batch
-   actions to spaces * Enhancement
-   [owncloud/web#9653](https://github.com/owncloud/web/pull/9653): Keyword Query
-   Language (KQL) search syntax * Enhancement
-   [owncloud/web#9671](https://github.com/owncloud/web/pull/9671): OcModal set
-   buttons to same width * Enhancement
-   [owncloud/web#9682](https://github.com/owncloud/web/pull/9682): Add password
-   policy compatibility * Enhancement
-   [owncloud/web#9691](https://github.com/owncloud/web/pull/9691): Password
-   generator for public links * Enhancement
-   [owncloud/web#9696](https://github.com/owncloud/web/pull/9696): Added app banner
-   for mobile devices * Enhancement
-   [owncloud/web#9706](https://github.com/owncloud/web/pull/9706): Unify sharing
-   expiration date menu items * Enhancement
-   [owncloud/web#9727](https://github.com/owncloud/web/pull/9727): Show error if
-   password is on a banned password list * Enhancement
-   [owncloud/web#9771](https://github.com/owncloud/web/pull/9771): Handle
-   postprocessing state via Server Sent Events * Enhancement
-   [owncloud/web#9806](https://github.com/owncloud/web/pull/9806): Preview image
-   presentation * Enhancement
-   [owncloud/web#9809](https://github.com/owncloud/web/pull/9809): Add editors to
-   the application menu * Enhancement
-   [owncloud/web#9814](https://github.com/owncloud/web/pull/9814): Registering nav
-   items as extension * Enhancement
-   [owncloud/web#9815](https://github.com/owncloud/web/pull/9815): Add new portal
-   into runtime to include footer * Enhancement
-   [owncloud/web#9818](https://github.com/owncloud/web/pull/9818): Add `mode`
-   config option * Enhancement
-   [owncloud/web#9831](https://github.com/owncloud/web/pull/9831): Last modified
-   filter chips * Enhancement
-   [owncloud/web#9841](https://github.com/owncloud/web/pull/9841): Add embed mode
-   actions * Enhancement
-   [owncloud/web#9847](https://github.com/owncloud/web/issues/9847): Provide vendor
-   neutral file icons * Enhancement
-   [owncloud/web#9853](https://github.com/owncloud/web/pull/9853): Show only create
-   folder button in embed mode * Enhancement
-   [owncloud/web#9854](https://github.com/owncloud/web/pull/9854): Search query
-   term linking * Enhancement
-   [owncloud/web#9857](https://github.com/owncloud/web/pull/9857): Add permission
-   to delete link passwords when password is enforced * Enhancement
-   [owncloud/web#9858](https://github.com/owncloud/web/pull/9858): Remove settings
-   icon from searchbar * Enhancement
-   [owncloud/web#9863](https://github.com/owncloud/web/pull/9863): Location picker
-   in embed mode * Enhancement
-   [owncloud/web#9864](https://github.com/owncloud/web/pull/9864): Search tags
-   filter chips style aligned * Enhancement
-   [owncloud/web#9884](https://github.com/owncloud/web/pull/9884): Enable dark
-   theme on importer * Enhancement
-   [owncloud/web#9890](https://github.com/owncloud/web/pull/9890): Create shortcuts
-   * Enhancement [owncloud/web#9905](https://github.com/owncloud/web/pull/9905):
-   Manage tags in details panel * Enhancement
-   [owncloud/web#9906](https://github.com/owncloud/web/pull/9906): Reorganize "New"
-   menu * Enhancement
-   [owncloud/web#9912](https://github.com/owncloud/web/pull/9912): Add media type
-   filter chip * Enhancement
-   [owncloud/web#9940](https://github.com/owncloud/web/pull/9940): Display error
-   message for upload to locked folder * Enhancement
-   [owncloud/web#9966](https://github.com/owncloud/web/issues/9966): Support more
-   audio formats with correct icon * Enhancement
-   [owncloud/web#10007](https://github.com/owncloud/web/issues/10007): Additional
-   languages * Enhancement
-   [owncloud/web#10013](https://github.com/owncloud/web/issues/10013): Shared by
-   filter * Enhancement
-   [owncloud/web#10014](https://github.com/owncloud/web/issues/10014): Share search
-   filter * Enhancement
-   [owncloud/web#10024](https://github.com/owncloud/web/pull/10024): Duplicate
-   space * Enhancement
-   [owncloud/web#10037](https://github.com/owncloud/web/pull/10037): Default link
-   permission * Enhancement
-   [owncloud/web#10047](https://github.com/owncloud/web/pull/10047): Add explaining
-   contextual helper to spaces overview * Enhancement
-   [owncloud/web#10057](https://github.com/owncloud/web/pull/10057): Folder tree
-   creation during upload * Enhancement
-   [owncloud/web#10062](https://github.com/owncloud/web/pull/10062): Show webdav
-   information in details view * Enhancement
-   [owncloud/web#10072](https://github.com/owncloud/web/issues/10072): Add
-   authentication delegation in the Embed mode * Enhancement
-   [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support
-   mandatory filter while listing users * Enhancement
-   [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering
-   quick actions as extension
-
-   https://github.com/owncloud/ocis/pull/8491
-   https://github.com/owncloud/ocis/pull/8468
-   https://github.com/owncloud/ocis/pull/8342
-   https://github.com/owncloud/ocis/pull/8154
-   https://github.com/owncloud/ocis/pull/8154
-   https://github.com/owncloud/ocis/pull/8055
-   https://github.com/owncloud/ocis/pull/7930
-   https://github.com/owncloud/ocis/pull/7952
-   https://github.com/owncloud/ocis/pull/7918
-   https://github.com/owncloud/ocis/pull/7883
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.5
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.4
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.3
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.2
-   https://github.com/owncloud/web/releases/tag/v8.0.0-rc.1
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.1
-   https://github.com/owncloud/web/releases/tag/v8.0.0-beta.2
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.13
-   https://github.com/owncloud/web/releases/tag/v8.0.0-alpha.12
-
 * Enhancement - Drop the unnecessary grants exists check when creating shares: [#8502](https://github.com/owncloud/ocis/pull/8502)
 
    We have bumped reva to drop the unnecessary grants exists check when creating
@@ -1971,7 +1757,158 @@ The following sections list the changes for 5.0.0-rc.5.
 
    https://github.com/owncloud/ocis/pull/8502
 
-* Enhancement - Update reva to 2.19.0: [#8519](https://github.com/owncloud/ocis/pull/8519)
+* Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
+
+   We have updated go to version 1.22.
+
+   https://github.com/owncloud/ocis/pull/8586
+
+* Enhancement - Update web to v8.0.0: [#8613](https://github.com/owncloud/ocis/pull/8613)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.0. Please refer to the changelog (linked) for
+   details on the web release.
+
+  * Bugfix [owncloud/web#9257](https://github.com/owncloud/web/issues/9257): Filter out shares without display name
+  * Bugfix [owncloud/web#9529](https://github.com/owncloud/web/pull/9529): Shared with action menu label alignment
+  * Bugfix [owncloud/web#9649](https://github.com/owncloud/web/pull/9649): Add project space filter
+  * Bugfix [owncloud/web#9663](https://github.com/owncloud/web/pull/9663): Respect the open-in-new-tab-config for external apps
+  * Bugfix [owncloud/web#9694](https://github.com/owncloud/web/issues/9694): Special characters in username
+  * Bugfix [owncloud/web#9788](https://github.com/owncloud/web/issues/9788): Create .space folder if it does not exist
+  * Bugfix [owncloud/web#9799](https://github.com/owncloud/web/issues/9799): Link resolving into default app
+  * Bugfix [owncloud/web#9832](https://github.com/owncloud/web/pull/9832): Copy quicklinks for webkit navigator
+  * Bugfix [owncloud/web#9843](https://github.com/owncloud/web/pull/9843): Fix display path on resources
+  * Bugfix [owncloud/web#9844](https://github.com/owncloud/web/pull/9844): Upload space image
+  * Bugfix [owncloud/web#9861](https://github.com/owncloud/web/pull/9861): Duplicated file search request
+  * Bugfix [owncloud/web#9873](https://github.com/owncloud/web/pull/9873): Tags are no longer editable for a locked file
+  * Bugfix [owncloud/web#9881](https://github.com/owncloud/web/pull/9881): Prevent rendering of old/wrong set of resources in search list
+  * Bugfix [owncloud/web#9915](https://github.com/owncloud/web/pull/9915): Keep both folders conflict in same-named folders
+  * Bugfix [owncloud/web#9931](https://github.com/owncloud/web/pull/9931): Enabling "invite people" for password-protected folder/file
+  * Bugfix [owncloud/web#10010](https://github.com/owncloud/web/issues/10010): Displaying full video in their dimensions
+  * Bugfix [owncloud/web#10031](https://github.com/owncloud/web/issues/10031): Icon extension mapping
+  * Bugfix [owncloud/web#10065](https://github.com/owncloud/web/pull/10065): Logout page after token expiry
+  * Bugfix [owncloud/web#10083](https://github.com/owncloud/web/pull/10083): Disable expiration date for alias link (internal)
+  * Bugfix [owncloud/web#10092](https://github.com/owncloud/web/pull/10092): Allow empty search query in "in-here" search
+  * Bugfix [owncloud/web#10096](https://github.com/owncloud/web/pull/10096): Remove password buttons on input if disabled
+  * Bugfix [owncloud/web#10118](https://github.com/owncloud/web/pull/10118): Tilesview has whitespace
+  * Bugfix [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces files list previews cropped
+  * Bugfix [owncloud/web#10149](https://github.com/owncloud/web/pull/10149): Spaces overview tile previews zoomed
+  * Bugfix [owncloud/web#10154](https://github.com/owncloud/web/pull/10154): Resolving links without drive alias
+  * Bugfix [owncloud/web#10156](https://github.com/owncloud/web/pull/10156): Uploading the same files parallel
+  * Bugfix [owncloud/web#10158](https://github.com/owncloud/web/pull/10158): GDPR export polling
+  * Bugfix [owncloud/web#10176](https://github.com/owncloud/web/pull/10176): Turned off file extensions not always respected
+  * Bugfix [owncloud/web#10179](https://github.com/owncloud/web/pull/10179): Space navigate to trash missing
+  * Bugfix [owncloud/web#10182](https://github.com/owncloud/web/pull/10182): Make versions panel readonly in viewers and editors
+  * Bugfix [owncloud/web#10220](https://github.com/owncloud/web/pull/10220): Loading indicator during conflict dialog
+  * Bugfix [owncloud/web#10227](https://github.com/owncloud/web/issues/10227): Configurable concurrent requests
+  * Bugfix [owncloud/web#10232](https://github.com/owncloud/web/pull/10232): Skip searchbar preview fetch on reload
+  * Bugfix [owncloud/web#10318](https://github.com/owncloud/web/pull/10318): Scrollable account page
+  * Bugfix [owncloud/web#10321](https://github.com/owncloud/web/pull/10321): Private link error messages
+  * Bugfix [owncloud/web#10347](https://github.com/owncloud/web/pull/10347): Readonly user attributes have no effect on group memberships
+  * Bugfix [owncloud/web#10424](https://github.com/owncloud/web/pull/10424): Restore space
+  * Bugfix [owncloud/web#10473](https://github.com/owncloud/web/issues/10473): Public link file download
+  * Bugfix [owncloud/web#10489](https://github.com/owncloud/web/pull/10489): Wrong share permissions when resharing off
+  * Bugfix [owncloud/web#10514](https://github.com/owncloud/web/pull/10514): Indicate shares that are not manageable due to file locking
+  * Change [owncloud/web#2404](https://github.com/owncloud/web/issues/2404): Theme handling
+  * Change [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove deprecated code
+  * Change [owncloud/web#9653](https://github.com/owncloud/web/pull/9653): Keyword Query Language (KQL) search syntax
+  * Change [owncloud/web#9709](https://github.com/owncloud/web/issues/9709): DavProperties without namespace
+  * Enhancement [owncloud/web#7317](https://github.com/owncloud/ocis/pull/7317): Make login url configurable
+  * Enhancement [owncloud/web#7497](https://github.com/owncloud/ocis/issues/7497): Permission checks for shares and favorites
+  * Enhancement [owncloud/web#7600](https://github.com/owncloud/web/issues/7600): Scroll to newly created folder
+  * Enhancement [owncloud/web#9302](https://github.com/owncloud/web/issues/9302): Application unification
+  * Enhancement [owncloud/web#9423](https://github.com/owncloud/web/pull/9423): Show local loading spinner in sharing button
+  * Enhancement [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): File versions tooltip with absolute date
+  * Enhancement [owncloud/web#9441](https://github.com/owncloud/web/pull/9441): Disabling extensions
+  * Enhancement [owncloud/web#9451](https://github.com/owncloud/web/pull/9451): Add SSE to get notifications instantly
+  * Enhancement [owncloud/web#9525](https://github.com/owncloud/web/pull/9525): Tags form improved
+  * Enhancement [owncloud/web#9527](https://github.com/owncloud/web/pull/9527): Don't display confirmation dialog on file deletion
+  * Enhancement [owncloud/web#9531](https://github.com/owncloud/web/issues/9531): Personal shares can be shown and hidden
+  * Enhancement [owncloud/web#9552](https://github.com/owncloud/web/pull/9552): Upload preparation time
+  * Enhancement [owncloud/web#9561](https://github.com/owncloud/web/pull/9561): Indicate processing state
+  * Enhancement [owncloud/web#9566](https://github.com/owncloud/web/pull/9566): Display locking information
+  * Enhancement [owncloud/web#9584](https://github.com/owncloud/web/pull/9584): Moving share's "set expiration date" function
+  * Enhancement [owncloud/web#9625](https://github.com/owncloud/web/pull/9625): Add keyboard navigation to spaces overview
+  * Enhancement [owncloud/web#9627](https://github.com/owncloud/web/pull/9627): Add batch actions to spaces
+  * Enhancement [owncloud/web#9671](https://github.com/owncloud/web/pull/9671): OcModal set buttons to same width
+  * Enhancement [owncloud/web#9682](https://github.com/owncloud/web/pull/9682): Add password policy compatibility
+  * Enhancement [owncloud/web#9691](https://github.com/owncloud/web/pull/9691): Password generator for public links
+  * Enhancement [owncloud/web#9696](https://github.com/owncloud/web/pull/9696): Added app banner for mobile devices
+  * Enhancement [owncloud/web#9706](https://github.com/owncloud/web/pull/9706): Unify sharing expiration date menu items
+  * Enhancement [owncloud/web#9709](https://github.com/owncloud/web/issues/9709): New WebDAV implementation in web-client
+  * Enhancement [owncloud/web#9727](https://github.com/owncloud/web/pull/9727): Show error if password is on a banned password list
+  * Enhancement [owncloud/web#9768](https://github.com/owncloud/web/issues/9768): Embed mode
+  * Enhancement [owncloud/web#9771](https://github.com/owncloud/web/pull/9771): Handle postprocessing state via Server Sent Events
+  * Enhancement [owncloud/web#9794](https://github.com/owncloud/web/pull/9794): Registering search providers as extension
+  * Enhancement [owncloud/web#9806](https://github.com/owncloud/web/pull/9806): Preview image presentation
+  * Enhancement [owncloud/web#9809](https://github.com/owncloud/web/pull/9809): Add editors to the application menu
+  * Enhancement [owncloud/web#9814](https://github.com/owncloud/web/pull/9814): Registering nav items as extension
+  * Enhancement [owncloud/web#9815](https://github.com/owncloud/web/pull/9815): Add new portal into runtime to include footer
+  * Enhancement [owncloud/web#9831](https://github.com/owncloud/web/pull/9831): Last modified filter chips
+  * Enhancement [owncloud/web#9847](https://github.com/owncloud/web/issues/9847): Provide vendor neutral file icons
+  * Enhancement [owncloud/web#9854](https://github.com/owncloud/web/pull/9854): Search query term linking
+  * Enhancement [owncloud/web#9857](https://github.com/owncloud/web/pull/9857): Add permission to delete link passwords when password is enforced
+  * Enhancement [owncloud/web#9858](https://github.com/owncloud/web/pull/9858): Remove settings icon from searchbar
+  * Enhancement [owncloud/web#9864](https://github.com/owncloud/web/pull/9864): Search tags filter chips style aligned
+  * Enhancement [owncloud/web#9884](https://github.com/owncloud/web/pull/9884): Enable dark theme on importer
+  * Enhancement [owncloud/web#9890](https://github.com/owncloud/web/pull/9890): Create shortcuts
+  * Enhancement [owncloud/web#9905](https://github.com/owncloud/web/pull/9905): Manage tags in details panel
+  * Enhancement [owncloud/web#9906](https://github.com/owncloud/web/pull/9906): Reorganize "New" menu
+  * Enhancement [owncloud/web#9912](https://github.com/owncloud/web/pull/9912): Add media type filter chip
+  * Enhancement [owncloud/web#9940](https://github.com/owncloud/web/pull/9940): Display error message for upload to locked folder
+  * Enhancement [owncloud/web#9966](https://github.com/owncloud/web/issues/9966): Support more audio formats with correct icon
+  * Enhancement [owncloud/web#10007](https://github.com/owncloud/web/issues/10007): Additional languages
+  * Enhancement [owncloud/web#10013](https://github.com/owncloud/web/issues/10013): Shared by filter
+  * Enhancement [owncloud/web#10014](https://github.com/owncloud/web/issues/10014): Share search filter
+  * Enhancement [owncloud/web#10024](https://github.com/owncloud/web/pull/10024): Duplicate space
+  * Enhancement [owncloud/web#10037](https://github.com/owncloud/web/pull/10037): Default link permission
+  * Enhancement [owncloud/web#10047](https://github.com/owncloud/web/pull/10047): Add explaining contextual helper to spaces overview
+  * Enhancement [owncloud/web#10057](https://github.com/owncloud/web/pull/10057): Folder tree creation during upload
+  * Enhancement [owncloud/web#10062](https://github.com/owncloud/web/pull/10062): Show webdav information in details view
+  * Enhancement [owncloud/web#10099](https://github.com/owncloud/web/pull/10099): Support mandatory filter while listing users
+  * Enhancement [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Registering quick actions as extension
+  * Enhancement [owncloud/web#10104](https://github.com/owncloud/web/pull/10104): Create link modal
+  * Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): Registering right sidebar panels as extension
+  * Enhancement [owncloud/web#10111](https://github.com/owncloud/web/pull/10111): File sidebar in viewer and editor apps
+  * Enhancement [owncloud/web#10224](https://github.com/owncloud/web/pull/10224): Harmonize AppSwitcher icon colors
+  * Enhancement [owncloud/web#10356](https://github.com/owncloud/web/pull/10356): Preview app add reset button for images
+
+   https://github.com/owncloud/ocis/pull/8613
+   https://github.com/owncloud/web/releases/tag/v8.0.0
+
+* Enhancement - Update web to v8.0.1: [#8626](https://github.com/owncloud/ocis/pull/8626)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.1. Please refer to the changelog (linked) for
+   details on the web release.
+
+  * Bugfix [owncloud/web#10573](https://github.com/owncloud/web/pull/10573): Add link in right sidebar sharing menu, doesn't copy link to clipboard
+  * Bugfix [owncloud/web#10576](https://github.com/owncloud/web/pull/10576): WebDav Url in right sidebar is missing dav in path
+  * Bugfix [owncloud/web#10585](https://github.com/owncloud/web/issues/10585): Update translations
+
+   https://github.com/owncloud/ocis/pull/8626
+   https://github.com/owncloud/web/releases/tag/v8.0.1
+
+* Enhancement - Update reva to 2.19.2: [#8638](https://github.com/owncloud/ocis/pull/8638)
+
+   We update reva to the version 2.19.2
+
+  *   Bugfix [cs3org/reva#4557](https://github.com/cs3org/reva/pull/4557): Fix ceph build
+  *   Bugfix [cs3org/reva#4570](https://github.com/cs3org/reva/pull/4570): Fix sharing invite on virtual drive
+  *   Bugfix [cs3org/reva#4559](https://github.com/cs3org/reva/pull/4559): Fix graph drive invite
+  *   Bugfix [cs3org/reva#4518](https://github.com/cs3org/reva/pull/4518): Fix an error when lock/unlock a file
+  *   Bugfix [cs3org/reva#4566](https://github.com/cs3org/reva/pull/4566): Fix public link previews
+  *   Bugfix [cs3org/reva#4561](https://github.com/cs3org/reva/pull/4561): Fix Stat() by Path on re-created resource
+  *   Enhancement [cs3org/reva#4556](https://github.com/cs3org/reva/pull/4556): Allow tracing requests by giving util functions a context
+  *   Enhancement [cs3org/reva#4545](https://github.com/cs3org/reva/pull/4545): Extend service account permissions
+  *   Enhancement [cs3org/reva#4564](https://github.com/cs3org/reva/pull/4564): Send file locked/unlocked events
+
+   We update reva to the version 2.19.1
+
+  *   Bugfix [cs3org/reva#4534](https://github.com/cs3org/reva/pull/4534): Fix remove/update share permissions
+  *   Bugfix [cs3org/reva#4539](https://github.com/cs3org/reva/pull/4539): Fix a typo
 
    We update reva to the version 2.19.0
 
@@ -2112,6 +2049,7 @@ The following sections list the changes for 5.0.0-rc.5.
   *   Enhancement [cs3org/reva#4170](https://github.com/cs3org/reva/pull/4170): Update password policies
   *   Enhancement [cs3org/reva#4232](https://github.com/cs3org/reva/pull/4232): Improve error handling in utils package
 
+   https://github.com/owncloud/ocis/pull/8638
    https://github.com/owncloud/ocis/pull/8519
    https://github.com/owncloud/ocis/pull/8502
    https://github.com/owncloud/ocis/pull/8340
@@ -7532,7 +7470,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -7706,11 +7644,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -7883,24 +7839,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
