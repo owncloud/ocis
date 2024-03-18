@@ -6,11 +6,11 @@ Feature: assign role
 
   Scenario Outline: only admin user can see all existing roles
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    And the administrator has given "Alice" the role "<user-role>" using the settings api
     When user "Alice" tries to get all existing roles
-    Then the HTTP status code should be "<statusCode>"
+    Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | userRole    | statusCode |
+      | user-role    | http-status-code |
       | Admin       | 201        |
       | Space Admin | 201        |
       | User        | 201        |
@@ -18,11 +18,11 @@ Feature: assign role
   @issue-5032
   Scenario Outline: only admin user can see assignments list
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    And the administrator has given "Alice" the role "<user-role>" using the settings api
     When user "Alice" tries to get list of assignment
-    Then the HTTP status code should be "<statusCode>"
+    Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | userRole    | statusCode |
+      | user-role    | http-status-code |
       | Admin       | 201        |
       | Space Admin | 401        |
       | User        | 401        |
@@ -30,12 +30,12 @@ Feature: assign role
 
   Scenario Outline: a user cannot change own role
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
-    When user "Alice" changes his own role to "<desiredRole>"
+    And the administrator has given "Alice" the role "<user-role>" using the settings api
+    When user "Alice" changes his own role to "<desired-role>"
     Then the HTTP status code should be "400"
-    And user "Alice" should have the role "<userRole>"
+    And user "Alice" should have the role "<user-role>"
     Examples:
-      | userRole    | desiredRole |
+      | user-role    | desired-role |
       | Admin       | User        |
       | Admin       | Space Admin |
       | Space Admin | Admin       |
@@ -49,12 +49,12 @@ Feature: assign role
       | username |
       | Alice    |
       | Brian    |
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
-    When user "Alice" changes the role "<desiredRole>" for user "Brian"
-    Then the HTTP status code should be "<statusCode>"
-    And user "Brian" should have the role "<expectedRole>"
+    And the administrator has given "Alice" the role "<user-role>" using the settings api
+    When user "Alice" changes the role "<desired-role>" for user "Brian"
+    Then the HTTP status code should be "<http-status-code>"
+    And user "Brian" should have the role "<expected-role>"
     Examples:
-      | userRole    | desiredRole | statusCode | expectedRole |
+      | user-role    | desired-role | http-status-code | expected-role |
       | Admin       | User        | 201        | User         |
       | Admin       | Space Admin | 201        | Space Admin  |
       | Admin       | Admin       | 201        | Admin        |
