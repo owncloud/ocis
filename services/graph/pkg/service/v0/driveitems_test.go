@@ -55,13 +55,15 @@ type itemsList struct {
 
 var _ = Describe("Driveitems", func() {
 	var (
-		svc             service.Service
-		ctx             context.Context
-		cfg             *config.Config
-		gatewayClient   *cs3mocks.GatewayAPIClient
-		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		eventsPublisher mocks.Publisher
-		identityBackend *identitymocks.Backend
+		svc                    service.Service
+		ctx                    context.Context
+		cfg                    *config.Config
+		gatewayClient          *cs3mocks.GatewayAPIClient
+		gatewaySelector        pool.Selectable[gateway.GatewayAPIClient]
+		eventsPublisher        mocks.Publisher
+		identityBackend        *identitymocks.Backend
+		getPublicShareResponse *link.GetPublicShareResponse
+		getShareResponse       *collaboration.GetShareResponse
 
 		rr *httptest.ResponseRecorder
 
@@ -86,6 +88,12 @@ var _ = Describe("Driveitems", func() {
 				return gatewayClient
 			},
 		)
+		getPublicShareResponse = &link.GetPublicShareResponse{
+			Status: status.NewNotFound(ctx, "not found"),
+		}
+		getShareResponse = &collaboration.GetShareResponse{
+			Status: status.NewNotFound(ctx, "not found"),
+		}
 
 		identityBackend = &identitymocks.Backend{}
 		newGroup = libregraph.NewGroup()
@@ -111,26 +119,25 @@ var _ = Describe("Driveitems", func() {
 
 	Describe("DeletePermission", func() {
 		It("deletes a user permission as expected", func() {
-			getShareMock := gatewayClient.On("GetShare",
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareResponse, nil)
+
+			getShareResponse.Status = status.NewOK(ctx)
+			getShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{
+					OpaqueId: "permissionid",
+				},
+				ResourceId: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				},
+			}
+			gatewayClient.On("GetShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
 					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
 				}),
-			)
-			getShareMockResponse := &collaboration.GetShareResponse{
-				Status: status.NewOK(ctx),
-				Share: &collaboration.Share{
-					Id: &collaboration.ShareId{
-						OpaqueId: "permissionid",
-					},
-					ResourceId: &provider.ResourceId{
-						StorageId: "1",
-						SpaceId:   "2",
-						OpaqueId:  "3",
-					},
-				},
-			}
-			getShareMock.Return(getShareMockResponse, nil)
+			).Return(getShareResponse, nil)
 
 			rmShareMock := gatewayClient.On("RemoveShare",
 				mock.Anything,
@@ -158,17 +165,6 @@ var _ = Describe("Driveitems", func() {
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 		})
 		It("deletes a link permission as expected", func() {
-			getShareMock := gatewayClient.On("GetShare",
-				mock.Anything,
-				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
-					return req.GetRef().GetId().GetOpaqueId() == "linkpermissionid"
-				}),
-			)
-			getShareMockResponse := &collaboration.GetShareResponse{
-				Status: status.NewNotFound(ctx, "not found"),
-			}
-			getShareMock.Return(getShareMockResponse, nil)
-
 			getPublicShareMock := gatewayClient.On("GetPublicShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
@@ -214,28 +210,51 @@ var _ = Describe("Driveitems", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 		})
+		It("deletes a space permission as expected", func() {
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareResponse, nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!2")
+			rctx.URLParams.Add("permissionID", "u:userid")
+
+			gatewayClient.On("RemoveShare",
+				mock.Anything,
+				mock.Anything,
+			).Return(func(ctx context.Context, in *collaboration.RemoveShareRequest, opts ...grpc.CallOption) (*collaboration.RemoveShareResponse, error) {
+				Expect(in.Ref.GetKey()).ToNot(BeNil())
+				Expect(in.Ref.GetKey().GetGrantee().GetUserId().GetOpaqueId()).To(Equal("userid"))
+				return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
+			})
+
+			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+
+			svc.DeletePermission(
+				rr,
+				httptest.NewRequest(http.MethodPost, "/", nil).WithContext(ctx),
+			)
+
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+		})
 
 		It("fails to delete permission when the item id does not match the shared resource's id", func() {
-			getShareMock := gatewayClient.On("GetShare",
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareResponse, nil)
+			getShareResponse.Status = status.NewOK(ctx)
+			getShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{
+					OpaqueId: "permissionid",
+				},
+				ResourceId: &provider.ResourceId{
+					StorageId: "3",
+					SpaceId:   "4",
+					OpaqueId:  "5",
+				},
+			}
+			gatewayClient.On("GetShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
 					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
 				}),
-			)
-			getShareMockResponse := &collaboration.GetShareResponse{
-				Status: status.NewOK(ctx),
-				Share: &collaboration.Share{
-					Id: &collaboration.ShareId{
-						OpaqueId: "permissionid",
-					},
-					ResourceId: &provider.ResourceId{
-						StorageId: "3",
-						SpaceId:   "4",
-						OpaqueId:  "5",
-					},
-				},
-			}
-			getShareMock.Return(getShareMockResponse, nil)
+			).Return(getShareResponse, nil)
 
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "1$2")
