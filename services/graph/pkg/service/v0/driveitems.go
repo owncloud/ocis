@@ -599,6 +599,10 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 
 	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.Id = conversions.ToPointer(id)
+	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		// permissions on a space root are not handled by a share manager so
+		// they don't get a shareid
+		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
 	}
 
 	if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
