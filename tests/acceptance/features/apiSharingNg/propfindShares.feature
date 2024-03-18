@@ -11,7 +11,7 @@ Feature: propfind a shares
       | Carol    |
 
   @issue-4421
-  Scenario Outline: sharee PROPFIND a shares when multiple users share resource with same name
+  Scenario Outline: sharee PROPFIND same name shares shared by multiple users
     Given user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
