@@ -718,8 +718,8 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     Examples:
       | dav-path               | space    | http-status-code |
-      | /remote.php/dav/spaces | Personal | 400              |
-      | /dav/spaces            | Personal | 400              |
+      | /remote.php/dav/spaces | Personal | 409              |
+      | /dav/spaces            | Personal | 409              |
       | /remote.php/dav/spaces | myspace  | 400              |
       | /dav/spaces            | myspace  | 400              |
       | /remote.php/dav/spaces | Shares   | 404              |
@@ -738,8 +738,8 @@ Feature: moving/renaming file using file id
       | dav-path               | space    | http-status-code |
       | /remote.php/dav/spaces | Personal | 400              |
       | /dav/spaces            | Personal | 400              |
-      | /remote.php/dav/spaces | myspace  | 400              |
-      | /dav/spaces            | myspace  | 400              |
+      | /remote.php/dav/spaces | myspace  | 409              |
+      | /dav/spaces            | myspace  | 409              |
       | /remote.php/dav/spaces | Shares   | 404              |
       | /dav/spaces            | Shares   | 404              |
 
