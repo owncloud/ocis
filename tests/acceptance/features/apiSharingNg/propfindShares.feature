@@ -88,3 +88,35 @@ Feature: propfind a shares
       | old              | folderToShare | folderToShare (1) |
       | new              | textfile.txt  | textfile (1).txt  |
       | new              | folderToShare | folderToShare (1) |
+
+  @issue-4421
+  Scenario: sharee PROPFIND shares with bracket in the name
+    Given using spaces DAV path
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "to share" to "folderToShare/textfile.txt"
+    And user "Carol" has created folder "folderToShare"
+    And user "Carol" has uploaded file with content "to share" to "folderToShare/textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Carol" has sent the following share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare (1)" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
+      | key            | value                    |
+      | oc:fileid      | UUIDof:folderToShare (1) |
+      | oc:name        | folderToShare            |
+      | oc:permissions | SR                       |
+    And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
+      | key            | value               |
+      | oc:fileid      | UUIDof:textfile.txt |
+      | oc:name        | textfile.txt        |
+      | oc:permissions | SR                  |
