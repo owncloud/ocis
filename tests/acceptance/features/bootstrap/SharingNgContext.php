@@ -559,4 +559,45 @@ class SharingNgContext implements Context {
 
 		Assert::assertSame($should, $fileFound, $assertMessage);
 	}
+
+	/**
+	 *
+	 * @param string $user
+	 * @param string $itemId
+	 * @param string $shareSpaceId
+	 *
+	 * @return ResponseInterface
+	 */
+	public function declineShares(string $user, string $itemId, string $shareSpaceId): ResponseInterface {
+		return GraphHelper::unmountShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId,
+		);
+	}
+
+	/**
+	 * @When user :user declines share :share using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $offeredBy
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userDeclinesShareUsingTheGraphApi(
+		string $user,
+		string $share,
+		string $offeredBy
+	):void {
+		$shareSpaceId = ($this->spacesContext->getSpaceByName($user, "Shares"))["id"];
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$itemId = $shareSpaceId . '!' . $shareItemId;
+		$this->featureContext->setResponse($this->declineShares($user, $itemId, $shareSpaceId));
+		$this->featureContext->pushToLastStatusCodesArrays();
+	}
 }

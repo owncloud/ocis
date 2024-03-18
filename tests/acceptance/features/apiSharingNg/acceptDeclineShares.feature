@@ -1,7 +1,7 @@
-Feature: accept/decline incoming share
+Feature:  mount or unmount incoming share
   As a user
   I want to have control over the share received
-  So that I can filter out the files and folder shared to Me
+  So that I can filter out the files and folder shared with Me
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -11,16 +11,16 @@ Feature: accept/decline incoming share
     And using spaces DAV path
 
 
-  Scenario: decline shared file when auto accept is enabled
+  Scenario Outline: unmount shared resource
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has sent the following share invitation:
-      | resource        | textfile0.txt |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
-    When user "Brian" declines share "/textfile0.txt" using the Graph API
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" declines share "<resource>" using the Graph API
     And user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the JSON data of the response should match
@@ -50,44 +50,7 @@ Feature: accept/decline incoming share
       }
     }
     """
-
-
-  Scenario: decline shared folder when auto accept is enabled
-    Given user "Alice" has created folder "folder"
-    And user "Alice" has sent the following share invitation:
-      | resource        | folder   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
-    When user "Brian" declines share "folder" using the Graph API
-    And user "Brian" lists the shares shared with him using the Graph API
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the JSON data of the response should match
-      """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@client.synchronize"
-            ],
-            "properties": {
-              "@client.synchronize": {
-                "const": false
-              }
-            }
-          }
-        }
-      }
-    }
-    """
-
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |

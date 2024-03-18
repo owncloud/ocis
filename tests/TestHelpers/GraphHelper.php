@@ -1899,32 +1899,21 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
-	 * @param string $share
+	 * @param string $itemId
+	 * @param string $shareSpaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function declineShare(
+	public static function unmountShare(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
 		string $password,
-		string $share
+		string $itemId,
+		string $shareSpaceId
 	):ResponseInterface {
-		$response = self::getSharesSharedWithMe(
-			$baseUrl,
-			$xRequestId,
-			$user,
-			$password,
-		);
-		$responseBody = json_decode($response->getBody()->getContents(), true);
-		foreach ($responseBody["value"] as $value) {
-			if (isset($value["name"]) && $value["name"] === $share) {
-				$itemId = $value["id"];
-				$driveId = $value["parentReference"]["id"];
-			}
-		}
-		$url = self::getBetaFullUrl($baseUrl, "drives/$driveId/items/$itemId");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
 		return HttpRequestHelper::delete(
 			$url,
 			$xRequestId,
