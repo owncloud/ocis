@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Disable Multipart uploads: [#8666](https://github.com/owncloud/ocis/pull/8666)
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+* Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
@@ -148,6 +149,16 @@ The following sections list the changes for unreleased.
    default to the built-in NATS instance.
 
    https://github.com/owncloud/ocis/pull/8419
+
+* Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
+
+   We have introduced a new static routes package to the proxy. This package is
+   responsible for serving static files and oidc well-known endpoint
+   `/.well-known/openid-configuration`. We have removed the well-known middleware
+   for OIDC and moved it to the newly introduced static routes module in the proxy.
+
+   https://github.com/owncloud/ocis/issues/6095
+   https://github.com/owncloud/ocis/pull/8541
 
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 
