@@ -16,14 +16,14 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And the JSON data of the response should match
       """
       {
@@ -91,7 +91,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -109,16 +109,16 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And for user "Carol" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And the JSON data of the response should match
       """
       {
@@ -186,7 +186,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -197,11 +197,11 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation for a file to user with different permissions
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource          | textfile1.txt       |
-      | space             | Personal            |
-      | sharee            | Brian               |
-      | shareType         | user                |
-      | permissionsAction | <permissionsAction> |
+      | resource          | textfile1.txt        |
+      | space             | Personal             |
+      | sharee            | Brian                |
+      | shareType         | user                 |
+      | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -233,7 +233,7 @@ Feature: Send a sharing invitations
                   "minItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permissions-action>$"
                   }
                 },
                 "grantedToV2": {
@@ -270,7 +270,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsAction  |
+      | permissions-action |
       | permissions/create |
       | upload/create      |
       | path/read          |
@@ -292,11 +292,11 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation for a folder to user with different permissions
     Given user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource          | FolderToShare       |
-      | space             | Personal            |
-      | sharee            | Brian               |
-      | shareType         | user                |
-      | permissionsAction | <permissionsAction> |
+      | resource          | FolderToShare        |
+      | space             | Personal             |
+      | sharee            | Brian                |
+      | shareType         | user                 |
+      | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -328,7 +328,7 @@ Feature: Send a sharing invitations
                   "maxItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permissions-action>$"
                   }
                 },
                 "grantedToV2": {
@@ -365,7 +365,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsAction  |
+      | permissions-action |
       | permissions/create |
       | children/create    |
       | upload/create      |
@@ -396,11 +396,11 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource          | textfile1.txt       |
-      | space             | Personal            |
-      | sharee            | grp1                |
-      | shareType         | group               |
-      | permissionsAction | <permissionsAction> |
+      | resource          | textfile1.txt        |
+      | space             | Personal             |
+      | sharee            | grp1                 |
+      | shareType         | group                |
+      | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -432,7 +432,7 @@ Feature: Send a sharing invitations
                   "maxItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permissions-action>$"
                   }
                 },
                 "grantedToV2": {
@@ -469,7 +469,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsAction  |
+      | permissions-action |
       | permissions/create |
       | upload/create      |
       | path/read          |
@@ -497,11 +497,11 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource          | FolderToShare       |
-      | space             | Personal            |
-      | sharee            | grp1                |
-      | shareType         | group               |
-      | permissionsAction | <permissionsAction> |
+      | resource          | FolderToShare        |
+      | space             | Personal             |
+      | sharee            | grp1                 |
+      | shareType         | group                |
+      | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -533,7 +533,7 @@ Feature: Send a sharing invitations
                   "maxItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^libre\\.graph\\/driveItem\\/<permissionsAction>$"
+                    "pattern": "^libre\\.graph\\/driveItem\\/<permissions-action>$"
                   }
                 },
                 "grantedToV2": {
@@ -570,7 +570,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissionsAction  |
+      | permissions-action |
       | permissions/create |
       | children/create    |
       | upload/create      |
@@ -596,7 +596,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>                   |
+      | resource        | <resource>               |
       | space           | Personal                 |
       | sharee          | Brian                    |
       | shareType       | user                     |
@@ -677,7 +677,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -695,7 +695,7 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>                   |
+      | resource        | <resource>               |
       | space           | Personal                 |
       | sharee          | grp1                     |
       | shareType       | group                    |
@@ -776,7 +776,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -789,7 +789,7 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has disabled user "Brian"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -862,7 +862,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -881,7 +881,7 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the administrator has deleted group "grp1"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -920,7 +920,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -933,7 +933,7 @@ Feature: Send a sharing invitations
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has deleted a user "Brian"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -970,7 +970,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -993,7 +993,7 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1, grp2         |
       | shareType       | group, group       |
@@ -1032,7 +1032,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -1054,7 +1054,7 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1, Bob          |
       | shareType       | group, user        |
@@ -1093,7 +1093,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -1105,7 +1105,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | nonExistentGroup   |
       | shareType       | group              |
@@ -1144,7 +1144,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -1162,13 +1162,13 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -1205,7 +1205,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
       | File Editor      | /textfile1.txt |
       | Viewer           | FolderToShare  |
@@ -1217,7 +1217,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>                               |
+      | resource        | <resource>                           |
       | space           | Personal                             |
       | shareeId        | a4c0c83e-ae24-4870-93c3-fcaf2a2228f7 |
       | shareType       | user                                 |
@@ -1254,7 +1254,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1263,11 +1263,11 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>   |
-      | space           | Personal |
-      | shareeId        |          |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | shareeId        |            |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1300,7 +1300,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1309,7 +1309,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>         |
+      | resource        | <resource>     |
       | space           | Personal       |
       | sharee          | Brian          |
       | shareType       | wrongShareType |
@@ -1346,7 +1346,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1361,7 +1361,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>         |
+      | resource        | <resource>     |
       | space           | Personal       |
       | sharee          | grp1           |
       | shareType       | wrongShareType |
@@ -1398,7 +1398,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1407,11 +1407,11 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       |          |
-      | permissionsRole | Viewer   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       |            |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1444,7 +1444,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1459,11 +1459,11 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>   |
-      | space           | Personal |
-      | sharee          | grp1     |
-      | shareType       |          |
-      | permissionsRole | Viewer   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | grp1       |
+      | shareType       |            |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -1496,7 +1496,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -1505,7 +1505,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following share invitation using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -1544,7 +1544,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path           |
+      | permissions-role | resource       |
       | Manager          | /textfile1.txt |
       | Space Viewer     | /textfile1.txt |
       | Space Editor     | /textfile1.txt |
@@ -1604,17 +1604,17 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Alice" tries to send the following share invitation using the Graph API:
-      | resource        | <path>   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "409"
     And the JSON data of the response should match
       """
@@ -1645,7 +1645,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | path           |
+      | resource       |
       | /textfile1.txt |
       | FolderToShare  |
 
@@ -2109,14 +2109,14 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     When user "Alice" sends the following share invitation for space using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And the JSON data of the response should match
       """
       {
@@ -2179,7 +2179,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path          |
+      | permissions-role | resource      |
       | Viewer           | textfile1.txt |
       | File Editor      | textfile1.txt |
       | Viewer           | FolderToShare |
@@ -2200,16 +2200,16 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     When user "Alice" sends the following share invitation for space using the Graph API:
-      | resource        | <path>             |
+      | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | grp1               |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And for user "Carol" the space Shares should contain these entries:
-      | <path> |
+      | <resource> |
     And the JSON data of the response should match
       """
       {
@@ -2277,7 +2277,7 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | path          |
+      | permissions-role | resource      |
       | Viewer           | textfile1.txt |
       | File Editor      | textfile1.txt |
       | Viewer           | FolderToShare |

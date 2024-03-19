@@ -10,10 +10,10 @@ Feature: Create a share link for a resource
   Scenario Outline: create a link share of a folder
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following link share using the Graph API:
-      | resource        | folder            |
-      | space           | Personal          |
-      | permissionsRole | <permissionsRole> |
-      | password        | %public%          |
+      | resource        | folder             |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -57,7 +57,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<permissionsRole>"
+                "const": "<permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -69,12 +69,12 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | upload          |
-      | createOnly      |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal link share of a folder
@@ -152,10 +152,10 @@ Feature: Create a share link for a resource
   Scenario Outline: create a link share of a file
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
-      | resource        | textfile1.txt     |
-      | space           | Personal          |
-      | permissionsRole | <permissionsRole> |
-      | password        | %public%          |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -199,7 +199,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<permissionsRole>"
+                "const": "<permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -211,10 +211,10 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal link share of a file
@@ -294,7 +294,7 @@ Feature: Create a share link for a resource
     When user "Alice" creates the following link share using the Graph API:
       | resource           | folder                   |
       | space              | Personal                 |
-      | permissionsRole    | <permissionsRole>        |
+      | permissionsRole    | <permissions-role>       |
       | password           | %public%                 |
       | displayName        | Homework                 |
       | expirationDateTime | 2200-07-15T14:00:00.000Z |
@@ -346,7 +346,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<permissionsRole>"
+                "const": "<permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -358,12 +358,12 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | upload          |
-      | createOnly      |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: create a link share of a file with display name and expiry date
@@ -371,7 +371,7 @@ Feature: Create a share link for a resource
     When user "Alice" creates the following link share using the Graph API:
       | resource           | textfile1.txt            |
       | space              | Personal                 |
-      | permissionsRole    | <permissionsRole>        |
+      | permissionsRole    | <permissions-role>       |
       | password           | %public%                 |
       | displayName        | Homework                 |
       | expirationDateTime | 2200-07-15T14:00:00.000Z |
@@ -423,7 +423,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<permissionsRole>"
+                "const": "<permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -435,10 +435,10 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a file without password
@@ -447,9 +447,9 @@ Feature: Create a share link for a resource
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
-      | resource        | textfile1.txt     |
-      | space           | Personal          |
-      | permissionsRole | <permissionsRole> |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -493,7 +493,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<permissionsRole>"
+                "const": "<permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -505,24 +505,24 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | internal        |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | internal         |
+      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: update role of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following link share:
-      | resource        | textfile1.txt             |
-      | space           | Personal                  |
-      | permissionsRole | <previousPermissionsRole> |
-      | password        | %public%                  |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the Graph API with
-      | resource        | textfile1.txt        |
-      | space           | Personal             |
-      | permissionsRole | <newPermissionsRole> |
+      | resource        | textfile1.txt          |
+      | space           | Personal               |
+      | permissionsRole | <new-permissions-role> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -566,7 +566,7 @@ Feature: Create a share link for a resource
               },
               "type": {
                 "type": "string",
-                "const": "<newPermissionsRole>"
+                "const": "<new-permissions-role>"
               },
               "webUrl": {
                 "type": "string",
@@ -578,22 +578,22 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | previousPermissionsRole | newPermissionsRole |
-      | view                    | edit               |
-      | view                    | blocksDownload     |
-      | edit                    | view               |
-      | edit                    | blocksDownload     |
-      | blocksDownload          | edit               |
-      | blocksDownload          | blocksDownload     |
+      | permissions-role | new-permissions-role |
+      | view             | edit                 |
+      | view             | blocksDownload       |
+      | edit             | view                 |
+      | edit             | blocksDownload       |
+      | blocksDownload   | edit                 |
+      | blocksDownload   | blocksDownload       |
 
   @issue-8619
   Scenario Outline: update role of a file's to internal link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following link share:
-      | resource        | textfile1.txt             |
-      | space           | Personal                  |
-      | permissionsRole | <previousPermissionsRole> |
-      | password        | %public%                  |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the Graph API with
       | resource        | textfile1.txt |
       | space           | Personal      |
@@ -653,10 +653,10 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | previousPermissionsRole |
-      | view                    |
-      | edit                    |
-      | blocksDownload          |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
 
 
   Scenario: update expiration date of a file's link share
@@ -732,15 +732,15 @@ Feature: Create a share link for a resource
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created folder "folder"
     And user "Alice" has created the following link share:
-      | resource           | <path>                   |
+      | resource           | <resource>               |
       | space              | Personal                 |
       | permissionsRole    | view                     |
       | password           | %public%                 |
       | expirationDateTime | 2200-07-15T14:00:00.000Z |
     When user "Alice" updates the last public link share using the Graph API with
-      | resource           | <path>   |
-      | space              | Personal |
-      | expirationDateTime |          |
+      | resource           | <resource> |
+      | space              | Personal   |
+      | expirationDateTime |            |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -792,7 +792,7 @@ Feature: Create a share link for a resource
       }
       """
     Examples:
-      | path          |
+      | resource      |
       | textfile1.txt |
       | folder        |
 

@@ -94,8 +94,8 @@ Feature: lock files
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" locks file "textfile.txt" inside the space "Project" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -109,9 +109,9 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
     Examples:
-      | role    |
-      | manager |
-      | editor  |
+      | space-role |
+      | manager    |
+      | editor     |
 
 
   Scenario Outline: lock a file in the project space using file-id
@@ -121,8 +121,8 @@ Feature: lock files
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -136,9 +136,9 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
     Examples:
-      | role    | dav-path                          |
-      | manager | /remote.php/dav/spaces/<<FILEID>> |
-      | editor  | /dav/spaces/<<FILEID>>            |
+      | space-role | dav-path                          |
+      | manager    | /remote.php/dav/spaces/<<FILEID>> |
+      | editor     | /dav/spaces/<<FILEID>>            |
 
 
   Scenario: viewer cannot lock a file in the project space

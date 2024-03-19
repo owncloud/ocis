@@ -13,22 +13,22 @@ Feature: Remove access to a drive item
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>            |
-      | space           | Personal          |
-      | sharee          | Brian             |
-      | shareType       | user              |
-      | permissionsRole | <permissionsRole> |
-    When user "Alice" removes the share permission of user "Brian" from resource "<path>" of space "Personal" using the Graph API
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" removes the share permission of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
-      | <path> |
+      | <resource> |
     Examples:
-      | permissionsRole | path          |
-      | Viewer          | textfile.txt  |
-      | File Editor     | textfile.txt  |
-      | Viewer          | FolderToShare |
-      | Editor          | FolderToShare |
-      | Uploader        | FolderToShare |
+      | permissions-role | resource      |
+      | Viewer           | textfile.txt  |
+      | File Editor      | textfile.txt  |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |
 
 
   Scenario Outline: user removes access to resource inside of a project space in the user share
@@ -37,22 +37,22 @@ Feature: Remove access to a drive item
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>            |
-      | space           | NewSpace          |
-      | sharee          | Brian             |
-      | shareType       | user              |
-      | permissionsRole | <permissionsRole> |
-    When user "Alice" removes the share permission of user "Brian" from resource "<path>" of space "NewSpace" using the Graph API
+      | resource        | <resource>         |
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" removes the share permission of user "Brian" from resource "<resource>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
-      | <path> |
+      | <resource> |
     Examples:
-      | permissionsRole | path          |
-      | Viewer          | textfile.txt  |
-      | File Editor     | textfile.txt  |
-      | Viewer          | FolderToShare |
-      | Editor          | FolderToShare |
-      | Uploader        | FolderToShare |
+      | permissions-role | resource      |
+      | Viewer           | textfile.txt  |
+      | File Editor      | textfile.txt  |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource in a group share
@@ -62,22 +62,22 @@ Feature: Remove access to a drive item
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>            |
-      | space           | Personal          |
-      | sharee          | group1            |
-      | shareType       | group             |
-      | permissionsRole | <permissionsRole> |
-    When user "Alice" removes the share permission of group "group1" from resource "<path>" of space "Personal" using the Graph API
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | group1             |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" removes the share permission of group "group1" from resource "<resource>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
-      | <path> |
+      | <resource> |
     Examples:
-      | permissionsRole | path          |
-      | Viewer          | textfile.txt  |
-      | File Editor     | textfile.txt  |
-      | Viewer          | FolderToShare |
-      | Editor          | FolderToShare |
-      | Uploader        | FolderToShare |
+      | permissions-role | resource      |
+      | Viewer           | textfile.txt  |
+      | File Editor      | textfile.txt  |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |
 
 
   Scenario Outline: user removes access to a resource inside of a project space in group share
@@ -89,56 +89,56 @@ Feature: Remove access to a drive item
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
     And user "Alice" has sent the following share invitation:
-      | resource        | <path>            |
-      | space           | NewSpace          |
-      | sharee          | group1            |
-      | shareType       | group             |
-      | permissionsRole | <permissionsRole> |
-    When user "Alice" removes the share permission of group "group1" from resource "<path>" of space "NewSpace" using the Graph API
+      | resource        | <resource>         |
+      | space           | NewSpace           |
+      | sharee          | group1             |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" removes the share permission of group "group1" from resource "<resource>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
-      | <path> |
+      | <resource> |
     Examples:
-      | permissionsRole | path          |
-      | Viewer          | textfile.txt  |
-      | File Editor     | textfile.txt  |
-      | Viewer          | FolderToShare |
-      | Editor          | FolderToShare |
-      | Uploader        | FolderToShare |
+      | permissions-role | resource      |
+      | Viewer           | textfile.txt  |
+      | File Editor      | textfile.txt  |
+      | Viewer           | FolderToShare |
+      | Editor           | FolderToShare |
+      | Uploader         | FolderToShare |
 
 
   Scenario Outline: user removes access to a folder in link share
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has created the following link share:
-      | resource        | FolderToShare |
-      | space           | Personal      |
-      | permissionsRole | <role>        |
-      | password        | %public%      |
+      | resource        | FolderToShare      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" removes the share permission of link from folder "FolderToShare" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
-      | role           |
-      | view           |
-      | edit           |
-      | upload         |
-      | createOnly     |
-      | blocksDownload |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
 
 
   Scenario Outline: user removes access to a file in link share
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
     And user "Alice" has created the following link share:
-      | resource        | textfile.txt      |
-      | space           | Personal          |
-      | permissionsRole | <permissionsRole> |
-      | password        | %public%          |
+      | resource        | textfile.txt       |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" removes the share permission of link from file "textfile.txt" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
 
 
   Scenario Outline: user removes access to a folder in project space in link share
@@ -146,19 +146,19 @@ Feature: Remove access to a drive item
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has created the following link share:
-      | resource        | FolderToShare |
-      | space           | NewSpace      |
-      | permissionsRole | <role>        |
-      | password        | %public%      |
+      | resource        | FolderToShare      |
+      | space           | NewSpace           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" removes the share permission of link from folder "FolderToShare" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
-      | role           |
-      | view           |
-      | edit           |
-      | upload         |
-      | createOnly     |
-      | blocksDownload |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
 
 
   Scenario Outline: user removes access to a file in project space in link share
@@ -166,14 +166,14 @@ Feature: Remove access to a drive item
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
     And user "Alice" has created the following link share:
-      | resource        | textfile.txt      |
-      | space           | NewSpace          |
-      | permissionsRole | <permissionsRole> |
-      | password        | %public%          |
+      | resource        | textfile.txt       |
+      | space           | NewSpace           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" removes the share permission of link from file "textfile.txt" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
-      | permissionsRole |
-      | view            |
-      | edit            |
-      | blocksDownload  |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |

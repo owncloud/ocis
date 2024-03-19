@@ -87,16 +87,16 @@ Feature: Update permission of a share
     Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has created folder "folder"
     And user "Alice" has sent the following share invitation:
-      | resource           | <path>               |
+      | resource           | <resource>           |
       | space              | Personal             |
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
     When user "Alice" updates the last share with the following using the Graph API:
-      | space              | Personal |
-      | resource           | <path>   |
-      | expirationDateTime |          |
+      | space              | Personal   |
+      | resource           | <resource> |
+      | expirationDateTime |            |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
@@ -150,7 +150,7 @@ Feature: Update permission of a share
     }
     """
     Examples:
-      | path         |
+      | resource     |
       | testfile.txt |
       | folder       |
 
@@ -159,15 +159,15 @@ Feature: Update permission of a share
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
-      | resource           | <path>                      |
-      | space              | Personal                    |
-      | sharee             | Brian                       |
-      | shareType          | user                        |
-      | permissionsRole    | <previous-permissions-role> |
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" updates the last share with the following using the Graph API:
-      | permissionsRole    | <new-permissions-role>      |
-      | space              | Personal                    |
-      | resource           | <path>                      |
+      | permissionsRole | <new-permissions-role> |
+      | space           | Personal               |
+      | resource        | <resource>             |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
@@ -221,12 +221,12 @@ Feature: Update permission of a share
     }
     """
     Examples:
-    | previous-permissions-role | path          | new-permissions-role |
-    | Viewer                    | textfile1.txt | File Editor          |
-    | File Editor               | textfile1.txt | Viewer               |
-    | Viewer                    | FolderToShare | Uploader             |
-    | Viewer                    | FolderToShare | Editor               |
-    | Editor                    | FolderToShare | Viewer               |
-    | Editor                    | FolderToShare | Uploader             |
-    | Uploader                  | FolderToShare | Editor               |
-    | Uploader                  | FolderToShare | Viewer               |
+      | permissions-role | resource      | new-permissions-role |
+      | Viewer           | textfile1.txt | File Editor          |
+      | File Editor      | textfile1.txt | Viewer               |
+      | Viewer           | FolderToShare | Uploader             |
+      | Viewer           | FolderToShare | Editor               |
+      | Editor           | FolderToShare | Viewer               |
+      | Editor           | FolderToShare | Uploader             |
+      | Uploader         | FolderToShare | Editor               |
+      | Uploader         | FolderToShare | Viewer               |

@@ -27,17 +27,17 @@ Feature: Resharing
     When user "<user>" gets all the shares inside the folder "Shares/folder" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the response should contain <numVisibleShares> entries
+    And the response should contain <visible-shares-no> entries
     And user "Brian" should not be included in the response
-    And user "Carol" <CarolVisible> included in the response
-    And user "Damian" <DamianVisible> included in the response
-    And user "Fred" <FredVisible> included in the response
+    And user "Carol" <carol-visible> included in the response
+    And user "Damian" <damian-visible> included in the response
+    And user "Fred" <fred-visible> included in the response
     Examples:
-      | user   | numVisibleShares | CarolVisible  | DamianVisible | FredVisible   |
-      | Brian  | 2                | should be     | should not be | should be     |
-      | Carol  | 1                | should not be | should be     | should not be |
-      | Damian | 0                | should not be | should not be | should not be |
-      | Fred   | 0                | should not be | should not be | should not be |
+      | user   | visible-shares-no | carol-visible | damian-visible | fred-visible  |
+      | Brian  | 2                 | should be     | should not be  | should be     |
+      | Carol  | 1                 | should not be | should be      | should not be |
+      | Damian | 0                 | should not be | should not be  | should not be |
+      | Fred   | 0                 | should not be | should not be  | should not be |
 
 
   Scenario: owners can see all the chain
@@ -60,61 +60,61 @@ Feature: Resharing
     Given user "Carol" has shared folder "Shares/folder" with user "Fred" with permissions "17"
     When user "<user>" updates the last share using the sharing API with
       | permissions | 31 |
-    Then the OCS status code should be "<code>"
-    And user "Fred" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+    Then the OCS status code should be "<ocs-status-code>"
+    And user "Fred" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
     Examples:
-      | user  | code | canUpload     |
-      | Alice | 100  | should be     |
-      | Brian | 998  | should not be |
-      | Carol | 100  | should be     |
+      | user  | ocs-status-code | can-upload    |
+      | Alice | 100             | should be     |
+      | Brian | 998             | should not be |
+      | Carol | 100             | should be     |
 
 
   Scenario Outline: deleting reshares
     Given user "Carol" has shared folder "Shares/folder" with user "Gina" with permissions "17"
     When user "<user>" deletes the last share using the sharing API
-    Then the OCS status code should be "<code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And as "Gina" folder "Shares/folder" <exists>
     And as "Carol" folder "Shares/folder" should exist
     Examples:
-      | user  | code | exists           |
-      | Alice | 100  | should not exist |
-      | Brian | 998  | should exist     |
-      | Carol | 100  | should not exist |
+      | user  | ocs-status-code | exists           |
+      | Alice | 100             | should not exist |
+      | Brian | 998             | should exist     |
+      | Carol | 100             | should not exist |
 
   @skipOnRevaMaster
   Scenario Outline: resharing folder with different permissions
-    When user "<user>" shares folder "Shares/folder" with user "Ember" with permissions "<permissions>" using the sharing API
-    Then the OCS status code should be "<code>"
+    When user "<user>" shares folder "Shares/folder" with user "Ember" with permissions "<sharee-permissions>" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
     Examples:
-      | user   | permissions | code |
-      | Brian  | 17          | 100  |
-      | Carol  | 31          | 100  |
-      | Damian | 17          | 100  |
-      | Damian | 27          | 403  |
-      | Damian | 31          | 403  |
+      | user   | sharee-permissions | ocs-status-code |
+      | Brian  | 17                 | 100             |
+      | Carol  | 31                 | 100             |
+      | Damian | 17                 | 100             |
+      | Damian | 27                 | 403             |
+      | Damian | 31                 | 403             |
 
   @skipOnRevaMaster
   Scenario Outline: Resharing files with different permissions
     Given user "Alice" has uploaded file with content "Random data" to "/file.txt"
-    And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<shareepermissions>"
-    When user "Brian" shares file "Shares/file.txt" with user "Fred" with permissions "<granteepermissions>" using the sharing API
-    Then the OCS status code should be "<code>"
+    And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<sharee-permissions>"
+    When user "Brian" shares file "Shares/file.txt" with user "Fred" with permissions "<grantee-permissions>" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
     Examples:
-      | shareepermissions | granteepermissions | code |
-      | 17                | 17                 | 100  |
-      | 17                | 19                 | 403  |
-      | 19                | 19                 | 100  |
+      | sharee-permissions | grantee-permissions | ocs-status-code |
+      | 17                 | 17                  | 100             |
+      | 17                 | 19                  | 403             |
+      | 19                 | 19                  | 100             |
 
 
   Scenario Outline: resharing with group with different permissions
     Given group "security department" has been created
     And the administrator has added a user "Ember" to the group "security department" using the Graph API
     And the administrator has added a user "Fred" to the group "security department" using the Graph API
-    When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<permissions>" using the sharing API
+    When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<sharee-permissions>" using the sharing API
     Then the OCS status code should be "100"
-    And user "Ember" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
-    And user "Fred" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+    And user "Ember" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+    And user "Fred" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
     Examples:
-      | permissions | canUpload     |
-      | 17          | should not be |
-      | 31          | should be     |
+      | sharee-permissions | can-upload    |
+      | 17                 | should not be |
+      | 31                 | should be     |

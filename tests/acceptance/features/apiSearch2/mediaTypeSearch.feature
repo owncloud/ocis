@@ -178,8 +178,8 @@ Feature: media type search
     Then the HTTP status code should be "207"
     And the search result should contain "2" entries
     And the search result of user "Alice" should contain these entries:
-      | %spaceid%    |
-      | testFolder   |
+      | %spaceid%  |
+      | testFolder |
     When user "Alice" searches for "mediatype:document" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "2" entries
