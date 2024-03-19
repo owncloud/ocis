@@ -13,28 +13,28 @@ Feature: create user
   Scenario Outline: admin creates a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user with the following attributes using the Graph API:
-      | userName       | <userName>    |
-      | displayName    | <displayName> |
-      | email          | <email>       |
-      | password       | <password>    |
-      | accountEnabled | <enable>      |
-    Then the HTTP status code should be "<code>"
-    And user "<userName>" <shouldOrNot> exist
+      | userName       | <user>         |
+      | displayName    | <display-name> |
+      | email          | <email>        |
+      | password       | <password>     |
+      | accountEnabled | <enable>       |
+    Then the HTTP status code should be "<http-status-code>"
+    And user "<user>" <should-or-not> exist
     Examples:
-      | userName                     | displayName                             | email                   | password                     | code | enable | shouldOrNot |
-      | SameDisplayName              | Alice Hansen                            | new@example.org         | containsCharacters(*:!;_+-&) | 201  | true   | should      |
-      | withoutPassSameEmail         | without pass                            | alice@example.org       |                              | 201  | true   | should      |
-      | name                         | pass with space                         | example@example.org     | my pass                      | 201  | true   | should      |
-      | user1                        | user names must not start with a number | example@example.org     | my pass                      | 201  | true   | should      |
-      | nameWithCharacters(*:!;_+-&) | user                                    | new@example.org         | 123                          | 400  | true   | should not  |
-      | name with space              | name with space                         | example@example.org     | 123                          | 400  | true   | should not  |
-      | createDisabledUser           | disabled user                           | example@example.org     | 123                          | 201  | false  | should      |
-      | nameWithNumbers0123456       | user                                    | name0123456@example.org | 123                          | 201  | true   | should      |
-      | name.with.dots               | user                                    | name.w.dots@example.org | 123                          | 201  | true   | should      |
-      | 123456789                    | user                                    | 123456789@example.org   | 123                          | 400  | true   | should not  |
-      | 0.0                          | user                                    | float@example.org       | 123                          | 400  | true   | should not  |
-      | withoutEmail                 | without email                           |                         | 123                          | 201  | true   | should      |
-      | Alice                        | same userName                           | new@example.org         | 123                          | 409  | true   | should      |
+      | user                         | display-name                            | email                   | password                     | http-status-code | enable | should-or-not |
+      | SameDisplayName              | Alice Hansen                            | new@example.org         | containsCharacters(*:!;_+-&) | 201              | true   | should        |
+      | withoutPassSameEmail         | without pass                            | alice@example.org       |                              | 201              | true   | should        |
+      | name                         | pass with space                         | example@example.org     | my pass                      | 201              | true   | should        |
+      | user1                        | user names must not start with a number | example@example.org     | my pass                      | 201              | true   | should        |
+      | nameWithCharacters(*:!;_+-&) | user                                    | new@example.org         | 123                          | 400              | true   | should not    |
+      | name with space              | name with space                         | example@example.org     | 123                          | 400              | true   | should not    |
+      | createDisabledUser           | disabled user                           | example@example.org     | 123                          | 201              | false  | should        |
+      | nameWithNumbers0123456       | user                                    | name0123456@example.org | 123                          | 201              | true   | should        |
+      | name.with.dots               | user                                    | name.w.dots@example.org | 123                          | 201              | true   | should        |
+      | 123456789                    | user                                    | 123456789@example.org   | 123                          | 400              | true   | should not    |
+      | 0.0                          | user                                    | float@example.org       | 123                          | 400              | true   | should not    |
+      | withoutEmail                 | without email                           |                         | 123                          | 201              | true   | should        |
+      | Alice                        | same userName                           | new@example.org         | 123                          | 409              | true   | should        |
 
 
   Scenario: user cannot be created with empty name
@@ -49,7 +49,7 @@ Feature: create user
 
 
   Scenario Outline: user without admin right cannot create a user
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" creates a new user with the following attributes using the Graph API:
       | userName       | user         |
       | displayName    | user         |
@@ -59,7 +59,7 @@ Feature: create user
     Then the HTTP status code should be "401"
     And user "user" should not exist
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -97,15 +97,15 @@ Feature: create user
     Given the config "GRAPH_USERNAME_MATCH" has been set to "none"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user with the following attributes using the Graph API:
-      | userName       | <userName>      |
+      | userName       | <user>          |
       | displayName    | test user       |
       | email          | new@example.org |
       | password       | 123             |
       | accountEnabled | true            |
     Then the HTTP status code should be "201"
-    And user "<userName>" should exist
+    And user "<user>" should exist
     Examples:
-      | userName          | description                                 |
+      | user              | description                                 |
       | 1248Bob           | user names starts with the number           |
       | (*:!;+-&$%)_alice | user names starts with the ASCII characters |
 

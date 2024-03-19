@@ -17,8 +17,8 @@ Feature: edit user
 
 
   Scenario Outline: admin user can edit another user's email
-    When the user "Alice" changes the email of user "Brian" to "<newEmail>" using the Graph API
-    Then the HTTP status code should be "<code>"
+    When the user "Alice" changes the email of user "Brian" to "<new-email>" using the Graph API
+    Then the HTTP status code should be "<http-status-code>"
     And the user information of "Brian" should match this JSON schema
     """
     {
@@ -29,25 +29,25 @@ Feature: edit user
       "properties": {
         "mail": {
           "type": "string",
-          "enum": ["<emailAsResult>"]
+          "enum": ["<expected-email>"]
         }
       }
     }
     """
     Examples:
-      | action description        | newEmail             | code | emailAsResult        |
-      | change to a valid email   | newemail@example.com | 200  | newemail@example.com |
-      | override existing mail    | brian@example.com    | 200  | brian@example.com    |
-      | two users with same mail  | alice@example.org    | 200  | alice@example.org    |
-      | empty mail                |                      | 400  | brian@example.com    |
-      | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
+      | action description        | new-email            | http-status-code | expected-email       |
+      | change to a valid email   | newemail@example.com | 200              | newemail@example.com |
+      | override existing mail    | brian@example.com    | 200              | brian@example.com    |
+      | two users with same mail  | alice@example.org    | 200              | alice@example.org    |
+      | empty mail                |                      | 400              | brian@example.com    |
+      | change to a invalid email | invalidEmail         | 400              | brian@example.com    |
 
   @issue-7044
   Scenario Outline: admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
-    When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
-    Then the HTTP status code should be "<code>"
-    And the user information of "<newUserName>" should match this JSON schema
+    When the user "Alice" changes the user name of user "Carol" to "<user>" using the Graph API
+    Then the HTTP status code should be "<http-status-code>"
+    And the user information of "<new-user>" should match this JSON schema
     """
     {
       "type": "object",
@@ -56,17 +56,17 @@ Feature: edit user
       ],
       "properties": {
         "onPremisesSamAccountName": {
-          "enum": ["<newUserName>"]
+          "enum": ["<new-user>"]
         }
       }
     }
     """
     Examples:
-      | action description           | userName | code | newUserName |
-      | change to a valid user name  | Lionel   | 200  | Lionel      |
-      | user name characters         | a*!_+-&  | 200  | a*!_+-&     |
-      | change to existing user name | Brian    | 409  | Brian       |
-      | empty user name              |          | 400  | Brian       |
+      | action description           | user    | http-status-code | new-user |
+      | change to a valid user name  | Lionel  | 200              | Lionel   |
+      | user name characters         | a*!_+-& | 200              | a*!_+-&  |
+      | change to existing user name | Brian   | 409              | Carol    |
+      | empty user name              |         | 400              | Carol    |
 
 
   Scenario: admin user changes the name of a user to the name of an existing disabled user
@@ -122,7 +122,7 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to change their email address
-    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Brian" should match this JSON schema
@@ -141,20 +141,20 @@ Feature: edit user
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
 
 
   Scenario Outline: normal user should not be able to edit another user's email
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Carol" should match this JSON schema
@@ -173,7 +173,7 @@ Feature: edit user
     }
     """
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -189,7 +189,7 @@ Feature: edit user
 
 
   Scenario Outline: admin user can edit another user display name
-    When the user "Alice" changes the display name of user "Brian" to "<newDisplayName>" using the Graph API
+    When the user "Alice" changes the display name of user "Brian" to "<new-display-name>" using the Graph API
     Then the HTTP status code should be "200"
     And the user information of "Brian" should match this JSON schema
     """
@@ -201,21 +201,21 @@ Feature: edit user
       "properties": {
         "displayName": {
           "type": "string",
-          "enum": ["<displayNameAsResult>"]
+          "enum": ["<expected-display-name>"]
         }
       }
     }
     """
     Examples:
-      | action description                | newDisplayName | displayNameAsResult |
-      | change to a display name          | Olaf Scholz    | Olaf Scholz         |
-      | override to existing display name | Carol King     | Carol King          |
-      | change to an empty display name   |                | Brian Murphy        |
-      | displayName with characters       | *:!;_+-&#(?)   | *:!;_+-&#(?)        |
+      | action description                | new-display-name | expected-display-name |
+      | change to a display name          | Olaf Scholz      | Olaf Scholz           |
+      | override to existing display name | Carol King       | Carol King            |
+      | change to an empty display name   |                  | Brian Murphy          |
+      | displayName with characters       | *:!;_+-&#(?)     | *:!;_+-&#(?)          |
 
 
   Scenario Outline: normal user should not be able to change his/her own display name
-    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Alice" should match this JSON schema
@@ -234,20 +234,20 @@ Feature: edit user
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
 
 
   Scenario Outline: normal user should not be able to edit another user's display name
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the display name of user "Carol" to "Alice Hansen" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Carol" should match this JSON schema
@@ -266,7 +266,7 @@ Feature: edit user
     }
     """
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -289,20 +289,20 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to reset the password of another user
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     And user "Carol" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
     Then the HTTP status code should be "401"
     And the content of file "resetpassword.txt" for user "Carol" using password "1234" should be "test file for reset password"
     But user "Carol" using password "newpassword" should not be able to download file "resetpassword.txt"
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -361,7 +361,7 @@ Feature: edit user
 
   Scenario Outline: normal user should not be able to disable another user
     Given user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to disable user "Carol" using the Graph API
     Then the HTTP status code should be "401"
     When user "Alice" gets information of user "Carol" using Graph API
@@ -402,7 +402,7 @@ Feature: edit user
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -454,7 +454,7 @@ Feature: edit user
   Scenario Outline: normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Carol"
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to enable user "Carol" using the Graph API
     Then the HTTP status code should be "401"
     When user "Alice" gets information of user "Carol" using Graph API
@@ -495,7 +495,7 @@ Feature: edit user
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |

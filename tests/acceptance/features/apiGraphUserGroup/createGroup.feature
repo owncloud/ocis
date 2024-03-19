@@ -9,19 +9,19 @@ Feature: create group
 
 
   Scenario Outline: admin user creates a group
-    When user "Alice" creates a group "<groupname>" using the Graph API
+    When user "Alice" creates a group "<group>" using the Graph API
     Then the HTTP status code should be "201"
-    And group "<groupname>" should exist
+    And group "<group>" should exist
     Examples:
-    | groupname       |
-    | simplegroup     |
-    | España§àôœ€     |
-    | नेपाली            |
-    | $x<=>[y*z^2+1]! |
-    | 😅 😆           |
-    | comma,grp1      |
-    | Finance (NP)    |
-    | slash\Middle    |
+      | group           |
+      | simplegroup     |
+      | España§àôœ€     |
+      | नेपाली          |
+      | $x<=>[y*z^2+1]! |
+      | 😅 😆           |
+      | comma,grp1      |
+      | Finance (NP)    |
+      | slash\Middle    |
 
   @issue-3516
   Scenario: admin user tries to create a group that already exists
@@ -33,12 +33,12 @@ Feature: create group
   @issue-5938
   Scenario Outline: user other than the admin can't create a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" tries to create a group "mygroup" using the Graph API
     Then the HTTP status code should be "403"
     And group "mygroup" should not exist
     Examples:
-      | userRole    |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |

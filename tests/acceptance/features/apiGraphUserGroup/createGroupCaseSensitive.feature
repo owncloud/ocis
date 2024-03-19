@@ -5,17 +5,17 @@ Feature: create groups, group names are case insensitive
 
   @issue-3516
   Scenario Outline: group names are case insensitive, creating groups with different upper and lower case names
-    Given using OCS API version "<ocs_api_version>"
-    And group "<group_id1>" has been created
-    When the administrator creates a group "<group_id2>" using the Graph API
-    And the administrator creates a group "<group_id3>" using the Graph API
+    Given using OCS API version "<ocs-api-version>"
+    And group "<group>" has been created
+    When the administrator creates a group "<group-2>" using the Graph API
+    And the administrator creates a group "<group-3>" using the Graph API
     Then the HTTP status code of responses on all endpoints should be "409"
     And these groups should not exist:
-    | groupname   |
-    | <group_id2> |
-    | <group_id3> |
+      | groupname |
+      | <group-2> |
+      | <group-3> |
     Examples:
-      | ocs_api_version | group_id1            | group_id2            | group_id3            |
+      | ocs-api-version | group                | group-2              | group-3              |
       | 1               | case-sensitive-group | Case-Sensitive-Group | CASE-SENSITIVE-GROUP |
       | 1               | Case-Sensitive-Group | CASE-SENSITIVE-GROUP | case-sensitive-group |
       | 1               | CASE-SENSITIVE-GROUP | case-sensitive-group | Case-Sensitive-Group |
