@@ -36,7 +36,7 @@ This mode is supposed to be used in the context of selecting or sharing resource
 For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/).
 See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
 
-# Web Apps
+## Web Apps
 
 The administrator of the environment is capable of providing custom web applications to the users.
 This feature is useful for organizations that want to provide third party or custom apps to their users.
@@ -44,7 +44,7 @@ This feature is useful for organizations that want to provide third party or cus
 It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
 and does not support injection of dynamic web applications (custom dynamic backends).
 
-## Loading Applications
+### Loading Applications
 
 Web applications are loaded from the buildin FS in the ocis binary, e.g. `ocis_src_path/services/web/assets/apps`
 this cannot be manipulated at runtime only at build-time.
@@ -61,7 +61,7 @@ For example, if ocis would contain a build in extension named `image-viewer-dfx`
 application named `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
 applications from the web ui.
 
-## Application Structure
+### Application Structure
 
 Applications always have to follow a strict structure, which is as follows:
 
@@ -75,7 +75,7 @@ The `manifest.json` file contains the following fields:
 * `entrypoint` - required - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
 * `config` - optional - a list of key-value pairs that are passed to the global web application configuration
 
-## Application Configuration
+### Application Configuration
 
 It's important to note that an application manifest should never be changed manually;
 if a custom configuration is needed, the administrator should provide the required configuration inside the
@@ -127,7 +127,7 @@ besides the configuration from the `manifest.json` file, the `apps.yaml` file ca
 
 The local provided configuration yaml will always override the shipped application manifest configuration.
 
-## Fallback Mechanism
+### Fallback Mechanism
 
 Besides the configuration and application registration, there is one further important aspect to know;
 in the process of loading the application assets, the system uses a fallback mechanism to load the assets.
@@ -143,6 +143,6 @@ Every other asset is loaded from the build in extension, but the logo is loaded 
 
 The same applies for the `manifest.json` file, if the administrator wants to provide a custom `manifest.json` file.
 
-## Miscellaneous
+### Miscellaneous
 
 Please note that ocis needs a restart to load new applications or changes to the `apps.yaml` file.
