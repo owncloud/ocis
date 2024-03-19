@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 * Enhancement - Update web to v9.0.0-alpha.2: [#8634](https://github.com/owncloud/ocis/pull/8634)
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
+* Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
 
 ## Details
 
@@ -268,6 +269,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8352
    https://github.com/owncloud/ocis/pull/8642
+
+* Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
+
+   Bumps keycloak version
+
+   https://github.com/owncloud/ocis/issues/8569
+   https://github.com/owncloud/ocis/pull/8687
 
 # Changelog for [5.0.0] (2024-03-18)
 
