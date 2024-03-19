@@ -9,15 +9,15 @@ Feature: delete groups
 
 
   Scenario Outline: admin user deletes a group
-    Given group "<group_id>" has been created
-    When user "Alice" deletes group "<group_id>" using the Graph API
+    Given group "<group>" has been created
+    When user "Alice" deletes group "<group>" using the Graph API
     Then the HTTP status code should be "204"
-    And group "<group_id>" should not exist
+    And group "<group>" should not exist
     Examples:
-      | group_id            | comment                               |
+      | group               | comment                               |
       | simplegroup         | nothing special here                  |
       | España§àôœ€         | special European and other characters |
-      | नेपाली                | Unicode group name                    |
+      | नेपाली              | Unicode group name                    |
       | brand-new-group     | dash                                  |
       | the.group           | dot                                   |
       | left,right          | comma                                 |
@@ -39,26 +39,26 @@ Feature: delete groups
 
   @issue-5083
   Scenario Outline: admin user deletes a group having % (as only special char) in its name
-    Given group "<group_id>" has been created
-    When user "Alice" deletes group "<group_id>" using the Graph API
+    Given group "<group>" has been created
+    When user "Alice" deletes group "<group>" using the Graph API
     Then the HTTP status code should be "204"
-    And group "<group_id>" should not exist
+    And group "<group>" should not exist
     Examples:
-      | group_id            | comment                                 |
-      | 50%pass             | Percent sign (special escaping happens) |
-      | 50%2Eagle           | %2E literal looks like an escaped "."   |
-      | 50%2Fix             | %2F literal looks like an escaped slash |
+      | group     | comment                                 |
+      | 50%pass   | Percent sign (special escaping happens) |
+      | 50%2Eagle | %2E literal looks like an escaped "."   |
+      | 50%2Fix   | %2F literal looks like an escaped slash |
 
   @issue-5938
   Scenario Outline: user other than the admin can't delete a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "new-group" has been created
     When user "Brian" tries to delete group "new-group" using the Graph API
     Then the HTTP status code should be "403"
     And group "new-group" should exist
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |

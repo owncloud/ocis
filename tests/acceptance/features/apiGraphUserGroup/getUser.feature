@@ -57,8 +57,8 @@ Feature: get users
 
   @issue-5125
   Scenario Outline: non-admin user tries to get the information of a user
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role-2>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" tries to get information of user "Alice" using Graph API
     Then the HTTP status code should be "401"
     And the JSON data of the response should match
@@ -85,7 +85,7 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -254,7 +254,7 @@ Feature: get users
 
 
   Scenario Outline: non-admin user tries to get all users
-    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Brian" tries to get all users using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
@@ -281,7 +281,7 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -418,7 +418,7 @@ Feature: get users
 
 
   Scenario Outline: user gets his/her own information along with drive information
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" gets his drive information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -546,7 +546,7 @@ Feature: get users
       }
     """
     Examples:
-      | userRole    |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |
@@ -623,8 +623,8 @@ Feature: get users
 
   @issue-5125
   Scenario Outline: non-admin user tries to get the group information of a user
-    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And group "coffee-lover" has been created
     And user "Brian" has been added to group "coffee-lover"
     When the user "Alice" gets user "Brian" along with his group information using Graph API
@@ -653,7 +653,7 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -904,7 +904,7 @@ Feature: get users
 
   Scenario Outline: non admin user tries to get users of certain groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     When the user "Brian" gets all users of the group "tea-lover" using the Graph API
@@ -933,7 +933,7 @@ Feature: get users
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -1060,8 +1060,8 @@ Feature: get users
 
 
   Scenario Outline: non-admin user tries to get users with a certain role
-    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
-    When the user "Alice" gets all users with role "<role>" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When the user "Alice" gets all users with role "<user-role-2>" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
     """
@@ -1087,7 +1087,7 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -1103,7 +1103,7 @@ Feature: get users
 
   @issue-6017
   Scenario Outline: admin user gets the drive information of a user with different user role
-    Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And user "Brian" has created folder "my_data"
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
@@ -1196,7 +1196,7 @@ Feature: get users
     }
     """
     Examples:
-      | user-role-1 | user-role-2 |
+      | user-role   | user-role-2 |
       | Admin       | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
@@ -1208,7 +1208,7 @@ Feature: get users
 
 
   Scenario Outline: non-admin user tries to get drive information of other user with different user role
-    Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
     Then the HTTP status code should be "404"
@@ -1241,19 +1241,19 @@ Feature: get users
     }
     """
     Examples:
-      | user-role-1 | user-role-2 |
-      | User        | Admin       |
-      | User        | Space Admin |
-      | User        | User        |
-      | User        | User Light  |
-      | User Light  | Admin       |
-      | User Light  | Space Admin |
-      | User Light  | User        |
-      | User Light  | User Light  |
+      | user-role  | user-role-2 |
+      | User       | Admin       |
+      | User       | Space Admin |
+      | User       | User        |
+      | User       | User Light  |
+      | User Light | Admin       |
+      | User Light | Space Admin |
+      | User Light | User        |
+      | User Light | User Light  |
 
 
   Scenario Outline: user with different user role gets his/her own drive information
-    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets own personal drive information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -1344,7 +1344,7 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |
@@ -1447,7 +1447,7 @@ Feature: get users
           "properties": {
             "message": {
               "type": "string",
-              "enum": ["Token '<errorToken>' is invalid"]
+              "enum": ["Token '<error-token>' is invalid"]
             }
           }
         }
@@ -1455,7 +1455,7 @@ Feature: get users
     }
     """
     Examples:
-      | user                  | errorToken       |
+      | user                  | error-token      |
       | Alice-From-Wonderland | -From-Wonderland |
       | Alice@From@Wonderland | @From@Wonderland |
 

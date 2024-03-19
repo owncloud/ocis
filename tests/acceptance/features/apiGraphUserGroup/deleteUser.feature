@@ -13,15 +13,15 @@ Feature: delete user
   Scenario Outline: admin user deletes a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
-      | userName    | <userName>    |
-      | displayName | <displayName> |
-      | email       | <email>       |
-      | password    | <password>    |
-    When the user "Alice" deletes a user "<userName>" using the Graph API
+      | userName    | <user-name>    |
+      | displayName | <display-name> |
+      | email       | <email>        |
+      | password    | <password>     |
+    When the user "Alice" deletes a user "<user-name>" using the Graph API
     Then the HTTP status code should be "204"
-    And user "<userName>" should not exist
+    And user "<user-name>" should not exist
     Examples:
-      | userName             | displayName     | email               | password                     |
+      | user-name            | display-name    | email               | password                     |
       | SameDisplayName      | Alice Hansen    | new@example.org     | containsCharacters(*:!;_+-&) |
       | withoutPassSameEmail | without pass    | alice@example.org   |                              |
       | name                 | pass with space | example@example.org | my pass                      |
@@ -38,12 +38,12 @@ Feature: delete user
   Scenario Outline: admin user deletes another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not exist
     Examples:
-      | role        |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |
@@ -58,12 +58,12 @@ Feature: delete user
 
 
   Scenario Outline: non-admin user tries to delete his/her own account
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "401"
     And user "Alice" should exist
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -76,11 +76,11 @@ Feature: delete user
 
 
   Scenario Outline: non-admin user tries to delete a nonexistent user
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "401"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -88,13 +88,13 @@ Feature: delete user
 
   Scenario Outline: non-admin user tries to delete another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
-    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
     And user "Brian" should exist
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |
@@ -122,14 +122,14 @@ Feature: delete user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
-    And the administrator has assigned the role "<userRole>" to user "Carol" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Carol" using the Graph API
     And the user "Alice" has disabled user "Brian"
     When the user "Carol" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
     And user "Brian" should exist
     Examples:
-      | userRole    | role        |
+      | user-role   | user-role-2 |
       | Space Admin | Space Admin |
       | Space Admin | User        |
       | Space Admin | User Light  |

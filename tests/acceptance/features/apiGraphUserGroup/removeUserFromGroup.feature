@@ -12,23 +12,23 @@ Feature: remove a user from a group
       | groupname       | comment                               |
       | brand-new-group | nothing special here                  |
       | España§àôœ€     | special European and other characters |
-      | नेपाली            | Unicode group name                    |
+      | नेपाली          | Unicode group name                    |
     And the following users have been added to the following groups
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली            |
+      | Alice    | नेपाली          |
     When the administrator removes the following users from the following groups using the Graph API
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली            |
+      | Alice    | नेपाली          |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the following users should not belong to the following groups
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली            |
+      | Alice    | नेपाली          |
 
 
   Scenario: admin removes a user from a group with special characters
@@ -158,7 +158,7 @@ Feature: remove a user from a group
   @issue-5938
   Scenario Outline: user other than the admin can't remove a user from their group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -189,7 +189,7 @@ Feature: remove a user from a group
     """
     And user "Brian" should belong to group "grp1"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |

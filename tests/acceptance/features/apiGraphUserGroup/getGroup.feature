@@ -22,7 +22,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get the groups list
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And group "h2o-lover" has been created
@@ -52,7 +52,7 @@ Feature: get groups and their members
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -75,7 +75,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
     Then the HTTP status code should be "403"
@@ -103,7 +103,7 @@ Feature: get groups and their members
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -243,7 +243,7 @@ Feature: get groups and their members
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get all groups along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And user "Alice" has been added to group "tea-lover"
@@ -274,7 +274,7 @@ Feature: get groups and their members
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -365,7 +365,7 @@ Feature: get groups and their members
   @issue-5604
   Scenario Outline: user other than the admin gets a group along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
@@ -395,7 +395,7 @@ Feature: get groups and their members
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -454,9 +454,9 @@ Feature: get groups and their members
     Examples:
       | group           |
       | España§àôœ€     |
-      | नेपाली            |
+      | नेपाली          |
       | $x<=>[y*z^2+1]! |
-      | եòɴԪ˯ΗՐΛɔπ     |
+      | եòɴԪ˯ΗՐΛɔπ      |
 
 
   Scenario: admin user tries to get group information of non-existing group
@@ -473,7 +473,7 @@ Feature: get groups and their members
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
-    { 
+    {
       "type": "object",
       "required": [
         "value"
@@ -577,6 +577,6 @@ Feature: get groups and their members
     }
     """
     Examples:
-    | group      | token   |
-    | tea-lovers | -lovers |
-    | tea@lovers | @lovers |
+      | group      | token   |
+      | tea-lovers | -lovers |
+      | tea@lovers | @lovers |

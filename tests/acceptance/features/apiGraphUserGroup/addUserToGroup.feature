@@ -12,18 +12,18 @@ Feature: add users to group
       | groupname   | comment                               |
       | simplegroup | nothing special here                  |
       | España§àôœ€ | special European and other characters |
-      | नेपाली        | Unicode group name                    |
+      | नेपाली      | Unicode group name                    |
     When the administrator adds the following users to the following groups using the Graph API
       | username | groupname   |
       | Alice    | simplegroup |
       | Alice    | España§àôœ€ |
-      | Alice    | नेपाली        |
+      | Alice    | नेपाली      |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the following users should be listed in the following groups
       | username | groupname   |
       | Alice    | simplegroup |
       | Alice    | España§àôœ€ |
-      | Alice    | नेपाली        |
+      | Alice    | नेपाली      |
 
 
   Scenario: adding a user to a group with special character in its name
@@ -120,7 +120,7 @@ Feature: add users to group
 
   @issue-5938
   Scenario Outline: user other than the admin tries to add herself to a group
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And group "groupA" has been created
     When user "Alice" tries to add herself to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
@@ -148,7 +148,7 @@ Feature: add users to group
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -156,7 +156,7 @@ Feature: add users to group
   @issue-5938
   Scenario Outline: user other than the admin tries to add other user to a group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
@@ -184,7 +184,7 @@ Feature: add users to group
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -197,11 +197,11 @@ Feature: add users to group
   @issue-5939
   Scenario Outline: user other than the admin tries to add user to a nonexistent group
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |

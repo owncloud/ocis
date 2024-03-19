@@ -9,28 +9,28 @@ Feature: edit group name
 
   @issue-5977
   Scenario Outline: admin user renames a group
-    Given group "<old_group>" has been created
-    When user "Alice" renames group "<old_group>" to "<new_group>" using the Graph API
+    Given group "<group>" has been created
+    When user "Alice" renames group "<group>" to "<new-group>" using the Graph API
     Then the HTTP status code should be "204"
-    And group "<old_group>" should not exist
-    And group "<new_group>" should exist
+    And group "<group>" should not exist
+    And group "<new-group>" should exist
     Examples:
-      | old_group | new_group     |
-      | grp1      | grp101        |
-      | grp1      | España§àôœ€   |
-      | grp1      | नेपाली          |
-      | grp1      | $x<=>[y*z^2]! |
-      | grp1      | staff?group   |
-      | grp1      | 50%pass       |
+      | group | new-group     |
+      | grp1  | grp101        |
+      | grp1  | España§àôœ€   |
+      | grp1  | नेपाली        |
+      | grp1  | $x<=>[y*z^2]! |
+      | grp1  | staff?group   |
+      | grp1  | 50%pass       |
 
   @issue-5938
   Scenario Outline: user other than the admin can't rename a group
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And group "grp1" has been created
     When user "Alice" tries to rename group "grp1" to "grp101" using the Graph API
     Then the HTTP status code should be "403"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
