@@ -3,15 +3,13 @@ package command
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/render"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
@@ -135,13 +133,13 @@ func Server(cfg *config.Config) *cli.Command {
 				proxy.Config(cfg),
 			)
 
-			lh := StaticRouteHandler{
-				prefix:        cfg.HTTP.Root,
-				userInfoCache: userInfoCache,
-				logger:        logger,
-				config:        *cfg,
-				oidcClient:    oidcClient,
-				proxy:         rp,
+			lh := staticroutes.StaticRouteHandler{
+				Prefix:        cfg.HTTP.Root,
+				UserInfoCache: userInfoCache,
+				Logger:        logger,
+				Config:        *cfg,
+				OidcClient:    oidcClient,
+				Proxy:         rp,
 			}
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
@@ -150,7 +148,7 @@ func Server(cfg *config.Config) *cli.Command {
 			{
 				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m)
 				server, err := proxyHTTP.Server(
-					proxyHTTP.Handler(lh.handler()),
+					proxyHTTP.Handler(lh.Handler()),
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
@@ -199,94 +197,6 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
-}
-
-// StaticRouteHandler defines a Route Handler for static routes
-type StaticRouteHandler struct {
-	prefix        string
-	proxy         http.Handler
-	userInfoCache microstore.Store
-	logger        log.Logger
-	config        config.Config
-	oidcClient    oidc.OIDCClient
-}
-
-func (h *StaticRouteHandler) handler() http.Handler {
-	m := chi.NewMux()
-	m.Route(h.prefix, func(r chi.Router) {
-		// Wrapper for backchannel logout
-		r.Post("/backchannel_logout", h.backchannelLogout)
-
-		// TODO: migrate oidc well knowns here in a second wrapper
-
-		// Send all requests to the proxy handler
-		r.HandleFunc("/*", h.proxy.ServeHTTP)
-	})
-
-	// Also send requests for methods unknown to chi to the proxy handler as well
-	m.MethodNotAllowed(h.proxy.ServeHTTP)
-
-	return m
-}
-
-type jse struct {
-	Error            string `json:"error"`
-	ErrorDescription string `json:"error_description"`
-}
-
-// handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest
-func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
-	// parse the application/x-www-form-urlencoded POST request
-	logger := h.logger.SubloggerWithRequestID(r.Context())
-	if err := r.ParseForm(); err != nil {
-		logger.Warn().Err(err).Msg("ParseForm failed")
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
-		return
-	}
-
-	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), r.PostFormValue("logout_token"))
-	if err != nil {
-		logger.Warn().Err(err).Msg("VerifyLogoutToken failed")
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
-		return
-	}
-
-	records, err := h.userInfoCache.Read(logoutToken.SessionId)
-	if errors.Is(err, microstore.ErrNotFound) || len(records) == 0 {
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, nil)
-		return
-	}
-
-	if err != nil {
-		logger.Error().Err(err).Msg("Error reading userinfo cache")
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
-		return
-	}
-
-	for _, record := range records {
-		err = h.userInfoCache.Delete(string(record.Value))
-		if err != nil && !errors.Is(err, microstore.ErrNotFound) {
-			// Spec requires us to return a 400 BadRequest when the session could not be destroyed
-			logger.Err(err).Msg("could not delete user info from cache")
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
-			return
-		}
-		logger.Debug().Msg("Deleted userinfo from cache")
-	}
-
-	// we can ignore errors when cleaning up the lookup table
-	err = h.userInfoCache.Delete(logoutToken.SessionId)
-	if err != nil {
-		logger.Debug().Err(err).Msg("Failed to cleanup sessionid lookup entry")
-	}
-
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, nil)
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
@@ -403,11 +313,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		chimiddleware.RequestID,
 		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
-		middleware.OIDCWellKnownRewrite(
-			logger, cfg.OIDC.Issuer,
-			cfg.OIDC.RewriteWellKnown,
-			oidcHTTPClient,
-		),
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,
