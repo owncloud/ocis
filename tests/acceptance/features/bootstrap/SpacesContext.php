@@ -3617,11 +3617,12 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" with depth "([^"]*)" using the WebDAV API$/
+	 * @When user :user sends PROPFIND request from the space :spaceName to the resource :resource using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $resource
-	 * @param string $folderDepth
+	 * @param string|null $folderDepth
 	 *
 	 * @return void
 	 *
@@ -3629,7 +3630,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, string $resource, string $folderDepth): void {
+	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, string $resource, ?string $folderDepth = "1"): void {
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
 		);
@@ -3705,7 +3706,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			$folderDepth,
 			"files",
-			WebDavHelper::DAV_VERSION_SPACES,
+			$this->featureContext->getDavPathVersion(),
 			null,
 			$headers
 		);
