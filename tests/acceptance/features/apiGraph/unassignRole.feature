@@ -10,14 +10,14 @@ Feature: unassign user role
   Scenario Outline: admin user unassigns the role of another user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" unassigns the role of user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not have any role assigned
     When user "Brian" uploads file with content "this step will assign the role to default" to "assign-to-default.txt" using the WebDAV API
     And user "Brian" should have the role "User" assigned
     Examples:
-      | role        |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |
