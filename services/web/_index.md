@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2024-03-19T10:46:50.578442786Z
+date: 2024-03-19T14:49:01.765889352Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
@@ -30,8 +30,8 @@ The web service also provides a minimal API for branding functionality like chan
   * [Loading Applications](#loading-applications)
   * [Application Structure](#application-structure)
   * [Application Configuration](#application-configuration)
-  * [Fallback Mechanism](#fallback-mechanism)
-  * [Miscellaneous](#miscellaneous)
+  * [Using Custom Assets](#using-custom-assets)
+* [Miscellaneous](#miscellaneous)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Custom Compiled Web Assets
@@ -42,10 +42,9 @@ See [ownCloud Web / Getting Started](https://owncloud.dev/clients/web/getting-st
 
 ## Web UI Configuration
 
-Note that single configuration settings of the embedded web UI can be defined via `WEB_OPTION_xxx` environment variables.
-
-If a json based configuration file is used via the `WEB_UI_CONFIG_FILE` environment variable, these configurations take
-precedence over single options set.
+*   Single configuration settings of the embedded web UI can be defined via `WEB_OPTION_xxx` environment variables.
+*   A json based configuration file can be used via the `WEB_UI_CONFIG_FILE` environment variable.
+*   If a json based configuration file is used, these configurations take precedence over single options set.
 
 ### Web UI Options
 
@@ -75,55 +74,53 @@ and does not support injection of dynamic web applications (custom dynamic backe
 
 ### Loading Applications
 
-Web applications are loaded from the buildin FS in the ocis binary, e.g. `ocis_src_path/services/web/assets/apps`
-this cannot be manipulated at runtime only at build-time.
+Web applications are loaded, if added in the Infinite Scale source code, at build-time from
+`<ocis_repo>/services/web/assets/apps`. This cannot be manipulated at runtime.
 
-Additionally, the administrator can provide custom applications in one of the following ways:
+Additionally, the administrator can provide custom applications by storing them in the path defined by the environment
+variable `WEB_ASSET_APPS_PATH`.
 
-* By loading a web application from the default ocis base directory, e.g. `$OCIS_BASE_DATA_PATH/web/assets/apps` (default behavior).
-* By loading a web application from a user-provided path, by setting the `WEB_ASSET_APPS_PATH` environment variable.
+This environment variable defaults to the Infinite Scale base data directory `$OCIS_BASE_DATA_PATH/web/assets/apps`,
+but can be redefined with any path set manually.
 
-The list of available applications is composed of the build in extensions and the custom applications
-provided by the administrator, e.g. `WEB_ASSET_APPS_PATH` or `$OCIS_BASE_DATA_PATH/web/assets/apps`.
+The final list of available applications is composed of the built-in and the custom applications provided by the
+administrator via `WEB_ASSET_APPS_PATH`.
 
-For example, if ocis would contain a build in extension named `image-viewer-dfx` and the administrator provides a custom
-application named `image-viewer-obj` in the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
-applications from the web ui.
+For example, if Infinite Scale would contain a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
+applications from the WebUI.
 
 ### Application Structure
 
-Applications always have to follow a strict structure, which is as follows:
-
-* each application must be in its own directory
-* each application directory must contain a `manifest.json` file
-
+* Applications always have to follow a strict structure.\
 Everything else is skipped and not considered as an application.
+   *   Each application must be in its own directory accessed via `WEB_ASSET_APPS_PATH`.
+   *   Each application directory must contain a `manifest.json` file.
 
-The `manifest.json` file contains the following fields:
-
-* `entrypoint` - required - the entrypoint of the application, e.g. `index.js`, the path is relative to the parent directory
-* `config` - optional - a list of key-value pairs that are passed to the global web application configuration
+* The `manifest.json` file contains the following fields:
+   *   `entrypoint` - required\
+       The entrypoint of the application like `index.js`, the path is relative to the parent directory.
+   *   `config` - optional\
+       A list of key-value pairs that are passed to the global web application configuration `apps.yaml`.
 
 ### Application Configuration
 
-It's important to note that an application manifest should never be changed manually;
-if a custom configuration is needed, the administrator should provide the required configuration inside the
-`$OCIS_BASE_DATA_PATH/config/apps.yaml` file.
+If a custom configuration is needed, the administrator must provide the required configuration inside the `$OCIS_BASE_DATA_PATH/config/apps.yaml` file.
 
-The `apps.yaml` file must contain a list of key-value pairs which gets merged with the `config` field.
-For example, if the `image-viewer-obj` application contains the following configuration:
+NOTE: An application manifest should _never_ be changed manually, see [Using Custom Assets](#using-custom-assets) for customisation.
+
+The `apps.yaml` file must contain a list of key-value pairs which gets merged with the `config` field. For example, if the `image-viewer-obj` application contains the following configuration:
 
 ```json
 {
   "entrypoint": "index.js",
   "config": {
-    "maxWith": 1280,
+    "maxWidth": 1280,
     "maxHeight": 1280
   }
 }
 ```
 
-and the `apps.yaml` file contains the following configuration:
+The `apps.yaml` file contains the following configuration:
 
 ```yaml
 image-viewer-obj:
@@ -132,7 +129,7 @@ image-viewer-obj:
     maxSize: 512
 ```
 
-the final configuration for web will be:
+The final configuration for web will be:
 
 ```json
 {
@@ -141,7 +138,7 @@ the final configuration for web will be:
       "id": "image-viewer-obj",
       "path": "index.js",
       "config": {
-        "maxWith": 1280,
+        "maxWidth": 1280,
         "maxHeight": 640,
         "maxSize": 512
       }
@@ -150,31 +147,27 @@ the final configuration for web will be:
 }
 ```
 
-besides the configuration from the `manifest.json` file, the `apps.yaml` file can also contain the following fields:
+Besides the configuration from the `manifest.json` file, the `apps.yaml` file can also contain the following fields:
 
-* `disabled` - optional - defaults to `false` - if set to `true`, the application will not be loaded
+*   `disabled` - optional\
+    Defaults to `false`. If set to `true`, the application will not be loaded.
 
-The local provided configuration yaml will always override the shipped application manifest configuration.
+### Using Custom Assets
 
-### Fallback Mechanism
+Besides the configuration and application registration, in the process of loading the application assets, the system uses a mechanism to load custom assets.
 
-Besides the configuration and application registration, there is one further important aspect to know;
-in the process of loading the application assets, the system uses a fallback mechanism to load the assets.
+This is very useful for cases where just a single asset should be overwritten, like a logo or similar.
 
-This is incredibly useful for cases where just a single asset should be overwritten, e.g., a logo or similar.
+Consider the following: Infinite Scale is shipped with a default web app named `image-viewer-dfx` which contains a logo,
+but the administrator wants to provide a custom logo for that application.
 
-Consider the following, ocis is shipped with a default extension named `image-viewer-dfx` which contains a logo,
-but the administrator wants to provide a custom logo for the `image-viewer-dfx` application.
+This can be achieved using the path defined via `WEB_ASSET_APPS_PATH` and adding a custom structure like `WEB_ASSET_APPS_PATH/image-viewer-dfx/`. Here you can add all custom assets to load like `logo.png`. On loading the web app, custom assets defined overwrite default ones.
 
-This can be achieved by providing a custom logo in the `WEB_ASSET_APPS_PATH` directory,
-e.g. `WEB_ASSET_APPS_PATH/image-viewer-dfx/logo.png`.
-Every other asset is loaded from the build in extension, but the logo is loaded from the custom directory.
+This also applies for the `manifest.json` file, if the administrator wants to provide a custom one.
 
-The same applies for the `manifest.json` file, if the administrator wants to provide a custom `manifest.json` file.
+## Miscellaneous
 
-### Miscellaneous
-
-Please note that ocis needs a restart to load new applications or changes to the `apps.yaml` file.
+Please note that Infinite Scale, in particular the web service, needs a restart to load new applications or changes to the `apps.yaml` file.
 ## Example Yaml Config
 {{< include file="services/_includes/web-config-example.yaml"  language="yaml" >}}
 
