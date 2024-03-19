@@ -166,8 +166,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
 
-	if cfg.HTTP.CORS.AllowedOrigins == nil && cfg.Commons != nil && cfg.Commons.OcisURL != "" ||
-		len(cfg.HTTP.CORS.AllowedOrigins) == 1 && cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200" {
+	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") && (cfg.HTTP.CORS.AllowedOrigins == nil && cfg.Commons != nil && cfg.Commons.OcisURL != "" ||
+		len(cfg.HTTP.CORS.AllowedOrigins) == 1 && cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
 		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
