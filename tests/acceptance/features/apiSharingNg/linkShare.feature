@@ -217,7 +217,7 @@ Feature: Create a share link for a resource
       | blocksDownload  |
 
   @issue-8619
-  Scenario: create an internal link share of a folder
+  Scenario: create an internal link share of a file
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following link share using the Graph API:
       | resource        | textfile1.txt |
