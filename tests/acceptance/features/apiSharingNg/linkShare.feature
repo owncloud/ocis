@@ -27,7 +27,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -45,23 +45,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": [""]
+                "const": ""
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<permissionsRole>"]
+                "const": "<permissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -72,10 +72,81 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
-#      | internal        |
       | upload          |
       | createOnly      |
       | blocksDownload  |
+
+  @issue-8619
+  Scenario: create an internal link share of a folder
+    Given user "Alice" has created folder "folder"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folder   |
+      | space           | Personal |
+      | permissionsRole | internal |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "type": "string",
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "type": "boolean",
+                "const": false
+              },
+              "preventsDownload": {
+                "type": "boolean",
+                "const": false
+              },
+              "type": {
+                "type": "string",
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8619
+  Scenario: try to create an internal link share of a folder with password
+    Given user "Alice" has created folder "folder"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folder   |
+      | space           | Personal |
+      | permissionsRole | internal |
+      | password        | %public% |
+    Then the HTTP status code should be "400"
 
   @issue-7879
   Scenario Outline: create a link share of a file
@@ -98,7 +169,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -116,23 +187,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": [""]
+                "const": ""
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<permissionsRole>"]
+                "const": "<permissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -143,8 +214,79 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
-#      | internal        |
       | blocksDownload  |
+
+  @issue-8619
+  Scenario: create an internal link share of a file
+    Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | permissionsRole | internal      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "type": "string",
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "type": "boolean",
+                "const": false
+              },
+              "preventsDownload": {
+                "type": "boolean",
+                "const": false
+              },
+              "type": {
+                "type": "string",
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8619
+  Scenario: try to create an internal link share of a file with password
+    Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | permissionsRole | internal      |
+      | password        | %public%      |
+    Then the HTTP status code should be "400"
 
   @issue-7879
   Scenario Outline: create a link share of a folder with display name and expiry date
@@ -170,7 +312,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -178,7 +320,7 @@ Feature: Create a share link for a resource
           },
           "expirationDateTime": {
             "type": "string",
-            "enum": ["2200-07-15T23:59:59Z"]
+            "const": "2200-07-15T23:59:59Z"
           },
           "link": {
             "type": "object",
@@ -192,23 +334,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": ["Homework"]
+                "const": "Homework"
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<permissionsRole>"]
+                "const": "<permissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -219,7 +361,6 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
-#      | internal        |
       | upload          |
       | createOnly      |
       | blocksDownload  |
@@ -248,7 +389,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -256,7 +397,7 @@ Feature: Create a share link for a resource
           },
           "expirationDateTime": {
             "type": "string",
-            "enum": ["2200-07-15T23:59:59Z"]
+            "const": "2200-07-15T23:59:59Z"
           },
           "link": {
             "type": "object",
@@ -270,23 +411,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": ["Homework"]
+                "const": "Homework"
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<permissionsRole>"]
+                "const": "<permissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -297,7 +438,6 @@ Feature: Create a share link for a resource
       | permissionsRole |
       | view            |
       | edit            |
-#      | internal        |
       | blocksDownload  |
 
   @env-config @issue-7879
@@ -323,7 +463,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [false]
+            "const": false
           },
           "id": {
             "type": "string",
@@ -341,23 +481,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": [""]
+                "const": ""
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<permissionsRole>"]
+                "const": "<permissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -396,7 +536,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -414,23 +554,23 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "type": "string",
-                "enum": [""]
+                "const": ""
               },
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["<newPermissionsRole>"]
+                "const": "<newPermissionsRole>"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -440,14 +580,83 @@ Feature: Create a share link for a resource
     Examples:
       | previousPermissionsRole | newPermissionsRole |
       | view                    | edit               |
-#      | view                    | internal           |
       | view                    | blocksDownload     |
       | edit                    | view               |
       | edit                    | blocksDownload     |
-#      | view                    | internal           |
       | blocksDownload          | edit               |
       | blocksDownload          | blocksDownload     |
-#      | view                    | internal           |
+
+  @issue-8619
+  Scenario Outline: update role of a file's to internal link share
+    Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
+    And user "Alice" has created the following link share:
+      | resource        | textfile1.txt             |
+      | space           | Personal                  |
+      | permissionsRole | <previousPermissionsRole> |
+      | password        | %public%                  |
+    When user "Alice" updates the last public link share using the Graph API with
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | permissionsRole | internal      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "type": "boolean",
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "type": "string",
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "type": "boolean",
+                "const": false
+              },
+              "preventsDownload": {
+                "type": "boolean",
+                "const": false
+              },
+              "type": {
+                "type": "string",
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | previousPermissionsRole |
+      | view                    |
+      | edit                    |
+      | blocksDownload          |
 
 
   Scenario: update expiration date of a file's link share
@@ -476,7 +685,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -484,7 +693,7 @@ Feature: Create a share link for a resource
           },
           "expirationDateTime": {
             "type": "string",
-            "enum": ["2201-07-15T23:59:59Z"]
+            "const": "2201-07-15T23:59:59Z"
           },
           "link": {
             "type": "object",
@@ -498,19 +707,19 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["view"]
+                "const": "view"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -545,7 +754,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "id": {
             "type": "string",
@@ -563,19 +772,19 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.quickLink": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "preventsDownload": {
                 "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "type": {
                 "type": "string",
-                "enum": ["view"]
+                "const": "view"
               },
               "webUrl": {
                 "type": "string",
-                "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
           }
@@ -598,9 +807,9 @@ Feature: Create a share link for a resource
       | space           | Personal      |
       | permissionsRole | view          |
     When user "Alice" sets the following password for the last link share using the Graph API:
-      | resource     | textfile1.txt |
-      | space        | Personal      |
-      | password     | %public%      |
+      | resource | textfile1.txt |
+      | space    | Personal      |
+      | password | %public%      |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -612,7 +821,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           }
         }
       }
@@ -627,9 +836,9 @@ Feature: Create a share link for a resource
       | permissionsRole | view          |
       | password        | $heLlo*1234*  |
     When user "Alice" sets the following password for the last link share using the Graph API:
-      | resource     | textfile1.txt |
-      | space        | Personal      |
-      | password     | %public%      |
+      | resource | textfile1.txt |
+      | space    | Personal      |
+      | password | %public%      |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -641,7 +850,7 @@ Feature: Create a share link for a resource
         "properties": {
           "hasPassword": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           }
         }
       }
@@ -680,9 +889,7 @@ Feature: Create a share link for a resource
               },
               "message": {
                 "type": "string",
-                "enum": [
-                  "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
-                ]
+                "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
               }
             }
           }
@@ -731,9 +938,7 @@ Feature: Create a share link for a resource
               },
               "message": {
                 "type": "string",
-                "enum": [
-                  "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
-                ]
+                "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
               }
             }
           }
