@@ -89,12 +89,12 @@ Feature: Deprovisioning notification
 
 
   Scenario Outline: non-admin user tries to create a deprovisioning notification
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" tries to create a deprovisioning notification
     Then the HTTP status code should be "404"
     And user "Alice" should not have any notification
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
@@ -160,19 +160,19 @@ Feature: Deprovisioning notification
 
 
   Scenario Outline: non-admin user tries to delete the deprovisioning notification
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" tries to delete the deprovisioning notification
     Then the HTTP status code should be "404"
     And user "Alice" should not have any notification
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | User        |
       | User Light  |
 
 
   Scenario Outline: administrator creates a deprovisioning notification with different date formats
-    When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
+    When the administrator creates a deprovisioning notification for date "<deprovision-date>" of format "<deprovision-date-format>"
     And user "Alice" lists all notifications
     Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
@@ -186,14 +186,14 @@ Feature: Deprovisioning notification
             "message": {
               "type": "string",
               "enum": [
-                "Attention! The instance will be shut down and deprovisioned on <deprovision_date>. Download all your data before that date as no access past that date is possible."
+                "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
               ]
             }
           }
         }
         """
     Examples:
-      | deprovision_date                    | deprovision_date_format             |
+      | deprovision-date                    | deprovision-date-format             |
       | 2030-04-09T15:04:05.999999999+07:00 | 2006-01-02T15:04:05.999999999Z07:00 |
       | 5:15PM                              | 3:04PM                              |
       # with date format like `Jan _2 15:04:05`, `_` gets replaced with a space in the response.
@@ -206,7 +206,7 @@ Feature: Deprovisioning notification
 
   Scenario Outline: administrator change a deprovisioning notification with different date formats
     Given the administrator has created a deprovisioning notification
-    When the administrator creates a deprovisioning notification for date "<deprovision_date>" of format "<deprovision_date_format>"
+    When the administrator creates a deprovisioning notification for date "<deprovision-date>" of format "<deprovision-date-format>"
     And user "Alice" lists all notifications
     Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
@@ -220,14 +220,14 @@ Feature: Deprovisioning notification
             "message": {
               "type": "string",
               "enum": [
-                "Attention! The instance will be shut down and deprovisioned on <deprovision_date>. Download all your data before that date as no access past that date is possible."
+                "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
               ]
             }
           }
         }
         """
     Examples:
-      | deprovision_date                | deprovision_date_format         |
+      | deprovision-date                | deprovision-date-format         |
       | 01/02 03:04:05PM '23 -0700      | 01/02 03:04:05PM '06 -0700      |
       | Mon Jan  2 15:04:05 UTC 2023    | Mon Jan _2 15:04:05 UTC 2006    |
       | Mon Jan 02 15:04:05 -0700 2023  | Mon Jan 02 15:04:05 -0700 2006  |

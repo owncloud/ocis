@@ -22,15 +22,15 @@ Feature: share by disabling re-share
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
-      | permissions | <expectedPermissions> |
+      | permissions | <expected-permissions> |
     Examples:
-      | dav-path-version | role   | expectedPermissions |
-      | old              | editor | 15                  |
-      | old              | viewer | 1                   |
-      | new              | editor | 15                  |
-      | new              | viewer | 1                   |
-      | spaces           | editor | 15                  |
-      | spaces           | viewer | 1                   |
+      | dav-path-version | role   | expected-permissions |
+      | old              | editor | 15                   |
+      | old              | viewer | 1                    |
+      | new              | editor | 15                   |
+      | new              | viewer | 1                    |
+      | spaces           | editor | 15                   |
+      | spaces           | viewer | 1                    |
 
 
   Scenario Outline: try to re-share folder
