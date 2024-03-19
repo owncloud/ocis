@@ -95,14 +95,14 @@ Feature: antivirus
       | permissions | change                   |
       | expireDate  | 2040-01-01T23:59:59+0100 |
       | password    | %public%                 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename    |
+      | dav-path-version | file-name     | new-file-name  |
       | old              | eicar.com     | virusFile1.txt |
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
@@ -121,14 +121,14 @@ Feature: antivirus
       | password    | newpasswd                |
       | expireDate  | 2040-01-01T23:59:59+0100 |
       | password    | %public%                 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename    |
+      | dav-path-version | file-name     | new-file-name  |
       | old              | eicar.com     | virusFile1.txt |
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
@@ -142,15 +142,15 @@ Feature: antivirus
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
-    When user "Brian" uploads file "filesForUpload/filesWithVirus/<filename>" to "/Shares/uploadFolder/<newfilename>" using the WebDAV API
+    When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename    |
+      | dav-path-version | file-name     | new-file-name  |
       | old              | eicar.com     | virusFile1.txt |
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
@@ -162,15 +162,15 @@ Feature: antivirus
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
-    When user "Brian" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "Shares" using the WebDAV API
+    When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | filename      | newfilename    |
+      | file-name     | new-file-name  |
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 
@@ -182,15 +182,15 @@ Feature: antivirus
     And user "Brian" has been added to group "group1"
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has shared folder "uploadFolder" with group "group1"
-    When user "Brian" uploads file "filesForUpload/filesWithVirus/<filename>" to "/Shares/uploadFolder/<newfilename>" using the WebDAV API
+    When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename    |
+      | dav-path-version | file-name     | new-file-name  |
       | old              | eicar.com     | virusFile1.txt |
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
@@ -204,15 +204,15 @@ Feature: antivirus
     And user "Brian" has been added to group "group1"
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has shared folder "uploadFolder" with group "group1"
-    When user "Brian" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "Shares" using the WebDAV API
+    When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
-    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
+    And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | filename      | newfilename    |
+      | file-name     | new-file-name  |
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 
@@ -222,22 +222,22 @@ Feature: antivirus
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "uploadFolder" in space "new-space"
-    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "new-space" using the WebDAV API
+    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Alice" folder "uploadFolder" of the space "new-space" should not contain these entries:
-      | <newfilename> |
-    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
+      | <new-file-name> |
+    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should get a notification for resource "<newfilename>" with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Alice" the space "new-space" should not contain these entries:
-      | /<newfilename> |
+      | /<new-file-name> |
     Examples:
-      | filename      | newfilename    |
+      | file-name     | new-file-name  |
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 
@@ -250,17 +250,17 @@ Feature: antivirus
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | editor |
-    When user "Brian" uploads a file "/filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
+    When user "Brian" uploads a file "/filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                        |
-      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Brian" the space "new-space" should not contain these entries:
-      | /<newfilename> |
+      | /<new-file-name> |
     And for user "Alice" the space "new-space" should not contain these entries:
-      | /<newfilename> |
+      | /<new-file-name> |
     Examples:
-      | filename      | newfilename    |
+      | file-name     | new-file-name  |
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 

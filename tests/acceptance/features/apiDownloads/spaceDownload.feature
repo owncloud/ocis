@@ -31,7 +31,7 @@ Feature: Download space
   Scenario Outline: user downloads a shared space (shared by others)
     Given user "Alice" has shared a space "Project-space" with settings:
       | shareWith | Brian  |
-      | role      | <role> |
+      | role      | <space-role> |
     When user "Brian" downloads the space "Project-space" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded "tar" archive should contain these files:
@@ -39,18 +39,18 @@ Feature: Download space
       | file1.txt        | some data         |
       | .space/readme.md | space description |
     Examples:
-      | role    |
+      | space-role    |
       | manager |
       | editor  |
       | viewer  |
 
 
   Scenario Outline: admin/space-admin tries to download a space that they do not have access to
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" tries to download the space "Project-space" owned by user "Alice" using the WebDAV API
     Then the HTTP status code should be "404"
     Examples:
-      | userRole    |
+      | user-role   |
       | Admin       |
       | Space Admin |
 

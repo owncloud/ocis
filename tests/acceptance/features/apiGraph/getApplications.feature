@@ -8,7 +8,7 @@ Feature: get applications
 
 
   Scenario Outline: admin user lists all the groups
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets all applications using the Graph API
     Then the HTTP status code should be "200"
     And the user API response should contain the following application information:
@@ -21,7 +21,7 @@ Feature: get applications
       | User        |
       | User Light  |
     Examples:
-      | role        |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |

@@ -31,8 +31,8 @@ Feature: Propfind test
   Scenario Outline: space member with a different role checks the PROPFIND request of a space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
     And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
@@ -41,21 +41,21 @@ Feature: Propfind test
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
       | oc:name        | new-space        |
-      | oc:permissions | <oc_permission>  |
+      | oc:permissions | <oc-permission>  |
       | oc:privatelink |                  |
       | oc:size        | 12               |
     Examples:
-      | role    | oc_permission |
-      | manager | RDNVCKZP      |
-      | editor  | DNVCK         |
-      | viewer  |               |
+      | space-role | oc-permission |
+      | manager    | RDNVCKZP      |
+      | editor     | DNVCK         |
+      | viewer     |               |
 
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the folder in the space
     Given user "Alice" has created a folder "folderMain" in space "new-space"
     And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
@@ -63,20 +63,20 @@ Feature: Propfind test
       | oc:fileid      | UUIDof:folderMain |
       | oc:file-parent | UUIDof:new-space  |
       | oc:name        | folderMain        |
-      | oc:permissions | <oc_permission>   |
+      | oc:permissions | <oc-permission>   |
       | oc:size        | 0                 |
     Examples:
-      | role    | oc_permission |
-      | manager | RDNVCKZP      |
-      | editor  | DNVCK         |
-      | viewer  |               |
+      | space-role | oc-permission |
+      | manager    | RDNVCKZP      |
+      | editor     | DNVCK         |
+      | viewer     |               |
 
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the sub-folder in the space
     Given user "Alice" has created a folder "folderMain/subFolder1/subFolder2" in space "new-space"
     And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
@@ -84,20 +84,20 @@ Feature: Propfind test
       | oc:fileid      | UUIDof:folderMain/subFolder1/subFolder2 |
       | oc:file-parent | UUIDof:folderMain/subFolder1            |
       | oc:name        | subFolder2                              |
-      | oc:permissions | <oc_permission>                         |
+      | oc:permissions | <oc-permission>                         |
       | oc:size        | 0                                       |
     Examples:
-      | role    | oc_permission |
-      | manager | RDNVCKZP      |
-      | editor  | DNVCK         |
-      | viewer  |               |
+      | space-role | oc-permission |
+      | manager    | RDNVCKZP      |
+      | editor     | DNVCK         |
+      | viewer     |               |
 
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the file in the space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
     And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "testfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
@@ -105,10 +105,10 @@ Feature: Propfind test
       | oc:fileid      | UUIDof:testfile.txt |
       | oc:file-parent | UUIDof:new-space    |
       | oc:name        | testfile.txt        |
-      | oc:permissions | <oc_permission>     |
+      | oc:permissions | <oc-permission>     |
       | oc:size        | 12                  |
     Examples:
-      | role    | oc_permission |
-      | manager | RDNVWZP       |
-      | editor  | DNVW          |
-      | viewer  |               |
+      | space-role | oc-permission |
+      | manager    | RDNVWZP       |
+      | editor     | DNVW          |
+      | viewer     |               |

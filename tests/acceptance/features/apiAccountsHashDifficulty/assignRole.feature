@@ -10,10 +10,10 @@ Feature: assign role
     When user "Alice" tries to get all existing roles
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | user-role    | http-status-code |
-      | Admin       | 201        |
-      | Space Admin | 201        |
-      | User        | 201        |
+      | user-role   | http-status-code |
+      | Admin       | 201              |
+      | Space Admin | 201              |
+      | User        | 201              |
 
   @issue-5032
   Scenario Outline: only admin user can see assignments list
@@ -22,10 +22,10 @@ Feature: assign role
     When user "Alice" tries to get list of assignment
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | user-role    | http-status-code |
-      | Admin       | 201        |
-      | Space Admin | 401        |
-      | User        | 401        |
+      | user-role   | http-status-code |
+      | Admin       | 201              |
+      | Space Admin | 401              |
+      | User        | 401              |
 
 
   Scenario Outline: a user cannot change own role
@@ -35,13 +35,13 @@ Feature: assign role
     Then the HTTP status code should be "400"
     And user "Alice" should have the role "<user-role>"
     Examples:
-      | user-role    | desired-role |
-      | Admin       | User        |
-      | Admin       | Space Admin |
-      | Space Admin | Admin       |
-      | Space Admin | Space Admin |
-      | User        | Admin       |
-      | User        | Space Admin |
+      | user-role   | desired-role |
+      | Admin       | User         |
+      | Admin       | Space Admin  |
+      | Space Admin | Admin        |
+      | Space Admin | Space Admin  |
+      | User        | Admin        |
+      | User        | Space Admin  |
 
 
   Scenario Outline: only admin user can change the role for another user
@@ -54,11 +54,11 @@ Feature: assign role
     Then the HTTP status code should be "<http-status-code>"
     And user "Brian" should have the role "<expected-role>"
     Examples:
-      | user-role    | desired-role | http-status-code | expected-role |
-      | Admin       | User        | 201        | User         |
-      | Admin       | Space Admin | 201        | Space Admin  |
-      | Admin       | Admin       | 201        | Admin        |
-      | Space Admin | Admin       | 400        | User         |
-      | Space Admin | Space Admin | 400        | User         |
-      | User        | Admin       | 400        | User         |
-      | User        | Space Admin | 400        | User         |
+      | user-role   | desired-role | http-status-code | expected-role |
+      | Admin       | User         | 201              | User          |
+      | Admin       | Space Admin  | 201              | Space Admin   |
+      | Admin       | Admin        | 201              | Admin         |
+      | Space Admin | Admin        | 400              | User          |
+      | Space Admin | Space Admin  | 400              | User          |
+      | User        | Admin        | 400              | User          |
+      | User        | Space Admin  | 400              | User          |

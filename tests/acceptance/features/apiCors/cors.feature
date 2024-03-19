@@ -11,32 +11,32 @@ Feature: CORS headers
 
   @issue-5195
   Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "<endpoint>" with headers
       | header | value               |
       | Origin | https://aphno.badal |
-    Then the OCS status code should be "<ocs-code>"
-    And the HTTP status code should be "<http-code>"
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "<http-status-code>"
     And the following headers should be set
       | header                           | value               |
       | Access-Control-Expose-Headers    | Location            |
       | Access-Control-Allow-Origin      | https://aphno.badal |
       | Access-Control-Allow-Credentials | true                |
     Examples:
-      | ocs_api_version | endpoint                          | ocs-code | http-code |
-      | 1               | /config                           | 100      | 200       |
-      | 2               | /config                           | 200      | 200       |
-      | 1               | /apps/files_sharing/api/v1/shares | 100      | 200       |
-      | 2               | /apps/files_sharing/api/v1/shares | 200      | 200       |
+      | ocs-api-version | endpoint                          | ocs-status-code | http-status-code |
+      | 1               | /config                           | 100             | 200              |
+      | 2               | /config                           | 200             | 200              |
+      | 1               | /apps/files_sharing/api/v1/shares | 100             | 200              |
+      | 2               | /apps/files_sharing/api/v1/shares | 200             | 200              |
 
 
   Scenario Outline: CORS headers should not be returned when CORS domain does not match origin header
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "<endpoint>" with headers
       | header | value              |
       | Origin | https://mero.badal |
-    Then the OCS status code should be "<ocs-code>"
-    And the HTTP status code should be "<http-code>"
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "<http-status-code>"
     And the following headers should not be set
       | header                        |
       | Access-Control-Allow-Headers  |
@@ -44,32 +44,32 @@ Feature: CORS headers
       | Access-Control-Allow-Origin   |
       | Access-Control-Allow-Methods  |
     Examples:
-      | ocs_api_version | endpoint                          | ocs-code | http-code |
-      | 1               | /config                           | 100      | 200       |
-      | 2               | /config                           | 200      | 200       |
-      | 1               | /apps/files_sharing/api/v1/shares | 100      | 200       |
-      | 2               | /apps/files_sharing/api/v1/shares | 200      | 200       |
+      | ocs-api-version | endpoint                          | ocs-status-code | http-status-code |
+      | 1               | /config                           | 100             | 200              |
+      | 2               | /config                           | 200             | 200              |
+      | 1               | /apps/files_sharing/api/v1/shares | 100             | 200              |
+      | 2               | /apps/files_sharing/api/v1/shares | 200             | 200              |
 
   @issue-5194
   Scenario Outline: CORS headers should be returned when an preflight request is sent
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Alice" sends HTTP method "OPTIONS" to OCS API endpoint "<endpoint>" with headers
       | header                         | value                                                                                                                                                                                                                                                                                                                                                 |
       | Origin                         | https://aphno.badal                                                                                                                                                                                                                                                                                                                                   |
       | Access-Control-Request-Headers | Origin, Accept, Content-Type, Depth, Authorization, Ocs-Apirequest, If-None-Match, If-Match, Destination, Overwrite, X-Request-Id, X-Requested-With, Tus-Resumable, Tus-Checksum-Algorithm, Upload-Concat, Upload-Length, Upload-Metadata, Upload-Defer-Length, Upload-Expires, Upload-Checksum, Upload-Offset, X-Http-Method-Override, Cache-Control |
-      | Access-Control-Request-Method  | <request_method>                                                                                                                                                                                                                                                                                                                                      |
+      | Access-Control-Request-Method  | <request-method>                                                                                                                                                                                                                                                                                                                                      |
     And the HTTP status code should be "204"
     And the following headers should be set
       | header                       | value                                                                                                                                                                                                                                                                                                                                                 |
       | Access-Control-Allow-Headers | Origin, Accept, Content-Type, Depth, Authorization, Ocs-Apirequest, If-None-Match, If-Match, Destination, Overwrite, X-Request-Id, X-Requested-With, Tus-Resumable, Tus-Checksum-Algorithm, Upload-Concat, Upload-Length, Upload-Metadata, Upload-Defer-Length, Upload-Expires, Upload-Checksum, Upload-Offset, X-Http-Method-Override, Cache-Control |
       | Access-Control-Allow-Origin  | https://aphno.badal                                                                                                                                                                                                                                                                                                                                   |
-      | Access-Control-Allow-Methods | <request_method>                                                                                                                                                                                                                                                                                                                                      |
+      | Access-Control-Allow-Methods | <request-method>                                                                                                                                                                                                                                                                                                                                      |
     Examples:
-      | ocs_api_version |  | endpoint                          | request_method |
-      | 1               |  | /apps/files_sharing/api/v1/shares | GET            |
-      | 2               |  | /apps/files_sharing/api/v1/shares | PUT            |
-      | 1               |  | /apps/files_sharing/api/v1/shares | DELETE         |
-      | 2               |  | /apps/files_sharing/api/v1/shares | POST           |
+      | ocs-api-version | endpoint                          | request-method |
+      | 1               | /apps/files_sharing/api/v1/shares | GET            |
+      | 2               | /apps/files_sharing/api/v1/shares | PUT            |
+      | 1               | /apps/files_sharing/api/v1/shares | DELETE         |
+      | 2               | /apps/files_sharing/api/v1/shares | POST           |
 
 
   Scenario: CORS headers should be returned when setting CORS domain sending origin header in the Graph api

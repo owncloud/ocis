@@ -495,28 +495,28 @@ Feature: user GDPR (General Data Protection Regulation) report
 
   Scenario Outline: user tries to generate GDPR report of other users
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<new-user-role>" to user "Brian" using the Graph API
     When user "Alice" tries to export GDPR report of user "Brian" to "/.personal_data_export.json" using Graph API
     Then the HTTP status code should be "400"
     Examples:
-      | userRole    | role        |
-      | Space Admin | Space Admin |
-      | Space Admin | User        |
-      | Space Admin | User Light  |
-      | Space Admin | Admin       |
-      | User        | Space Admin |
-      | User        | User        |
-      | User        | User Light  |
-      | User        | Admin       |
-      | User Light  | Space Admin |
-      | User Light  | User        |
-      | User Light  | User Light  |
-      | User Light  | Admin       |
-      | Admin       | Space Admin |
-      | Admin       | User        |
-      | Admin       | User Light  |
-      | Admin       | Admin       |
+      | user-role   | new-user-role |
+      | Space Admin | Space Admin   |
+      | Space Admin | User          |
+      | Space Admin | User Light    |
+      | Space Admin | Admin         |
+      | User        | Space Admin   |
+      | User        | User          |
+      | User        | User Light    |
+      | User        | Admin         |
+      | User Light  | Space Admin   |
+      | User Light  | User          |
+      | User Light  | User Light    |
+      | User Light  | Admin         |
+      | Admin       | Space Admin   |
+      | Admin       | User          |
+      | Admin       | User Light    |
+      | Admin       | Admin         |
 
 
   Scenario: generate a GDPR report and check events when user creates a folder
