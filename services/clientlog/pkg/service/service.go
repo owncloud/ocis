@@ -95,12 +95,17 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		evType string
 		data   interface{}
 	)
+
+	p := func(typ string, ref *provider.Reference) {
+		evType = typ
+		users, data, err = processFileEvent(ctx, ref, gwc, event.InitiatorID)
+	}
+
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
 	case events.UploadReady:
-		evType = "postprocessing-finished"
-		users, data, err = processFileEvent(ctx, e.FileRef, gwc, "")
+		p("postprocessing-finished", e.FileRef)
 	case events.ItemTrashed:
 		evType = "item-trashed"
 
@@ -129,24 +134,19 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			}
 		}
 	case events.ItemRestored:
-		evType = "item-restored"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
+		p("item-restored", e.Ref)
 	case events.ContainerCreated:
-		evType = "folder-created"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
+		p("folder-created", e.Ref)
 	case events.ItemMoved:
 		// we are only interested in the rename case
 		if !utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
 			return
 		}
-		evType = "item-renamed"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
+		p("item-renamed", e.Ref)
 	case events.FileLocked:
-		evType = "file-locked"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
+		p("file-locked", e.Ref)
 	case events.FileUnlocked:
-		evType = "file-unlocked"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
+		p("file-unlocked", e.Ref)
 	}
 
 	if err != nil {
@@ -185,6 +185,7 @@ func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.
 		ItemID:       storagespace.FormatResourceID(*info.GetId()),
 		SpaceID:      storagespace.FormatStorageID(info.GetSpace().GetRoot().GetStorageId(), info.GetSpace().GetRoot().GetSpaceId()),
 		InitiatorID:  initiatorid,
+		Etag:         info.GetEtag(),
 	}
 
 	users, err := utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)

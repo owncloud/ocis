@@ -6,4 +6,5 @@ type FileEvent struct {
 	ItemID       string `json:"itemid"`
 	SpaceID      string `json:"spaceid"`
 	InitiatorID  string `json:"initiatorid"`
+	Etag         string `json:"etag"`
 }
