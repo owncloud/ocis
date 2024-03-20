@@ -26,7 +26,7 @@ func DefaultConfig() *config.Config {
 			Root:      "/graph/v1.0",
 			Namespace: "com.owncloud.graph",
 			CORS: config.CORS{
-				AllowedOrigins: []string{"*"},
+				AllowedOrigins: []string{"https://localhost:9200"},
 			},
 		},
 		Service: config.Service{
@@ -76,6 +76,13 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") &&
+		(cfg.HTTP.CORS.AllowedOrigins == nil ||
+			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
+				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
 

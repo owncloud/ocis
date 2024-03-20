@@ -29,7 +29,8 @@ func DefaultConfig() *config.Config {
 			Root:      "/",
 			Namespace: "com.owncloud.web",
 			CORS: config.CORS{
-				AllowedOrigins: []string{"*"},
+				AllowedOrigins:   []string{"https://localhost:9200"},
+				AllowCredentials: false,
 			},
 		},
 		Service: config.Service{
@@ -80,6 +81,13 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
+
+	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") &&
+		(cfg.HTTP.CORS.AllowedOrigins == nil ||
+			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
+				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
 

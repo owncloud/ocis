@@ -21,7 +21,6 @@ Feature: CORS headers
       | header                           | value               |
       | Access-Control-Expose-Headers    | Location            |
       | Access-Control-Allow-Origin      | https://aphno.badal |
-      | Access-Control-Allow-Credentials | true                |
     Examples:
       | ocs-api-version | endpoint                          | ocs-status-code | http-status-code |
       | 1               | /config                           | 100             | 200              |

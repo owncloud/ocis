@@ -32,7 +32,7 @@ func DefaultConfig() *config.Config {
 			CacheTTL:  604800, // 7 days
 
 			CORS: config.CORS{
-				AllowedOrigins: []string{"*"},
+				AllowedOrigins: []string{"https://localhost:9200"},
 				AllowedMethods: []string{
 					"OPTIONS",
 					"HEAD",
@@ -73,7 +73,7 @@ func DefaultConfig() *config.Config {
 					"Upload-Offset",
 					"X-HTTP-Method-Override",
 				},
-				AllowCredentials: true,
+				AllowCredentials: false,
 			},
 		},
 		Service: config.Service{
@@ -172,6 +172,13 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
+
+	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") &&
+		(cfg.HTTP.CORS.AllowedOrigins == nil ||
+			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
+				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
 

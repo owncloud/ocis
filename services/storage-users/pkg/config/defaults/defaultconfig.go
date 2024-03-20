@@ -38,7 +38,7 @@ func DefaultConfig() *config.Config {
 			Protocol:  "tcp",
 			Prefix:    "data",
 			CORS: config.CORS{
-				AllowedOrigins: []string{"*"},
+				AllowedOrigins: []string{"https://localhost:9200"},
 				AllowedMethods: []string{
 					"POST",
 					"HEAD",
@@ -63,7 +63,7 @@ func DefaultConfig() *config.Config {
 					"Upload-Incomplete",
 					"Upload-Draft-Interop-Version",
 				},
-				AllowCredentials: true,
+				AllowCredentials: false,
 				ExposedHeaders: []string{
 					"Upload-Offset",
 					"Location",
@@ -207,6 +207,13 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Tasks.PurgeTrashBin.UserID == "" && cfg.Commons != nil {
 		cfg.Tasks.PurgeTrashBin.UserID = cfg.Commons.AdminUserID
+	}
+
+	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") &&
+		(cfg.HTTP.CORS.AllowedOrigins == nil ||
+			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
+				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
 	}
 }
 
