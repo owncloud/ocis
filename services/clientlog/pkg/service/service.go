@@ -100,7 +100,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		err = errors.New("unhandled event")
 	case events.UploadReady:
 		evType = "postprocessing-finished"
-		users, data, err = processFileEvent(ctx, e.FileRef, gwc)
+		users, data, err = processFileEvent(ctx, e.FileRef, gwc, "")
 	case events.ItemTrashed:
 		evType = "item-trashed"
 
@@ -120,7 +120,8 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 					ItemID: storagespace.FormatResourceID(*e.ID),
 					// TODO: check with web if parentID is needed
 					// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
-					SpaceID: storagespace.FormatStorageID(e.ID.GetStorageId(), e.ID.GetSpaceId()),
+					SpaceID:     storagespace.FormatStorageID(e.ID.GetStorageId(), e.ID.GetSpaceId()),
+					InitiatorID: event.InitiatorID,
 				}
 
 				users, err = utils.GetSpaceMembers(ctx, e.ID.GetSpaceId(), gwc, utils.ViewerRole)
@@ -129,23 +130,23 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		}
 	case events.ItemRestored:
 		evType = "item-restored"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
 	case events.ContainerCreated:
 		evType = "folder-created"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
 	case events.ItemMoved:
 		// we are only interested in the rename case
 		if !utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
 			return
 		}
 		evType = "item-renamed"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
 	case events.FileLocked:
 		evType = "file-locked"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
 	case events.FileUnlocked:
 		evType = "file-unlocked"
-		users, data, err = processFileEvent(ctx, e.Ref, gwc)
+		users, data, err = processFileEvent(ctx, e.Ref, gwc, event.InitiatorID)
 	}
 
 	if err != nil {
@@ -173,7 +174,7 @@ func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interf
 	})
 }
 
-func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient) ([]string, FileEvent, error) {
+func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient, initiatorid string) ([]string, FileEvent, error) {
 	info, err := utils.GetResource(ctx, ref, gwc)
 	if err != nil {
 		return nil, FileEvent{}, err
@@ -183,6 +184,7 @@ func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.
 		ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
 		ItemID:       storagespace.FormatResourceID(*info.GetId()),
 		SpaceID:      storagespace.FormatStorageID(info.GetSpace().GetRoot().GetStorageId(), info.GetSpace().GetRoot().GetSpaceId()),
+		InitiatorID:  initiatorid,
 	}
 
 	users, err := utils.GetSpaceMembers(ctx, info.GetSpace().GetId().GetOpaqueId(), gwc, utils.ViewerRole)
