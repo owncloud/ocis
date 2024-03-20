@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-20-10-56-49]
+[#deprecation-note-2024-03-20-13-45-09]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -175,7 +175,7 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[*] ++
+++[https://localhost:9200] ++
 a| [subs=-attributes]
 A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
 
@@ -205,7 +205,7 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++true ++
+++false ++
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 

@@ -21,7 +21,7 @@ http:
   root: /graph/v1.0
   cors:
     allow_origins:
-    - '*'
+    - https://localhost:9200
     allow_methods: []
     allow_headers: []
     allow_credentials: false

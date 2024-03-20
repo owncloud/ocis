@@ -26,7 +26,7 @@ http:
   cache_ttl: 604800
   cors:
     allow_origins:
-    - '*'
+    - https://localhost:9200
     allow_methods:
     - OPTIONS
     - HEAD
@@ -65,7 +65,7 @@ http:
     - Upload-Checksum
     - Upload-Offset
     - X-HTTP-Method-Override
-    allow_credentials: true
+    allow_credentials: false
 asset:
   path: ""
   core_path: /var/lib/ocis/web/assets/core

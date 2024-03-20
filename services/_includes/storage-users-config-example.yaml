@@ -26,7 +26,7 @@ http:
   prefix: data
   cors:
     allow_origins:
-    - '*'
+    - https://localhost:9200
     allow_methods:
     - POST
     - HEAD
@@ -49,7 +49,7 @@ http:
     - Upload-Concat
     - Upload-Incomplete
     - Upload-Draft-Interop-Version
-    allow_credentials: true
+    allow_credentials: false
     expose_headers:
     - Upload-Offset
     - Location

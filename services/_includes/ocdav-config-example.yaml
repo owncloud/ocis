@@ -22,7 +22,7 @@ http:
   prefix: ""
   cors:
     allow_origins:
-    - '*'
+    - https://localhost:9200
     allow_methods:
     - OPTIONS
     - HEAD
@@ -61,7 +61,7 @@ http:
     - Upload-Offset
     - X-HTTP-Method-Override
     - Cache-Control
-    allow_credentials: true
+    allow_credentials: false
 token_manager:
   jwt_secret: ""
 reva:
