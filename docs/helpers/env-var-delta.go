@@ -74,16 +74,25 @@ func RenderEnvVarDeltaTable(osArgs []string) {
 	}
 	fmt.Printf("Success, found %d entries\n", len(configFields))
 	for _, field := range configFields {
-		if field.DeprecationVersion != "" {
-			fmt.Printf("Processing field %s\n", field.Name)
+		if field.IntroductionVersion != "" &&
+			field.IntroductionVersion != "pre5.0" &&
+			!semver.IsValid(field.IntroductionVersion) &&
+			field.IntroductionVersion[0] != 'v' {
+			field.IntroductionVersion = "v" + field.IntroductionVersion
 		}
-		if field.RemovalVersion != "" && semver.Compare(startVersion, field.RemovalVersion) < 0 && semver.Compare(endVersion, field.RemovalVersion) >= 0 {
+		if field.IntroductionVersion != "pre5.0" && !semver.IsValid(field.IntroductionVersion) {
+			fmt.Printf("Invalid semver for field %s: %s\n", field.Name, field.IntroductionVersion)
+			os.Exit(1)
+		}
+		//fmt.Printf("Processing field %s dv: %s, iv: %s\n", field.Name, field.DeprecationVersion, field.IntroductionVersion)
+		if semver.IsValid(field.RemovalVersion) && semver.Compare(startVersion, field.RemovalVersion) < 0 && semver.Compare(endVersion, field.RemovalVersion) >= 0 {
 			variableList["removed"] = append(variableList["removed"], field)
 		}
-		if field.DeprecationVersion != "" && semver.Compare(startVersion, field.DeprecationVersion) <= 0 && semver.Compare(endVersion, field.DeprecationVersion) > 0 {
+		if semver.IsValid(field.DeprecationVersion) && semver.Compare(startVersion, field.DeprecationVersion) <= 0 && semver.Compare(endVersion, field.DeprecationVersion) > 0 {
 			variableList["deprecated"] = append(variableList["deprecated"], field)
 		}
-		if field.IntroductionVersion != "" && semver.Compare(startVersion, field.IntroductionVersion) <= 0 && semver.Compare(endVersion, field.IntroductionVersion) > 0 {
+		if semver.IsValid(field.IntroductionVersion) && semver.Compare(startVersion, field.IntroductionVersion) <= 0 && semver.Compare(endVersion, field.IntroductionVersion) >= 0 {
+			fmt.Printf("Adding field %s iv: %s\n", field.Name, field.IntroductionVersion)
 			variableList["added"] = append(variableList["added"], field)
 		}
 	}
