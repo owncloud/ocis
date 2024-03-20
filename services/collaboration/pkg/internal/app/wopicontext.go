@@ -11,6 +11,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -29,7 +30,7 @@ type WopiContext struct {
 	ViewAppUrl    string
 }
 
-func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
+func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.URL.Query().Get("access_token")
 		if accessToken == "" {
@@ -44,7 +45,7 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte(app.Config.JWTSecret), nil
+			return []byte(jwtSecret), nil
 		})
 
 		if err != nil {
@@ -59,7 +60,7 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 
 		ctx := r.Context()
 
-		wopiContextAccessToken, err := DecryptAES([]byte(app.Config.JWTSecret), claims.WopiContext.AccessToken)
+		wopiContextAccessToken, err := DecryptAES([]byte(jwtSecret), claims.WopiContext.AccessToken)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
@@ -69,6 +70,17 @@ func WopiContextAuthMiddleware(app *DemoApp, next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, wopiContextKey, claims.WopiContext)
 		// authentication for the CS3 api
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, claims.WopiContext.AccessToken)
+
+		// include additional info in the context's logger
+		// we might need to check https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/common-headers
+		// although some headers might not be sent depending on the client.
+		logger := zerolog.Ctx(ctx)
+		ctx = logger.With().
+			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
+			Str("FileReference", claims.WopiContext.FileReference.String()).
+			Str("ViewMode", claims.WopiContext.ViewMode.String()).
+			Str("Requester", claims.WopiContext.User.GetId().String()).
+			Logger().WithContext(ctx)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

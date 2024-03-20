@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -76,7 +77,7 @@ func Server(opts ...Option) (http.Service, error) {
 		),
 	)
 
-	prepareRoutes(mux, options.App)
+	prepareRoutes(mux, options)
 
 	if err := micro.RegisterHandler(service.Server(), mux); err != nil {
 		return http.Service{}, err
@@ -85,23 +86,37 @@ func Server(opts ...Option) (http.Service, error) {
 	return service, nil
 }
 
-func prepareRoutes(r *chi.Mux, demoapp *app.DemoApp) {
+func prepareRoutes(r *chi.Mux, options Options) {
+	adapter := options.Adapter
+	logger := options.Logger
+	// prepare basic logger for the request
+	r.Use(func(h stdhttp.Handler) stdhttp.Handler {
+		return stdhttp.HandlerFunc(func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+			ctx := logger.With().
+				Str(log.RequestIDString, r.Header.Get("X-Request-ID")).
+				Str("proto", r.Proto).
+				Str("method", r.Method).
+				Str("path", r.URL.Path).
+				Logger().WithContext(r.Context())
+			h.ServeHTTP(w, r.WithContext(ctx))
+		})
+	})
 	r.Route("/wopi", func(r chi.Router) {
 
 		r.Get("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
-			app.WopiInfoHandler(demoapp, w, r)
+			stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusTeapot), stdhttp.StatusTeapot)
 		})
 
 		r.Route("/files/{fileid}", func(r chi.Router) {
 
 			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
 				// authentication and wopi context
-				return app.WopiContextAuthMiddleware(demoapp, h)
+				return app.WopiContextAuthMiddleware(options.Config.JWTSecret, h)
 			},
 			)
 
 			r.Get("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
-				app.CheckFileInfo(demoapp, w, r)
+				adapter.CheckFileInfo(w, r)
 			})
 
 			r.Post("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
@@ -110,13 +125,13 @@ func prepareRoutes(r *chi.Mux, demoapp *app.DemoApp) {
 
 				case "LOCK":
 					// "UnlockAndRelock" operation goes through here
-					app.Lock(demoapp, w, r)
+					adapter.Lock(w, r)
 				case "GET_LOCK":
-					app.GetLock(demoapp, w, r)
+					adapter.GetLock(w, r)
 				case "REFRESH_LOCK":
-					app.RefreshLock(demoapp, w, r)
+					adapter.RefreshLock(w, r)
 				case "UNLOCK":
-					app.UnLock(demoapp, w, r)
+					adapter.UnLock(w, r)
 
 				case "PUT_USER_INFO":
 					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/putuserinfo
@@ -138,7 +153,7 @@ func prepareRoutes(r *chi.Mux, demoapp *app.DemoApp) {
 
 			r.Route("/contents", func(r chi.Router) {
 				r.Get("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
-					app.GetFile(demoapp, w, r)
+					adapter.GetFile(w, r)
 				})
 
 				r.Post("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
@@ -146,7 +161,7 @@ func prepareRoutes(r *chi.Mux, demoapp *app.DemoApp) {
 					switch action {
 
 					case "PUT":
-						app.PutFile(demoapp, w, r)
+						adapter.PutFile(w, r)
 
 					default:
 						stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusInternalServerError), stdhttp.StatusInternalServerError)
