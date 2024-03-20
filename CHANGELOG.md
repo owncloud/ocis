@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
+* Enhancement - Change Cors default settings: [#8518](https://github.com/owncloud/ocis/pull/8518)
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
 * Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
@@ -173,6 +174,15 @@ The following sections list the changes for unreleased.
    enabled and usable by default.
 
    https://github.com/owncloud/ocis/pull/8410
+
+* Enhancement - Change Cors default settings: [#8518](https://github.com/owncloud/ocis/pull/8518)
+
+   We have changed the default CORS settings to set `Access-Control-Allow-Origin`
+   to the `OCIS_URL` if not explicitely set and `Access-Control-Allow-Credentials`
+   to `false` if not explicitely set.
+
+   https://github.com/owncloud/ocis/issues/8514
+   https://github.com/owncloud/ocis/pull/8518
 
 * Enhancement - Custom WEB App Loading: [#8523](https://github.com/owncloud/ocis/pull/8523)
 
