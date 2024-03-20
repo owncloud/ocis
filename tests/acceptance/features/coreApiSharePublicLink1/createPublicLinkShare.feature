@@ -10,30 +10,30 @@ Feature: create a public link share
 
   @smokeTest @skipOnReva
   Scenario Outline: creating public link share of a file or a folder using the default permissions without password using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has created folder "/PARENT"
     When user "Alice" creates a public link share using the sharing API with settings
       | path | randomfile.txt |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path | PARENT |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
 
   @smokeTest
   Scenario Outline: creating a new public link share of a file with password using the new public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | randomfile.txt |
       | password | %public%       |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | item_type              | file            |
@@ -55,19 +55,19 @@ Feature: create a public link share
     Then the HTTP status code should be "401"
     And the value of the item "//s:message" in the response should match "/No 'Authorization: Basic' header found/"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: create a new public link share of a file with edit permissions
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | randomfile.txt            |
       | permissions | read,update,create,delete |
       | password    | %public%                  |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | item_type              | file            |
@@ -84,20 +84,20 @@ Feature: create a public link share
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
     And uploading content to a public link shared file with password "%public%" should work using the new public WebDAV API
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share of a folder, with a password and accessing using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | PARENT   |
       | password    | %public% |
       | permissions | change   |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | item_type              | folder               |
@@ -118,18 +118,18 @@ Feature: create a public link share
     And the public should not be able to download file "/randomfile.txt" from inside the last public link shared folder using the new public WebDAV API without a password
     And the public should not be able to download file "/randomfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "%regular%"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @smokeTest
   Scenario Outline: getting the share information of public link share from the OCS API does not expose sensitive information
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | randomfile.txt |
       | password | %public%       |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | file_target            | /randomfile.txt |
@@ -141,18 +141,18 @@ Feature: create a public link share
       | share_with             | ***redacted***  |
       | share_with_displayname | ***redacted***  |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @env-config
   Scenario Outline: getting the share information of password less public-links hides credential placeholders
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
-    And using OCS API version "<ocs_api_version>"
+    And using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path | randomfile.txt |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | file_target | /randomfile.txt |
@@ -165,18 +165,18 @@ Feature: create a public link share
       | share_with             | ANY_VALUE |
       | share_with_displayname | ANY_VALUE |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | /afolder |
       | password | %public% |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id          | A_STRING    |
@@ -185,19 +185,19 @@ Feature: create a public link share
     And the public upload to the last publicly shared folder using the old public WebDAV API with password "%public%" should fail with HTTP status code "403"
     And the public upload to the last publicly shared folder using the old public WebDAV API with password "%public%" should fail with HTTP status code "403"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a link share with edit permissions keeps it using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /afolder                  |
       | permissions | read,update,create,delete |
       | password    | %public%                  |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id          | A_STRING                  |
@@ -205,19 +205,19 @@ Feature: create a public link share
       | permissions | read,update,create,delete |
     And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a link share with upload permissions keeps it using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /afolder    |
       | permissions | read,create |
       | password    | %public%    |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id          | A_STRING    |
@@ -225,51 +225,51 @@ Feature: create a public link share
       | permissions | read,create |
     And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: Do not allow public sharing of the root on OCIS when the default permission is read and access using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | /        |
       | password | %public% |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
 
 
   Scenario Outline: user creates a public link share of a file with file name longer than 64 chars using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "long file" to "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | /aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt |
       | password | %public%                                                                |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "long file"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: user creates a public link share of a folder with folder name longer than 64 chars and access using the public WebDAV API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog"
     And user "Alice" has uploaded file with content "Random data" to "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | /aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog |
       | password | %public%                                                            |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the public should be able to download file "/randomfile.txt" from inside the last public link shared folder using the old public WebDAV API with password "%public%" and the content should be "Random data"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
@@ -394,9 +394,9 @@ Feature: create a public link share
     When user "Alice" updates the last public link share using the sharing API with
       | password | Test:123345 |
     Then the OCS status code should be "998"
-    And the HTTP status code should be "<http-code>"
+    And the HTTP status code should be "<http-status-code>"
     And the OCS status message should be "update public share: resource not found"
     Examples:
-      | ocs-api-version | http-code |
-      | 1               | 200       |
-      | 2               | 404       |
+      | ocs-api-version | http-status-code |
+      | 1               | 200              |
+      | 2               | 404              |

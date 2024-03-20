@@ -18,7 +18,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee |
       | itemType | file   |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
@@ -30,9 +30,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search without exact match not-exact casing
@@ -40,7 +40,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sHaRee |
       | itemType | file   |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
@@ -52,9 +52,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search only with group members - allowed
@@ -63,7 +63,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee |
       | itemType | file   |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
@@ -75,9 +75,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search with exact match
@@ -85,7 +85,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | Sharee1 |
       | itemType | file    |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
       | Sharee One | 0 | sharee1 |
@@ -95,9 +95,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search with exact match not-exact casing
@@ -105,7 +105,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee1 |
       | itemType | file    |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
       | Sharee One | 0 | sharee1 |
@@ -115,9 +115,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search with exact match not-exact casing group
@@ -125,7 +125,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | shareegroup2 |
       | itemType | file         |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be empty
@@ -135,9 +135,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search with "self"
@@ -145,7 +145,7 @@ Feature: search sharees
     When user "Sharee1" gets the sharees using the sharing API with parameters
       | search   | Sharee1 |
       | itemType | file    |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
       | Sharee One | 0 | sharee1 |
@@ -155,9 +155,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: enumerate only group members - only show partial results from member of groups
@@ -169,7 +169,7 @@ Feature: search sharees
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | anot |
       | itemType | file |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
@@ -179,9 +179,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: search without exact match such that the search string matches the user getting the sharees
@@ -190,7 +190,7 @@ Feature: search sharees
     When user "sharee1" gets the sharees using the sharing API with parameters
       | search   | sharee |
       | itemType | file   |
-    Then the OCS status code should be "<ocs-status>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
@@ -203,6 +203,6 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status |
-      | 1               | 100        |
-      | 2               | 200        |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |

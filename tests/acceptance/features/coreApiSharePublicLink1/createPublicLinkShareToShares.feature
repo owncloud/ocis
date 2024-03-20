@@ -8,12 +8,12 @@ Feature: create a public link share when share_folder is set to Shares
 
 
   Scenario Outline: creating a new public link share of a file gives the correct response
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | randomfile.txt |
       | password | %public%       |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | item_type              | file            |
@@ -28,6 +28,6 @@ Feature: create a public link share when share_folder is set to Shares
       | uid_owner              | %username%      |
       | name                   |                 |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

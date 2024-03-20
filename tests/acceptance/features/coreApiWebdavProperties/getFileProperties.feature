@@ -10,12 +10,12 @@ Feature: get file properties
   @smokeTest
   Scenario Outline: user sends a PROPFIND request on various file names
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "uploaded content" to "<file_name>"
-    When user "Alice" gets the properties of file "<file_name>" using the WebDAV API
+    And user "Alice" has uploaded file with content "uploaded content" to "<file-name>"
+    When user "Alice" gets the properties of file "<file-name>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the properties response should contain an etag
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | old              | /upload.txt       |
       | old              | /strängé file.txt |
       | old              | /नेपाली.txt       |
@@ -27,7 +27,7 @@ Feature: get file properties
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | spaces           | /upload.txt       |
       | spaces           | /strängé file.txt |
       | spaces           | /नेपाली.txt       |
@@ -36,13 +36,13 @@ Feature: get file properties
   @issue-1296
   Scenario Outline: user sends a PROPFIND request on various file with '?, #, &, +' in its name
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "uploaded content" to "<file_name>"
-    When user "Alice" gets the properties of file "<file_name>" using the WebDAV API
+    And user "Alice" has uploaded file with content "uploaded content" to "<file-name>"
+    When user "Alice" gets the properties of file "<file-name>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the properties response should contain an etag
-    And there should be an entry with href containing "<expected_href>" in the response to user "Alice"
+    And there should be an entry with href containing "<expected-href>" in the response to user "Alice"
     Examples:
-      | dav-path-version | file_name     | expected_href                                |
+      | dav-path-version | file-name     | expected-href                                |
       | old              | /C++ file.cpp | remote.php/webdav/C++ file.cpp               |
       | old              | /file #2.txt  | remote.php/webdav/file #2.txt                |
       | old              | /file ?2.txt  | remote.php/webdav/file ?2.txt                |
@@ -54,7 +54,7 @@ Feature: get file properties
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name     | expected_href                     |
+      | dav-path-version | file-name     | expected-href                     |
       | spaces           | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp |
       | spaces           | /file #2.txt  | dav/spaces/%spaceid%/file #2.txt  |
       | spaces           | /file ?2.txt  | dav/spaces/%spaceid%/file ?2.txt  |
@@ -63,16 +63,16 @@ Feature: get file properties
   @issue-1296
   Scenario Outline: user sends a PROPFIND request on various folder names
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/file1.txt"
-    And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/file2.txt"
-    When user "Alice" gets the properties of folder "<folder_name>" with depth 1 using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    And user "Alice" has uploaded file with content "uploaded content" to "<folder-name>/file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "<folder-name>/file2.txt"
+    When user "Alice" gets the properties of folder "<folder-name>" with depth 1 using the WebDAV API
     Then the HTTP status code should be "207"
-    And there should be an entry with href containing "<expected_href>/" in the response to user "Alice"
-    And there should be an entry with href containing "<expected_href>/file1.txt" in the response to user "Alice"
-    And there should be an entry with href containing "<expected_href>/file2.txt" in the response to user "Alice"
+    And there should be an entry with href containing "<expected-href>/" in the response to user "Alice"
+    And there should be an entry with href containing "<expected-href>/file1.txt" in the response to user "Alice"
+    And there should be an entry with href containing "<expected-href>/file2.txt" in the response to user "Alice"
     Examples:
-      | dav-path-version | folder_name     | expected_href                                  |
+      | dav-path-version | folder-name     | expected-href                                  |
       | old              | /upload         | remote.php/webdav/upload                       |
       | old              | /strängé folder | remote.php/webdav/strängé folder               |
       | old              | /C++ folder     | remote.php/webdav/C++ folder                   |
@@ -90,7 +90,7 @@ Feature: get file properties
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name     | expected_href                       |
+      | dav-path-version | folder-name     | expected-href                       |
       | spaces           | /upload         | dav/spaces/%spaceid%/upload         |
       | spaces           | /strängé folder | dav/spaces/%spaceid%/strängé folder |
       | spaces           | /C++ folder     | dav/spaces/%spaceid%/C++ folder     |
@@ -102,13 +102,13 @@ Feature: get file properties
 
   Scenario Outline: user sends a PROPFIND request on various files inside various folders
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/<file_name>"
-    When user "Alice" gets the properties of file "<folder_name>/<file_name>" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    And user "Alice" has uploaded file with content "uploaded content" to "<folder-name>/<file-name>"
+    When user "Alice" gets the properties of file "<folder-name>/<file-name>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the properties response should contain an etag
     Examples:
-      | dav-path-version | folder_name                      | file_name                     |
+      | dav-path-version | folder-name                      | file-name                     |
       | old              | /upload                          | abc.txt                       |
       | old              | /strängé folder                  | strängé file.txt              |
       | old              | /C++ folder                      | C++ file.cpp                  |
@@ -122,7 +122,7 @@ Feature: get file properties
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name     | file_name        |
+      | dav-path-version | folder-name     | file-name        |
       | spaces           | /upload         | abc.txt          |
       | spaces           | /strängé folder | strängé file.txt |
       | spaces           | /C++ folder     | C++ file.cpp     |

@@ -148,7 +148,7 @@ Feature: make webdav request with special urls
       | //remote.php//dav/files/%username%/textfile1.txt    |
       | /remote.php//dav/files/%username%/PARENT/parent.txt |
       | /remote.php//webdav/PARENT                          |
-      | //remote.php/dav//files/%username%//FOLDER           |
+      | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "207"
 
   @skipOnRevaMaster
@@ -169,7 +169,7 @@ Feature: make webdav request with special urls
       | //remote.php//dav/files/%username%/textfile1.txt    |
       | /remote.php//dav/files/%username%/PARENT/parent.txt |
       | /remote.php//webdav/PARENT                          |
-      | //remote.php/dav//files/%username%//FOLDER           |
+      | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "207"
 
   @skipOnRevaMaster

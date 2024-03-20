@@ -12,11 +12,11 @@ Feature: share access by ID
 
 
   Scenario Outline: get a share with a valid share ID
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
-    And user "Alice" gets share with id "%last_share_id%" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    And user "Alice" gets share with id "%last_share-id%" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
       | share_with             | %username%            |
@@ -32,19 +32,19 @@ Feature: share access by ID
       | share_type             | user                  |
     And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: get a share with an invalid share id
-    Given using OCS API version "<ocs_api_version>"
-    When user "Alice" gets share with id "<share_id>" using the sharing API
+    Given using OCS API version "<ocs-api-version>"
+    When user "Alice" gets share with id "<share-id>" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
-      | ocs_api_version | share_id   | http_status_code |
+      | ocs-api-version | share-id   | http-status-code |
       | 1               | 2333311    | 200              |
       | 2               | 2333311    | 404              |
       | 1               | helloshare | 200              |
@@ -56,10 +56,10 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using the share Id
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
       | /Shares/textfile0.txt |
@@ -67,18 +67,19 @@ Feature: share access by ID
       | path                  |
       | /Shares/textfile0.txt |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: accept a share using the invalid share Id
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
+    When user "Brian" accepts share with ID "<share-id>" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
-      | ocs_api_version | share_id   | http_status_code |
+      | ocs-api-version | share-id   | http-status-code |
       | 1               | 2333311    | 200              |
       | 2               | 2333311    | 404              |
       | 1               | helloshare | 200              |
@@ -90,22 +91,23 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using empty share Id
-    Given using OCS API version "<ocs_api_version>"
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "<http_status_code>"
+    Given using OCS API version "<ocs-api-version>"
+    When user "Brian" accepts share with ID "" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
-      | ocs_api_version | http_status_code | ocs_status_code |
+      | ocs-api-version | http-status-code | ocs-status-code |
       | 1               | 200              | 999             |
       | 2               | 500              | 500             |
 
 
   Scenario Outline: decline a share using the share Id
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" declines share with ID "%last_share_id%" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    When user "Brian" declines share with ID "%last_share-id%" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should not see the following elements
       | /Shares/textfile0.txt |
@@ -113,19 +115,19 @@ Feature: share access by ID
       | path                  |
       | /Shares/textfile0.txt |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: decline a share using a invalid share Id
-    Given using OCS API version "<ocs_api_version>"
-    When user "Brian" declines share with ID "<share_id>" using the sharing API
+    Given using OCS API version "<ocs-api-version>"
+    When user "Brian" declines share with ID "<share-id>" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
-      | ocs_api_version | share_id   | http_status_code |
+      | ocs-api-version | share-id   | http-status-code |
       | 1               | 2333311    | 200              |
       | 2               | 2333311    | 404              |
       | 1               | helloshare | 200              |
@@ -137,12 +139,12 @@ Feature: share access by ID
 
 
   Scenario Outline: decline a share using empty share Id
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Brian" declines share with ID "" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "<http_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
-      | ocs_api_version | http_status_code | ocs_status_code |
+      | ocs-api-version | http-status-code | ocs-status-code |
       | 1               | 200              | 999             |
       | 2               | 500              | 500             |

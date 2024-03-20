@@ -250,13 +250,13 @@ Feature: move (rename) file
 
   Scenario Outline: renaming file with dots in the path
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    And user "Alice" has uploaded file with content "uploaded content for file name ending with a dot" to "<folder_name>/<file_name>"
-    When user "Alice" moves file "<folder_name>/<file_name>" to "<folder_name>/abc.txt" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    And user "Alice" has uploaded file with content "uploaded content for file name ending with a dot" to "<folder-name>/<file-name>"
+    When user "Alice" moves file "<folder-name>/<file-name>" to "<folder-name>/abc.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "<folder_name>/abc.txt" should exist
+    And as "Alice" file "<folder-name>/abc.txt" should exist
     Examples:
-      | dav-path-version | folder_name   | file_name   |
+      | dav-path-version | folder-name   | file-name   |
       | old              | /upload.      | abc.        |
       | old              | /upload.      | abc .       |
       | old              | /upload.1     | abc         |
@@ -272,7 +272,7 @@ Feature: move (rename) file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name   | file_name   |
+      | dav-path-version | folder-name   | file-name   |
       | spaces           | /upload.      | abc.        |
       | spaces           | /upload.      | abc .       |
       | spaces           | /upload.1     | abc         |
@@ -377,79 +377,79 @@ Feature: move (rename) file
 
   Scenario Outline: moving a file (deep moves with various folder and file names)
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<source_folder>"
-    And user "Alice" has created folder "<target_folder>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source_folder>/<source_file>"
-    When user "Alice" moves file "/<source_folder>/<source_file>" to "/<target_folder>/<target_file>" using the WebDAV API
+    And user "Alice" has created folder "<source-folder>"
+    And user "Alice" has created folder "<destination-folder>"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source-folder>/<source-file>"
+    When user "Alice" moves file "/<source-folder>/<source-file>" to "/<destination-folder>/<destination-file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/<target_folder>/<target_file>" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/<destination-folder>/<destination-file>" for user "Alice" should be "ownCloud test text file 0"
     Examples:
-      | dav-path-version | source_folder | source_file | target_folder | target_file |
-      | old              | text          | file.txt    | 0             | file.txt    |
-      | old              | text          | file.txt    | 1             | file.txt    |
-      | old              | 0             | file.txt    | text          | file.txt    |
-      | old              | 1             | file.txt    | text          | file.txt    |
-      | old              | texta         | 0           | textb         | file.txt    |
-      | old              | texta         | 1           | textb         | file.txt    |
-      | old              | texta         | file.txt    | textb         | 0           |
-      | old              | texta         | file.txt    | textb         | 1           |
-      | new              | text          | file.txt    | 0             | file.txt    |
-      | new              | text          | file.txt    | 1             | file.txt    |
-      | new              | 0             | file.txt    | text          | file.txt    |
-      | new              | 1             | file.txt    | text          | file.txt    |
-      | new              | texta         | 0           | textb         | file.txt    |
-      | new              | texta         | 1           | textb         | file.txt    |
-      | new              | texta         | file.txt    | textb         | 0           |
-      | new              | texta         | file.txt    | textb         | 1           |
+      | dav-path-version | source-folder | source-file | destination-folder | destination-file |
+      | old              | text          | file.txt    | 0                  | file.txt         |
+      | old              | text          | file.txt    | 1                  | file.txt         |
+      | old              | 0             | file.txt    | text               | file.txt         |
+      | old              | 1             | file.txt    | text               | file.txt         |
+      | old              | texta         | 0           | textb              | file.txt         |
+      | old              | texta         | 1           | textb              | file.txt         |
+      | old              | texta         | file.txt    | textb              | 0                |
+      | old              | texta         | file.txt    | textb              | 1                |
+      | new              | text          | file.txt    | 0                  | file.txt         |
+      | new              | text          | file.txt    | 1                  | file.txt         |
+      | new              | 0             | file.txt    | text               | file.txt         |
+      | new              | 1             | file.txt    | text               | file.txt         |
+      | new              | texta         | 0           | textb              | file.txt         |
+      | new              | texta         | 1           | textb              | file.txt         |
+      | new              | texta         | file.txt    | textb              | 0                |
+      | new              | texta         | file.txt    | textb              | 1                |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | source_folder | source_file | target_folder | target_file |
-      | spaces           | text          | file.txt    | 0             | file.txt    |
-      | spaces           | text          | file.txt    | 1             | file.txt    |
-      | spaces           | 0             | file.txt    | text          | file.txt    |
-      | spaces           | 1             | file.txt    | text          | file.txt    |
-      | spaces           | texta         | 0           | textb         | file.txt    |
-      | spaces           | texta         | 1           | textb         | file.txt    |
-      | spaces           | texta         | file.txt    | textb         | 0           |
-      | spaces           | texta         | file.txt    | textb         | 1           |
+      | dav-path-version | source-folder | source-file | destination-folder | destination-file |
+      | spaces           | text          | file.txt    | 0                  | file.txt         |
+      | spaces           | text          | file.txt    | 1                  | file.txt         |
+      | spaces           | 0             | file.txt    | text               | file.txt         |
+      | spaces           | 1             | file.txt    | text               | file.txt         |
+      | spaces           | texta         | 0           | textb              | file.txt         |
+      | spaces           | texta         | 1           | textb              | file.txt         |
+      | spaces           | texta         | file.txt    | textb              | 0                |
+      | spaces           | texta         | file.txt    | textb              | 1                |
 
 
   Scenario Outline: moving a file from a folder to the root
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<source_folder>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source_folder>/<source_file>"
-    When user "Alice" moves file "/<source_folder>/<source_file>" to "/<target_file>" using the WebDAV API
+    And user "Alice" has created folder "<source-folder>"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source-folder>/<source-file>"
+    When user "Alice" moves file "/<source-folder>/<source-file>" to "/<destination-file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/<target_file>" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/<destination-file>" for user "Alice" should be "ownCloud test text file 0"
     Examples:
-      | dav-path-version | source_folder | source_file | target_file |
-      | old              | 0             | file.txt    | file.txt    |
-      | old              | 1             | file.txt    | file.txt    |
-      | old              | texta         | 0           | file.txt    |
-      | old              | texta         | 1           | file.txt    |
-      | old              | texta         | file.txt    | 0           |
-      | old              | texta         | file.txt    | 1           |
-      | new              | 0             | file.txt    | file.txt    |
-      | new              | 1             | file.txt    | file.txt    |
-      | new              | texta         | 0           | file.txt    |
-      | new              | texta         | 1           | file.txt    |
-      | new              | texta         | file.txt    | 0           |
-      | new              | texta         | file.txt    | 1           |
+      | dav-path-version | source-folder | source-file | destination-file |
+      | old              | 0             | file.txt    | file.txt         |
+      | old              | 1             | file.txt    | file.txt         |
+      | old              | texta         | 0           | file.txt         |
+      | old              | texta         | 1           | file.txt         |
+      | old              | texta         | file.txt    | 0                |
+      | old              | texta         | file.txt    | 1                |
+      | new              | 0             | file.txt    | file.txt         |
+      | new              | 1             | file.txt    | file.txt         |
+      | new              | texta         | 0           | file.txt         |
+      | new              | texta         | 1           | file.txt         |
+      | new              | texta         | file.txt    | 0                |
+      | new              | texta         | file.txt    | 1                |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | source_folder | source_file | target_file |
-      | spaces           | 0             | file.txt    | file.txt    |
-      | spaces           | 1             | file.txt    | file.txt    |
-      | spaces           | texta         | 0           | file.txt    |
-      | spaces           | texta         | 1           | file.txt    |
-      | spaces           | texta         | file.txt    | 0           |
-      | spaces           | texta         | file.txt    | 1           |
+      | dav-path-version | source-folder | source-file | destination-file |
+      | spaces           | 0             | file.txt    | file.txt         |
+      | spaces           | 1             | file.txt    | file.txt         |
+      | spaces           | texta         | 0           | file.txt         |
+      | spaces           | texta         | 1           | file.txt         |
+      | spaces           | texta         | file.txt    | 0                |
+      | spaces           | texta         | file.txt    | 1                |
 
 
   Scenario Outline: move a file of size zero byte

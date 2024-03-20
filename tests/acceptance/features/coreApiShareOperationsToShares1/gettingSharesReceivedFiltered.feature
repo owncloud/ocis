@@ -32,28 +32,28 @@ Feature: get the received shares filtered by type (user, group etc)
 
 
   Scenario Outline: getting shares received from users
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Brian" gets the user shares shared with him using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And exactly 2 files or folders should be included in the response
     And folder "/Shares/folderToShareWithUser" should be included in the response
     And file "/Shares/fileToShareWithUser.txt" should be included in the response
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: getting shares received from groups
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     When user "Brian" gets the group shares shared with him using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And exactly 2 files or folders should be included in the response
     And folder "/Shares/folderToShareWithGroup" should be included in the response
     And folder "/Shares/fileToShareWithGroup.txt" should be included in the response
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

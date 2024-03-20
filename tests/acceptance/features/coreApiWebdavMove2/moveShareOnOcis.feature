@@ -247,10 +247,10 @@ Feature: move (rename) file
     And user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test data" to "testshare/testfile.txt"
     And user "Brian" has created a share with settings
-      | path        | testshare     |
-      | shareType   | user          |
-      | permissions | read          |
-      | shareWith   | Alice         |
+      | path        | testshare |
+      | shareType   | user      |
+      | permissions | read      |
+      | shareWith   | Alice     |
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/child/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/Shares/testshare/child/testfile.txt" should not exist

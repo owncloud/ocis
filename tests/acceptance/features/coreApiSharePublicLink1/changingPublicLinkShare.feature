@@ -134,7 +134,7 @@ Feature: changing a public link share
 
   @skipOnReva
   Scenario Outline: normal user tries to remove password of a public link share (change/create permission)
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT       |
       | permissions | <permissions> |
@@ -143,11 +143,11 @@ Feature: changing a public link share
       | path        | /PARENT       |
       | permissions | <permissions> |
       | password    |               |
-    Then the HTTP status code should be "<http_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | ocs_api_version | permissions | http_status_code |
+      | ocs-api-version | permissions | http-status-code |
       | 1               | change      | 200              |
       | 2               | change      | 400              |
       | 1               | create      | 200              |
@@ -155,7 +155,7 @@ Feature: changing a public link share
 
   @issue-7821 @skipOnReva
   Scenario Outline: normal user tries to remove password of a public link (update without sending permissions)
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT  |
       | permissions | change   |
@@ -163,17 +163,17 @@ Feature: changing a public link share
     When user "Alice" updates the last public link share using the sharing API with
       | path     | /PARENT |
       | password |         |
-    Then the HTTP status code should be "<http_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And the OCS status code should be "104"
     And the OCS status message should be "user is not allowed to delete the password from the public link"
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 403              |
 
 
   Scenario Outline: normal user removes password of a public link (invite only public link)
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT  |
@@ -184,16 +184,16 @@ Feature: changing a public link share
       | password    |         |
       | permissions | invite  |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @skipOnReva # reva doesn't have a pre-created admin user
   Scenario Outline: administrator removes password of a read-only public link
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And admin has created folder "/PARENT"
     And user "admin" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "admin" has created a public link share with settings
@@ -205,16 +205,16 @@ Feature: changing a public link share
       | permissions | read    |
       | password    |         |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status code should be "<ocs-status-code>"
     And the public should be able to download file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password ""
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @skipOnReva # reva doesn't have a pre-created admin user
   Scenario Outline: administrator tries to remove password of a public link share (change/create permission)
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And admin has created folder "/PARENT"
     And user "admin" has created a public link share with settings
       | path        | /PARENT       |
@@ -224,11 +224,11 @@ Feature: changing a public link share
       | path        | /PARENT       |
       | permissions | <permissions> |
       | password    |               |
-    Then the HTTP status code should be "<http_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | ocs_api_version | permissions | http_status_code |
+      | ocs-api-version | permissions | http-status-code |
       | 1               | change      | 200              |
       | 2               | change      | 400              |
       | 1               | create      | 200              |

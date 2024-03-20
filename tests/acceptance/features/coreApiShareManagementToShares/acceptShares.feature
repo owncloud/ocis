@@ -241,7 +241,7 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And the sharing API should report to user "Brian" that these shares are in the pending state
-      | path                 |
+      | path            |
       | /Shares/PARENT/ |
     And the sharing API should report that no shares are shared with user "Alice"
 

@@ -8,7 +8,7 @@ Feature: upload to a public link share
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-             
+
 
   Scenario Outline: uploading file to a public upload-only share using public API that was deleted does not work
     Given using <dav-path-version> DAV path

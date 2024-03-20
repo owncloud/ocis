@@ -178,15 +178,15 @@ Feature: restore deleted files/folders
 
   Scenario Outline: files with strange names can be restored
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "file original content" to "<file-to-upload>"
-    And user "Alice" has deleted file "<file-to-upload>"
-    And user "Alice" restores the file with original path "<file-to-upload>" using the trashbin API
+    And user "Alice" has uploaded file with content "file original content" to "<file-name>"
+    And user "Alice" has deleted file "<file-name>"
+    And user "Alice" restores the file with original path "<file-name>" using the trashbin API
     Then the HTTP status code should be "201"
-    And as "Alice" the file with original path "<file-to-upload>" should not exist in the trashbin
-    And as "Alice" file "<file-to-upload>" should exist
-    And the content of file "<file-to-upload>" for user "Alice" should be "file original content"
+    And as "Alice" the file with original path "<file-name>" should not exist in the trashbin
+    And as "Alice" file "<file-name>" should exist
+    And the content of file "<file-name>" for user "Alice" should be "file original content"
     Examples:
-      | dav-path-version | file-to-upload          |
+      | dav-path-version | file-name               |
       | old              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
       | new              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
       | old              | strängé नेपाली file     |

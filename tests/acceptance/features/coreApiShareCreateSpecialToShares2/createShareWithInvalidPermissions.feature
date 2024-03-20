@@ -10,20 +10,20 @@ Feature: cannot share resources with invalid permissions
 
 
   Scenario Outline: cannot create a share of a file or folder with invalid permissions
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" creates a share using the sharing API with settings
-      | path        | <item>        |
+      | path        | <resource>    |
       | shareWith   | Brian         |
       | shareType   | user          |
       | permissions | <permissions> |
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "<http_status_code>"
-    And as "Brian" entry "<item>" should not exist
-    And as "Brian" entry "/Shares/<item>" should not exist
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "<http-status-code>"
+    And as "Brian" entry "<resource>" should not exist
+    And as "Brian" entry "/Shares/<resource>" should not exist
     And the sharing API should report to user "Brian" that no shares are in the pending state
     Examples:
-      | ocs_api_version | ocs_status_code | http_status_code | item          | permissions |
+      | ocs-api-version | ocs-status-code | http-status-code | resource      | permissions |
       | 1               | 400             | 200              | textfile0.txt | 0           |
       | 2               | 400             | 400              | textfile0.txt | 0           |
       | 1               | 400             | 200              | PARENT        | 0           |
@@ -35,7 +35,7 @@ Feature: cannot share resources with invalid permissions
 
 
   Scenario Outline: cannot create a share of a file with a user with only create permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" creates a share using the sharing API with settings
       | path        | textfile0.txt |
@@ -43,18 +43,18 @@ Feature: cannot share resources with invalid permissions
       | shareType   | user          |
       | permissions | create        |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And as "Brian" entry "textfile0.txt" should not exist
     And as "Brian" entry "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Brian" that no shares are in the pending state
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
 
 
   Scenario Outline: cannot create a share of a file with a user with only (create,delete) permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" creates a share using the sharing API with settings
       | path        | textfile0.txt |
@@ -62,12 +62,12 @@ Feature: cannot share resources with invalid permissions
       | shareType   | user          |
       | permissions | <permissions> |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And as "Brian" entry "textfile0.txt" should not exist
     And as "Brian" entry "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Brian" that no shares are in the pending state
     Examples:
-      | ocs_api_version | http_status_code | permissions   |
+      | ocs-api-version | http-status-code | permissions   |
       | 1               | 200              | delete        |
       | 2               | 400              | delete        |
       | 1               | 200              | create,delete |
@@ -75,7 +75,7 @@ Feature: cannot share resources with invalid permissions
 
 
   Scenario Outline: cannot create a share of a file with a group with only create permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -85,18 +85,18 @@ Feature: cannot share resources with invalid permissions
       | shareType   | group         |
       | permissions | create        |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And as "Brian" entry "textfile0.txt" should not exist
     And as "Brian" entry "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Brian" that no shares are in the pending state
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
 
 
   Scenario Outline: cannot create a share of a file with a group with only (create,delete) permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -106,12 +106,12 @@ Feature: cannot share resources with invalid permissions
       | shareType   | group         |
       | permissions | <permissions> |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And as "Brian" entry "textfile0.txt" should not exist
     And as "Brian" entry "/Shares/textfile0.txt" should not exist
     And the sharing API should report to user "Brian" that no shares are in the pending state
     Examples:
-      | ocs_api_version | http_status_code | permissions   |
+      | ocs-api-version | http-status-code | permissions   |
       | 1               | 200              | delete        |
       | 2               | 400              | delete        |
       | 1               | 200              | create,delete |

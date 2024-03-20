@@ -10,13 +10,13 @@ Feature: upload file
   @smokeTest
   Scenario Outline: upload a file and check etag and download content
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "uploaded content" to "<file_name>" using the WebDAV API
+    When user "Alice" uploads file with content "uploaded content" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "<file_name>" for user "Alice" should be "uploaded content"
+    And the content of file "<file-name>" for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | old              | /upload.txt       |
       | old              | /नेपाली.txt       |
       | old              | /strängé file.txt |
@@ -28,7 +28,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | spaces           | /upload.txt       |
       | spaces           | /नेपाली.txt       |
       | spaces           | /strängé file.txt |
@@ -37,11 +37,11 @@ Feature: upload file
 
   Scenario Outline: upload a file and check download content
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "uploaded content" to <file_name> using the WebDAV API
+    When user "Alice" uploads file with content "uploaded content" to <file-name> using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file <file_name> for user "Alice" should be "uploaded content"
+    And the content of file <file-name> for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | file_name      |
+      | dav-path-version | file-name      |
       | old              | "C++ file.cpp" |
       | old              | "file #2.txt"  |
       | new              | "C++ file.cpp" |
@@ -49,7 +49,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name      |
+      | dav-path-version | file-name      |
       | spaces           | "C++ file.cpp" |
       | spaces           | "file #2.txt"  |
 
@@ -57,11 +57,11 @@ Feature: upload file
   #after fixing all issues delete this Scenario and merge with the one above
   Scenario Outline: upload a file with character '?' in its name and check download content
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "uploaded content" to <file_name> using the WebDAV API
+    When user "Alice" uploads file with content "uploaded content" to <file-name> using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file <file_name> for user "Alice" should be "uploaded content"
+    And the content of file <file-name> for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | file_name           |
+      | dav-path-version | file-name           |
       | old              | "file ?2.txt"       |
       | old              | " ?fi=le&%#2 . txt" |
       | old              | " # %ab ab?=ed "    |
@@ -71,7 +71,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name           |
+      | dav-path-version | file-name           |
       | spaces           | "file ?2.txt"       |
       | spaces           | " ?fi=le&%#2 . txt" |
       | spaces           | " # %ab ab?=ed "    |
@@ -79,11 +79,11 @@ Feature: upload file
 
   Scenario Outline: upload a file with comma in the filename and check download content
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "file with comma" to <file_name> using the WebDAV API
+    When user "Alice" uploads file with content "file with comma" to <file-name> using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file <file_name> for user "Alice" should be "file with comma"
+    And the content of file <file-name> for user "Alice" should be "file with comma"
     Examples:
-      | dav-path-version | file_name      |
+      | dav-path-version | file-name      |
       | old              | "sample,1.txt" |
       | old              | ",,,.txt"      |
       | old              | ",,,.,"        |
@@ -93,7 +93,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name      |
+      | dav-path-version | file-name      |
       | spaces           | "sample,1.txt" |
       | spaces           | ",,,.txt"      |
       | spaces           | ",,,.,"        |
@@ -101,12 +101,12 @@ Feature: upload file
 
   Scenario Outline: upload a file into a folder and check download content
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    When user "Alice" uploads file with content "uploaded content" to "<folder_name>/<file_name>" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    When user "Alice" uploads file with content "uploaded content" to "<folder-name>/<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "<folder_name>/<file_name>" for user "Alice" should be "uploaded content"
+    And the content of file "<folder-name>/<file-name>" for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | folder_name                      | file_name                     |
+      | dav-path-version | folder-name                      | file-name                     |
       | old              | /upload                          | abc.txt                       |
       | old              | /strängé folder                  | strängé file.txt              |
       | old              | /C++ folder                      | C++ file.cpp                  |
@@ -120,7 +120,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name     | file_name        |
+      | dav-path-version | folder-name     | file-name        |
       | spaces           | /strängé folder | strängé file.txt |
       | spaces           | /upload         | abc.txt          |
       | spaces           | /C++ folder     | C++ file.cpp     |
@@ -131,12 +131,12 @@ Feature: upload file
     #after fixing all issues delete this Scenario and merge with the one above
   Scenario Outline: upload a file into a folder with character '?' in its name and check download content
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    When user "Alice" uploads file with content "uploaded content" to "<folder_name>/<file_name>" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    When user "Alice" uploads file with content "uploaded content" to "<folder-name>/<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "<folder_name>/<file_name>" for user "Alice" should be "uploaded content"
+    And the content of file "<folder-name>/<file-name>" for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | folder_name       | file_name    |
+      | dav-path-version | folder-name       | file-name    |
       | old              | /folder ?2.txt    | file ?2.txt  |
       | old              | /?fi=le&%#2 . txt | # %ab ab?=ed |
       | new              | /folder ?2.txt    | file ?2.txt  |
@@ -144,7 +144,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name       | file_name    |
+      | dav-path-version | folder-name       | file-name    |
       | spaces           | /folder ?2.txt    | file ?2.txt  |
       | spaces           | /?fi=le&%#2 . txt | # %ab ab?=ed |
 
@@ -188,13 +188,13 @@ Feature: upload file
 
   Scenario Outline: upload a file into a folder with dots in the path and check download content
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "<folder_name>/<file_name>" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "<folder-name>/<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "/<folder_name>/<file_name>" should exist
-    And the content of file "<folder_name>/<file_name>" for user "Alice" should be "uploaded content for file name ending with a dot"
+    And as "Alice" file "/<folder-name>/<file-name>" should exist
+    And the content of file "<folder-name>/<file-name>" for user "Alice" should be "uploaded content for file name ending with a dot"
     Examples:
-      | dav-path-version | folder_name   | file_name   |
+      | dav-path-version | folder-name   | file-name   |
       | old              | /upload.      | abc.        |
       | old              | /upload.      | abc .       |
       | old              | /upload.1     | abc.txt     |
@@ -209,7 +209,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name   | file_name   |
+      | dav-path-version | folder-name   | file-name   |
       | spaces           | /upload.      | abc.        |
       | spaces           | /upload.      | abc .       |
       | spaces           | /upload.1     | abc.txt     |

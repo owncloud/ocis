@@ -162,13 +162,13 @@ Feature: dav-versions
     When user "Alice" downloads the version of file "textfile0.txt" with the index "1"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                |
+      | header              | value                                                                  |
       | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
     And the downloaded content should be "version 1"
     When user "Alice" downloads the version of file "textfile0.txt" with the index "2"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                |
+      | header              | value                                                                  |
       | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
     And the downloaded content should be "uploaded content"
 
@@ -181,13 +181,13 @@ Feature: dav-versions
     When user "Alice" downloads the version of file "textfile0.txt" with the index "1"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                |
+      | header              | value                                                                  |
       | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
     And the downloaded content should be "version 2"
     When user "Alice" downloads the version of file "textfile0.txt" with the index "2"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                |
+      | header              | value                                                                  |
       | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
     And the downloaded content should be "uploaded content"
 

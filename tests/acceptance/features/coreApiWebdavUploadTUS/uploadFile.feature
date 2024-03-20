@@ -9,10 +9,10 @@ Feature: upload file
 
   Scenario Outline: upload a file and check download content
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "uploaded content" to "<file_name>" using the TUS protocol on the WebDAV API
-    Then the content of file "<file_name>" for user "Alice" should be "uploaded content"
+    When user "Alice" uploads file with content "uploaded content" to "<file-name>" using the TUS protocol on the WebDAV API
+    Then the content of file "<file-name>" for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | old              | /upload.txt       |
       | old              | /नेपाली.txt       |
       | old              | /strängé file.txt |
@@ -30,7 +30,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name         |
+      | dav-path-version | file-name         |
       | spaces           | /upload.txt       |
       | spaces           | /strängé file.txt |
       | spaces           | /नेपाली.txt       |
@@ -42,11 +42,11 @@ Feature: upload file
 
   Scenario Outline: upload a file into a folder and check download content
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    When user "Alice" uploads file with content "uploaded content" to "<folder_name>/<file_name>" using the TUS protocol on the WebDAV API
-    Then the content of file "<folder_name>/<file_name>" for user "Alice" should be "uploaded content"
+    And user "Alice" has created folder "<folder-name>"
+    When user "Alice" uploads file with content "uploaded content" to "<folder-name>/<file-name>" using the TUS protocol on the WebDAV API
+    Then the content of file "<folder-name>/<file-name>" for user "Alice" should be "uploaded content"
     Examples:
-      | dav-path-version | folder_name                      | file_name                     |
+      | dav-path-version | folder-name                      | file-name                     |
       | old              | /upload                          | abc.txt                       |
       | old              | /strängé folder                  | strängé file.txt              |
       | old              | /C++ folder                      | C++ file.cpp                  |
@@ -64,7 +64,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name                      | file_name                     |
+      | dav-path-version | folder-name                      | file-name                     |
       | spaces           | /upload                          | abc.txt                       |
       | spaces           | /strängé folder (duplicate #2 &) | strängé file (duplicate #2 &) |
       | spaces           | /C++ folder                      | C++ file.cpp                  |
@@ -189,9 +189,9 @@ Feature: upload file
     And the following headers should not be set
       | header   |
       | Location |
-    And as "Alice" file <file_name> should not exist
+    And as "Alice" file <file-name> should not exist
     Examples:
-      | dav-path-version | file_name               | metadata                     |
+      | dav-path-version | file-name               | metadata                     |
       | old              | " "                     | IA==                         |
       | old              | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | old              | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
@@ -203,7 +203,7 @@ Feature: upload file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name               | metadata                     |
+      | dav-path-version | file-name               | metadata                     |
       | spaces           | " "                     | IA==                         |
       | spaces           | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | spaces           | "folder/file"           | Zm9sZGVyL2ZpbGU=             |

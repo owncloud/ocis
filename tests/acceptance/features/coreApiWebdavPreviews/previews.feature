@@ -88,12 +88,12 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: download previews of file types that don't support preview
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/<filename>" to "/<filename>"
-    When user "Alice" downloads the preview of "/<filename>" with width "32" and height "32" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/<file-name>" to "/<file-name>"
+    When user "Alice" downloads the preview of "/<file-name>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "404"
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
     Examples:
-      | dav-path-version | filename     |
+      | dav-path-version | file-name    |
       | old              | simple.pdf   |
       | old              | simple.odt   |
       | old              | new-data.zip |
@@ -107,12 +107,12 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: download previews of different image file types
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/<imageName>" to "/<imageName>"
-    When user "Alice" downloads the preview of "/<imageName>" with width "32" and height "32" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/<image-name>" to "/<image-name>"
+    When user "Alice" downloads the preview of "/<image-name>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
     Examples:
-      | dav-path-version | imageName      |
+      | dav-path-version | image-name     |
       | old              | testavatar.jpg |
       | old              | testavatar.png |
       | new              | testavatar.jpg |
@@ -138,13 +138,13 @@ Feature: previews of files downloaded through the webdav API
   Scenario Outline: download previews of shared files (to shares folder)
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file "filesForUpload/<resource>" to "/<resource>"
-    And user "Alice" has shared file "/<resource>" with user "Brian"
-    When user "Brian" downloads the preview of shared resource "/Shares/<resource>" with width "32" and height "32" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/<file-name>" to "/<file-name>"
+    And user "Alice" has shared file "/<file-name>" with user "Brian"
+    When user "Brian" downloads the preview of shared resource "/Shares/<file-name>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
     Examples:
-      | dav-path-version | resource    |
+      | dav-path-version | file-name   |
       | old              | lorem.txt   |
       | old              | example.gif |
       | new              | lorem.txt   |

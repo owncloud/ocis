@@ -45,13 +45,13 @@ Feature: get quota
       | shareType   | user      |
       | permissions | all       |
       | shareWith   | Alice     |
-    When user "Alice" gets the following properties of folder "<folder-path>" inside space "Shares" using the WebDAV API
+    When user "Alice" gets the following properties of folder "<folder-name>" inside space "Shares" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
     Then the HTTP status code should be "207"
     And the single response should contain a property "d:quota-available-bytes" with value "9000"
     Examples:
-      | dav-path-version | folder-path       |
+      | dav-path-version | folder-name       |
       | old              | /Shares/testquota |
       | new              | /Shares/testquota |
       | spaces           | /testquota        |
