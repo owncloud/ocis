@@ -2283,3 +2283,49 @@ Feature: Send a sharing invitations
       | Viewer           | FolderToShare |
       | Editor           | FolderToShare |
       | Uploader         | FolderToShare |
+
+  @issue-8494
+  Scenario Outline: try to send share invitation for personal space to user with different roles
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "space type is not eligible for sharing"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
