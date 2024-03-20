@@ -12,7 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/cs3wopiserver"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/http"
 	"github.com/urfave/cli/v2"
@@ -49,12 +49,28 @@ func Server(cfg *config.Config) *cli.Command {
 			}()
 			defer cancel()
 
-			app, err := cs3wopiserver.Start(cfg, logger) // grpc server needs decoupling
+			// prepare components
+			if err := helpers.RegisterOcisService(ctx, cfg, logger); err != nil {
+				return err
+			}
+
+			gwc, err := helpers.GetCS3apiClient(cfg, false)
 			if err != nil {
 				return err
 			}
+
+			appUrls, err := helpers.GetAppURLs(cfg, logger)
+			if err != nil {
+				return err
+			}
+
+			if err := helpers.RegisterAppProvider(ctx, cfg, logger, gwc, appUrls); err != nil {
+				return err
+			}
+
+			// start GRPC server
 			grpcServer, teardown, err := grpc.Server(
-				grpc.App(app),
+				grpc.AppURLs(appUrls),
 				grpc.Config(cfg),
 				grpc.Logger(logger),
 			)
@@ -98,8 +114,9 @@ func Server(cfg *config.Config) *cli.Command {
 					cancel()
 				})
 			*/
+			// start HTTP server
 			server, err := http.Server(
-				http.Adapter(connector.NewHttpAdapter(app.GetGwc(), cfg)),
+				http.Adapter(connector.NewHttpAdapter(gwc, cfg)),
 				http.Logger(logger),
 				http.Config(cfg),
 				http.Context(ctx),

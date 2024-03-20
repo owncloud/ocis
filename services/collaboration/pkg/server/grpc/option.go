@@ -5,7 +5,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -14,7 +13,7 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	App           *app.DemoApp
+	AppURLs       map[string]map[string]string
 	Name          string
 	Logger        log.Logger
 	Context       context.Context
@@ -33,10 +32,10 @@ func newOptions(opts ...Option) Options {
 	return opt
 }
 
-// App provides a function to set the logger option.
-func App(val *app.DemoApp) Option {
+// AppURLs provides app urls based on mimetypes.
+func AppURLs(val map[string]map[string]string) Option {
 	return func(o *Options) {
-		o.App = val
+		o.AppURLs = val
 	}
 }
 

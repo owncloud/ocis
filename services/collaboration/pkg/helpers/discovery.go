@@ -1,7 +1,6 @@
-package app
+package helpers
 
 import (
-	"context"
 	"crypto/tls"
 	"io"
 	"net/http"
@@ -10,28 +9,17 @@ import (
 
 	"github.com/beevik/etree"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/pkg/errors"
 )
 
-func (app *DemoApp) WopiDiscovery(ctx context.Context) error {
-	res, err := getAppURLs(app.Config.WopiApp.Addr, app.Config.WopiApp.Insecure, app.Logger)
-	if err != nil {
-		// logging is already covered inside the `getAppURLs` function
-		return err
-	}
-
-	app.AppURLs = res
-	return nil
-}
-
-func getAppURLs(wopiAppUrl string, insecure bool, logger log.Logger) (map[string]map[string]string, error) {
-
-	wopiAppUrl = wopiAppUrl + "/hosting/discovery"
+func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]string, error) {
+	wopiAppUrl := cfg.WopiApp.Addr + "/hosting/discovery"
 
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: insecure,
+				InsecureSkipVerify: cfg.WopiApp.Insecure,
 			},
 		},
 	}

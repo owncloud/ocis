@@ -16,7 +16,7 @@ func Server(opts ...Option) (*grpc.Server, func(), error) {
 	handle, teardown, err := svc.NewHandler(
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
-		svc.AppURLs(options.App.AppURLs),
+		svc.AppURLs(options.AppURLs),
 	)
 	if err != nil {
 		options.Logger.Error().
