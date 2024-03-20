@@ -23,7 +23,7 @@ type Config struct {
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`
-	//Debug   Debug    `yaml:"debug"`
+	Debug   Debug    `yaml:"debug"`
 
 	Context context.Context `yaml:"-"`
 }

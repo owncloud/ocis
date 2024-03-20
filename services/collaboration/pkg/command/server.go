@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/http"
 	"github.com/urfave/cli/v2"
@@ -98,31 +99,31 @@ func Server(cfg *config.Config) *cli.Command {
 					cancel()
 				})
 
-			/*
-				server, err := debug.Server(
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
-				)
-				if err != nil {
-					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
-					return err
-				}
+			// start debug server
+			debugServer, err := debug.Server(
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
+			if err != nil {
+				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
+				return err
+			}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
-					cancel()
-				})
-			*/
+			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
+				cancel()
+			})
+
 			// start HTTP server
-			server, err := http.Server(
+			httpServer, err := http.Server(
 				http.Adapter(connector.NewHttpAdapter(gwc, cfg)),
 				http.Logger(logger),
 				http.Config(cfg),
 				http.Context(ctx),
 				http.TracerProvider(traceProvider),
 			)
-			gr.Add(server.Run, func(_ error) {
+			gr.Add(httpServer.Run, func(_ error) {
 				cancel()
 			})
 

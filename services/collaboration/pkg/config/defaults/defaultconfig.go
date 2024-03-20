@@ -37,6 +37,12 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.collaboration",
 			Scheme:    "https",
 		},
+		Debug: config.Debug{
+			Addr:   "127.0.0.1:9304",
+			Token:  "",
+			Pprof:  false,
+			Zpages: false,
+		},
 		WopiApp: config.WopiApp{
 			Addr:     "https://127.0.0.1:8080",
 			Insecure: false,
