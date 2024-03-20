@@ -101,6 +101,7 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - AuthContext:
+        - TUSContext:
 
     coreApiShareOperationsToShares1:
       paths:

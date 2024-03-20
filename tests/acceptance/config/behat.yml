@@ -320,6 +320,7 @@ default:
         - PublicWebDavContext:
         - OcisConfigContext:
         - SettingsContext:
+        - TUSContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

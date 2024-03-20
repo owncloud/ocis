@@ -686,3 +686,28 @@ Feature: sharing
       | ocs-api-version | http-status |
       | 1               | 200         |
       | 2               | 403         |
+
+  @issue-8464
+  Scenario: sharee overwrite the file shared with them
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/Folder"
+    And group "grp1" has been created
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has uploaded file with content "ownCloud" to "/Folder/textfile0.txt"
+    And user "Alice" has shared folder "Folder" with group "grp1" with permissions "31"
+    And user "Alice" has shared folder "Folder" with user "Brian" with permissions "17"
+    When user "Brian" uploads file with content "ownCloud testing" to "/Shares/Folder/textfile0.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" the content of the file "Folder/textfile0.txt" of the space "Personal" should be "ownCloud testing"
+
+  @issue-8464
+  Scenario: sharee overwrite the file shared with them using TUS
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/Folder"
+    And group "grp1" has been created
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has uploaded file with content "ownCloud" to "/Folder/textfile0.txt"
+    And user "Alice" has shared folder "Folder" with group "grp1" with permissions "31"
+    And user "Alice" has shared folder "Folder" with user "Brian" with permissions "17"
+    When user "Brian" uploads file with content "ownCloud testing" to "/Shares/Folder/textfile0.txt" using the TUS protocol on the WebDAV API
+    Then for user "Alice" the content of the file "Folder/textfile0.txt" of the space "Personal" should be "ownCloud testing"
