@@ -44,6 +44,10 @@ func New(cfg *config.Config, logger log.Logger) (*DemoApp, error) {
 	return app, nil
 }
 
+func (app *DemoApp) GetGwc() gatewayv1beta1.GatewayAPIClient {
+	return app.gwc
+}
+
 func (app *DemoApp) GetCS3apiClient() error {
 	// establish a connection to the cs3 api endpoint
 	// in this case a REVA gateway, started by oCIS
