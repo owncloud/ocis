@@ -139,7 +139,7 @@ Feature: sharing
       | share_with  | %username%            |
       | file_target | /Shares/textfile0.txt |
       | path        | /textfile0.txt        |
-      | permissions | <granted_permissions> |
+      | permissions | <granted-permissions> |
       | uid_owner   | %username%            |
     And as "Carol" file "/Shares/textfile0.txt" should exist
     # The receiver of the reshare can always delete their received share, even though they do not have delete permission

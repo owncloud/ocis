@@ -15,7 +15,7 @@ Feature: share access by ID
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
-    And user "Alice" gets share with id "%last_share-id%" using the sharing API
+    And user "Alice" gets share with id "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
@@ -106,7 +106,7 @@ Feature: share access by ID
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" declines share with ID "%last_share-id%" using the sharing API
+    When user "Brian" declines share with ID "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should not see the following elements
