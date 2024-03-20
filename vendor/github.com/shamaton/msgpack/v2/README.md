@@ -17,8 +17,6 @@ You can get the fastest performance with [msgpackgen](https://github.com/shamato
 * Supports extend encoder / decoder
 * Can also Encoding / Decoding struct as array
 
-This package requires more than  version **1.13**
-
 ## Installation
 
 Current version is **msgpack/v2**.
@@ -32,12 +30,15 @@ package main
 
 import (
   "github.com/shamaton/msgpack/v2"
+  "net/http"
 )
 
+type Struct struct {
+	String string
+}
+
+// simple
 func main() {
-	type Struct struct {
-		String string
-	}
 	v := Struct{String: "msgpack"}
 
 	d, err := msgpack.Marshal(v)
@@ -45,10 +46,20 @@ func main() {
 		panic(err)
 	}
 	r := Struct{}
-	err = msgpack.Unmarshal(d, &r)
-	if err != nil {
+	if err =  msgpack.Unmarshal(d, &r); err != nil {
 		panic(err)
 	}
+}
+
+// streaming
+func handle(w http.ResponseWriter, r *http.Request) {
+	var body Struct
+	if err := msgpack.UnmarshalRead(r, &body); err != nil {
+		panic(err)
+    }
+	if err := msgpack.MarshalWrite(w, body); err != nil {
+		panic(err)
+    }
 }
 ```
 

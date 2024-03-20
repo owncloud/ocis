@@ -18,6 +18,8 @@ type timeDecoder struct {
 	ext.DecoderCommon
 }
 
+var _ ext.Decoder = (*timeDecoder)(nil)
+
 func (td *timeDecoder) Code() int8 {
 	return def.TimeStamp
 }
