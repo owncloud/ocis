@@ -21,7 +21,7 @@ func main() {
 			if len(os.Args) != 4 {
 				fmt.Println("Needs two arguments: env-var-delta-table <first-version> <second-version>")
 				fmt.Println("Example: env-var-delta-table v5.0.0 v6.0.0")
-				fmt.Println("Will not generate usable results vor versions Prior to v5.0.0")
+				fmt.Println("Will not generate usable results for versions Prior to v5.0.0")
 			} else {
 				RenderEnvVarDeltaTable(os.Args)
 			}
@@ -33,7 +33,7 @@ func main() {
 		case "help":
 			fallthrough
 		default:
-			fmt.Println("Usage: env-var-delta-table [templates|rogue|globals|service-index|env-var-delta-table|all|help]")
+			fmt.Printf("Usage: %s [templates|rogue|globals|service-index|env-var-delta-table|all|help]\n", os.Args[0])
 		}
 	} else {
 		// Left here, even though present in the switch case, for backwards compatibility
