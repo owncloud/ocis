@@ -1,4 +1,4 @@
-package app
+package connector
 
 type FileInfo struct {
 	// ------------
