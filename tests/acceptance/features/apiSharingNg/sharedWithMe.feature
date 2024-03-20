@@ -4742,57 +4742,37 @@ Feature: an user gets the resources shared to them
             "oneOf": [
               {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "folder"
-                    ]
+                    "const": "folder"
                   }
                 }
               },
               {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "folder (2)"
-                    ]
+                    "const": "folder (1)"
                   }
                 }
               },
               {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "textfile.txt"
-                    ]
+                    "const": "textfile.txt"
                   }
                 }
               },
               {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "textfile (1).txt"
-                    ]
+                    "const": "textfile (1).txt"
                   }
                 }
               }
