@@ -1702,14 +1702,16 @@ github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-password v0.2.0
 ## explicit; go 1.14
 github.com/sethvargo/go-password/password
-# github.com/shamaton/msgpack/v2 v2.1.1
-## explicit; go 1.15
+# github.com/shamaton/msgpack/v2 v2.2.0
+## explicit; go 1.20
 github.com/shamaton/msgpack/v2
 github.com/shamaton/msgpack/v2/def
 github.com/shamaton/msgpack/v2/ext
 github.com/shamaton/msgpack/v2/internal/common
 github.com/shamaton/msgpack/v2/internal/decoding
 github.com/shamaton/msgpack/v2/internal/encoding
+github.com/shamaton/msgpack/v2/internal/stream/decoding
+github.com/shamaton/msgpack/v2/internal/stream/encoding
 github.com/shamaton/msgpack/v2/time
 # github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 ## explicit
