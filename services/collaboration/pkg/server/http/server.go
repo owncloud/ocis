@@ -13,7 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
+	colabmiddleware "github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )
@@ -111,7 +111,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 
 			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
 				// authentication and wopi context
-				return app.WopiContextAuthMiddleware(options.Config.JWTSecret, h)
+				return colabmiddleware.WopiContextAuthMiddleware(options.Config.JWTSecret, h)
 			},
 			)
 

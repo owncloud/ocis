@@ -14,7 +14,7 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 )
 
@@ -39,7 +39,7 @@ func NewFileConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *
 // GetLock returns a lock or an empty string if no lock exists
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getlock
 func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -81,7 +81,7 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/lock
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/unlockandrelock
 func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (string, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -205,7 +205,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 // RefreshLock refreshes a provided lock for 30 minutes
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/refreshlock
 func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -302,7 +302,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 // UnLock removes a given lock from a file
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/unlock
 func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -386,10 +386,10 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 
 // CheckFileInfo returns information about the requested file and capabilities of the wopi server
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo
-func (f *FileConnector) CheckFileInfo(ctx context.Context) (app.FileInfo, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return app.FileInfo{}, err
+		return FileInfo{}, err
 	}
 
 	logger := zerolog.Ctx(ctx)
@@ -399,7 +399,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (app.FileInfo, error)
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: stat failed")
-		return app.FileInfo{}, err
+		return FileInfo{}, err
 	}
 
 	if statRes.Status.Code != rpcv1beta1.Code_CODE_OK {
@@ -407,10 +407,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (app.FileInfo, error)
 			Str("StatusCode", statRes.Status.Code.String()).
 			Str("StatusMsg", statRes.Status.Message).
 			Msg("CheckFileInfo: stat failed with unexpected status")
-		return app.FileInfo{}, NewConnectorError(500, statRes.Status.GetCode().String()+" "+statRes.Status.GetMessage())
+		return FileInfo{}, NewConnectorError(500, statRes.Status.GetCode().String()+" "+statRes.Status.GetMessage())
 	}
 
-	fileInfo := app.FileInfo{
+	fileInfo := FileInfo{
 		// OwnerID must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
 		OwnerID:           hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp)),
 		Size:              int64(statRes.Info.Size),

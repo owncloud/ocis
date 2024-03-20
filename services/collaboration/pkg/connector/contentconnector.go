@@ -14,7 +14,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 )
 
@@ -33,7 +33,7 @@ func NewContentConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config
 // GetFile downloads the file from the storage
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getfile
 func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 // PutFile uploads the file to the storage
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/putfile
 func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (string, error) {
-	wopiContext, err := app.WopiContextFromCtx(ctx)
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return "", err
 	}

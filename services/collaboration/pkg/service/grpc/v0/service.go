@@ -18,7 +18,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/internal/app"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 )
 
 func NewHandler(opts ...Option) (*Service, func(), error) {
@@ -148,7 +148,7 @@ func (s *Service) OpenInApp(
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := app.EncryptAES([]byte(s.config.JWTSecret), req.AccessToken)
+	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.JWTSecret), req.AccessToken)
 	if err != nil {
 		s.logger.Error().
 			Err(err).
@@ -161,7 +161,7 @@ func (s *Service) OpenInApp(
 		}, err
 	}
 
-	wopiContext := app.WopiContext{
+	wopiContext := middleware.WopiContext{
 		AccessToken:   cryptedReqAccessToken,
 		FileReference: providerFileRef,
 		User:          user,
@@ -183,7 +183,7 @@ func (s *Service) OpenInApp(
 		return nil, err
 	}
 
-	claims := &app.Claims{
+	claims := &middleware.Claims{
 		WopiContext: wopiContext,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: cs3Claims.ExpiresAt,
