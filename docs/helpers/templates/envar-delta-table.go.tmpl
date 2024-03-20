@@ -55,7 +55,7 @@ func main() {
 		for _, field := range fields {
 			variants := strings.Split(field.Name, ";")
 			for _, variant := range variants {
-				if configFields[variant].Name == "" {
+				if (configFields[variant] != nil && configFields[variant].Name == "") || configFields[variant] == nil {
 					configFields[variant] = &field
 				} else {
 					fmt.Printf("%v, duplicate key, merging\n", variant)
