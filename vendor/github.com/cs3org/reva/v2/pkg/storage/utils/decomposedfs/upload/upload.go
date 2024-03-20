@@ -129,6 +129,8 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 	defer span.End()
 	log := appctx.GetLogger(ctx)
 
+	ctx = ctxpkg.ContextSetInitiator(ctx, session.InitiatorID())
+
 	// calculate the checksum of the written bytes
 	// they will all be written to the metadata later, so we cannot omit any of them
 	// TODO only calculate the checksum in sync that was requested to match, the rest could be async ... but the tests currently expect all to be present

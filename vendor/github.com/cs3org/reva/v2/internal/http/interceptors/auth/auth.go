@@ -240,7 +240,7 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 					logError(isUnprotectedEndpoint, log, err, "got an error retrieving groups for user "+user.Username, http.StatusInternalServerError, w)
 					return nil, err
 				}
-				return ctxWithUserInfo(ctx, r, user, token, tokenScope), nil
+				return ctxWithUserInfo(ctx, r, user, token, tokenScope, r.Header.Get(ctxpkg.InitiatorHeader)), nil
 			}
 		}
 	}
@@ -341,24 +341,16 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 		return nil, err
 	}
 
-	// store user and core access token in context.
-	ctx = ctxpkg.ContextSetUser(ctx, u)
-	ctx = ctxpkg.ContextSetToken(ctx, token)
-	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, token) // TODO(jfd): hardcoded metadata key. use  PerRPCCredentials?
-
-	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.UserAgentHeader, r.UserAgent())
-
-	// store scopes in context
-	ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
-
-	return ctxWithUserInfo(ctx, r, u, token, tokenScope), nil
+	return ctxWithUserInfo(ctx, r, u, token, tokenScope, r.Header.Get(ctxpkg.InitiatorHeader)), nil
 }
 
-func ctxWithUserInfo(ctx context.Context, r *http.Request, user *userpb.User, token string, tokenScope map[string]*authpb.Scope) context.Context {
+func ctxWithUserInfo(ctx context.Context, r *http.Request, user *userpb.User, token string, tokenScope map[string]*authpb.Scope, initiatorid string) context.Context {
 	ctx = ctxpkg.ContextSetUser(ctx, user)
 	ctx = ctxpkg.ContextSetToken(ctx, token)
+	ctx = ctxpkg.ContextSetInitiator(ctx, initiatorid)
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, token)
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.UserAgentHeader, r.UserAgent())
+	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorid)
 	ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
 	return ctx
 }

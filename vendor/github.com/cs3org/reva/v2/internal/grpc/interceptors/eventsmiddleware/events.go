@@ -185,7 +185,6 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 				ev = FileTouched(v, req.(*provider.TouchFileRequest), ownerID, executantID)
 			}
 		case *provider.SetLockResponse:
-			fmt.Println("set lock response", v)
 			if isSuccess(v) {
 				ev = FileLocked(v, req.(*provider.SetLockRequest), ownerID, executantID)
 			}

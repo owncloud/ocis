@@ -182,6 +182,18 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 			return nil, errors.Wrap(err, "gateway: error denying grant in storage")
 		}
 	} else {
+		if !grant.Permissions.RemoveGrant {
+			// this request might remove Manager Permissions so we need to
+			// check if there is at least one manager remaining of the
+			// resource.
+			listGrantRes, err := s.listGrants(ctx, req.GetShare().GetResourceId())
+			if err != nil {
+				return nil, errors.Wrap(err, "gateway: error getting grant to remove from storage")
+			}
+			if !isSpaceManagerRemaining(listGrantRes.GetGrants(), grant.GetGrantee()) {
+				return nil, errors.New("gateway: can't remove the last manager")
+			}
+		}
 		st, err = s.updateGrant(ctx, req.GetShare().GetResourceId(), grant, opaque)
 		if err != nil {
 			return nil, errors.Wrap(err, "gateway: error adding grant to storage")
@@ -709,6 +721,11 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 	if permissions == nil {
 		return nil, errors.New("gateway: error getting grant to remove from storage")
 	}
+
+	if len(listGrantRes.Grants) == 1 || !isSpaceManagerRemaining(listGrantRes.Grants, grantee) {
+		return nil, errors.New("gateway: can't remove the last manager")
+	}
+
 	// TODO: change CS3 APIs
 	opaque := &typesv1beta1.Opaque{
 		Map: map[string]*typesv1beta1.OpaqueEntry{
@@ -726,6 +743,18 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 	}
 	s.providerCache.RemoveListStorageProviders(ref)
 	return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
+}
+
+func isSpaceManagerRemaining(grants []*provider.Grant, grantee *provider.Grantee) bool {
+	for _, g := range grants {
+		// RemoveGrant is currently the way to check for the manager role
+		// If it is not set than the current grant is not for a manager and
+		// we can just continue with the next one.
+		if g.Permissions.RemoveGrant && !isEqualGrantee(g.Grantee, grantee) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *svc) checkLock(ctx context.Context, shareId *collaboration.ShareId) (*rpc.Status, error) {
