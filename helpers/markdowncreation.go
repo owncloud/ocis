@@ -53,7 +53,7 @@ func generateMarkdown(filepath string, servicename string) error {
 		Content: fmt.Sprintf(_configMarkdown, servicename, servicename),
 	})
 
-	tpl := template.Must(template.ParseFiles("index.tmpl"))
+	tpl := template.Must(template.ParseFiles("templates/index.tmpl"))
 	b := bytes.NewBuffer(nil)
 	if err := tpl.Execute(b, map[string]interface{}{
 		"ServiceName":  head.Header,
