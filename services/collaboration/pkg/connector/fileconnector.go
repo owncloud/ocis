@@ -411,8 +411,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 	}
 
 	fileInfo := FileInfo{
-		// OwnerID must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		OwnerID:           hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp)),
+		// OwnerId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
+		OwnerId:           hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp)),
 		Size:              int64(statRes.Info.Size),
 		Version:           statRes.Info.Mtime.String(),
 		BaseFileName:      path.Base(statRes.Info.Path),
@@ -451,11 +451,11 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 	// user logic from reva wopi driver #TODO: refactor
 	var isPublicShare bool = false
 	if wopiContext.User != nil {
-		// UserID must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
+		// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
 		if wopiContext.User.Id.Type == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
-			fileInfo.UserID = hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp))
+			fileInfo.UserId = hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp))
 		} else {
-			fileInfo.UserID = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
 		}
 
 		if wopiContext.User.Opaque != nil {
@@ -465,12 +465,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 		}
 		if !isPublicShare {
 			fileInfo.UserFriendlyName = wopiContext.User.Username
-			fileInfo.UserID = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
 		}
 	}
 	if wopiContext.User == nil || isPublicShare {
 		randomID, _ := uuid.NewUUID()
-		fileInfo.UserID = hex.EncodeToString([]byte("guest-" + randomID.String()))
+		fileInfo.UserId = hex.EncodeToString([]byte("guest-" + randomID.String()))
 		fileInfo.UserFriendlyName = "Guest " + randomID.String()
 		fileInfo.IsAnonymousUser = true
 	}
