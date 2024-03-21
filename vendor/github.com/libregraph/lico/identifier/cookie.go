@@ -37,7 +37,7 @@ func (i *Identifier) setLogonCookie(rw http.ResponseWriter, value string) error 
 		Path:     i.pathPrefix + "/identifier/_/",
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.logonCookieSameSite,
 	}
 	http.SetCookie(rw, &cookie)
 
@@ -55,7 +55,7 @@ func (i *Identifier) removeLogonCookie(rw http.ResponseWriter) error {
 		Path:     i.pathPrefix + "/identifier/_/",
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.logonCookieSameSite,
 
 		Expires: farPastExpiryTime,
 	}
@@ -78,7 +78,7 @@ func (i *Identifier) setConsentCookie(rw http.ResponseWriter, cr *ConsentRequest
 		Path:     i.pathPrefix + "/identifier/_/",
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.consentCookieSameSite,
 	}
 	http.SetCookie(rw, &cookie)
 
@@ -106,7 +106,7 @@ func (i *Identifier) removeConsentCookie(rw http.ResponseWriter, req *http.Reque
 		Path:     i.pathPrefix + "/identifier/_/",
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.consentCookieSameSite,
 
 		Expires: farPastExpiryTime,
 	}
@@ -150,7 +150,7 @@ func (i *Identifier) setStateCookie(rw http.ResponseWriter, scope string, state 
 		Path:     i.pathPrefix + "/identifier/" + scope,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.stateCookieSameSite,
 	}
 	http.SetCookie(rw, &cookie)
 
@@ -178,7 +178,7 @@ func (i *Identifier) removeStateCookie(rw http.ResponseWriter, req *http.Request
 		Path:     i.pathPrefix + "/identifier/" + scope,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: i.stateCookieSameSite,
 
 		Expires: farPastExpiryTime,
 	}

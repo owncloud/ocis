@@ -29,7 +29,7 @@ func (p *Provider) setBrowserStateCookie(rw http.ResponseWriter, value string) e
 		Path:     p.browserStateCookiePath,
 		Secure:   true,
 		HttpOnly: false, // This Cookie is intended to be read by Javascript.
-		SameSite: http.SameSiteNoneMode,
+		SameSite: p.browserStateCookieSameSite,
 	}
 	http.SetCookie(rw, &cookie)
 
@@ -43,7 +43,7 @@ func (p *Provider) removeBrowserStateCookie(rw http.ResponseWriter) error {
 		Path:     p.browserStateCookiePath,
 		Secure:   true,
 		HttpOnly: false, // This Cookie is intended to be read by Javascript.
-		SameSite: http.SameSiteNoneMode,
+		SameSite: p.browserStateCookieSameSite,
 
 		Expires: farPastExpiryTime,
 	}
@@ -60,7 +60,7 @@ func (p *Provider) setSessionCookie(rw http.ResponseWriter, value string) error 
 		Path:     p.sessionCookiePath,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: p.sessionCookieSameSite,
 	}
 	http.SetCookie(rw, &cookie)
 
@@ -83,7 +83,7 @@ func (p *Provider) removeSessionCookie(rw http.ResponseWriter) error {
 		Path:     p.sessionCookiePath,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: p.sessionCookieSameSite,
 
 		Expires: farPastExpiryTime,
 	}

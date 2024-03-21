@@ -1265,7 +1265,7 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.61.2
+# github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7
 ## explicit; go 1.18
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap

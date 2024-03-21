@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"net/http"
 	"path/filepath"
 	"strings"
 
@@ -64,6 +65,7 @@ func DefaultConfig() *config.Config {
 			ValidationKeysPath:                "",
 			CookieBackendURI:                  "",
 			CookieNames:                       nil,
+			CookieSameSite:                    http.SameSiteStrictMode,
 			AccessTokenDurationSeconds:        60 * 5,            // 5 minutes
 			IDTokenDurationSeconds:            60 * 5,            // 5 minutes
 			RefreshTokenDurationSeconds:       60 * 60 * 24 * 30, // 30 days
