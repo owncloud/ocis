@@ -7,12 +7,12 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/http"
@@ -29,13 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			logger := log.NewLogger(
-				log.Name(cfg.Service.Name),
-				log.Level(cfg.Log.Level),
-				log.Pretty(cfg.Log.Pretty),
-				log.Color(cfg.Log.Color),
-				log.File(cfg.Log.File),
-			)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
