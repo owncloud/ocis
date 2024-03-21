@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Prevent copying a file to a parent folder: [#8649](https://github.com/owncloud/ocis/pull/8649)
 * Bugfix - Disable Multipart uploads: [#8666](https://github.com/owncloud/ocis/pull/8666)
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
+* Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
@@ -143,6 +144,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8619
    https://github.com/owncloud/ocis/pull/8668
+
+* Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
+
+   Fix http error when uploading via a public link
+
+   https://github.com/owncloud/ocis/issues/8699
+   https://github.com/owncloud/ocis/pull/8702
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
