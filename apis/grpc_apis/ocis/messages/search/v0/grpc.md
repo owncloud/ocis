@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.search.v0"
 url: /apis/grpc_apis/ocis_messages_search_v0
-date: 2024-03-21T05:56:00Z
+date: 2024-03-21T06:21:55Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
