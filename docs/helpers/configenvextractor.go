@@ -12,9 +12,10 @@ import (
 )
 
 var targets = map[string]string{
-	"adoc-generator.go.tmpl":                      "output/adoc/adoc-generator.go",
-	"example-config-generator.go.tmpl":            "output/exampleconfig/example-config-generator.go",
-	"environment-variable-docs-generator.go.tmpl": "output/env/environment-variable-docs-generator.go",
+	"templates/adoc-generator.go.tmpl":                      "output/adoc/adoc-generator.go",
+	"templates/example-config-generator.go.tmpl":            "output/exampleconfig/example-config-generator.go",
+	"templates/environment-variable-docs-generator.go.tmpl": "output/env/environment-variable-docs-generator.go",
+	"templates/envar-delta-table.go.tmpl":                   "output/env/envvar-delta-table.go",
 }
 
 // RenderTemplates does something with templates
@@ -37,7 +38,10 @@ func RenderTemplates() {
 		runIntermediateCode(output)
 	}
 	fmt.Println("Cleaning up")
-	os.RemoveAll("output")
+	err = os.RemoveAll("output")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func generateIntermediateCode(templatePath string, intermediateCodePath string, paths []string) {
