@@ -28,7 +28,7 @@ Feature: change shared resource
 
 
   Scenario Outline: overwrite a received file share
-    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
@@ -47,7 +47,7 @@ Feature: change shared resource
     When user "Brian" tries to get version of the file "/textfile1.txt" with the index "1" of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
-      | userRole    |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |

@@ -291,7 +291,7 @@ Feature: List and create spaces
 
 
   Scenario Outline: user can list his created spaces via multiple endpoints
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match
@@ -419,19 +419,19 @@ Feature: List and create spaces
     }
     """
     Examples:
-      | role        |
+      | user-role   |
       | Admin       |
       | Space Admin |
 
 
   Scenario Outline: user cannot list space by id if he is not member of the space
-    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And user "Admin" has created a space "Project Venus" with the default quota using the Graph API
     When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id
     Then the HTTP status code should be "404"
     And the json responded should not contain a space with name "Project Venus"
     Examples:
-      | role       |
+      | user-role  |
       | User       |
       | User Light |
 
@@ -440,7 +440,7 @@ Feature: List and create spaces
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has disabled auto-accepting
     And user "Brian" has uploaded file with content "this is a test file." to "test.txt"
-    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And user "Brian" has shared file "/test.txt" with user "Alice"
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
@@ -510,7 +510,7 @@ Feature: List and create spaces
     }
     """
     Examples:
-      | userRole    |
+      | user-role   |
       | Admin       |
       | Space Admin |
       | User        |

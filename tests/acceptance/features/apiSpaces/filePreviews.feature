@@ -16,11 +16,11 @@ Feature: Preview file in project space
 
 
   Scenario Outline: user can preview created txt files in the project space
-    Given user "Alice" has uploaded a file inside space "previews of the files" with content "test" to "<entity>"
-    When user "Alice" downloads the preview of "<entity>" of the space "previews of the files" with width "<width>" and height "<height>" using the WebDAV API
+    Given user "Alice" has uploaded a file inside space "previews of the files" with content "test" to "<file-name>"
+    When user "Alice" downloads the preview of "<file-name>" of the space "previews of the files" with width "<width>" and height "<height>" using the WebDAV API
     Then the HTTP status code should be "200"
     Examples:
-      | entity                | width | height |
+      | file-name             | width | height |
       | /file.txt             | 36    | 36     |
       | /name with spaces.txt | 1200  | 1200   |
 

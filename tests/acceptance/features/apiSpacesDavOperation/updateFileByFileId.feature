@@ -85,16 +85,16 @@ Feature: update files using file id
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" sends HTTP method "PUT" to URL "<dav-path>" with content "updated content"
-    Then the HTTP status code should be "<http_status_code>"
+    Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     Examples:
-      | dav-path                          | role   | http_status_code | file-content    |
-      | /remote.php/dav/spaces/<<FILEID>> | viewer | 403              | some data       |
-      | /dav/spaces/<<FILEID>>            | editor | 204              | updated content |
+      | dav-path                          | space-role | http-status-code | file-content    |
+      | /remote.php/dav/spaces/<<FILEID>> | viewer     | 403              | some data       |
+      | /dav/spaces/<<FILEID>>            | editor     | 204              | updated content |
 
 
   Scenario Outline: user tries to update content of a file owned by others

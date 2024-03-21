@@ -60,34 +60,34 @@ Feature: Restoring space
 
   Scenario Outline: user without space manager role cannot restore space
     Given user "Alice" has shared a space "restore a space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
-      | role   |
-      | viewer |
-      | editor |
+      | space-role |
+      | viewer     |
+      | editor     |
 
 
   Scenario Outline: user with role user and user light cannot restore space
-    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
-      | role       |
+      | user-role  |
       | User       |
       | User Light |
 
   @issue-5872
   Scenario Outline: admin and space admin can restore other space
-    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" restores a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "200"
     Examples:
-      | role        |
+      | user-role   |
       | Admin       |
       | Space Admin |

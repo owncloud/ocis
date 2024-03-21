@@ -85,22 +85,22 @@ Feature: Tag
 
   Scenario Outline: member of the space tries to create tag
     Given user "Alice" has shared a space "use-tag" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" creates the following tags for folder "folderMain/insideTheFolder.txt" of space "use-tag":
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
-    Then the HTTP status code should be "<code>"
+    Then the HTTP status code should be "<http-status-code>"
     When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
-    And the response <shouldOrNot> contain following tags:
+    And the response <should-or-not> contain following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
     Examples:
-      | role    | code | shouldOrNot |
-      | viewer  | 403  | should not  |
-      | editor  | 200  | should      |
-      | manager | 200  | should      |
+      | space-role | http-status-code | should-or-not |
+      | viewer     | 403              | should not    |
+      | editor     | 200              | should        |
+      | manager    | 200              | should        |
 
 
   Scenario: recipient has a created tags if share is accepted
@@ -120,53 +120,53 @@ Feature: Tag
 
   Scenario Outline: recipient of the shared resource tries to create a tag
     Given user "Alice" has created a share inside of space "use-tag" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | <role>     |
-    When user "Brian" creates the following tags for <resource> "<resourceName>" of space "Shares":
+      | path      | folderMain   |
+      | shareWith | Brian        |
+      | role      | <space-role> |
+    When user "Brian" creates the following tags for <resource-type> "<resource>" of space "Shares":
       | tag in a shared resource |
       | second tag               |
-    Then the HTTP status code should be "<code>"
+    Then the HTTP status code should be "<http-status-code>"
     When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
-    And the response <shouldOrNot> contain following tags:
+    And the response <should-or-not> contain following tags:
       | tag in a shared resource |
       | second tag               |
     Examples:
-      | role    | resource | resourceName                   | code | shouldOrNot |
-      | viewer  | file     | folderMain/insideTheFolder.txt | 403  | should not  |
-      | editor  | file     | folderMain/insideTheFolder.txt | 200  | should      |
-      | manager | file     | folderMain/insideTheFolder.txt | 200  | should      |
-      | viewer  | folder   | folderMain                     | 403  | should not  |
-      | editor  | folder   | folderMain                     | 200  | should      |
-      | manager | folder   | folderMain                     | 200  | should      |
+      | space-role | resource-type | resource                       | http-status-code | should-or-not |
+      | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should not    |
+      | editor     | file          | folderMain/insideTheFolder.txt | 200              | should        |
+      | manager    | file          | folderMain/insideTheFolder.txt | 200              | should        |
+      | viewer     | folder        | folderMain                     | 403              | should not    |
+      | editor     | folder        | folderMain                     | 200              | should        |
+      | manager    | folder        | folderMain                     | 200              | should        |
 
 
   Scenario Outline: recipient of the shared resource tries to remove a tag
     Given user "Alice" has created a share inside of space "use-tag" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | <role>     |
-    And user "Alice" has created the following tags for <resource> "<resourceName>" of the space "use-tag":
+      | path      | folderMain   |
+      | shareWith | Brian        |
+      | role      | <space-role> |
+    And user "Alice" has created the following tags for <resource-type> "<resource>" of the space "use-tag":
       | tag in a shared resource |
       | second tag               |
-    When user "Brian" removes the following tags for <resource> "<resourceName>" of space "Shares":
+    When user "Brian" removes the following tags for <resource-type> "<resource>" of space "Shares":
       | tag in a shared resource |
       | second tag               |
-    Then the HTTP status code should be "<code>"
+    Then the HTTP status code should be "<http-status-code>"
     When user "Alice" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
-    And the response <shouldOrNot> contain following tags:
+    And the response <should-or-not> contain following tags:
       | tag in a shared resource |
       | second tag               |
     Examples:
-      | role    | resource | resourceName                   | code | shouldOrNot |
-      | viewer  | file     | folderMain/insideTheFolder.txt | 403  | should      |
-      | editor  | file     | folderMain/insideTheFolder.txt | 200  | should not  |
-      | manager | file     | folderMain/insideTheFolder.txt | 200  | should not  |
-      | viewer  | folder   | folderMain                     | 403  | should      |
-      | editor  | folder   | folderMain                     | 200  | should not  |
-      | manager | folder   | folderMain                     | 200  | should not  |
+      | space-role | resource-type | resource                       | http-status-code | should-or-not |
+      | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should        |
+      | editor     | file          | folderMain/insideTheFolder.txt | 200              | should not    |
+      | manager    | file          | folderMain/insideTheFolder.txt | 200              | should not    |
+      | viewer     | folder        | folderMain                     | 403              | should        |
+      | editor     | folder        | folderMain                     | 200              | should not    |
+      | manager    | folder        | folderMain                     | 200              | should not    |
 
 
   Scenario: user removes folder tags

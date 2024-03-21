@@ -20,8 +20,8 @@ Feature: Restore files, folder
 
   Scenario Outline: user with different role can see deleted objects in trash bin of the space via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     And user "Alice" has removed the folder "newFolder" from space "restore objects"
     When user "Brian" lists all deleted files in the trash bin of the space "restore objects"
@@ -29,71 +29,71 @@ Feature: Restore files, folder
     And as "Brian" folder "newFolder" should exist in the trashbin of the space "restore objects"
     And as "Brian" file "file.txt" should exist in the trashbin of the space "restore objects"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: user can restore a folder with some objects from the trash via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And user "Alice" has removed the folder "newFolder" from space "restore objects"
     When user "<user>" restores the folder "newFolder" from the trash of the space "restore objects" to "/newFolder"
-    Then the HTTP status code should be "<code>"
-    And for user "<user>" the space "restore objects" <shouldOrNotBeInSpace> contain these entries:
+    Then the HTTP status code should be "<http-status-code>"
+    And for user "<user>" the space "restore objects" <should-or-not-be-in-space> contain these entries:
       | newFolder |
-    And as "<user>" folder "newFolder" <shouldOrNotBeInTrash> exist in the trashbin of the space "restore objects"
+    And as "<user>" folder "newFolder" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
-      | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash |
-      | Alice | manager | 201  | should               | should not           |
-      | Brian | manager | 201  | should               | should not           |
-      | Brian | editor  | 201  | should               | should not           |
-      | Brian | viewer  | 403  | should not           | should               |
+      | user  | space-role | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
+      | Alice | manager    | 201              | should                    | should not                |
+      | Brian | manager    | 201              | should                    | should not                |
+      | Brian | editor     | 201              | should                    | should not                |
+      | Brian | viewer     | 403              | should not                | should                    |
 
 
   Scenario Outline: user can restore a file from the trash via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     When user "<user>" restores the file "file.txt" from the trash of the space "restore objects" to "newFolder/file.txt"
-    Then the HTTP status code should be "<code>"
-    And for user "<user>" folder "newFolder" of the space "restore objects" <shouldOrNotBeInSpace> contain these files:
+    Then the HTTP status code should be "<http-status-code>"
+    And for user "<user>" folder "newFolder" of the space "restore objects" <should-or-not-be-in-space> contain these files:
       | file.txt |
-    And as "<user>" file "file.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "restore objects"
+    And as "<user>" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
-      | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash |
-      | Alice | manager | 201  | should               | should not           |
-      | Brian | manager | 201  | should               | should not           |
-      | Brian | editor  | 201  | should               | should not           |
-      | Brian | viewer  | 403  | should not           | should               |
+      | user  | space-role | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
+      | Alice | manager    | 201              | should                    | should not                |
+      | Brian | manager    | 201              | should                    | should not                |
+      | Brian | editor     | 201              | should                    | should not                |
+      | Brian | viewer     | 403              | should not                | should                    |
 
 
   Scenario Outline: only space manager can purge the trash via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     When user "Brian" deletes the file "file.txt" from the trash of the space "restore objects"
-    Then the HTTP status code should be "<code>"
-    And as "Brian" file "file.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "restore objects"
+    Then the HTTP status code should be "<http-status-code>"
+    And as "Brian" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
-      | role    | code | shouldOrNotBeInTrash |
-      | manager | 204  | should not           |
-      | editor  | 403  | should               |
-      | viewer  | 403  | should               |
+      | space-role | http-status-code | should-or-not-be-in-trash |
+      | manager    | 204              | should not                |
+      | editor     | 403              | should                    |
+      | viewer     | 403              | should                    |
 
 
   Scenario Outline: admin user who is not a member of space cannot see its trash bin
     Given user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" with admin permission lists all deleted files in the trash bin of the space "restore objects"
     Then the HTTP status code should be "404"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | Admin       |
 
@@ -102,13 +102,13 @@ Feature: Restore files, folder
     Given user "Alice" has shared a space "restore objects" with settings:
       | shareWith | Brian  |
       | role      | editor |
-    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     When user "Brian" tries to delete the file "file.txt" from the trash of the space "restore objects"
     Then the HTTP status code should be "403"
     And as "Alice" file "file.txt" should exist in the trashbin of the space "restore objects"
     Examples:
-      | role        |
+      | user-role   |
       | Space Admin |
       | Admin       |
 
