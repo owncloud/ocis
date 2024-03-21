@@ -184,6 +184,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	private bool $dbConversion = false;
 
+	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	/**
 	 * @param bool $value
 	 *

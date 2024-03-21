@@ -559,4 +559,39 @@ class SharingNgContext implements Context {
 
 		Assert::assertSame($should, $fileFound, $assertMessage);
 	}
+
+	/**
+	 *
+	 * @param string $user
+	 * @param string $itemId
+	 * @param string $shareSpaceId
+	 *
+	 * @return ResponseInterface
+	 */
+	public function unmountShare(string $user, string $itemId, string $shareSpaceId): ResponseInterface {
+		return GraphHelper::unmountShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId,
+		);
+	}
+
+	/**
+	 * @When user :user unmounts share :share using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userUnmountsShareUsingTheGraphApi(string $user):void {
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$itemId = $shareSpaceId . '!' . $shareItemId;
+		$this->featureContext->setResponse($this->unmountShare($user, $itemId, $shareSpaceId));
+		$this->featureContext->pushToLastStatusCodesArrays();
+	}
 }

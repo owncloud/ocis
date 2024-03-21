@@ -1893,4 +1893,33 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $itemId
+	 * @param string $shareSpaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function unmountShare(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $itemId,
+		string $shareSpaceId
+	):ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }

@@ -2536,6 +2536,7 @@ class GraphContext implements Context {
 				$credentials['password']
 			)
 		);
+		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 
 	/**
