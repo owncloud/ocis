@@ -84,21 +84,21 @@ Feature: set file properties
 
   @issue-1263
   Scenario Outline: setting custom DAV property using one endpoint and reading it with other endpoint
-    Given using <action-dav-path-version> DAV path
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testnewold.txt"
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testnewold.txt" to "lucky"
-    And using <other-dav-path-version> DAV path
+    And using <dav-path-version-2> DAV path
     When user "Alice" gets a custom property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testnewold.txt"
     Then the response should contain a custom "very-custom-prop" property with namespace "x1='http://whatever.org/ns'" and value "lucky"
     Examples:
-      | action-dav-path-version | other-dav-path-version |
-      | old                     | new                    |
-      | new                     | old                    |
+      | dav-path-version | dav-path-version-2 |
+      | old              | new                |
+      | new              | old                |
 
     @skipOnRevaMaster
     Examples:
-      | action-dav-path-version | other-dav-path-version |
-      | spaces                  | new                    |
-      | spaces                  | old                    |
-      | new                     | spaces                 |
-      | old                     | spaces                 |
+      | dav-path-version | dav-path-version-2 |
+      | spaces           | new                |
+      | spaces           | old                |
+      | new              | spaces             |
+      | old              | spaces             |

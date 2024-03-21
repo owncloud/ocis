@@ -14,7 +14,7 @@ Feature: resharing a resource with an expiration date
 
 
   Scenario Outline: user should be able to set expiration while resharing a file with user
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
     When user "Brian" creates a share using the sharing API with settings
       | path        | /Shares/textfile0.txt |
@@ -23,19 +23,19 @@ Feature: resharing a resource with an expiration date
       | shareWith   | Carol                 |
       | expireDate  | +3 days               |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status code should be "<ocs-status-code>"
     And the information of the last share of user "Brian" should include
       | expiration | +3 days |
     And the response when user "Carol" gets the info of the last share should include
       | expiration | +3 days |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @issue-1289
   Scenario Outline: user should be able to set expiration while resharing a file with group
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
@@ -46,19 +46,19 @@ Feature: resharing a resource with an expiration date
       | shareWith   | grp1                  |
       | expireDate  | +3 days               |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status code should be "<ocs-status-code>"
     And the information of the last share of user "Brian" should include
       | expiration | +3 days |
     And the response when user "Carol" gets the info of the last share should include
       | expiration | +3 days |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: resharing using the sharing API with default expire date set but not enforced
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
     When user "Brian" creates a share using the sharing API with settings
       | path        | /Shares/textfile0.txt |
@@ -66,12 +66,12 @@ Feature: resharing a resource with an expiration date
       | permissions | change                |
       | shareWith   | Carol                 |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_status_code>"
+    And the OCS status code should be "<ocs-status-code>"
     And the information of the last share of user "Brian" should include
       | expiration |  |
     And the response when user "Carol" gets the info of the last share should include
       | expiration |  |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

@@ -78,11 +78,11 @@ Feature: checksums
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
-    When user "Alice" uploads file with checksum "<incorrect_checksum>" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
+    When user "Alice" uploads file with checksum "<checksum>" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
     Then the HTTP status code should be "406"
     And as "Alice" file "textFile.txt" should not exist
     Examples:
-      | dav-path-version | incorrect_checksum                            |
+      | dav-path-version | checksum                                      |
       | old              | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
       | new              | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
       | old              | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
@@ -90,7 +90,7 @@ Feature: checksums
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | incorrect_checksum                            |
+      | dav-path-version | checksum                                      |
       | spaces           | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
       | spaces           | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
 
@@ -189,7 +189,7 @@ Feature: checksums
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded a chunk to the last created TUS Location with offset "0" and data "01234" with checksum "MD5 4100c4d44da9177247e44a5fc1546778" using the TUS protocol on the WebDAV API
     And user "Alice" has uploaded a chunk to the last created TUS Location with offset "5" and data "56789" with checksum "MD5 099ebea48ea9666a7da2177267983138" using the TUS protocol on the WebDAV API
-    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<overwriteChecksum>" using the TUS protocol on the WebDAV API with these headers:
+    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<checksum>" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" requests the checksum of "/textFile.txt" via propfind
@@ -197,7 +197,7 @@ Feature: checksums
     And the webdav checksum should match "SHA1:aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d MD5:5d41402abc4b2a76b9719d911017c592 ADLER32:062c0215"
     And the content of file "/textFile.txt" for user "Alice" should be "hello"
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | old              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | new              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
@@ -205,7 +205,7 @@ Feature: checksums
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c592          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
@@ -218,13 +218,13 @@ Feature: checksums
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded a chunk to the last created TUS Location with offset "0" and data "01234" with checksum "MD5 4100c4d44da9177247e44a5fc1546778" using the TUS protocol on the WebDAV API
     And user "Alice" has uploaded a chunk to the last created TUS Location with offset "5" and data "56789" with checksum "MD5 099ebea48ea9666a7da2177267983138" using the TUS protocol on the WebDAV API
-    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<overwriteInvalidChecksum>" using the TUS protocol on the WebDAV API with these headers:
+    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<checksum>" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     Then the HTTP status code should be "406"
     And the content of file "/textFile.txt" for user "Alice" should be "0123456789"
     Examples:
-      | dav-path-version | overwriteInvalidChecksum                      |
+      | dav-path-version | checksum                                      |
       | old              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | new              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
@@ -232,7 +232,7 @@ Feature: checksums
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | overwriteInvalidChecksum                      |
+      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c593          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
 
@@ -244,7 +244,7 @@ Feature: checksums
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e7b" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
-    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<overwriteChecksum>" using the TUS protocol on the WebDAV API with these headers:
+    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<checksum>" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -253,7 +253,7 @@ Feature: checksums
     And the webdav checksum should match "SHA1:aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d MD5:5d41402abc4b2a76b9719d911017c592 ADLER32:062c0215"
     And the content of file "/textFile.txt" for user "Alice" should be "hello"
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | old              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | new              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
@@ -261,7 +261,7 @@ Feature: checksums
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c592          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
@@ -273,14 +273,14 @@ Feature: checksums
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e7b" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
-    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<overwriteChecksum>" using the TUS protocol on the WebDAV API with these headers:
+    When user "Alice" overwrites existing file with offset "0" and data "hello" with checksum "<checksum>" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     Then the HTTP status code should be "406"
     And the content of file "/textFile.txt" for user "Alice" should be "12345"
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | old              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | new              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
@@ -288,6 +288,6 @@ Feature: checksums
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | overwriteChecksum                             |
+      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c593          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |

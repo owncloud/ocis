@@ -64,12 +64,12 @@ Feature: delete folder
 
   Scenario Outline: deleting folder with dot in the name
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    When user "Alice" deletes folder "<folder_name>" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    When user "Alice" deletes folder "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "204"
-    And as "Alice" folder "<folder_name>" should not exist
+    And as "Alice" folder "<folder-name>" should not exist
     Examples:
-      | dav-path-version | folder_name |
+      | dav-path-version | folder-name |
       | old              | /fo.        |
       | old              | /fo.1       |
       | old              | /fo...1..   |
@@ -87,7 +87,7 @@ Feature: delete folder
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name |
+      | dav-path-version | folder-name |
       | spaces           | /fo.        |
       | spaces           | /fo.1       |
       | spaces           | /fo...1..   |

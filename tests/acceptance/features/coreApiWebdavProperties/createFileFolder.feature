@@ -10,11 +10,11 @@ Feature: create files and folder
 
   Scenario Outline: create a folder
     Given using <dav-path-version> DAV path
-    When user "Alice" creates folder "<folder_name>" using the WebDAV API
+    When user "Alice" creates folder "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" folder "<folder_name>" should exist
+    And as "Alice" folder "<folder-name>" should exist
     Examples:
-      | dav-path-version | folder_name     |
+      | dav-path-version | folder-name     |
       | old              | /upload         |
       | old              | /strängé folder |
       | old              | /C++ folder.cpp |
@@ -34,7 +34,7 @@ Feature: create files and folder
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name     |
+      | dav-path-version | folder-name     |
       | spaces           | /upload         |
       | spaces           | /strängé folder |
       | spaces           | /C++ folder.cpp |
@@ -143,12 +143,12 @@ Feature: create files and folder
 
   Scenario Outline: create a file
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "some text" to "<file_name>" using the WebDAV API
+    When user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "<file_name>" should exist
-    And the content of file "<file_name>" for user "Alice" should be "some text"
+    And as "Alice" file "<file-name>" should exist
+    And the content of file "<file-name>" for user "Alice" should be "some text"
     Examples:
-      | dav-path-version | file_name        |
+      | dav-path-version | file-name        |
       | old              | /upload.txt      |
       | old              | /strängéfile.txt |
       | old              | /C++ file.cpp    |
@@ -168,7 +168,7 @@ Feature: create files and folder
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file_name        |
+      | dav-path-version | file-name        |
       | spaces           | /upload.txt      |
       | spaces           | /strängéfile.txt |
       | spaces           | /C++ file.cpp    |

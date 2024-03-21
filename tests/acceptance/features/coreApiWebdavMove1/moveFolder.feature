@@ -103,13 +103,13 @@ Feature: move (rename) folder
 
   Scenario Outline: renaming folder with dots in the path
     Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    And user "Alice" has uploaded file with content "uploaded content for file name ending with a dot" to "<folder_name>/abc.txt"
-    When user "Alice" moves folder "<folder_name>" to "/uploadFolder" using the WebDAV API
+    And user "Alice" has created folder "<folder-name>"
+    And user "Alice" has uploaded file with content "uploaded content for file name ending with a dot" to "<folder-name>/abc.txt"
+    When user "Alice" moves folder "<folder-name>" to "/uploadFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/uploadFolder/abc.txt" for user "Alice" should be "uploaded content for file name ending with a dot"
     Examples:
-      | dav-path-version | folder_name   |
+      | dav-path-version | folder-name   |
       | old              | /upload.      |
       | old              | /upload.1     |
       | old              | /upload...1.. |
@@ -123,7 +123,7 @@ Feature: move (rename) folder
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder_name   |
+      | dav-path-version | folder-name   |
       | spaces           | /upload.      |
       | spaces           | /upload.1     |
       | spaces           | /upload...1.. |

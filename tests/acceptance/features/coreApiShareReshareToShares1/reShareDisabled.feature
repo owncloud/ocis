@@ -11,12 +11,12 @@ Feature: resharing can be disabled
       | Alice    |
       | Brian    |
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And using OCS API version "<ocs_api_version>"
+    And using OCS API version "<ocs-api-version>"
     When user "Alice" shares file "/textfile0.txt" with user "Brian" with permissions "share,update,read" using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And as "Brian" file "/Shares/textfile0.txt" should exist
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

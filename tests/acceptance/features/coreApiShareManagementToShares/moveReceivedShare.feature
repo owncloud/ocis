@@ -62,7 +62,7 @@ Feature: sharing
     And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path                                 |  dav-path-personal               |
+      | dav-path                                 | dav-path-personal                |
       | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
       | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
 
@@ -119,7 +119,7 @@ Feature: sharing
     And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path                                 |  dav-path-personal               |
+      | dav-path                                 | dav-path-personal                |
       | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
       | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
 
@@ -252,20 +252,20 @@ Feature: sharing
   Scenario Outline: receiver renames a received folder share to name with special characters in group sharing
     Given group "grp1" has been created
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has created folder "<sharer_folder>"
-    And user "Alice" has created folder "<group_folder>"
-    And user "Alice" has shared folder "<sharer_folder>" with user "Brian"
-    When user "Brian" moves folder "/Shares/<sharer_folder>" to "/Shares/<receiver_folder>" using the WebDAV API
+    And user "Alice" has created folder "<sharer-folder>"
+    And user "Alice" has created folder "<group-folder>"
+    And user "Alice" has shared folder "<sharer-folder>" with user "Brian"
+    When user "Brian" moves folder "/Shares/<sharer-folder>" to "/Shares/<receiver-folder>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" folder "<receiver_folder>" should not exist
-    And as "Brian" folder "/Shares/<receiver_folder>" should exist
-    When user "Alice" shares folder "<group_folder>" with group "grp1" using the sharing API
-    And user "Carol" moves folder "/Shares/<group_folder>" to "/Shares/<receiver_folder>" using the WebDAV API
+    And as "Alice" folder "<receiver-folder>" should not exist
+    And as "Brian" folder "/Shares/<receiver-folder>" should exist
+    When user "Alice" shares folder "<group-folder>" with group "grp1" using the sharing API
+    And user "Carol" moves folder "/Shares/<group-folder>" to "/Shares/<receiver-folder>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" folder "<receiver_folder>" should not exist
-    But as "Carol" folder "/Shares/<receiver_folder>" should exist
+    And as "Alice" folder "<receiver-folder>" should not exist
+    But as "Carol" folder "/Shares/<receiver-folder>" should exist
     Examples:
-      | sharer_folder | group_folder    | receiver_folder |
+      | sharer-folder | group-folder    | receiver-folder |
       | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  |
       | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    |
 
@@ -273,21 +273,21 @@ Feature: sharing
   Scenario Outline: receiver renames a received file share to name with special characters with share, read, change permissions in group sharing
     Given group "grp1" has been created
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has created folder "<sharer_folder>"
-    And user "Alice" has created folder "<group_folder>"
-    And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<sharer_folder>/fileInside"
-    And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<group_folder>/fileInside"
-    And user "Alice" has shared folder "<sharer_folder>" with user "Brian" with permissions "share,read,change"
-    When user "Brian" moves folder "/Shares/<sharer_folder>/fileInside" to "/Shares/<sharer_folder>/<receiver_file>" using the WebDAV API
+    And user "Alice" has created folder "<sharer-folder>"
+    And user "Alice" has created folder "<group-folder>"
+    And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<sharer-folder>/fileInside"
+    And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<group-folder>/fileInside"
+    And user "Alice" has shared folder "<sharer-folder>" with user "Brian" with permissions "share,read,change"
+    When user "Brian" moves folder "/Shares/<sharer-folder>/fileInside" to "/Shares/<sharer-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "<sharer_folder>/<receiver_file>" should exist
-    And as "Brian" file "/Shares/<sharer_folder>/<receiver_file>" should exist
-    When user "Alice" shares folder "<group_folder>" with group "grp1" with permissions "share,read,change" using the sharing API
-    And user "Carol" moves folder "/Shares/<group_folder>/fileInside" to "/Shares/<group_folder>/<receiver_file>" using the WebDAV API
+    And as "Alice" file "<sharer-folder>/<receiver_file>" should exist
+    And as "Brian" file "/Shares/<sharer-folder>/<receiver_file>" should exist
+    When user "Alice" shares folder "<group-folder>" with group "grp1" with permissions "share,read,change" using the sharing API
+    And user "Carol" moves folder "/Shares/<group-folder>/fileInside" to "/Shares/<group-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "<group_folder>/<receiver_file>" should exist
-    And as "Carol" file "/Shares/<group_folder>/<receiver_file>" should exist
+    And as "Alice" file "<group-folder>/<receiver_file>" should exist
+    And as "Carol" file "/Shares/<group-folder>/<receiver_file>" should exist
     Examples:
-      | sharer_folder | group_folder    | receiver_file  |
+      | sharer-folder | group-folder    | receiver_file  |
       | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a |
       | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d   |

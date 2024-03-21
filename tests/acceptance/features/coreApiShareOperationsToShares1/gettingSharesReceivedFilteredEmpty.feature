@@ -20,7 +20,7 @@ Feature: get the received shares filtered by type (user, group etc)
 
 
   Scenario Outline: getting shares received from users when there are none
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
@@ -32,17 +32,17 @@ Feature: get the received shares filtered by type (user, group etc)
       | permissions | read                       |
       | password    | %public%                   |
     When user "Brian" gets the user shares shared with him using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: getting shares received from groups when there are none
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
     And user "Alice" has created a public link share with settings
       | path        | /folderToShareWithPublic |
@@ -54,11 +54,11 @@ Feature: get the received shares filtered by type (user, group etc)
       | permissions | read                       |
       | password    | %public%                   |
     When user "Brian" gets the group shares shared with him using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
@@ -67,7 +67,7 @@ Feature: get the received shares filtered by type (user, group etc)
     # Note: public links are purposely created in this scenario
     #       users do not receive public links, so asking for a list of public links
     #       that are "shared with me" should always return an empty list.
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
     And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
     And user "Alice" has created a public link share with settings
@@ -81,10 +81,10 @@ Feature: get the received shares filtered by type (user, group etc)
       | permissions | read                       |
       | password    | %public%                   |
     When user "Brian" gets the public link shares shared with him using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

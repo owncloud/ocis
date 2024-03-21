@@ -15,12 +15,12 @@ Feature: create file or folder named similar to Shares folder
 
   Scenario Outline: create a folder with a name similar to Shares
     Given using <dav-path-version> DAV path
-    When user "Brian" creates folder "<folder_name>" using the WebDAV API
+    When user "Brian" creates folder "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Brian" folder "<folder_name>" should exist
+    And as "Brian" folder "<folder-name>" should exist
     And as "Brian" folder "/Shares" should exist
     Examples:
-      | dav-path-version | folder_name |
+      | dav-path-version | folder-name |
       | old              | /Share      |
       | old              | /shares     |
       | old              | /Shares1    |
@@ -31,12 +31,12 @@ Feature: create file or folder named similar to Shares folder
 
   Scenario Outline: create a file with a name similar to Shares
     Given using <dav-path-version> DAV path
-    When user "Brian" uploads file with content "some text" to "<file_name>" using the WebDAV API
+    When user "Brian" uploads file with content "some text" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "<file_name>" for user "Brian" should be "some text"
+    And the content of file "<file-name>" for user "Brian" should be "some text"
     And as "Brian" folder "/Shares" should exist
     Examples:
-      | dav-path-version | file_name |
+      | dav-path-version | file-name |
       | old              | /Share    |
       | old              | /shares   |
       | old              | /Shares1  |

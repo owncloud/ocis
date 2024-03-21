@@ -117,12 +117,12 @@ Feature: download file
 
   Scenario Outline: download a file with comma in the filename
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "file with comma in filename" to <filename>
-    When user "Alice" downloads file <filename> using the WebDAV API
+    And user "Alice" has uploaded file with content "file with comma in filename" to <file-name>
+    When user "Alice" downloads file <file-name> using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "file with comma in filename"
     Examples:
-      | dav-path-version | filename       |
+      | dav-path-version | file-name      |
       | old              | "sample,1.txt" |
       | old              | ",,,.txt"      |
       | old              | ",,,.,"        |
@@ -132,7 +132,7 @@ Feature: download file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | filename       |
+      | dav-path-version | file-name      |
       | spaces           | "sample,1.txt" |
       | spaces           | ",,,.txt"      |
       | spaces           | ",,,.,"        |
@@ -265,22 +265,22 @@ Feature: download file
   @smokeTest @issue-8361
   Scenario Outline: downloading a file should serve security headers
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "test file" to "/<file>"
-    When user "Alice" downloads file "/<file>" using the WebDAV API
+    And user "Alice" has uploaded file with content "test file" to "/<file-name>"
+    When user "Alice" downloads file "/<file-name>" using the WebDAV API
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header                            | value                                                    |
-      | Content-Disposition               | attachment; filename*=UTF-8''"<file>"; filename="<file>" |
-      | Content-Security-Policy           | default-src 'none';                                      |
-      | X-Content-Type-Options            | nosniff                                                  |
-      | X-Download-Options                | noopen                                                   |
-      | X-Frame-Options                   | SAMEORIGIN                                               |
-      | X-Permitted-Cross-Domain-Policies | none                                                     |
-      | X-Robots-Tag                      | none                                                     |
-      | X-XSS-Protection                  | 1; mode=block                                            |
+      | header                            | value                                                              |
+      | Content-Disposition               | attachment; filename*=UTF-8''"<file-name>"; filename="<file-name>" |
+      | Content-Security-Policy           | default-src 'none';                                                |
+      | X-Content-Type-Options            | nosniff                                                            |
+      | X-Download-Options                | noopen                                                             |
+      | X-Frame-Options                   | SAMEORIGIN                                                         |
+      | X-Permitted-Cross-Domain-Policies | none                                                               |
+      | X-Robots-Tag                      | none                                                               |
+      | X-XSS-Protection                  | 1; mode=block                                                      |
     And the downloaded content should be "test file"
     Examples:
-      | dav-path-version | file               |
+      | dav-path-version | file-name          |
       | old              | textfile.txt       |
       | old              | comma,.txt         |
       | old              | 'quote'single'.txt |
@@ -290,7 +290,7 @@ Feature: download file
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file               |
+      | dav-path-version | file-name          |
       | spaces           | textfile.txt       |
       | spaces           | comma,.txt         |
       | spaces           | 'quote'single'.txt |

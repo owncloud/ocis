@@ -13,33 +13,33 @@ Feature: sharing
 
   @issue-7555
   Scenario Outline: delete all group shares
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared file "textfile0.txt" with group "grp1"
     And user "Brian" has moved file "/Shares/textfile0.txt" to "/Shares/anotherName.txt"
     When user "Alice" deletes the last share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should not see the share id of the last share
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     And as "Brian" file "/Shares/anotherName.txt" should not exist
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @smokeTest
   Scenario Outline: delete a share
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Alice" deletes the last share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the last share id should not be included in the response
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
@@ -140,7 +140,7 @@ Feature: sharing
 
 
   Scenario Outline: group share recipient tries to delete the share
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -149,73 +149,73 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared entry "<entry_to_share>" with group "grp1"
+    And user "Alice" has shared entry "<entry-to-share>" with group "grp1"
     When user "Brian" deletes the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
-    And as "Alice" entry "<entry_to_share>" should exist
-    And as "Brian" entry "<received_entry>" should exist
-    And as "Carol" entry "<received_entry>" should exist
+    And the HTTP status code should be "<http-status-code>"
+    And as "Alice" entry "<entry-to-share>" should exist
+    And as "Brian" entry "<received-entry>" should exist
+    And as "Carol" entry "<received-entry>" should exist
     Examples:
-      | entry_to_share          | ocs_api_version | http_status_code | received_entry          | pending_entry           |
-      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt | /Shares/shared_file.txt |
-      | /shared                 | 1               | 200              | /Shares/shared          | /Shares/shared          |
-      | /shared                 | 2               | 404              | /Shares/shared          | /Shares/shared          |
+      | entry-to-share          | ocs-api-version | http-status-code | received-entry          |
+      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt |
+      | /shared                 | 1               | 200              | /Shares/shared          |
+      | /shared                 | 2               | 404              | /Shares/shared          |
 
 
   Scenario Outline: individual share recipient tries to delete the share
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared entry "<entry_to_share>" with user "Brian"
+    And user "Alice" has shared entry "<entry-to-share>" with user "Brian"
     When user "Brian" deletes the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
-    And as "Alice" entry "<entry_to_share>" should exist
-    And as "Brian" entry "<received_entry>" should exist
+    And the HTTP status code should be "<http-status-code>"
+    And as "Alice" entry "<entry-to-share>" should exist
+    And as "Brian" entry "<received-entry>" should exist
     Examples:
-      | entry_to_share          | ocs_api_version | http_status_code | received_entry          | pending_entry           |
-      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt | /Shares/shared_file.txt |
-      | /shared                 | 1               | 200              | /Shares/shared          | /Shares/shared          |
-      | /shared                 | 2               | 404              | /Shares/shared          | /Shares/shared          |
+      | entry-to-share          | ocs-api-version | http-status-code | received-entry          |
+      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt |
+      | /shared                 | 1               | 200              | /Shares/shared          |
+      | /shared                 | 2               | 404              | /Shares/shared          |
 
   @issue-720
   Scenario Outline: request PROPFIND after sharer deletes the collaborator
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Alice" deletes the last share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     When user "Brian" requests "/remote.php/dav/files/%username%" with "PROPFIND" using basic auth
     Then the HTTP status code should be "207"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @issue-1229
   Scenario Outline: delete a share with wrong authentication
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Brian" tries to delete the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 404              |
 
 
   Scenario Outline: unshare a shared resources
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Alice" unshares file "textfile0.txt" shared to "Brian"
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |

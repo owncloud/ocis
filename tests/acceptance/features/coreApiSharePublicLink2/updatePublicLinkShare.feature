@@ -9,14 +9,14 @@ Feature: update a public link share
 
 
   Scenario Outline: change expiration date of a public link share and get its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
       | password | %public% |
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
@@ -44,13 +44,13 @@ Feature: update a public link share
       | mail_send                  | 0                    |
       | name                       |                      |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @smokeTest
   Scenario Outline: change expiration date of a newly created public link share and get its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
@@ -58,7 +58,7 @@ Feature: update a public link share
     And user "Alice" has updated the last public link share with
       | expireDate | 2033-01-31T23:59:59+0100 |
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                | A_STRING             |
@@ -78,31 +78,31 @@ Feature: update a public link share
       | url               | AN_URL               |
       | mimetype          | httpd/unix-directory |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share with password and adding an expiration date using public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has created a public link share with settings
       | path     | randomfile.txt |
       | password | %public%       |
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the old public WebDAV API with password "%public%" and the content should be "Random data"
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share, updating its password and getting its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
@@ -110,7 +110,7 @@ Feature: update a public link share
     And user "Alice" has updated the last public link share with
       | password | %public% |
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                | A_STRING             |
@@ -129,13 +129,13 @@ Feature: update a public link share
       | url               | AN_URL               |
       | mimetype          | httpd/unix-directory |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share, updating its permissions and getting its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
@@ -143,7 +143,7 @@ Feature: update a public link share
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                | A_STRING                  |
@@ -162,13 +162,13 @@ Feature: update a public link share
       | url               | AN_URL                    |
       | mimetype          | httpd/unix-directory      |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share, updating its permissions to view download and upload and getting its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
@@ -176,7 +176,7 @@ Feature: update a public link share
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                | A_STRING                  |
@@ -195,13 +195,13 @@ Feature: update a public link share
       | url               | AN_URL                    |
       | mimetype          | httpd/unix-directory      |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: creating a new public link share, updating publicUpload option and getting its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
       | path     | FOLDER   |
@@ -209,7 +209,7 @@ Feature: update a public link share
     And user "Alice" has updated the last public link share with
       | publicUpload | true |
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                | A_STRING                  |
@@ -228,13 +228,13 @@ Feature: update a public link share
       | url               | AN_URL                    |
       | mimetype          | httpd/unix-directory      |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @skipOnReva
   Scenario Outline: adding public upload to a read only shared folder as recipient is not allowed using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
@@ -245,17 +245,17 @@ Feature: update a public link share
     When user "Brian" updates the last public link share using the sharing API with
       | publicUpload | true |
     Then the OCS status code should be "403"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 403              |
 
   @skipOnReva
   Scenario Outline:adding public upload to a shared folder as recipient is allowed with permissions using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
@@ -265,18 +265,18 @@ Feature: update a public link share
       | password     | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | publicUpload | true |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And uploading a file with password "%public%" should work using the old public WebDAV API
     And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @skipOnReva
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
@@ -287,17 +287,17 @@ Feature: update a public link share
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | read,update,create,delete |
     Then the OCS status code should be "403"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 403              |
 
   @skipOnReva
   Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
@@ -307,17 +307,17 @@ Feature: update a public link share
       | password    | %public%     |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | read,update,create,delete |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And uploading a file with password "%public%" should work using the new public WebDAV API
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @issue-1269
   Scenario Outline: updating share permissions from change to read restricts public from deleting files using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/CHILD/child.txt"
@@ -331,13 +331,13 @@ Feature: update a public link share
     And the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
     Examples:
-      | ocs_api_version |
+      | ocs-api-version |
       | 1               |
       | 2               |
 
 
   Scenario Outline: updating share permissions from read to change allows public to delete files using the public API
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/parent.txt"
@@ -354,13 +354,13 @@ Feature: update a public link share
     And as "Alice" file "PARENT/CHILD/child.txt" should not exist
     And as "Alice" file "PARENT/parent.txt" should not exist
     Examples:
-      | ocs_api_version |
+      | ocs-api-version |
       | 1               |
       | 2               |
 
 
   Scenario Outline: rename a folder with public link and get its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -368,7 +368,7 @@ Feature: update a public link share
       | password | %public% |
     And user "Alice" has moved folder "/FOLDER" to "/RENAMED_FOLDER"
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                     | A_STRING             |
@@ -393,7 +393,7 @@ Feature: update a public link share
       | mail_send              | 0                    |
       | name                   |                      |
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | old              | 1               | 100             |
       | old              | 2               | 200             |
       | new              | 1               | 100             |
@@ -401,13 +401,13 @@ Feature: update a public link share
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |
 
 
   Scenario Outline: rename a file with public link and get its info
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
     And user "Alice" has created a public link share with settings
@@ -415,7 +415,7 @@ Feature: update a public link share
       | password | %public%  |
     And user "Alice" has moved file "/lorem.txt" to "/new-lorem.txt"
     When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                     | A_STRING       |
@@ -440,7 +440,7 @@ Feature: update a public link share
       | mail_send              | 0              |
       | name                   |                |
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | old              | 1               | 100             |
       | old              | 2               | 200             |
       | new              | 1               | 100             |
@@ -448,13 +448,13 @@ Feature: update a public link share
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |
 
 
   Scenario Outline: update the role of a public link to internal
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has created a public link share with settings
@@ -463,10 +463,10 @@ Feature: update a public link share
       | password    | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 0 |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | old              | 1               | 100             |
       | old              | 2               | 200             |
       | new              | 1               | 100             |
@@ -474,6 +474,6 @@ Feature: update a public link share
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | ocs_api_version | ocs_status_code |
+      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |

@@ -10,7 +10,7 @@ Feature: sharing
 
   @smokeTest
   Scenario Outline: allow modification of reshare
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -20,18 +20,18 @@ Feature: sharing
     And user "Brian" has shared folder "/Shares/TMP" with user "Carol"
     When user "Brian" updates the last share using the sharing API with
       | permissions | read |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Carol" should not be able to upload file "filesForUpload/textfile.txt" to "/Shares/TMP/textfile.txt"
     And user "Brian" should be able to upload file "filesForUpload/textfile.txt" to "/Shares/TMP/textfile.txt"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
   @issue-1289 @issue-7555
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -40,7 +40,7 @@ Feature: sharing
     And user "Brian" has moved file "/Shares/textfile0.txt" to "/Shares/textfile_new.txt"
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with group "grp1" should include
       | id                | A_STRING              |
@@ -57,39 +57,39 @@ Feature: sharing
       | displayname_owner | %displayname%         |
       | mimetype          | text/plain            |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: cannot set permissions to zero
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with group "grp1"
     When user "Alice" updates the last share using the sharing API with
       | permissions | 0 |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     Examples:
-      | ocs_api_version | http_status_code |
+      | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
 
   @issue-2173
   Scenario Outline: cannot update a share of a file with a user to have only create and/or delete permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     # Brian should still have at least read access to the shared file
     And as "Brian" entry "/Shares/textfile0.txt" should exist
     Examples:
-      | ocs_api_version | http_status_code | permissions   |
+      | ocs-api-version | http-status-code | permissions   |
       | 1               | 200              | create        |
       | 2               | 400              | create        |
       | 1               | 200              | delete        |
@@ -99,7 +99,7 @@ Feature: sharing
 
   @issue-2173
   Scenario Outline: cannot update a share of a file with a group to have only create and/or delete permission
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -108,11 +108,11 @@ Feature: sharing
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
-    And the HTTP status code should be "<http_status_code>"
+    And the HTTP status code should be "<http-status-code>"
     # Brian in grp1 should still have at least read access to the shared file
     And as "Brian" entry "/Shares/textfile0.txt" should exist
     Examples:
-      | ocs_api_version | http_status_code | permissions   |
+      | ocs-api-version | http-status-code | permissions   |
       | 1               | 200              | create        |
       | 2               | 400              | create        |
       | 1               | 200              | delete        |
@@ -183,13 +183,13 @@ Feature: sharing
   @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below
   Scenario Outline: change the permission of the share and check the API response
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/Alice-folder"
     And user "Alice" has shared folder "/Alice-folder" with user "Brian" with permissions "read"
     When user "Alice" updates the last share using the sharing API with
       | permissions | all |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be ""
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
@@ -223,13 +223,13 @@ Feature: sharing
       | name |  |
       # | token |  |
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
 
   Scenario Outline: increasing permissions is allowed for owner
-    Given using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -241,11 +241,11 @@ Feature: sharing
       | permissions | read |
     When user "Carol" updates the last share using the sharing API with
       | permissions | all |
-    Then the OCS status code should be "<ocs_status_code>"
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should be able to upload file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt"
     Examples:
-      | ocs_api_version | ocs_status_code |
+      | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
 
